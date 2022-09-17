@@ -1,17 +1,14 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(mbed-usb INTERFACE)
+if(MBED_ENABLE_OS_INTERNAL_TESTS)
+    if(MBED_BUILD_GREENTEA_TESTS)
+        add_subdirectory(tests/TESTS)
+    endif()
+endif()
 
-target_include_directories(mbed-usb
-    INTERFACE
-        include
-        include/usb
-        include/usb/internal
-)
-
-target_sources(mbed-usb
-    INTERFACE
+if("DEVICE_USBDEVICE=1" IN_LIST MBED_TARGET_DEFINITIONS)
+    add_library(mbed-usb STATIC EXCLUDE_FROM_ALL
         source/AsyncOp.cpp
         source/ByteBuffer.cpp
         source/EndpointResolver.cpp
@@ -26,10 +23,27 @@ target_sources(mbed-usb
         source/USBHID.cpp
         source/USBKeyboard.cpp
         source/USBMIDI.cpp
-        source/USBMSD.cpp
         source/USBMouse.cpp
         source/USBMouseKeyboard.cpp
-        source/USBSerial.cpp
-)
+        source/USBSerial.cpp)
 
-target_link_libraries(mbed-usb INTERFACE mbed-storage)
+    target_include_directories(mbed-usb
+        INTERFACE
+            include
+            include/usb
+            include/usb/internal
+    )
+
+    target_link_libraries(mbed-usb PUBLIC mbed-core-flags)
+
+    # USB Mass Storage Device library is separate because it pulls in a dependency on mbed-storage-blockdevice
+    add_library(mbed-usb-msd STATIC EXCLUDE_FROM_ALL
+        source/msd/USBMSD.cpp)
+
+    target_include_directories(mbed-usb-msd
+        PUBLIC
+            include/usb/msd
+    )
+
+    target_link_libraries(mbed-usb-msd PUBLIC mbed-usb mbed-storage-blockdevice)
+endif()
