@@ -28,7 +28,7 @@ if("DEVICE_USBDEVICE=1" IN_LIST MBED_TARGET_DEFINITIONS)
         source/USBSerial.cpp)
 
     target_include_directories(mbed-usb
-        INTERFACE
+        PUBLIC
             include
             include/usb
             include/usb/internal
