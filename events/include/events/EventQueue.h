@@ -122,7 +122,7 @@ public:
     /** Dispatch events without a timeout
      *
      * Executes events indefinitely unless the dispatch loop is forcibly broken.
-     * @See break_dispatch()
+     * @see break_dispatch()
      *
      */
     void dispatch_forever();
