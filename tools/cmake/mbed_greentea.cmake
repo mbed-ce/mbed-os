@@ -103,12 +103,6 @@ function(mbed_greentea_add_test)
 
     mbed_set_post_build(${MBED_GREENTEA_TEST_NAME})
 
-    if(NOT ${MBED_OUTPUT_EXT} STREQUAL "")
-        set(MBED_GREENTEA_TEST_IMAGE_NAME "${MBED_GREENTEA_TEST_NAME}.${MBED_OUTPUT_EXT}")
-    else()
-        set(MBED_GREENTEA_TEST_IMAGE_NAME "${MBED_GREENTEA_TEST_NAME}.bin")
-    endif()
-
     # User can set this cache variable to supply extra arguments to greentea.
     # such as: -d to set the drive path
     list(APPEND MBED_HTRUN_ARGUMENTS -p ${MBED_GREENTEA_SERIAL_PORT})

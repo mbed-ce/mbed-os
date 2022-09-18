@@ -10,7 +10,7 @@ execute_process(
 
 # Then run and communicate with the test
 # -----------------------------------------------------------------------
-set(MBEDHTRUN_ARGS --skip-flashing -f @MBED_GREENTEA_TEST_IMAGE_NAME@ @MBED_HTRUN_ARGUMENTS@) # filled in by configure script
+set(MBEDHTRUN_ARGS --skip-flashing @MBED_HTRUN_ARGUMENTS@) # filled in by configure script
 
 # Print out command
 string(REPLACE ";" " " MBEDHTRUN_ARGS_FOR_DISPLAY "${MBEDHTRUN_ARGS}")
