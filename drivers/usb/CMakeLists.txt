@@ -18,7 +18,6 @@ if("DEVICE_USBDEVICE=1" IN_LIST MBED_TARGET_DEFINITIONS)
         source/TaskBase.cpp
         source/USBAudio.cpp
         source/USBCDC.cpp
-        source/USBCDC_ECM.cpp
         source/USBDevice.cpp
         source/USBHID.cpp
         source/USBKeyboard.cpp
@@ -46,4 +45,16 @@ if("DEVICE_USBDEVICE=1" IN_LIST MBED_TARGET_DEFINITIONS)
     )
 
     target_link_libraries(mbed-usb-msd PUBLIC mbed-usb mbed-storage-blockdevice)
+
+    # USB CDC ECM library is separate because it pulls in a dependency on mbed-rtos-flags
+    add_library(mbed-usb-cdc-ecm STATIC EXCLUDE_FROM_ALL
+        source/cdc_ecm/USBCDC_ECM.cpp)
+
+
+    target_include_directories(mbed-usb-cdc-ecm
+        PUBLIC
+            include/usb/cdc_ecm
+    )
+
+    target_link_libraries(mbed-usb-cdc-ecm PUBLIC mbed-usb mbed-rtos-flags)
 endif()
