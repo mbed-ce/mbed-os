@@ -372,7 +372,7 @@ static FileHandle *default_console()
     static USBSerial console(false); // Do not connect in blocking mode, otherwise the code won't start until USB is connected
 
     bool uninitializedVal = false;
-    if(consoleInitialized.compare_exchange_strong(uninitializedVal, true)) {
+    if (consoleInitialized.compare_exchange_strong(uninitializedVal, true)) {
         console.connect();
     }
 
