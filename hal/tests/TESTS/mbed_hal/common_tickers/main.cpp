@@ -222,9 +222,8 @@ void ticker_interrupt_test(void)
     const ticker_info_t *p_ticker_info = intf->get_info();
 
     for (uint32_t i = 0; i < (sizeof(ticker_timeout) / sizeof(uint32_t)); i++) {
-
-		// If needed, delay until we can run the test without overflowing the ticker.
-		overflow_protect();
+        // If needed, delay until we can run the test without overflowing the ticker.
+        overflow_protect();
 
         /* Skip timeout if less than max allowed execution time of set_interrupt() - 20 us */
         if (TICKS_TO_US(ticker_timeout[i], p_ticker_info->frequency) < (MAX_FUNC_EXEC_TIME_US + DELTA_FUNC_EXEC_TIME_US)) {
