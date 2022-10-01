@@ -190,7 +190,7 @@ int  i2c_stop(i2c_t *obj);
 /** Blocking reading data
  *
  *  @param obj     The I2C object
- *  @param address 7-bit address (last bit is 1)
+ *  @param address 8-bit address (last bit is 1)
  *  @param data    The buffer for receiving
  *  @param length  Number of bytes to read
  *  @param stop    Stop to be generated after the transfer is done
@@ -201,7 +201,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop);
 /** Blocking sending data
  *
  *  @param obj     The I2C object
- *  @param address 7-bit address (last bit is 0)
+ *  @param address 8-bit address (last bit is 0)
  *  @param data    The buffer for sending
  *  @param length  Number of bytes to write
  *  @param stop    Stop to be generated after the transfer is done
