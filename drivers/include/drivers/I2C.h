@@ -192,16 +192,16 @@ class I2C : private NonCopyable<I2C> {
 
 public:
 
-	/**
-	 * Result code for I2C operations
-	 */
-	enum Result : int
-	{
-		ACK = 0, /// ACK was received
-		NACK, /// NACK was received
-		TIMEOUT, /// Timeout waiting for I2C hardware
-		OTHER_ERROR /// Other error in I2C operation
-	};
+    /**
+     * Result code for I2C operations
+     */
+    enum Result : int
+    {
+        ACK = 0, /// ACK was received
+        NACK, /// NACK was received
+        TIMEOUT, /// Timeout waiting for I2C hardware
+        OTHER_ERROR /// Other error in I2C operation
+    };
 
 
     /** Create an I2C Master interface, connected to the specified pins.
@@ -246,7 +246,7 @@ public:
      */
     Result read(int address, char *data, int length, bool repeated = false);
 
-	/** Write to an I2C slave
+    /** Write to an I2C slave
      *
      * Performs a complete write transaction. The least significant bit of
      * the address must be 0 to indicate a write.
@@ -261,19 +261,19 @@ public:
      */
     Result write(int address, const char *data, int length, bool repeated = false);
 
-	/** Creates a start condition on the %I2C bus.  After calling this function, you should call
+    /** Creates a start condition on the %I2C bus.  After calling this function, you should call
      * \link write_byte() \endlink to send the %I2C address.
      */
     void start(void);
 
-	/** Read a single byte from the %I2C bus.
-	 *
-	 * After calling this function, you may call it again to read another byte from the slave.  Alternately,
-	 * you may call \link stop() \endlink to stop the current transaction, or \link start() \endlink to
-	 * start a new transaction.
-	 *
-	 * Note: Reads are not acknowledged by the slave device in I2C, which is why this function does not
-	 * return an ACK/NACK result.
+    /** Read a single byte from the %I2C bus.
+     *
+     * After calling this function, you may call it again to read another byte from the slave.  Alternately,
+     * you may call \link stop() \endlink to stop the current transaction, or \link start() \endlink to
+     * start a new transaction.
+     *
+     * Note: Reads are not acknowledged by the slave device in I2C, which is why this function does not
+     * return an ACK/NACK result.
      *
      *  @param ack indicates if the byte is to be acknowledged (1 = acknowledge)
      *
@@ -285,11 +285,11 @@ public:
     /** Read a single byte from the %I2C bus.  This function is a legacy alias for \link read_byte() \endlink
      *
      * After calling this function, you may call it again to read another byte from the slave.  Alternately,
-	 * you may call \link stop() \endlink to stop the current transaction, or \link start() \endlink to
-	 * start a new transaction.
-	 *
-	 * Note: Reads are not acknowledged by the slave device in I2C, which is why this function does not
-	 * return an ACK/NACK result.
+     * you may call \link stop() \endlink to stop the current transaction, or \link start() \endlink to
+     * start a new transaction.
+     *
+     * Note: Reads are not acknowledged by the slave device in I2C, which is why this function does not
+     * return an ACK/NACK result.
      *
      *  @param ack indicates if the byte is to be acknowledged (1 = acknowledge)
      *
@@ -297,11 +297,11 @@ public:
      *    the byte read
      */
     int read(int ack)
-	{
-		return read_byte(ack);
-	}
+    {
+        return read_byte(ack);
+    }
 
-	/** Write a single byte out on the %I2C bus.  The very first write_byte() call after calling start()
+    /** Write a single byte out on the %I2C bus.  The very first write_byte() call after calling start()
      * is used to set up the slave address.
      *
      * After calling this function, you may call \link write_byte() \endlink again to write bytes in a write operation,
@@ -315,8 +315,8 @@ public:
      */
     Result write_byte(int data);
 
-	/** Write a single byte out on the I2C bus.  Deprecated version of \link write_byte(), with a legacy
-	 * return code format.
+    /** Write a single byte out on the I2C bus.  Deprecated version of \link write_byte(), with a legacy
+     * return code format.
      *
      *  @param data data to write out on bus
      *
@@ -325,8 +325,8 @@ public:
      *    '1' - ACK was received,
      *    '2' - timeout
      */
-	MBED_DEPRECATED_SINCE("mbed-ce", "Use I2C::write_byte() instead for better readability and return codes")
-	int write(int data);
+    MBED_DEPRECATED_SINCE("mbed-ce", "Use I2C::write_byte() instead for better readability and return codes")
+    int write(int data);
 
     /**
      * Creates a stop condition on the I2C bus. This puts the bus back into an idle state where new transactions can be
@@ -386,8 +386,8 @@ public:
      */
     void abort_transfer();
 
-	/** Start I2C transfer and wait until it is complete.  Like the transactional API this blocks the current thread,
-	 * however all work is done in the background and other threads may execute.
+    /** Start I2C transfer and wait until it is complete.  Like the transactional API this blocks the current thread,
+     * however all work is done in the background and other threads may execute.
      *
      * The I2C peripheral will begin a transmit and/or receive operation in the background.  If only a transmit
      * or receive buffer is specified, only a transmit or receive will be done.  If both buffers are specified,

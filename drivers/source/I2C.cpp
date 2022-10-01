@@ -79,7 +79,7 @@ I2C::Result I2C::write(int address, const char *data, int length, bool repeated)
 
     unlock();
 
-	// Note: C i2c_write() function does not distinguish between NACKs and errors, so assume NACK if read did not go through
+    // Note: C i2c_write() function does not distinguish between NACKs and errors, so assume NACK if read did not go through
     return length == written ? Result::ACK : Result::NACK;
 }
 
@@ -93,7 +93,7 @@ I2C::Result I2C::read(int address, char *data, int length, bool repeated)
 
     unlock();
 
-	// Note: C i2c_read() function does not distinguish between NACKs and errors, so assume NACK if read did not go through
+    // Note: C i2c_read() function does not distinguish between NACKs and errors, so assume NACK if read did not go through
     return length == read ? Result::ACK : Result::NACK;
 }
 
@@ -123,35 +123,35 @@ I2C::Result I2C::write_byte(int data)
     int ret = i2c_byte_write(&_i2c, data);
     unlock();
 
-	switch(ret)
-	{
-		case 0:
-			return Result::NACK;
-		case 1:
-			return Result::ACK;
-		case 2:
-			return Result::TIMEOUT;
-		default:
-			return Result::OTHER_ERROR;
-	}
+    switch(ret)
+    {
+        case 0:
+            return Result::NACK;
+        case 1:
+            return Result::ACK;
+        case 2:
+            return Result::TIMEOUT;
+        default:
+            return Result::OTHER_ERROR;
+    }
 }
 
 int I2C::write(int data)
 {
-	auto result = write_byte(data);
+    auto result = write_byte(data);
 
-	// Replicate the legacy return code
-	switch(result)
-	{
-		case Result::ACK:
-			return 1;
-		case Result::NACK:
-			return 0;
-		case Result::TIMEOUT:
-			return 2;
-		default:
-			return static_cast<int>(result);
-	}
+    // Replicate the legacy return code
+    switch(result)
+    {
+        case Result::ACK:
+            return 1;
+        case Result::NACK:
+            return 0;
+        case Result::TIMEOUT:
+            return 2;
+        default:
+            return static_cast<int>(result);
+    }
 }
 
 void I2C::stop(void)
@@ -246,54 +246,54 @@ void I2C::abort_transfer(void)
 
 I2C::Result I2C::transfer_and_wait(int address, const char *tx_buffer, int tx_length, char *rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout, bool repeated)
 {
-	// Use EventFlags to suspend the thread until the transfer finishes
-	rtos::EventFlags transferResultFlags("I2C::Result EvFlags");
+    // Use EventFlags to suspend the thread until the transfer finishes
+    rtos::EventFlags transferResultFlags("I2C::Result EvFlags");
 
-	// Simple callback from the transfer that sets the EventFlags using the I2C result event
-	event_callback_t transferCallback([&](int event) {transferResultFlags.set(event);});
+    // Simple callback from the transfer that sets the EventFlags using the I2C result event
+    event_callback_t transferCallback([&](int event) {transferResultFlags.set(event);});
 
-	transfer(address, tx_buffer, tx_length, rx_buffer, rx_length, transferCallback, I2C_EVENT_ALL, repeated);
+    transfer(address, tx_buffer, tx_length, rx_buffer, rx_length, transferCallback, I2C_EVENT_ALL, repeated);
 
-	// Wait until transfer complete, error, or timeout
-	uint32_t result = transferResultFlags.wait_any_for(I2C_EVENT_ALL, timeout);
+    // Wait until transfer complete, error, or timeout
+    uint32_t result = transferResultFlags.wait_any_for(I2C_EVENT_ALL, timeout);
 
-	if(result & osFlagsError)
-	{
-		if(result == osFlagsErrorTimeout)
-		{
-			// Timeout expired, cancel transfer.
-			abort_transfer();
-			return Result::TIMEOUT;
-		}
-		else
-		{
-			// Other event flags error.  Transfer might be still running so cancel it.
-			abort_transfer();
-			return Result::OTHER_ERROR;
-		}
-	}
-	else
-	{
-		// Note: Cannot use a switch here because multiple flags might be set at the same time (possible
-		// in the STM32 HAL code at least).
-		if(result & I2C_EVENT_TRANSFER_COMPLETE)
-		{
-			return Result::ACK;
-		}
-		else if((result & I2C_EVENT_ERROR_NO_SLAVE) || (result & I2C_EVENT_TRANSFER_EARLY_NACK))
-		{
-			// Both of these events mean that a NACK was received somewhere.  Theoretically NO_SLAVE means
-			// NACK while transmitting address and EARLY_NACK means nack during the write operation.
-			// But these aren't distinguished in the Result enum and even some of the HALs treat them
-			// interchangeably.
-			return Result::NACK;
-		}
-		else
-		{
-			// Other / unknown error code
-			return Result::OTHER_ERROR;
-		}
-	}
+    if(result & osFlagsError)
+    {
+        if(result == osFlagsErrorTimeout)
+        {
+            // Timeout expired, cancel transfer.
+            abort_transfer();
+            return Result::TIMEOUT;
+        }
+        else
+        {
+            // Other event flags error.  Transfer might be still running so cancel it.
+            abort_transfer();
+            return Result::OTHER_ERROR;
+        }
+    }
+    else
+    {
+        // Note: Cannot use a switch here because multiple flags might be set at the same time (possible
+        // in the STM32 HAL code at least).
+        if(result & I2C_EVENT_TRANSFER_COMPLETE)
+        {
+            return Result::ACK;
+        }
+        else if((result & I2C_EVENT_ERROR_NO_SLAVE) || (result & I2C_EVENT_TRANSFER_EARLY_NACK))
+        {
+            // Both of these events mean that a NACK was received somewhere.  Theoretically NO_SLAVE means
+            // NACK while transmitting address and EARLY_NACK means nack during the write operation.
+            // But these aren't distinguished in the Result enum and even some of the HALs treat them
+            // interchangeably.
+            return Result::NACK;
+        }
+        else
+        {
+            // Other / unknown error code
+            return Result::OTHER_ERROR;
+        }
+    }
 }
 
 void I2C::irq_handler_asynch(void)
