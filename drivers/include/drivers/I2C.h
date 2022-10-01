@@ -204,21 +204,28 @@ public:
 	};
 
 
-    /** Create an I2C Master interface, connected to the specified pins
+    /** Create an I2C Master interface, connected to the specified pins.
+     * The new object defaults to 100kHz speed.
      *
      *  @param sda I2C data line pin
      *  @param scl I2C clock line pin
      */
     I2C(PinName sda, PinName scl);
 
-    /** Create an I2C Master interface, connected to the specified pins
+    /** Create an I2C Master interface, connected to the specified pins.
+     * The new object defaults to 100kHz speed.
      *
      *  @param static_pinmap reference to structure which holds static pinmap.
      */
     I2C(const i2c_pinmap_t &static_pinmap);
     I2C(const i2c_pinmap_t &&) = delete; // prevent passing of temporary objects
 
-    /** Set the frequency of the I2C interface
+    /** Set the frequency of the I2C interface.
+     * If you do not call this function, the I2C will run at 100kHz speed.
+     *
+     * Note: Some underlying HALs only support a very limited set of common I2C frequencies, such as 100kHz and
+     * 400kHz.  Other implementations support all frequencies.  If the frequency you set is not supported, you will get
+     * an assertion failure after calling this function.
      *
      *  @param hz The bus frequency in hertz
      */
