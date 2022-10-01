@@ -195,8 +195,7 @@ public:
     /**
      * Result code for I2C operations
      */
-    enum Result : int
-    {
+    enum Result : int {
         ACK = 0, /// ACK was received
         NACK, /// NACK was received
         TIMEOUT, /// Timeout waiting for I2C hardware
