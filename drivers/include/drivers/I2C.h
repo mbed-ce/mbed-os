@@ -196,10 +196,14 @@ public:
      * Result code for I2C operations
      */
     enum Result : int {
-        ACK = 0, /// ACK was received
-        NACK, /// NACK was received
-        TIMEOUT, /// Timeout waiting for I2C hardware
-        OTHER_ERROR /// Other error in I2C operation
+        /// ACK was received
+        ACK = 0,
+        /// NACK was received
+        NACK,
+        /// Timeout waiting for I2C hardware
+        TIMEOUT,
+        /// Other error in I2C operation
+        OTHER_ERROR
     };
 
 
@@ -235,7 +239,7 @@ public:
      * Performs a complete read transaction. The least significant bit of
      * the address must be 1 to indicate a read.
      *
-     *  @param address 8-bit I2C slave address [ addr | 1 ]
+     *  @param address 8-bit I2C slave address [ (7-bit addr << 1) | 1 ]
      *  @param data Pointer to the byte-array to read data in to
      *  @param length Number of bytes to read
      *  @param repeated Set up for a repeated start.  If true, the Mbed processor does not relinquish the bus after
@@ -274,7 +278,8 @@ public:
      * Note: Reads are not acknowledged by the slave device in I2C, which is why this function does not
      * return an ACK/NACK result.
      *
-     *  @param ack indicates if the byte is to be acknowledged (1 = acknowledge)
+     *  @param ack indicates if the byte is to be acknowledged (true = acknowledge).  Use false to indicate to
+     *  the slave that you don't want to read any more data.
      *
      *  @returns
      *    the byte read, or -1 on error.
@@ -314,7 +319,7 @@ public:
      */
     Result write_byte(int data);
 
-    /** Write a single byte out on the I2C bus.  Deprecated version of \link write_byte(), with a legacy
+    /** Write a single byte out on the %I2C bus.  Deprecated version of \link write_byte() \endlink, with a legacy
      * return code format.
      *
      *  @param data data to write out on bus
@@ -328,16 +333,16 @@ public:
     int write(int data);
 
     /**
-     * Creates a stop condition on the I2C bus. This puts the bus back into an idle state where new transactions can be
+     * Creates a stop condition on the %I2C bus. This puts the bus back into an idle state where new transactions can be
      * initiated by this device or others.
      */
     void stop(void);
 
-    /** Acquire exclusive access to this I2C bus
+    /** Acquire exclusive access to this %I2C bus
      */
     virtual void lock(void);
 
-    /** Release exclusive access to this I2C bus
+    /** Release exclusive access to this %I2C bus
      */
     virtual void unlock(void);
 
@@ -348,9 +353,9 @@ public:
 
 #if DEVICE_I2C_ASYNCH
 
-    /** Start nonblocking I2C transfer.
+    /** Start nonblocking %I2C transfer.
      *
-     * The I2C peripheral will begin a transmit and/or receive operation in the background.  If only a transmit
+     * The %I2C peripheral will begin a transmit and/or receive operation in the background.  If only a transmit
      * or receive buffer is specified, only a transmit or receive will be done.  If both buffers are specified,
      * first the transmission is done to the given slave address, then the specified number of bytes are received.
      *
@@ -366,7 +371,7 @@ public:
      * You may not call any other functions on this class instance until the transfer is complete, has errored,
      * or is aborted.  Trying to start multiple transfers at once will return an error.
      *
-     * @param address   8/10 bit I2C slave address
+     * @param address   8/10 bit %I2C slave address
      * @param tx_buffer The TX buffer with data to be transferred.  May be nullptr if tx_length is 0.
      * @param tx_length The length of TX buffer in bytes.  If 0, no transmission is done.
      * @param rx_buffer The RX buffer, which is used for received data.  May be nullptr if tx_length is 0.
@@ -385,10 +390,10 @@ public:
      */
     void abort_transfer();
 
-    /** Start I2C transfer and wait until it is complete.  Like the transactional API this blocks the current thread,
+    /** Start %I2C transfer and wait until it is complete.  Like the transactional API this blocks the current thread,
      * however all work is done in the background and other threads may execute.
      *
-     * The I2C peripheral will begin a transmit and/or receive operation in the background.  If only a transmit
+     * The %I2C peripheral will begin a transmit and/or receive operation in the background.  If only a transmit
      * or receive buffer is specified, only a transmit or receive will be done.  If both buffers are specified,
      * first the transmission is done to the given slave address, then the specified number of bytes are received.
      *
@@ -396,7 +401,7 @@ public:
      *
      * This function locks the deep sleep until it returns.
      *
-     * @param address   8/10 bit I2C slave address
+     * @param address   8/10 bit %I2C slave address
      * @param tx_buffer The TX buffer with data to be transferred.  May be nullptr if tx_length is 0.
      * @param tx_length The length of TX buffer in bytes.  If 0, no transmission is done.
      * @param rx_buffer The RX buffer, which is used for received data.  May be nullptr if tx_length is 0.

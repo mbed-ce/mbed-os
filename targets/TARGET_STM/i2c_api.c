@@ -155,7 +155,7 @@ static uint32_t      I2c_valid_timing_nbr = 0;
 #endif // MBED_CONF_TARGET_I2C_TIMING_VALUE_ALGO
 
 #ifndef DEBUG_STDIO
-#   define DEBUG_STDIO 0
+#   define DEBUG_STDIO 1
 #endif
 
 #if DEBUG_STDIO
@@ -910,9 +910,10 @@ int i2c_stop(i2c_t *obj)
 
     // Ensure the transmission is started before sending a stop
     if ((handle->Instance->CR2 & (uint32_t)I2C_CR2_RD_WRN) == 0) {
-        timeout = FLAG_TIMEOUT;
-        while (!__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TXIS)) {
+        timeout = BYTE_TIMEOUT;
+        while (!__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TCR)) {
             if ((timeout--) == 0) {
+				DEBUG_PRINTF("timeout in i2c_stop waiting for I2C_FLAG_TCR\r\n");
                 return I2C_ERROR_BUS_BUSY;
             }
         }
@@ -924,6 +925,7 @@ int i2c_stop(i2c_t *obj)
     timeout = FLAG_TIMEOUT;
     while (!__HAL_I2C_GET_FLAG(handle, I2C_FLAG_STOPF)) {
         if ((timeout--) == 0) {
+			DEBUG_PRINTF("timeout in i2c_stop waiting for I2C_FLAG_STOPF\r\n");
             return I2C_ERROR_BUS_BUSY;
         }
     }
@@ -1265,7 +1267,7 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
         /* Keep Set event flag */
         event_code = (I2C_EVENT_TRANSFER_EARLY_NACK) | (I2C_EVENT_ERROR_NO_SLAVE);
     }
-    DEBUG_PRINTF("HAL_I2C_ErrorCallback:%d, index=%d\r\n", (int) hi2c->ErrorCode, obj_s->index);
+    //DEBUG_PRINTF("HAL_I2C_ErrorCallback:%d, index=%d\r\n", (int) hi2c->ErrorCode, obj_s->index);
 
     /* re-init IP to try and get back in a working state */
     i2c_init_internal(obj, NULL);
