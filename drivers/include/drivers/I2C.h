@@ -395,7 +395,7 @@ public:
      *
      * Internally, the chip vendor may implement this function using either DMA or interrupts.
      *
-     * This function locks the deep sleep until any event has occurred
+     * This function locks the deep sleep until it returns.
      *
      * @param address   8/10 bit I2C slave address
      * @param tx_buffer The TX buffer with data to be transferred.  May be nullptr if tx_length is 0.
