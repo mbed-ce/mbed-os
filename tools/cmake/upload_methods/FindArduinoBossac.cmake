@@ -31,7 +31,7 @@ endif()
 list(SORT ArduinoBossac_PATHS)
 list(REVERSE ArduinoBossac_PATHS)
 
-find_program(ArduinoBossac NAMES bossac PATHS ${ArduinoBossac_PATHS} DOC "Path to the Arduino variant of bossac")
+find_program(ArduinoBossac NAMES bossac HINTS ${ArduinoBossac_PATHS} DOC "Path to the Arduino variant of bossac")
 
 find_package_handle_standard_args(ArduinoBossac REQUIRED_VARS ArduinoBossac)
 
