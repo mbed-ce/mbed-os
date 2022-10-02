@@ -176,6 +176,19 @@ namespace mbed {
  * Some devices implement these features using DMA, others use interrupts, so be mindful that there may still be
  * significant CPU usage if you have multiple and/or high-rate transfers going on.
  *
+ * <h1>A Note about Addressing</h1>
+ * Most %I2C devices make use of 7-bit addresses (see <a href="https://www.i2c-bus.org/addressing/">here</a> for details).
+ * Mbed OS, however, works with addresses in 8-bit format, where the least significant bit specifies if the transaction
+ * is a read (1) or a write (0).  Due to this, you will generally need to use bitshifts and bitwise ORs when passing
+ * addresses to I2C functions.  See the documentation on each function for details.
+ *
+ * %I2C also has a <a href="https://www.i2c-bus.org/addressing/10-bit-addressing/">10-bit addressing mode</a>, where
+ * the address is sent in two logical bytes on the bus.  Some, but not all, Mbed targets support this mode -- refer
+ * to your MCU datasheet and your target's HAL code for details.  For 10-bit addresses, use the same format to
+ * pass them to I2C functions -- shift them left by one and set the LSBit to indicate the read/write direction.
+ * On MCUs that do not natively support 10-bit addressing, you can emulate support by using the single-byte API
+ * to send two address bytes; see the linked page above for details.
+ *
  * <h1>Other Info</h1>
  *
  * \warning Mbed OS requires that you only create one instance of the I2C class per physical %I2C bus on your chip.
@@ -239,7 +252,7 @@ public:
      * Performs a complete read transaction. The least significant bit of
      * the address must be 1 to indicate a read.
      *
-     *  @param address 8-bit I2C slave address [ (7-bit addr << 1) | 1 ]
+     *  @param address 8/11-bit I2C slave address [ (7 or 10 bit addr << 1) | 1 ]
      *  @param data Pointer to the byte-array to read data in to
      *  @param length Number of bytes to read
      *  @param repeated Set up for a repeated start.  If true, the Mbed processor does not relinquish the bus after
@@ -254,7 +267,7 @@ public:
      * Performs a complete write transaction. The least significant bit of
      * the address must be 0 to indicate a write.
      *
-     *  @param address 8-bit I2C slave address [ (7-bit addr << 1) | 0 ]
+     *  @param address 8/11-bit I2C slave address [ (7 or 10 bit addr << 1) | 1 ]
      *  @param data Pointer to the byte-array data to send
      *  @param length Number of bytes to send
      *  @param repeated Set up for a repeated start.  If true, the Mbed processor does not relinquish the bus after
@@ -371,7 +384,7 @@ public:
      * You may not call any other functions on this class instance until the transfer is complete, has errored,
      * or is aborted.  Trying to start multiple transfers at once will return an error.
      *
-     * @param address   8/10 bit %I2C slave address
+     * @param address   8/11 bit %I2C slave address
      * @param tx_buffer The TX buffer with data to be transferred.  May be nullptr if tx_length is 0.
      * @param tx_length The length of TX buffer in bytes.  If 0, no transmission is done.
      * @param rx_buffer The RX buffer, which is used for received data.  May be nullptr if tx_length is 0.
@@ -401,7 +414,7 @@ public:
      *
      * This function locks the deep sleep until it returns.
      *
-     * @param address   8/10 bit %I2C slave address
+     * @param address   8/11 bit %I2C slave address
      * @param tx_buffer The TX buffer with data to be transferred.  May be nullptr if tx_length is 0.
      * @param tx_length The length of TX buffer in bytes.  If 0, no transmission is done.
      * @param rx_buffer The RX buffer, which is used for received data.  May be nullptr if tx_length is 0.
