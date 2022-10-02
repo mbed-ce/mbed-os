@@ -50,7 +50,8 @@
 #include <errno.h>
 #include "platform/mbed_retarget.h"
 
-#if DEVICE_USBDEVICE
+// Need to use the USBSerial class for this config option
+#if MBED_CONF_TARGET_CONSOLE_USB
 #include "USBSerial.h"
 #endif
 

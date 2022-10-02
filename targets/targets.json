@@ -6939,7 +6939,6 @@
             "5"
         ],
         "device_name": "nRF52840_xxAA",
-        "OUTPUT_EXT": "hex",
         "is_disk_virtual": true,
         "supported_toolchains": [
             "GCC_ARM",
