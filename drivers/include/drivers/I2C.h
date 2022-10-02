@@ -267,7 +267,7 @@ public:
      * Performs a complete write transaction. The least significant bit of
      * the address must be 0 to indicate a write.
      *
-     *  @param address 8/11-bit I2C slave address [ (7 or 10 bit addr << 1) | 1 ]
+     *  @param address 8/11-bit I2C slave address [ (7 or 10 bit addr << 1) | 0 ]
      *  @param data Pointer to the byte-array data to send
      *  @param length Number of bytes to send
      *  @param repeated Set up for a repeated start.  If true, the Mbed processor does not relinquish the bus after
