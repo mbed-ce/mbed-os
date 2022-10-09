@@ -16,7 +16,13 @@ endfunction(copy_append_property)
 # Create a "distribution" of Mbed OS containing the base Mbed and certain modules.
 # This distribution only needs to be compiled once and can be referenced in an arbitrary amount of targets.
 function(mbed_create_distro NAME) # ARGN: modules...
-	mbed_add_library(${NAME} EXCLUDE_FROM_ALL)
+
+	# Use an OBJECT library so that weak symbol resolution works properly
+	add_library(${NAME} OBJECT EXCLUDE_FROM_ALL)
+
+	# Workaround to ensure that everything that links to this library receives its objects, including other object libraries
+    # from here: https://gitlab.kitware.com/cmake/cmake/-/issues/18090#note_1041608
+    target_sources(${NAME} INTERFACE $<TARGET_OBJECTS:${NAME}>)
 
 	# Now copy include dirs, compile defs, and compile options (but NOT interface source files) over
 	# to the distribution target so they will be passed into things that link to it.
@@ -92,3 +98,53 @@ function(mbed_create_distro NAME) # ARGN: modules...
 	endwhile()
 
 endfunction(mbed_create_distro)
+
+# Traverse a tree of targets and create an interface target containing all of the flags (includes/compile options/
+# etc) but none of the source files extracted from those targets.
+# This is mainly used as a shim so that we don't need to edit 100s of target CMake files and separate out the targets
+# containing flags from the targets containing source files.
+function(mbed_extract_flags NAME) # ARGN: modules...
+	add_library(${NAME} INTERFACE)
+
+	# Now copy include dirs, compile defs, and compile options (but NOT interface source files) over
+	# to the distribution target so they will be passed into things that link to it.
+	# To do this, we need to recursively traverse the tree of dependencies.
+	set(REMAINING_MODULES ${ARGN})
+	set(COMPLETED_MODULES ${ARGN})
+	while(NOT "${REMAINING_MODULES}" STREQUAL "")
+
+		#message("Flags: ${NAME}.  REMAINING_MODULES: ${REMAINING_MODULES}")
+
+		list(GET REMAINING_MODULES 0 CURR_MODULE)
+		list(REMOVE_AT REMAINING_MODULES 0)
+
+		if(TARGET "${CURR_MODULE}")
+			copy_append_property(INTERFACE_COMPILE_DEFINITIONS ${CURR_MODULE} ${NAME})
+			copy_append_property(INTERFACE_COMPILE_OPTIONS ${CURR_MODULE} ${NAME})
+			copy_append_property(INTERFACE_INCLUDE_DIRECTORIES ${CURR_MODULE} ${NAME})
+			copy_append_property(INTERFACE_LINK_OPTIONS ${CURR_MODULE} ${NAME})
+
+			list(APPEND COMPLETED_MODULES ${CURR_MODULE})
+
+			# find sub-modules of this module
+			get_property(SUBMODULES TARGET ${CURR_MODULE} PROPERTY INTERFACE_LINK_LIBRARIES)
+			foreach(SUBMODULE ${SUBMODULES})
+				if(NOT "${SUBMODULE}" MATCHES "::@") # remove CMake internal CMAKE_DIRECTORY_ID_SEP markers
+					# Remove LINK_ONLY genexes from target_link_libraries(... PRIVATE).  We can ignore things wrapped in these
+					# because they will already have been handled by the target_link_libraries earlier on.
+					if(NOT "${SUBMODULE}" MATCHES "\\$<LINK_ONLY:.*>")
+						if(NOT ${SUBMODULE} IN_LIST COMPLETED_MODULES)
+							list(APPEND REMAINING_MODULES ${SUBMODULE})
+						endif()
+					endif()
+				endif()
+			endforeach()
+		else()
+			# Module is not a target, it's something else like a linker flag or a generator expression
+			# So, just link it to the output.
+			target_link_libraries(${NAME} INTERFACE ${CURR_MODULE})
+		endif()
+
+	endwhile()
+
+endfunction(mbed_extract_flags)

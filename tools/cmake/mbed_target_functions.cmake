@@ -67,39 +67,6 @@ function(mbed_generate_map_file target)
 endfunction()
 
 #
-# Create a library that will be used to store part of the Mbed code.
-# An object library is created, plus a special workaround to help link dependencies work correctly.
-# (static libraries cannot be used since they don't resolve weak symbols correctly)
-#
-# To create a library that is not compiled unless it's used, pass EXCLUDE_FROM_ALL as the second argument.
-#
-# Note: If you want to create an INTERFACE or ALIAS library, use the regular add_library() instead.
-#
-function(mbed_add_library NAME) # ARGN...
-    add_library(${NAME} OBJECT ${ARGN})
-
-    set_property(TARGET ${NAME} PROPERTY MBED_TARGET_OWN_NAME ${NAME})
-
-    # Workaround to ensure that everything that links to this library receives its objects, including other object libraries
-    # from here: https://gitlab.kitware.com/cmake/cmake/-/issues/18090#note_1041608
-    #target_sources(${NAME} INTERFACE $<TARGET_OBJECTS:${NAME}>)
-    target_link_libraries(${NAME} INTERFACE $<$<NOT:$<OR:$<IN_LIST:${NAME},$<TARGET_PROPERTY:LINK_LIBRARIES>>,$<STREQUAL:${NAME},$<TARGET_PROPERTY:MBED_TARGET_OWN_NAME>>>>:$<TARGET_OBJECTS:${NAME}>>)
-
-    # Broken apart, this looks like:
-    # $<
-    #   $<NOT:
-    #         $<OR:
-    #              $<IN_LIST:${NAME},$<TARGET_PROPERTY:LINK_LIBRARIES>>,
-    #              $<STREQUAL:${NAME},$<TARGET_PROPERTY:MBED_TARGET_OWN_NAME>>
-    #          >
-    #   >:
-    #   $<TARGET_OBJECTS:${NAME}>
-    #  >
-
-
-endfunction()
-
-#
 # Validate selected application profile.
 #
 function(mbed_validate_application_profile target)

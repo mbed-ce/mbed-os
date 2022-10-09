@@ -63,7 +63,6 @@ if(MBED_IS_NATIVE_BUILD)
     # Pick up some include files that are needed later
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/tools/cmake)
     include(mbed_create_distro)
-    include(mbed_target_functions)
 else()
     include(mbed_set_linker_script)
 endif()
@@ -275,6 +274,10 @@ if(NOT MBED_IS_NATIVE_BUILD)
 
     # Set up the linker script and hook it up to the top-level OS targets
     mbed_setup_linker_script(mbed-baremetal mbed-os)
+
+    # Make sure that things linking mbed-core-flags can also get the target-specific include dirs and flags.
+    mbed_extract_flags(${MBED_TARGET_CMAKE_NAME}-flags ${MBED_TARGET_CMAKE_NAME})
+    target_link_libraries(mbed-core-flags INTERFACE ${MBED_TARGET_CMAKE_NAME}-flags)
 endif()
 
 # Ninja requires to be forced for response files
