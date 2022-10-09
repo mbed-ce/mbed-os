@@ -146,6 +146,10 @@ extern "C" {
 void _eth_config_mac(ETH_HandleTypeDef *heth);
 void ETH_IRQHandler(void);
 
+// We need to give the linker a reason to pull in the stmxx_eth_init.c files, since they only contain
+// weak symbol overrides and would otherwise be ignored.
+void stm32_eth_init_weak_symbol_helper();
+
 #ifdef USE_USER_DEFINED_HAL_ETH_IRQ_CALLBACK
 MBED_WEAK void STM_HAL_ETH_Handler();
 #else
@@ -284,6 +288,9 @@ static osThreadId_t create_new_thread(const char *threadName, void (*thread)(voi
 bool STM32_EMAC::low_level_init_successful()
 #ifndef ETH_IP_VERSION_V2
 {
+    // Generate a reference to this empty function so the linker pulls it in.
+    stm32_eth_init_weak_symbol_helper();
+
     uint32_t PHY_ID;
 
     /* Init ETH */
@@ -354,6 +361,9 @@ bool STM32_EMAC::low_level_init_successful()
 #else // ETH_IP_VERSION_V2
 {
     uint32_t idx;
+
+    // Generate a reference to this empty function so the linker pulls it in.
+    stm32_eth_init_weak_symbol_helper();
 
     MPU_Config();
 

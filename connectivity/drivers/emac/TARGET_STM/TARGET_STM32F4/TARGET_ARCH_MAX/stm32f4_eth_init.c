@@ -79,3 +79,7 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef *heth)
         NVIC_DisableIRQ(ETH_IRQn);
     }
 }
+
+// Blank, non-weak-override function to make sure the linker pulls in this file
+void stm32_eth_init_weak_symbol_helper()
+{}
