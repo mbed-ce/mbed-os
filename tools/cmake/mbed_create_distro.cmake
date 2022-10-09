@@ -55,6 +55,17 @@ function(mbed_create_distro NAME) # ARGN: modules...
 				copy_append_property(INTERFACE_INCLUDE_DIRECTORIES ${CURR_MODULE} ${NAME})
 				copy_append_property(INTERFACE_LINK_OPTIONS ${CURR_MODULE} ${NAME})
 
+				# Additionally, interface libraries can export precompiled .o files as sources.
+				# We need to copy these to the interface sources of the distro, because adding a .o
+				# to the sources of an object library does nothing.
+				get_property(CURR_MODULE_INTERFACE_SOURCES TARGET ${CURR_MODULE} PROPERTY INTERFACE_SOURCES)
+				foreach(INTERFACE_SOURCE ${CURR_MODULE_INTERFACE_SOURCES})
+					if("${INTERFACE_SOURCE}" MATCHES ".o$" OR "${INTERFACE_SOURCE}" MATCHES ".obj$")
+						# Object file found
+						target_sources(${NAME} INTERFACE ${INTERFACE_SOURCE})
+					endif()
+				endforeach()
+
 				# CMake currently has a limitation that OBJECT libraries cannot link to other OBJECT libraries
 				# via the LINK_LIBRARIES property -- CMake will not link the objects in properly :/.
 				# see: https://cmake.org/pipermail/cmake/2019-May/069453.html
@@ -65,13 +76,13 @@ function(mbed_create_distro NAME) # ARGN: modules...
 
 					# Check if this object library has any other libraries exported through its INTERFACE_SOURCES.
 					# If it does, we need to propagate those too.
-					get_property(OBJ_INTERFACE_SOURCES TARGET ${NAME} PROPERTY INTERFACE_SOURCES)
-					foreach(INTERFACE_SOURCE ${OBJ_INTERFACE_SOURCES})
+					foreach(INTERFACE_SOURCE ${CURR_MODULE_INTERFACE_SOURCES})
 						if(INTERFACE_SOURCE MATCHES "\\$<TARGET_OBJECTS:.*>")
 							target_sources(${NAME} INTERFACE ${INTERFACE_SOURCE})
 						endif()
 					endforeach()
 				endif()
+
 
 				list(APPEND COMPLETED_MODULES ${CURR_MODULE})
 
