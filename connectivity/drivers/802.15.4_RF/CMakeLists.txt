@@ -1,7 +1,7 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(mbed-802.15.4-rf STATIC EXCLUDE_FROM_ALL)
+mbed_add_library(mbed-802.15.4-rf EXCLUDE_FROM_ALL)
 
 target_link_libraries(mbed-802.15.4-rf PUBLIC mbed-core-flags)
 

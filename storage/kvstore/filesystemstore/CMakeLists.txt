@@ -9,7 +9,7 @@ if(MBED_ENABLE_OS_INTERNAL_TESTS)
     endif()
 endif()
 
-add_library(mbed-storage-filesystemstore STATIC EXCLUDE_FROM_ALL)
+mbed_add_library(mbed-storage-filesystemstore EXCLUDE_FROM_ALL)
 
 target_include_directories(mbed-storage-filesystemstore
     PUBLIC

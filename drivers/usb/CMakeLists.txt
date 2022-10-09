@@ -8,7 +8,7 @@ if(MBED_ENABLE_OS_INTERNAL_TESTS)
 endif()
 
 if("DEVICE_USBDEVICE=1" IN_LIST MBED_TARGET_DEFINITIONS)
-    add_library(mbed-usb STATIC EXCLUDE_FROM_ALL
+    mbed_add_library(mbed-usb EXCLUDE_FROM_ALL
         source/AsyncOp.cpp
         source/ByteBuffer.cpp
         source/EndpointResolver.cpp
@@ -36,7 +36,7 @@ if("DEVICE_USBDEVICE=1" IN_LIST MBED_TARGET_DEFINITIONS)
     target_link_libraries(mbed-usb PUBLIC mbed-core-flags)
 
     # USB Mass Storage Device library is separate because it pulls in a dependency on mbed-storage-blockdevice
-    add_library(mbed-usb-msd STATIC EXCLUDE_FROM_ALL
+    mbed_add_library(mbed-usb-msd EXCLUDE_FROM_ALL
         source/msd/USBMSD.cpp)
 
     target_include_directories(mbed-usb-msd
@@ -47,7 +47,7 @@ if("DEVICE_USBDEVICE=1" IN_LIST MBED_TARGET_DEFINITIONS)
     target_link_libraries(mbed-usb-msd PUBLIC mbed-usb mbed-storage-blockdevice)
 
     # USB CDC ECM library is separate because it pulls in a dependency on mbed-rtos-flags
-    add_library(mbed-usb-cdc-ecm STATIC EXCLUDE_FROM_ALL
+    mbed_add_library(mbed-usb-cdc-ecm EXCLUDE_FROM_ALL
         source/cdc_ecm/USBCDC_ECM.cpp)
 
 

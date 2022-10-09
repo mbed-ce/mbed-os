@@ -4,8 +4,8 @@
 # List of all features libraries available.
 add_library(mbed-fpga-ci-test-shield INTERFACE)
 add_library(mbed-client-cli INTERFACE)
-add_library(mbed-unity STATIC EXCLUDE_FROM_ALL)
-add_library(mbed-utest STATIC EXCLUDE_FROM_ALL)
+mbed_add_library(mbed-unity EXCLUDE_FROM_ALL)
+mbed_add_library(mbed-utest EXCLUDE_FROM_ALL)
 
 add_subdirectory(frameworks/COMPONENT_FPGA_CI_TEST_SHIELD)
 add_subdirectory(frameworks/mbed-client-cli)

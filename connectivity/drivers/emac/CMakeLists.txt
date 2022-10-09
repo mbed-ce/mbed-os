@@ -5,7 +5,7 @@ if(NOT "DEVICE_EMAC=1" IN_LIST MBED_TARGET_DEFINITIONS)
     return()
 endif()
 
-add_library(mbed-emac STATIC EXCLUDE_FROM_ALL)
+mbed_add_library(mbed-emac EXCLUDE_FROM_ALL)
 
 if("ARM_FM" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_ARM_FM)

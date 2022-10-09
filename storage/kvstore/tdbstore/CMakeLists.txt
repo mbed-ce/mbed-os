@@ -9,7 +9,7 @@ if(MBED_ENABLE_OS_INTERNAL_TESTS)
     endif()
 endif()
 
-add_library(mbed-storage-tdbstore STATIC EXCLUDE_FROM_ALL)
+mbed_add_library(mbed-storage-tdbstore EXCLUDE_FROM_ALL)
 
 target_include_directories(mbed-storage-tdbstore
     PUBLIC
@@ -25,6 +25,5 @@ target_sources(mbed-storage-tdbstore
 
 target_link_libraries(mbed-storage-tdbstore
     PUBLIC
-        mbed-storage-kvstore
         mbed-storage-blockdevice
 )

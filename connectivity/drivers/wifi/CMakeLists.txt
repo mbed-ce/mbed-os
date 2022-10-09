@@ -1,7 +1,7 @@
 # Copyright (c) 2020-2021 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(mbed-wifi STATIC EXCLUDE_FROM_ALL)
+mbed_add_library(mbed-wifi EXCLUDE_FROM_ALL)
 
 add_subdirectory(TARGET_WICED EXCLUDE_FROM_ALL)
 

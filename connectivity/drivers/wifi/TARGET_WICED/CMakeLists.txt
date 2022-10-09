@@ -1,7 +1,7 @@
 # Copyright (c) 2020-2021 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(mbed-wiced STATIC EXCLUDE_FROM_ALL)
+mbed_add_library(mbed-wiced EXCLUDE_FROM_ALL)
 
 if(${CMAKE_CROSSCOMPILING})
     if(${MBED_TOOLCHAIN} STREQUAL "ARM")

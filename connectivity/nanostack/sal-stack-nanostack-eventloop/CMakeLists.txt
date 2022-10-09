@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(mbed-nanostack-sal_stack-event_loop STATIC EXCLUDE_FROM_ALL)
+mbed_add_library(mbed-nanostack-sal_stack-event_loop EXCLUDE_FROM_ALL)
 
 target_include_directories(mbed-nanostack-sal_stack-event_loop
     PUBLIC
