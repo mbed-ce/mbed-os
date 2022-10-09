@@ -1,7 +1,7 @@
 # Copyright (c) 2020-2021, Pelion and affiliates.
 # SPDX-License-Identifier: Apache-2.0
 
-mbed_add_library(mbed-nanostack-sal_stack EXCLUDE_FROM_ALL)
+add_library(mbed-nanostack-sal_stack STATIC EXCLUDE_FROM_ALL)
 
 add_subdirectory(source/6LoWPAN)
 add_subdirectory(source/BorderRouter)

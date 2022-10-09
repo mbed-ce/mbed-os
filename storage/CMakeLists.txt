@@ -5,7 +5,7 @@
 
 if(${CMAKE_CROSSCOMPILING})
     # List of all storage libraries available, also has some source files.
-    mbed_add_library(mbed-storage EXCLUDE_FROM_ALL)
+    add_library(mbed-storage STATIC EXCLUDE_FROM_ALL)
 
     # The directories below contain optional target libraries
     add_subdirectory(blockdevice EXCLUDE_FROM_ALL)

@@ -9,7 +9,7 @@ if(MBED_ENABLE_OS_INTERNAL_TESTS)
     endif()
 endif()
 
-mbed_add_library(mbed-cellular EXCLUDE_FROM_ALL)
+add_library(mbed-cellular STATIC EXCLUDE_FROM_ALL)
 
 add_subdirectory(source/framework)
 

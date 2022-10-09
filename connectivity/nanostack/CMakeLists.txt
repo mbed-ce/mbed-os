@@ -1,7 +1,7 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-mbed_add_library(mbed-nanostack EXCLUDE_FROM_ALL)
+add_library(mbed-nanostack STATIC EXCLUDE_FROM_ALL)
 
 add_subdirectory(coap-service)
 add_subdirectory(mbed-mesh-api)

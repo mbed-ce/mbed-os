@@ -1,7 +1,7 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-mbed_add_library(mbed-storage-fat EXCLUDE_FROM_ALL)
+add_library(mbed-storage-fat STATIC EXCLUDE_FROM_ALL)
 
 target_include_directories(mbed-storage-fat
     PUBLIC

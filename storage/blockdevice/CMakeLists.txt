@@ -10,7 +10,7 @@ if(MBED_ENABLE_OS_INTERNAL_TESTS)
     endif()
 endif()
 
-mbed_add_library(mbed-storage-blockdevice EXCLUDE_FROM_ALL)
+add_library(mbed-storage-blockdevice STATIC EXCLUDE_FROM_ALL)
 
 if("DATAFLASH" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(COMPONENT_DATAFLASH)

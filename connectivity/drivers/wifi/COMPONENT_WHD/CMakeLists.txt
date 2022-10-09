@@ -3,7 +3,7 @@
 
 add_subdirectory(whd-bsp-integration EXCLUDE_FROM_ALL)
 
-mbed_add_library(mbed-cy-psoc6-whd-43012 EXCLUDE_FROM_ALL)
+add_library(mbed-cy-psoc6-whd-43012 STATIC EXCLUDE_FROM_ALL)
 target_include_directories(mbed-cy-psoc6-whd-43012
     PUBLIC
         wifi-host-driver/resources/firmware/COMPONENT_43012
@@ -16,7 +16,7 @@ target_sources(mbed-cy-psoc6-whd-43012
         wifi-host-driver/resources/firmware/COMPONENT_43012/43012C0_clm_blob.c
 )
 
-mbed_add_library(mbed-cy-psoc6-whd-43438 EXCLUDE_FROM_ALL)
+add_library(mbed-cy-psoc6-whd-43438 STATIC EXCLUDE_FROM_ALL)
 target_include_directories(mbed-cy-psoc6-whd-43438
     PUBLIC
         wifi-host-driver/resources/firmware/COMPONENT_43438
@@ -29,7 +29,7 @@ target_sources(mbed-cy-psoc6-whd-43438
         wifi-host-driver/resources/firmware/COMPONENT_43438/43438A1_clm_blob.c
 )
 
-mbed_add_library(mbed-cy-psoc6-whd-4343w EXCLUDE_FROM_ALL)
+add_library(mbed-cy-psoc6-whd-4343w STATIC EXCLUDE_FROM_ALL)
 target_include_directories(mbed-cy-psoc6-whd-4343w
     PUBLIC
         wifi-host-driver/resources/firmware/COMPONENT_4343W
@@ -97,7 +97,7 @@ add_library(mbed-cy8ckit-064b0s2-4343w-whd INTERFACE)
 target_include_directories(mbed-cy8ckit-064b0s2-4343w-whd INTERFACE wifi-host-driver/resources/nvram/TARGET_CY8CKIT_064B0S2_4343W)
 
 
-mbed_add_library(mbed-cy-psoc6-whd EXCLUDE_FROM_ALL)
+add_library(mbed-cy-psoc6-whd STATIC EXCLUDE_FROM_ALL)
 
 target_include_directories(mbed-cy-psoc6-whd
     PUBLIC

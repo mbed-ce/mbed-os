@@ -1,7 +1,7 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-mbed_add_library(mbed-storage-littlefs-v2 EXCLUDE_FROM_ALL)
+add_library(mbed-storage-littlefs-v2 STATIC EXCLUDE_FROM_ALL)
 
 target_include_directories(mbed-storage-littlefs-v2
     PUBLIC

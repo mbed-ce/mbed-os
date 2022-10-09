@@ -1,7 +1,7 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-mbed_add_library(mbed-storage-i2cee EXCLUDE_FROM_ALL)
+add_library(mbed-storage-i2cee STATIC EXCLUDE_FROM_ALL)
 
 target_sources(mbed-storage-i2cee
     PRIVATE
