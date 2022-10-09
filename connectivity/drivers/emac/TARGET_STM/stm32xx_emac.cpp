@@ -145,7 +145,12 @@ extern "C" {
 
 void _eth_config_mac(ETH_HandleTypeDef *heth);
 void ETH_IRQHandler(void);
-MBED_WEAK void STM_HAL_ETH_Handler(ETH_HandleTypeDef *heth);
+
+#ifdef USE_USER_DEFINED_HAL_ETH_IRQ_CALLBACK
+MBED_WEAK void STM_HAL_ETH_Handler();
+#else
+void STM_HAL_ETH_Handler();
+#endif
 
 #ifdef __cplusplus
 }
@@ -241,16 +246,6 @@ static void MPU_Config(void)
 }
 
 #endif
-
-/**
- * IRQ Handler
- *
- * @param  heth: ETH handle
- * @retval None
- */
-MBED_WEAK void STM_HAL_ETH_Handler()
-{
-}
 
 /**
  * Ethernet IRQ Handler
@@ -1084,5 +1079,47 @@ void HAL_ETH_MACErrorCallback(ETH_HandleTypeDef *heth)
                "Error from ethernet HAL (HAL_ETH_MACErrorCallback)\n");
 }
 #endif // ETH_IP_VERSION_V2
+
+#ifndef USE_USER_DEFINED_HAL_ETH_IRQ_CALLBACK
+
+#define FLAG_RX                 1
+
+/**
+ * Override Ethernet Rx Transfer completed callback
+ * @param  heth: ETH handle
+ * @retval None
+ */
+void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
+{
+    STM32_EMAC &emac = STM32_EMAC::get_instance();
+    if (emac.thread) {
+        osThreadFlagsSet(emac.thread, FLAG_RX);
+    }
+}
+
+/**
+ * Override the IRQ Handler
+ * @param  None
+ * @retval None
+ */
+void STM_HAL_ETH_Handler()
+{
+   STM32_EMAC &emac = STM32_EMAC::get_instance();
+   HAL_ETH_IRQHandler(&emac.EthHandle);
+}
+
+#else /* USE_USER_DEFINED_HAL_ETH_IRQ_CALLBACK */
+
+/**
+ * IRQ Handler
+ *
+ * @param  heth: ETH handle
+ * @retval None
+ */
+MBED_WEAK void STM_HAL_ETH_Handler()
+{
+}
+
+#endif /* USE_USER_DEFINED_HAL_ETH_IRQ_CALLBACK */
 
 #endif /* DEVICE_EMAC */
