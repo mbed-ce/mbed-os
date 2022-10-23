@@ -536,10 +536,7 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
 
     // I2C Xfer operation init
     obj_s->event = 0;
-    obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
-#ifdef I2C_IP_VERSION_V2
-    obj_s->pending_start = 0;
-#endif
+    obj_s->state = STM_I2C_IDLE;
 }
 
 void i2c_deinit_internal(i2c_t *obj)
@@ -889,10 +886,10 @@ int i2c_byte_write(i2c_t *obj, int data)
 
 int i2c_start(i2c_t *obj)
 {
+    // The I2C peripheral in this chip cannot issue a start condition without also sending the first address byte.
+    // So, this function has to set a flag, and we will send the actual start condition later.
     struct i2c_s *obj_s = I2C_S(obj);
-    /*  This I2C IP doesn't  */
-    obj_s->pending_start = 1;
-    return 0;
+    obj_s->state = STM_I2C_PENDING_START;
 }
 
 int i2c_stop(i2c_t *obj)
@@ -908,14 +905,16 @@ int i2c_stop(i2c_t *obj)
     }
 #endif
 
-    // Ensure the transmission is started before sending a stop
-    if ((handle->Instance->CR2 & (uint32_t)I2C_CR2_RD_WRN) == 0) {
-        timeout = FLAG_TIMEOUT;
-        while (!__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TXIS)) {
-            if ((timeout--) == 0) {
-                return I2C_ERROR_BUS_BUSY;
-            }
-        }
+    if(obj_s->state == STM_I2C_TR_READ_IN_PROGRESS || obj_s->state == STM_I2C_TR_WRITE_IN_PROGRESS)
+    {
+        // Cannot use single-byte functions while a transaction is in progress.
+        return 3;
+    }
+    if(obj_s->state == STM_I2C_IDLE)
+    {
+        // We get here if we got a NACK earlier and the operation aborted itself.
+        // The hardware has already generated a stop condition.
+        return 0;
     }
 
     // Generate the STOP condition
@@ -941,11 +940,8 @@ int i2c_stop(i2c_t *obj)
      */
     i2c_sw_reset(obj);
 
-    /*  In case of mixed usage of the APIs (unitary + SYNC)
-     *  re-init HAL state */
-    if (obj_s->XferOperation != I2C_FIRST_AND_LAST_FRAME) {
-        i2c_init_internal(obj, NULL);
-    }
+    // stop() restores the I2C to IDLE state.
+    obj_s->state = STM_I2C_IDLE;
 
     return 0;
 }
@@ -962,6 +958,18 @@ int i2c_byte_read(i2c_t *obj, int last)
         return i2c_slave_read(obj, &data, 1);
     }
 #endif
+
+    if(obj_s->state == STM_I2C_TR_READ_IN_PROGRESS || obj_s->state == STM_I2C_TR_WRITE_IN_PROGRESS)
+    {
+        // Cannot use single-byte functions while a transaction is in progress.
+        return -1;
+    }
+    if(obj_s->state != STM_I2C_SB_READ_IN_PROGRESS)
+    {
+        // Must be in a read operation in order to read!
+        return -1;
+    }
+
     /* Then send data when there's room in the TX fifo */
     if ((tmpreg & I2C_CR2_RELOAD) != 0) {
         while (!__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TCR)) {
@@ -1009,8 +1017,23 @@ int i2c_byte_write(i2c_t *obj, int data)
         return i2c_slave_write(obj, (char *) &data, 1);
     }
 #endif
-    if (obj_s->pending_start) {
-        obj_s->pending_start = 0;
+
+    if(obj_s->state == STM_I2C_TR_READ_IN_PROGRESS || obj_s->state == STM_I2C_TR_WRITE_IN_PROGRESS)
+    {
+        // Cannot use single-byte functions while a transaction is in progress.
+        return 3;
+    }
+    if(obj_s->state == STM_I2C_IDLE)
+    {
+        // Cannot use single-byte without calling start() or issuing a repeated start
+        return 3;
+    }
+
+    if (obj_s->state == STM_I2C_PENDING_START)
+    {
+        // Clear Acknowledge Failure flag in case it was set from a previous operation
+    	__HAL_I2C_CLEAR_FLAG(handle, I2C_FLAG_AF);
+
         //*  First byte after the start is the address */
         tmpreg |= (uint32_t)((uint32_t)data & I2C_CR2_SADD);
         if (data & 0x01) {
@@ -1023,24 +1046,34 @@ int i2c_byte_write(i2c_t *obj, int data)
         tmpreg &= ~I2C_CR2_RELOAD;
         /*  Disable Autoend */
         tmpreg &= ~I2C_CR2_AUTOEND;
-        /* Do not set any transfer size for now */
-        tmpreg |= (I2C_CR2_NBYTES & (1 << 16));
+        /*  Set transfer size to 1 */
+        tmpreg |= (I2C_CR2_NBYTES & (1 << I2C_CR2_NBYTES_Pos));
         /* Set the prepared configuration */
         handle->Instance->CR2 = tmpreg;
+
+        // Wait until we get the result for the address byte.
+		// The hardware clears the I2C_CR2_START bit when the start condition has been sent.
+		timeout = BYTE_TIMEOUT;
+		while (handle->Instance->CR2 & I2C_CR2_START) {
+			if ((timeout--) == 0) {
+				return 2;
+			}
+		}
+
+        // Set to read or write based on the address
+        obj_s->state = data & 0x1 ? STM_I2C_SB_READ_IN_PROGRESS : STM_I2C_SB_WRITE_IN_PROGRESS;
+
     } else {
-        /* Set the prepared configuration */
+
+        if(obj_s->state == STM_I2C_SB_READ_IN_PROGRESS)
+        {
+            // Cannot do a write in a read transaction!
+            return 3;
+        }
+
         tmpreg = handle->Instance->CR2;
 
-        /* Then send data when there's room in the TX fifo */
-        if ((tmpreg & I2C_CR2_RELOAD) != 0) {
-            while (!__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TCR)) {
-                if ((timeout--) == 0) {
-                    DEBUG_PRINTF("timeout in i2c_byte_write\r\n");
-                    return 2;
-                }
-            }
-        }
-        /*  Enable reload mode as we don't know how many bytes will eb sent */
+        /*  Enable reload mode as we don't know how many bytes will be sent */
         tmpreg |= I2C_CR2_RELOAD;
         /*  Set transfer size to 1 */
         tmpreg |= (I2C_CR2_NBYTES & (1 << 16));
@@ -1050,12 +1083,33 @@ int i2c_byte_write(i2c_t *obj, int data)
         timeout = FLAG_TIMEOUT;
         while (!__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TXE)) {
             if ((timeout--) == 0) {
+                DEBUG_PRINTF("timeout in i2c_byte_write waiting for I2C_FLAG_TXE\r\n");
                 return 2;
             }
         }
         /*  Write byte */
         handle->Instance->TXDR = data;
+
+        // Wait until we get the result for that byte
+		// Since we set NBYTES to 1 and RELOAD to 1, the Transfer Complete Reload flag will set when this byte has transferred.
+		// Since we set AUTOEND to 0, the MCU will pause the SCL clock from then until we write another byte.
+		timeout = BYTE_TIMEOUT;
+		while (!(__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TCR) || __HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF))) {
+			if ((timeout--) == 0) {
+				DEBUG_PRINTF("timeout in i2c_byte_write waiting for byte complete\r\n");
+				return 2;
+			}
+		}
     }
+
+    // If I2C_FLAG_AF is set, we got a NACK, and the hardware has already generated a stop.
+	// Otherwise, we got an ACK.
+	if(__HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF))
+	{
+		__HAL_I2C_CLEAR_FLAG(handle, I2C_FLAG_AF);
+		obj_s->state = STM_I2C_IDLE;
+		return 0; // NACK
+	}
 
     return 1;
 }
@@ -1089,15 +1143,10 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
         }
     }
 #elif defined(I2C_IP_VERSION_V2)
-    if ((obj_s->XferOperation == I2C_FIRST_FRAME) || (obj_s->XferOperation == I2C_FIRST_AND_LAST_FRAME) || (obj_s->XferOperation == I2C_LAST_FRAME)) {
-        if (stop) {
-            obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
-        } else {
-            obj_s->XferOperation = I2C_FIRST_FRAME;
-        }
-    } else {
-        // should not happend
-        error("I2C: abnormal case should not happend");
+    if(!(obj_s->state == STM_I2C_IDLE || obj_s->state == STM_I2C_PENDING_START))
+    {
+        // I2C peripheral is not ready to start a new transaction
+        return I2C_ERROR_INVALID_USAGE;
     }
 #endif
 
@@ -1108,9 +1157,11 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     */
     i2c_ev_err_enable(obj, i2c_get_irq_handler(obj));
 
-    ret = HAL_I2C_Master_Seq_Receive_IT(handle, address, (uint8_t *) data, length, obj_s->XferOperation);
+    uint32_t xferOptions = stop ? I2C_FIRST_AND_LAST_FRAME : I2C_FIRST_FRAME;
+    ret = HAL_I2C_Master_Seq_Receive_IT(handle, address, (uint8_t *) data, length, xferOptions);
 
     if (ret == HAL_OK) {
+        obj_s->state = STM_I2C_TR_WRITE_IN_PROGRESS;
         timeout = BYTE_TIMEOUT_US * (length + 1);
         /*  transfer started : wait completion or timeout */
         while (!(obj_s->event & I2C_EVENT_ALL) && (--timeout != 0)) {
@@ -1121,13 +1172,27 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 
         if ((timeout == 0) || (obj_s->event != I2C_EVENT_TRANSFER_COMPLETE)) {
             DEBUG_PRINTF("TIMEOUT or error in i2c_read\r\n");
+
+            // Pass up the error code indicating a NACK
+            if(obj_s->event | I2C_EVENT_ERROR_NO_SLAVE)
+            {
+                count = I2C_ERROR_NO_SLAVE;
+            }
+
             /* re-init IP to try and get back in a working state */
             i2c_init_internal(obj, NULL);
+            obj_s->state = STM_I2C_IDLE;
+
         } else {
             count = length;
+
+            // If we requested repeated start, go into PENDING_START state so the user can call write_byte().
+            // Otherwise, we are now IDLE.
+            obj_s->state = stop ? STM_I2C_IDLE : STM_I2C_PENDING_START;
         }
     } else {
         DEBUG_PRINTF("ERROR in i2c_read:%d\r\n", ret);
+        obj_s->state = STM_I2C_IDLE;
     }
 
     return count;
@@ -1159,15 +1224,10 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
         }
     }
 #elif defined(I2C_IP_VERSION_V2)
-    if ((obj_s->XferOperation == I2C_FIRST_FRAME) || (obj_s->XferOperation == I2C_FIRST_AND_LAST_FRAME) || (obj_s->XferOperation == I2C_LAST_FRAME)) {
-        if (stop) {
-            obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
-        } else {
-            obj_s->XferOperation = I2C_FIRST_FRAME;
-        }
-    } else {
-        // should not happend
-        error("I2C: abnormal case should not happend");
+    if(!(obj_s->state == STM_I2C_IDLE || obj_s->state == STM_I2C_PENDING_START))
+    {
+        // I2C peripheral is not ready to start a new transaction
+        return I2C_ERROR_INVALID_USAGE;
     }
 #endif
 
@@ -1175,9 +1235,12 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 
     i2c_ev_err_enable(obj, i2c_get_irq_handler(obj));
 
-    ret = HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *) data, length, obj_s->XferOperation);
+    uint32_t xferOptions = stop ? I2C_FIRST_AND_LAST_FRAME : I2C_FIRST_FRAME;
+    ret = HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *) data, length, xferOptions);
 
     if (ret == HAL_OK) {
+
+        obj_s->state = STM_I2C_TR_WRITE_IN_PROGRESS;
         timeout = BYTE_TIMEOUT_US * (length + 1);
         /*  transfer started : wait completion or timeout */
         while (!(obj_s->event & I2C_EVENT_ALL) && (--timeout != 0)) {
@@ -1188,13 +1251,27 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 
         if ((timeout == 0) || (obj_s->event != I2C_EVENT_TRANSFER_COMPLETE)) {
             DEBUG_PRINTF(" TIMEOUT or error in i2c_write\r\n");
+
+            // Pass up the error code indicating a NACK
+            if(obj_s->event | I2C_EVENT_ERROR_NO_SLAVE)
+            {
+                count = I2C_ERROR_NO_SLAVE;
+            }
+
             /* re-init IP to try and get back in a working state */
             i2c_init_internal(obj, NULL);
+            obj_s->state = STM_I2C_IDLE;
+
         } else {
             count = length;
+
+            // If we requested repeated start, go into PENDING_START state so the user can call write_byte().
+            // Otherwise, we are now IDLE.
+            obj_s->state = stop ? STM_I2C_IDLE : STM_I2C_PENDING_START;
         }
     } else {
         DEBUG_PRINTF("ERROR in i2c_write\r\n");
+        obj_s->state = STM_I2C_IDLE;
     }
 
     return count;
@@ -1215,20 +1292,19 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
         } else {
             obj_s->XferOperation = I2C_NEXT_FRAME;
         }
+        HAL_I2C_Master_Seq_Receive_IT(hi2c, obj_s->address, (uint8_t *)obj->rx_buff.buffer, obj->rx_buff.length, obj_s->XferOperation);
 #elif defined(I2C_IP_VERSION_V2)
-        if (obj_s->stop) {
-            obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
-        } else {
-            obj_s->XferOperation = I2C_FIRST_FRAME;
-        }
+        uint32_t xferOptions = obj_s->stop ? I2C_FIRST_AND_LAST_FRAME : I2C_FIRST_FRAME;
+        HAL_I2C_Master_Seq_Receive_IT(hi2c, obj_s->address, (uint8_t *)obj->rx_buff.buffer, obj->rx_buff.length, xferOptions);
+        obj_s->state = STM_I2C_TR_READ_IN_PROGRESS;
 #endif
 
-        HAL_I2C_Master_Seq_Receive_IT(hi2c, obj_s->address, (uint8_t *)obj->rx_buff.buffer, obj->rx_buff.length, obj_s->XferOperation);
     } else
 #endif
     {
         /* Set event flag */
         obj_s->event = I2C_EVENT_TRANSFER_COMPLETE;
+        obj_s->state = obj_s->stop ? STM_I2C_IDLE : STM_I2C_PENDING_START;
     }
 }
 
@@ -1242,6 +1318,7 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 #endif
     /* Set event flag */
     obj_s->event = I2C_EVENT_TRANSFER_COMPLETE;
+    obj_s->state = obj_s->stop ? STM_I2C_IDLE : STM_I2C_PENDING_START;
 }
 
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
@@ -1265,6 +1342,15 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
         /* Keep Set event flag */
         event_code = (I2C_EVENT_TRANSFER_EARLY_NACK) | (I2C_EVENT_ERROR_NO_SLAVE);
     }
+
+    // If we only got a NACK, no reason to call the cavalry
+	if(handle->ErrorCode == HAL_I2C_ERROR_AF)
+	{
+        obj_s->state = STM_I2C_IDLE; // Hardware stops the transaction when it gets a NACK
+		obj_s->event = event_code;
+		return;
+	}
+
     DEBUG_PRINTF("HAL_I2C_ErrorCallback:%d, index=%d\r\n", (int) hi2c->ErrorCode, obj_s->index);
 
     /* re-init IP to try and get back in a working state */
@@ -1525,10 +1611,9 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
     obj_s->stop = stop;
 
     i2c_ev_err_enable(obj, handler);
-
+#if defined(I2C_IP_VERSION_V1)
     /* Set operation step depending if stop sending required or not */
     if ((tx_length && !rx_length) || (!tx_length && rx_length)) {
-#if defined(I2C_IP_VERSION_V1)
         // Trick to remove compiler warning "left and right operands are identical" in some cases
         uint32_t op1 = I2C_FIRST_AND_LAST_FRAME;
         uint32_t op2 = I2C_LAST_FRAME;
@@ -1546,27 +1631,15 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
                 obj_s->XferOperation = I2C_NEXT_FRAME;
             }
         }
-#elif defined(I2C_IP_VERSION_V2)
-        if ((obj_s->XferOperation == I2C_FIRST_FRAME) || (obj_s->XferOperation == I2C_FIRST_AND_LAST_FRAME) || (obj_s->XferOperation == I2C_LAST_FRAME)) {
-            if (stop) {
-                obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
-            } else {
-                obj_s->XferOperation = I2C_FIRST_FRAME;
-            }
-        } else {
-            // should not happend
-            error("I2C: abnormal case should not happend");
-        }
-#endif
+
         if (tx_length > 0) {
             HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *)tx, tx_length, obj_s->XferOperation);
         }
-        if (rx_length > 0) {
+        else { // RX
             HAL_I2C_Master_Seq_Receive_IT(handle, address, (uint8_t *)rx, rx_length, obj_s->XferOperation);
         }
     } else if (tx_length && rx_length) {
-        /* Two steps operation, don't modify XferOperation, keep it for next step */
-#if defined(I2C_IP_VERSION_V1)
+
         // Trick to remove compiler warning "left and right operands are identical" in some cases
         uint32_t op1 = I2C_FIRST_AND_LAST_FRAME;
         uint32_t op2 = I2C_LAST_FRAME;
@@ -1576,10 +1649,32 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
                    (obj_s->XferOperation == I2C_NEXT_FRAME)) {
             HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *)tx, tx_length, I2C_NEXT_FRAME);
         }
-#elif defined(I2C_IP_VERSION_V2)
-        HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *)tx, tx_length, I2C_FIRST_FRAME);
-#endif
     }
+#elif defined(I2C_IP_VERSION_V2)
+    /* Set operation step depending if stop sending required or not */
+    if ((tx_length && !rx_length) || (!tx_length && rx_length)) {
+        if(!(obj_s->state == STM_I2C_IDLE || obj_s->state == STM_I2C_PENDING_START))
+        {
+            // I2C peripheral is not ready to start a new transaction
+            return;
+        }
+
+        uint32_t xferOptions = stop ? I2C_FIRST_AND_LAST_FRAME : I2C_FIRST_FRAME;
+        if (tx_length > 0) {
+            obj_s->state = STM_I2C_TR_WRITE_IN_PROGRESS;
+            HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *)tx, tx_length, xferOptions);
+        }
+        else { // RX
+            obj_s->state = STM_I2C_TR_READ_IN_PROGRESS;
+            HAL_I2C_Master_Seq_Receive_IT(handle, address, (uint8_t *)rx, rx_length, xferOptions);
+        }
+
+    } else if (tx_length && rx_length) {
+        obj_s->state = STM_I2C_TR_WRITE_IN_PROGRESS;
+        HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *) tx, tx_length, I2C_FIRST_FRAME);
+    }
+#endif
+
 }
 
 
@@ -1619,6 +1714,8 @@ void i2c_abort_asynch(i2c_t *obj)
     uint16_t Dummy_DevAddress = 0x00;
 
     HAL_I2C_Master_Abort_IT(handle, Dummy_DevAddress);
+
+    obj_s->state == STM_I2C_IDLE;
 }
 
 #if MBED_CONF_TARGET_I2C_TIMING_VALUE_ALGO
