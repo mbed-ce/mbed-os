@@ -920,7 +920,7 @@ int i2c_stop(i2c_t *obj)
     }
 #endif
 
-    if(obj_s->state == STM_I2C_TR_READ_IN_PROGRESS || obj_s->state == STM_I2C_TR_WRITE_IN_PROGRESS)
+    if(!(obj_s->state == STM_I2C_SB_READ_IN_PROGRESS || obj_s->state == STM_I2C_SB_WRITE_IN_PROGRESS))
     {
         // Cannot use single-byte functions while a transaction is in progress.
         return 3;
