@@ -1002,11 +1002,6 @@ int i2c_byte_read(i2c_t *obj, int last)
     }
 #endif
 
-    if(obj_s->state == STM_I2C_TR_READ_IN_PROGRESS || obj_s->state == STM_I2C_TR_WRITE_IN_PROGRESS)
-    {
-        // Cannot use single-byte functions while a transaction is in progress.
-        return -1;
-    }
     if(obj_s->state != STM_I2C_SB_READ_IN_PROGRESS)
     {
         // Must be in a read operation in order to read!
@@ -1062,14 +1057,9 @@ int i2c_byte_write(i2c_t *obj, int data)
     }
 #endif
 
-    if(obj_s->state == STM_I2C_TR_READ_IN_PROGRESS || obj_s->state == STM_I2C_TR_WRITE_IN_PROGRESS)
+    if(!(obj_s->state == STM_I2C_SB_WRITE_IN_PROGRESS || obj_s->state == STM_I2C_PENDING_START))
     {
-        // Cannot use single-byte functions while a transaction is in progress.
-        return 3;
-    }
-    if(obj_s->state == STM_I2C_IDLE)
-    {
-        // Cannot use single-byte without calling start() or issuing a repeated start
+        // Must either be ready to send address or ready to write data bytes
         return 3;
     }
 
