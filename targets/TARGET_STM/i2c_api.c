@@ -1066,7 +1066,7 @@ int i2c_byte_write(i2c_t *obj, int data)
     if (obj_s->state == STM_I2C_PENDING_START)
     {
         // Clear Acknowledge Failure flag in case it was set from a previous operation
-    	__HAL_I2C_CLEAR_FLAG(handle, I2C_FLAG_AF);
+        __HAL_I2C_CLEAR_FLAG(handle, I2C_FLAG_AF);
 
         //*  First byte after the start is the address */
         tmpreg |= (uint32_t)((uint32_t)data & I2C_CR2_SADD);
@@ -1086,13 +1086,13 @@ int i2c_byte_write(i2c_t *obj, int data)
         handle->Instance->CR2 = tmpreg;
 
         // Wait until we get the result for the address byte.
-		// The hardware clears the I2C_CR2_START bit when the start condition has been sent.
-		timeout = BYTE_TIMEOUT;
-		while (handle->Instance->CR2 & I2C_CR2_START) {
-			if ((timeout--) == 0) {
-				return 2;
-			}
-		}
+        // The hardware clears the I2C_CR2_START bit when the start condition has been sent.
+        timeout = BYTE_TIMEOUT;
+        while (handle->Instance->CR2 & I2C_CR2_START) {
+            if ((timeout--) == 0) {
+                return 2;
+            }
+        }
 
         // Set to read or write based on the address
         obj_s->state = data & 0x1 ? STM_I2C_SB_READ_IN_PROGRESS : STM_I2C_SB_WRITE_IN_PROGRESS;
@@ -1125,25 +1125,25 @@ int i2c_byte_write(i2c_t *obj, int data)
         handle->Instance->TXDR = data;
 
         // Wait until we get the result for that byte
-		// Since we set NBYTES to 1 and RELOAD to 1, the Transfer Complete Reload flag will set when this byte has transferred.
-		// Since we set AUTOEND to 0, the MCU will pause the SCL clock from then until we write another byte.
-		timeout = BYTE_TIMEOUT;
-		while (!(__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TCR) || __HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF))) {
-			if ((timeout--) == 0) {
-				DEBUG_PRINTF("timeout in i2c_byte_write waiting for byte complete\r\n");
-				return 2;
-			}
-		}
+        // Since we set NBYTES to 1 and RELOAD to 1, the Transfer Complete Reload flag will set when this byte has transferred.
+        // Since we set AUTOEND to 0, the MCU will pause the SCL clock from then until we write another byte.
+        timeout = BYTE_TIMEOUT;
+        while (!(__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TCR) || __HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF))) {
+            if ((timeout--) == 0) {
+                DEBUG_PRINTF("timeout in i2c_byte_write waiting for byte complete\r\n");
+                return 2;
+            }
+        }
     }
 
     // If I2C_FLAG_AF is set, we got a NACK, and the hardware is currently generating a stop.
-	// Otherwise, we got an ACK.
-	if(__HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF))
-	{
-		__HAL_I2C_CLEAR_FLAG(handle, I2C_FLAG_AF);
-		obj_s->state = STM_I2C_IDLE;
-		return 0; // NACK
-	}
+    // Otherwise, we got an ACK.
+    if(__HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF))
+    {
+        __HAL_I2C_CLEAR_FLAG(handle, I2C_FLAG_AF);
+        obj_s->state = STM_I2C_IDLE;
+        return 0; // NACK
+    }
 
     return 1;
 }
@@ -1412,12 +1412,12 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     }
 
     // If we only got a NACK, no reason to call the cavalry
-	if(handle->ErrorCode == HAL_I2C_ERROR_AF)
-	{
+    if(handle->ErrorCode == HAL_I2C_ERROR_AF)
+    {
         obj_s->state = STM_I2C_IDLE; // Hardware stops the transaction when it gets a NACK
-		obj_s->event = event_code;
-		return;
-	}
+        obj_s->event = event_code;
+        return;
+    }
 
     DEBUG_PRINTF("HAL_I2C_ErrorCallback:%d, index=%d\r\n", (int) hi2c->ErrorCode, obj_s->index);
 
