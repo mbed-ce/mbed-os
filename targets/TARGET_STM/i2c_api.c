@@ -900,9 +900,21 @@ inline bool i2c_is_ready_for_transaction_start(stm_i2c_state state)
 
 int i2c_start(i2c_t *obj)
 {
-    // The I2C peripheral in this chip cannot issue a start condition without also sending the first address byte.
-    // So, this function has to set a flag, and we will send the actual start condition later.
     struct i2c_s *obj_s = I2C_S(obj);
+
+    if(obj_s->state == STM_I2C_SB_READ_IN_PROGRESS || obj_s->state == STM_I2C_SB_WRITE_IN_PROGRESS)
+    {
+        // If we are currently in a single-byte operation, we need some special logic to end the current
+        // transaction before a new one can be started.  Without this, the I2C peripheral seems to refuse
+        // to send another start condition as it thinks the previous operation is still running.
+        uint32_t cr2_val = obj_s->handle.Instance->CR2;
+        cr2_val &= ~(I2C_CR2_RELOAD_Msk);
+        cr2_val &= ~(I2C_CR2_NBYTES_Msk);
+        obj_s->handle.Instance->CR2 = cr2_val;
+    }
+
+    // The I2C peripheral in this chip cannot issue a start condition without also sending the first address byte.
+    // So, this function just has to set a flag, and we will send the actual start condition later.
     obj_s->state = STM_I2C_PENDING_START;
     return 0;
 }
