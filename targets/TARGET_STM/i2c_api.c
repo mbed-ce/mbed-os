@@ -932,11 +932,6 @@ int i2c_stop(i2c_t *obj)
     }
 #endif
 
-    if(!(obj_s->state == STM_I2C_SB_READ_IN_PROGRESS || obj_s->state == STM_I2C_SB_WRITE_IN_PROGRESS))
-    {
-        // Cannot use single-byte functions while a transaction is in progress.
-        return 3;
-    }
     if(obj_s->state == STM_I2C_IDLE)
     {
         // We get here if we got a NACK earlier and the operation aborted itself.
@@ -952,6 +947,11 @@ int i2c_stop(i2c_t *obj)
         __HAL_I2C_CLEAR_FLAG(handle, I2C_FLAG_STOPF);
 
         return 0;
+    }
+    else if(!(obj_s->state == STM_I2C_SB_READ_IN_PROGRESS || obj_s->state == STM_I2C_SB_WRITE_IN_PROGRESS))
+    {
+        // Cannot use single-byte functions while a transaction is in progress.
+        return 3;
     }
 
     // Generate the STOP condition
