@@ -894,24 +894,30 @@ inline bool i2c_is_ready_for_transaction_start(stm_i2c_state state)
     // repeated start.
 
     return state == STM_I2C_IDLE || STM_I2C_PENDING_START == state
-           || state == STM_I2C_SB_READ_IN_PROGRESS || state == STM_I2C_SB_READ_IN_PROGRESS;
+           || state == STM_I2C_SB_READ_IN_PROGRESS || state == STM_I2C_SB_WRITE_IN_PROGRESS;
 }
 
-
-int i2c_start(i2c_t *obj)
-{
-    struct i2c_s *obj_s = I2C_S(obj);
-
-    if(obj_s->state == STM_I2C_SB_READ_IN_PROGRESS || obj_s->state == STM_I2C_SB_WRITE_IN_PROGRESS)
-    {
-        // If we are currently in a single-byte operation, we need some special logic to end the current
-        // transaction before a new one can be started.  Without this, the I2C peripheral seems to refuse
-        // to send another start condition as it thinks the previous operation is still running.
+/**
+ * If currently in a single-byte operation, special reset logic is needed to get the peripheral
+ * ready to repeated-start another transaction.  This function performs those steps if they are needed.
+ */
+void prep_for_restart_if_needed(struct i2c_s *obj_s) {
+    if (obj_s->state == STM_I2C_SB_READ_IN_PROGRESS || obj_s->state == STM_I2C_SB_WRITE_IN_PROGRESS) {
+        // Force an end to the current operation by setting bytes remaining to 0 and RELOAD to false.
+        // Without this, the I2C peripheral seems to refuse to send another start condition as it
+        // thinks the previous operation is still running.
         uint32_t cr2_val = obj_s->handle.Instance->CR2;
         cr2_val &= ~(I2C_CR2_RELOAD_Msk);
         cr2_val &= ~(I2C_CR2_NBYTES_Msk);
         obj_s->handle.Instance->CR2 = cr2_val;
     }
+}
+
+int i2c_start(i2c_t *obj)
+{
+    struct i2c_s *obj_s = I2C_S(obj);
+
+    prep_for_restart_if_needed(obj_s);
 
     // The I2C peripheral in this chip cannot issue a start condition without also sending the first address byte.
     // So, this function just has to set a flag, and we will send the actual start condition later.
@@ -1169,6 +1175,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     struct i2c_s *obj_s = I2C_S(obj);
     I2C_HandleTypeDef *handle = &(obj_s->handle);
     int count = I2C_ERROR_BUS_BUSY;
+    uint32_t xferOptions;
 #if defined(I2C_IP_VERSION_V1)
     // Trick to remove compiler warning "left and right operands are identical" in some cases
     uint32_t op1 = I2C_FIRST_AND_LAST_FRAME;
@@ -1187,12 +1194,17 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
             obj_s->XferOperation = I2C_NEXT_FRAME;
         }
     }
+    xferOptions = obj_s->XferOperation;
 #elif defined(I2C_IP_VERSION_V2)
     if(!i2c_is_ready_for_transaction_start(obj_s->state))
     {
         // I2C peripheral is not ready to start a new transaction
         return I2C_ERROR_INVALID_USAGE;
     }
+
+    prep_for_restart_if_needed(obj_s);
+
+    xferOptions = stop ? I2C_FIRST_AND_LAST_FRAME : I2C_FIRST_FRAME;
 #endif
 
     obj_s->event = 0;
@@ -1202,7 +1214,6 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     */
     i2c_ev_err_enable(obj, i2c_get_irq_handler(obj));
 
-    uint32_t xferOptions = stop ? I2C_FIRST_AND_LAST_FRAME : I2C_FIRST_FRAME;
     int ret = HAL_I2C_Master_Seq_Receive_IT(handle, address, (uint8_t *) data, length, xferOptions);
 
     if (ret == HAL_OK) {
@@ -1249,6 +1260,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
     struct i2c_s *obj_s = I2C_S(obj);
     I2C_HandleTypeDef *handle = &(obj_s->handle);
     int count = I2C_ERROR_BUS_BUSY;
+    uint32_t xferOptions;
 
 #if defined(I2C_IP_VERSION_V1)
     // Trick to remove compiler warning "left and right operands are identical" in some cases
@@ -1268,19 +1280,23 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
             obj_s->XferOperation = I2C_NEXT_FRAME;
         }
     }
+    xferOptions = obj_s->XferOperation;
 #elif defined(I2C_IP_VERSION_V2)
     if(!i2c_is_ready_for_transaction_start(obj_s->state))
     {
         // I2C peripheral is not ready to start a new transaction
         return I2C_ERROR_INVALID_USAGE;
     }
+
+    prep_for_restart_if_needed(obj_s);
+
+    xferOptions = stop ? I2C_FIRST_AND_LAST_FRAME : I2C_FIRST_FRAME;
 #endif
 
     obj_s->event = 0;
 
     i2c_ev_err_enable(obj, i2c_get_irq_handler(obj));
 
-    uint32_t xferOptions = stop ? I2C_FIRST_AND_LAST_FRAME : I2C_FIRST_FRAME;
     int ret = HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *) data, length, xferOptions);
 
     if (ret == HAL_OK)
@@ -1731,7 +1747,11 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
         }
     }
 #elif defined(I2C_IP_VERSION_V2)
+
+    prep_for_restart_if_needed(obj_s);
+
     if ((tx_length && !rx_length) || (!tx_length && rx_length)) {
+
         if(!i2c_is_ready_for_transaction_start(obj_s->state))
         {
             // I2C peripheral is not ready to start a new transaction
