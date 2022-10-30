@@ -1,4 +1,4 @@
-# Mbed OS upload method configuration file for target DISCO_F469NI.
+# Mbed OS upload method configuration file for target DISCO_F769NI.
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
@@ -27,7 +27,7 @@ set(JLINK_UPLOAD_INTERFACE SWD)
 # Config options for PYOCD
 # -------------------------------------------------------------
 
-set(PYOCD_UPLOAD_ENABLED TRUE)
+set(PYOCD_UPLOAD_ENABLED FALSE)
 set(PYOCD_TARGET_NAME stm32f769nihx)
 set(PYOCD_CLOCK_SPEED 4000k)
 
