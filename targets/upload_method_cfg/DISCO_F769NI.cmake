@@ -4,7 +4,6 @@
 
 # Notes:
 # 1. Using the JLINK upload method with your dev board requires converting its ST-LINK into a J-Link.  See here for details: https://www.segger.com/products/debug-probes/j-link/models/other-j-links/st-link-on-board/
-# 2. The PYOCD upload method is disabled by default, because it works only firs time after full erase from STM32Cube and failed every time after.
 
 # General config parameters
 # -------------------------------------------------------------
@@ -27,7 +26,7 @@ set(JLINK_UPLOAD_INTERFACE SWD)
 # Config options for PYOCD
 # -------------------------------------------------------------
 
-set(PYOCD_UPLOAD_ENABLED FALSE)
+set(PYOCD_UPLOAD_ENABLED TRUE)
 set(PYOCD_TARGET_NAME stm32f769nihx)
 set(PYOCD_CLOCK_SPEED 4000k)
 
@@ -47,7 +46,8 @@ set(STM32CUBE_GDBSERVER_ARGS --swd)
 
 # Config options for stlink
 # -------------------------------------------------------------
+# not tested 
 
-set(STLINK_UPLOAD_ENABLED TRUE)
+set(STLINK_UPLOAD_ENABLED FALSE)
 set(STLINK_LOAD_ADDRESS 0x8000000)
 set(STLINK_ARGS --connect-under-reset)
