@@ -910,6 +910,14 @@ static void prep_for_restart_if_needed(struct i2c_s *obj_s) {
         cr2_val &= ~(I2C_CR2_RELOAD_Msk);
         cr2_val &= ~(I2C_CR2_NBYTES_Msk);
         obj_s->handle.Instance->CR2 = cr2_val;
+
+        // Wait until the hardware ends the transfer and sets the transfer complete flag.
+        int timeout = FLAG_TIMEOUT;
+        while (!__HAL_I2C_GET_FLAG(&obj_s->handle, I2C_FLAG_TC)) {
+            if ((timeout--) == 0) {
+                break;
+            }
+        }
     }
 }
 
