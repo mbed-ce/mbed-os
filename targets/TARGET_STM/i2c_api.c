@@ -536,7 +536,7 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
 
     // I2C Xfer operation init
     obj_s->event = 0;
-    obj_s->state = STM_I2C_IDLE;
+    STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
 }
 
 void i2c_deinit_internal(i2c_t *obj)
@@ -1248,7 +1248,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     int ret = HAL_I2C_Master_Seq_Receive_IT(handle, address, (uint8_t *) data, length, xferOptions);
 
     if (ret == HAL_OK) {
-        obj_s->state = STM_I2C_TR_WRITE_IN_PROGRESS;
+        STM_I2C_SET_STATE(obj_s, STM_I2C_TR_WRITE_IN_PROGRESS);
         uint32_t timeout = BYTE_TIMEOUT_US * (length + 1);
         /*  transfer started : wait completion or timeout */
         while (!(obj_s->event & I2C_EVENT_ALL) && (--timeout != 0)) {
@@ -1268,19 +1268,19 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 
             /* re-init IP to try and get back in a working state */
             i2c_init_internal(obj, NULL);
-            obj_s->state = STM_I2C_IDLE;
+            STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
 
         } else {
             count = length;
 
             // If we requested repeated start, go into PENDING_START state so the user can call write_byte().
             // Otherwise, we are now IDLE.
-            obj_s->state = stop ? STM_I2C_IDLE : STM_I2C_PENDING_START;
+            STM_I2C_SET_STATE(obj_s, stop ? STM_I2C_IDLE : STM_I2C_PENDING_START);
         }
     } else {
         DEBUG_PRINTF("ERROR in i2c_read:%d\r\n", ret);
 
-        obj_s->state = STM_I2C_IDLE;
+        STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
     }
 
     return count;
@@ -1332,7 +1332,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 
     if (ret == HAL_OK)
     {
-        obj_s->state = STM_I2C_TR_WRITE_IN_PROGRESS;
+        STM_I2C_SET_STATE(obj_s, STM_I2C_TR_WRITE_IN_PROGRESS);
         uint32_t timeout = BYTE_TIMEOUT_US * (length + 1);
         /*  transfer started : wait completion or timeout */
         while (!(obj_s->event & I2C_EVENT_ALL) && (--timeout != 0)) {
@@ -1352,18 +1352,18 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 
             /* re-init IP to try and get back in a working state */
             i2c_init_internal(obj, NULL);
-            obj_s->state = STM_I2C_IDLE;
+            STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
 
         } else {
             count = length;
 
             // If we requested repeated start, go into PENDING_START state so the user can call write_byte().
             // Otherwise, we are now IDLE.
-            obj_s->state = stop ? STM_I2C_IDLE : STM_I2C_PENDING_START;
+            STM_I2C_SET_STATE(obj_s, stop ? STM_I2C_IDLE : STM_I2C_PENDING_START);
         }
     } else {
         DEBUG_PRINTF("ERROR in i2c_write\r\n");
-        obj_s->state = STM_I2C_IDLE;
+        STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
     }
 
     return count;
@@ -1473,7 +1473,7 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     // If we only got a NACK, no reason to call the cavalry
     if(handle->ErrorCode == HAL_I2C_ERROR_AF)
     {
-        obj_s->state = STM_I2C_IDLE; // Hardware stops the transaction when it gets a NACK
+        STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE); // Hardware stops the transaction when it gets a NACK
         obj_s->event = event_code;
         return;
     }
@@ -1834,7 +1834,11 @@ uint8_t i2c_active(i2c_t *obj)
 {
     struct i2c_s *obj_s = I2C_S(obj);
 
+#ifdef I2C_IP_VERSION_V2
     return !i2c_is_ready_for_transaction_start(obj_s->state);
+#else
+    return obj_s->handle.State != HAL_I2C_STATE_READY;
+#endif
 }
 
 void i2c_abort_asynch(i2c_t *obj)
@@ -1848,7 +1852,7 @@ void i2c_abort_asynch(i2c_t *obj)
 
     HAL_I2C_Master_Abort_IT(handle, Dummy_DevAddress);
 
-    obj_s->state = STM_I2C_IDLE;
+    STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
 }
 
 #if MBED_CONF_TARGET_I2C_TIMING_VALUE_ALGO

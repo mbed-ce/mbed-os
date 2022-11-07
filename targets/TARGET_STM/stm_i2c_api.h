@@ -23,8 +23,6 @@
 
 #include <stdbool.h>
 
-#ifdef I2C_IP_VERSION_V2
-
 /**
  * State of the I2C peripheral.
  * Note: SB stands for Single Byte, TR stands for Transaction
@@ -40,6 +38,8 @@ typedef enum stm_i2c_state
     STM_I2C_ASYNC_READ_IN_PROGRESS,
     STM_I2C_ASYNC_WRITE_IN_PROGRESS
 } stm_i2c_state;
+
+#ifdef I2C_IP_VERSION_V2
 
 /**
  * Extended I2C structure containing STM-specific data
@@ -84,6 +84,14 @@ struct i2c_s {
 #endif
 };
 
+#endif
+
+// Macro that can be used to set the state of an I2C object.
+// Compiles to nothing for IP v1
+#ifdef I2C_IP_VERSION_V2
+#define STM_I2C_SET_STATE(i2c_s, new_state) i2c_s->state = new_state
+#else
+#define STM_I2C_SET_STATE(i2c_s, new_state) (void)i2c_s
 #endif
 
 #endif //MBED_STM_I2C_API_H
