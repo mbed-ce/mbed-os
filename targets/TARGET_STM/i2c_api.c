@@ -525,6 +525,9 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
 
 #ifdef I2C_IP_VERSION_V2
     obj_s->current_hz = obj_s->hz;
+#else
+    // I2C Xfer operation init
+    obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
 #endif
 
 #if DEVICE_I2CSLAVE
@@ -534,7 +537,6 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
     obj_s->pending_slave_rx_maxter_tx = 0;
 #endif
 
-    // I2C Xfer operation init
     obj_s->event = 0;
     STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
 }
@@ -820,11 +822,14 @@ int i2c_stop(i2c_t *obj)
     // Generate the STOP condition
     i2c->CR1 |= I2C_CR1_STOP;
 
-    /*  In case of mixed usage of the APIs (unitary + SYNC)
-     *  re-init HAL state
-     */
-    if (obj_s->XferOperation != I2C_FIRST_AND_LAST_FRAME) {
-        i2c_init_internal(obj, NULL);
+    obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
+
+    // Wait until condition is generated
+    int timeout = FLAG_TIMEOUT;
+    while (__HAL_I2C_GET_FLAG(&obj_s->handle, I2C_FLAG_BUSY)) {
+        if ((timeout--) == 0) {
+            return -1;
+        }
     }
 
     return 0;
