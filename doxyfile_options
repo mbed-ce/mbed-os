@@ -858,6 +858,7 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */connectivity/mbedtls/* \
                          */features/unsupported/* \
                          */connectivity/lwipstack/* \
+                         */connectivity/lorawan/lorastack/* \
                          */connectivity/nanostack/sal-stack-nanostack/* \
                          */connectivity/nanostack/coap-service/* \
                          */mbed-trace/* \

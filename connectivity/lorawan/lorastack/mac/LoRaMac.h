@@ -1,5 +1,4 @@
 /**
- * \cond THIRD_PARTY_DOCS
  * \file      LoRaMac.h
  *
  * \brief     LoRa MAC layer implementation
@@ -705,7 +704,3 @@ private:
 };
 
 #endif // MBED_LORAWAN_MAC_H__
-
-/**
- * \endcond
- */

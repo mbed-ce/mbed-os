@@ -1,5 +1,4 @@
 /**
- * \cond THIRD_PARTY_DOCS
  * \file      LoRaWANStack.h
  *
  * \brief     LoRaWAN stack layer implementation
@@ -29,7 +28,7 @@
  *
  * \author    Daniel Jaeckle ( STACKFORCE )
  *
- * \defgroup  LoRaWAN stack layer that controls MAC layer underneath
+ * \addtogroup  LoRaWAN
  *
  * License: Revised BSD License, see LICENSE.TXT file include in the project
  *
@@ -516,7 +515,3 @@ private:
 };
 
 #endif /* LORAWANSTACK_H_ */
-
-/**
- * \endcond
- */
