@@ -1,4 +1,5 @@
 /**
+ * \cond THIRD_PARTY_DOCS
  * \file      LoRaMacCommand.h
  *
  * \brief     LoRa MAC layer implementation
@@ -251,3 +252,7 @@ private:
 };
 
 #endif //__LORAMACCOMMAND_H__
+
+/**
+ * \endcond
+ */

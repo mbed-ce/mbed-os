@@ -1,4 +1,5 @@
 /**
+ * \cond THIRD_PARTY_DOCS
  * \file      LoRaWANStack.h
  *
  * \brief     LoRaWAN stack layer implementation
@@ -515,3 +516,7 @@ private:
 };
 
 #endif /* LORAWANSTACK_H_ */
+
+/**
+ * \endcond
+ */
