@@ -29,7 +29,6 @@ extern "C" {
 
 
 /**
-  * @cond THIRD_PARTY_DOCS
   * @defgroup MX_WIFI Wi-Fi_API
   * @brief Driver API on STM32 for MXCHIP Wi-Fi module, see mx_wifi.h
   * @{ **
@@ -1496,13 +1495,6 @@ int32_t MX_WIFI_FOTA_start(MX_WIFIObject_t *Obj, const char *url, const char *md
 /**
   * @} **
   */
-
-
-/**
-  * @endcond
-  * @} **
-  */
-
 
 
 #ifdef __cplusplus

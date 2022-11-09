@@ -868,6 +868,7 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */nanostack/sal-stack-nanostack-eventloop/* \
                          */connectivity/drivers/802.15.4_RF/* \
                          */connectivity/drivers/wifi/COMPONENT_WHD/* \
+                         */connectivity/drivers/wifi/TARGET_STM/COMPONENT_EMW3080B/mx_wifi/* \
                          */components/wifi/* \
                          */UNITTESTS/* \
                          */connectivity/cellular/framework/device/* \

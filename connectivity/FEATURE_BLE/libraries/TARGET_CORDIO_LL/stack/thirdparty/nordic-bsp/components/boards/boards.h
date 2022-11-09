@@ -94,7 +94,6 @@ extern "C" {
 #endif
 
 /**
- * @cond THIRD_PARTY_DOCS
  * @defgroup BSP_BOARD_INIT_FLAGS Board initialization flags.
  * @{ */
 #define BSP_INIT_NONE    0        /**< No initialization of LEDs or buttons (@ref bsp_board_init).*/
@@ -358,7 +357,3 @@ uint32_t bsp_board_button_idx_to_pin(uint32_t button_idx);
 #endif
 
 #endif
-
-/**
- * @endcond
- */
