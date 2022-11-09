@@ -24,7 +24,7 @@
 #include "platform/Callback.h"
 
 namespace mbed {
-    
+
 /** \addtogroup storage-blockdevice */
 /** @{*/
 
