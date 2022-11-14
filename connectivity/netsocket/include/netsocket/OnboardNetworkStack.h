@@ -142,10 +142,20 @@ public:
             return NSAPI_ERROR_UNSUPPORTED;
         }
 
-        /** @copydoc NetworkStack::get_netmask */
+        /** Copies netmask of the network interface to user supplied buffer
+        *
+        * @param    buf        buffer to which netmask will be copied as "W:X:Y:Z"
+        * @param    buflen     size of supplied buffer
+        * @return              Pointer to a buffer, or NULL if the buffer is too small
+        */
         virtual nsapi_error_t get_netmask(SocketAddress *address) = 0;
 
-        /** @copydoc NetworkStack::get_gateway */
+        /** Copies gateway address of the network interface to user supplied buffer
+         *
+         * @param    buf        buffer to which gateway address will be copied as "W:X:Y:Z"
+         * @param    buflen     size of supplied buffer
+         * @return              Pointer to a buffer, or NULL if the buffer is too small
+         */
         virtual nsapi_error_t get_gateway(SocketAddress *address) = 0;
     };
 
