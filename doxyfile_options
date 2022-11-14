@@ -2268,6 +2268,10 @@ PREDEFINED             = DOXYGEN_ONLY \
                          DEVICE_WATCHDOG \
                          DEVICE_LOCALFILESYSTEM \
                          TFM_LVL=1 \
+                         MBEDTLS_ENTROPY_C\
+                         MBEDTLS_CIPHER_MODE_CTR\
+                         MBEDTLS_CMAC_C\
+                         DEVICEKEY_ENABLED\
                          "MBED_DEPRECATED_SINCE(d, m)=" \
                          "MBED_ENABLE_IF_CALLBACK_COMPATIBLE(F, M)=" \
                          MBED_DEPRECATED(s)= \
