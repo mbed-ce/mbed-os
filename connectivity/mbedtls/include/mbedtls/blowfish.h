@@ -33,6 +33,13 @@
 
 #include "mbedtls/platform_util.h"
 
+/**
+ * \addtogroup mbedtls
+ * \{
+ * \defgroup blowfish_module Blowfish
+ * \{
+ */
+
 #define MBEDTLS_BLOWFISH_ENCRYPT     1
 #define MBEDTLS_BLOWFISH_DECRYPT     0
 #define MBEDTLS_BLOWFISH_MAX_KEY_BITS     448
@@ -277,6 +284,9 @@ int mbedtls_blowfish_crypt_ctr( mbedtls_blowfish_context *ctx,
                         const unsigned char *input,
                         unsigned char *output );
 #endif /* MBEDTLS_CIPHER_MODE_CTR */
+
+/// \}
+/// \}
 
 #ifdef __cplusplus
 }

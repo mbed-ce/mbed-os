@@ -800,7 +800,7 @@ WARNINGS               = YES
 # will automatically be disabled.
 # The default value is: YES.
 
-WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_UNDOCUMENTED   = NO
 
 # If the WARN_IF_DOC_ERROR tag is set to YES, doxygen will generate warnings for
 # potential errors in the documentation, such as not documenting some parameters
@@ -924,7 +924,6 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */connectivity/drivers/emac/* \
                          */features/cryptocell/* \
                          */features/frameworks/* \
-                         */connectivity/mbedtls/* \
                          */features/unsupported/* \
                          */connectivity/lwipstack/* \
                          */connectivity/lorawan/lorastack/* \
@@ -947,7 +946,8 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */connectivity/cellular/framework/common/* \
                          */FEATURE_BLE/source/* \
                          */FEATURE_BLE/libraries/cordio_stack/* \
-                         */FEATURE_BLE/libraries/TARGET_*/stack/*
+                         */FEATURE_BLE/libraries/TARGET_*/stack/* \
+                         */platform/FEATURE_EXPERIMENTAL_API/FEATURE_PSA/TARGET_TFM/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

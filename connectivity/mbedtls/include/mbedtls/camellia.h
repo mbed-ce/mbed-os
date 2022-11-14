@@ -33,6 +33,13 @@
 
 #include "mbedtls/platform_util.h"
 
+/**
+ * \addtogroup mbedtls
+ * \{
+ * \defgroup camellia_module Camellia
+ * \{
+ */
+
 #define MBEDTLS_CAMELLIA_ENCRYPT     1
 #define MBEDTLS_CAMELLIA_DECRYPT     0
 
@@ -305,6 +312,9 @@ int mbedtls_camellia_crypt_ctr( mbedtls_camellia_context *ctx,
                        const unsigned char *input,
                        unsigned char *output );
 #endif /* MBEDTLS_CIPHER_MODE_CTR */
+
+/// \}
+/// \}
 
 #if defined(MBEDTLS_SELF_TEST)
 

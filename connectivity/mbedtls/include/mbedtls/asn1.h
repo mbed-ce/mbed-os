@@ -35,7 +35,9 @@
 #endif
 
 /**
- * \addtogroup asn1_module
+ * \addtogroup mbedtls
+ * \{
+ * \defgroup asn1_module ASN.1
  * \{
  */
 
@@ -114,8 +116,7 @@
 #define MBEDTLS_ASN1_TAG_PC_MASK             0x20
 #define MBEDTLS_ASN1_TAG_VALUE_MASK          0x1F
 
-/* \} name */
-/* \} addtogroup asn1_module */
+/** \} name */
 
 /** Returns the size of the binary string, without the trailing \\0 */
 #define MBEDTLS_OID_SIZE(x) (sizeof(x) - 1)
@@ -134,12 +135,16 @@
         ( ( MBEDTLS_OID_SIZE(oid_str) != (oid_buf_len) ) ||             \
           memcmp( (oid_str), (oid_buf), (oid_buf_len) ) != 0 )
 
+/// \}
+/// \}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
  * \name Functions to parse ASN.1 data structures
+ * \addtogroup asn1_module
  * \{
  */
 
@@ -599,6 +604,8 @@ void mbedtls_asn1_free_named_data( mbedtls_asn1_named_data *entry );
  *              sets \c *head to \c NULL.
  */
 void mbedtls_asn1_free_named_data_list( mbedtls_asn1_named_data **head );
+
+/// \}
 
 #ifdef __cplusplus
 }
