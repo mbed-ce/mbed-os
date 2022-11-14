@@ -1,5 +1,5 @@
 /**
- * \file psa/crypto_types.h
+ * \file
  *
  * \brief PSA cryptography module: type aliases.
  *

@@ -38,7 +38,7 @@ template <typename F>
 class Event;
 
 /**
- * \defgroup events_Event Event<void()> class
+ * \defgroup events_Event Event classes
  * @{
  */
 

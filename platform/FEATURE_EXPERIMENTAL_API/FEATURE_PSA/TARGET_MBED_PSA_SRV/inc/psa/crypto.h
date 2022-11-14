@@ -1,5 +1,5 @@
 /**
- * \file psa/crypto.h
+ * \file
  * \brief Platform Security Architecture cryptography module
  */
 /*

@@ -1,5 +1,5 @@
 /*!
- * \file      sx126x.h
+ * \file      sx126x_ds.h
  *
  * \brief     SX126x driver implementation
  *
