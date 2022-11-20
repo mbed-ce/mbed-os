@@ -36,23 +36,23 @@ extern "C" {
  * target.
  *
  * # Defined behaviour
- * * The function ::rtc_init is safe to call repeatedly - Verified by test ::rtc_init_test.
- * * RTC accuracy is at least 10% - Verified by test ::rtc_accuracy_test.
- * * Init/free doesn't stop RTC from counting - Verified by test ::rtc_persist_test.
- * * Software reset doesn't stop RTC from counting - Verified by test ::rtc_reset_test.
- * * Sleep modes don't stop RTC from counting - Verified by test ::rtc_sleep_test.
+ * * The function ::rtc_init is safe to call repeatedly - Verified by test rtc_init_test.
+ * * RTC accuracy is at least 10% - Verified by test rtc_accuracy_test.
+ * * Init/free doesn't stop RTC from counting - Verified by test rtc_persist_test.
+ * * Software reset doesn't stop RTC from counting - Verified by test rtc_reset_test.
+ * * Sleep modes don't stop RTC from counting - Verified by test rtc_sleep_test.
  * * Shutdown mode doesn't stop RTC from counting - Not verified.
  * * The functions ::rtc_write/::rtc_read provides availability to set/get RTC time
- * - Verified by test ::rtc_write_read_test.
+ * - Verified by test rtc_write_read_test.
  * * The functions ::rtc_isenabled returns 1 if the RTC is counting and the time has been set,
- * 0 otherwise - Verified by test ::rtc_enabled_test.
+ * 0 otherwise - Verified by test rtc_enabled_test.
  *
  * # Undefined behaviour
  * * Calling any function other than ::rtc_init before the initialisation of the RTC
  *
  * # Potential bugs
- * * Incorrect overflow handling - Verified by ::rtc_range_test
- * * Glitches due to ripple counter - Verified by ::rtc_glitch_test
+ * * Incorrect overflow handling - Verified by rtc_range_test
+ * * Glitches due to ripple counter - Verified by rtc_glitch_test
  *
  * @see hal_rtc_tests
  *

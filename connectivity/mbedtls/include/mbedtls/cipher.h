@@ -73,6 +73,13 @@ extern "C" {
 #endif
 
 /**
+* \addtogroup mbedtls
+* \{
+* \defgroup cipher_module Cipher
+* \{
+*/
+
+/**
  * \brief     Supported cipher types.
  *
  * \warning   RC4 and DES are considered weak ciphers and their use
@@ -1087,6 +1094,10 @@ int mbedtls_cipher_auth_decrypt_ext( mbedtls_cipher_context_t *ctx,
                          unsigned char *output, size_t output_len,
                          size_t *olen, size_t tag_len );
 #endif /* MBEDTLS_CIPHER_MODE_AEAD || MBEDTLS_NIST_KW_C */
+
+/// \}
+/// \}
+
 #ifdef __cplusplus
 }
 #endif
