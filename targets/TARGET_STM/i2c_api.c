@@ -1119,9 +1119,6 @@ int i2c_byte_write(i2c_t *obj, int data)
 
     if (obj_s->state == STM_I2C_PENDING_START)
     {
-        // Clear Acknowledge Failure flag in case it was set from a previous operation
-        __HAL_I2C_CLEAR_FLAG(handle, I2C_FLAG_AF);
-
         //*  First byte after the start is the address */
         tmpreg |= (uint32_t)((uint32_t)data & I2C_CR2_SADD);
         if (data & 0x01) {
