@@ -127,6 +127,25 @@ endfunction()
 # Set post build operations
 #
 function(mbed_set_post_build target)
+    if("${ARGN}" STREQUAL "")
+        if(TARGET mbed-os)
+            get_target_property(LINKER_SCRIPT_PATH mbed-os LINKER_SCRIPT_PATH)
+            target_link_options(${target}
+            PRIVATE
+                "-T" "${LINKER_SCRIPT_PATH}"
+        )
+        elseif(TARGET mbed-baremetal)
+            get_target_property(LINKER_SCRIPT_PATH mbed-baremetal LINKER_SCRIPT_PATH)
+            target_link_options(${target}
+            PRIVATE
+                "-T" "${LINKER_SCRIPT_PATH}"
+        )
+        endif()
+    else()
+        message(STATUS "${target} uses custom linker script  ${ARGV2}")
+        mbed_set_custom_linker_script(${target} ${ARGV2})
+    endif()
+
     # The mapfile name includes the top-level target name and the
     # executable suffix for all toolchains as CMake hardcodes the name of the
     # diagnostic output file for some toolchains.
