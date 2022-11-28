@@ -81,7 +81,10 @@ function(mbed_setup_linker_script mbed_os_target mbed_baremetal_target target_de
     foreach(TARGET ${mbed_baremetal_target} ${mbed_os_target})
         add_dependencies(${TARGET} mbed-linker-script)
 
-        # store LINKER_SCRIPT_PATH
+        # When building the Mbed internal tests, the tests get created before the mbed-os target does.  So, the normal logic 
+        # in mbed_set_post_build() to set the linker script does not work.  So, we need to instead attach the linker script to 
+        # the mbed-os and mbed-baremetal libraries themselves, so it will get picked up automatically.
+        # This prevents a custom linker script from being used in STANDALONE mode, but we don't need to do that.
         set_target_properties(${TARGET} PROPERTIES LINKER_SCRIPT_PATH  ${LINKER_SCRIPT_PATH})
 
         #  add linker script only for tests
