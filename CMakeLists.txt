@@ -252,8 +252,10 @@ directory.  If this is a custom target, you need to define a target called ${MBE
 add_subdirectory(mbed-os)")
 endif()
 
-# Disable any requested files from the targets/ directory.
-mbed_apply_mcu_target_file_disables()
+if(NOT MBED_IS_NATIVE_BUILD)
+    # Disable any requested files from the targets/ directory.
+    mbed_apply_mcu_target_file_disables()
+endif()
 
 add_subdirectory(cmsis)
 add_subdirectory(drivers)
