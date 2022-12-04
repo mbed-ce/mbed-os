@@ -6,4 +6,5 @@ add_library(mbed-bluenrg-2 STATIC EXCLUDE_FROM_ALL
 
 target_link_libraries(mbed-bluenrg-2 PUBLIC
 	mbed-os
-	mbed-ble)
+	mbed-ble
+	mbed-ble-cordio)
