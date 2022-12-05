@@ -53,12 +53,14 @@ const PinMap PinMap_I2C_SCL[] = {
 const PinMap PinMap_UART_TX[] = {
     {GPIO_AD_B0_12, UART_1, 2},
     {GPIO_AD_B1_06, UART_3, 2},
+    {GPIO_AD_B0_02, UART_6, 2},
     {NC  ,  NC    , 0}
 };
 
 const PinMap PinMap_UART_RX[] = {
     {GPIO_AD_B0_13, UART_1, 2},
     {GPIO_AD_B1_07, UART_3, 2},
+    {GPIO_AD_B0_03, UART_6, 2},
     {NC  ,  NC    , 0}
 };
 
