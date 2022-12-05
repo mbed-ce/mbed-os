@@ -5017,6 +5017,7 @@
             "full",
             "bare-metal"
         ],
+        "public": false,
         "extra_labels": [
             "NXP",
             "MCUXpresso_MCUS",
@@ -5120,23 +5121,6 @@
         "device_has_remove": [
             "EMAC"
         ]
-    },
-    "TEENSY_41": {
-        "inherits": [
-            "MIMXRT105X"
-        ],
-        "extra_labels_add": [
-            "TEENSY_4X",
-            "TEENSY_41"
-        ],
-        "macros_add": [
-            "MIMXRT105X_BOARD_HAS_EXTERNAL_RAM=0",
-            "MBED_APP_SIZE=0x7c0000"
-        ],
-        "overrides": {
-            "console-usb": true,
-            "console-uart": false
-        }
     },
     "MIMXRT1170_EVK": {
         "supported_form_factors": [
