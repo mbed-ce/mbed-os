@@ -5021,7 +5021,6 @@
         "extra_labels": [
             "NXP",
             "MCUXpresso_MCUS",
-            "EVK",
             "MIMXRT1050",
             "IMX",
             "NXP_EMAC",
@@ -5082,16 +5081,20 @@
         "inherits": [
             "MIMXRT105X"
         ],
+        "extra_labels_add": [
+            "EVK",
+            "1050_EVK"
+        ],
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "macros": [
+        "macros_add": [
             "XIP_BOOT_HEADER_DCD_ENABLE=1",
             "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
             "MIMXRT105X_BOARD_HAS_EXTERNAL_RAM=1",
             "MIMXRT105X_EXTERNAL_RAM_SIZE=0x01E00000"
         ],
-        "device_has": [
+        "device_has_add": [
             "FLASH"
         ],
         "detect_code": [
@@ -5101,6 +5104,28 @@
             "network-default-interface-type": "ETHERNET"
         },
         "bootloader_supported": true
+    },
+    "MIMXRT1060_EVK": {
+        "inherits": [
+            "MIMXRT105X"
+        ],
+        "extra_labels_add": [
+            "EVK",
+            "1060_EVK"
+        ],
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "macros_add": [
+            "XIP_BOOT_HEADER_DCD_ENABLE=1",
+            "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
+            "MIMXRT105X_BOARD_HAS_EXTERNAL_RAM=1",
+            "MIMXRT105X_EXTERNAL_RAM_SIZE=0x01E00000",
+            "MBED_APP_SIZE=0x800000"
+        ],
+        "overrides": {
+            "network-default-interface-type": "ETHERNET"
+        }
     },
     "TEENSY_40": {
         "inherits": [
