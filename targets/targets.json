@@ -1487,7 +1487,7 @@
             "STM32F103xE"
         ]
     },
-	"MCU_STM32F103xD": {
+    "MCU_STM32F103xD": {
         "inherits": [
             "MCU_STM32F1"
         ],
