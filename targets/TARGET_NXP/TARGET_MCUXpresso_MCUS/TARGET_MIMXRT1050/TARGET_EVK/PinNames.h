@@ -189,8 +189,11 @@ typedef enum {
     ARDUINO_UNO_D11 = GPIO_SD_B0_02,
     ARDUINO_UNO_D12 = GPIO_SD_B0_03,
     ARDUINO_UNO_D13 = GPIO_SD_B0_00,
-    ARDUINO_UNO_D14 = GPIO_AD_B0_01,
-    ARDUINO_UNO_D15 = GPIO_AD_B0_00,
+
+    // Note: MIMXRT1050 EVKB Rev A connected D15 and D15 to AD_B0_01 and AD_B0_00 instead, but this did not comply
+    // with the standard as these pins do not have an I2C instance on them, so it was changed in Rev B.
+    ARDUINO_UNO_D14 = GPIO_AD_B1_01,
+    ARDUINO_UNO_D15 = GPIO_AD_B1_00,
 
     ARDUINO_UNO_A0 = GPIO_AD_B1_10,
     ARDUINO_UNO_A1 = GPIO_AD_B1_11,
