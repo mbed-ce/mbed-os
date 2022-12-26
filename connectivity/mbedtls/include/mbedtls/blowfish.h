@@ -36,7 +36,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup blowfish_module Blowfish
+ * \defgroup mbedtls_blowfish_module Blowfish
  * \{
  */
 

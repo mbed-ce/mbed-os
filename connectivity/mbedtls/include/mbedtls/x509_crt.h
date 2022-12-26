@@ -33,7 +33,7 @@
 #include "mbedtls/bignum.h"
 
 /**
- * \addtogroup x509_module
+ * \addtogroup mbedtls_x509_module
  * \{
  */
 
@@ -842,7 +842,7 @@ void mbedtls_x509_crt_restart_free( mbedtls_x509_crt_restart_ctx *ctx );
 #endif /* MBEDTLS_X509_CRT_PARSE_C */
 
 /** \} name */
-/** \} addtogroup x509_module */
+/** \} addtogroup mbedtls_x509_module */
 
 #if defined(MBEDTLS_X509_CRT_WRITE_C)
 /**

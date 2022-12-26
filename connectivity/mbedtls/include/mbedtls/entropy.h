@@ -51,7 +51,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup entropy_module Entropy Accumulator
+ * \defgroup mbedtls_entropy_module Entropy Accumulator
  * \{
  */
 

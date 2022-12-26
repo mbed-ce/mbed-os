@@ -43,7 +43,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup aria_module ARIA
+ * \defgroup mbedtls_aria_module ARIA
  * \{
  */
 

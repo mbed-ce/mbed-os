@@ -56,7 +56,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup ctr_drbg_module CTR_DRBG
+ * \defgroup mbedtls_ctr_drbg_module CTR_DRBG
  * \{
  */
 

@@ -44,7 +44,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup gcm_module Galois/Counter Mode
+ * \defgroup mbedtls_gcm_module Galois/Counter Mode
  * \{
  */
 

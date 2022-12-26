@@ -38,7 +38,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup x509_module X.509
+ * \defgroup mbedtls_x509_module X.509
  * Structures for parsing X.509 certificates, CRLs and CSRs
  * \{
  */

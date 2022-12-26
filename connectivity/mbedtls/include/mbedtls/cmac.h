@@ -41,7 +41,7 @@ extern "C" {
 /**
 * \addtogroup mbedtls
 * \{
-* \defgroup cmac_module CMAC
+* \defgroup mbedtls_cmac_module CMAC
 * \{
 */
 

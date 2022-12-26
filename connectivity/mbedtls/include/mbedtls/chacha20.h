@@ -44,7 +44,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup chacha20_module ChaCha20
+ * \defgroup mbedtls_chacha20_module ChaCha20
  * \{
  */
 

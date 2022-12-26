@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 /**
- * \addtogroup entropy_module
+ * \addtogroup mbedtls_entropy_module
  * \{
  */
 

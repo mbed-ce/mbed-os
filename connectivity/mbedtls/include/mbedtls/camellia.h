@@ -36,7 +36,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup camellia_module Camellia
+ * \defgroup mbedtls_camellia_module Camellia
  * \{
  */
 

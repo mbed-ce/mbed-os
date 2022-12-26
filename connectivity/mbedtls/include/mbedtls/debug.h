@@ -37,7 +37,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup debug_module Debug
+ * \defgroup mbedtls_debug_module Debug
  * \{
  */
 

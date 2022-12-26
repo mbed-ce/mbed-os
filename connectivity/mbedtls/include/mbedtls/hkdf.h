@@ -36,7 +36,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup hkdf_module HKDF
+ * \defgroup mbedtls_hkdf_module HKDF
  * \{
  */
 

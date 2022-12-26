@@ -37,7 +37,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup arc4_module ARC4
+ * \defgroup mbedtls_arc4_module ARC4
  * \{
  */
 

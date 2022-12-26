@@ -39,7 +39,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup des_module DES
+ * \defgroup mbedtls_des_module DES
  * \{
  */
 

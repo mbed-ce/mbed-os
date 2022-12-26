@@ -2271,6 +2271,7 @@ PREDEFINED             = DOXYGEN_ONLY \
                          MBEDTLS_ENTROPY_C\
                          MBEDTLS_CIPHER_MODE_CTR\
                          MBEDTLS_CMAC_C\
+                         MBEDTLS_VERSION_C\
                          DEVICEKEY_ENABLED\
                          "MBED_DEPRECATED_SINCE(d, m)=" \
                          "MBED_ENABLE_IF_CALLBACK_COMPATIBLE(F, M)=" \

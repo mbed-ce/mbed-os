@@ -75,7 +75,7 @@ extern "C" {
 /**
 * \addtogroup mbedtls
 * \{
-* \defgroup cipher_module Cipher
+* \defgroup mbedtls_cipher_module Cipher
 * \{
 */
 

@@ -33,7 +33,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup asn1write_module ASN.1 Write
+ * \defgroup mbedtls_asn1write_module ASN.1 Write
  * \{
  */
 

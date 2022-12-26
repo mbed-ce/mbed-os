@@ -37,7 +37,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup asn1_module ASN.1
+ * \defgroup mbedtls_asn1_module ASN.1
  * \{
  */
 

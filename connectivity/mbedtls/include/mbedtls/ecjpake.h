@@ -54,7 +54,7 @@ extern "C" {
 /**
 * \addtogroup mbedtls
 * \{
-* \defgroup ecjpake_module Elliptic Curve J-PAKE
+* \defgroup mbedtls_ecjpake_module Elliptic Curve J-PAKE
 * \{
 */
 

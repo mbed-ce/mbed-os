@@ -42,7 +42,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup ecdsa_module ECDSA
+ * \defgroup mbedtls_ecdsa_module ECDSA
  * \{
  */
 

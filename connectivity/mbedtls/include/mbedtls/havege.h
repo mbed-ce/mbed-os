@@ -40,7 +40,7 @@ extern "C" {
 /**
 * \addtogroup mbedtls
 * \{
-* \defgroup havege_module HAVEGE
+* \defgroup mbedtls_havege_module HAVEGE
 * \{
 */
 

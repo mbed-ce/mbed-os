@@ -41,7 +41,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup hrmac_drbg_module HMAC_DRBG
+ * \defgroup mbedtls_hrmac_drbg_module HMAC_DRBG
  * \{
  */
 

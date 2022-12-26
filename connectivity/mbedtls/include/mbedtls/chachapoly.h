@@ -49,7 +49,7 @@ extern "C" {
 #endif
 
 /**
-* \addtogroup chacha20_module
+* \addtogroup mbedtls_chacha20_module
 * \{
 */
 

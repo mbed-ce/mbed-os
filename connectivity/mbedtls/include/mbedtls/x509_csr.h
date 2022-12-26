@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 /**
- * \addtogroup x509_module
+ * \addtogroup mbedtls_x509_module
  * \{ */
 
 /**
@@ -152,7 +152,7 @@ void mbedtls_x509_csr_free( mbedtls_x509_csr *csr );
 #endif /* MBEDTLS_X509_CSR_PARSE_C */
 
 /** \} name */
-/** \} addtogroup x509_module */
+/** \} addtogroup mbedtls_x509_module */
 
 #if defined(MBEDTLS_X509_CSR_WRITE_C)
 /**

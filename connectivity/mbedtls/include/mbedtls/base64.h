@@ -33,7 +33,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup base64_module Base64
+ * \defgroup mbedtls_base64_module Base64
  * \{
  */
 

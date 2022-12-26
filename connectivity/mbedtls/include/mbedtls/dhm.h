@@ -73,7 +73,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup dhm_module Diffie-Hellman-Merkle
+ * \defgroup mbedtls_dhm_module Diffie-Hellman-Merkle
  * \{
  */
 

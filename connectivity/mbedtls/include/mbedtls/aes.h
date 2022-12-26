@@ -52,7 +52,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup aes_module AES
+ * \defgroup mbedtls_aes_module AES
  * \{
  */
 

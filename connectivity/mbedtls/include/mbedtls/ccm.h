@@ -68,7 +68,7 @@ extern "C" {
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup ccm_module CCM
+ * \defgroup mbedtls_ccm_module CCM
  * \{
  */
 

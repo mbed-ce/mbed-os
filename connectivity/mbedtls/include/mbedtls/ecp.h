@@ -45,7 +45,7 @@
 /**
  * \addtogroup mbedtls
  * \{
- * \defgroup ecp_module Elliptic Curves over GF(P)
+ * \defgroup mbedtls_ecp_module Elliptic Curves over GF(P)
  * \{
  */
 

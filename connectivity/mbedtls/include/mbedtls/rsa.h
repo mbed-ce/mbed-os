@@ -41,6 +41,13 @@
 #include "mbedtls/threading.h"
 #endif
 
+/**
+ * \addtogroup mbedtls
+ * \{
+ * \defgroup mbedtls_rsa_module RSA
+ * \{
+ */
+
 /*
  * RSA Error codes
  */
@@ -1271,5 +1278,8 @@ int mbedtls_rsa_self_test( int verbose );
 #ifdef __cplusplus
 }
 #endif
+
+/// \}
+/// \}
 
 #endif /* rsa.h */

@@ -52,7 +52,7 @@ extern "C" {
 /**
 * \addtogroup mbedtls
 * \{
-* \defgroup ecdh_module Elliptic Curve Diffie-Hellman
+* \defgroup mbedtls_ecdh_module Elliptic Curve Diffie-Hellman
 * \{
 */
 

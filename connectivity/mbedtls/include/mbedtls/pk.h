@@ -642,7 +642,7 @@ const char * mbedtls_pk_get_name( const mbedtls_pk_context *ctx );
 mbedtls_pk_type_t mbedtls_pk_get_type( const mbedtls_pk_context *ctx );
 
 #if defined(MBEDTLS_PK_PARSE_C)
-/** \ingroup pk_module */
+/** \ingroup mbedtls_pk_module */
 /**
  * \brief           Parse a private key in PEM or DER format
  *
@@ -675,7 +675,7 @@ int mbedtls_pk_parse_key( mbedtls_pk_context *ctx,
                   const unsigned char *key, size_t keylen,
                   const unsigned char *pwd, size_t pwdlen );
 
-/** \ingroup pk_module */
+/** \ingroup mbedtls_pk_module */
 /**
  * \brief           Parse a public key in PEM or DER format
  *
@@ -701,7 +701,7 @@ int mbedtls_pk_parse_public_key( mbedtls_pk_context *ctx,
                          const unsigned char *key, size_t keylen );
 
 #if defined(MBEDTLS_FS_IO)
-/** \ingroup pk_module */
+/** \ingroup mbedtls_pk_module */
 /**
  * \brief           Load and parse a private key
  *
@@ -725,7 +725,7 @@ int mbedtls_pk_parse_public_key( mbedtls_pk_context *ctx,
 int mbedtls_pk_parse_keyfile( mbedtls_pk_context *ctx,
                       const char *path, const char *password );
 
-/** \ingroup pk_module */
+/** \ingroup mbedtls_pk_module */
 /**
  * \brief           Load and parse a public key
  *
