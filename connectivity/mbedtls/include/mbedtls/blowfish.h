@@ -40,8 +40,8 @@
  * \{
  */
 
-#define MBEDTLS_BLOWFISH_ENCRYPT     1
-#define MBEDTLS_BLOWFISH_DECRYPT     0
+#define MBEDTLS_BLOWFISH_ENCRYPT     1 ///< Constant to select blowfish encryption
+#define MBEDTLS_BLOWFISH_DECRYPT     0 ///< Constant to select blowfish decryption
 #define MBEDTLS_BLOWFISH_MAX_KEY_BITS     448
 #define MBEDTLS_BLOWFISH_MIN_KEY_BITS     32
 #define MBEDTLS_BLOWFISH_ROUNDS      16         /**< Rounds to use. When increasing this value, make sure to extend the initialisation vectors */

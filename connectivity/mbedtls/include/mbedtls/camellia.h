@@ -40,8 +40,8 @@
  * \{
  */
 
-#define MBEDTLS_CAMELLIA_ENCRYPT     1
-#define MBEDTLS_CAMELLIA_DECRYPT     0
+#define MBEDTLS_CAMELLIA_ENCRYPT     1 ///< Constant to select camellia encryption
+#define MBEDTLS_CAMELLIA_DECRYPT     0 ///< Constant to select camellia decryption
 
 #if !defined(MBEDTLS_DEPRECATED_REMOVED)
 #define MBEDTLS_ERR_CAMELLIA_INVALID_KEY_LENGTH   MBEDTLS_DEPRECATED_NUMERIC_CONSTANT( -0x0024 )

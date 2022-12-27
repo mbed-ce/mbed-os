@@ -406,7 +406,7 @@ int mbedtls_ecdsa_write_signature( mbedtls_ecdsa_context *ctx,
  * \param slen      The address at which to store the actual length of
  *                  the signature written. Must not be \c NULL.
  * \param f_rng     The RNG function. This must not be \c NULL if
- *                  #MBEDTLS_ECDSA_DETERMINISTIC is unset. Otherwise,
+ *                  MBEDTLS_ECDSA_DETERMINISTIC is unset. Otherwise,
  *                  it is unused and may be set to \c NULL.
  * \param p_rng     The RNG context to be passed to \p f_rng. This may be
  *                  \c NULL if \p f_rng is \c NULL or doesn't use a context.

@@ -218,8 +218,8 @@ typedef enum {
 /** Type of operation. */
 typedef enum {
     MBEDTLS_OPERATION_NONE = -1,
-    MBEDTLS_DECRYPT = 0,
-    MBEDTLS_ENCRYPT,
+    MBEDTLS_DECRYPT = 0, ///< Operation type for decryption
+    MBEDTLS_ENCRYPT, ///< Operation type for encryption
 } mbedtls_operation_t;
 
 enum {

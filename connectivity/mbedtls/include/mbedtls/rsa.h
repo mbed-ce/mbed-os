@@ -80,7 +80,7 @@
 #define MBEDTLS_RSA_SIGN        1 /**< Identifier for RSA signature operations. */
 #define MBEDTLS_RSA_CRYPT       2 /**< Identifier for RSA encryption and decryption operations. */
 
-#define MBEDTLS_RSA_SALT_LEN_ANY    -1
+#define MBEDTLS_RSA_SALT_LEN_ANY    -1 ///< Constant for mbedtls_rsa_rsassa_pss_verify_ext to accept any salt length
 
 /*
  * The above constants may be used even if the RSA module is compile out,
