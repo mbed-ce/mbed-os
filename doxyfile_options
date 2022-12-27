@@ -947,7 +947,8 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */FEATURE_BLE/source/* \
                          */FEATURE_BLE/libraries/cordio_stack/* \
                          */FEATURE_BLE/libraries/TARGET_*/stack/* \
-                         */platform/FEATURE_EXPERIMENTAL_API/FEATURE_PSA/TARGET_TFM/*
+                         */platform/FEATURE_EXPERIMENTAL_API/FEATURE_PSA/TARGET_TFM/* \
+                         */platform/FEATURE_EXPERIMENTAL_API/FEATURE_PSA/TARGET_MBED_PSA_SRV/test_abstraction_layers/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

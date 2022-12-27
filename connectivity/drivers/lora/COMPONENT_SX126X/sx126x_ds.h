@@ -3,7 +3,7 @@
  *
  * \brief     SX126x driver implementation
  *
- * \copyright Revised BSD License, see section \ref LICENSE.
+ * \copyright Revised BSD License
  *
  * \code
  *                ______                              _
