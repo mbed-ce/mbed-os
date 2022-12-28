@@ -435,17 +435,19 @@ protected:
      *  Receives data and stores the source address in address if address
      *  is not NULL. Returns the number of bytes received into the buffer.
      *
-     *  Additional information related to the message can be retrieved with
-     *  the control data.
+     *  Ancillary data is stored into \c control.  The caller needs to allocate a buffer
+     *  that is large enough to contain the data they want to receive, then pass the pointer in
+     *  through the \c control member.  The data will be filled into \c control, beginning with a header
+     *  specifying what data was received.  See #MsgHeaderIterator for how to parse this data.
      *
      *  This call is non-blocking. If recvfrom would block,
      *  NSAPI_ERROR_WOULD_BLOCK is returned immediately.
      *
      *  @param handle   Socket handle
      *  @param address  Destination for the source address or NULL
-     *  @param buffer   Destination buffer for data received from the host
+     *  @param data     Destination buffer for data received from the host
      *  @param size     Size of the buffer in bytes
-     *  @param control     Storage for ancillary data
+     *  @param control  Storage for ancillary data
      *  @param control_size   Size of  ancillary data
      *  @return         Number of received bytes on success, negative error
      *                  code on failure
