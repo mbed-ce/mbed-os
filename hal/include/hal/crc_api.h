@@ -121,8 +121,11 @@ extern "C" {
  *
  * Example:
  *
+ * @code
  *    #define HAL_CRC_IS_SUPPORTED(polynomial, width) \
  *         ((width) == 16 || ((width) == 32 && (polynomial) == POLY_32BIT_ANSI)
+ * @endcode
+ *
  * @{
  */
 

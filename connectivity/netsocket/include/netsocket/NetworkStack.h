@@ -238,8 +238,15 @@ public:
     /** Dynamic downcast to a OnboardNetworkStack */
     virtual OnboardNetworkStack *onboardNetworkStack()
     {
-        return 0;
+        return nullptr;
     }
+
+    /**
+     * Type for a call-in callback.
+     * This is a pointer to a function that will call the provided callback from the network stack
+     * after a given delay, or immediately if \p delay_ms is 0.
+     */
+    typedef mbed::Callback<nsapi_error_t (int delay_ms, mbed::Callback<void()> user_cb)> call_in_callback_cb_t;
 
 protected:
     friend class InternetSocket;
@@ -502,12 +509,6 @@ protected:
                                      int optname, void *optval, unsigned *optlen);
 
 private:
-
-    /** Call in callback
-      *
-      *  Callback is used to call the call in method of the network stack.
-      */
-    typedef mbed::Callback<nsapi_error_t (int delay_ms, mbed::Callback<void()> user_cb)> call_in_callback_cb_t;
 
     /** Get a call in callback
      *

@@ -304,24 +304,6 @@ protected:
 
 private:
 
-    /** Call in callback
-      *
-      *  Callback is used to call the call in method of the network stack.
-      */
-    typedef mbed::Callback<nsapi_error_t (int delay_ms, mbed::Callback<void()> user_cb)> call_in_callback_cb_t;
-
-    /** Get a call in callback
-     *
-     *  Get a call in callback from the network stack context.
-     *
-     *  Callback should not take more than 10ms to execute, otherwise it might
-     *  prevent underlying thread processing. A portable user of the callback
-     *  should not make calls to network operations due to stack size limitations.
-     *  The callback should not perform expensive operations such as socket recv/send
-     *  calls or blocking operations.
-     *
-     *  @return         Call in callback
-     */
     call_in_callback_cb_t get_call_in_callback() override;
 
     /** Call a callback after a delay
