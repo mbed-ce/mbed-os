@@ -138,7 +138,7 @@ extern "C" {
  * * Passing pins that cannot be on the same peripheral
  * * Passing an invalid pointer as `obj` to any function
  * * Passing an invalid pointer as `handler` to ::spi_master_transfer
- * * Calling ::spi_abort while no async transfer is being processed (no transfer or a synchronous transfer)
+ * * Calling ::spi_abort_asynch while no async transfer is being processed (no transfer or a synchronous transfer)
  *
  * @{
  */

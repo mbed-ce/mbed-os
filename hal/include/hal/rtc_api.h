@@ -75,7 +75,7 @@ extern "C" {
  * before any other RTC functions ares called. This does not change the state
  * of the RTC. It just enables access to it.
  *
- * @note This function is safe to call repeatedly - Tested by ::rtc_init_test
+ * @note This function is safe to call repeatedly - Tested by rtc_init_test
  *
  * Example Implementation Pseudo Code:
  * @code
@@ -102,7 +102,7 @@ void rtc_init(void);
  * After this function is called no other RTC functions should be called
  * except for ::rtc_init.
  *
- * @note This function does not stop the RTC from counting - Tested by ::rtc_persist_test
+ * @note This function does not stop the RTC from counting - Tested by rtc_persist_test
  *
  * Example Implementation Pseudo Code:
  * @code
@@ -141,7 +141,7 @@ int rtc_isenabled(void);
  * @note Some RTCs are not synchronized with the main clock. If
  * this is the case with your RTC then you must read the RTC time
  * in a loop to prevent reading the wrong time due to a glitch.
- * The test ::rtc_glitch_test is intended to catch this bug.
+ * The test rtc_glitch_test is intended to catch this bug.
  *
  * Example implementation for an unsynchronized ripple counter:
  * @code

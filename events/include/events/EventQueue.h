@@ -725,6 +725,7 @@ public:
      * @endcode
      *
      *  @param f        Function to execute when the event is dispatched
+     *  @param args     List of arguments that will be passed to \c f
      *  @return         Event that will dispatch on the specific queue
      */
     template <typename F, typename... ArgTs>
