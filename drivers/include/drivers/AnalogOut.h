@@ -66,7 +66,7 @@ public:
     }
 
     AnalogOut(const PinMap &&) = delete; // prevent passing of temporary objects
-    
+
     /** Create an AnalogOut connected to the specified pin
      *
      * @param pinmap reference to structure which holds static pinmap.
