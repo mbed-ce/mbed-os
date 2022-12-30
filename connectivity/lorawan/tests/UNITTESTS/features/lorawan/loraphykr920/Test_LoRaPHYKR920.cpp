@@ -76,7 +76,7 @@ public:
 
     radio_state_t get_status(void) override
     {
-        return 0;
+        return RF_IDLE;
     };
 
     virtual void set_max_payload_length(radio_modems_t modem, uint8_t max)

@@ -80,7 +80,7 @@ public:
      * @param fh    file handle used for reading AT responses and writing AT commands
      * @param delim delimiter used when parsing at responses, "\r" should be used as output_delimiter
      */
-    AT_CellularDevice(FileHandle *fh, char *delim = "\r");
+    AT_CellularDevice(FileHandle *fh, char const *delim = "\r");
 
     virtual ~AT_CellularDevice();
 
