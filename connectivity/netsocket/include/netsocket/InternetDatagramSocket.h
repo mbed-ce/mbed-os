@@ -154,7 +154,7 @@ public:
      *  @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
      *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
      *                  and send cannot be performed immediately.
-     *  #retval         NSAPI_ERROR_NO_ADDRESS if the address was not set with connect().
+     *  @retval         NSAPI_ERROR_NO_ADDRESS if the address was not set with connect().
      *  @retval         Other negative error codes for stack-related failures.
      *                  See \ref NetworkStack::socket_send.
      */

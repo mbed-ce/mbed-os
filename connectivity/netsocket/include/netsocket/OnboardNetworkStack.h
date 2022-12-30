@@ -142,19 +142,17 @@ public:
             return NSAPI_ERROR_UNSUPPORTED;
         }
 
-        /** Copies netmask of the network interface to user supplied buffer
-        *
-        * @param    buf        buffer to which netmask will be copied as "W:X:Y:Z"
-        * @param    buflen     size of supplied buffer
-        * @return              Pointer to a buffer, or NULL if the buffer is too small
-        */
+        /** Writes the netmask of the network interface into a user-supplied #SocketAddress.
+         *
+         * @param    address    Structure to write netmask into.
+         * @return              Error code or success.
+         */
         virtual nsapi_error_t get_netmask(SocketAddress *address) = 0;
 
-        /** Copies gateway address of the network interface to user supplied buffer
+        /** Writes the gateway address of the network interface into a user-supplied #SocketAddress.
          *
-         * @param    buf        buffer to which gateway address will be copied as "W:X:Y:Z"
-         * @param    buflen     size of supplied buffer
-         * @return              Pointer to a buffer, or NULL if the buffer is too small
+         * @param    address    Structure to write netmask into.
+         * @return              Error code or success.
          */
         virtual nsapi_error_t get_gateway(SocketAddress *address) = 0;
     };
@@ -167,7 +165,8 @@ public:
      *
      * @param      emac             EMAC HAL implementation for this network interface
      * @param      default_if       true if the interface should be treated as the default one
-     * @param[out] interface_out    pointer to stack interface object controlling the EMAC
+     * @param[out] interface_out    Network stack's representation of the network interface will be saved to this pointer.
+     * @param[in] user_network_interface Pointer to NetworkInterface that represents the ethernet interface being added.
      * @return                      NSAPI_ERROR_OK on success, or error code
      */
     virtual nsapi_error_t add_ethernet_interface(EMAC &emac, bool default_if, Interface **interface_out, NetworkInterface *user_network_interface = NULL) = 0;
