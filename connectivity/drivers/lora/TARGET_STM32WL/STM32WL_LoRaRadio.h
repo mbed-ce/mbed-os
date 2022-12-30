@@ -107,7 +107,7 @@ public:
      *  @param symb_timeout  Sets the RxSingle timeout value
      *                          FSK : timeout number of bytes
      *                          LoRa: timeout in symbols
-     *  @param fixLen        Fixed length packets [0: variable, 1: fixed]
+     *  @param fix_len        Fixed length packets [0: variable, 1: fixed]
      *  @param payload_len   Sets payload length when fixed lenght is used
      *  @param crc_on        Enables/Disables the CRC [0: OFF, 1: ON]
      *  @param freq_hop_on   Enables disables the intra-packet frequency hopping  [0: OFF, 1: ON] (LoRa only)
@@ -211,9 +211,9 @@ public:
      *  Get radio status
      *
      *  @param status        Radio status [RF_IDLE, RF_RX_RUNNING, RF_TX_RUNNING]
-     *  @return              Return current radio status
+     *  @return              Current radio status
      */
-    virtual uint8_t get_status(void);
+    virtual radio_state_t get_status(void);
 
     /**
      *  Sets the maximum payload length
