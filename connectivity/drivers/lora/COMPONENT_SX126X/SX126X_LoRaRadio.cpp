@@ -1273,14 +1273,14 @@ radio_state_t SX126X_LoRaRadio::get_status(void)
 {
     switch(_operation_mode)
     {
-    case MODE_TX:
-        return RF_TX_RUNNING;
-    case MODE_RX:
-        return RF_RX_RUNNING;
-    case MODE_CAD:
-        return RF_CAD;
-    default: // various standby states
-        return RF_IDLE;
+        case MODE_TX:
+            return RF_TX_RUNNING;
+        case MODE_RX:
+            return RF_RX_RUNNING;
+        case MODE_CAD:
+            return RF_CAD;
+        default: // various standby states
+            return RF_IDLE;
     }
 }
 
