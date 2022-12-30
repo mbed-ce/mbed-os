@@ -56,7 +56,6 @@ namespace mbed {
 class AnalogOut {
 
 public:
-
     /** Create an AnalogOut connected to the specified pin
      *
      * @param pin AnalogOut pin to connect to

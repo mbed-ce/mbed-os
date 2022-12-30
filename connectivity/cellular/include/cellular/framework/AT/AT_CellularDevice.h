@@ -74,12 +74,12 @@ public:
 
 public:
 
-	/**
-	 * Create an AT_CellularDevice.
-	 *
-	 * @param fh    file handle used for reading AT responses and writing AT commands
-	 * @param delim delimiter used when parsing at responses, "\r" should be used as output_delimiter
-	 */
+    /**
+     * Create an AT_CellularDevice.
+     *
+     * @param fh    file handle used for reading AT responses and writing AT commands
+     * @param delim delimiter used when parsing at responses, "\r" should be used as output_delimiter
+     */
     AT_CellularDevice(FileHandle *fh, char *delim = "\r");
 
     virtual ~AT_CellularDevice();
