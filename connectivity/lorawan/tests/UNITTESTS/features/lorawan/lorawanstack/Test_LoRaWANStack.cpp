@@ -100,7 +100,7 @@ public:
         return 4;
     };
 
-    virtual uint8_t get_status(void)
+    radio_state_t get_status(void) override
     {
         return uint8_value;
     };

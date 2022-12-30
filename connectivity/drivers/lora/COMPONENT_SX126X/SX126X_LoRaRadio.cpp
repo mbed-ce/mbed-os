@@ -1271,8 +1271,7 @@ void SX126X_LoRaRadio::set_buffer_base_addr(uint8_t tx_base_addr, uint8_t rx_bas
 
 radio_state_t SX126X_LoRaRadio::get_status(void)
 {
-    switch(_operation_mode)
-    {
+    switch(_operation_mode) {
         case MODE_TX:
             return RF_TX_RUNNING;
         case MODE_RX:
