@@ -107,27 +107,25 @@ jobs:
           git diff --exit-code --diff-filter=d --color
 
 
-#  docs-check:
-#    runs-on: ubuntu-latest
-#    container:
-#      image: ghcr.io/armmbed/mbed-os-env:master-latest
-#
-#    steps:
-#
-#      - name: Checkout repo
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
-#          submodules: recursive
-#
-#      - name: Spell Checks
-#        run: |
-#          set -x
-#          ./tools/test/ci/doxy-spellchecker/spell.sh drivers .codecheckignore
-#          ./tools/test/ci/doxy-spellchecker/spell.sh platform .codecheckignore
-#          ./tools/test/ci/doxy-spellchecker/spell.sh events .codecheckignore
-#          ./tools/test/ci/doxy-spellchecker/spell.sh rtos .codecheckignore
-#          ./tools/test/ci/doxy-spellchecker/spell.sh connectivity/netsocket .codecheckignore
+  docs-check:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Spell Checks
+        run: |
+          set -x
+          ./tools/test/ci/doxy-spellchecker/spell.sh drivers .codecheckignore
+          ./tools/test/ci/doxy-spellchecker/spell.sh platform .codecheckignore
+          ./tools/test/ci/doxy-spellchecker/spell.sh events .codecheckignore
+          ./tools/test/ci/doxy-spellchecker/spell.sh rtos .codecheckignore
+          ./tools/test/ci/doxy-spellchecker/spell.sh connectivity/netsocket .codecheckignore
 #
 #      - name: Create BUILD folder
 #          run: |
