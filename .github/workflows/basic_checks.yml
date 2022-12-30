@@ -26,7 +26,7 @@ jobs:
         name: install dependencies
         shell: bash
         run: |
-          pip install -U scancode-toolkit click gemfileparser
+          pip install -U scancode-toolkit "click>=7,<8"
 
       - 
         name: license check 
@@ -129,7 +129,7 @@ jobs:
           # that do end with .s
           find  -name "*.s" | tee BUILD/badasm |
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
-          
+
   docs-check:
     runs-on: ubuntu-latest
 
