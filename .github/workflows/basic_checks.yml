@@ -42,7 +42,7 @@ jobs:
             | ( grep -v '^tools/test/toolchains/api_test.py' || true ) \
             | while read file; do cp --parents "${file}" SCANCODE; done
           ls SCANCODE
-          scancode -l --json-pp scancode.json SCANCODE
+          scancode -v -l --json-pp scancode.json SCANCODE
           python ./tools/test/ci/scancode-evaluate.py scancode.json || true
           cat scancode-evaluate.log
           COUNT=$(cat scancode-evaluate.log | grep 'File:' | grep -v 'SPDX' | wc -l) || true
