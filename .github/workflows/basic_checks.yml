@@ -106,6 +106,14 @@ jobs:
             | while read file; do astyle -n --options=.astylerc "${file}"; done
           git diff --exit-code --diff-filter=d --color
 
+      - name: Spell Checks
+        run: |
+          set -x
+          ./tools/test/ci/doxy-spellchecker/spell.sh drivers .codecheckignore
+          ./tools/test/ci/doxy-spellchecker/spell.sh platform .codecheckignore
+          ./tools/test/ci/doxy-spellchecker/spell.sh events .codecheckignore
+          ./tools/test/ci/doxy-spellchecker/spell.sh rtos .codecheckignore
+          ./tools/test/ci/doxy-spellchecker/spell.sh connectivity/netsocket .codecheckignore
 
   docs-check:
     runs-on: ubuntu-latest
@@ -118,23 +126,14 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Spell Checks
-        run: |
-          set -x
-          ./tools/test/ci/doxy-spellchecker/spell.sh drivers .codecheckignore
-          ./tools/test/ci/doxy-spellchecker/spell.sh platform .codecheckignore
-          ./tools/test/ci/doxy-spellchecker/spell.sh events .codecheckignore
-          ./tools/test/ci/doxy-spellchecker/spell.sh rtos .codecheckignore
-          ./tools/test/ci/doxy-spellchecker/spell.sh connectivity/netsocket .codecheckignore
-#
-#      - name: Create BUILD folder
-#          run: |
-#            mkdir -p ${{ github.workspace }}/BUILD
-#
-#      - name: Doxygen Action
-#        uses: mattnotmitt/doxygen-action@v1.9.1
-#        with:
-#          doxyfile-path: ./doxyfile_options
+      - name: Create BUILD folder
+          run: |
+            mkdir -p ${{ github.workspace }}/BUILD
+
+      - name: Doxygen Action
+        uses: mattnotmitt/doxygen-action@v1.9.1
+        with:
+          doxyfile-path: ./doxyfile_options
 #
 #      - name: File Naming Checks
 #        run: |
