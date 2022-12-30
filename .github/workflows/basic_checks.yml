@@ -115,6 +115,21 @@ jobs:
           ./tools/test/ci/doxy-spellchecker/spell.sh rtos .codecheckignore
           ./tools/test/ci/doxy-spellchecker/spell.sh connectivity/netsocket .codecheckignore
 
+      - name: File Naming Checks
+        run: |
+          set -x
+          # Assert that all binary libraries are named correctly
+          # The strange command below asserts that there are exactly 0 libraries
+          # that do not start with lib
+          find "(" -name "*.a" -or -name "*.ar" ")" -and -not -name "lib*" |
+          tee BUILD/badlibs |
+          sed -e "s/^/Bad library name found: /" && [ ! -s BUILD/badlibs ]
+          # Assert that all assembler files are named correctly
+          # The strange command below asserts that there are exactly 0 libraries
+          # that do end with .s
+          find  -name "*.s" | tee BUILD/badasm |
+          sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
+          
   docs-check:
     runs-on: ubuntu-latest
 
@@ -127,28 +142,13 @@ jobs:
           submodules: recursive
 
       - name: Create BUILD folder
-          run: |
-            mkdir -p ${{ github.workspace }}/BUILD
+        run: |
+          mkdir -p ${{ github.workspace }}/BUILD
 
       - name: Doxygen Action
         uses: mattnotmitt/doxygen-action@v1.9.1
         with:
           doxyfile-path: ./doxyfile_options
-#
-#      - name: File Naming Checks
-#        run: |
-#          set -x
-#          # Assert that all binary libraries are named correctly
-#          # The strange command below asserts that there are exactly 0 libraries
-#          # that do not start with lib
-#          find "(" -name "*.a" -or -name "*.ar" ")" -and -not -name "lib*" |
-#          tee BUILD/badlibs |
-#          sed -e "s/^/Bad library name found: /" && [ ! -s BUILD/badlibs ]
-#          # Assert that all assembler files are named correctly
-#          # The strange command below asserts that there are exactly 0 libraries
-#          # that do end with .s
-#          find  -name "*.s" | tee BUILD/badasm |
-#          sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
   python-tests:
     # these tests run in 3.7, hence running in vm not in pre-built docker
