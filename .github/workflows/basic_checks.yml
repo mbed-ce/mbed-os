@@ -118,9 +118,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          submodules: recursive
     
-      - 
-        name: spell checks
+      - name: Spell Checks
         run: |
           set -x
           ./tools/test/ci/doxy-spellchecker/spell.sh drivers .codecheckignore
@@ -129,18 +129,18 @@ jobs:
           ./tools/test/ci/doxy-spellchecker/spell.sh rtos .codecheckignore
           ./tools/test/ci/doxy-spellchecker/spell.sh connectivity/netsocket .codecheckignore
 
-      - 
-        name: doxygen
+      - name: Create BUILD folder
+          run: |
+            mkdir -p ${{ github.workspace }}/BUILD
+
+      - name: Doxygen Action
+        uses: mattnotmitt/doxygen-action@v1.9.1
+        with:
+          doxyfile-path: ./doxyfile_options
+
+      - name: File Naming Checks
         run: |
           set -x
-          ccache -s
-          mkdir BUILD
-          # Assert that the Doxygen build produced no warnings.
-          # The strange command below asserts that the Doxygen command had an
-          # output of zero length
-          doxygen doxyfile_options 2>&1
-          # Once Mbed OS has been fixed, enable the full test by replacing the top line with this:
-          # - ( ! doxygen doxyfile_options 2>&1 | grep . )
           # Assert that all binary libraries are named correctly
           # The strange command below asserts that there are exactly 0 libraries
           # that do not start with lib
