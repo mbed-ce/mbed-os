@@ -170,31 +170,9 @@ typedef enum {
 #endif
 
     // Generic signals namings
-    LED1        = PC_13,
-    USER_BUTTON = PA_0,
-
+#define LED1        = PC_13,
     // Standardized button names
-    BUTTON1     = USER_BUTTON,
-
-    // Serial backword compatibility
-    STDIO_UART_TX = CONSOLE_TX,
-    STDIO_UART_RX = CONSOLE_RX,
-    SERIAL_TX     = CONSOLE_TX,
-    SERIAL_RX     = CONSOLE_RX,
-#ifndef USBTX
-    USBTX         = CONSOLE_TX,
-#endif
-#ifndef USBRX
-    USBRX         = CONSOLE_RX,
-#endif
-
-    I2C_SCL     = PB_8,
-    I2C_SDA     = PB_9,
-    SPI_MOSI    = PA_7,
-    SPI_MISO    = PA_6,
-    SPI_SCK     = PA_5,
-    SPI_CS      = PB_6,
-    PWM_OUT     = PB_3,
+#define BUTTON1     = USER_BUTTON,
 
     /**** USB FS pins ****/
     USB_OTG_FS_DM = PA_11,
