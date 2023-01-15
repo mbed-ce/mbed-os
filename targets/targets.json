@@ -1922,15 +1922,11 @@
         "inherits": [
             "MCU_STM32F411xE"
         ],
-        "device_has_remove": [
-            "LPTICKER"
-        ],
         "macros_add": [
             "HSE_VALUE=25000000U"
         ],
         "overrides": {
-            "lse_available": 1,
-            "clock_source": "USE_PLL_HSE_XTAL"
+            "clock_source": "USE_PLL_HSI | USE_PLL_HSE_XTAL"
         },
         "device_has_add": [
             "USBDEVICE"
