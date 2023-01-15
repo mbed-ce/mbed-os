@@ -30,7 +30,7 @@ set(JLINK_UPLOAD_INTERFACE SWD)
 # -------------------------------------------------------------
 
 set(PYOCD_UPLOAD_ENABLED TRUE)
-set(PYOCD_TARGET_NAME STM32F41CE)
+set(PYOCD_TARGET_NAME STM32F411CE)
 set(PYOCD_CLOCK_SPEED 4000k)
 
 # Config options for OPENOCD
