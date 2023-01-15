@@ -214,11 +214,11 @@ typedef enum {
     RCC_OSC_OUT = PH_1,
 
     /**** DEBUG pins ****/
-    SYS_JTCK_SWCLK = PA_14,
-    SYS_JTDI = PA_15,
-    SYS_JTDO_SWO = PB_3,
-    SYS_JTMS_SWDIO = PA_13,
-    SYS_JTRST = PB_4,
+    DEBUG_JTCK_SWCLK = PA_14,
+    DEBUG_JTDI = PA_15,
+    DEBUG_JTDO_SWO = PB_3,
+    DEBUG_JTMS_SWDIO = PA_13,
+    DEBUG_JTRST = PB_4,
     SYS_WKUP = PA_0,
 
 } PinName;

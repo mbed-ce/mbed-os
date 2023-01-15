@@ -31,12 +31,15 @@
 #include "stm32f4xx.h"
 #include "mbed_error.h"
 
+// For clock debugging purpose - output on MCO2 pin(PC9) 
+#define FREQDEBUG  0 
+
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC     0x8  // Use external clock (ST Link MCO)
 #define USE_PLL_HSE_XTAL     0x4  // Use external xtal (X3 on board - not provided by default)
 #define USE_PLL_HSI          0x2  // Use HSI internal clock
 
-#if ( ((CLOCK_SOURCE) & USE_PLL_HSE_XTAL) || ((CLOCK_SOURCE) & USE_PLL_HSE_EXTC) )
+#if ( ((CLOCK_SOURCE) & USE_PLL_HSE_XTAL) || ((CLOCK_SOURCE) & USE_PLL_HSE_EXTC))
 uint8_t SetSysClock_PLL_HSE(uint8_t bypass);
 #endif /* ((CLOCK_SOURCE) & USE_PLL_HSE_XTAL) || ((CLOCK_SOURCE) & USE_PLL_HSE_EXTC) */
 
@@ -77,9 +80,10 @@ void SetSysClock(void)
             }
         }
     }
-
+#if FREQDEBUG == 1
     /* Output clock on MCO2 pin(PC9) for debugging purpose */
-    //HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCODIV_4);
+    HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCODIV_4);
+#endif
 }
 
 #if ( ((CLOCK_SOURCE) & USE_PLL_HSE_XTAL) || ((CLOCK_SOURCE) & USE_PLL_HSE_EXTC) )
@@ -88,6 +92,8 @@ void SetSysClock(void)
 /******************************************************************************/
 uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 {
+    if(bypass) return 0; // FAIL because it is not supported
+    
     RCC_OscInitTypeDef RCC_OscInitStruct;
     RCC_ClkInitTypeDef RCC_ClkInitStruct;
 
@@ -105,12 +111,7 @@ uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 
         // Enable HSE oscillator and activate PLL with HSE as source
         RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSE;
-        if (bypass == 0) {
-            RCC_OscInitStruct.HSEState          = RCC_HSE_ON;       // External 25 MHz xtal on OSC_IN/OSC_OUT
-        } else {
-            RCC_OscInitStruct.HSEState          = RCC_HSE_BYPASS;   // External 25 MHz clock on OSC_IN
-        }
-
+        RCC_OscInitStruct.HSEState          = RCC_HSE_ON;       // External 25 MHz xtal on OSC_IN/OSC_OUT
         RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
         RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
         #if (DEVICE_USBDEVICE)
@@ -138,13 +139,9 @@ uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK) {
         return 0; // FAIL
     }
-
-    /* Output clock on MCO1 pin(PA8) for debugging purpose */
-    //if (bypass == 0)
-    //  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSE, RCC_MCODIV_2); // 4 MHz with xtal
-    //else
-    //  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSE, RCC_MCODIV_1); // 8 MHz with external clock
-
+#if FREQDEBUG == 1 /* Output clock on MCO1 pin(PA8) for debugging purpose */
+    HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSE, RCC_MCODIV_2); // 4 MHz with xtal
+#endif
     return 1; // OK
 }
 #endif /* ((CLOCK_SOURCE) & USE_PLL_HSE_XTAL) || ((CLOCK_SOURCE) & USE_PLL_HSE_EXTC) */
@@ -193,8 +190,9 @@ uint8_t SetSysClock_PLL_HSI(void)
         return 0; // FAIL
     }
 
-    /* Output clock on MCO1 pin(PA8) for debugging purpose */
-    //HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSI, RCC_MCODIV_1); // 16 MHz
+#if FREQDEBUG == 1 /* Output clock on MCO1 pin(PA8) for debugging purpose */
+    HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSI, RCC_MCODIV_1); // 16 MHz
+#endif
 
     return 1; // OK
 }
