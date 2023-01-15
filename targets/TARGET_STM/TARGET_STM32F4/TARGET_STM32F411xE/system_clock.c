@@ -150,7 +150,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 /******************************************************************************/
 /*            PLL (clocked by HSI) used as System clock source                */
 /******************************************************************************/
-uint8_t SetSysClock_PLL_HSI(void)
+MBED_WEAK uint8_t SetSysClock_PLL_HSI(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct;
     RCC_ClkInitTypeDef RCC_ClkInitStruct;
