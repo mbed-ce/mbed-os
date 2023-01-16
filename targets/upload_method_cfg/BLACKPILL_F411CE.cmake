@@ -5,7 +5,7 @@
 # Notes:
 # 1. Using the JLINK upload method with your dev board requires converting its ST-LINK into a J-Link.  See here for details: https://www.segger.com/products/debug-probes/j-link/models/other-j-links/st-link-on-board/
 # 2. If your target is not natively supported by the pyOCD, then you need install a keil package for family of your target by hands. Type "pyocd pack show" to console and you will see a list of already installed packages.
-#   If any package for your family is not on the list, then you need install them via command "pyocd pack install stm32f1".Then just type "pyocd pack find STM32f1" or "pyocd pack find STM32f103" and you will see the part name of your target.
+#   If any package for your family is not on the list, then you need install them via command "pyocd pack install stm32f4".Then just type "pyocd pack find STM32f4" or "pyocd pack find STM32f411" and you will see the part name of your target.
 #   Alternqativly you can type command "pyocd list" whne your board is connected. You will see state of your board.
 
 # General config parameters
