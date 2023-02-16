@@ -1188,9 +1188,7 @@ usb_status_t USB_DeviceEhciInit(uint8_t controllerId,
     usb_device_ehci_state_struct_t *ehciState;
     uint32_t ehci_base[] = USBHS_BASE_ADDRS;
     uint8_t intanceIndex;
-
-    printf("Hello World from inside usb_device_ehci.c, controllerId = %u\n", controllerId);
-
+    
 #if (defined(USB_DEVICE_CONFIG_CHARGER_DETECT) && (USB_DEVICE_CONFIG_CHARGER_DETECT > 0U)) && \
     ((defined(FSL_FEATURE_SOC_USBHSDCD_COUNT) && (FSL_FEATURE_SOC_USBHSDCD_COUNT > 0U)) || \
     (defined(FSL_FEATURE_SOC_USB_ANALOG_COUNT) && (FSL_FEATURE_SOC_USB_ANALOG_COUNT > 0U)))
