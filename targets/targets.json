@@ -3248,13 +3248,14 @@
             "STM32H725xE"
         ],
         "macros_add": [
+            "MBED_SPLIT_HEAP",
             "STM32H725xx"
         ],
         "overrides": {
             "system_power_supply": "PWR_LDO_SUPPLY"
         }
     },
-	    "WIO_H725AE": {
+	"WIO_H725AE": {
         "inherits": [
             "MCU_STM32H725xE"
         ],

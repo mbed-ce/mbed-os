@@ -200,8 +200,8 @@ SECTIONS
 
     } > SRAM
 
-    /* Check if bss exceeds SRAM */
-    ASSERT(__data_end__ <= (ORIGIN(SRAM)+LENGTH(SRAM)), ".data is too big for SRAM")
+    /* Check if data exceeds SRAM */
+    ASSERT(__data_end__ <= (ORIGIN(SRAM)+LENGTH(SRAM)), "data is too big for SRAM")
 
     /* Uninitialized data section
      * This region is not initialized by the C/C++ library and can be used to
@@ -229,7 +229,7 @@ SECTIONS
     } > SRAM
 
     /* Check if bss exceeds SRAM */
-    ASSERT(__bss_end__ <= (ORIGIN(SRAM)+LENGTH(SRAM)), "BSS is too big for SRAM")
+    ASSERT(__bss_end__ <= (ORIGIN(SRAM)+LENGTH(SRAM)), "bss is too big for SRAM")
 
     .heap (COPY):
     {
