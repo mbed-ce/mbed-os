@@ -3248,6 +3248,7 @@
             "STM32H725xE"
         ],
         "macros_add": [
+            "MBED_SPLIT_HEAP",
             "STM32H725xx"
         ],
         "overrides": {
