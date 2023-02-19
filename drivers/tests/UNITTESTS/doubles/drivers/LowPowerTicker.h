@@ -41,7 +41,7 @@ public:
 
     void attach_us(Callback<void()> func, us_timestamp_t t)
     {
-        func(); 
+        func();
     }
 
     void detach()

@@ -19,25 +19,25 @@
 
 rtos::Mutex::Mutex()
 {
-	return;
+    return;
 }
 
 rtos::Mutex::~Mutex()
 {
-	return;
+    return;
 }
 
 osStatus rtos::Mutex::lock()
 {
-	return osOK;
+    return osOK;
 }
 
 osStatus rtos::Mutex::unlock()
 {
-	return osOK;
+    return osOK;
 }
 
 bool rtos::Mutex::trylock()
 {
-	return true;
+    return true;
 }
