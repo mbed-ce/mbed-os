@@ -6,7 +6,7 @@
 # Detect IDEs
 # -------------------------------------------------------------
 
-if($ENV{CLION_IDE} AND MBED_UPLOAD_SUPPORTS_DEBUG)
+if("$ENV{CLION_IDE}" AND MBED_UPLOAD_SUPPORTS_DEBUG)
 	message(STATUS "Mbed: Detected CLion IDE, will generate CLion debug configurations")
 	set(MBED_GENERATE_CLION_DEBUG_CFGS TRUE)
 
