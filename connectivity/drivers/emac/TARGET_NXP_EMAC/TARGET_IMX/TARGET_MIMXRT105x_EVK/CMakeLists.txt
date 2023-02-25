@@ -4,4 +4,5 @@
 target_sources(mbed-emac
     PRIVATE
         hardware_init.c
+		fsl_phy_ksz8081rnb.c
 )
