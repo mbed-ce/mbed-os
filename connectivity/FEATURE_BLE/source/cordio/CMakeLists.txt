@@ -15,12 +15,13 @@ target_include_directories(mbed-ble-cordio
 )
 
 target_sources(mbed-ble-cordio
+    PUBLIC
+        source/BLEInstanceBaseImpl.cpp
     PRIVATE
         driver/CordioHCIDriver.cpp
         driver/CordioHCITransportDriver.cpp
         driver/H4TransportDriver.cpp
 
-        source/BLEInstanceBaseImpl.cpp
         source/GattServerImpl.cpp
         source/PalAttClientImpl.cpp
         source/PalEventQueueImpl.cpp
