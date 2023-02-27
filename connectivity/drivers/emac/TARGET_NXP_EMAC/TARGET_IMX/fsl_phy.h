@@ -108,16 +108,6 @@ extern "C" {
 status_t PHY_Init(ENET_Type *base, uint32_t phyAddr, uint32_t srcClock_Hz);
 
 /*!
- * @brief Initiates auto negotiation.
- *
- * @param base       ENET peripheral base address.
- * @param phyAddr    The PHY address.
- * @retval kStatus_Success  PHY auto negotiation success
- * @retval kStatus_PHY_AutoNegotiateFail  PHY auto negotiate fail
- */
-status_t PHY_AutoNegotiation(ENET_Type *base, uint32_t phyAddr);
-
-/*!
  * @brief PHY Write function. This function write data over the SMI to
  * the specified PHY register. This function is called by all PHY interfaces.
  *
@@ -170,6 +160,25 @@ status_t PHY_EnableLoopback(ENET_Type *base, uint32_t phyAddr, phy_loop_t mode, 
  * @retval kStatus_PHY_SMIVisitTimeout  PHY SMI visit time out
  */
 status_t PHY_GetLinkStatus(ENET_Type *base, uint32_t phyAddr, bool *status);
+
+/*!
+ * @brief Gets the PHY autonegotiation status
+ *
+ * @param base     ENET peripheral base address.
+ * @param phyAddr  The PHY address.
+ * @param[out] status   Whether autonegotiation is done.
+ * @return Error code or success
+ */
+status_t PHY_GetAutonegotiationStatus(ENET_Type *base, uint32_t phyAddr, bool *status);
+
+/*!
+ * @brief Starts the autonegotiation process.  Should be called after the link comes up.
+ *
+ * @param base     ENET peripheral base address.
+ * @param phyAddr  The PHY address.
+ * @return Error code or success
+ */
+status_t PHY_StartAutonegotiation(ENET_Type *base, uint32_t phyAddr);
 
 /*!
  * @brief Gets the PHY link speed and duplex.

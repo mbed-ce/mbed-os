@@ -25,9 +25,8 @@
  to be as vector table */
 #undef __VECTOR_TABLE
 
-// Phy address appears to be 0 for the Teensy 4.1
-// Reference https://github.com/ssilverman/QNEthernet/blob/master/src/lwip_t41.c#L175
-#define BOARD_ENET_PHY_ADDR 0
+// Set to 1 by MIMXRT pullups/pulldowns on CRS_DV and RXD0
+#define BOARD_ENET_PHY_ADDR 1
 
 #include "objects.h"
 

@@ -3,6 +3,6 @@
 
 target_sources(mbed-emac
     PRIVATE
-        hardware_init.c
-		fsl_phy_dp83825.c
+	hardware_init.cpp
+	fsl_phy_dp83825.c
 )

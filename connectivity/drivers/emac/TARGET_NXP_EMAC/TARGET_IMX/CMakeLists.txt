@@ -16,4 +16,5 @@ target_include_directories(mbed-emac
 target_sources(mbed-emac
     PRIVATE
         imx_emac.cpp
+        fsl_phy_common.c
 )

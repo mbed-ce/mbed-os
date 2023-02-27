@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "cmsis_os.h"
 
@@ -73,7 +74,10 @@ extern "C" void kinetis_init_eth_hardware(void);
 /** \brief  Driver thread priority */
 #define THREAD_PRIORITY (osPriorityNormal)
 
-#define PHY_TASK_PERIOD      200ms
+#define PHY_TASK_PERIOD      50ms
+
+// Change to 1 to get debug printfs from the emac
+#define DEBUG_IMX_EMAC 1
 
 Kinetis_EMAC::Kinetis_EMAC() : xTXDCountSem(ENET_TX_RING_LEN, ENET_TX_RING_LEN), hwaddr()
 {
@@ -247,6 +251,9 @@ bool Kinetis_EMAC::low_level_init_successful()
     ENET_SetCallback(&g_handle, &Kinetis_EMAC::ethernet_callback, this);
     ENET_ActiveRead(ENET);
 
+    bool anStatus;
+    PHY_GetAutonegotiationStatus(ENET, phyAddr, &anStatus);
+
     return true;
 }
 
@@ -323,6 +330,8 @@ void Kinetis_EMAC::input(int idx)
     if (p == NULL) {
         return;
     }
+
+    printf("Got packet!\n");
 
     emac_link_input_cb(p);
 }
@@ -448,44 +457,40 @@ bool Kinetis_EMAC::link_out(emac_mem_buf_t *buf)
  * PHY task: monitor link
 *******************************************************************************/
 
-#define STATE_UNKNOWN           (-1)
-#define STATE_LINK_DOWN         (0)
-#define STATE_LINK_UP           (1)
 
 void Kinetis_EMAC::phy_task()
 {
     uint32_t phyAddr = BOARD_ENET_PHY_ADDR;
 
     // Get current status
-    PHY_STATE crt_state;
-    bool connection_status;
-    PHY_GetLinkStatus(ENET, phyAddr, &connection_status);
+    PHY_STATE currState{};
+    PHY_GetLinkStatus(ENET, phyAddr, &currState.link_up);
 
-    if (connection_status) {
-        crt_state.connected = STATE_LINK_UP;
-    } else {
-        crt_state.connected = STATE_LINK_DOWN;
+    if(currState.link_up && !prev_state.link_up)
+    {
+        phy_speed_t speed;
+        phy_duplex_t duplex;
+        PHY_GetLinkSpeedDuplex(ENET, phyAddr, &speed, &duplex);
+
+#if DEBUG_IMX_EMAC
+        printf("[IMX EMAC] Link went up!  Negotiated for speed %s, duplex %s\n",
+               speed == kPHY_Speed100M ? "100M" : "10M",
+               duplex == kPHY_FullDuplex ? "full" : "half");
+#endif
+        /* Poke the registers*/
+        ENET_SetMII(ENET, (enet_mii_speed_t)speed, (enet_mii_duplex_t)duplex);
+
+        emac_link_state_cb(currState.link_up);
+    }
+    else if(!currState.link_up && prev_state.link_up)
+    {
+#if DEBUG_IMX_EMAC
+        printf("[IMX EMAC] Link went down!\n");
+#endif
+        emac_link_state_cb(currState.link_up);
     }
 
-    if (crt_state.connected == STATE_LINK_UP) {
-        if (prev_state.connected != STATE_LINK_UP) {
-            PHY_AutoNegotiation(ENET, phyAddr);
-        }
-
-        PHY_GetLinkSpeedDuplex(ENET, phyAddr, &crt_state.speed, &crt_state.duplex);
-
-        if (prev_state.connected != STATE_LINK_UP || crt_state.speed != prev_state.speed) {
-            /* Poke the registers*/
-            ENET_SetMII(ENET, (enet_mii_speed_t)crt_state.speed, (enet_mii_duplex_t)crt_state.duplex);
-        }
-    }
-
-    // Compare with previous state
-    if (crt_state.connected != prev_state.connected && emac_link_state_cb) {
-        emac_link_state_cb(crt_state.connected);
-    }
-
-    prev_state = crt_state;
+    prev_state = currState;
 }
 
 bool Kinetis_EMAC::power_up()
@@ -505,9 +510,7 @@ bool Kinetis_EMAC::power_up()
     rx_isr();
 
     /* PHY monitoring task */
-    prev_state.connected = STATE_LINK_DOWN;
-    prev_state.speed = (phy_speed_t)STATE_UNKNOWN;
-    prev_state.duplex = (phy_duplex_t)STATE_UNKNOWN;
+    prev_state.link_up = false;
 
     mbed::mbed_event_queue()->call(mbed::callback(this, &Kinetis_EMAC::phy_task));
 
