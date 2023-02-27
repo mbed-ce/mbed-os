@@ -74,7 +74,7 @@ extern "C" void kinetis_init_eth_hardware(void);
 /** \brief  Driver thread priority */
 #define THREAD_PRIORITY (osPriorityNormal)
 
-#define PHY_TASK_PERIOD      50ms
+#define PHY_TASK_PERIOD      100ms
 
 // Change to 1 to get debug printfs from the emac
 #define DEBUG_IMX_EMAC 1
@@ -232,7 +232,9 @@ bool Kinetis_EMAC::low_level_init_successful()
 
     ENET_GetDefaultConfig(&config);
 
-    if (PHY_Init(ENET, phyAddr, sysClock) != kStatus_Success) {
+    if (PHY_Init(ENET, phyAddr, sysClock) != kStatus_Success)
+    {
+        printf("[IMX EMAC] Could not contact ethernet phy\n");
         return false;
     }
 
@@ -250,10 +252,7 @@ bool Kinetis_EMAC::low_level_init_successful()
 
     ENET_SetCallback(&g_handle, &Kinetis_EMAC::ethernet_callback, this);
     ENET_ActiveRead(ENET);
-
-    bool anStatus;
-    PHY_GetAutonegotiationStatus(ENET, phyAddr, &anStatus);
-
+    
     return true;
 }
 
