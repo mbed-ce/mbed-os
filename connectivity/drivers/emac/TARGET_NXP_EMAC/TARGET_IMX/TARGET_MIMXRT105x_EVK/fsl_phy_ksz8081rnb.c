@@ -84,6 +84,14 @@ status_t PHY_Init(ENET_Type *base, uint32_t phyAddr, uint32_t srcClock_Hz)
         }
 #endif  /* FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE */
     }
+
+    // Enable autonegotiation, allow negotiating for all ethernet types
+    PHY_Write(base, phyAddr, PHY_AUTONEG_ADVERTISE_REG,
+                       (PHY_100BASETX_FULLDUPLEX_MASK | PHY_100BASETX_HALFDUPLEX_MASK |
+                        PHY_10BASETX_FULLDUPLEX_MASK | PHY_10BASETX_HALFDUPLEX_MASK | 0x1U));
+
+    PHY_Write(base, phyAddr, PHY_BASICCONTROL_REG, (PHY_BCTL_AUTONEG_MASK));
+
     return result;
 }
 

@@ -48,6 +48,29 @@ extern "C" void kinetis_init_eth_hardware(void)
 {
     CLOCK_EnableClock(kCLOCK_Iomuxc);           /* iomuxc clock (iomuxc_clk_enable): 0x03u */
 
+    // Power down pin (leave high for now, keeping the phy active)
+    static mbed::DigitalOut powerDown(GPIO_B0_15, 1);
+
+    // Reset pin
+    static mbed::DigitalOut reset(GPIO_B0_14, 1);
+
+
+    // Use temporary digital outputs to set the strapping options.
+    // Note: Cannot use GPIO pullups/pulldowns as they are not strong enough to overcome the phy's
+    // 10k internal pulldowns
+    {
+        mbed::DigitalOut strapPhyAdd0(GPIO_B1_04, 1);
+        mbed::DigitalOut strapPhyAdd1(GPIO_B1_06, 0);
+        mbed::DigitalOut strapRMIIMode(GPIO_B1_05, 1);
+
+        // Send reset pulse
+        reset.write(0);
+        wait_us(25); // DP83825 datasheet specifies >=25us reset pulse
+        reset.write(1);
+        wait_us(2000); // DP83825 datasheet specifies at least 2ms between reset and SMI access
+    }
+
+
     // REF CLK (high speed output)
     IOMUXC_SetPinMux(IOMUXC_GPIO_B1_10_ENET_REF_CLK, 0);
     IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_10_ENET_REF_CLK,
@@ -104,36 +127,21 @@ extern "C" void kinetis_init_eth_hardware(void)
                         IOMUXC_SW_PAD_CTL_PAD_DSE(5) |
                         IOMUXC_SW_PAD_CTL_PAD_SPEED(3));
 
-    // RXD0 (input with 100k pullup [to set phy address])
+    // RXD0 (input )
     IOMUXC_SetPinMux(IOMUXC_GPIO_B1_04_ENET_RX_DATA00, 0);
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_04_ENET_RX_DATA00,
-                        IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                        IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                        IOMUXC_SW_PAD_CTL_PAD_PUS(2));
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_04_ENET_RX_DATA00, 0);
 
-    // RXD1 (input with 100k pullup [to set RMII slave mode])
+    // RXD1 (input)
     IOMUXC_SetPinMux(IOMUXC_GPIO_B1_05_ENET_RX_DATA01, 0);
-    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_05_ENET_RX_DATA01,
-                        IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                        IOMUXC_SW_PAD_CTL_PAD_PUE_MASK |
-                        IOMUXC_SW_PAD_CTL_PAD_PUS(2));
+    IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_05_ENET_RX_DATA01, 0);
 
     BOARD_InitModuleClock();
 
     // Set up 50MHz clock output to the phy on GPIO_B1_10
     IOMUXC_EnableMode(IOMUXC_GPR, kIOMUXC_GPR_ENET1TxClkOutputDir, true);
 
-    // Power down pin (leave high for now, keeping the phy active)
-    static mbed::DigitalOut powerDown(GPIO_B0_15, 1);
 
-    // Reset pin
-    static mbed::DigitalOut reset(GPIO_B0_14, 1);
 
-    // Send reset pulse
-    reset.write(0);
-    wait_us(25); // DP83825 datasheet specifies >=25us reset pulse
-    reset.write(1);
-    wait_us(2000); // DP83825 datasheet specifies at least 2ms between reset and SMI access
 }
 
 /*******************************************************************************

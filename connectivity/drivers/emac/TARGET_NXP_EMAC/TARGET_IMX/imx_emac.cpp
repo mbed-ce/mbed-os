@@ -44,6 +44,7 @@
 #include "events/mbed_shared_queues.h"
 
 #include "fsl_phy.h"
+#include "fsl_iomuxc.h"
 
 #include "imx_emac_config.h"
 #include "imx_emac.h"
@@ -194,7 +195,6 @@ bool Kinetis_EMAC::low_level_init_successful()
     uint32_t sysClock;
     phy_speed_t phy_speed;
     phy_duplex_t phy_duplex;
-    uint32_t phyAddr = 0;
     enet_config_t config;
 
     AT_NONCACHEABLE_SECTION_ALIGN(static enet_rx_bd_struct_t rx_desc_start_addr[ENET_RX_RING_LEN], ENET_BUFF_ALIGNMENT);
@@ -232,14 +232,14 @@ bool Kinetis_EMAC::low_level_init_successful()
 
     ENET_GetDefaultConfig(&config);
 
-    if (PHY_Init(ENET, phyAddr, sysClock) != kStatus_Success)
+    if (PHY_Init(ENET, BOARD_ENET_PHY_ADDR, sysClock) != kStatus_Success)
     {
         printf("[IMX EMAC] Could not contact ethernet phy\n");
         return false;
     }
 
     /* Get link information from PHY */
-    PHY_GetLinkSpeedDuplex(ENET, phyAddr, &phy_speed, &phy_duplex);
+    PHY_GetLinkSpeedDuplex(ENET, BOARD_ENET_PHY_ADDR, &phy_speed, &phy_duplex);
     /* Change the MII speed and duplex for actual link status. */
     config.miiSpeed = (enet_mii_speed_t)phy_speed;
     config.miiDuplex = (enet_mii_duplex_t)phy_duplex;
@@ -459,17 +459,15 @@ bool Kinetis_EMAC::link_out(emac_mem_buf_t *buf)
 
 void Kinetis_EMAC::phy_task()
 {
-    uint32_t phyAddr = BOARD_ENET_PHY_ADDR;
-
     // Get current status
     PHY_STATE currState{};
-    PHY_GetLinkStatus(ENET, phyAddr, &currState.link_up);
+    PHY_GetLinkStatus(ENET, BOARD_ENET_PHY_ADDR, &currState.link_up);
 
     if(currState.link_up && !prev_state.link_up)
     {
         phy_speed_t speed;
         phy_duplex_t duplex;
-        PHY_GetLinkSpeedDuplex(ENET, phyAddr, &speed, &duplex);
+        PHY_GetLinkSpeedDuplex(ENET, BOARD_ENET_PHY_ADDR, &speed, &duplex);
 
 #if DEBUG_IMX_EMAC
         printf("[IMX EMAC] Link went up!  Negotiated for speed %s, duplex %s\n",
