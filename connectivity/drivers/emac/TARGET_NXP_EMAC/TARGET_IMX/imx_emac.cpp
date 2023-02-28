@@ -78,7 +78,7 @@ extern "C" void kinetis_init_eth_hardware(void);
 #define PHY_TASK_PERIOD      100ms
 
 // Change to 1 to get debug printfs from the emac
-#define DEBUG_IMX_EMAC 1
+#define DEBUG_IMX_EMAC 0
 
 Kinetis_EMAC::Kinetis_EMAC() : xTXDCountSem(ENET_TX_RING_LEN, ENET_TX_RING_LEN), hwaddr()
 {
