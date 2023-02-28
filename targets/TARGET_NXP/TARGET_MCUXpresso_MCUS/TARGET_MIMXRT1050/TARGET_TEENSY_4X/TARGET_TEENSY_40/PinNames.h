@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: MIMXRT1050_EVK */
+/* MBED TARGET LIST: TEENSY_40 */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H

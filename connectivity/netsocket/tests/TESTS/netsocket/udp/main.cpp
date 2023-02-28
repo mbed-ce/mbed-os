@@ -65,8 +65,7 @@ static void _ifup()
     TEST_ASSERT_NOT_NULL_MESSAGE(net, "No NetworkInterface configured");
     nsapi_error_t err = net->connect();
 
-    if(err != NSAPI_ERROR_OK)
-    {
+    if(err != NSAPI_ERROR_OK) {
         printf("Failed to initialize networking.  Error: %d", err);
     }
 
