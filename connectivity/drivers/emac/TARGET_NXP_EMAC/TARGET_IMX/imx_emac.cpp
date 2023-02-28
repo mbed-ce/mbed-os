@@ -330,8 +330,6 @@ void Kinetis_EMAC::input(int idx)
         return;
     }
 
-    printf("Got packet!\n");
-
     emac_link_input_cb(p);
 }
 

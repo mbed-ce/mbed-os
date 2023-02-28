@@ -72,7 +72,7 @@ extern "C" void kinetis_init_eth_hardware(void)
 
 
     // REF CLK (high speed output)
-    IOMUXC_SetPinMux(IOMUXC_GPIO_B1_10_ENET_REF_CLK, 0);
+    IOMUXC_SetPinMux(IOMUXC_GPIO_B1_10_ENET_REF_CLK, 1);
     IOMUXC_SetPinConfig(IOMUXC_GPIO_B1_10_ENET_REF_CLK,
                         IOMUXC_SW_PAD_CTL_PAD_SRE_MASK |
                         IOMUXC_SW_PAD_CTL_PAD_DSE(5) |
@@ -139,9 +139,6 @@ extern "C" void kinetis_init_eth_hardware(void)
 
     // Set up 50MHz clock output to the phy on GPIO_B1_10
     IOMUXC_EnableMode(IOMUXC_GPR, kIOMUXC_GPR_ENET1TxClkOutputDir, true);
-
-
-
 }
 
 /*******************************************************************************

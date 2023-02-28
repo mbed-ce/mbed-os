@@ -91,7 +91,6 @@ status_t PHY_GetLinkStatus(ENET_Type *base, uint32_t phyAddr, bool *status)
 
     /* Read the basic status register. */
     result = PHY_Read(base, phyAddr, PHY_BASICSTATUS_REG, &data);
-    printf("BMSR = %lx\n", data);
     if (result == kStatus_Success)
     {
         if (!(PHY_BSTATUS_LINKSTATUS_MASK & data))
