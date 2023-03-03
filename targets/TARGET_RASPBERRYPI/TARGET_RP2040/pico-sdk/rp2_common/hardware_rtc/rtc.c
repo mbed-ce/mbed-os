@@ -19,7 +19,7 @@ bool rtc_running(void) {
     return (rtc_hw->ctrl & RTC_CTRL_RTC_ACTIVE_BITS);
 }
 
-void rtc_init(void) {
+void _rtc_init(void) {
     // Get clk_rtc freq and make sure it is running
     uint rtc_freq = clock_get_hz(clk_rtc);
     assert(rtc_freq != 0);
