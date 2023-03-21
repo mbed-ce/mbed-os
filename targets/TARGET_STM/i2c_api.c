@@ -931,7 +931,9 @@ static void prep_for_restart_if_needed(struct i2c_s *obj_s) {
  * STOP at the end of the current transaction.
  */
 static uint32_t get_hal_xfer_options(struct i2c_s *obj_s, bool stop) {
-    if (obj_s->state == STM_I2C_SB_READ_IN_PROGRESS || obj_s->state == STM_I2C_SB_WRITE_IN_PROGRESS) {
+    if (obj_s->state == STM_I2C_SB_READ_IN_PROGRESS ||
+        obj_s->state == STM_I2C_SB_WRITE_IN_PROGRESS ||
+        obj_s->state == STM_I2C_PENDING_START) {
         if(stop) {
             // Generate restart condition and stop at end
             return I2C_OTHER_AND_LAST_FRAME;
@@ -944,7 +946,7 @@ static uint32_t get_hal_xfer_options(struct i2c_s *obj_s, bool stop) {
             // Generate start condition and stop at end
             return I2C_FIRST_AND_LAST_FRAME;
         } else {
-            return I2C_LAST_FRAME;
+            return I2C_FIRST_FRAME;
         }
     }
 }
@@ -1199,6 +1201,16 @@ int i2c_byte_write(i2c_t *obj, int data)
     return 1;
 }
 #endif //I2C_IP_VERSION_V2
+
+/* Private define for @ref PreviousState usage */
+#define I2C_STATE_MSK             ((uint32_t)((uint32_t)((uint32_t)HAL_I2C_STATE_BUSY_TX | (uint32_t)HAL_I2C_STATE_BUSY_RX) & (uint32_t)(~((uint32_t)HAL_I2C_STATE_READY)))) /*!< Mask State define, keep only RX and TX bits            */
+#define I2C_STATE_NONE            ((uint32_t)(HAL_I2C_MODE_NONE))                                                        /*!< Default Value                                          */
+#define I2C_STATE_MASTER_BUSY_TX  ((uint32_t)(((uint32_t)HAL_I2C_STATE_BUSY_TX & I2C_STATE_MSK) | (uint32_t)HAL_I2C_MODE_MASTER))            /*!< Master Busy TX, combinaison of State LSB and Mode enum */
+#define I2C_STATE_MASTER_BUSY_RX  ((uint32_t)(((uint32_t)HAL_I2C_STATE_BUSY_RX & I2C_STATE_MSK) | (uint32_t)HAL_I2C_MODE_MASTER))            /*!< Master Busy RX, combinaison of State LSB and Mode enum */
+#define I2C_STATE_SLAVE_BUSY_TX   ((uint32_t)(((uint32_t)HAL_I2C_STATE_BUSY_TX & I2C_STATE_MSK) | (uint32_t)HAL_I2C_MODE_SLAVE))             /*!< Slave Busy TX, combinaison of State LSB and Mode enum  */
+#define I2C_STATE_SLAVE_BUSY_RX   ((uint32_t)(((uint32_t)HAL_I2C_STATE_BUSY_RX & I2C_STATE_MSK) | (uint32_t)HAL_I2C_MODE_SLAVE))             /*!< Slave Busy RX, combinaison of State LSB and Mode enum  */
+#define I2C_STATE_MEM_BUSY_TX     ((uint32_t)(((uint32_t)HAL_I2C_STATE_BUSY_TX & I2C_STATE_MSK) | (uint32_t)HAL_I2C_MODE_MEM))               /*!< Memory Busy TX, combinaison of State LSB and Mode enum */
+#define I2C_STATE_MEM_BUSY_RX     ((uint32_t)(((uint32_t)HAL_I2C_STATE_BUSY_RX & I2C_STATE_MSK) | (uint32_t)HAL_I2C_MODE_MEM))               /*!< Memory Busy RX, combinaison of State LSB and Mode enum */
 
 /*
  *  SYNC APIS
