@@ -244,7 +244,7 @@ void flash_copy_flash_to_flash()
 
     // Fill second to last page with test data
     size_t const numDataWords = flash_get_page_size(&test_flash) / sizeof(uint32_t);
-    uint32_t * data = new uint32_t[numDataWords];
+    uint32_t *data = new uint32_t[numDataWords];
     for (size_t wordIdx = 0; wordIdx < numDataWords; ++wordIdx) {
         data[wordIdx] = wordIdx;
     }
