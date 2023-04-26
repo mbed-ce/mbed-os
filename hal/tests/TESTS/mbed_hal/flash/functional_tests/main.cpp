@@ -226,9 +226,9 @@ void flash_copy_flash_to_flash()
     TEST_ASSERT_EQUAL_INT32(0, ret);
 
     uint32_t last_page_address = flash_get_start_address(&test_flash) + flash_get_size(&test_flash) - flash_get_page_size(&test_flash);
-    uint32_t * last_page_pointer = reinterpret_cast<uint32_t *>(last_page_address);
+    uint32_t *last_page_pointer = reinterpret_cast<uint32_t *>(last_page_address);
     uint32_t second_to_last_page_address = last_page_address - flash_get_page_size(&test_flash);
-    uint32_t * second_to_last_page_pointer = reinterpret_cast<uint32_t *>(second_to_last_page_address);
+    uint32_t *second_to_last_page_pointer = reinterpret_cast<uint32_t *>(second_to_last_page_address);
 
     // Erase the sector(s) which contain the last two pages
     uint32_t last_page_sector = ALIGN_DOWN(last_page_address, flash_get_sector_size(&test_flash, last_page_address));
@@ -237,8 +237,7 @@ void flash_copy_flash_to_flash()
     ret = flash_erase_sector(&test_flash, last_page_sector);
     TEST_ASSERT_EQUAL_INT32(0, ret);
 
-    if(last_page_sector != second_to_last_page_sector)
-    {
+    if(last_page_sector != second_to_last_page_sector) {
         ret = flash_erase_sector(&test_flash, second_to_last_page_sector);
         TEST_ASSERT_EQUAL_INT32(0, ret);
     }
@@ -246,8 +245,7 @@ void flash_copy_flash_to_flash()
     // Fill second to last page with test data
     size_t const numDataWords = flash_get_page_size(&test_flash) / sizeof(uint32_t);
     uint32_t * data = new uint32_t[numDataWords];
-    for(size_t wordIdx = 0; wordIdx < numDataWords; ++wordIdx)
-    {
+    for(size_t wordIdx = 0; wordIdx < numDataWords; ++wordIdx) {
         data[wordIdx] = wordIdx;
     }
 
@@ -258,7 +256,7 @@ void flash_copy_flash_to_flash()
     TEST_ASSERT_EQUAL_UINT32_ARRAY(data, second_to_last_page_pointer, numDataWords);
 
     // Now, program last page from the second to last page
-    ret = flash_program_page(&test_flash, last_page_address,reinterpret_cast<const uint8_t *>(second_to_last_page_pointer), flash_get_page_size(&test_flash));
+    ret = flash_program_page(&test_flash, last_page_address, reinterpret_cast<const uint8_t *>(second_to_last_page_pointer), flash_get_page_size(&test_flash));
     TEST_ASSERT_EQUAL_INT32(0, ret);
 
     // Make sure data was written
