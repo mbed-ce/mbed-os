@@ -391,15 +391,14 @@ void vPortPOST_SLEEP_PROCESSING(clock_mode_t powermode)
 // Override of MIMXRT SDK delay function.
 // The default delay function used the full CPU clock frequency, so it produced massive overshoots
 // (delaying 30x longer than intended) when the MCU is exiting sleep (and core clock is reduced to 24MHz).
-// This delay function uses the us ticker which always ticks at the same speed when the CPU clock is reduced.
+// This delay function uses the us ticker which always ticks at the same speed even when the CPU clock is reduced.
 void SDK_DelayAtLeastUs(uint32_t delay_us)
 {
     uint32_t initialTickerValue = us_ticker_read();
     uint32_t targetTickerValue = delay_us + initialTickerValue;
 
     // Wait for rollover if needed
-    if(targetTickerValue < initialTickerValue)
-    {
+    if(targetTickerValue < initialTickerValue) {
         while(us_ticker_read() > initialTickerValue) {}
     }
 

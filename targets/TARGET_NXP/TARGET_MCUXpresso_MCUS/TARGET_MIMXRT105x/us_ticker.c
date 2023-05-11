@@ -20,9 +20,6 @@
 #include "fsl_pit.h"
 #include "clock_config.h"
 
-#include "stdio.h"
-#include "inttypes.h"
-
 const ticker_info_t* us_ticker_get_info()
 {
     static const ticker_info_t info = {

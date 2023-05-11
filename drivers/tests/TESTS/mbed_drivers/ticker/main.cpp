@@ -18,7 +18,6 @@
 #include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"
-#include <cinttypes>
 
 #if !DEVICE_USTICKER
 #error [NOT_SUPPORTED] test not supported
@@ -185,9 +184,7 @@ void test_multi_ticker(void)
         ticker[i].attach(callback(increment_multi_counter), MULTI_TICKER_TIME);
     }
 
-    printf("before sleep: %" PRIu32 "\n", us_ticker_read());
     ThisThread::sleep_for(MULTI_TICKER_TIME + extra_wait);
-    printf("after sleep: %" PRIu32 "\n", us_ticker_read());
 
     TEST_ASSERT_EQUAL(TICKER_COUNT, multi_counter);
 
