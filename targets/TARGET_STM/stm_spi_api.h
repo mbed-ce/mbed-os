@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2016-2020 STMicroelectronics
+ * Copyright (c) 2016-2023 STMicroelectronics
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +15,33 @@
  * limitations under the License.
  */
 
-#ifndef MBED_SPI_DEVICE_H
-#define MBED_SPI_DEVICE_H
 
-#include "stm32l4xx_ll_spi.h"
+#ifndef MBED_OS_STM_SPI_API_H
+#define MBED_OS_STM_SPI_API_H
 
-// Defines the word legnth capability of the device where Nth bit allows for N window size
-#define STM32_SPI_CAPABILITY_WORD_LENGTH (0x0000FFF8)
+#include "spi_device.h"
 
-// We have DMA support
-#define STM32_SPI_CAPABILITY_DMA 1
-
+#if STM32_SPI_CAPABILITY_DMA
+#include "stm_dma_utils.h"
 #endif
+
+struct spi_s {
+    SPI_HandleTypeDef handle;
+    IRQn_Type spiIRQ;
+    SPIName spi;
+    PinName pin_miso;
+    PinName pin_mosi;
+    PinName pin_sclk;
+    PinName pin_ssel;
+#if DEVICE_SPI_ASYNCH
+    uint32_t event;
+    uint8_t transfer_type;
+#endif
+    uint8_t spiIndex; // Index of the SPI peripheral, from 1-6
+#if STM32_SPI_CAPABILITY_DMA
+    bool txDMAInitialized;
+    bool rxDMAInitialized;
+#endif
+};
+
+#endif //MBED_OS_STM_SPI_API_H

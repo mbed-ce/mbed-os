@@ -42,6 +42,11 @@
 #include "pinmap.h"
 #include "PeripheralPins.h"
 #include "spi_device.h"
+#include "stm_spi_api.h"
+
+#ifdef STM32_SPI_CAPABILITY_DMA
+#include "stm_dma_info.h"
+#endif
 
 #if DEVICE_SPI_ASYNCH
 #define SPI_INST(obj)    ((SPI_TypeDef *)(obj->spi.spi))
@@ -205,6 +210,12 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
     RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 #endif /* SPI_IP_VERSION_V2 */
 
+#ifdef STM32_SPI_CAPABILITY_DMA
+    // Every SPI starts with DMA not initialized, we do that lazily later
+    spiobj->rxDMAInitialized = false;
+    spiobj->txDMAInitialized = false;
+#endif
+
 #if defined SPI1_BASE
     // Enable SPI clock
     if (spiobj->spi == SPI_1) {
@@ -224,6 +235,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI1_RELEASE_RESET();
         __HAL_RCC_SPI1_CLK_ENABLE();
         spiobj->spiIRQ = SPI1_IRQn;
+        spiobj->spiIndex = 1;
     }
 #endif
 
@@ -245,6 +257,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI2_RELEASE_RESET();
         __HAL_RCC_SPI2_CLK_ENABLE();
         spiobj->spiIRQ = SPI2_IRQn;
+        spiobj->spiIndex = 2;
     }
 #endif
 
@@ -266,6 +279,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI3_RELEASE_RESET();
         __HAL_RCC_SPI3_CLK_ENABLE();
         spiobj->spiIRQ = SPI3_IRQn;
+        spiobj->spiIndex = 3;
     }
 #endif
 
@@ -283,6 +297,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI4_RELEASE_RESET();
         __HAL_RCC_SPI4_CLK_ENABLE();
         spiobj->spiIRQ = SPI4_IRQn;
+        spiobj->spiIndex = 4;
     }
 #endif
 
@@ -300,6 +315,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI5_RELEASE_RESET();
         __HAL_RCC_SPI5_CLK_ENABLE();
         spiobj->spiIRQ = SPI5_IRQn;
+        spiobj->spiIndex = 5;
     }
 #endif
 
@@ -317,6 +333,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI6_RELEASE_RESET();
         __HAL_RCC_SPI6_CLK_ENABLE();
         spiobj->spiIRQ = SPI6_IRQn;
+        spiobj->spiIndex = 6;
     }
 #endif
 
@@ -417,6 +434,44 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
 
     SPI_INIT_DIRECT(obj, &explicit_spi_pinmap);
 }
+
+#ifdef STM32_SPI_CAPABILITY_DMA
+
+/**
+ * Initialize the DMA for an SPI object in the Tx direction.
+ * Does nothing if DMA is already initialized.
+ */
+static void spi_init_tx_dma(struct spi_s * obj)
+{
+    if(!obj->txDMAInitialized)
+    {
+        // Get DMA handle
+        DMALinkInfo const *dmaLink = &SPITxDMALinks[obj->spiIndex - 1];
+
+        // Initialize DMA channel
+        DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_MEMORY_TO_PERIPH, false, true, DMA_PDATAALIGN_BYTE, DMA_MDATAALIGN_BYTE);
+        __HAL_LINKDMA(&obj->handle, hdmatx, *dmaHandle);
+    }
+}
+
+/**
+ * Initialize the DMA for an SPI object in the Rx direction.
+ * Does nothing if DMA is already initialized.
+ */
+static void spi_init_rx_dma(struct spi_s * obj)
+{
+    if(!obj->rxDMAInitialized)
+    {
+        // Get DMA handle
+        DMALinkInfo const *dmaLink = &SPIRxDMALinks[obj->spiIndex - 1];
+
+        // Initialize DMA channel
+        DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, DMA_PDATAALIGN_BYTE, DMA_MDATAALIGN_BYTE);
+        __HAL_LINKDMA(&obj->handle, hdmarx, *dmaHandle);
+    }
+}
+
+#endif
 
 void spi_free(spi_t *obj)
 {
@@ -1362,7 +1417,7 @@ typedef enum {
 
 
 /// @returns the number of bytes transferred, or `0` if nothing transferred
-static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer_type, const void *tx, void *rx, size_t length)
+static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer_type, const void *tx, void *rx, size_t length, DMAUsage hint)
 {
     struct spi_s *spiobj = SPI_S(obj);
     SPI_HandleTypeDef *handle = &(spiobj->handle);
@@ -1373,11 +1428,33 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
     // so the number of transfers depends on the container size
     size_t words;
 
-    DEBUG_PRINTF("SPI inst=0x%8X Start: %u, %u\r\n", (int)handle->Instance, transfer_type, length);
+    DEBUG_PRINTF("SPI inst=0x%8X Start: %u, %u\r\n", (int) handle->Instance, transfer_type, length);
 
     obj->spi.transfer_type = transfer_type;
 
     words = length >> bitshift;
+
+#if STM32_SPI_CAPABILITY_DMA
+    if (hint != DMA_USAGE_NEVER)
+    {
+        // Initialize DMA channel(s) needed
+        switch (transfer_type)
+        {
+            case SPI_TRANSFER_TYPE_TXRX:
+                spi_init_rx_dma(&obj->spi);
+                spi_init_tx_dma(&obj->spi);
+                break;
+            case SPI_TRANSFER_TYPE_TX:
+                spi_init_tx_dma(&obj->spi);
+                break;
+            case SPI_TRANSFER_TYPE_RX:
+                spi_init_rx_dma(&obj->spi);
+                break;
+            default:
+                break;
+        }
+    }
+#endif
 
     // enable the interrupt
     IRQn_Type irq_n = spiobj->spiIRQ;
