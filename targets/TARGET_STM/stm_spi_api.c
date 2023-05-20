@@ -101,6 +101,20 @@ static inline void spi_flush_rx(spi_t *obj)
     LL_SPI_ClearFlag_OVR(SPI_INST(obj));
 }
 
+// Store the spi_s * inside an SPI handle, for later retrieval in callbacks
+static inline void store_spis_pointer(SPI_HandleTypeDef * spiHandle, struct spi_s * spis) {
+    // Annoyingly, STM neglected to provide any sort of "user data" pointer inside SPI_HandleTypeDef for use
+    // in callbacks.  However, there are some variables in the Init struct that are never accessed after HAL_SPI_Init().
+    // So, we can reuse those to store our pointer.
+    spiHandle->Init.TIMode = (uint32_t)spis;
+}
+
+// Get spi_s * from SPI_HandleTypeDef
+static inline struct spi_s * get_spis_pointer(SPI_HandleTypeDef * spiHandle) {
+    return (struct spi_s *) spiHandle->Init.TIMode;
+}
+
+
 void spi_get_capabilities(PinName ssel, bool slave, spi_capabilities_t *cap)
 {
     if (slave) {
@@ -158,6 +172,9 @@ void init_spi(spi_t *obj)
     if (HAL_SPI_Init(handle) != HAL_OK) {
         error("Cannot initialize SPI");
     }
+
+    store_spis_pointer(handle, spiobj);
+
     /* In some cases after SPI object re-creation SPI overrun flag may not
      * be cleared, so clear RX data explicitly to prevent any transmissions errors */
     spi_flush_rx(obj);
@@ -214,6 +231,10 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
     // Every SPI starts with DMA not initialized, we do that lazily later
     spiobj->rxDMAInitialized = false;
     spiobj->txDMAInitialized = false;
+#endif
+
+#ifdef DEVICE_SPI_ASYNCH
+    spiobj->driverCallback = NULL;
 #endif
 
 #if defined SPI1_BASE
@@ -1434,6 +1455,8 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
 
     words = length >> bitshift;
 
+    bool useDMA = false;
+
 #if STM32_SPI_CAPABILITY_DMA
     if (hint != DMA_USAGE_NEVER)
     {
@@ -1453,15 +1476,18 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
             default:
                 break;
         }
+
+        useDMA = true;
     }
 #endif
 
-    // enable the interrupt
-    IRQn_Type irq_n = spiobj->spiIRQ;
-    NVIC_DisableIRQ(irq_n);
-    NVIC_ClearPendingIRQ(irq_n);
-    NVIC_SetPriority(irq_n, 1);
-    NVIC_EnableIRQ(irq_n);
+    if (!useDMA) {
+        // enable the interrupt
+        IRQn_Type irq_n = spiobj->spiIRQ;
+        NVIC_ClearPendingIRQ(irq_n);
+        NVIC_SetPriority(irq_n, 1);
+        NVIC_EnableIRQ(irq_n);
+    }
 
     // flush FIFO
 #if defined(SPI_FLAG_FRLVL)
@@ -1477,16 +1503,33 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
 #endif
     switch (transfer_type) {
         case SPI_TRANSFER_TYPE_TXRX:
-            rc = HAL_SPI_TransmitReceive_IT(handle, (uint8_t *)tx, (uint8_t *)rx, words);
+            if(useDMA) {
+                rc = HAL_SPI_TransmitReceive_DMA(handle, (uint8_t *)tx, (uint8_t *)rx, words);
+            }
+            else {
+                rc = HAL_SPI_TransmitReceive_IT(handle, (uint8_t *) tx, (uint8_t *) rx, words);
+            }
             break;
         case SPI_TRANSFER_TYPE_TX:
-            rc = HAL_SPI_Transmit_IT(handle, (uint8_t *)tx, words);
+            if (useDMA) {
+                rc = HAL_SPI_Transmit_DMA(handle, (uint8_t *)tx, words);
+            }
+            else {
+                rc = HAL_SPI_Transmit_IT(handle, (uint8_t *) tx, words);
+            }
             break;
         case SPI_TRANSFER_TYPE_RX:
             // the receive function also "transmits" the receive buffer so in order
             // to guarantee that 0xff is on the line, we explicitly memset it here
             memset(rx, SPI_FILL_CHAR, length);
-            rc = HAL_SPI_Receive_IT(handle, (uint8_t *)rx, words);
+
+            if (useDMA) {
+                rc = HAL_SPI_Receive_DMA(handle, (uint8_t *)rx, words);
+            }
+            else {
+                rc = HAL_SPI_Receive_IT(handle, (uint8_t *)rx, words);
+            }
+
             break;
         default:
             length = 0;
@@ -1507,14 +1550,10 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
 }
 
 // asynchronous API
-// DMA support for SPI is currently not supported, hence asynchronous SPI does not support high speeds(MHZ range)
 void spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint8_t bit_width, uint32_t handler, uint32_t event, DMAUsage hint)
 {
     struct spi_s *spiobj = SPI_S(obj);
     SPI_HandleTypeDef *handle = &(spiobj->handle);
-
-    // TODO: DMA usage is currently ignored
-    (void) hint;
 
     // check which use-case we have
     bool use_tx = (tx != NULL && tx_length > 0);
@@ -1540,9 +1579,9 @@ void spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx,
 
     obj->spi.event = event;
 
-    // register the thunking handler
-    IRQn_Type irq_n = spiobj->spiIRQ;
-    NVIC_SetVector(irq_n, (uint32_t)handler);
+    // Register the callback.
+    // It's a function pointer, but it's passed as a uint32_t because of reasons.
+    spiobj->driverCallback = (void (*)(void))handler;
     DEBUG_PRINTF("SPI: Transfer: tx %u (%u), rx %u (%u), IRQ %u\n", use_tx, tx_length, use_rx, rx_length, irq_n);
 
     // enable the right hal transfer
@@ -1554,15 +1593,15 @@ void spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx,
             obj->tx_buff.length = size;
             obj->rx_buff.length = size;
         }
-        spi_master_start_asynch_transfer(obj, SPI_TRANSFER_TYPE_TXRX, tx, rx, size);
+        spi_master_start_asynch_transfer(obj, SPI_TRANSFER_TYPE_TXRX, tx, rx, size, hint);
     } else if (use_tx) {
-        spi_master_start_asynch_transfer(obj, SPI_TRANSFER_TYPE_TX, tx, NULL, tx_length);
+        spi_master_start_asynch_transfer(obj, SPI_TRANSFER_TYPE_TX, tx, NULL, tx_length, hint);
     } else if (use_rx) {
-        spi_master_start_asynch_transfer(obj, SPI_TRANSFER_TYPE_RX, NULL, rx, rx_length);
+        spi_master_start_asynch_transfer(obj, SPI_TRANSFER_TYPE_RX, NULL, rx, rx_length, hint);
     }
 }
 
-inline uint32_t spi_irq_handler_asynch(spi_t *obj)
+uint32_t spi_irq_handler_asynch(spi_t *obj)
 {
     int event = 0;
     SPI_HandleTypeDef *handle = &(SPI_S(obj)->handle);
@@ -1614,6 +1653,36 @@ inline uint32_t spi_irq_handler_asynch(spi_t *obj)
     return (event & (obj->spi.event | SPI_EVENT_INTERNAL_TRANSFER_COMPLETE));
 }
 
+// Callback from STM32 HAL when a bidirectional SPI transfer completes (interrupt based or DMA)
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    struct spi_s * spis = get_spis_pointer(hspi);
+    if(spis != NULL)
+    {
+        spis->driverCallback();
+    }
+}
+
+// Callback from STM32 HAL when a Rx-only SPI transfer completes (interrupt based or DMA)
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    struct spi_s * spis = get_spis_pointer(hspi);
+    if(spis != NULL)
+    {
+        spis->driverCallback();
+    }
+}
+
+// Callback from STM32 HAL when a Tx-only SPI transfer completes (interrupt based or DMA)
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    struct spi_s * spis = get_spis_pointer(hspi);
+    if(spis != NULL)
+    {
+        spis->driverCallback();
+    }
+}
+
 uint8_t spi_active(spi_t *obj)
 {
     struct spi_s *spiobj = SPI_S(obj);
@@ -1635,15 +1704,20 @@ void spi_abort_asynch(spi_t *obj)
     struct spi_s *spiobj = SPI_S(obj);
     SPI_HandleTypeDef *handle = &(spiobj->handle);
 
-    // disable interrupt
+    // disable interrupt if it was enabled
     IRQn_Type irq_n = spiobj->spiIRQ;
     NVIC_ClearPendingIRQ(irq_n);
     NVIC_DisableIRQ(irq_n);
 
+    // TODO abort DMA transfer here
+
     // clean-up
     LL_SPI_Disable(SPI_INST(obj));
     HAL_SPI_DeInit(handle);
+    handle->Init.TIMode = SPI_TIMODE_DISABLE; // This will have gotten clobbered by store_spis_pointer()
     HAL_SPI_Init(handle);
+    store_spis_pointer(handle, spiobj);
+
     // cleanup input buffer
     spi_flush_rx(obj);
     // enable SPI back if it isn't 3-wire mode

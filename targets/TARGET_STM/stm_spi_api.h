@@ -36,6 +36,12 @@ struct spi_s {
 #if DEVICE_SPI_ASYNCH
     uint32_t event;
     uint8_t transfer_type;
+
+    // Callback function for when we get an interrupt on an async transfer.
+    // This will point, through a bit of indirection, to SPI::irq_handler_asynch()
+    // for the correct SPI instance.
+    void (*driverCallback)(void);
+
 #endif
     uint8_t spiIndex; // Index of the SPI peripheral, from 1-6
 #if STM32_SPI_CAPABILITY_DMA
