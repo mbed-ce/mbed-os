@@ -110,6 +110,101 @@ DMA_Channel_TypeDef * stm_get_dma_channel(const DMALinkInfo *dmaLink)
     }
 }
 
+IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
+{
+    switch(dmaLink->dmaIdx)
+    {
+#ifdef DMA1
+        case 1:
+            switch(dmaLink->channelIdx)
+            {
+#ifdef DMA1_Channel1
+                case 1:
+                    return DMA1_Channel1_IRQn;
+#endif
+
+// STM32F0 has shared ISRs for Ch2-Ch3 and Ch4-Ch5
+#ifdef TARGET_MCU_STM32F0
+                case 2:
+                case 3:
+                    return DMA1_Channel2_3_IRQn;
+                case 4:
+                case 5:
+                    return DMA1_Channel4_5_IRQn;
+#else
+#ifdef DMA1_Channel2
+                case 2:
+                    return DMA1_Channel2_IRQn;
+#endif
+#ifdef DMA1_Channel3
+                case 3:
+                    return DMA1_Channel3_IRQn;
+#endif
+#ifdef DMA1_Channel4
+                case 4:
+                    return DMA1_Channel4_IRQn;
+#endif
+#ifdef DMA1_Channel5
+                case 5:
+                    return DMA1_Channel5_IRQn;
+#endif
+#endif
+
+#ifdef DMA1_Channel6
+                case 6:
+                    return DMA1_Channel6_IRQn;
+#endif
+#ifdef DMA1_Channel7
+                case 7:
+                    return DMA1_Channel7_IRQn;
+#endif
+                default:
+                    mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
+            }
+#endif
+
+#ifdef DMA2
+        case 2:
+            switch(dmaLink->channelIdx)
+            {
+#ifdef DMA2_Channel1
+                case 1:
+                    return DMA2_Channel1_IRQn;
+#endif
+#ifdef DMA2_Channel2
+                case 2:
+                    return DMA2_Channel2_IRQn;
+#endif
+#ifdef DMA2_Channel3
+                case 3:
+                    return DMA2_Channel3_IRQn;
+#endif
+#ifdef DMA2_Channel4
+                case 4:
+                    return DMA2_Channel4_IRQn;
+#endif
+#ifdef DMA2_Channel5
+                case 5:
+                    return DMA2_Channel5_IRQn;
+#endif
+#ifdef DMA2_Channel6
+                case 6:
+                    return DMA2_Channel6_IRQn;
+#endif
+#ifdef DMA2_Channel7
+                case 7:
+                    return DMA2_Channel7_IRQn;
+#endif
+                default:
+                    mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
+            }
+#endif
+        default:
+            mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA controller", dmaLink->dmaIdx, MBED_FILENAME, __LINE__);
+
+    }
+}
+
 DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direction, bool periphInc, bool memInc,
                                      uint32_t periphDataAlignment, uint32_t memDataAlignment){
      // Enable DMA mux clock for devices with it
@@ -154,7 +249,10 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
 
     HAL_DMA_Init(dmaHandle);
 
-    // TODO set up interrupt
+    // Set up interrupt
+    IRQn_Type irqNum = stm_get_dma_irqn(dmaLink);
+    NVIC_EnableIRQ(irqNum);
+    NVIC_SetPriority(irqNum, 7);
 
     return dmaHandle;
 }

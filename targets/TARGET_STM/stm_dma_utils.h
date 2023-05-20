@@ -71,6 +71,13 @@ typedef struct DMALinkInfo {
 DMA_Channel_TypeDef * stm_get_dma_channel(DMALinkInfo const * dmaLink);
 
 /**
+ * @brief Get the interrupt number for a DMA link
+ *
+ * @param dmaLink DMA link instance
+ */
+IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink);
+
+/**
  * @brief Initialize a DMA link for use.
  *
  * This enables and sets up the interrupt, allocates a DMA handle, and returns the handle pointer.
