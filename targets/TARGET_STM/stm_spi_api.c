@@ -90,6 +90,55 @@ extern HAL_StatusTypeDef HAL_SPIEx_FlushRxFifo(SPI_HandleTypeDef *hspi);
 #define HAS_32BIT_SPI_TRANSFERS 1
 #endif // SPI_DATASIZE_X
 
+// SPI IRQ handlers
+#if defined SPI1_BASE
+static SPI_HandleTypeDef * spi1Handle; // Handle of whatever SPI structure is used for SPI1
+void SPI1_IRQHandler()
+{
+    HAL_SPI_IRQHandler(spi1Handle);
+}
+#endif
+
+#if defined SPI2_BASE
+static SPI_HandleTypeDef * spi2Handle; // Handle of whatever SPI structure is used for SPI2
+void SPI2_IRQHandler()
+{
+    HAL_SPI_IRQHandler(spi2Handle);
+}
+#endif
+
+#if defined SPI3_BASE
+static SPI_HandleTypeDef * spi3Handle; // Handle of whatever SPI structure is used for SPI3
+void SPI3_IRQHandler()
+{
+    HAL_SPI_IRQHandler(spi3Handle);
+}
+#endif
+
+#if defined SPI4_BASE
+static SPI_HandleTypeDef * spi4Handle; // Handle of whatever SPI structure is used for SPI4
+void SPI4_IRQHandler()
+{
+    HAL_SPI_IRQHandler(spi4Handle);
+}
+#endif
+
+#if defined SPI5_BASE
+static SPI_HandleTypeDef * spi5Handle; // Handle of whatever SPI structure is used for SPI5
+void SPI5_IRQHandler()
+{
+    HAL_SPI_IRQHandler(spi5Handle);
+}
+#endif
+
+#if defined SPI6_BASE
+static SPI_HandleTypeDef * spi6Handle; // Handle of whatever SPI structure is used for SPI6
+void SPI6_IRQHandler()
+{
+    HAL_SPI_IRQHandler(spi6Handle);
+}
+#endif
+
 /**
  * Flush RX FIFO/input register of SPI interface and clear overrun flag.
  */
@@ -257,6 +306,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI1_CLK_ENABLE();
         spiobj->spiIRQ = SPI1_IRQn;
         spiobj->spiIndex = 1;
+        spi1Handle = &spiobj->handle;
     }
 #endif
 
@@ -279,6 +329,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI2_CLK_ENABLE();
         spiobj->spiIRQ = SPI2_IRQn;
         spiobj->spiIndex = 2;
+        spi2Handle = &spiobj->handle;
     }
 #endif
 
@@ -301,6 +352,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI3_CLK_ENABLE();
         spiobj->spiIRQ = SPI3_IRQn;
         spiobj->spiIndex = 3;
+        spi3Handle = &spiobj->handle;
     }
 #endif
 
@@ -319,6 +371,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI4_CLK_ENABLE();
         spiobj->spiIRQ = SPI4_IRQn;
         spiobj->spiIndex = 4;
+        spi4Handle = &spiobj->handle;
     }
 #endif
 
@@ -337,6 +390,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI5_CLK_ENABLE();
         spiobj->spiIRQ = SPI5_IRQn;
         spiobj->spiIndex = 5;
+        spi5Handle = &spiobj->handle;
     }
 #endif
 
@@ -355,6 +409,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         __HAL_RCC_SPI6_CLK_ENABLE();
         spiobj->spiIRQ = SPI6_IRQn;
         spiobj->spiIndex = 6;
+        spi6Handle = &spiobj->handle;
     }
 #endif
 
@@ -1449,8 +1504,6 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
     // so the number of transfers depends on the container size
     size_t words;
 
-    DEBUG_PRINTF("SPI inst=0x%8X Start: %u, %u\r\n", (int) handle->Instance, transfer_type, length);
-
     obj->spi.transfer_type = transfer_type;
 
     words = length >> bitshift;
@@ -1480,6 +1533,8 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
         useDMA = true;
     }
 #endif
+
+    DEBUG_PRINTF("SPI inst=0x%8X Start: type=%u, length=%u, DMA=%d\r\n", (int) handle->Instance, transfer_type, length, !!useDMA);
 
     if (!useDMA) {
         // enable the interrupt
@@ -1582,7 +1637,7 @@ void spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx,
     // Register the callback.
     // It's a function pointer, but it's passed as a uint32_t because of reasons.
     spiobj->driverCallback = (void (*)(void))handler;
-    DEBUG_PRINTF("SPI: Transfer: tx %u (%u), rx %u (%u), IRQ %u\n", use_tx, tx_length, use_rx, rx_length, irq_n);
+    DEBUG_PRINTF("SPI: Transfer: tx %u (%u), rx %u (%u)\n", use_tx, tx_length, use_rx, rx_length);
 
     // enable the right hal transfer
     if (use_tx && use_rx) {
@@ -1605,9 +1660,6 @@ uint32_t spi_irq_handler_asynch(spi_t *obj)
 {
     int event = 0;
     SPI_HandleTypeDef *handle = &(SPI_S(obj)->handle);
-
-    // call the CubeF4 handler, this will update the handle
-    HAL_SPI_IRQHandler(handle);
 
     if (handle->State == HAL_SPI_STATE_READY) {
         // When HAL SPI is back to READY state, check if there was an error
