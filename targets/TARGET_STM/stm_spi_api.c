@@ -525,7 +525,7 @@ static void spi_init_tx_dma(struct spi_s * obj)
         DMALinkInfo const *dmaLink = &SPITxDMALinks[obj->spiIndex - 1];
 
         // Initialize DMA channel
-        DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_MEMORY_TO_PERIPH, false, true, DMA_PDATAALIGN_BYTE, DMA_MDATAALIGN_BYTE);
+        DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_MEMORY_TO_PERIPH, false, true, 1, 1);
         __HAL_LINKDMA(&obj->handle, hdmatx, *dmaHandle);
     }
 }
@@ -542,7 +542,7 @@ static void spi_init_rx_dma(struct spi_s * obj)
         DMALinkInfo const *dmaLink = &SPIRxDMALinks[obj->spiIndex - 1];
 
         // Initialize DMA channel
-        DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, DMA_PDATAALIGN_BYTE, DMA_MDATAALIGN_BYTE);
+        DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1);
         __HAL_LINKDMA(&obj->handle, hdmarx, *dmaHandle);
     }
 }

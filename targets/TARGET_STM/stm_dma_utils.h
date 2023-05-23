@@ -24,6 +24,15 @@
 
 #include "cmsis.h"
 
+// On some smaller devices, e.g. STM32L1 family, DMA channels are simply logically ORed rather than
+// muxed, so we don't need the "sourceNumber" field.
+// We can check if this is the case by the absence of specific peripherals/registers.
+#if defined(DMA1_CSELR) || defined(DMAMUX1_BASE) || defined(DMA_SxCR_CHSEL_Msk)
+#define STM_DEVICE_HAS_DMA_SOURCE_SELECTION 1
+#else
+#define STM_DEVICE_HAS_DMA_SOURCE_SELECTION 0
+#endif
+
 /*
  * Structure containing info about a peripheral's link to the DMA controller.
  */
@@ -36,14 +45,15 @@ typedef struct DMALinkInfo {
     /// Index of the channel on the DMA module.
     /// Note that some STMicro chips have a DMA mux allowing any DMA peripheral to be used with
     /// any channel, and others have a semi-fixed architecture with just some basic multiplexing.
-    /// Note: 1-indexed.
+    /// Note: May be 1 or 0 indexed depending on processor
     uint8_t channelIdx;
 
+#if STM_DEVICE_HAS_DMA_SOURCE_SELECTION
     /// Request source number.  This is either a DMA mux input number, or a mux selection number
     /// on devices without a DMA mux.
     /// Note: 0-indexed.
     uint8_t sourceNumber;
-
+#endif
 } DMALinkInfo;
 
 // DMA and DMA channel counts.  On MOST devices DMA controllers have 7 channels each...
@@ -57,10 +67,18 @@ typedef struct DMALinkInfo {
 #define NUM_DMA_CONTROLLERS 0
 #endif
 
-#ifdef TARGET_MCU_STM32F0
-#define NUM_DMA_CHANNELS_PER_CONTROLLER 5
+// determine DMA IP version.  Old version calls them "streams", new version calls them "channels"
+#ifdef DMA1_Stream0
+#define DMA_IP_VERSION_V1
 #else
-#define NUM_DMA_CHANNELS_PER_CONTROLLER 7
+#define DMA_IP_VERSION_V2
+#endif
+
+// Include correct header for the IP version
+#ifdef DMA_IP_VERSION_V1
+#include "stm_dma_ip_v1.h"
+#else
+#include "stm_dma_ip_v2.h"
 #endif
 
 /**
@@ -87,12 +105,12 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink);
  * @param direction \c DMA_PERIPH_TO_MEMORY, \c DMA_MEMORY_TO_PERIPH, or \c DMA_MEMORY_TO_MEMORY
  * @param periphInc Whether the Peripheral address register should be incremented or not.
  * @param memInc Whether the Memory address register should be incremented or not.
- * @param periphDataAlignment \c DMA_PDATAALIGN_BYTE, \c DMA_PDATAALIGN_HALFWORD, or \c DMA_PDATAALIGN_WORD
+ * @param periphDataAlignment Alignment value of the peripheral data.  1, 2, or 4.
  * @param memDataAlignment \c DMA_MDATAALIGN_BYTE, \c DMA_MDATAALIGN_HALFWORD, or \c DMA_MDATAALIGN_WORD
  *
  * @return Pointer to DMA handle allocated by this module
  */
-DMA_HandleTypeDef * stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t direction, bool periphInc, bool memInc, uint32_t periphDataAlignment, uint32_t memDataAlignment);
+DMA_HandleTypeDef * stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t direction, bool periphInc, bool memInc, uint8_t periphDataAlignment, uint8_t memDataAlignment);
 
 /**
  * Free the underlying resources for a DMA link.  Disables interrupt and frees memory.

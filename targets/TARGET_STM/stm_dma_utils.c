@@ -25,7 +25,7 @@
 
 // Array to store pointer to DMA handle for each DMA channel.
 // Note: arrays are 0-indexed, so DMA1 Channel2 is at stmDMAHandles[0][1].
-static DMA_HandleTypeDef * stmDMAHandles[NUM_DMA_CONTROLLERS][NUM_DMA_CHANNELS_PER_CONTROLLER];
+static DMA_HandleTypeDef * stmDMAHandles[NUM_DMA_CONTROLLERS][MAX_DMA_CHANNELS_PER_CONTROLLER];
 
 DMA_Channel_TypeDef * stm_get_dma_channel(const DMALinkInfo *dmaLink)
 {
@@ -62,6 +62,38 @@ DMA_Channel_TypeDef * stm_get_dma_channel(const DMALinkInfo *dmaLink)
 #ifdef DMA1_Channel7
                 case 7:
                     return DMA1_Channel7;
+#endif
+#ifdef DMA1_Stream0
+                case 0:
+                    return DMA1_Stream0;
+#endif
+#ifdef DMA1_Stream1
+                case 1:
+                    return DMA1_Stream1;
+#endif
+#ifdef DMA1_Stream2
+                case 2:
+                    return DMA1_Stream2;
+#endif
+#ifdef DMA1_Stream3
+                case 3:
+                    return DMA1_Stream3;
+#endif
+#ifdef DMA1_Stream4
+                case 4:
+                    return DMA1_Stream4;
+#endif
+#ifdef DMA1_Stream5
+                case 5:
+                    return DMA1_Stream5;
+#endif
+#ifdef DMA1_Stream6
+                case 6:
+                    return DMA1_Stream6;
+#endif
+#ifdef DMA1_Stream7
+                case 7:
+                    return DMA1_Stream7;
 #endif
                 default:
                     mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
@@ -100,6 +132,38 @@ DMA_Channel_TypeDef * stm_get_dma_channel(const DMALinkInfo *dmaLink)
                 case 7:
                     return DMA2_Channel7;
 #endif
+#ifdef DMA2_Stream0
+                case 0:
+                    return DMA2_Stream0;
+#endif
+#ifdef DMA2_Stream1
+                case 1:
+                    return DMA2_Stream1;
+#endif
+#ifdef DMA2_Stream2
+                case 2:
+                    return DMA2_Stream2;
+#endif
+#ifdef DMA2_Stream3
+                case 3:
+                    return DMA2_Stream3;
+#endif
+#ifdef DMA2_Stream4
+                case 4:
+                    return DMA2_Stream4;
+#endif
+#ifdef DMA2_Stream5
+                case 5:
+                    return DMA2_Stream5;
+#endif
+#ifdef DMA2_Stream6
+                case 6:
+                    return DMA2_Stream6;
+#endif
+#ifdef DMA2_Stream7
+                case 7:
+                    return DMA2_Stream7;
+#endif
                 default:
                     mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
             }
@@ -123,7 +187,7 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                     return DMA1_Channel1_IRQn;
 #endif
 
-// STM32F0 has shared ISRs for Ch2-Ch3 and Ch4-Ch5
+// STM32F0 has shared ISRs for Ch2-Ch3 and Ch4-Ch5, and NO ISRs for channels 6 and 7
 #ifdef TARGET_MCU_STM32F0
                 case 2:
                 case 3:
@@ -131,6 +195,24 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                 case 4:
                 case 5:
                     return DMA1_Channel4_5_IRQn;
+
+// STM32G0 has shared ISRs for Ch2-Ch3 and and NO ISRs for channels 4 through 7
+#elif defined(TARGET_MCU_STM32G0)
+                case 2:
+                case 3:
+                    return DMA1_Channel2_3_IRQn;
+
+// STM32L0 has shared ISRs for Ch2-Ch3 and Ch4-Ch7
+#elif defined(TARGET_MCU_STM32L0)
+                case 2:
+                case 3:
+                    return DMA1_Channel2_3_IRQn;
+
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    return DMA1_Channel4_5_6_7_IRQn;
 #else
 #ifdef DMA1_Channel2
                 case 2:
@@ -148,8 +230,6 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                 case 5:
                     return DMA1_Channel5_IRQn;
 #endif
-#endif
-
 #ifdef DMA1_Channel6
                 case 6:
                     return DMA1_Channel6_IRQn;
@@ -158,6 +238,41 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                 case 7:
                     return DMA1_Channel7_IRQn;
 #endif
+#endif
+
+#ifdef DMA1_Stream0
+                case 0:
+                    return DMA1_Stream0_IRQn;
+#endif
+#ifdef DMA1_Stream1
+                case 1:
+                    return DMA1_Stream1_IRQn;
+#endif
+#ifdef DMA1_Stream2
+                case 2:
+                    return DMA1_Stream2_IRQn;
+#endif
+#ifdef DMA1_Stream3
+                case 3:
+                    return DMA1_Stream3_IRQn;
+#endif
+#ifdef DMA1_Stream4
+                case 4:
+                    return DMA1_Stream4_IRQn;
+#endif
+#ifdef DMA1_Stream5
+                case 5:
+                    return DMA1_Stream5_IRQn;
+#endif
+#ifdef DMA1_Stream6
+                case 6:
+                    return DMA1_Stream6_IRQn;
+#endif
+#ifdef DMA1_Stream7
+                case 7:
+                    return DMA1_Stream7_IRQn;
+#endif
+
                 default:
                     mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
             }
@@ -195,6 +310,40 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                 case 7:
                     return DMA2_Channel7_IRQn;
 #endif
+
+#ifdef DMA2_Stream0
+                    case 0:
+                    return DMA2_Stream0_IRQn;
+#endif
+#ifdef DMA2_Stream1
+                    case 1:
+                    return DMA2_Stream1_IRQn;
+#endif
+#ifdef DMA2_Stream2
+                    case 2:
+                    return DMA2_Stream2_IRQn;
+#endif
+#ifdef DMA2_Stream3
+                    case 3:
+                    return DMA2_Stream3_IRQn;
+#endif
+#ifdef DMA2_Stream4
+                    case 4:
+                    return DMA2_Stream4_IRQn;
+#endif
+#ifdef DMA2_Stream5
+                    case 5:
+                    return DMA2_Stream5_IRQn;
+#endif
+#ifdef DMA2_Stream6
+                    case 6:
+                    return DMA2_Stream6_IRQn;
+#endif
+#ifdef DMA2_Stream7
+                    case 7:
+                    return DMA2_Stream7_IRQn;
+#endif
+
                 default:
                     mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
             }
@@ -206,10 +355,10 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
 }
 
 DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direction, bool periphInc, bool memInc,
-                                     uint32_t periphDataAlignment, uint32_t memDataAlignment){
+                                     uint8_t periphDataAlignment, uint8_t memDataAlignment){
      // Enable DMA mux clock for devices with it
-#ifdef DMAMUX1
-    __HAL_RCC_DMAMUX1_CLK_ENABLE()
+#ifdef __HAL_RCC_DMAMUX1_CLK_ENABLE
+    __HAL_RCC_DMAMUX1_CLK_ENABLE();
 #endif
 
     // Turn on clock for the DMA module
@@ -238,14 +387,136 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
 
     // Configure handle
     dmaHandle->Instance = stm_get_dma_channel(dmaLink);
+#if STM_DEVICE_HAS_DMA_SOURCE_SELECTION
+
+    // Most devices with IP v1 call this member "Channel" and most with IP v2 call it "Request".
+    // But not STM32H7!
+#if defined(DMA_IP_VERSION_V1) && !defined(TARGET_MCU_STM32H7)
+    dmaHandle->Init.Channel = dmaLink->sourceNumber;
+#else
     dmaHandle->Init.Request = dmaLink->sourceNumber;
+#endif
+
+#endif
     dmaHandle->Init.Direction = direction;
+
+    // STM32U5 uses different fields for... basically everything in this struct
+#ifdef STM32U5
+    if(direction == DMA_MEMORY_TO_PERIPH || direction == DMA_MEMORY_TO_MEMORY)
+    {
+        // Source is memory
+        dmaHandle->Init.SrcInc = memInc ? DMA_SINC_INCREMENTED : DMA_SINC_FIXED;
+
+        switch(memDataAlignment) {
+            case 4:
+                dmaHandle->Init.SrcDataWidth = DMA_SRC_DATAWIDTH_WORD;
+                break;
+            case 2:
+                dmaHandle->Init.SrcDataWidth = DMA_SRC_DATAWIDTH_HALFWORD;
+                break;
+            case 1:
+            default:
+                dmaHandle->Init.SrcDataWidth = DMA_SRC_DATAWIDTH_BYTE;
+                break;
+
+        }
+    }
+    else {
+        // Source is a peripheral
+        dmaHandle->Init.SrcInc = periphInc ? DMA_SINC_INCREMENTED : DMA_SINC_FIXED;
+
+        switch(periphDataAlignment) {
+            case 4:
+                dmaHandle->Init.SrcDataWidth = DMA_SRC_DATAWIDTH_WORD;
+                break;
+            case 2:
+                dmaHandle->Init.SrcDataWidth = DMA_SRC_DATAWIDTH_HALFWORD;
+                break;
+            case 1:
+            default:
+                dmaHandle->Init.SrcDataWidth = DMA_SRC_DATAWIDTH_BYTE;
+                break;
+
+        }
+    }
+
+    if(direction == DMA_PERIPH_TO_MEMORY || direction == DMA_MEMORY_TO_MEMORY)
+    {
+        // Destination is memory
+        dmaHandle->Init.DestInc = memInc ? DMA_SINC_INCREMENTED : DMA_SINC_FIXED;
+
+        switch(memDataAlignment) {
+            case 4:
+                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_WORD;
+                break;
+            case 2:
+                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_HALFWORD;
+                break;
+            case 1:
+            default:
+                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_BYTE;
+                break;
+
+        }
+    }
+    else {
+        // Destination is a peripheral
+        dmaHandle->Init.DestInc = periphInc ? DMA_SINC_INCREMENTED : DMA_SINC_FIXED;
+
+        switch(periphDataAlignment) {
+            case 4:
+                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_WORD;
+                break;
+            case 2:
+                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_HALFWORD;
+                break;
+            case 1:
+            default:
+                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_BYTE;
+                break;
+
+        }
+    }
+
+    dmaHandle->Init.SrcBurstLength = 1;
+    dmaHandle->Init.DestBurstLength = 1;
+
+#else
     dmaHandle->Init.PeriphInc = periphInc ? DMA_PINC_ENABLE : DMA_PINC_DISABLE;
     dmaHandle->Init.MemInc = memInc ? DMA_MINC_ENABLE : DMA_MINC_DISABLE;
-    dmaHandle->Init.PeriphDataAlignment = periphDataAlignment;
-    dmaHandle->Init.MemDataAlignment = memDataAlignment;
-    dmaHandle->Init.Mode = DMA_NORMAL;
     dmaHandle->Init.Priority = DMA_PRIORITY_MEDIUM;
+
+    switch(periphDataAlignment) {
+        case 4:
+            dmaHandle->Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+            break;
+        case 2:
+            dmaHandle->Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+            break;
+        case 1:
+        default:
+            dmaHandle->Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+            break;
+
+    }
+
+    switch(memDataAlignment) {
+        case 4:
+            dmaHandle->Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+            break;
+        case 2:
+            dmaHandle->Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+            break;
+        case 1:
+        default:
+            dmaHandle->Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+            break;
+
+    }
+
+#endif
+
+    dmaHandle->Init.Mode = DMA_NORMAL;
 
     HAL_DMA_Init(dmaHandle);
 
@@ -287,6 +558,46 @@ void DMA1_Channel4_5_IRQHandler(void)
     }
 }
 
+#elif defined(TARGET_MCU_STM32G0)
+
+void DMA1_Channel2_3_IRQHandler(void)
+{
+    if(stmDMAHandles[0][1] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][1]);
+    }
+    if(stmDMAHandles[0][2] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][2]);
+    }
+}
+
+#elif defined(TARGET_MCU_STM32L0)
+
+void DMA1_Channel2_3_IRQHandler(void)
+{
+    if(stmDMAHandles[0][1] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][1]);
+    }
+    if(stmDMAHandles[0][2] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][2]);
+    }
+}
+
+void DMA1_Channel4_5_6_7_IRQHandler(void)
+{
+    if(stmDMAHandles[0][3] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+    }
+    if(stmDMAHandles[0][4] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
+    }
+    if(stmDMAHandles[0][5] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][5]);
+    }
+    if(stmDMAHandles[0][6] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
+    }
+}
+
 #else
 
 #ifdef DMA1_Channel2
@@ -317,8 +628,6 @@ void DMA1_Channel5_IRQHandler(void)
 }
 #endif
 
-#endif
-
 #ifdef DMA1_Channel6
 void DMA1_Channel6_IRQHandler(void)
 {
@@ -331,6 +640,7 @@ void DMA1_Channel7_IRQHandler(void)
 {
     HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
 }
+#endif
 #endif
 
 #ifdef DMA2_Channel1
@@ -379,5 +689,117 @@ void DMA2_Channel6_IRQHandler(void)
 void DMA2_Channel7_IRQHandler(void)
 {
     HAL_DMA_IRQHandler(stmDMAHandles[1][6]);
+}
+#endif
+
+#ifdef DMA1_Stream0
+void DMA1_Stream0_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[0][0]);
+}
+#endif
+
+#ifdef DMA1_Stream1
+void DMA1_Stream1_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[0][1]);
+}
+#endif
+
+#ifdef DMA1_Stream2
+void DMA1_Stream2_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[0][2]);
+}
+#endif
+
+#ifdef DMA1_Stream3
+void DMA1_Stream3_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+}
+#endif
+
+#ifdef DMA1_Stream4
+void DMA1_Stream4_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
+}
+#endif
+
+#ifdef DMA1_Stream5
+void DMA1_Stream5_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[0][5]);
+}
+#endif
+
+#ifdef DMA1_Stream6
+void DMA1_Stream6_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
+}
+#endif
+
+#ifdef DMA1_Stream7
+void DMA1_Stream7_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[0][7]);
+}
+#endif
+
+#ifdef DMA2_Stream0
+void DMA2_Stream0_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[1][0]);
+}
+#endif
+
+#ifdef DMA2_Stream1
+void DMA2_Stream1_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[1][1]);
+}
+#endif
+
+#ifdef DMA2_Stream2
+void DMA2_Stream2_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[1][2]);
+}
+#endif
+
+#ifdef DMA2_Stream3
+void DMA2_Stream3_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[1][3]);
+}
+#endif
+
+#ifdef DMA2_Stream4
+void DMA2_Stream4_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[1][4]);
+}
+#endif
+
+#ifdef DMA2_Stream5
+void DMA2_Stream5_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[1][5]);
+}
+#endif
+
+#ifdef DMA2_Stream6
+void DMA2_Stream6_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[1][6]);
+}
+#endif
+
+#ifdef DMA2_Stream7
+void DMA2_Stream7_IRQHandler(void)
+{
+    HAL_DMA_IRQHandler(stmDMAHandles[1][7]);
 }
 #endif

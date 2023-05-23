@@ -21,45 +21,20 @@
 #include "cmsis.h"
 #include "stm_dma_utils.h"
 
-#ifdef DMAMUX1
-
-// STM32L4+ devices, with DMAMUX feature.
-// On this device, the DMA channels may be chosen arbitrarily.
+// See STM32F2 reference manual Tables 22 and 23
 
 /// Mapping from SPI index to DMA link info for Tx
 static const DMALinkInfo SPITxDMALinks[] = {
-        {1, 1, DMA_REQUEST_SPI1_TX},
-        {1, 3, DMA_REQUEST_SPI2_TX},
-        {2, 5, DMA_REQUEST_SPI3_TX}
+        {2, 3, 3}, // SPI1 Tx is DMA2 Stream 3 Channel 3
+        {1, 4, 0}, // SPI2 Tx is DMA1 Stream 3 Channel 0
+        {1, 5, 0}  // SPI3 Tx is DMA1 Stream 5 Channel 0
 };
 
 /// Mapping from SPI index to DMA link info for Rx
 static const DMALinkInfo SPIRxDMALinks[] = {
-        {1, 2, DMA_REQUEST_SPI1_RX},
-        {1, 4, DMA_REQUEST_SPI2_RX},
-        {1, 6, DMA_REQUEST_SPI3_RX}
+        {2, 0, 3}, // SPI1 Rx is DMA2 Stream 0 Channel 3
+        {1, 3, 0}, // SPI2 Rx is DMA1 Stream 3 Channel 0
+        {1, 0, 0}  // SPI3 Rx is DMA2 Stream 0 Channel 0
 };
-
-#else
-
-
-// Base model STM32L4 devices, with fixed DMA line mapping
-// See STM32L4 reference manual Tables 41 and 42.
-
-/// Mapping from SPI index to DMA link info for Tx
-static const DMALinkInfo SPITxDMALinks[] = {
-        {1, 3, 1}, // SPI1 Tx is DMA1 Ch3 Request 1
-        {1, 5, 1}, // SPI2 Tx is DMA1 Ch5 Request 1
-        {2, 2, 3}  // SPI3 Tx is DMA2 Ch2 Request 3
-};
-
-/// Mapping from SPI index to DMA link info for Rx
-static const DMALinkInfo SPIRxDMALinks[] = {
-        {1, 2, 1}, // SPI1 Rx is DMA1 Ch2 Request 1
-        {1, 4, 1}, // SPI2 Rx is DMA1 Ch4 Request 1
-        {2, 1, 3}  // SPI3 Rx is DMA2 Ch1 Request 3
-};
-
-#endif
 
 #endif //MBED_OS_STM_DMA_INFO_H
