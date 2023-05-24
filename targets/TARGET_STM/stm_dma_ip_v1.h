@@ -24,27 +24,30 @@
 #ifndef MBED_OS_STM_DMA_IP_V1_H
 #define MBED_OS_STM_DMA_IP_V1_H
 
-// Determine max channels per DMA controller.
-// We have to do this by just counting the macros.
-#if defined(DMA1_Stream0) && defined(DMA1_Stream1) && defined(DMA1_Stream2) && defined(DMA1_Stream3) && defined(DMA1_Stream4) && defined(DMA1_Stream5) && defined(DMA1_Stream6) && defined(DMA1_Stream7)
+// Devices with DMA IP v1 have at most 8 channels per controller.
 #define MAX_DMA_CHANNELS_PER_CONTROLLER 8
-#elif defined(DMA1_Stream0) && defined(DMA1_Stream1) && defined(DMA1_Stream2) && defined(DMA1_Stream3) && defined(DMA1_Stream4) && defined(DMA1_Stream5) && defined(DMA1_Stream6)
-#define MAX_DMA_CHANNELS_PER_CONTROLLER 7
-#elif defined(DMA1_Stream0) && defined(DMA1_Stream1) && defined(DMA1_Stream2) && defined(DMA1_Stream3) && defined(DMA1_Stream4) && defined(DMA1_Stream5)
-#define MAX_DMA_CHANNELS_PER_CONTROLLER 6
-#elif defined(DMA1_Stream0) && defined(DMA1_Stream1) && defined(DMA1_Stream2) && defined(DMA1_Stream3) && defined(DMA1_Stream4)
-#define MAX_DMA_CHANNELS_PER_CONTROLLER 5
-#elif defined(DMA1_Stream0) && defined(DMA1_Stream1) && defined(DMA1_Stream2) && defined(DMA1_Stream3)
-#define MAX_DMA_CHANNELS_PER_CONTROLLER 4
-#elif defined(DMA1_Stream0) && defined(DMA1_Stream1) && defined(DMA1_Stream2)
-#define MAX_DMA_CHANNELS_PER_CONTROLLER 3
-#elif defined(DMA1_Stream0) && defined(DMA1_Stream1)
-#define MAX_DMA_CHANNELS_PER_CONTROLLER 2
+
+// Count DMA controllers
+#ifdef DMA1
+#ifdef DMA2
+#define NUM_DMA_CONTROLLERS 2
 #else
-#define MAX_DMA_CHANNELS_PER_CONTROLLER 1
+#define NUM_DMA_CONTROLLERS 1
+#endif
+#else
+#define NUM_DMA_CONTROLLERS 0
 #endif
 
 // Provide an alias so that code can always use the v2 name for this structure
 #define DMA_Channel_TypeDef DMA_Stream_TypeDef
+
+// On some smaller devices, e.g. STM32L1 family, DMA channels are simply logically ORed rather than
+// muxed, so we don't need the "sourceNumber" field.
+// We can check if this is the case by the absence of specific peripherals/registers.
+#if defined(DMAMUX1_BASE) || defined(DMA_SxCR_CHSEL_Msk)
+#define STM_DEVICE_HAS_DMA_SOURCE_SELECTION 1
+#else
+#define STM_DEVICE_HAS_DMA_SOURCE_SELECTION 0
+#endif
 
 #endif //MBED_OS_STM_DMA_IP_V1_H

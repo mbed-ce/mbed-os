@@ -24,13 +24,22 @@
 
 #include "cmsis.h"
 
-// On some smaller devices, e.g. STM32L1 family, DMA channels are simply logically ORed rather than
-// muxed, so we don't need the "sourceNumber" field.
-// We can check if this is the case by the absence of specific peripherals/registers.
-#if defined(DMA1_CSELR) || defined(DMAMUX1_BASE) || defined(DMA_SxCR_CHSEL_Msk)
-#define STM_DEVICE_HAS_DMA_SOURCE_SELECTION 1
+// determine DMA IP version using the available constants in the chip header
+#if defined(GPDMA1)
+#define DMA_IP_VERSION_V3
+#elif defined(DMA1_Channel1)
+#define DMA_IP_VERSION_V2
 #else
-#define STM_DEVICE_HAS_DMA_SOURCE_SELECTION 0
+#define DMA_IP_VERSION_V1
+#endif
+
+// Include correct header for the IP version
+#ifdef DMA_IP_VERSION_V3
+#include "stm_dma_ip_v3.h"
+#elif defined(DMA_IP_VERSION_V2)
+#include "stm_dma_ip_v2.h"
+#else
+#include "stm_dma_ip_v1.h"
 #endif
 
 /*
@@ -55,31 +64,6 @@ typedef struct DMALinkInfo {
     uint8_t sourceNumber;
 #endif
 } DMALinkInfo;
-
-// DMA and DMA channel counts.  On MOST devices DMA controllers have 7 channels each...
-#ifdef DMA1
-#ifdef DMA2
-#define NUM_DMA_CONTROLLERS 2
-#else
-#define NUM_DMA_CONTROLLERS 1
-#endif
-#else
-#define NUM_DMA_CONTROLLERS 0
-#endif
-
-// determine DMA IP version.  Old version calls them "streams", new version calls them "channels"
-#ifdef DMA1_Stream0
-#define DMA_IP_VERSION_V1
-#else
-#define DMA_IP_VERSION_V2
-#endif
-
-// Include correct header for the IP version
-#ifdef DMA_IP_VERSION_V1
-#include "stm_dma_ip_v1.h"
-#else
-#include "stm_dma_ip_v2.h"
-#endif
 
 /**
  * @brief Get the DMA channel instance for a DMA link
