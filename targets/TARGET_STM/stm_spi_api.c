@@ -526,7 +526,14 @@ static void spi_init_tx_dma(struct spi_s * obj)
 
         // Initialize DMA channel
         DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_MEMORY_TO_PERIPH, false, true, 1, 1);
+
+        if(dmaHandle == NULL)
+        {
+            mbed_error(MBED_ERROR_ALREADY_IN_USE, "Tx DMA channel already used by something else!", 0, MBED_FILENAME, __LINE__);
+        }
+
         __HAL_LINKDMA(&obj->handle, hdmatx, *dmaHandle);
+        obj->txDMAInitialized = true;
     }
 }
 
@@ -543,7 +550,14 @@ static void spi_init_rx_dma(struct spi_s * obj)
 
         // Initialize DMA channel
         DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1);
+
+        if(dmaHandle == NULL)
+        {
+            mbed_error(MBED_ERROR_ALREADY_IN_USE, "Rx DMA channel already used by something else!", 0, MBED_FILENAME, __LINE__);
+        }
+
         __HAL_LINKDMA(&obj->handle, hdmarx, *dmaHandle);
+        obj->rxDMAInitialized = true;
     }
 }
 

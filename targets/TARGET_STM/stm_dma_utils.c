@@ -429,6 +429,20 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
 
 DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direction, bool periphInc, bool memInc,
                                      uint8_t periphDataAlignment, uint8_t memDataAlignment){
+
+#ifdef DMA_IP_VERSION_V2
+    // Channels start from 1 in IP v2 only
+    uint8_t channelIdx = dmaLink->channelIdx - 1;
+#else
+    uint8_t channelIdx = dmaLink->channelIdx;
+#endif
+
+    if(stmDMAHandles[dmaLink->dmaIdx - 1][channelIdx] != NULL)
+    {
+        // Channel already allocated (e.g. two SPI busses which use the same DMA request tried to be initialized)
+        return NULL;
+    }
+
      // Enable DMA mux clock for devices with it
 #ifdef __HAL_RCC_DMAMUX1_CLK_ENABLE
     __HAL_RCC_DMAMUX1_CLK_ENABLE();
@@ -461,7 +475,7 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
     // so we don't want to allocate DMA handles until they're needed.
     DMA_HandleTypeDef * dmaHandle = malloc(sizeof(DMA_HandleTypeDef));
     memset(dmaHandle, 0, sizeof(DMA_HandleTypeDef));
-    stmDMAHandles[dmaLink->dmaIdx - 1][dmaLink->channelIdx - 1] = dmaHandle;
+    stmDMAHandles[dmaLink->dmaIdx - 1][channelIdx] = dmaHandle;
 
     // Configure handle
     dmaHandle->Instance = stm_get_dma_channel(dmaLink);
@@ -609,6 +623,8 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
 
     return dmaHandle;
 }
+
+#ifdef DMA_IP_VERSION_V2
 
 #ifdef DMA1_Channel1
 void DMA1_Channel1_IRQHandler(void)
@@ -773,7 +789,9 @@ void DMA2_Channel7_IRQHandler(void)
     HAL_DMA_IRQHandler(stmDMAHandles[1][6]);
 }
 #endif
+#endif // DMA_IP_VERSION_V2
 
+#ifdef DMA_IP_VERSION_V1
 #ifdef DMA1_Stream0
 void DMA1_Stream0_IRQHandler(void)
 {
@@ -886,7 +904,9 @@ void DMA2_Stream7_IRQHandler(void)
     HAL_DMA_IRQHandler(stmDMAHandles[1][7]);
 }
 #endif
+#endif // DMA_IP_VERSION_V1
 
+#ifdef DMA_IP_VERSION_V3
 #ifdef GPDMA1_Channel0
 void GPDMA1_Channel0_IRQHandler(void)
 {
@@ -998,3 +1018,4 @@ void GPDMA1_Channel15_IRQHandler(void)
     HAL_DMA_IRQHandler(stmDMAHandles[0][15]);
 }
 #endif
+#endif // DMA_IP_VERSION_V3
