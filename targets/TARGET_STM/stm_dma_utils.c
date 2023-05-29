@@ -168,6 +168,14 @@ DMA_Channel_TypeDef * stm_get_dma_channel(const DMALinkInfo *dmaLink)
                     mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
             }
 #endif
+#ifdef BDMA
+        case 3:
+            switch(dmaLink->channelIdx)
+            {
+                case 0:
+                    return BDMA_Channel0;
+            }
+#endif
         default:
             mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA controller", dmaLink->dmaIdx, MBED_FILENAME, __LINE__);
 
@@ -464,6 +472,11 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
 #ifdef GPDMA1
         case 1:
             __HAL_RCC_GPDMA1_CLK_ENABLE();
+            break;
+#endif
+#ifdef BDMA
+        case 3:
+            __HAL_RCC_BDMA_CLK_ENABLE();
             break;
 #endif
         default:

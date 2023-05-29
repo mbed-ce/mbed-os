@@ -1563,6 +1563,15 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
         NVIC_EnableIRQ(irq_n);
     }
 
+#if defined(SPI_CAPABILITY_DMA) && defined(__DCACHE_PRESENT)
+    if (useDMA)
+    {
+        // For chips with a cache (e.g. Cortex-M7), we need to evict the Tx data from cache to main memory.
+        // This ensures that the DMA controller can see the most up-to-date copy of the data.
+        SCB_CleanDCache_by_Addr(tx, length);
+    }
+#endif
+
     // flush FIFO
 #if defined(SPI_FLAG_FRLVL)
     HAL_SPIEx_FlushRxFifo(handle);
@@ -1780,6 +1789,7 @@ void spi_abort_asynch(spi_t *obj)
     NVIC_ClearPendingIRQ(irq_n);
     NVIC_DisableIRQ(irq_n);
 
+#ifdef STM32_SPI_CAPABILITY_DMA
     // Abort DMA transfers if DMA channels have been allocated
     if(spiobj->txDMAInitialized) {
         HAL_DMA_Abort_IT(spiobj->handle.hdmatx);
@@ -1787,6 +1797,7 @@ void spi_abort_asynch(spi_t *obj)
     if(spiobj->rxDMAInitialized) {
         HAL_DMA_Abort_IT(spiobj->handle.hdmarx);
     }
+#endif
 
     // clean-up
     LL_SPI_Disable(SPI_INST(obj));
