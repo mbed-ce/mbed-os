@@ -484,7 +484,7 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
     // Most devices with IP v1 call this member "Channel" and most with IP v2 call it "Request".
     // But not STM32H7!
 #if defined(DMA_IP_VERSION_V1) && !defined(TARGET_MCU_STM32H7)
-    dmaHandle->Init.Channel = dmaLink->sourceNumber;
+    dmaHandle->Init.Channel = dmaLink->sourceNumber << DMA_SxCR_CHSEL_Pos;
 #else
     dmaHandle->Init.Request = dmaLink->sourceNumber;
 #endif

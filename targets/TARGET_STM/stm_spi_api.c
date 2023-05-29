@@ -1539,6 +1539,11 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
                 break;
             case SPI_TRANSFER_TYPE_RX:
                 spi_init_rx_dma(&obj->spi);
+                if(handle->Init.Direction == SPI_DIRECTION_2LINES) {
+                    // For 2 line SPI, doing an Rx-only transfer still requires a second DMA channel to send the fill
+                    // bytes.
+                    spi_init_tx_dma(&obj->spi);
+                }
                 break;
             default:
                 break;
@@ -1775,7 +1780,13 @@ void spi_abort_asynch(spi_t *obj)
     NVIC_ClearPendingIRQ(irq_n);
     NVIC_DisableIRQ(irq_n);
 
-    // TODO abort DMA transfer here
+    // Abort DMA transfers if DMA channels have been allocated
+    if(spiobj->txDMAInitialized) {
+        HAL_DMA_Abort_IT(spiobj->handle.hdmatx);
+    }
+    if(spiobj->rxDMAInitialized) {
+        HAL_DMA_Abort_IT(spiobj->handle.hdmarx);
+    }
 
     // clean-up
     LL_SPI_Disable(SPI_INST(obj));
