@@ -521,6 +521,15 @@ static void spi_init_tx_dma(struct spi_s * obj)
 {
     if(!obj->txDMAInitialized)
     {
+#ifdef TARGET_MCU_STM32H7
+        // For STM32H7, SPI6 does not support DMA through the normal mechanism -- it would require use of the BDMA
+        // controller, which we don't currently support, and which can only access data in SRAM4.
+        if(obj->spiIndex == 6)
+        {
+            mbed_error(MBED_ERROR_UNSUPPORTED, "DMA not supported on SPI6!", 0, MBED_FILENAME, __LINE__);
+        }
+#endif
+
         // Get DMA handle
         DMALinkInfo const *dmaLink = &SPITxDMALinks[obj->spiIndex - 1];
 
@@ -545,6 +554,15 @@ static void spi_init_rx_dma(struct spi_s * obj)
 {
     if(!obj->rxDMAInitialized)
     {
+#ifdef TARGET_MCU_STM32H7
+        // For STM32H7, SPI6 does not support DMA through the normal mechanism -- it would require use of the BDMA
+        // controller, which we don't currently support, and which can only access data in SRAM4.
+        if(obj->spiIndex == 6)
+        {
+            mbed_error(MBED_ERROR_UNSUPPORTED, "DMA not supported on SPI6!", 0, MBED_FILENAME, __LINE__);
+        }
+#endif
+
         // Get DMA handle
         DMALinkInfo const *dmaLink = &SPIRxDMALinks[obj->spiIndex - 1];
 
@@ -1555,20 +1573,19 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
 
     DEBUG_PRINTF("SPI inst=0x%8X Start: type=%u, length=%u, DMA=%d\r\n", (int) handle->Instance, transfer_type, length, !!useDMA);
 
-    if (!useDMA) {
-        // enable the interrupt
-        IRQn_Type irq_n = spiobj->spiIRQ;
-        NVIC_ClearPendingIRQ(irq_n);
-        NVIC_SetPriority(irq_n, 1);
-        NVIC_EnableIRQ(irq_n);
-    }
+    // Enable the interrupt.  This might be needed even for DMA -- some HAL implementations (e.g. H7) have
+    // the DMA interrupt handler trigger the SPI interrupt.
+    IRQn_Type irq_n = spiobj->spiIRQ;
+    NVIC_ClearPendingIRQ(irq_n);
+    NVIC_SetPriority(irq_n, 1);
+    NVIC_EnableIRQ(irq_n);
 
-#if defined(SPI_CAPABILITY_DMA) && defined(__DCACHE_PRESENT)
-    if (useDMA)
+#if defined(STM32_SPI_CAPABILITY_DMA) && defined(__DCACHE_PRESENT)
+    if (useDMA && transfer_type != SPI_TRANSFER_TYPE_RX)
     {
         // For chips with a cache (e.g. Cortex-M7), we need to evict the Tx data from cache to main memory.
         // This ensures that the DMA controller can see the most up-to-date copy of the data.
-        SCB_CleanDCache_by_Addr(tx, length);
+        SCB_CleanDCache_by_Addr((volatile void*)tx, length);
     }
 #endif
 
@@ -1607,6 +1624,11 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
             memset(rx, SPI_FILL_CHAR, length);
 
             if (useDMA) {
+#if defined(STM32_SPI_CAPABILITY_DMA) && defined(__DCACHE_PRESENT)
+                // For chips with a cache (e.g. Cortex-M7), we need to evict the Tx data from cache to main memory.
+                // This ensures that the DMA controller can see the most up-to-date copy of the data.
+                SCB_CleanDCache_by_Addr(rx, length);
+#endif
                 rc = HAL_SPI_Receive_DMA(handle, (uint8_t *)rx, words);
             }
             else {
@@ -1617,6 +1639,15 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
         default:
             length = 0;
     }
+
+#if defined(STM32_SPI_CAPABILITY_DMA) && defined(__DCACHE_PRESENT)
+    if (useDMA)
+    {
+        // For chips with a cache (e.g. Cortex-M7), we need to invalidate the Rx data in cache.
+        // This ensures that the CPU will fetch the data from SRAM instead of using its cache.
+        SCB_InvalidateDCache_by_Addr(rx, length);
+    }
+#endif
 
     if (rc) {
 #if defined(SPI_IP_VERSION_V2)

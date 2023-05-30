@@ -31,7 +31,6 @@ static const DMALinkInfo SPITxDMALinks[] = {
         {1, 5, DMA_REQUEST_SPI3_TX},
         {1, 7, DMA_REQUEST_SPI4_TX},
         {2, 1, DMA_REQUEST_SPI5_TX},
-        {3, 1, BDMA_REQUEST_SPI6_TX}, // SPI6 must be used through BDMA
 };
 
 /// Mapping from SPI index to DMA link info for Rx
@@ -41,7 +40,6 @@ static const DMALinkInfo SPIRxDMALinks[] = {
         {1, 4, DMA_REQUEST_SPI3_RX},
         {1, 6, DMA_REQUEST_SPI4_RX},
         {2, 0, DMA_REQUEST_SPI5_RX},
-        {3, 0, BDMA_REQUEST_SPI6_TX}, // SPI6 must be used through BDMA
 };
 
 

@@ -168,14 +168,6 @@ DMA_Channel_TypeDef * stm_get_dma_channel(const DMALinkInfo *dmaLink)
                     mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
             }
 #endif
-#ifdef BDMA
-        case 3:
-            switch(dmaLink->channelIdx)
-            {
-                case 0:
-                    return BDMA_Channel0;
-            }
-#endif
         default:
             mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA controller", dmaLink->dmaIdx, MBED_FILENAME, __LINE__);
 
