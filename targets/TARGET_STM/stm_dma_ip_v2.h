@@ -31,12 +31,6 @@
 // Only 5 channels usable, the other 2 lack interrupts
 #define MAX_DMA_CHANNELS_PER_CONTROLLER 5
 
-#elif defined(TARGET_MCU_STM32G0)
-
-// STM32G0 is weird and does its own thing.
-// Only 3 channels usable, the other 4 lack interrupts
-#define MAX_DMA_CHANNELS_PER_CONTROLLER 3
-
 #else
 
 // Devices with DMA IP v2 have at most 7 channels per controller.

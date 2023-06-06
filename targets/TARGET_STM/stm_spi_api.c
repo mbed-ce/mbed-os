@@ -588,6 +588,18 @@ void spi_free(spi_t *obj)
 
     DEBUG_PRINTF("spi_free\r\n");
 
+#if STM32_SPI_CAPABILITY_DMA
+    // Free DMA channels if allocated
+    if(spiobj->txDMAInitialized)
+    {
+        stm_free_dma_link(&SPITxDMALinks[spiobj->spiIndex - 1]);
+    }
+    if(spiobj->rxDMAInitialized)
+    {
+        stm_free_dma_link(&SPIRxDMALinks[spiobj->spiIndex - 1]);
+    }
+#endif
+
     __HAL_SPI_DISABLE(handle);
     HAL_SPI_DeInit(handle);
 

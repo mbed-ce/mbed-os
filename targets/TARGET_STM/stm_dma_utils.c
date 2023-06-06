@@ -196,11 +196,22 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                 case 5:
                     return DMA1_Channel4_5_IRQn;
 
-// STM32G0 has shared ISRs for Ch2-Ch3 and and NO ISRs for channels 4 through 7
+// STM32G0 has shared ISRs for Ch2-Ch3 and Ch4-Ch7 (and also all DMA2 channels on devices with DMA2)
 #elif defined(TARGET_MCU_STM32G0)
                 case 2:
                 case 3:
                     return DMA1_Channel2_3_IRQn;
+
+                // IRQ name for the remaining DMA channels depends on whether DMA2 exists or not
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+#ifdef DMA2
+                    return DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX1_OVR_IRQn;
+#else
+                    return DMA1_Channel4_5_6_7_IRQn;
+#endif
 
 // STM32L0 has shared ISRs for Ch2-Ch3 and Ch4-Ch7
 #elif defined(TARGET_MCU_STM32L0)
@@ -282,6 +293,16 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
         case 2:
             switch(dmaLink->channelIdx)
             {
+#ifdef TARGET_MCU_STM32G0
+                // STM32G0 does its own thing and has all DMA2 channels under 1 IRQ
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    return DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX1_OVR_IRQn;
+#else
+
 #ifdef DMA2_Channel1
                 case 1:
                     return DMA2_Channel1_IRQn;
@@ -342,6 +363,7 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
 #ifdef DMA2_Stream7
                     case 7:
                     return DMA2_Stream7_IRQn;
+#endif
 #endif
 
                 default:
@@ -629,6 +651,26 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
     return dmaHandle;
 }
 
+void stm_free_dma_link(const DMALinkInfo *dmaLink)
+{
+    // Note: we can't disable the interrupt here, in case one ISR is shared by multiple DMA channels
+    // and another channel is still using the interrupt.
+
+#ifdef DMA_IP_VERSION_V2
+    // Channels start from 1 in IP v2 only
+    uint8_t channelIdx = dmaLink->channelIdx - 1;
+#else
+    uint8_t channelIdx = dmaLink->channelIdx;
+#endif
+
+    // Deinit hardware channel
+    HAL_DMA_DeInit(stmDMAHandles[dmaLink->dmaIdx - 1][channelIdx]);
+
+    // Free memory
+    free(stmDMAHandles[dmaLink->dmaIdx - 1][channelIdx]);
+    stmDMAHandles[dmaLink->dmaIdx - 1][channelIdx] = NULL;
+}
+
 #ifdef DMA_IP_VERSION_V2
 
 #ifdef DMA1_Channel1
@@ -672,6 +714,55 @@ void DMA1_Channel2_3_IRQHandler(void)
         HAL_DMA_IRQHandler(stmDMAHandles[0][2]);
     }
 }
+
+#ifdef DMA2
+void DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX1_OVR_IRQHandler(void)
+{
+    if(stmDMAHandles[0][3] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+    }
+    if(stmDMAHandles[0][4] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
+    }
+    if(stmDMAHandles[0][5] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][5]);
+    }
+    if(stmDMAHandles[0][6] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
+    }
+    if(stmDMAHandles[1][0] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][0]);
+    }
+    if(stmDMAHandles[1][1] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][1]);
+    }
+    if(stmDMAHandles[1][2] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][2]);
+    }
+    if(stmDMAHandles[1][3] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][3]);
+    }
+    if(stmDMAHandles[1][4] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][4]);
+    }
+}
+#else
+void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
+{
+    if(stmDMAHandles[0][3] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+    }
+    if(stmDMAHandles[0][4] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
+    }
+    if(stmDMAHandles[0][5] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][5]);
+    }
+    if(stmDMAHandles[0][6] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
+    }
+}
+#endif
 
 #elif defined(TARGET_MCU_STM32L0)
 

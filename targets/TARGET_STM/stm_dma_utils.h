@@ -98,9 +98,12 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink);
 DMA_HandleTypeDef * stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t direction, bool periphInc, bool memInc, uint8_t periphDataAlignment, uint8_t memDataAlignment);
 
 /**
- * Free the underlying resources for a DMA link.  Disables interrupt and frees memory.
+ * @brief Free a DMA link.
+ *
+ * This frees memory associated with it and unlocks the hardware DMA channel so that it can be used by somebody else.
+ *
+ * @param dmaLink DMA link ponter to free.
  */
 void stm_free_dma_link(DMALinkInfo const * dmaLink);
-
 
 #endif //MBED_OS_STM_DMA_UTILS_H
