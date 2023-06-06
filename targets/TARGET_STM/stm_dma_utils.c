@@ -209,8 +209,10 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                 case 7:
 #ifdef DMA2
                     return DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX1_OVR_IRQn;
+#elif DMA1_Channel7
+                    return DMA1_Ch4_7_DMAMUX1_OVR_IRQn;
 #else
-                    return DMA1_Channel4_5_6_7_IRQn;
+                    return DMA1_Ch4_5_DMAMUX1_OVR_IRQn;
 #endif
 
 // STM32L0 has shared ISRs for Ch2-Ch3 and Ch4-Ch7
@@ -746,7 +748,7 @@ void DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX1_OVR_IRQHandler(void)
         HAL_DMA_IRQHandler(stmDMAHandles[1][4]);
     }
 }
-#else
+#elif defined(DMA1_Channel7)
 void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
 {
     if(stmDMAHandles[0][3] != NULL) {
@@ -760,6 +762,16 @@ void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
     }
     if(stmDMAHandles[0][6] != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
+    }
+}
+#else
+void DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler(void)
+{
+    if(stmDMAHandles[0][3] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+    }
+    if(stmDMAHandles[0][4] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
     }
 }
 #endif
