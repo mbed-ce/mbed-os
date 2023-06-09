@@ -209,7 +209,7 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                 case 7:
 #ifdef DMA2
                     return DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX1_OVR_IRQn;
-#elif DMA1_Channel7
+#elif defined(DMA1_Channel7)
                     return DMA1_Ch4_7_DMAMUX1_OVR_IRQn;
 #else
                     return DMA1_Ch4_5_DMAMUX1_OVR_IRQn;
