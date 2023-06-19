@@ -26,7 +26,7 @@
 #ifndef MBED_OS_STM_DMA_IP_V3_H
 #define MBED_OS_STM_DMA_IP_V3_H
 
-// Devices with DMA IP v2 have at most 7 channels per controller.
+// Devices with DMA IP v3 have at most 16 channels per controller.
 #define MAX_DMA_CHANNELS_PER_CONTROLLER 16
 
 #define NUM_DMA_CONTROLLERS 1
