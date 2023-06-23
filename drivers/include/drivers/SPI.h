@@ -393,7 +393,7 @@ public:
      * @param rx_buffer Pointer to the byte-array of data to read from the device.
      * @param rx_length Number of bytes to read, may be zero.
      * @return
-     *      The number of bytes written and read from the device. This is
+     *      The number of bytes written and read from the device (as an int). This is
      *      maximum of tx_length and rx_length.
      */
     template<typename WordT>
@@ -445,12 +445,13 @@ public:
      *                  received data are ignored.
      * @param rx_length The length of RX buffer in bytes.
      * @param callback  The event callback function.
-     * @param event     The event mask of events to modify. @see spi_api.h for SPI events.
+     * @param event     The logical OR of events to subscribe to.  May be #SPI_EVENT_ALL, or some combination
+     *        of the flags #SPI_EVENT_ERROR, #SPI_EVENT_COMPLETE, or #SPI_EVENT_RX_OVERFLOW
      *
      * \warning Be sure to call this function with pointer types matching the frame size set for the SPI bus,
      * or undefined behavior may occur!
      *
-     * @return Operation result.
+     * @return Operation result (integer)
      * @retval 0 If the transfer has started.
      * @retval -1 if the transfer could not be enqueued (increase drivers.spi_transaction_queue_len option)
      */
@@ -482,10 +483,11 @@ public:
      * \warning Be sure to call this function with pointer types matching the frame size set for the SPI bus,
      * or undefined behavior may occur!
      *
-     * @return -1 if the transfer could not be enqueued (increase drivers.spi_transaction_queue_len option)
-     * @return 1 on timeout
-     * @return 2 on other error
-     * @return 0 on success
+     * @return Operation result (integer)
+     * @retval -1 if the transfer could not be enqueued (increase drivers.spi_transaction_queue_len option)
+     * @retval 1 on timeout
+     * @retval 2 on other error
+     * @retval 0 on success
      */
     template<typename WordT>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
