@@ -9772,6 +9772,10 @@
             "PICO_TIME_DEFAULT_ALARM_POOL_DISABLED",
             "PICO_ON_DEVICE=1",
             "PICO_UART_ENABLE_CRLF_SUPPORT=0"
-        ]
+        ],
+        "overrides": {
+            "console-usb": true,
+            "console-uart": false
+        }
     }
 }

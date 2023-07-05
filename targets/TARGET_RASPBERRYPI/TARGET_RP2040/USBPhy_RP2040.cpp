@@ -31,7 +31,7 @@ extern "C" {
 #include "hardware/resets.h"
 
 #ifdef PICO_RP2040_USB_DEVICE_ENUMERATION_FIX
-#include "rp2040_usb_device_enumeration.h"
+#include "pico/fix/rp2040_usb_device_enumeration.h"
 #endif
 
 #ifdef __cplusplus

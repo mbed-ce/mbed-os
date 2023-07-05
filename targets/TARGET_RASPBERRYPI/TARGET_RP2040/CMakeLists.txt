@@ -27,7 +27,7 @@ target_include_directories(mbed-rp2040
         pico-sdk/rp2_common/hardware_sync/include
         pico-sdk/rp2_common/hardware_xosc/include
         pico-sdk/rp2_common/pico_platform/include
-        pico-sdk/rp2_common/pico_fix/rp2040_usb_device_enumeration/include/pico/fix
+        pico-sdk/rp2_common/pico_fix/rp2040_usb_device_enumeration/include/
         pico-sdk/rp2_common/pico_bootrom/include
         pico-sdk/rp2_common/hardware_claim/include
         pico-sdk/rp2040/hardware_structs/include
@@ -79,6 +79,7 @@ target_sources(mbed-rp2040
         pico-sdk/common/pico_sync/mutex.c
         pico-sdk/common/pico_time/time.c
         pico-sdk/common/pico_sync/lock_core.c
+        pico-sdk/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c
 )
 
 mbed_set_linker_script(mbed-rp2040 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
