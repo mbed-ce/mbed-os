@@ -182,7 +182,7 @@ static const uint8_t _sfdp_4_byte_inst_table[8] = {0x7F, 0xEF, 0xFF, 0xFF, 0x21,
  * Get the global mutex used to protect the chip select pin array (below).
  * It will be initialized on first use.
  */
-static rtos::Mutex & get_devices_mutex();
+static rtos::Mutex &get_devices_mutex();
 
 /*
  * Get the global array of active chip select pins.
@@ -190,7 +190,7 @@ static rtos::Mutex & get_devices_mutex();
  *
  * This function should be called with the devices mutex locked.
  */
-static PinName * get_active_ospif_csel_arr();
+static PinName *get_active_ospif_csel_arr();
 
 
 int OSPIFBlockDevice::_number_of_active_ospif_flash_csel = 0;
@@ -869,14 +869,14 @@ int OSPIFBlockDevice::change_mode(int mode)
 /*   Different Device Csel Mgmt */
 /********************************/
 
-static rtos::Mutex & get_devices_mutex()
+static rtos::Mutex &get_devices_mutex()
 {
     static rtos::Mutex devicesMutex;
     return devicesMutex;
 }
 
 
-static PinName * get_active_ospif_csel_arr()
+static PinName *get_active_ospif_csel_arr()
 {
     // Declare the active csel array info as local static variables.
     // This makes sure it's initialized on first use, so even if an OSPIFBlockDevice is declared
@@ -884,7 +884,7 @@ static PinName * get_active_ospif_csel_arr()
     static bool active_csel_arr_initialized = false;
     static PinName active_csel_arr[OSPIF_MAX_ACTIVE_FLASH_DEVICES];
 
-    if(!active_csel_arr_initialized) {
+    if (!active_csel_arr_initialized) {
         for (int i_ind = 0; i_ind < OSPIF_MAX_ACTIVE_FLASH_DEVICES; i_ind++) {
             active_csel_arr[i_ind] = NC;
         }
@@ -898,7 +898,7 @@ int OSPIFBlockDevice::add_new_csel_instance(PinName csel)
 {
     rtos::ScopedMutexLock lock(get_devices_mutex());
 
-    PinName * active_ospif_flash_csel_arr = get_active_ospif_csel_arr();
+    PinName *active_ospif_flash_csel_arr = get_active_ospif_csel_arr();
 
     if (_number_of_active_ospif_flash_csel >= OSPIF_MAX_ACTIVE_FLASH_DEVICES) {
         return -2;
@@ -927,7 +927,7 @@ int OSPIFBlockDevice::remove_csel_instance(PinName csel)
 {
     rtos::ScopedMutexLock lock(get_devices_mutex());
 
-    PinName * active_ospif_flash_csel_arr = get_active_ospif_csel_arr();
+    PinName *active_ospif_flash_csel_arr = get_active_ospif_csel_arr();
 
     // remove the csel from existing device list
     for (int i_ind = 0; i_ind < OSPIF_MAX_ACTIVE_FLASH_DEVICES; i_ind++) {
