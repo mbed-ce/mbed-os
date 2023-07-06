@@ -73,6 +73,7 @@ target_sources(mbed-rp2040
         pico-sdk/rp2_common/hardware_claim/claim.c
         pico-sdk/rp2_common/hardware_timer/timer.c
         pico-sdk/rp2_common/hardware_sync/sync.c
+        pico-sdk/rp2_common/hardware_rtc/rtc.c
         pico-sdk/rp2_common/pico_bootrom/bootrom.c
         pico-sdk/rp2_common/pico_platform/platform.c
         pico-sdk/common/pico_time/time.c

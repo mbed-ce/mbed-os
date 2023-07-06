@@ -22,7 +22,11 @@
 #endif
 
 #if !defined(MBED_ROM_SIZE)
-#define MBED_ROM_SIZE  0x0  // 0 B
+#if defined(PICO_FLASH_SIZE_BYTES)
+#define MBED_ROM_SIZE PICO_FLASH_SIZE_BYTES
+#else
+#define MBED_ROM_SIZE  (2048*1024)
+#endif
 #endif
 
 #if !defined(MBED_RAM_START)
@@ -30,7 +34,7 @@
 #endif
 
 #if !defined(MBED_RAM_SIZE)
-#define MBED_RAM_SIZE  0x0  // 0 B
+#define MBED_RAM_SIZE  (256*1024)
 #endif
 
 #endif
