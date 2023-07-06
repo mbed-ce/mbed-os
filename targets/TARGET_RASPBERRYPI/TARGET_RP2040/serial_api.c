@@ -114,7 +114,6 @@ static inline void uart1_irq(void)
 
 void serial_irq_handler(serial_t *obj, uart_irq_handler handler, uint32_t id)
 {
-    int UART_IRQ = obj->dev == uart0 ? UART0_IRQ : UART1_IRQ;
     if (obj->dev == uart0) {
         serial_irq_ids[0] = id;
     } else {

@@ -9763,7 +9763,7 @@
             "RTC"
         ]
     },
-    "RASPBERRY_PI_PICO": {
+    "RASPBERRY_PI_PICO_SWD": {
         "inherits": ["RP2040"],
         "macros_add": [
             "PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1",
@@ -9772,7 +9772,10 @@
             "PICO_TIME_DEFAULT_ALARM_POOL_DISABLED",
             "PICO_ON_DEVICE=1",
             "PICO_UART_ENABLE_CRLF_SUPPORT=0"
-        ],
+        ]
+    },
+    "RASPBERRY_PI_PICO": {
+        "inherits": ["RASPBERRY_PI_PICO_SWD"],
         "overrides": {
             "console-usb": true,
             "console-uart": false

@@ -74,9 +74,7 @@ target_sources(mbed-rp2040
         pico-sdk/rp2_common/hardware_timer/timer.c
         pico-sdk/rp2_common/hardware_sync/sync.c
         pico-sdk/rp2_common/pico_bootrom/bootrom.c
-        pico-sdk/rp2_common/pico_runtime/runtime.c
         pico-sdk/rp2_common/pico_platform/platform.c
-        pico-sdk/common/pico_sync/mutex.c
         pico-sdk/common/pico_time/time.c
         pico-sdk/common/pico_sync/lock_core.c
         pico-sdk/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c
