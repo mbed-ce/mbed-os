@@ -30,6 +30,9 @@ extern "C" {
 int stdio_uart_inited = 0;
 serial_t stdio_uart;
 
+static inline void uart0_irq(void);
+static inline void uart1_irq(void);
+
 void serial_init(serial_t *obj, PinName tx, PinName rx)
 {
     if (tx == STDIO_UART_TX && stdio_uart_inited != 0) {
@@ -62,8 +65,15 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
     //uart_set_translate_crlf(obj->dev, false);
     uart_set_fifo_enabled(obj->dev, false);
 
+    // Prepare interrupt.  Note that we set it to enabled here, but the interrupt
+    // won't fire yet because we haven't enabled any interrupt sources.
+    int UART_IRQ = obj->dev == uart0 ? UART0_IRQ : UART1_IRQ;
+    irq_set_exclusive_handler(UART_IRQ, obj->dev == uart0 ? uart0_irq : uart1_irq);
+    irq_clear(UART_IRQ);
+    irq_set_enabled(UART_IRQ, true);
+
     if (tx == STDIO_UART_TX) {
-        memmove(&stdio_uart, obj, sizeof(serial_t));
+        memcpy(&stdio_uart, obj, sizeof(serial_t));
         stdio_uart_inited = 1;
     }
 }
@@ -102,14 +112,23 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
 static volatile uart_irq_handler irq_handler;
 static volatile uint32_t serial_irq_ids[2] = {0};
 
-static inline void uart0_irq(void)
-{
-    irq_handler(serial_irq_ids[0], RxIrq);
+static inline void uart0_irq(void) {
+    if(uart_is_writable(uart0)) {
+        irq_handler(serial_irq_ids[0], TxIrq);
+    }
+    if(uart_is_readable(uart0)) {
+        irq_handler(serial_irq_ids[0], RxIrq);
+    }
 }
 
 static inline void uart1_irq(void)
 {
-    irq_handler(serial_irq_ids[1], RxIrq);
+    if(uart_is_writable(uart1)) {
+        irq_handler(serial_irq_ids[1], TxIrq);
+    }
+    if(uart_is_readable(uart1)) {
+        irq_handler(serial_irq_ids[1], RxIrq);
+    }
 }
 
 void serial_irq_handler(serial_t *obj, uart_irq_handler handler, uint32_t id)
@@ -124,12 +143,14 @@ void serial_irq_handler(serial_t *obj, uart_irq_handler handler, uint32_t id)
 
 void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
 {
-    int UART_IRQ = obj->dev == uart0 ? UART0_IRQ : UART1_IRQ;
+    if(irq == RxIrq) {
+        obj->rxIrqEnabled = enable;
+    }
+    else if(irq == TxIrq) {
+        obj->txIrqEnabled = enable;
+    }
 
-    irq_set_exclusive_handler(UART_IRQ, obj->dev == uart0 ? uart0_irq : uart1_irq);
-    irq_set_enabled(UART_IRQ, enable);
-
-    uart_set_irq_enables(obj->dev, irq == RxIrq, irq == TxIrq);
+    uart_set_irq_enables(obj->dev, obj->rxIrqEnabled, obj->txIrqEnabled);
 }
 
 int serial_getc(serial_t *obj)

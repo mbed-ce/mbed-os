@@ -51,6 +51,8 @@ extern "C" {
 
 #include "cmsis.h"
 
+#include <stdbool.h>
+
 #include "PortNames.h"
 #include "PeripheralNames.h"
 #include "PinNames.h"
@@ -91,6 +93,10 @@ struct serial_s {
     PinName pin_rts;
     PinName pin_cts;
     uint32_t baud;
+
+    // Current states of the IRQ enables for Tx and Rx
+    bool txIrqEnabled;
+    bool rxIrqEnabled;
 };
 
 struct i2c_s {
