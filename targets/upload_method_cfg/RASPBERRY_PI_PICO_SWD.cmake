@@ -1,4 +1,8 @@
 # Mbed OS upload method configuration file for target RASPBERRY_PI_PICO_SWD.
+# This config file allows debugging of RPi Pico targets using an external CMSIS-DAP debugger.
+# This debugger can be a Picoprobe running the new picoprobe-cmsis firmware, or
+# another SWD debugger like a Pitaya-Link.
+
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
@@ -23,3 +27,7 @@ set(OPENOCD_CHIP_CONFIG_COMMANDS
 	-c "gdb_breakpoint_override hard" # Make sure GDB uses HW breakpoints
 	-c "adapter speed 4000"
 )
+
+# Config options for PICOTOOL
+# -------------------------------------------------------------
+set(PICOTOOL_UPLOAD_ENABLED TRUE)

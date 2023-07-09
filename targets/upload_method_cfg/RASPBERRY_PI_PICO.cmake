@@ -1,55 +1,14 @@
-# Mbed OS upload method configuration file for target RASPBERRY_PI_PICO
+# Mbed OS upload method configuration file for target RASPBERRY_PI_PICO (without SWD debugger)
+# Currently, only picotool is supported for uploading code, which requires manually putting the board
+# into bootloader mode whenever you wish to program it.
+# Note: If you have a debugger connected to your board, you should be using the RASPBERRY_PI_PICO_SWD target instead.
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
-# Notes:
-# 1. Keep in mind the RASPBERRY_PI_PICO does not contain any on-board debugger, so all upload methods counts with external debugger.
-# 2. Using the JLINK upload method with your dev board requires converting its ST-LINK (versions lower than 3) into a J-Link.  See here for details: https://www.segger.com/products/debug-probes/j-link/models/other-j-links/st-link-on-board/
-# 3. PyOCD reports error "No cores were discovered!" 
-# 4. OpenOCD tested with ST-Link V2-1
-
 # General config parameters
 # -------------------------------------------------------------
-set(UPLOAD_METHOD_DEFAULT PYOCD)
+set(UPLOAD_METHOD_DEFAULT PICOTOOL)
 
-# Config options for MBED
+# Config options for PICOTOOL
 # -------------------------------------------------------------
-
-set(MBED_UPLOAD_ENABLED FALSE)
-set(MBED_RESET_BAUDRATE 115200)
-
-# Config options for JLINK
-# -------------------------------------------------------------
-
-set(JLINK_UPLOAD_ENABLED TRUE)
-set(JLINK_CPU_NAME RP2040)
-set(JLINK_CLOCK_SPEED 4000)
-set(JLINK_UPLOAD_INTERFACE SWD)
-
-# Config options for PYOCD
-# -------------------------------------------------------------
-
-set(PYOCD_UPLOAD_ENABLED TRUE)
-set(PYOCD_TARGET_NAME rp2040)
-set(PYOCD_CLOCK_SPEED 4000k)
-
-# Config options for OPENOCD
-# -------------------------------------------------------------
-
-set(OPENOCD_UPLOAD_ENABLED FALSE)
-set(OPENOCD_CHIP_CONFIG_COMMANDS
-    -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/xxx.cfg)
-
-# Config options for STM32Cube
-# -------------------------------------------------------------
-
-set(STM32CUBE_UPLOAD_ENABLED FALSE)
-set(STM32CUBE_CONNECT_COMMAND -c port=SWD reset=HWrst)
-set(STM32CUBE_GDBSERVER_ARGS --swd)
-
-# Config options for stlink
-# -------------------------------------------------------------
-
-set(STLINK_UPLOAD_ENABLED FALSE)
-set(STLINK_LOAD_ADDRESS 0x8000000)
-set(STLINK_ARGS --connect-under-reset)
+set(PICOTOOL_UPLOAD_ENABLED TRUE)

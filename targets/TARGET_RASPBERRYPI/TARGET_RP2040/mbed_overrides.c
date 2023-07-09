@@ -5,6 +5,7 @@
 #include "hardware/resets.h"
 #include "hardware/clocks.h"
 #include "hardware/sync.h"
+#include "pico/binary_info.h"
 
 #include <stdarg.h>
 
@@ -69,6 +70,12 @@ void mbed_sdk_init()
 
 	mbed_sdk_inited = 1;
 }
+
+// Note we put at most 4 pieces of binary info in the reset section because that's how much spare space we had
+// (picked the most common ones)... if there is a link failure because of .reset section overflow then move
+// more out.
+#define reset_section_attr __attribute__((section(".reset")))
+bi_decl_with_attr(bi_program_name("Mbed OS CE Program"), reset_section_attr)
 
 // Pico SDK panic handlers
 void __attribute__((noreturn)) panic_unsupported() {
