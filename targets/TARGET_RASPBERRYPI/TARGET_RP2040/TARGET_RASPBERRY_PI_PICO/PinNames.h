@@ -1,3 +1,6 @@
+
+/* MBED TARGET LIST: RASPBERRY_PI_PICO */
+
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H
 
@@ -54,14 +57,11 @@ typedef enum {
     CONSOLE_TX = p0,
     CONSOLE_RX = p1,
 
-    LED1 = p25,
-    LED2 = p25,
-    LED3 = p25,
-    LED4 = p25,
-
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
+
+#define LED1 p25
 
 #ifdef __cplusplus
 }
