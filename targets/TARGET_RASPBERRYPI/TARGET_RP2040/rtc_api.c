@@ -1,13 +1,27 @@
 #if DEVICE_RTC
 
+#include "mbed_critical.h"
 #include "rtc_api.h"
 #include "hardware/rtc.h"
 #include "hardware/structs/rtc.h"
+#include "hardware/clocks.h"
 #include "mbed_mktime.h"
+#include "mbed_wait_api.h"
 
 void rtc_init(void)
 {
-    _rtc_init();
+    core_util_critical_section_enter();
+
+    // Calling _rtc_init() resets the current time.
+    // So, if the RTC has already been initialized, we don't want to initialize it again.
+    static bool rtc_initted = false;
+    if(!rtc_initted)
+    {
+        _rtc_init();
+        rtc_initted = true;
+    }
+
+    core_util_critical_section_exit();
 }
 
 void rtc_free(void)
@@ -62,6 +76,15 @@ void rtc_write(time_t t)
     struct tm timeinfo;
     datetime_t date;
 
+    // JS: After some testing, it seems that whatever value is written to the RTC always ends up being
+    // 1 second higher after it's read back.  This means that writing the RTC and then reading it again
+    // won't produce the expected result.  I wasn't able to find any errata or anything documenting
+    // this behavior, but it's very consistent, and the RTC tests fail if the below block is removed.
+    // To fix the error, we just decrease the time by 1 second before writing it to the registers.
+    if (t >= 1) {
+        t -= 1;
+    }
+
     if (_rtc_localtime(t, &timeinfo, RTC_4_YEAR_LEAP_YEAR_SUPPORT) == false) {
         return;
     }
@@ -84,7 +107,18 @@ void rtc_write(time_t t)
     date.min = timeinfo.tm_min;
     date.sec = timeinfo.tm_sec;
 
+
+    core_util_critical_section_enter();
     rtc_set_datetime(&date);
+    core_util_critical_section_exit();
+
+    // Per the datasheet section 4.8.4, writes to the RTC take 2 RTC clocks (~50us at our frequency)
+    // to go through.  However, the Mbed test suite expects the new time to be available immediately.
+    // So, don't return from this function until the write is complete.
+    // Instead, wait 2*(1/clk_rtc) microseconds.
+    const int writeWaitTime = (2 * 1000000) / clock_get_hz(clk_rtc);
+    wait_us(writeWaitTime);
+
     return;
 }
 
