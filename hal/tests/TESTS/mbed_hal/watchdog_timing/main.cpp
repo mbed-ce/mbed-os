@@ -157,7 +157,7 @@ void test_timeout_lower_limit()
     wait_us(sleep_time_ms * 1000);
     hal_watchdog_kick();
 
-    if (send_reset_notification(&current_case, 2 * TIMEOUT_LOWER_LIMIT_MS) == false) {
+    if (!send_reset_notification(&current_case, 2 * TIMEOUT_LOWER_LIMIT_MS)) {
         TEST_ASSERT_MESSAGE(0, "Dev-host communication error.");
         return;
     }

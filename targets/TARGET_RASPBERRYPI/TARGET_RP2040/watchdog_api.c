@@ -10,7 +10,7 @@ watchdog_status_t hal_watchdog_init(const watchdog_config_t *config)
 {
     watchdogConfig = *config;
     // The pico watchdogs accept a maximum value of 0x7fffff
-    if ( config->timeout_ms < 0x1 && config->timeout_ms > 0x7FFFFF ) {
+    if ( config->timeout_ms < 0x1 || config->timeout_ms > 0x7FFFFF ) {
         return WATCHDOG_STATUS_INVALID_ARGUMENT;
     }
 
@@ -32,11 +32,7 @@ watchdog_status_t hal_watchdog_stop(void)
 
 uint32_t hal_watchdog_get_reload_value(void)
 {
-    uint32_t load_value = watchdogConfig.timeout_ms * 1000 * 2;
-    if (load_value > 0xffffffu) {
-        load_value = 0xffffffu;
-    }
-    return load_value;
+    return watchdogConfig.timeout_ms;
 }
 
 watchdog_features_t hal_watchdog_get_platform_features(void)
@@ -46,8 +42,12 @@ watchdog_features_t hal_watchdog_get_platform_features(void)
     features.max_timeout = 0x7FFFFF;
     features.update_config = true;
     features.disable_watchdog = true;
-    return features;
 
+    // SDK configures the watchdog underlying counter to run at 1MHz
+    features.clock_typical_frequency = 1000000;
+    features.clock_max_frequency = 1000000;
+
+    return features;
 }
 
 #endif // DEVICE_WATCHDOG
