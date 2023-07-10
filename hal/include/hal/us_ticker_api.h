@@ -155,6 +155,9 @@ void us_ticker_irq_handler(void);
  * clocking and prescaler registers, along with disabling
  * the compare interrupt.
  *
+ * Implementations must tolerate this function being called multiple times, and subsequent calls
+ * after the first one shall clear any configured interrupt.
+ *
  * @note Initialization properties tested by ticker_init_test
  *
  * Pseudo Code:
@@ -227,6 +230,7 @@ void us_ticker_free(void);
  * }
  * @endcode
  */
+// note: parenthesis around the function name make sure this isn't replaced by the us_ticker_read() macro version.
 uint32_t (us_ticker_read)(void);
 
 /** Set interrupt for specified timestamp

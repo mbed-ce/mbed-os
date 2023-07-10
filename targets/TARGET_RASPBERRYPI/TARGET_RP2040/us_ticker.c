@@ -54,6 +54,10 @@ const ticker_info_t* us_ticker_get_info()
 }
 
 static const uint8_t alarm_num = 0;
+static const uint8_t irq_num = TIMER_IRQ_0; // IRQ corresponding to the above alarm
+
+static bool us_ticker_inited = false;
+
 
 static void us_ticker_irq_handler_internal(uint alarm_src) {
     if (alarm_num == alarm_src) {
@@ -63,13 +67,21 @@ static void us_ticker_irq_handler_internal(uint alarm_src) {
 
 void us_ticker_init(void)
 {
-    hardware_alarm_claim(alarm_num);
-    hardware_alarm_set_callback(alarm_num, us_ticker_irq_handler_internal);
+    if(us_ticker_inited) {
+        /* calling init again should cancel current interrupt */
+        us_ticker_disable_interrupt();
+    }
+    else {
+        hardware_alarm_claim(alarm_num);
+        hardware_alarm_set_callback(alarm_num, us_ticker_irq_handler_internal);
+        us_ticker_inited = true;
+    }
+
 }
 
-uint32_t us_ticker_read()
+uint32_t (us_ticker_read)()
 {
-    return time_us_32();
+    return us_ticker_read();
 }
 
 void us_ticker_set_interrupt(timestamp_t timestamp)
@@ -99,7 +111,27 @@ void us_ticker_set_interrupt(timestamp_t timestamp)
 
 void us_ticker_fire_interrupt(void)
 {
-    us_ticker_irq_handler();
+    // Cancel any previously active interrupts (we don't want the real interrupt firing at the same time as
+    // the artifically generated one)
+    us_ticker_disable_interrupt();
+
+    // Temporarily reassign the IRQ to directly call the Mbed OS irq handler.
+    // This is because the Pico SDK version of the handler checks the currently active alarm,
+    // and there won't be one in this case.
+    irq_handler_t picoSDKHandler = irq_get_vtable_handler(irq_num);
+    bool wasEnabled = irq_is_enabled(irq_num);
+
+    irq_remove_handler(irq_num, picoSDKHandler);
+    irq_set_exclusive_handler(irq_num, &us_ticker_irq_handler);
+    irq_set_pending(irq_num);
+    irq_set_enabled(irq_num, true);
+
+    // IRQ will execute immediately here
+
+    // Restore old settings
+    irq_remove_handler(irq_num, &us_ticker_irq_handler);
+    irq_set_enabled(irq_num, wasEnabled);
+    irq_set_exclusive_handler(irq_num, picoSDKHandler);
 }
 
 void us_ticker_disable_interrupt(void)

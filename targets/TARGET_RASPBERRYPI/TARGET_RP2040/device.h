@@ -33,5 +33,6 @@
 #define MBED_DEVICE_H
 
 #include "objects.h"
+#include "us_ticker_defines.h"
 
 #endif
