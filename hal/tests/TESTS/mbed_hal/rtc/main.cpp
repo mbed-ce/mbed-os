@@ -211,7 +211,7 @@ void rtc_write_read_test()
         // To prevent the RTC from ticking during the read-write operation, busy wait until it ticks.
         // That gives us a second in which to execute the test.
         auto initialVal = RealTimeClock::now();
-        while(RealTimeClock::now() == initialVal) {}
+        while (RealTimeClock::now() == initialVal) {}
 
         RealTimeClock::write(init_val);
         const auto read_val = RealTimeClock::now();
