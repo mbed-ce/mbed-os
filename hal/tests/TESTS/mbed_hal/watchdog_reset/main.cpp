@@ -110,7 +110,7 @@ void test_simple_reset()
     // Phase 1. -- run the test code.
     // Init the watchdog and wait for a device reset.
     watchdog_config_t config = { TIMEOUT_MS.count() };
-    if (send_reset_notification(&current_case, 2 * TIMEOUT_MS + SERIAL_FLUSH_TIME_MS) == false) {
+    if (!send_reset_notification(&current_case, 2 * TIMEOUT_MS + SERIAL_FLUSH_TIME_MS)) {
         TEST_ASSERT_MESSAGE(0, "Dev-host communication error.");
         return;
     }
@@ -122,7 +122,7 @@ void test_simple_reset()
     // Watchdog reset should have occurred during a wait above.
 
     hal_watchdog_kick();
-    wdg_kicking_ticker.attach_us(mbed::callback(hal_watchdog_kick), 20000); // For testsuite failure handling.
+    wdg_kicking_ticker.attach(mbed::callback(hal_watchdog_kick), 20ms); // For testsuite failure handling.
     TEST_ASSERT_MESSAGE(0, "Watchdog did not reset the device as expected.");
 }
 
@@ -137,12 +137,12 @@ void test_sleep_reset()
     }
 
     // Phase 1. -- run the test code.
-    watchdog_config_t config = { TIMEOUT_MS };
-    if (send_reset_notification(&current_case, 2 * TIMEOUT_MS + SERIAL_FLUSH_TIME_MS) == false) {
+    watchdog_config_t config = { TIMEOUT_MS.count() };
+    if (!send_reset_notification(&current_case, 2 * TIMEOUT_MS + SERIAL_FLUSH_TIME_MS)) {
         TEST_ASSERT_MESSAGE(0, "Dev-host communication error.");
         return;
     }
-    wait_us(SERIAL_FLUSH_TIME_US); // Wait for the serial buffers to flush.
+    wait_us(std::chrono::duration_cast<std::chrono::microseconds>(SERIAL_FLUSH_TIME_MS).count()); // Wait for the serial buffers to flush.
     TEST_ASSERT_EQUAL(WATCHDOG_STATUS_OK, hal_watchdog_init(&config));
     sleep_manager_lock_deep_sleep();
     if (sleep_manager_can_deep_sleep()) {
@@ -156,7 +156,7 @@ void test_sleep_reset()
     // Watchdog reset should have occurred during the sleep above.
 
     hal_watchdog_kick();
-    wdg_kicking_ticker.attach_us(mbed::callback(hal_watchdog_kick), 20000); // For testsuite failure handling.
+    wdg_kicking_ticker.attach(mbed::callback(hal_watchdog_kick), 20ms); // For testsuite failure handling.
     TEST_ASSERT_MESSAGE(0, "Watchdog did not reset the device as expected.");
 }
 
@@ -171,13 +171,13 @@ void test_deepsleep_reset()
     }
 
     // Phase 1. -- run the test code.
-    watchdog_config_t config = { TIMEOUT_MS };
-    if (send_reset_notification(&current_case, 2 * TIMEOUT_MS + SERIAL_FLUSH_TIME_MS) == false) {
+    watchdog_config_t config = { TIMEOUT_MS.count() };
+    if (!send_reset_notification(&current_case, 2 * TIMEOUT_MS + SERIAL_FLUSH_TIME_MS)) {
         TEST_ASSERT_MESSAGE(0, "Dev-host communication error.");
         return;
     }
-    wait_us(SERIAL_FLUSH_TIME_US); // Wait for the serial buffers to flush.
-    wait_us(SERIAL_FLUSH_TIME_US); // Wait for the serial buffers to flush.
+    wait_us(std::chrono::duration_cast<std::chrono::microseconds>(SERIAL_FLUSH_TIME_MS).count()); // Wait for the serial buffers to flush.
+    wait_us(std::chrono::duration_cast<std::chrono::microseconds>(SERIAL_FLUSH_TIME_MS).count()); // Wait for the serial buffers to flush.
     TEST_ASSERT_EQUAL(WATCHDOG_STATUS_OK, hal_watchdog_init(&config));
     if (!sleep_manager_can_deep_sleep()) {
         TEST_ASSERT_MESSAGE(0, "Deepsleep should be allowed.");
@@ -192,7 +192,7 @@ void test_deepsleep_reset()
     // Watchdog reset should have occurred during the deepsleep above.
 
     hal_watchdog_kick();
-    wdg_kicking_ticker.attach_us(mbed::callback(hal_watchdog_kick), 20000); // For testsuite failure handling.
+    wdg_kicking_ticker.attach(mbed::callback(hal_watchdog_kick), 20ms); // For testsuite failure handling.
     TEST_ASSERT_MESSAGE(0, "Watchdog did not reset the device as expected.");
 }
 #endif
