@@ -93,7 +93,9 @@ uint32_t flash_get_size(const flash_t *obj)
 
 uint32_t flash_get_sector_size(const flash_t *obj, uint32_t address)
 {
-    (void)(obj);
+    if (address < flash_get_start_address(obj) || address >= flash_get_start_address(obj) + flash_get_size(obj)) {
+        return MBED_FLASH_INVALID_SIZE;
+    }
 
     return FLASH_SECTOR_SIZE;
 }
@@ -107,6 +109,8 @@ uint32_t flash_get_page_size(const flash_t *obj)
 
 uint32_t flash_get_start_address(const flash_t *obj)
 {
+    (void)obj;
+
     return XIP_BASE;
 }
 

@@ -63,6 +63,7 @@ target_sources(mbed-rp2040
         pico-sdk/rp2_common/hardware_flash/flash.c
         pico-sdk/rp2_common/hardware_uart/uart.c
         pico-sdk/rp2_common/hardware_spi/spi.c
+        pico-sdk/rp2_common/hardware_i2c/i2c.c
         pico-sdk/rp2_common/hardware_gpio/gpio.c
         pico-sdk/rp2_common/hardware_xosc/xosc.c
         pico-sdk/rp2_common/hardware_irq/irq.c
