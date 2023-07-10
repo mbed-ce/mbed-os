@@ -1,6 +1,7 @@
 #include "cmsis.h"
 #include "objects.h"
 #include "platform/mbed_error.h"
+#include "mbed_interface.h"
 
 #include "hardware/resets.h"
 #include "hardware/clocks.h"
@@ -87,14 +88,14 @@ void hard_assertion_failure(void) {
 }
 
 void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
-    puts("\n*** PANIC ***\n");
+    mbed_error_printf("\n*** PANIC ***\n");
 
     // Try and format the message to the stack
     const size_t MSG_BUF_LEN = 256;
     char msgBuf[MSG_BUF_LEN];
     va_list args;
     va_start(args, fmt);
-    vsnprintf(msgBuf, MSG_BUF_LEN, fmt, args);
+    snprintf(msgBuf, MSG_BUF_LEN, fmt, args);
     va_end(args);
 
     MBED_ERROR(
