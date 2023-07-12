@@ -286,6 +286,9 @@ void us_ticker_clear_interrupt(void);
  *
  * The ticker should be initialized prior calling this function.
  *
+ * Note: This function might be called from the ticker ISR, in which case it should
+ * schedule the ticker ISR to be executed again as soon as it returns.
+ *
  * Pseudo Code:
  * @code
  * void us_ticker_fire_interrupt(void)
