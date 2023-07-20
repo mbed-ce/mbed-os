@@ -313,6 +313,8 @@
 /* Includes ----------------------------------------------------------------------------------------------------------*/
 #include "stm32h5xx_hal.h"
 
+#if defined(DEVICE_I3C)
+
 /** @addtogroup STM32H5xx_HAL_Driver
   * @{
   */
@@ -9253,6 +9255,8 @@ static void I3C_TreatErrorCallback(I3C_HandleTypeDef *hi3c)
   */
 
 #endif /* HAL_I3C_MODULE_ENABLED */
+
+#endif /* DEVICE_I3C */
 
 /**
   * @}

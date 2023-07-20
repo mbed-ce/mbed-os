@@ -24,6 +24,8 @@
 extern "C" {
 #endif
 
+#if defined(DEVICE_I3C)
+
 /* Includes ----------------------------------------------------------------------------------------------------------*/
 #if defined (USE_HAL_DRIVER)
 #include "stm32h5xx_hal.h"
@@ -125,6 +127,7 @@ ErrorStatus I3C_TgtTimingComputation(const I3C_TgtTimingTypeDef *pInputTiming,
 /**
   * @}
   */
+#endif /* #if DEVICE_I3C */
 
 #ifdef __cplusplus
 }

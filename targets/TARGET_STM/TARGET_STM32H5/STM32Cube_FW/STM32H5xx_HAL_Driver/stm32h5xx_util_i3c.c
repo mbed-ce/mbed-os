@@ -19,6 +19,8 @@
 /* Includes ----------------------------------------------------------------------------------------------------------*/
 #include "stm32h5xx_util_i3c.h"
 
+#if defined(DEVICE_I3C)
+
 /** @addtogroup STM32H5xx_UTIL_Driver
   * @{
   */
@@ -407,3 +409,5 @@ ErrorStatus I3C_TgtTimingComputation(const I3C_TgtTimingTypeDef *pInputTiming,
 /**
   * @}
   */
+
+ #endif /* DEVICE_I3C */

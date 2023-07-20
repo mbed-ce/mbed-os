@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+#if defined(DEVICE_I3C)
 
 /* Includes ----------------------------------------------------------------------------------------------------------*/
 #include "stm32h5xx_hal_def.h"
@@ -1311,6 +1312,7 @@ HAL_StatusTypeDef HAL_I3C_GetCCCInfo(I3C_HandleTypeDef *hi3c,
 /**
   * @}
   */
+#endif /* DEVICE_I3C */
 
 #ifdef __cplusplus
 }
