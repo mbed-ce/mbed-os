@@ -127,7 +127,7 @@ SECTIONS
     /* End of .text-like segments */
     __etext = .;
 
-   .ram_vector_table (COPY): {
+   .ram_vector_table (NOLOAD): {
         *(.ram_vector_table)
     } > RAM
 
@@ -177,7 +177,7 @@ SECTIONS
         __data_end__ = .;
     } > RAM AT> FLASH
 
-    .uninitialized_data (COPY): {
+    .uninitialized_data (NOLOAD): {
         . = ALIGN(4);
         *(.uninitialized_data*)
     } > RAM
@@ -208,7 +208,7 @@ SECTIONS
         __bss_end__ = .;
     } > RAM
 
-    .heap (COPY):
+    .heap (NOLOAD):
     {
         __end__ = .;
         PROVIDE(end = .);
@@ -226,22 +226,22 @@ SECTIONS
     /* by default we put core 0 stack at the end of scratch Y, so that if core 1
      * stack is not used then all of SCRATCH_X is free.
      */
-    .stack1_dummy (COPY):
+    .stack1_dummy (NOLOAD):
     {
         *(.stack1*)
     } > SCRATCH_X
 
-    .stack_dummy (COPY):
+    .stack_dummy (NOLOAD):
     {
         *(.stack*)
-    } > RAM
+    } > SCRATCH_Y
 
     .flash_end : {
-        __flash_binary_end = .;
+        PROVIDE(__flash_binary_end = .);
     } > FLASH
 
     /* stack limit is poorly named, but historically is maximum heap ptr */
-    __StackTop = ORIGIN(RAM) + LENGTH(RAM);
+    __StackTop = ORIGIN(SCRATCH_Y) + LENGTH(SCRATCH_Y);
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
     __StackOneTop = ORIGIN(SCRATCH_X) + LENGTH(SCRATCH_X);
     __StackOneBottom = __StackOneTop - SIZEOF(.stack1_dummy);

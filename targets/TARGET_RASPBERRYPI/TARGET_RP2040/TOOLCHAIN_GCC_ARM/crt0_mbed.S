@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "pico.h"
+#include "pico/asm_helper.S"
+
 #include "hardware/regs/m0plus.h"
-#include "hardware/platform_defs.h"
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 #include "pico/binary_info/defs.h"
@@ -16,22 +18,21 @@
 #endif
 #endif
 
-.syntax unified
-.cpu cortex-m0plus
-.thumb
+pico_default_asm_setup
 
 .section .vectors, "ax"
 .align 2
 
-.global __vectors
+.global __vectors, __VECTOR_TABLE
+__VECTOR_TABLE:
 __vectors:
 .word __StackTop
 .word _reset_handler
-.word isr_nmi
+.word NMI_Handler
 .word HardFault_Handler
-.word MemManage_Handler
-.word BusFault_Handler
-.word UsageFault_Handler
+.word isr_invalid // Reserved, should never fire
+.word isr_invalid // Reserved, should never fire
+.word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
 .word isr_invalid // Reserved, should never fire
@@ -41,38 +42,43 @@ __vectors:
 .word isr_invalid // Reserved, should never fire
 .word PendSV_Handler
 .word SysTick_Handler
-.word isr_irq0
-.word isr_irq1
-.word isr_irq2
-.word isr_irq3
-.word isr_irq4
-.word isr_irq5
-.word isr_irq6
-.word isr_irq7
-.word isr_irq8
-.word isr_irq9
-.word isr_irq10
-.word isr_irq11
-.word isr_irq12
-.word isr_irq13
-.word isr_irq14
-.word isr_irq15
-.word isr_irq16
-.word isr_irq17
-.word isr_irq18
-.word isr_irq19
-.word isr_irq20
-.word isr_irq21
-.word isr_irq22
-.word isr_irq23
-.word isr_irq24
-.word isr_irq25
-.word isr_irq26
-.word isr_irq27
-.word isr_irq28
-.word isr_irq29
-.word isr_irq30
-.word isr_irq31
+.word TIMER_IRQ_0_Handler
+.word TIMER_IRQ_1_Handler
+.word TIMER_IRQ_2_Handler
+.word TIMER_IRQ_3_Handler
+.word PWM_IRQ_WRAP_Handler
+.word USBCTRL_IRQ_Handler
+.word XIP_IRQ_Handler
+.word PIO0_IRQ_0_Handler
+.word PIO0_IRQ_1_Handler
+.word PIO1_IRQ_0_Handler
+.word TIMER_IRQ_1_Handler0
+.word TIMER_IRQ_1_Handler1
+.word TIMER_IRQ_1_Handler2
+.word TIMER_IRQ_1_Handler3
+.word TIMER_IRQ_1_Handler4
+.word TIMER_IRQ_1_Handler5
+.word TIMER_IRQ_1_Handler6
+.word TIMER_IRQ_1_Handler7
+.word TIMER_IRQ_1_Handler8
+.word TIMER_IRQ_1_Handler9
+.word TIMER_IRQ_2_Handler0
+.word TIMER_IRQ_2_Handler1
+.word TIMER_IRQ_2_Handler2
+.word TIMER_IRQ_2_Handler3
+.word TIMER_IRQ_2_Handler4
+.word TIMER_IRQ_2_Handler5
+.word TIMER_IRQ_2_Handler6
+.word TIMER_IRQ_2_Handler7
+.word TIMER_IRQ_2_Handler8
+.word TIMER_IRQ_2_Handler9
+.word TIMER_IRQ_3_Handler0
+.word TIMER_IRQ_3_Handler1
+
+// all default exception handlers do nothing, and we can check for them being set to our
+// default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
+.global __default_isrs_start
+__default_isrs_start:
 
 // Declare a weak symbol for each ISR.
 // By default, they will fall through to the undefined IRQ handler below (breakpoint),
@@ -88,11 +94,14 @@ __vectors:
 
 // these are separated out for clarity
 decl_isr_bkpt isr_invalid
-decl_isr_bkpt isr_nmi
+decl_isr_bkpt NMI_Handler
 decl_isr_bkpt HardFault_Handler
 decl_isr_bkpt SVC_Handler
 decl_isr_bkpt PendSV_Handler
 decl_isr_bkpt SysTick_Handler
+
+.global __default_isrs_end
+__default_isrs_end:
 
 .macro decl_isr name
 .weak \name
@@ -101,44 +110,44 @@ decl_isr_bkpt SysTick_Handler
 \name:
 .endm
 
-decl_isr isr_irq0
-decl_isr isr_irq1
-decl_isr isr_irq2
-decl_isr isr_irq3
-decl_isr isr_irq4
-decl_isr isr_irq5
-decl_isr isr_irq6
-decl_isr isr_irq7
-decl_isr isr_irq8
-decl_isr isr_irq9
-decl_isr isr_irq10
-decl_isr isr_irq11
-decl_isr isr_irq12
-decl_isr isr_irq13
-decl_isr isr_irq14
-decl_isr isr_irq15
-decl_isr isr_irq16
-decl_isr isr_irq17
-decl_isr isr_irq18
-decl_isr isr_irq19
-decl_isr isr_irq20
-decl_isr isr_irq21
-decl_isr isr_irq22
-decl_isr isr_irq23
-decl_isr isr_irq24
-decl_isr isr_irq25
-decl_isr isr_irq26
-decl_isr isr_irq27
-decl_isr isr_irq28
-decl_isr isr_irq29
-decl_isr isr_irq30
-decl_isr isr_irq31
+decl_isr TIMER_IRQ_0_Handler
+decl_isr TIMER_IRQ_1_Handler
+decl_isr TIMER_IRQ_2_Handler
+decl_isr TIMER_IRQ_3_Handler
+decl_isr PWM_IRQ_WRAP_Handler
+decl_isr USBCTRL_IRQ_Handler
+decl_isr XIP_IRQ_Handler
+decl_isr PIO0_IRQ_0_Handler
+decl_isr PIO0_IRQ_1_Handler
+decl_isr PIO1_IRQ_0_Handler
+decl_isr TIMER_IRQ_1_Handler0
+decl_isr TIMER_IRQ_1_Handler1
+decl_isr TIMER_IRQ_1_Handler2
+decl_isr TIMER_IRQ_1_Handler3
+decl_isr TIMER_IRQ_1_Handler4
+decl_isr TIMER_IRQ_1_Handler5
+decl_isr TIMER_IRQ_1_Handler6
+decl_isr TIMER_IRQ_1_Handler7
+decl_isr TIMER_IRQ_1_Handler8
+decl_isr TIMER_IRQ_1_Handler9
+decl_isr TIMER_IRQ_2_Handler0
+decl_isr TIMER_IRQ_2_Handler1
+decl_isr TIMER_IRQ_2_Handler2
+decl_isr TIMER_IRQ_2_Handler3
+decl_isr TIMER_IRQ_2_Handler4
+decl_isr TIMER_IRQ_2_Handler5
+decl_isr TIMER_IRQ_2_Handler6
+decl_isr TIMER_IRQ_2_Handler7
+decl_isr TIMER_IRQ_2_Handler8
+decl_isr TIMER_IRQ_2_Handler9
+decl_isr TIMER_IRQ_3_Handler0
+decl_isr TIMER_IRQ_3_Handler1
 
 // All unhandled USER IRQs fall through to here
 .global __unhandled_user_irq
 .thumb_func
 __unhandled_user_irq:
-    bl __get_current_exception
+    mrs  r0, ipsr
     subs r0, #16
 .global unhandled_user_irq_num_in_r0
 unhandled_user_irq_num_in_r0:
@@ -216,6 +225,9 @@ _reset_handler:
     cmp r0, #0
     bne hold_non_core0_in_bootrom
 
+    // In a NO_FLASH binary, don't perform .data copy, since it's loaded
+    // in-place by the SRAM load. Still need to clear .bss
+#if !PICO_NO_FLASH
     adr r4, data_cpy_table
 
     // assume there is at least one entry
@@ -226,6 +238,7 @@ _reset_handler:
     bl data_cpy
     b 1b
 2:
+#endif
 
     // Zero out the BSS
     ldr r1, =__bss_start__
@@ -241,22 +254,18 @@ bss_fill_test:
 platform_entry: // symbol for stack traces
     // Use 32-bit jumps, in case these symbols are moved out of branch range
     // (e.g. if main is in SRAM and crt0 in flash)
-    //ldr r1, =runtime_init
-    //blx r1
+    // Mbed OS: Changed this to call _start() instead of runtime_init() and main()
     ldr r1, =_start
     blx r1
     ldr r1, =exit
     blx r1
     // exit should not return.  If it does, hang the core.
     // (fall thru into our hang _exit impl
-.weak _exit
-.type _exit,%function
-.thumb_func
-_exit:
 1: // separate label because _exit can be moved out of branch range
     bkpt #0
     b 1b
 
+#if !PICO_NO_FLASH
 data_cpy_loop:
     ldm r1!, {r0}
     stm r2!, {r0}
@@ -264,6 +273,10 @@ data_cpy:
     cmp r2, r3
     blo data_cpy_loop
     bx lr
+#endif
+
+// Note the data copy table is still included for NO_FLASH builds, even though
+// we skip the copy, because it is listed in binary info
 
 .align 2
 data_cpy_table:
@@ -306,10 +319,3 @@ hold_non_core0_in_bootrom:
     ldr r0, = 'W' | ('V' << 8)
     bl rom_func_lookup
     bx r0
-
-.global __get_current_exception
-.thumb_func
-__get_current_exception:
-    mrs  r0, ipsr
-    uxtb r0, r0
-    bx   lr
