@@ -34,7 +34,7 @@
 #endif
 
 #if !defined(MBED_RAM_SIZE)
-#define MBED_RAM_SIZE  (256*1024)
+#define MBED_RAM_SIZE  (264*1024)
 #endif
 
 #endif
