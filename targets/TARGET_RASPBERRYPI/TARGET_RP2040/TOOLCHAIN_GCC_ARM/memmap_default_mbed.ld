@@ -18,8 +18,11 @@
     __HeapLimit
     __StackLimit
     __StackTop
+    __StackBottom (== __StackLimit)
     __stack (== StackTop)
 */
+
+#include "../cmsis_nvic.h"
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
     /* This value is normally defined by the tools
@@ -27,16 +30,15 @@
     #define MBED_CONF_TARGET_BOOT_STACK_SIZE  0x400
 #endif
 
-#if !defined(PICO_FLASH_SIZE_BYTES)
-    /* This value is normally defined by the tools
-       to 0x1000 for bare metal and 0x400 for RTOS */
-    #define PICO_FLASH_SIZE_BYTES  2048k
-#endif
-
 MEMORY
 {
-    FLASH(rx) : ORIGIN = 0x10000000, LENGTH = PICO_FLASH_SIZE_BYTES
-    RAM(rwx) : ORIGIN =  0x20000000, LENGTH = 256k
+    FLASH(rx) : ORIGIN = MBED_ROM_START, LENGTH = MBED_ROM_SIZE
+    RAM(rwx) : ORIGIN =  MBED_RAM_START, LENGTH = MBED_RAM_SIZE
+
+    /*
+     * Scratch banks are commonly used for critical data and functions accessed only by one core (when only
+     * one core is accessing the RAM bank, there is no opportunity for stalls).
+     */
     SCRATCH_X(rwx) : ORIGIN = 0x20040000, LENGTH = 4k
     SCRATCH_Y(rwx) : ORIGIN = 0x20041000, LENGTH = 4k
 }
@@ -217,25 +219,6 @@ SECTIONS
         __HeapLimit = .;
     } > RAM
 
-    /* .stack*_dummy section doesn't contains any symbols. It is only
-     * used for linker to calculate size of stack sections, and assign
-     * values to stack symbols later
-     *
-     * stack1 section may be empty/missing if platform_launch_core1 is not used */
-
-    /* by default we put core 0 stack at the end of scratch Y, so that if core 1
-     * stack is not used then all of SCRATCH_X is free.
-     */
-    .stack1_dummy (NOLOAD):
-    {
-        *(.stack1*)
-    } > SCRATCH_X
-
-    .stack_dummy (NOLOAD):
-    {
-        *(.stack*)
-    } > SCRATCH_Y
-
     .flash_end : {
         PROVIDE(__flash_binary_end = .);
     } > FLASH
@@ -243,9 +226,7 @@ SECTIONS
     /* stack limit is poorly named, but historically is maximum heap ptr */
     __StackTop = ORIGIN(SCRATCH_Y) + LENGTH(SCRATCH_Y);
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
-    __StackOneTop = ORIGIN(SCRATCH_X) + LENGTH(SCRATCH_X);
-    __StackOneBottom = __StackOneTop - SIZEOF(.stack1_dummy);
-    __StackBottom = __StackTop - SIZEOF(.stack_dummy);
+    __StackBottom = __StackLimit;
     PROVIDE(__stack = __StackTop);
 
     /* Check if data + heap + stack exceeds RAM limit */

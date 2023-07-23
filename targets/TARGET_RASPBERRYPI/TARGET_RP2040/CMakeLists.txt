@@ -3,7 +3,7 @@
 
 add_subdirectory(TARGET_RASPBERRY_PI_PICO EXCLUDE_FROM_ALL)
 
-set(LINKER_FILE TOOLCHAIN_GCC_ARM//memmap_default.ld)
+set(LINKER_FILE TOOLCHAIN_GCC_ARM/memmap_default_mbed.ld)
 
 target_include_directories(mbed-rp2040
     INTERFACE
