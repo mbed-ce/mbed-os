@@ -350,8 +350,14 @@ int SPI::queue_transfer(const void *tx_buffer, int tx_length, void *rx_buffer, i
 void SPI::start_transfer(const void *tx_buffer, int tx_length, void *rx_buffer, int rx_length, unsigned char bit_width, const event_callback_t &callback, int event)
 {
     lock_deep_sleep();
-    _acquire();
-    _set_ssel(0);
+
+    // Acquire the hardware and (if using GPIO CS mode) select the chip.
+    // But, if the user has already called select(), we can skip this step.
+    if (_select_count++ == 0) {
+        _acquire();
+        _set_ssel(0);
+    }
+
     _callback = callback;
     _irq.callback(&SPI::irq_handler_asynch);
     spi_master_transfer(&_peripheral->spi, tx_buffer, tx_length, rx_buffer, rx_length, bit_width, _irq.entry(), event, _usage);
@@ -396,7 +402,12 @@ void SPI::irq_handler_asynch(void)
 {
     int event = spi_irq_handler_asynch(&_peripheral->spi);
     if (_callback && (event & SPI_EVENT_ALL)) {
-        _set_ssel(1);
+
+        // If using GPIO CS mode, unless we were asked to keep the peripheral selected, deselect it.
+        if (--_select_count == 0) {
+            _set_ssel(1);
+        }
+
         unlock_deep_sleep();
         _callback.call(event & SPI_EVENT_ALL);
     }

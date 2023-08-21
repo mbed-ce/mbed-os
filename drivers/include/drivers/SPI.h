@@ -403,22 +403,40 @@ public:
         return write(reinterpret_cast<char const *>(tx_buffer), tx_length, reinterpret_cast<char *>(rx_buffer), rx_length);
     }
 
-    /** Acquire exclusive access to this SPI bus.
+    /**
+     * @brief Acquire exclusive access to this SPI bus.
+     *
+     * This function blocks until the chosen SPI peripheral is not being used by any other SPI objects.
+     * Careful -- if other code leaves the bus locked, this could block forever!
      */
     virtual void lock(void);
 
-    /** Release exclusive access to this SPI bus.
+    /**
+     * @brief Release exclusive access to this SPI bus.
+     *
+     * This allows other code to do operations using the SPI peripheral.
      */
     virtual void unlock(void);
 
-    /** Assert the Slave Select line, acquiring exclusive access to this SPI bus.
+    /**
+     * @brief Assert the Slave Select line and acquire exclusive access to this SPI bus.
      *
-     * If use_gpio_ssel was not passed to the constructor, this only acquires
-     * exclusive access; the Slave Select line will not activate until data is transferred.
+     * The slave select line will remain selected (low) for all following operations until
+     * you call #deselect() on this instance.  This allows you to string together multiple SPI transactions
+     * as if they were a single operation (from the perspective of peripheral chips).
+     *
+     * If use_gpio_ssel was not passed to the constructor, manual control of the SSEL line is not possible,
+     * and this function behaves identically to #lock().
+     *
+     * Like #lock(), this function will block until exclusive access can be acquired.
      */
     void select(void);
 
-    /** Deassert the Slave Select line, releasing exclusive access to this SPI bus.
+    /**
+     * @brief Deassert the Slave Select line, releasing exclusive access to this SPI bus.
+     *
+     * If use_gpio_ssel was not passed to the constructor, manual control of the SSEL line is not possible,
+     * and this function behaves identically to #unlock().
      */
     void deselect(void);
 
@@ -702,7 +720,7 @@ protected:
     /* Default character used for NULL transfers */
     char _write_fill;
     /* Select count to handle re-entrant selection */
-    int8_t _select_count;
+    volatile int8_t _select_count = 0;
     /* Static pinmap data */
     const spi_pinmap_t *_static_pinmap;
     /* SPI peripheral name */
