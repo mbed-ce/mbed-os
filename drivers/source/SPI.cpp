@@ -16,6 +16,7 @@
  */
 #include "drivers/SPI.h"
 #include "platform/mbed_critical.h"
+#include "mbed_error.h"
 
 #if DEVICE_SPI_ASYNCH
 #include "platform/mbed_power_mgmt.h"
@@ -110,11 +111,13 @@ SPI::SPI(const spi_pinmap_t &pinmap, PinName ssel) :
 
 void SPI::_do_init(SPI *obj)
 {
+    obj->_peripheral->initialized = true;
     spi_init(&obj->_peripheral->spi, obj->_mosi, obj->_miso, obj->_sclk, obj->_hw_ssel);
 }
 
 void SPI::_do_init_direct(SPI *obj)
 {
+    obj->_peripheral->initialized = true;
     spi_init_direct(&obj->_peripheral->spi, obj->_static_pinmap);
 }
 
@@ -132,13 +135,21 @@ void SPI::_do_construct()
     _write_fill = SPI_FILL_CHAR;
 
     core_util_critical_section_enter();
-    // lookup in a critical section if we already have it else initialize it
 
+    // lookup and claim the peripheral in a critical section in case another thread is
+    // also trying to claim it
     _peripheral = SPI::_lookup(_peripheral_name);
     if (!_peripheral) {
         _peripheral = SPI::_alloc();
         _peripheral->name = _peripheral_name;
     }
+
+    if(_peripheral->numUsers == std::numeric_limits<uint8_t>::max()) {
+        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_MUTEX_LOCK_FAILED), "Ref count at max!");
+    }
+
+    _peripheral->numUsers++;
+
     core_util_critical_section_exit();
 
 #if DEVICE_SPI_ASYNCH && MBED_CONF_DRIVERS_SPI_TRANSACTION_QUEUE_LEN
@@ -152,12 +163,23 @@ void SPI::_do_construct()
 
 SPI::~SPI()
 {
-    SPI::lock();
+    if(_peripheral->numUsers == 0){
+        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_MUTEX_UNLOCK_FAILED), "Ref count at 0?");
+    }
+
+    core_util_critical_section_enter();
+
     /* Make sure a stale pointer isn't left in peripheral's owner field */
     if (_peripheral->owner == this) {
         _peripheral->owner = nullptr;
     }
-    SPI::unlock();
+
+    if(--_peripheral->numUsers == 0)
+    {
+        _dealloc(_peripheral);
+    }
+
+    core_util_critical_section_exit();
 }
 
 SPI::spi_peripheral_s *SPI::_lookup(SPI::SPIName name)
@@ -165,7 +187,7 @@ SPI::spi_peripheral_s *SPI::_lookup(SPI::SPIName name)
     SPI::spi_peripheral_s *result = nullptr;
     core_util_critical_section_enter();
     for (int idx = 0; idx < _peripherals_used; idx++) {
-        if (_peripherals[idx].name == name) {
+        if (_peripherals[idx].numUsers > 0 && _peripherals[idx].name == name) {
             result = &_peripherals[idx];
             break;
         }
@@ -174,10 +196,28 @@ SPI::spi_peripheral_s *SPI::_lookup(SPI::SPIName name)
     return result;
 }
 
-SPI::spi_peripheral_s *SPI::_alloc()
+SPI::spi_peripheral_s * SPI::_alloc()
 {
     MBED_ASSERT(_peripherals_used < SPI_PERIPHERALS_USED);
-    return &_peripherals[_peripherals_used++];
+
+    // Find an unused peripheral to return
+    for(spi_peripheral_s & peripheral : _peripherals) {
+        if(peripheral.numUsers == 0) {
+            _peripherals_used++;
+            return &peripheral;
+        }
+    }
+
+    MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_INVALID_DATA_DETECTED), "Can't find new peripheral!");
+}
+
+void SPI::_dealloc(SPI::spi_peripheral_s *peripheral)
+{
+    if(peripheral->initialized) {
+        spi_free(&peripheral->spi);
+        peripheral->initialized = false;
+    }
+    --_peripherals_used;
 }
 
 void SPI::format(int bits, int mode)
@@ -484,6 +524,7 @@ void SPI::irq_handler_asynch(void)
     }
 #endif
 }
+
 
 #endif
 

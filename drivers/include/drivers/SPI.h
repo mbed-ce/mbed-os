@@ -681,9 +681,13 @@ protected:
         SPIName name = SPIName(0);
         /* Internal SPI object handling the resources' state. */
         spi_t spi{};
+        /* Number of SPI objects that have been created which reference this peripheral. */
+        uint8_t numUsers;
+        /* True iff anyone has ever called spi_init() / spi_init_direct() for this peripheral */
+        bool initialized;
         /* Used by lock and unlock for thread safety */
         SingletonPtr<rtos::Mutex> mutex;
-        /* Current user of the SPI */
+        /* Current user of the SPI, if any. */
         SPI *owner = nullptr;
 #if DEVICE_SPI_ASYNCH && MBED_CONF_DRIVERS_SPI_TRANSACTION_QUEUE_LEN
         /* Queue of pending transfers */
@@ -758,6 +762,9 @@ private:
     /** Allocate an entry in the static _peripherals table.
      */
     static spi_peripheral_s *_alloc();
+    /// Deallocate the given peripheral.
+    /// Must be called from a critical section.
+    static void _dealloc(spi_peripheral_s * peripheral);
 
     static void _do_init(SPI *obj);
     static void _do_init_direct(SPI *obj);
