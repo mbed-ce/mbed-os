@@ -372,27 +372,6 @@ public:
      * @param rx_buffer Pointer to the byte-array of data to read from the device.
      * @param rx_length Number of bytes to read, may be zero.
      * @return
-     *      The number of bytes written and read from the device. This is
-     *      maximum of tx_length and rx_length.
-     */
-    virtual int write(const char *tx_buffer, int tx_length, char *rx_buffer, int rx_length);
-
-    // Convenience overload of the above for any integer type instead of char*
-    /**
-     * @brief Write to the SPI Slave and obtain the response.
-     *
-     * The total number of bytes sent and received will be the maximum of
-     * tx_length and rx_length. The bytes written will be padded with the
-     * value 0xff.
-     *
-     * Note: Even if the word size / bits per frame is not 8, \c rx_length and \c tx_length
-     * still count bytes of input data, not numbers of words.
-     *
-     * @param tx_buffer Pointer to the byte-array of data to write to the device.
-     * @param tx_length Number of bytes to write, may be zero.
-     * @param rx_buffer Pointer to the byte-array of data to read from the device.
-     * @param rx_length Number of bytes to read, may be zero.
-     * @return
      *      The number of bytes written and read from the device (as an int). This is
      *      maximum of tx_length and rx_length.
      */
@@ -400,7 +379,22 @@ public:
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
     write(const WordT *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length)
     {
-        return write(reinterpret_cast<char const *>(tx_buffer), tx_length, reinterpret_cast<char *>(rx_buffer), rx_length);
+        return write_internal(reinterpret_cast<char const *>(tx_buffer), tx_length, reinterpret_cast<char *>(rx_buffer), rx_length);
+    }
+
+    // Overloads of the above to support passing nullptr
+    template<typename WordT>
+    typename std::enable_if<std::is_integral<WordT>::value, int>::type
+    write(const std::nullptr_t *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length)
+    {
+        return write_internal(reinterpret_cast<char const *>(tx_buffer), tx_length, reinterpret_cast<char *>(rx_buffer), rx_length);
+    }
+
+    template<typename WordT>
+    typename std::enable_if<std::is_integral<WordT>::value, int>::type
+    write(const WordT *tx_buffer, int tx_length, std::nullptr_t *rx_buffer, int rx_length)
+    {
+        return write_internal(reinterpret_cast<char const *>(tx_buffer), tx_length, reinterpret_cast<char *>(rx_buffer), rx_length);
     }
 
     /**
@@ -452,12 +446,12 @@ public:
 #if DEVICE_SPI_ASYNCH
 
     /**
-     * @brief Start non-blocking SPI transfer.
+     * @brief Start non-blocking %SPI transfer.
      *
      * This function locks the deep sleep until any event has occurred.
      *
      * @param tx_buffer The TX buffer with data to be transferred. If NULL is passed,
-     *                  the default SPI value is sent.
+     *                  the default %SPI value is sent.
      * @param tx_length The length of TX buffer in bytes.
      * @param rx_buffer The RX buffer which is used for received data. If NULL is passed,
      *                  received data are ignored.
@@ -465,9 +459,6 @@ public:
      * @param callback  The event callback function.
      * @param event     The logical OR of events to subscribe to.  May be #SPI_EVENT_ALL, or some combination
      *        of the flags #SPI_EVENT_ERROR, #SPI_EVENT_COMPLETE, or #SPI_EVENT_RX_OVERFLOW
-     *
-     * \warning Be sure to call this function with pointer types matching the frame size set for the SPI bus,
-     * or undefined behavior may occur!
      *
      * @return Operation result (integer)
      * @retval 0 If the transfer has started.
@@ -477,14 +468,27 @@ public:
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
     transfer(const WordT *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
     {
-        if (spi_active(&_peripheral->spi)) {
-            return queue_transfer(tx_buffer, tx_length, rx_buffer, rx_length, sizeof(WordT) * 8, callback, event);
-        }
-        start_transfer(tx_buffer, tx_length, rx_buffer, rx_length, sizeof(WordT) * 8, callback, event);
-        return 0;
+        return transfer_internal(tx_buffer, tx_length, rx_buffer, rx_length, callback, event);
     }
 
-    /** Start %SPI transfer and wait until it is complete.  Like the transactional API this blocks the current thread,
+    // Overloads of the above to support passing nullptr
+    template<typename WordT>
+    typename std::enable_if<std::is_integral<WordT>::value, int>::type
+    transfer(const std::nullptr_t *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
+    {
+        return transfer_internal(tx_buffer, tx_length, rx_buffer, rx_length, callback, event);
+    }
+    template<typename WordT>
+    typename std::enable_if<std::is_integral<WordT>::value, int>::type
+    transfer(const WordT *tx_buffer, int tx_length, std::nullptr_t *rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
+    {
+        return transfer_internal(tx_buffer, tx_length, rx_buffer, rx_length, callback, event);
+    }
+
+    /**
+     * @brief Start %SPI transfer and wait until it is complete.
+     *
+     * Like the transactional API this blocks the current thread,
      * however all work is done in the background and other threads may execute.
      *
      * As long as there is space, this function will enqueue the transfer request onto the peripheral,
@@ -498,9 +502,6 @@ public:
      * @param rx_length The length of RX buffer in bytes  If 0, no reception is done.
      * @param timeout timeout value.  Use #rtos::Kernel::wait_for_u32_forever to wait forever (the default).
      *
-     * \warning Be sure to call this function with pointer types matching the frame size set for the SPI bus,
-     * or undefined behavior may occur!
-     *
      * @return Operation result (integer)
      * @retval -1 if the transfer could not be enqueued (increase drivers.spi_transaction_queue_len option)
      * @retval 1 on timeout
@@ -511,53 +512,37 @@ public:
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
     transfer_and_wait(const WordT *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
     {
-        // Use EventFlags to suspend the thread until the transfer finishes
-        rtos::EventFlags transferResultFlags("SPI::transfer_and_wait EvFlags");
-
-        // Simple callback from the transfer that sets the EventFlags using the I2C result event
-        event_callback_t transferCallback([&](int event) {
-            transferResultFlags.set(event);
-        });
-
-        int txRet = transfer(tx_buffer, tx_length, rx_buffer, rx_length, transferCallback, SPI_EVENT_ALL);
-        if (txRet != 0) {
-            return txRet;
-        }
-
-        // Wait until transfer complete, error, or timeout
-        uint32_t result = transferResultFlags.wait_any_for(SPI_EVENT_ALL, timeout);
-
-        if (result & osFlagsError) {
-            if (result == osFlagsErrorTimeout) {
-                // Timeout expired, cancel transfer.
-                abort_transfer();
-                return 1;
-            } else {
-                // Other event flags error.  Transfer might be still running so cancel it.
-                abort_transfer();
-                return 2;
-            }
-        } else {
-            // Note: Cannot use a switch here because multiple flags might be set at the same time (possible
-            // in the STM32 HAL code at least).
-            if (result == SPI_EVENT_COMPLETE) {
-                return 0;
-            } else {
-                // SPI peripheral level error
-                return 2;
-            }
-        }
+        return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer, rx_length, timeout);
     }
 
-    /** Abort the on-going SPI transfer, and continue with transfers in the queue, if any.
+    // Overloads of the above to support passing nullptr
+    template<typename WordT>
+    typename std::enable_if<std::is_integral<WordT>::value, int>::type
+    transfer_and_wait(const std::nullptr_t *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
+    {
+        return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer, rx_length, timeout);
+    }
+    template<typename WordT>
+    typename std::enable_if<std::is_integral<WordT>::value, int>::type
+    transfer_and_wait(const WordT *tx_buffer, int tx_length, std::nullptr_t *rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
+    {
+        return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer, rx_length, timeout);
+    }
+
+    /**
+     * @brief Abort the on-going SPI transfer, if any, and continue with transfers in the queue, if any.
      */
     void abort_transfer();
 
-    /** Clear the queue of transfers.
+    /**
+     * @brief Clear the queue of transfers.
+     *
+     * If a transfer is currently active, it will continue until complete.
      */
     void clear_transfer_buffer();
 
-    /** Clear the queue of transfers and abort the on-going transfer.
+    /**
+     * @brief Clear the queue of transfers and abort any on-going transfer.
      */
     void abort_all_transfers();
 
@@ -586,7 +571,6 @@ protected:
      * @param rx_buffer The RX buffer which is used for received data. If NULL is passed,
      *                  received data are ignored.
      * @param rx_length The length of RX buffer in bytes.
-     * @param bit_width The buffers element width in bits.
      * @param callback  The event callback function.
      * @param event     The event mask of events to modify.
      *
@@ -594,7 +578,32 @@ protected:
      * @retval 0 A transfer was started or added to the queue.
      * @retval -1 Transfer can't be added because queue is full.
      */
-    int transfer(const void *tx_buffer, int tx_length, void *rx_buffer, int rx_length, unsigned char bit_width, const event_callback_t &callback, int event);
+    int transfer_internal(const void *tx_buffer, int tx_length, void *rx_buffer, int rx_length, const event_callback_t &callback, int event);
+
+    /**
+     * @brief Start %SPI transfer and wait until it is complete.
+     *
+     * Like the transactional API this blocks the current thread,
+     * however all work is done in the background and other threads may execute.
+     *
+     * As long as there is space, this function will enqueue the transfer request onto the peripheral,
+     * and block until it is done.
+     *
+     * Internally, the chip vendor may implement this function using either DMA or interrupts.
+     *
+     * @param tx_buffer The TX buffer with data to be transferred.  May be nullptr if tx_length is 0.
+     * @param tx_length The length of TX buffer in bytes.  If 0, no transmission is done.
+     * @param rx_buffer The RX buffer, which is used for received data.  May be nullptr if tx_length is 0.
+     * @param rx_length The length of RX buffer in bytes  If 0, no reception is done.
+     * @param timeout timeout value.  Use #rtos::Kernel::wait_for_u32_forever to wait forever (the default).
+     *
+     * @return Operation result (integer)
+     * @retval -1 if the transfer could not be enqueued (increase drivers.spi_transaction_queue_len option)
+     * @retval 1 on timeout
+     * @retval 2 on other error
+     * @retval 0 on success
+     */
+    int transfer_and_wait_internal(const void *tx_buffer, int tx_length, void *rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout);
 
     /** Put a transfer on the transfer queue.
      *
@@ -700,6 +709,12 @@ protected:
     DMAUsage _usage;
     /* Current sate of the sleep manager */
     bool _deep_sleep_locked;
+    /* Whether an async transfer is currently in progress.  Specifically, this is true
+     * iff start_transfer() has been called and the chip has been selected but irq_handler_asynch()
+     * has NOT been called yet. */
+    volatile bool _transfer_in_progress = false;
+    /* Event flags used for transfer_and_wait() */
+    rtos::EventFlags _transfer_and_wait_flags;
 #endif // DEVICE_SPI_ASYNCH
 
     // Configuration.
@@ -746,6 +761,26 @@ private:
 
     static void _do_init(SPI *obj);
     static void _do_init_direct(SPI *obj);
+
+    /**
+     * @brief Write to the SPI Slave and obtain the response.
+     *
+     * The total number of bytes sent and received will be the maximum of
+     * tx_length and rx_length. The bytes written will be padded with the
+     * value 0xff.
+     *
+     * Note: Even if the word size / bits per frame is not 8, \c rx_length and \c tx_length
+     * still count bytes of input data, not numbers of words.
+     *
+     * @param tx_buffer Pointer to the byte-array of data to write to the device.
+     * @param tx_length Number of bytes to write, may be zero.
+     * @param rx_buffer Pointer to the byte-array of data to read from the device.
+     * @param rx_length Number of bytes to read, may be zero.
+     * @return
+     *      The number of bytes written and read from the device. This is
+     *      maximum of tx_length and rx_length.
+     */
+    virtual int write_internal(const void * tx_buffer, int tx_length, void * rx_buffer, int rx_length);
 
 
 #endif //!defined(DOXYGEN_ONLY)
