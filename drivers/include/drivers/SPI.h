@@ -776,6 +776,9 @@ private:
      * Should be called with _peripherals_mutex locked.
      */
     static spi_peripheral_s *_alloc();
+    /// Deallocate the given peripheral.
+    /// Must be called from a critical section.
+    static void _dealloc(spi_peripheral_s * peripheral);
 
     /// Deallocate the given peripheral.
     /// Should be called with _peripherals_mutex locked.

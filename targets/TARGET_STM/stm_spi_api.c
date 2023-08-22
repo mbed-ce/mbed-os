@@ -276,12 +276,6 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
     RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 #endif /* SPI_IP_VERSION_V2 */
 
-#ifdef STM32_SPI_CAPABILITY_DMA
-    // Every SPI starts with DMA not initialized, we do that lazily later
-    spiobj->rxDMAInitialized = false;
-    spiobj->txDMAInitialized = false;
-#endif
-
 #ifdef DEVICE_SPI_ASYNCH
     spiobj->driverCallback = NULL;
 #endif
