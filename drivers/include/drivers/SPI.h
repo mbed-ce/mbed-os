@@ -681,14 +681,14 @@ protected:
         SPIName name = SPIName(0);
         /* Internal SPI object handling the resources' state. */
         spi_t spi{};
-        /* Number of SPI objects that have been created which reference this peripheral. */
-        uint8_t numUsers;
-        /* True iff anyone has ever called spi_init() / spi_init_direct() for this peripheral */
-        bool initialized;
         /* Used by lock and unlock for thread safety */
         SingletonPtr<rtos::Mutex> mutex;
         /* Current user of the SPI, if any. */
         SPI *owner = nullptr;
+        /* Number of SPI objects that have been created which reference this peripheral. */
+        uint8_t numUsers = 0;
+        /* True iff anyone has ever called spi_init() / spi_init_direct() for this peripheral */
+        bool initialized = false;
 #if DEVICE_SPI_ASYNCH && MBED_CONF_DRIVERS_SPI_TRANSACTION_QUEUE_LEN
         /* Queue of pending transfers */
         SingletonPtr<CircularBuffer<Transaction<SPI>, MBED_CONF_DRIVERS_SPI_TRANSACTION_QUEUE_LEN> > transaction_buffer;
@@ -732,7 +732,7 @@ protected:
 
     /* Size of the SPI frame */
     int _bits;
-    /* Clock polairy and phase */
+    /* Clock polarity and phase */
     int _mode;
     /* Clock frequency */
     int _hz;
@@ -764,7 +764,7 @@ private:
     static spi_peripheral_s *_alloc();
     /// Deallocate the given peripheral.
     /// Must be called from a critical section.
-    static void _dealloc(spi_peripheral_s * peripheral);
+    static void _dealloc(spi_peripheral_s *peripheral);
 
     static void _do_init(SPI *obj);
     static void _do_init_direct(SPI *obj);
@@ -787,7 +787,7 @@ private:
      *      The number of bytes written and read from the device. This is
      *      maximum of tx_length and rx_length.
      */
-    virtual int write_internal(const void * tx_buffer, int tx_length, void * rx_buffer, int rx_length);
+    virtual int write_internal(const void *tx_buffer, int tx_length, void *rx_buffer, int rx_length);
 
 
 #endif //!defined(DOXYGEN_ONLY)

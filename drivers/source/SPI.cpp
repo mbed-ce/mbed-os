@@ -144,7 +144,7 @@ void SPI::_do_construct()
         _peripheral->name = _peripheral_name;
     }
 
-    if(_peripheral->numUsers == std::numeric_limits<uint8_t>::max()) {
+    if (_peripheral->numUsers == std::numeric_limits<uint8_t>::max()) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_MUTEX_LOCK_FAILED), "Ref count at max!");
     }
 
@@ -163,7 +163,7 @@ void SPI::_do_construct()
 
 SPI::~SPI()
 {
-    if(_peripheral->numUsers == 0){
+    if (_peripheral->numUsers == 0) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_MUTEX_UNLOCK_FAILED), "Ref count at 0?");
     }
 
@@ -174,8 +174,7 @@ SPI::~SPI()
         _peripheral->owner = nullptr;
     }
 
-    if(--_peripheral->numUsers == 0)
-    {
+    if (--_peripheral->numUsers == 0) {
         _dealloc(_peripheral);
     }
 
@@ -196,13 +195,13 @@ SPI::spi_peripheral_s *SPI::_lookup(SPI::SPIName name)
     return result;
 }
 
-SPI::spi_peripheral_s * SPI::_alloc()
+SPI::spi_peripheral_s *SPI::_alloc()
 {
     MBED_ASSERT(_peripherals_used < SPI_PERIPHERALS_USED);
 
     // Find an unused peripheral to return
-    for(spi_peripheral_s & peripheral : _peripherals) {
-        if(peripheral.numUsers == 0) {
+    for (spi_peripheral_s &peripheral : _peripherals) {
+        if (peripheral.numUsers == 0) {
             _peripherals_used++;
             return &peripheral;
         }
@@ -213,7 +212,7 @@ SPI::spi_peripheral_s * SPI::_alloc()
 
 void SPI::_dealloc(SPI::spi_peripheral_s *peripheral)
 {
-    if(peripheral->initialized) {
+    if (peripheral->initialized) {
         spi_free(&peripheral->spi);
         peripheral->initialized = false;
     }
@@ -270,12 +269,12 @@ int SPI::write(int value)
     return ret;
 }
 
-int SPI::write_internal(const void * tx_buffer, int tx_length, void * rx_buffer, int rx_length)
+int SPI::write_internal(const void *tx_buffer, int tx_length, void *rx_buffer, int rx_length)
 {
     select();
     int ret = spi_master_block_write(&_peripheral->spi,
                                      reinterpret_cast<char const *>(tx_buffer), tx_length,
-                                     reinterpret_cast<char*>(rx_buffer), rx_length,
+                                     reinterpret_cast<char *>(rx_buffer), rx_length,
                                      _write_fill);
     deselect();
     return ret;
@@ -381,11 +380,11 @@ void SPI::abort_transfer()
     // Then, we check _transfer_in_progress again.  If it is true, then it means the ISR
     // fired during the call to spi_abort_async, so the transfer has already completed normally.
 
-    if(_transfer_in_progress) {
+    if (_transfer_in_progress) {
         spi_abort_asynch(&_peripheral->spi);
     }
 
-    if(_transfer_in_progress) {
+    if (_transfer_in_progress) {
         // End-of-transfer ISR never fired, clean up.
         unlock_deep_sleep();
 
