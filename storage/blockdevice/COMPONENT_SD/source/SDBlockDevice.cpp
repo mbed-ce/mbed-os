@@ -166,7 +166,7 @@ using namespace std::chrono;
 
 #define SD_COMMAND_TIMEOUT                       milliseconds{MBED_CONF_SD_CMD_TIMEOUT}
 #define SD_CMD0_GO_IDLE_STATE_RETRIES            MBED_CONF_SD_CMD0_IDLE_STATE_RETRIES
-#define SD_DBG                                   1      /*!< 1 - Enable debugging */
+#define SD_DBG                                   0      /*!< 1 - Enable debugging */
 #define SD_CMD_TRACE                             0      /*!< 1 - Enable SD command tracing */
 
 #define SD_BLOCK_DEVICE_ERROR_WOULD_BLOCK        -5001  /*!< operation would block */
@@ -204,7 +204,7 @@ using namespace std::chrono;
 #define CARD_UNKNOWN             4           /**< Unknown or unsupported card */
 
 /* SIZE in Bytes */
-#define PACKET_SIZE              6U          /*!< SD Packet size CMD+ARG+CRC */
+#define PACKET_SIZE              6           /*!< SD Packet size CMD+ARG+CRC */
 #define R1_RESPONSE_SIZE         1           /*!< Size of R1 response */
 #define R2_RESPONSE_SIZE         2           /*!< Size of R2 response */
 #define R3_R7_RESPONSE_SIZE      5           /*!< Size of R3/R7 response */
