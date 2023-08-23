@@ -204,7 +204,7 @@ using namespace std::chrono;
 #define CARD_UNKNOWN             4           /**< Unknown or unsupported card */
 
 /* SIZE in Bytes */
-#define PACKET_SIZE              6           /*!< SD Packet size CMD+ARG+CRC */
+#define PACKET_SIZE              6U          /*!< SD Packet size CMD+ARG+CRC */
 #define R1_RESPONSE_SIZE         1           /*!< Size of R1 response */
 #define R2_RESPONSE_SIZE         2           /*!< Size of R2 response */
 #define R3_R7_RESPONSE_SIZE      5           /*!< Size of R3/R7 response */
@@ -730,8 +730,15 @@ uint8_t SDBlockDevice::_cmd_spi(SDBlockDevice::cmdSupported cmd, uint32_t arg)
     }
 
     // send a command
-    for (int i = 0; i < PACKET_SIZE; i++) {
-        _spi.write(cmdPacket[i]);
+#if DEVICE_SPI_ASYNCH
+    if(_async_spi_enabled)
+    {
+        _spi.transfer_and_wait(cmdPacket, PACKET_SIZE, nullptr, 0);
+    }
+    else
+#endif
+    {
+        _spi.write(cmdPacket, PACKET_SIZE, nullptr, 0);
     }
 
     // The received byte immediataly following CMD12 is a stuff byte,
