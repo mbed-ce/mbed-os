@@ -121,6 +121,12 @@ void SPI::_do_init_direct(SPI *obj)
     spi_init_direct(&obj->_peripheral->spi, obj->_static_pinmap);
 }
 
+rtos::Mutex &SPI::_get_peripherals_mutex()
+{
+    static rtos::Mutex peripherals_mutex;
+    return peripherals_mutex;
+}
+
 void SPI::_do_construct()
 {
     // No lock needed in the constructor
@@ -135,7 +141,7 @@ void SPI::_do_construct()
     _write_fill = SPI_FILL_CHAR;
 
     {
-       rtos::ScopedMutexLock lock(_get_peripherals_mutex());
+        rtos::ScopedMutexLock lock(_get_peripherals_mutex());
 
         // lookup and claim the peripheral with the mutex locked in case another thread is
         // also trying to claim it
@@ -171,13 +177,11 @@ SPI::~SPI()
         rtos::ScopedMutexLock lock(_get_peripherals_mutex());
 
         /* Make sure a stale pointer isn't left in peripheral's owner field */
-        if (_peripheral->owner == this)
-        {
+        if (_peripheral->owner == this) {
             _peripheral->owner = nullptr;
         }
 
-        if (--_peripheral->numUsers == 0)
-        {
+        if (--_peripheral->numUsers == 0) {
             _dealloc(_peripheral);
         }
     }
@@ -523,13 +527,6 @@ void SPI::irq_handler_asynch(void)
     }
 #endif
 }
-
-rtos::Mutex &SPI::_get_peripherals_mutex()
-{
-    static rtos::Mutex peripherals_mutex;
-    return peripherals_mutex;
-}
-
 
 #endif
 

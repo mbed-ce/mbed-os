@@ -754,7 +754,10 @@ protected:
 
 private:
 
-    rtos::Mutex & _get_peripherals_mutex();
+    /**
+     * Get a reference to the mutex used to protect the peripherals array.
+     */
+    rtos::Mutex &_get_peripherals_mutex();
 
     void _do_construct();
 
