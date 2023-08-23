@@ -166,7 +166,7 @@ using namespace std::chrono;
 
 #define SD_COMMAND_TIMEOUT                       milliseconds{MBED_CONF_SD_CMD_TIMEOUT}
 #define SD_CMD0_GO_IDLE_STATE_RETRIES            MBED_CONF_SD_CMD0_IDLE_STATE_RETRIES
-#define SD_DBG                                   0      /*!< 1 - Enable debugging */
+#define SD_DBG                                   1      /*!< 1 - Enable debugging */
 #define SD_CMD_TRACE                             0      /*!< 1 - Enable SD command tracing */
 
 #define SD_BLOCK_DEVICE_ERROR_WOULD_BLOCK        -5001  /*!< operation would block */
@@ -251,43 +251,16 @@ using namespace std::chrono;
 // Only HC block size is supported. Making this a static constant reduces code size.
 const uint32_t SDBlockDevice::_block_size = BLOCK_SIZE_HC;
 
+#if MBED_CONF_SD_CRC_ENABLED
 SDBlockDevice::SDBlockDevice(PinName mosi, PinName miso, PinName sclk, PinName cs, uint64_t hz, bool crc_on)
-    : _sectors(0), _spi(mosi, miso, sclk, cs), _is_initialized(0),
-#if MBED_CONF_SD_CRC_ENABLED
-      _init_ref_count(0), _crc_on(crc_on)
-#else
-      _init_ref_count(0)
-#endif
-{
-#if !MBED_CONF_SD_CRC_ENABLED
-    // If this assert fails, this code was compiled without CRC support but you tried to use it.
-    MBED_ASSERT(!crc_on);
-#endif
-
-    _card_type = SDCARD_NONE;
-
-    // Set default to 100kHz for initialisation and 1MHz for data transfer
-    static_assert(((MBED_CONF_SD_INIT_FREQUENCY >= 100000) && (MBED_CONF_SD_INIT_FREQUENCY <= 400000)),
-                  "Initialization frequency should be between 100KHz to 400KHz");
-    _init_sck = MBED_CONF_SD_INIT_FREQUENCY;
-    _transfer_sck = hz;
-
-    _erase_size = BLOCK_SIZE_HC;
-}
-
-SDBlockDevice::SDBlockDevice(mbed::use_gpio_ssel_t, PinName mosi, PinName miso, PinName sclk, PinName cs, uint64_t hz, bool crc_on)
     : _sectors(0), _spi(mosi, miso, sclk, cs, use_gpio_ssel), _is_initialized(0),
-#if MBED_CONF_SD_CRC_ENABLED
       _init_ref_count(0), _crc_on(crc_on)
 #else
+SDBlockDevice::SDBlockDevice(PinName mosi, PinName miso, PinName sclk, PinName cs, uint64_t hz, bool crc_on)
+    : _sectors(0), _spi(mosi, miso, sclk, cs, use_gpio_ssel), _is_initialized(0),
       _init_ref_count(0)
 #endif
 {
-#if !MBED_CONF_SD_CRC_ENABLED
-    // If this assert fails, this code was compiled without CRC support but you tried to use it.
-    MBED_ASSERT(!crc_on);
-#endif
-
     _card_type = SDCARD_NONE;
 
     // Set default to 100kHz for initialisation and 1MHz for data transfer
@@ -299,43 +272,16 @@ SDBlockDevice::SDBlockDevice(mbed::use_gpio_ssel_t, PinName mosi, PinName miso, 
     _erase_size = BLOCK_SIZE_HC;
 }
 
-SDBlockDevice::SDBlockDevice(const spi_pinmap_t &spi_pinmap, uint64_t hz, bool crc_on)
-        : _sectors(0), _spi(spi_pinmap), _is_initialized(0),
 #if MBED_CONF_SD_CRC_ENABLED
-          _init_ref_count(0), _crc_on(crc_on)
-#else
-_init_ref_count(0)
-#endif
-{
-#if !MBED_CONF_SD_CRC_ENABLED
-    // If this assert fails, this code was compiled without CRC support but you tried to use it.
-    MBED_ASSERT(!crc_on);
-#endif
-
-    _card_type = SDCARD_NONE;
-
-    // Set default to 100kHz for initialisation and 1MHz for data transfer
-    static_assert(((MBED_CONF_SD_INIT_FREQUENCY >= 100000) && (MBED_CONF_SD_INIT_FREQUENCY <= 400000)),
-                  "Initialization frequency should be between 100KHz to 400KHz");
-    _init_sck = MBED_CONF_SD_INIT_FREQUENCY;
-    _transfer_sck = hz;
-
-    _erase_size = BLOCK_SIZE_HC;
-}
-
-SDBlockDevice::SDBlockDevice(const spi_pinmap_t &spi_pinmap, mbed::use_gpio_ssel_t, PinName cs, uint64_t hz, bool crc_on)
+SDBlockDevice::SDBlockDevice(const spi_pinmap_t &spi_pinmap, PinName cs, uint64_t hz, bool crc_on)
     : _sectors(0), _spi(spi_pinmap, cs), _is_initialized(0),
-#if MBED_CONF_SD_CRC_ENABLED
       _init_ref_count(0), _crc_on(crc_on)
 #else
+SDBlockDevice::SDBlockDevice(const spi_pinmap_t &spi_pinmap, PinName cs, uint64_t hz, bool crc_on)
+    : _sectors(0), _spi(spi_pinmap, cs), _is_initialized(0),
       _init_ref_count(0)
 #endif
 {
-#if !MBED_CONF_SD_CRC_ENABLED
-    // If this assert fails, this code was compiled without CRC support but you tried to use it.
-    MBED_ASSERT(!crc_on);
-#endif
-
     _card_type = SDCARD_NONE;
 
     // Set default to 100kHz for initialisation and 1MHz for data transfer
@@ -497,6 +443,12 @@ int SDBlockDevice::init()
 end:
     unlock();
     return BD_ERROR_OK;
+}
+
+void SDBlockDevice::set_async_spi_mode(bool enabled, DMAUsage dma_usage_hint)
+{
+    _async_spi_enabled = enabled;
+    _spi.set_dma_usage(dma_usage_hint);
 }
 
 int SDBlockDevice::deinit()
@@ -966,8 +918,15 @@ int SDBlockDevice::_read_bytes(uint8_t *buffer, uint32_t length)
     }
 
     // read data
-    for (uint32_t i = 0; i < length; i++) {
-        buffer[i] = _spi.write(SPI_FILL_CHAR);
+#if DEVICE_SPI_ASYNCH
+    if(_async_spi_enabled)
+    {
+        _spi.transfer_and_wait(nullptr, 0, buffer, length);
+    }
+    else
+#endif
+    {
+        _spi.write(nullptr, 0, buffer, length);
     }
 
     // Read the CRC16 checksum for the data block
@@ -1004,7 +963,19 @@ int SDBlockDevice::_read(uint8_t *buffer, uint32_t length)
     }
 
     // read data
-    _spi.write(NULL, 0, (char *)buffer, length);
+#if DEVICE_SPI_ASYNCH
+    if(_async_spi_enabled)
+    {
+        if(_spi.transfer_and_wait(nullptr, 0, buffer, length) != 0)
+        {
+            return SD_BLOCK_DEVICE_ERROR_WRITE;
+        }
+    }
+    else
+#endif
+    {
+        _spi.write(NULL, 0, (char *) buffer, length);
+    }
 
     // Read the CRC16 checksum for the data block
     crc = (_spi.write(SPI_FILL_CHAR) << 8);
@@ -1037,7 +1008,16 @@ uint8_t SDBlockDevice::_write(const uint8_t *buffer, uint8_t token, uint32_t len
     _spi.write(token);
 
     // write the data
-    _spi.write((char *)buffer, length, NULL, 0);
+#if DEVICE_SPI_ASYNCH
+    if(_async_spi_enabled)
+    {
+        _spi.transfer_and_wait(buffer, length, nullptr, 0);
+    }
+    else
+#endif
+    {
+        _spi.write(buffer, length, nullptr, 0);
+    }
 
 #if MBED_CONF_SD_CRC_ENABLED
     if (_crc_on) {
