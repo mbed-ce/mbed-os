@@ -119,7 +119,7 @@ const use_gpio_ssel_t use_gpio_ssel;
  *
  * <h1>Sharing a Bus</h1>
  * <p>Multiple %SPI devices may share the same physical bus, so long as each has its own dedicated chip select
- * (CS) pin.  To implement this sharing, each chip should create its own instance of the SPI class, passing
+ * (CS) pin.  To implement this sharing, each chip's driver should create its own instance of the SPI class, passing
  * the same MOSI, MISO, and SCLK pins but a different CS pin.  Mbed OS will internally share the %SPI hardware
  * between these objects.  Note that this is <i>completely different</i> from how the I2C class handles
  * sharing.</p>
@@ -133,9 +133,8 @@ const use_gpio_ssel_t use_gpio_ssel;
  *
  * <p>The frame size controls the effective width of data written and read from the chip.  For example, if you set
  * frame size to 8, SPI::write(int) will take one byte and return one byte, but if you set it to 16, SPI::write(int)
- * will take a 16 bit value and return a 16 bit value. You can also do complete transactions
- * (e.g. SPI::write(const char *, int, char *, int)) with frame sizes other than 8.  Just be sure to pass the
- * length in bytes, not words!</p>
+ * will take a 16 bit value and return a 16 bit value. You can also do transactions with frame sizes other
+ * than 8.  Just be sure to pass the length in bytes, not words!</p>
  *
  * <p>It should be noted that changing the frame size can perform an apparent "endian swap" on data being
  * transmitted.  For example, suppose you have the 32-bit integer 0x01020408.  On a little-endian processor,
@@ -212,7 +211,7 @@ const use_gpio_ssel_t use_gpio_ssel;
  * <p>This code will cause the data in \c command to be sent to the device and the response to be received into
  * \c response .  During the transfer, the current thread is paused, but other threads can execute.
  * The non-blocking API does not pause the current thread, but is a bit more complicated to use.
- * See the SPI::transfer_and_wait() implementation in the header file for an example.</p>
+ * See the SPI::transfer_and_wait() implementation in SPI.cpp for an example.</p>
  *
  * <h3>Async: DMA vs Interrupts</h3>
  * <p>Some processors only provide asynchronous %SPI via interrupts, some only support DMA, and some offer both.
@@ -423,6 +422,9 @@ public:
      * and this function behaves identically to #lock().
      *
      * Like #lock(), this function will block until exclusive access can be acquired.
+     *
+     * \warning Do not call this function while an asynchronous transfer is in progress,
+     *     as undefined behavior can occur.
      */
     void select(void);
 
@@ -431,6 +433,9 @@ public:
      *
      * If use_gpio_ssel was not passed to the constructor, manual control of the SSEL line is not possible,
      * and this function behaves identically to #unlock().
+     *
+     * \warning Do not call this function while an asynchronous transfer is in progress,
+     *     as undefined behavior can occur.
      */
     void deselect(void);
 
@@ -739,7 +744,7 @@ protected:
     /* Default character used for NULL transfers */
     char _write_fill;
     /* Select count to handle re-entrant selection */
-    volatile int8_t _select_count = 0;
+    volatile uint8_t _select_count = 0;
     /* Static pinmap data */
     const spi_pinmap_t *_static_pinmap;
     /* SPI peripheral name */
