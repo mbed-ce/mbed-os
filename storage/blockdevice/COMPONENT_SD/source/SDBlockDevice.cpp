@@ -731,11 +731,9 @@ uint8_t SDBlockDevice::_cmd_spi(SDBlockDevice::cmdSupported cmd, uint32_t arg)
 
     // send a command
 #if DEVICE_SPI_ASYNCH
-    if(_async_spi_enabled)
-    {
+    if (_async_spi_enabled) {
         _spi.transfer_and_wait(cmdPacket, PACKET_SIZE, nullptr, 0);
-    }
-    else
+    } else
 #endif
     {
         _spi.write(cmdPacket, PACKET_SIZE, nullptr, 0);
@@ -926,11 +924,9 @@ int SDBlockDevice::_read_bytes(uint8_t *buffer, uint32_t length)
 
     // read data
 #if DEVICE_SPI_ASYNCH
-    if(_async_spi_enabled)
-    {
+    if (_async_spi_enabled) {
         _spi.transfer_and_wait(nullptr, 0, buffer, length);
-    }
-    else
+    } else
 #endif
     {
         _spi.write(nullptr, 0, buffer, length);
@@ -971,14 +967,11 @@ int SDBlockDevice::_read(uint8_t *buffer, uint32_t length)
 
     // read data
 #if DEVICE_SPI_ASYNCH
-    if(_async_spi_enabled)
-    {
-        if(_spi.transfer_and_wait(nullptr, 0, buffer, length) != 0)
-        {
+    if (_async_spi_enabled) {
+        if (_spi.transfer_and_wait(nullptr, 0, buffer, length) != 0) {
             return SD_BLOCK_DEVICE_ERROR_WRITE;
         }
-    }
-    else
+    } else
 #endif
     {
         _spi.write(NULL, 0, (char *) buffer, length);
@@ -1016,11 +1009,9 @@ uint8_t SDBlockDevice::_write(const uint8_t *buffer, uint8_t token, uint32_t len
 
     // write the data
 #if DEVICE_SPI_ASYNCH
-    if(_async_spi_enabled)
-    {
+    if (_async_spi_enabled) {
         _spi.transfer_and_wait(buffer, length, nullptr, 0);
-    }
-    else
+    } else
 #endif
     {
         _spi.write(buffer, length, nullptr, 0);
