@@ -217,6 +217,9 @@ void init_spi(spi_t *obj)
 
     __HAL_SPI_DISABLE(handle);
 
+    // Reset flag used by store_spis_pointer()
+    handle->Init.TIMode = SPI_TIMODE_DISABLE;
+
     DEBUG_PRINTF("init_spi: instance=0x%8X\r\n", (int)handle->Instance);
     if (HAL_SPI_Init(handle) != HAL_OK) {
         error("Cannot initialize SPI");
@@ -455,7 +458,6 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
 #endif
     handle->Init.DataSize          = SPI_DATASIZE_8BIT;
     handle->Init.FirstBit          = SPI_FIRSTBIT_MSB;
-    handle->Init.TIMode            = SPI_TIMODE_DISABLE;
 
 #if defined (SPI_IP_VERSION_V2)
     handle->Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
