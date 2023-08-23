@@ -753,6 +753,9 @@ protected:
     void (*_init_func)(SPI *);
 
 private:
+
+    rtos::Mutex & _get_peripherals_mutex();
+
     void _do_construct();
 
     /** Private acquire function without locking/unlocking.
@@ -762,13 +765,17 @@ private:
     void _set_ssel(int);
 
     /** Private lookup in the static _peripherals table.
+     * Should be called with _peripherals_mutex locked.
      */
     static spi_peripheral_s *_lookup(SPIName name);
+
     /** Allocate an entry in the static _peripherals table.
+     * Should be called with _peripherals_mutex locked.
      */
     static spi_peripheral_s *_alloc();
+
     /// Deallocate the given peripheral.
-    /// Must be called from a critical section.
+    /// Should be called with _peripherals_mutex locked.
     static void _dealloc(spi_peripheral_s *peripheral);
 
     static void _do_init(SPI *obj);

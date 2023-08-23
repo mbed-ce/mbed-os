@@ -134,23 +134,23 @@ void SPI::_do_construct()
     _hz = 1000000;
     _write_fill = SPI_FILL_CHAR;
 
-    core_util_critical_section_enter();
+    {
+       rtos::ScopedMutexLock lock(_get_peripherals_mutex());
 
-    // lookup and claim the peripheral in a critical section in case another thread is
-    // also trying to claim it
-    _peripheral = SPI::_lookup(_peripheral_name);
-    if (!_peripheral) {
-        _peripheral = SPI::_alloc();
-        _peripheral->name = _peripheral_name;
+        // lookup and claim the peripheral with the mutex locked in case another thread is
+        // also trying to claim it
+        _peripheral = SPI::_lookup(_peripheral_name);
+        if (!_peripheral) {
+            _peripheral = SPI::_alloc();
+            _peripheral->name = _peripheral_name;
+        }
+
+        if (_peripheral->numUsers == std::numeric_limits<uint8_t>::max()) {
+            MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_MUTEX_LOCK_FAILED), "Ref count at max!");
+        }
+
+        _peripheral->numUsers++;
     }
-
-    if (_peripheral->numUsers == std::numeric_limits<uint8_t>::max()) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_MUTEX_LOCK_FAILED), "Ref count at max!");
-    }
-
-    _peripheral->numUsers++;
-
-    core_util_critical_section_exit();
 
 #if DEVICE_SPI_ASYNCH && MBED_CONF_DRIVERS_SPI_TRANSACTION_QUEUE_LEN
     // prime the SingletonPtr, so we don't have a problem trying to
@@ -167,31 +167,31 @@ SPI::~SPI()
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_MUTEX_UNLOCK_FAILED), "Ref count at 0?");
     }
 
-    core_util_critical_section_enter();
+    {
+        rtos::ScopedMutexLock lock(_get_peripherals_mutex());
 
-    /* Make sure a stale pointer isn't left in peripheral's owner field */
-    if (_peripheral->owner == this) {
-        _peripheral->owner = nullptr;
+        /* Make sure a stale pointer isn't left in peripheral's owner field */
+        if (_peripheral->owner == this)
+        {
+            _peripheral->owner = nullptr;
+        }
+
+        if (--_peripheral->numUsers == 0)
+        {
+            _dealloc(_peripheral);
+        }
     }
-
-    if (--_peripheral->numUsers == 0) {
-        _dealloc(_peripheral);
-    }
-
-    core_util_critical_section_exit();
 }
 
 SPI::spi_peripheral_s *SPI::_lookup(SPI::SPIName name)
 {
     SPI::spi_peripheral_s *result = nullptr;
-    core_util_critical_section_enter();
     for (int idx = 0; idx < _peripherals_used; idx++) {
         if (_peripherals[idx].numUsers > 0 && _peripherals[idx].name == name) {
             result = &_peripherals[idx];
             break;
         }
     }
-    core_util_critical_section_exit();
     return result;
 }
 
@@ -522,6 +522,12 @@ void SPI::irq_handler_asynch(void)
         dequeue_transaction();
     }
 #endif
+}
+
+rtos::Mutex &SPI::_get_peripherals_mutex()
+{
+    static rtos::Mutex peripherals_mutex;
+    return peripherals_mutex;
 }
 
 
