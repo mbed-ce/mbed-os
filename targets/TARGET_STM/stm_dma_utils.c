@@ -959,7 +959,7 @@ void DMA1_Stream7_IRQHandler(void)
 #ifdef DMA2_Stream0
 void DMA2_Stream0_IRQHandler(void)
 {
-    // Note: Unlike both IP v1 and IP v3, IP v2 channels are 0-indexed.
+    // Note: Unlike both IP v2 and IP v3, IP v1 channels are 0-indexed.
     HAL_DMA_IRQHandler(stmDMAHandles[1][0]);
 }
 #endif

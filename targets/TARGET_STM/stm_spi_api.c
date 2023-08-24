@@ -589,10 +589,12 @@ void spi_free(spi_t *obj)
     if(spiobj->txDMAInitialized)
     {
         stm_free_dma_link(&SPITxDMALinks[spiobj->spiIndex - 1]);
+        spiobj->txDMAInitialized = false;
     }
     if(spiobj->rxDMAInitialized)
     {
         stm_free_dma_link(&SPIRxDMALinks[spiobj->spiIndex - 1]);
+        spiobj->rxDMAInitialized = false;
     }
 #endif
 
@@ -1649,7 +1651,7 @@ static int spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer
     }
 
 #if defined(STM32_SPI_CAPABILITY_DMA) && defined(__DCACHE_PRESENT)
-    if (useDMA)
+    if (useDMA && transfer_type != SPI_TRANSFER_TYPE_TX)
     {
         // For chips with a cache (e.g. Cortex-M7), we need to invalidate the Rx data in cache.
         // This ensures that the CPU will fetch the data from SRAM instead of using its cache.
