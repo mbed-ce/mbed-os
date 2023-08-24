@@ -1843,16 +1843,8 @@ void spi_abort_asynch(spi_t *obj)
     // clean-up
     LL_SPI_Disable(SPI_INST(obj));
     HAL_SPI_DeInit(handle);
-    handle->Init.TIMode = SPI_TIMODE_DISABLE; // This will have gotten clobbered by store_spis_pointer()
-    HAL_SPI_Init(handle);
-    store_spis_pointer(handle, spiobj);
 
-    // cleanup input buffer
-    spi_flush_rx(obj);
-    // enable SPI back if it isn't 3-wire mode
-    if (handle->Init.Direction != SPI_DIRECTION_1LINE) {
-        LL_SPI_Enable(SPI_INST(obj));
-    }
+    init_spi(obj);
 }
 
 #endif //DEVICE_SPI_ASYNCH
