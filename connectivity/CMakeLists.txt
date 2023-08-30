@@ -11,7 +11,6 @@ if("FEATURE_BLE=1" IN_LIST MBED_TARGET_DEFINITIONS)
     add_subdirectory(FEATURE_BLE)
 endif()
 
-add_subdirectory(lorawan)
 add_subdirectory(drivers)
 add_subdirectory(libraries)
 add_subdirectory(lwipstack)

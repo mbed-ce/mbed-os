@@ -168,6 +168,78 @@ DMA_Channel_TypeDef * stm_get_dma_channel(const DMALinkInfo *dmaLink)
                     mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
             }
 #endif
+#ifdef GPDMA1
+        case 1:
+            switch(dmaLink->channelIdx)
+            {
+#ifdef GPDMA1_Channel0
+                case 0:
+                    return GPDMA1_Channel0;
+#endif
+#ifdef GPDMA1_Channel1
+                case 1:
+                    return GPDMA1_Channel1;
+#endif
+#ifdef GPDMA1_Channel2
+                case 2:
+                    return GPDMA1_Channel2;
+#endif
+#ifdef GPDMA1_Channel3
+                case 3:
+                    return GPDMA1_Channel3;
+#endif
+#ifdef GPDMA1_Channel4
+                case 4:
+                    return GPDMA1_Channel4;
+#endif
+#ifdef GPDMA1_Channel5
+                case 5:
+                    return GPDMA1_Channel5;
+#endif
+#ifdef GPDMA1_Channel6
+                case 6:
+                    return GPDMA1_Channel6;
+#endif
+#ifdef GPDMA1_Channel7
+                case 7:
+                    return GPDMA1_Channel7;
+#endif
+#ifdef GPDMA1_Channel8
+                case 8:
+                    return GPDMA1_Channel8;
+#endif
+#ifdef GPDMA1_Channel9
+                case 9:
+                    return GPDMA1_Channel9;
+#endif
+#ifdef GPDMA1_Channel10
+                case 10:
+                    return GPDMA1_Channel10;
+#endif
+#ifdef GPDMA1_Channel11
+                case 11:
+                    return GPDMA1_Channel11;
+#endif
+#ifdef GPDMA1_Channel12
+                case 12:
+                    return GPDMA1_Channel12;
+#endif
+#ifdef GPDMA1_Channel13
+                case 13:
+                    return GPDMA1_Channel13;
+#endif
+#ifdef GPDMA1_Channel14
+                case 14:
+                    return GPDMA1_Channel14;
+#endif
+#ifdef GPDMA1_Channel15
+                case 15:
+                    return GPDMA1_Channel15;
+#endif
+                default:
+                    mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA channel", dmaLink->channelIdx, MBED_FILENAME, __LINE__);
+            }
+#endif
         default:
             mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA controller", dmaLink->dmaIdx, MBED_FILENAME, __LINE__);
 
@@ -568,14 +640,14 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
 
         switch(memDataAlignment) {
             case 4:
-                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_WORD;
+                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_BYTE;
                 break;
             case 2:
-                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_HALFWORD;
+                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_HALFWORD;
                 break;
             case 1:
             default:
-                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_BYTE;
+                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_BYTE;
                 break;
 
         }
@@ -586,14 +658,14 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
 
         switch(periphDataAlignment) {
             case 4:
-                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_WORD;
+                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_BYTE;
                 break;
             case 2:
-                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_HALFWORD;
+                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_HALFWORD;
                 break;
             case 1:
             default:
-                dmaHandle->Init.DestDataWidth = DMA_SRC_DATAWIDTH_BYTE;
+                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_BYTE;
                 break;
 
         }
