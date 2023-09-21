@@ -1531,7 +1531,7 @@ extern "C" WEAK caddr_t _sbrk(int incr)
 
 #if defined(TOOLCHAIN_GCC_ARM)
 
-// Implementation of getpid for Newlib, following signature here: 
+// Implementation of getpid for Newlib, following signature here:
 // https://github.com/bminor/newlib/blob/55485616ba2afedca05da40f5cde59ee336b9f28/newlib/libc/sys/arm/syscalls.c#L32
 extern "C" pid_t _getpid()
 {
@@ -1539,6 +1539,8 @@ extern "C" pid_t _getpid()
     return 0;
 }
 
+// Implementation of kill for Newlib, following signature here:
+// https://github.com/bminor/newlib/blob/55485616ba2afedca05da40f5cde59ee336b9f28/newlib/libc/sys/arm/syscalls.c#L33
 extern "C" int _kill(int pid, int signal)
 {
     // Always return error
