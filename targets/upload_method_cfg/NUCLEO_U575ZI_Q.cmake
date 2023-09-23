@@ -1,9 +1,9 @@
-# Mbed OS upload method configuration file for target B_U585_IOT02A.
+# Mbed OS upload method configuration file for target NUCLEO_U575ZI_Q.
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
 # Notes:
-# 1. To use this target with PyOCD, you need to install a pack: `pyocd pack install STM32U585AIIxQ`.
+# 1. To use this target with PyOCD, you need to install a pack: `pyocd pack install STM32U575ZITxQ`.
 #    You might also need to run `pyocd pack update` first.
 # 2. PyOCD 0.35 can flash this device but not debug -- it is unable to hit breakpoints in my testing.
 # 3. Flashing via OpenOCD seems somewhat unreliable with this processor (at least with OpenOCD 0.12).
@@ -22,7 +22,7 @@ set(MBED_RESET_BAUDRATE 115200)
 # -------------------------------------------------------------
 
 set(PYOCD_UPLOAD_ENABLED TRUE)
-set(PYOCD_TARGET_NAME STM32U585AIIxQ)
+set(PYOCD_TARGET_NAME stm32u575zitx)
 set(PYOCD_CLOCK_SPEED 4000k)
 
 # Config options for OPENOCD
