@@ -49,6 +49,7 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	gdbserver
 	${LINKSERVER_PROBE_ARGS}
 	--gdb-port ${GDB_PORT}
+	${LINKSERVER_DEVICE}
 )
 
 # request extended-remote GDB sessions
