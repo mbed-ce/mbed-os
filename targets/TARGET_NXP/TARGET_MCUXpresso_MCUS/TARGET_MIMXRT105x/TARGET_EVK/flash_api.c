@@ -336,16 +336,15 @@ status_t flexspi_nor_flash_page_program_ram(uint32_t address, const uint32_t *sr
 AT_QUICKACCESS_SECTION_CODE(status_t flexspi_nor_enable_quad_mode_ram(void));
 AT_QUICKACCESS_SECTION_CODE(status_t flexspi_nor_read_status_register_ram(uint32_t * result));
 
-//uint32_t readStatusResult;
-
 /*
  * Check if quad SPI mode is enabled and, if not, enable it.
  *
  * Note that I'm not totally sure if this function is needed because I don't think
  * that the application could boot without quad mode enabled, but this might be
  * useful for programming non-boot-device flashes at a later date.
- * Or, if you must run the application on a flash which does not have quad mode,
- * you could temporarily change the read command to use 1-pad read during initial provisioning.
+ * Or, if you must run the application on a flash which does not have quad mode enabled,
+ * you could temporarily change the boot header read command to use 1-pad read,
+ * then rely on this function to update the setting.
  */
 status_t flexspi_nor_enable_quad_mode_ram(void)
 {
