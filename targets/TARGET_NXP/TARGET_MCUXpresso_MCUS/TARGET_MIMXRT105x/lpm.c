@@ -336,6 +336,8 @@ void LPM_AdjustSystemSettings(lpm_power_mode_t curRunMode, lpm_power_mode_t targ
             }
             break;
         case LPM_PowerModeLowPowerRun:
+             /* Disable FET ODRIVE */
+            PMU->REG_CORE_CLR = PMU_REG_CORE_FET_ODRIVE_MASK;
             if (targetMode == LPM_PowerModeOverRun)
             {
                 /* Adjust SOC voltage to 1.275V */
