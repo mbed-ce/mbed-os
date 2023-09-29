@@ -566,7 +566,7 @@ spif_bd_error SPIFBlockDevice::_spi_send_program_command(int prog_inst, const vo
 spif_bd_error SPIFBlockDevice::_spi_send_erase_command(int erase_inst, bd_addr_t addr, bd_size_t size)
 {
     tr_debug("Erase Inst: 0x%xh, addr: %llu, size: %llu", erase_inst, addr, size);
-    addr = (((int)addr) & 0xFFFFF000);
+    //addr = (((int)addr) & 0xFFFFF000);
     _spi_send_general_command(erase_inst, addr, NULL, 0, NULL, 0);
     return SPIF_BD_ERROR_OK;
 }
