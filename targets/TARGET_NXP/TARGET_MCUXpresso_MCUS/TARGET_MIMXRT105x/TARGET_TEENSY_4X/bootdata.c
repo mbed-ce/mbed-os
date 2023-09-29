@@ -6,7 +6,6 @@
 // - #define names had to be modified to match Mbed
 // - _flashimagelen replaced with __USED_FLASH_SIZE
 // - ResetHandler replaced with Reset_Handler
-// - hardcoded flash size replaced with BOARD_FLASH_SIZE
 
 /* Teensyduino Core Library
  * http://www.pjrc.com/teensy/
