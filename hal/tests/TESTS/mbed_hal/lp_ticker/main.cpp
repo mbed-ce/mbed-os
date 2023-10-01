@@ -164,8 +164,7 @@ void lp_ticker_glitch_test()
     while (last < (start + TICKER_GLITCH_TEST_TICKS)) {
         const uint32_t cur = lp_ticker_read();
 
-        if(cur < last)
-        {
+        if(cur < last) {
             printf("LP ticker went backward! Went from %" PRIu32 " to %" PRIu32 ", initial count was %" PRIu32 "\n", last, cur, start);
             TEST_FAIL();
         }
