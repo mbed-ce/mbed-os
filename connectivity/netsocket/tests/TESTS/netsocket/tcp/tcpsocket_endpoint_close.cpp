@@ -79,8 +79,7 @@ void TCPSOCKET_ENDPOINT_CLOSE()
                 break;
             }
             continue;
-        }
-        else if (recvd <= 0) {
+        } else if (recvd <= 0) {
             TEST_ASSERT_EQUAL(0, recvd);
             break;
         }
