@@ -23,6 +23,10 @@ list(
             asynchronous_dns_cache.cpp
 )
 
+if(MBED_GREENTEA_TEST_BAREMETAL)
+    set(TEST_SKIPPED "This test requires an RTOS!")
+endif()
+
 mbed_greentea_add_test(
     TEST_NAME
         mbed-connectivity-netsocket-dns
