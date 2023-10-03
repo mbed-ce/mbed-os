@@ -75,7 +75,7 @@ void test_lptimer_creation()
     LowPowerTimer lp_timer;
 
     /* Check results. */
-     (0, lp_timer.elapsed_time().count());
+    TEST_ASSERT_EQUAL_UINT64(0, lp_timer.elapsed_time().count());
 
     /* Wait 10 ms.
      * After that operation timer read routines should still return 0. */
