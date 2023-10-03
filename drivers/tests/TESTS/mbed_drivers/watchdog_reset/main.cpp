@@ -328,18 +328,18 @@ utest::v1::status_t testsuite_setup(const size_t number_of_cases)
 }
 
 Case cases[] = {
-    //Case("Watchdog reset", case_setup, test_simple_reset),
+    Case("Watchdog reset", case_setup, test_simple_reset),
 #if DEVICE_SLEEP
-    //Case("Watchdog reset in sleep mode", case_setup, test_sleep_reset),
+    Case("Watchdog reset in sleep mode", case_setup, test_sleep_reset),
 #if DEVICE_LPTICKER
     Case("Watchdog reset in deepsleep mode", case_setup, test_deepsleep_reset),
 #endif
 #endif
-    //Case("Watchdog started again", case_setup, test_restart_reset),
-    //Case("Kicking the Watchdog prevents reset", case_setup, test_kick_reset),
+    Case("Watchdog started again", case_setup, test_restart_reset),
+    Case("Kicking the Watchdog prevents reset", case_setup, test_kick_reset),
 };
 
-Specification specification( testsuite_setup, cases);
+Specification specification(testsuite_setup, cases);
 
 int main()
 {
