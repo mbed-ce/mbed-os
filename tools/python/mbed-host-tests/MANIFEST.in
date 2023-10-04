@@ -1,0 +1,7 @@
+global-exclude *.py[cod] __pycache__ *.so
+graft test
+include README.md
+include requirements.txt
+include test_requirements.txt
+include .coveragerc
+

@@ -1,0 +1,3 @@
+mock>=2
+coverage
+coveralls

@@ -1,0 +1,3 @@
+[run]
+source =
+    mbed_host_tests
