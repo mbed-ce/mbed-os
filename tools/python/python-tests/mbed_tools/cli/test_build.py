@@ -11,6 +11,9 @@ from unittest import TestCase, mock
 
 from click.testing import CliRunner
 
+import sys
+print(sys.path)
+
 from mbed_tools.cli.build import build
 from mbed_tools.project._internal.project_data import BUILD_DIR
 from mbed_tools.build.config import CMAKE_CONFIG_FILE

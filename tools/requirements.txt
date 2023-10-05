@@ -1,10 +1,18 @@
 PrettyTable<=1.0.1; python_version < '3.6'
-prettytable>=2.0,<3.0; python_version >= '3.6'
+prettytable>=2.0,<4.0; python_version >= '3.6'
 future>=0.18.0,<1.0
 jinja2>=2.11.3
 intelhex>=2.3.0,<3.0.0
-mbed-tools
-mbed-os-tools
+Click>=7.1,<9
+GitPython
+tqdm
+tabulate
+requests>=2.20
+pywin32; platform_system=='Windows'
+psutil; platform_system=='Linux'
+pyudev; platform_system=='Linux'
+typing-extensions
+pyserial
 
 # needed for signing secure images
 cryptography

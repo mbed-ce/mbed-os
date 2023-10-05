@@ -79,3 +79,6 @@ cli.add_command(deploy, "deploy")
 cli.add_command(import_, "import")
 cli.add_command(build, "compile")
 cli.add_command(sterm, "sterm")
+
+if __name__ == '__main__':
+    cli()
