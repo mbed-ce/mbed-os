@@ -165,8 +165,8 @@ jobs:
       -
         name: install dependencies
         run: |
-          sudo apt-get install -y python3-intelhex python3-prettytable python3-future python3-jinja2 python3-click python3-git python3-tqdm python3-tabulate python3-requests python3-psutil python3-pyudev python3-typing-extensions python3-serial python3-dotenv python3-appdirs python3-fasteners python3-lockfile python3-junit.xml
-          sudo apt-get install -y python3-pytest python3-factory-boy python3-requests-mock python3-mock python3-coverage python3-bs4 python3-lxml
+          xargs sudo apt-get install -y tools/requirements.apt.txt
+          xargs sudo apt-get install -y tools/python/python_tests/requirements.apt.txt
 
       -
         name: Python Tests

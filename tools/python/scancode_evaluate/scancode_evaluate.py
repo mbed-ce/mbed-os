@@ -30,6 +30,9 @@ MISSING_SPDX_TEXT = "Missing SPDX license identifier"
 
 userlog = logging.getLogger("scancode_evaluate")
 
+# find the mbed-os root dir by going up three levels from this script
+this_script_dir = os.path.dirname(__file__)
+mbed_os_root = os.path.normpath(os.path.join(this_script_dir, "..", "..", ".."))
 
 class ReturnCode(Enum):
     """Return codes."""
@@ -82,8 +85,11 @@ def has_binary_license(scanned_file_content):
 
 
 def get_file_text(scancode_output_data_file):
-    """Returns file text for scancode output file"""
-    file_path = os.path.abspath(scancode_output_data_file['path'])
+    """
+    Returns file text for scancode output file.
+    File path is expected to be relative to mbed-os root.
+    """
+    file_path = os.path.join(mbed_os_root, scancode_output_data_file['path'])
     try:
         with open(file_path, 'r') as read_file:
             return read_file.read()
