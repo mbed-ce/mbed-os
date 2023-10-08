@@ -5,3 +5,4 @@ unittest
 factory_boy
 requests-mock
 mock
+coverage
