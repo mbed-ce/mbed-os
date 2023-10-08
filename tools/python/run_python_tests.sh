@@ -2,7 +2,7 @@
 
 set -e
 
-PYTHON=python
+PYTHON=python3
 
 # Comma separated list of directories to exclude from coverage
 COVERAGE_EXCLUDES='--omit=python_tests/*'
