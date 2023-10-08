@@ -49,14 +49,11 @@ jobs:
           cd tools/python
           
           # Run the evaluation script, which may fail, and save its exit code.
-          # "set +e" is used to prevent aborting the job due to the bad exit code.
-          set +e
-          python -m scancode_evaluate.scancode_evaluate ../../scancode.json
-          EVALUATE_EXITCODE=$?
-          set -e
+          EVALUATE_EXITCODE=0
+          python -m scancode_evaluate.scancode_evaluate ../../scancode.json || EVALUATE_EXITCODE=$?
           
-          cat scancode-evaluate.log
-          if [ $EVALUATE_EXITCODE = 0 ]; then
+          cat scancode_evaluate.log
+          if [ "$EVALUATE_EXITCODE" = 0 ]; then
             echo "License check OK";
             true;
           else

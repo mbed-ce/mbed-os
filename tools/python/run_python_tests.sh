@@ -1,5 +1,14 @@
 #!/bin/sh
 
+#
+# Copyright (c) 2020-2023 Arm Limited and Contributors. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# Script which executes Python tests for each Python package and generates coverage information.
+# This is executed by the GitHub Actions CI build but also can be run locally.
+# Make sure to install python_tests/requirements.txt before running the tests!
+
 set -e
 
 PYTHON=python3
@@ -19,7 +28,7 @@ echo ">> Running pytest for scancode_evaluate package"
 $PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m pytest python_tests/scancode_evaluate
 
 # Note: For some reason, they decided not to add a "_test" suffix on the
-# test cases for some packages.  So, the "-p *.py" argument is needed to
+# test case filenames for some packages.  So, the "-p *.py" argument is needed to
 # make it look for any files as tests, not just ones ending in _test.py.
 
 echo ">> Running unittests for mbed_greentea package"
