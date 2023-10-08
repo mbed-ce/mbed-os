@@ -47,10 +47,9 @@ jobs:
           ls SCANCODE
           scancode -l --json-pp scancode.json SCANCODE
           cd tools/python
-          python -m scancode_evaluate.scancode_evaluate ../../scancode.json
+          EVALUATE_EXITCODE=$(python -m scancode_evaluate.scancode_evaluate ../../scancode.json)
           cat scancode-evaluate.log
-          COUNT=$(cat scancode_evaluate.log | grep 'File:' | grep -v 'SPDX' | wc -l) || true
-          if [ $COUNT = 0 ]; then
+          if [ $EVALUATE_EXITCODE = 0 ]; then
             echo "License check OK";
             true;
           else
