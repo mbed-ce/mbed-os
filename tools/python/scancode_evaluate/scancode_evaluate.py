@@ -19,7 +19,7 @@ limitations
 import argparse
 import json
 import logging
-import os.path
+import pathlib
 import re
 import sys
 from enum import Enum
@@ -31,8 +31,8 @@ MISSING_SPDX_TEXT = "Missing SPDX license identifier"
 userlog = logging.getLogger("scancode_evaluate")
 
 # find the mbed-os root dir by going up three levels from this script
-this_script_dir = os.path.dirname(__file__)
-mbed_os_root = os.path.normpath(os.path.join(this_script_dir, "..", "..", ".."))
+this_script_dir = pathlib.Path(__file__).parent
+mbed_os_root = this_script_dir.parent.parent.parent
 
 class ReturnCode(Enum):
     """Return codes."""
@@ -46,16 +46,14 @@ def init_logger():
     userlog.setLevel(logging.INFO)
     userlog.addHandler(
         logging.FileHandler(
-            os.path.join(os.getcwd(), 'scancode_evaluate.log'), mode='w'
+            pathlib.Path.cwd() / 'scancode_evaluate.log', mode='w'
         )
     )
 
 
-def path_leaf(path):
-    """Return the leaf of a path."""
-    head, tail = os.path.split(path)
-    # Ensure the correct file name is returned if the file ends with a slash
-    return tail or os.path.basename(head)
+def format_path_for_display(path: pathlib.Path) -> str:
+    """Format a returned file path for display in the log"""
+    return str(pathlib.Path(*path.parts[1:]))
 
 
 def has_permissive_text_in_scancode_output(scancode_output_data_file_licenses):
@@ -89,7 +87,7 @@ def get_file_text(scancode_output_data_file):
     Returns file text for scancode output file.
     File path is expected to be relative to mbed-os root.
     """
-    file_path = os.path.join(mbed_os_root, scancode_output_data_file['path'])
+    file_path = mbed_os_root / scancode_output_data_file['path']
     try:
         with open(file_path, 'r') as read_file:
             return read_file.read()
@@ -156,11 +154,13 @@ def license_check(scancode_output_path):
     if license_offenders:
         userlog.warning("Found files with missing license details, please review and fix")
         for offender in license_offenders:
-            userlog.warning("File: %s reason: %s" % (path_leaf(offender['path']), offender['fail_reason']))
+            userlog.warning("File: %s reason: %s" %
+                            (format_path_for_display(pathlib.Path(offender['path'])), offender['fail_reason']))
     if spdx_offenders:
         userlog.warning("Found files with missing SPDX identifier, please review and fix")
         for offender in spdx_offenders:
-            userlog.warning("File: %s reason: %s" % (path_leaf(offender['path']), offender['fail_reason']))
+            userlog.warning("File: %s reason: %s" %
+                            (format_path_for_display(pathlib.Path(offender['path'])), offender['fail_reason']))
     return len(license_offenders)
 
 
@@ -177,7 +177,7 @@ def parse_args():
 if __name__ == "__main__":
     init_logger()
     args = parse_args()
-    if os.path.isfile(args.scancode_output_path):
+    if pathlib.Path(args.scancode_output_path).is_file():
         sys.exit(
             ReturnCode.SUCCESS.value
             if license_check(args.scancode_output_path) == 0

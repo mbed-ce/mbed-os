@@ -47,7 +47,14 @@ jobs:
           ls SCANCODE
           scancode -l --json-pp scancode.json SCANCODE
           cd tools/python
-          EVALUATE_EXITCODE=$(python -m scancode_evaluate.scancode_evaluate ../../scancode.json)
+          
+          # Run the evaluation script, which may fail, and save its exit code.
+          # "set +e" is used to prevent aborting the job due to the bad exit code.
+          set +e
+          python -m scancode_evaluate.scancode_evaluate ../../scancode.json
+          EVALUATE_EXITCODE=$?
+          set -e
+          
           cat scancode-evaluate.log
           if [ $EVALUATE_EXITCODE = 0 ]; then
             echo "License check OK";
@@ -164,8 +171,8 @@ jobs:
       -
         name: install dependencies
         run: |
-          xargs sudo apt-get install -y tools/requirements.apt.txt
-          xargs sudo apt-get install -y tools/python/python_tests/requirements.apt.txt
+          xargs sudo apt-get install -y < tools/requirements.apt.txt
+          xargs sudo apt-get install -y < tools/python/python_tests/requirements.apt.txt
 
       -
         name: Python Tests
