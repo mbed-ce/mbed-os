@@ -43,9 +43,10 @@ jobs:
             | while read file; do cp --parents "${file}" SCANCODE; done
           ls SCANCODE
           scancode -l --json-pp scancode.json SCANCODE
-          python ./tools/test/ci/scancode-evaluate.py scancode.json || true
+          cd tools/python
+          python -m scancode_evaluate.scancode_evaluate ../../scancode.json || true
           cat scancode-evaluate.log
-          COUNT=$(cat scancode-evaluate.log | grep 'File:' | grep -v 'SPDX' | wc -l) || true
+          COUNT=$(cat scancode_evaluate.log | grep 'File:' | grep -v 'SPDX' | wc -l) || true
           if [ $COUNT = 0 ]; then
             echo "License check OK";
             true;
@@ -166,17 +167,15 @@ jobs:
       -
         name: install dependencies
         run: |
-          pip install -r tools/requirements.txt 
+          sudo apt-get install -y python3-intelhex python3-prettytable python3-future python3-jinja2 python3-click python3-git python3-tqdm python3-tabulate python3-requests python3-psutil python3-pyudev python3-typing-extensions python3-serial python3-dotenv
           pip install -r tools/test/requirements.txt
 
       -
-        name: pytest
+        name: Python Tests
         run: |
-          set -x
-          coverage run -a -m pytest tools/test
-          python tools/test/pylint.py
-          coverage run -a tools/project.py -S | sed -n '/^Total/p'
-          coverage html
+          cd tools/python
+          ./run_python_tests.sh
+
 
   pin-validation:
     runs-on: ubuntu-latest

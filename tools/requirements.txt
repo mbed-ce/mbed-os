@@ -3,6 +3,7 @@ prettytable>=2.0,<4.0; python_version >= '3.6'
 future>=0.18.0,<1.0
 jinja2>=2.11.3
 intelhex>=2.3.0,<3.0.0
+dotenv
 Click>=7.1,<9
 GitPython
 tqdm
@@ -13,6 +14,16 @@ psutil; platform_system=='Linux'
 pyudev; platform_system=='Linux'
 typing-extensions
 pyserial
+fasteners
+appdirs>=1.4,<2.0
+junit-xml>=1.0,<2.0
+lockfile
+six>=1.0,<2.0
+colorama>=0.3,<0.5
+
+# beautifulsoup only needed for USB device detection on Mac
+beautifulsoup4; sys_platform == 'darwin'
+lxml; sys_platform == 'darwin'
 
 # needed for signing secure images
 cryptography

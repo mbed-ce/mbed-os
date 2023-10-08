@@ -6,7 +6,6 @@
 import logging
 import sys
 
-from pkg_resources import get_distribution
 from typing import Union, Any
 
 import click
@@ -45,7 +44,8 @@ def print_version(context: click.Context, param: Union[click.Option, click.Param
     if not value or context.resilient_parsing:
         return
 
-    version_string = get_distribution("mbed-tools").version
+    # Mbed CE: changed this to be hardcoded for now.
+    version_string = "7.60.0"
     click.echo(version_string)
     context.exit()
 

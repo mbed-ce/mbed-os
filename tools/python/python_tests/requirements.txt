@@ -1,0 +1,7 @@
+# These are the requirements for running the Python package tests.
+# They are in addition to the requirements.txt under mbedos/tools/.
+pytest
+unittest
+factory_boy
+requests-mock
+mock

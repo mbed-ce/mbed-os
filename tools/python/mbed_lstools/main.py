@@ -37,8 +37,8 @@ del logging
 
 def get_version():
     """! Get mbed-ls Python module version string """
-    import pkg_resources  # part of setuptools
-    return pkg_resources.require("mbed-ls")[0].version
+    import mbed_os_tools
+    return mbed_os_tools.VERSION
 
 def print_version(mbeds, args):
     print(get_version())

@@ -85,9 +85,8 @@ LOCAL_HOST_TESTS_DIR = './test/host_tests'  # Used by mbedhtrun -e <dir>
 def get_greentea_version():
     """! Get Greentea (mbed-greentea) Python module version
     """
-    import pkg_resources  # part of setuptools
-    version = pkg_resources.require("mbed-greentea")[0].version
-    return version
+    import mbed_os_tools
+    return mbed_os_tools.VERSION
 
 def print_version():
     """! Print current package version

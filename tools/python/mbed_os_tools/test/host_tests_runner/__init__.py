@@ -20,6 +20,6 @@ Functionality can be overridden by set of plugins which can provide specialised 
 
 """
 
-from pkg_resources import get_distribution
+from mbed_os_tools import VERSION
 
-__version__ = get_distribution("mbed-os-tools").version
+__version__ = VERSION
