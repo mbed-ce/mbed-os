@@ -26,7 +26,9 @@ jobs:
         name: install dependencies
         shell: bash
         run: |
-          pip install -U scancode-toolkit "click>=7,<8"
+          # TODO scancode 32.0 introduced significant breaking changes to the license
+          # detection output format.  Need to update Mbed's scripts for the new format.
+          pip install -U scancode-toolkit<32.0 "click>=7,<8"
 
       - 
         name: license check 
@@ -44,7 +46,7 @@ jobs:
           ls SCANCODE
           scancode -l --json-pp scancode.json SCANCODE
           cd tools/python
-          python -m scancode_evaluate.scancode_evaluate ../../scancode.json || true
+          python -m scancode_evaluate.scancode_evaluate ../../scancode.json
           cat scancode-evaluate.log
           COUNT=$(cat scancode_evaluate.log | grep 'File:' | grep -v 'SPDX' | wc -l) || true
           if [ $COUNT = 0 ]; then
@@ -162,7 +164,7 @@ jobs:
       -
         name: install dependencies
         run: |
-          sudo apt-get install -y python3-intelhex python3-prettytable python3-future python3-jinja2 python3-click python3-git python3-tqdm python3-tabulate python3-requests python3-psutil python3-pyudev python3-typing-extensions python3-serial python3-dotenv
+          sudo apt-get install -y python3-intelhex python3-prettytable python3-future python3-jinja2 python3-click python3-git python3-tqdm python3-tabulate python3-requests python3-psutil python3-pyudev python3-typing-extensions python3-serial python3-dotenv python3-appdirs
           sudo apt-get install -y python3-pytest python3-factory-boy python3-requests-mock python3-mock python3-coverage
 
       -
