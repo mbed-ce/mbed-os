@@ -207,6 +207,7 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 
     uint8_t stdio_config = false;
 
+#if defined(MBED_CONF_TARGET_CONSOLE_UART)
     if ((tx == CONSOLE_TX) || (rx == CONSOLE_RX)) {
         stdio_config = true;
     } else {
@@ -214,6 +215,7 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
             error("Error: new serial object is using same UART as STDIO");
         }
     }
+#endif
 
     const serial_pinmap_t explicit_uart_pinmap = {peripheral, tx, tx_function, rx, rx_function, stdio_config};
 
