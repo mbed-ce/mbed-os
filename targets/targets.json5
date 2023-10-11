@@ -6573,7 +6573,8 @@
                 "std",
                 "small"
             ]
-        }
+        },
+        "device_name": "MAX32670"
     },
     "MAX32670EVKIT": {
         "inherits": [
@@ -6589,6 +6590,16 @@
             "0424"
         ],
         "image_url": "https://os.mbed.com/media/uploads/sadik_maxim/max32670evkit_daplink_fw_update.png"
+    },
+    "XDOT_MAX32670": {
+        "inherits": [
+            "MAX32670"
+        ],
+        "bootloader_supported": true,
+        "detect_code": [
+            "0351"
+        ],
+        "image_url": "https://os.mbed.com/media/cache/platforms/xDot_Developer_Kit_with_xdot.png.250x250_q85.png"
     },
 
     // SiLabs EFM32 Targets---------------------------------------------------------------------------------------------
