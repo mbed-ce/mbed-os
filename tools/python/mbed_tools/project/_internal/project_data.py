@@ -28,6 +28,7 @@ MBED_OS_REFERENCE_FILE_NAME = "mbed-os.lib"
 MBED_OS_DIR_NAME = "mbed-os"
 TARGETS_JSON_FILE_PATH = Path("targets", "targets.json5")
 CUSTOM_TARGETS_JSON_FILE_NAME = "custom_targets.json"
+CUSTOM_TARGETS_JSON5_FILE_NAME = "custom_targets.json5"
 
 # Information written to mbed-os.lib
 MBED_OS_REFERENCE_URL = "https://github.com/ARMmbed/mbed-os"
@@ -112,7 +113,13 @@ class MbedProgramFiles:
         else:
             logger.info("This program does not contain an mbed_app.json config file.")
 
-        custom_targets_json = root_path / CUSTOM_TARGETS_JSON_FILE_NAME
+        # If there's already a custom_targets.json5, use that.
+        # Otherwise, assume json.
+        if (root_path / CUSTOM_TARGETS_JSON5_FILE_NAME).exists():
+            custom_targets_json = root_path / CUSTOM_TARGETS_JSON5_FILE_NAME
+        else:
+            custom_targets_json = root_path / CUSTOM_TARGETS_JSON_FILE_NAME
+
         mbed_os_file = root_path / MBED_OS_REFERENCE_FILE_NAME
 
         cmakelists_file = root_path / CMAKELISTS_FILE_NAME
