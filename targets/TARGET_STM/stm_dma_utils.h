@@ -26,11 +26,11 @@
 
 // determine DMA IP version using the available constants in the chip header
 #if defined(GPDMA1)
-#define DMA_IP_VERSION_V3
+#define DMA_IP_VERSION_V3 1
 #elif defined(DMA1_Channel1)
-#define DMA_IP_VERSION_V2
+#define DMA_IP_VERSION_V2 1
 #else
-#define DMA_IP_VERSION_V1
+#define DMA_IP_VERSION_V1 1
 #endif
 
 // Include correct header for the IP version
