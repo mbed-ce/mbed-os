@@ -145,7 +145,8 @@ nsapi_error_t TLSSocketWrapper::set_root_ca_cert_path(const char *root_ca_path)
 
     crt = new (std::nothrow) mbedtls_x509_crt;
     if (!crt) {
-        return NSAPI_ERROR_NO_MEMORY;
+        /* In no chain is configured create a new one */
+        return set_root_ca_cert(root_ca, len);
     }
 
     mbedtls_x509_crt_init(crt);
