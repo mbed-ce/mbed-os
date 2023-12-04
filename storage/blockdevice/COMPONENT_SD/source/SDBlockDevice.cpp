@@ -921,8 +921,7 @@ int SDBlockDevice::_read_bytes(uint8_t *buffer, uint32_t length)
     // read data
 #if DEVICE_SPI_ASYNCH
     if (_async_spi_enabled) {
-        if(length > _async_data_buffer.capacity())
-        {
+        if (length > _async_data_buffer.capacity()) {
             return SD_BLOCK_DEVICE_ERROR_PARAMETER;
         }
 
@@ -973,8 +972,7 @@ int SDBlockDevice::_read(uint8_t *buffer, uint32_t length)
     // read data
 #if DEVICE_SPI_ASYNCH
     if (_async_spi_enabled) {
-        if(length > _async_data_buffer.capacity())
-        {
+        if (length > _async_data_buffer.capacity()) {
             return SD_BLOCK_DEVICE_ERROR_PARAMETER;
         }
 
@@ -1081,7 +1079,7 @@ bd_size_t SDBlockDevice::_sd_sectors()
     }
 #ifdef DEVICE_SPI_ASYNCH
     CacheAlignedBuffer<uint8_t, 16> csd_buffer;
-    uint8_t * csd = csd_buffer.data();
+    uint8_t *csd = csd_buffer.data();
 #else
     uint8_t csd[16];
 #endif

@@ -28,8 +28,11 @@ namespace mbed {
 /**
  * @brief CacheAlignedBuffer is used by Mbed in locations where we need a cache-aligned buffer.
  *
- * Cache alignment is desirable in several different situations in embedded programming; often
- * when working with DMA or other peripherals which write their results back to main memory.
+ * Cache alignment is desirable in several different situations in embedded programming -- one common
+ * use is when working with DMA or other peripherals which write their results back to main memory.
+ * After these peripherals do their work, the data will be correct in main memory, but the CPU cache
+ * might also contain a value cached from that memory which is now incorrect.
+ *
  * In order to read those results from memory without risk of getting old data from the
  * CPU cache, one needs to align the buffer so it takes up an integer number of cache lines,
  * then invalidate the cache lines so that the data gets reread from RAM.
@@ -43,7 +46,7 @@ namespace mbed {
  */
 template<typename DataT, size_t BufferSize>
 struct
-CacheAlignedBuffer {
+    CacheAlignedBuffer {
 private:
 #if __DCACHE_PRESENT
     // Allocate enough extra space that we can shift the start of the buffer forward to be on a cache line.
@@ -54,14 +57,14 @@ private:
     // So, we need to round up the backing buffer size to the nearest multiple of the cache line size.
     // The math for rounding up can be found here:
     // https://community.st.com/t5/stm32-mcus-products/maintaining-cpu-data-cache-coherence-for-dma-buffers/td-p/95746
-    constexpr static size_t requiredSizeRoundedUp =  (BufferSize * sizeof(DataT) + __SCB_DCACHE_LINE_SIZE - 1) & ~((__SCB_DCACHE_LINE_SIZE) - 1);
+    constexpr static size_t requiredSizeRoundedUp = (BufferSize *sizeof(DataT) + __SCB_DCACHE_LINE_SIZE - 1) & ~((__SCB_DCACHE_LINE_SIZE) - 1);
     constexpr static size_t backingBufferSizeBytes = requiredSizeRoundedUp + __SCB_DCACHE_LINE_SIZE - 1;
 #else
     constexpr static size_t backingBufferSizeBytes = BufferSize * sizeof(DataT);
 #endif
 
     uint8_t _backingBuffer[backingBufferSizeBytes];
-    DataT * _alignedArrayPtr;
+    DataT *_alignedArrayPtr;
 
     /**
      * Find and return the first location in the given buffer that starts on a cache line.
@@ -71,7 +74,7 @@ private:
      *
      * @return Pointer to first data item, aligned at the start of a cache line.
      */
-    inline DataT * findCacheLineStart(uint8_t * buffer)
+    inline DataT *findCacheLineStart(uint8_t *buffer)
     {
 #if __DCACHE_PRESENT
         // Use integer division to divide the address down to the cache line size, which
@@ -90,22 +93,22 @@ private:
 public:
 
     // Iterator types
-    typedef DataT * iterator;
-    typedef DataT const * const_iterator;
+    typedef DataT *iterator;
+    typedef DataT const *const_iterator;
 
     /**
      * @brief Construct new cache-aligned buffer.  Buffer will be zero-initialized.
      */
     CacheAlignedBuffer():
-    _backingBuffer{},
-    _alignedArrayPtr(findCacheLineStart(_backingBuffer))
+        _backingBuffer{},
+        _alignedArrayPtr(findCacheLineStart(_backingBuffer))
     {}
 
     /**
      * @brief Copy from other cache-aligned buffer.  Buffer memory will be copied.
      */
-    CacheAlignedBuffer(CacheAlignedBuffer const & other):
-    _alignedArrayPtr(findCacheLineStart(_backingBuffer))
+    CacheAlignedBuffer(CacheAlignedBuffer const &other):
+        _alignedArrayPtr(findCacheLineStart(_backingBuffer))
     {
         memcpy(this->_alignedArrayPtr, other._alignedArrayPtr, BufferSize * sizeof(DataT));
     }
@@ -113,7 +116,7 @@ public:
     /**
      * @brief Assign from other cache-aligned buffer.  Buffer memory will be assigned.
      */
-    CacheAlignedBuffer & operator=(CacheAlignedBuffer const & other)
+    CacheAlignedBuffer &operator=(CacheAlignedBuffer const &other)
     {
         memcpy(this->_alignedArrayPtr, other._alignedArrayPtr, BufferSize * sizeof(DataT));
     }
@@ -121,47 +124,74 @@ public:
     /**
      * @brief Get a pointer to the aligned data array inside the buffer
      */
-    DataT * data() { return _alignedArrayPtr; }
+    DataT *data()
+    {
+        return _alignedArrayPtr;
+    }
 
     /**
      * @brief Get a pointer to the aligned data array inside the buffer (const version)
      */
-    DataT const * data() const { return _alignedArrayPtr; }
+    DataT const *data() const
+    {
+        return _alignedArrayPtr;
+    }
 
     /**
      * @brief Element access
      */
-    DataT & operator[](size_t index) { return _alignedArrayPtr[index]; }
+    DataT &operator[](size_t index)
+    {
+        return _alignedArrayPtr[index];
+    }
 
     /**
      * @brief Element access (const)
      */
-    DataT operator[](size_t index) const { return _alignedArrayPtr[index]; }
+    DataT operator[](size_t index) const
+    {
+        return _alignedArrayPtr[index];
+    }
 
     /**
      * @brief Get iterator for start of buffer
      */
-    iterator begin() { return _alignedArrayPtr; }
+    iterator begin()
+    {
+        return _alignedArrayPtr;
+    }
 
     /**
      * @brief Get iterator for start of buffer
      */
-    const_iterator begin() const { return _alignedArrayPtr; }
+    const_iterator begin() const
+    {
+        return _alignedArrayPtr;
+    }
 
     /**
      * @brief Get iterator for end of buffer
      */
-    iterator end() { return _alignedArrayPtr + BufferSize; }
+    iterator end()
+    {
+        return _alignedArrayPtr + BufferSize;
+    }
 
     /**
      * @brief Get iterator for end of buffer
      */
-    const_iterator end() const { return _alignedArrayPtr + BufferSize; }
+    const_iterator end() const
+    {
+        return _alignedArrayPtr + BufferSize;
+    }
 
     /**
      * @return The maximum amount of DataT elements that this buffer can hold
      */
-    constexpr size_t capacity() { return BufferSize; }
+    constexpr size_t capacity()
+    {
+        return BufferSize;
+    }
 
     /**
      * @brief If this MCU has a data cache, this function _invalidates_ the buffer in the data cache.

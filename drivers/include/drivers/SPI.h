@@ -478,7 +478,7 @@ public:
      */
     template<typename WordT, size_t RxBufferLen>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> & rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
+    transfer(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> &rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
     {
         return transfer_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, callback, event);
     }
@@ -486,7 +486,7 @@ public:
     // Overloads of the above to support passing nullptr
     template<typename WordT, size_t RxBufferLen>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> & rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
+    transfer(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> &rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
     {
         return transfer_internal(tx_buffer, tx_length, rx_buffer, rx_length, callback, event);
     }
@@ -524,7 +524,7 @@ public:
      */
     template<typename WordT, size_t RxBufferLen>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer_and_wait(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> & rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
+    transfer_and_wait(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> &rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
     {
         return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, timeout);
     }
@@ -532,7 +532,7 @@ public:
     // Overloads of the above to support passing nullptr
     template<typename WordT, size_t RxBufferLen>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer_and_wait(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> & rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
+    transfer_and_wait(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> &rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
     {
         return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, timeout);
     }
@@ -741,7 +741,7 @@ protected:
 #if __DCACHE_PRESENT
     // These variables store the location and length in bytes of the Rx buffer if an async transfer
     // is in progress.  They are used for invalidating the cache after the transfer completes.
-    void * _transfer_in_progress_rx_buffer;
+    void *_transfer_in_progress_rx_buffer;
     size_t _transfer_in_progress_rx_len;
 #endif
 

@@ -397,8 +397,7 @@ void SPI::abort_transfer()
         }
 
 #if __DCACHE_PRESENT
-        if(_transfer_in_progress_uses_dma && _transfer_in_progress_rx_len > 0)
-        {
+        if (_transfer_in_progress_uses_dma && _transfer_in_progress_rx_len > 0) {
             // If the cache is present, invalidate the Rx data so it's loaded from main RAM.
             // We only want to do this if DMA actually got used for the transfer because, if interrupts
             // were used instead, the cache might have the correct data and NOT the main memory.
@@ -484,17 +483,15 @@ void SPI::start_transfer(const void *tx_buffer, int tx_length, void *rx_buffer, 
     // not interoperate with the CPU cache.  So, manual flushing/invalidation will be required.
     // This page is very useful for how to do this correctly:
     // https://community.st.com/t5/stm32-mcus-products/maintaining-cpu-data-cache-coherence-for-dma-buffers/td-p/95746
-    if(tx_length > 0)
-    {
+    if (tx_length > 0) {
         // For chips with a cache, we need to evict the Tx data from cache to main memory.
         // This ensures that the DMA controller can see the most up-to-date copy of the data.
-        SCB_CleanDCache_by_Addr(const_cast<void*>(tx_buffer), tx_length);
+        SCB_CleanDCache_by_Addr(const_cast<void *>(tx_buffer), tx_length);
     }
 
     // Additionally, we have to make sure that there aren't any pending changes which could be written back
     // to the Rx buffer memory by the cache at a later date, corrupting the DMA results.
-    if(rx_length > 0)
-    {
+    if (rx_length > 0) {
         SCB_InvalidateDCache_by_Addr(rx_buffer, rx_length);
     }
     _transfer_in_progress_rx_buffer = rx_buffer;
@@ -547,8 +544,7 @@ void SPI::irq_handler_asynch(void)
     if ((event & SPI_EVENT_ALL)) {
 
 #if __DCACHE_PRESENT
-        if(_transfer_in_progress_uses_dma && _transfer_in_progress_rx_len > 0)
-        {
+        if (_transfer_in_progress_uses_dma && _transfer_in_progress_rx_len > 0) {
             // If the cache is present, invalidate the Rx data so it's loaded from main RAM.
             // We only want to do this if DMA actually got used for the transfer because, if interrupts
             // were used instead, the cache might have the correct data and NOT the main memory.
@@ -566,8 +562,7 @@ void SPI::irq_handler_asynch(void)
 
         unlock_deep_sleep();
 
-        if(_callback)
-        {
+        if (_callback) {
             _callback.call(event & SPI_EVENT_ALL);
         }
     }
