@@ -397,7 +397,7 @@ void SPI::abort_transfer()
         }
 
 #if __DCACHE_PRESENT
-        if(_transfer_in_progress_uses_dma)
+        if(_transfer_in_progress_uses_dma && _transfer_in_progress_rx_len > 0)
         {
             // If the cache is present, invalidate the Rx data so it's loaded from main RAM.
             // We only want to do this if DMA actually got used for the transfer because, if interrupts
@@ -492,10 +492,10 @@ void SPI::start_transfer(const void *tx_buffer, int tx_length, void *rx_buffer, 
     }
 
     // Additionally, we have to make sure that there aren't any pending changes which could be written back
-    // to the Rx buffer memory by the cache at a later date, corrupting the DMA results
+    // to the Rx buffer memory by the cache at a later date, corrupting the DMA results.
     if(rx_length > 0)
     {
-        SCB_CleanInvalidateDCache_by_Addr(rx_buffer, rx_length);
+        SCB_InvalidateDCache_by_Addr(rx_buffer, rx_length);
     }
     _transfer_in_progress_rx_buffer = rx_buffer;
     _transfer_in_progress_rx_len = rx_length;
@@ -547,7 +547,7 @@ void SPI::irq_handler_asynch(void)
     if ((event & SPI_EVENT_ALL)) {
 
 #if __DCACHE_PRESENT
-        if(_transfer_in_progress_uses_dma)
+        if(_transfer_in_progress_uses_dma && _transfer_in_progress_rx_len > 0)
         {
             // If the cache is present, invalidate the Rx data so it's loaded from main RAM.
             // We only want to do this if DMA actually got used for the transfer because, if interrupts

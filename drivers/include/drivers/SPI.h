@@ -195,6 +195,11 @@ const use_gpio_ssel_t use_gpio_ssel;
  * the transfer but others can execute).  Here's a sample of how to send the same data as above
  * using the blocking async API:</p>
  *
+ * <p>Note that when using the asynchronous API, you must use the CacheAlignedBuffer class when declaring the
+ * receive buffer.  This is because some processors' async SPI implementations require the received buffer to
+ * be at an address which is aligned to the processor cache line size.  CacheAlignedBuffer takes care of this
+ * for you and provides functions (data(), begin(), end()) to access the underlying data in the buffer.</p>
+ *
  * @code
  * #include "mbed.h"
  *
@@ -204,8 +209,8 @@ const use_gpio_ssel_t use_gpio_ssel;
  *     device.format(8, 0);
  *
  *     uint8_t command[2] = {0x0A, 0x0B};
- *     uint8_t response[2];
- *     int result = device.transfer_and_wait(command, sizeof(command), response, sizeof(response));
+ *     CacheAlignedBuffer<uint8_t, 2> response;
+ *     int result = device.transfer_and_wait(command, sizeof(command), response, sizeof(command));
  * }
  * @endcode
  *
