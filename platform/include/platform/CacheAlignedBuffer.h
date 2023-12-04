@@ -57,7 +57,7 @@ private:
     constexpr static size_t requiredSizeRoundedUp =  (BufferSize * sizeof(DataT) + __SCB_DCACHE_LINE_SIZE - 1) & ~((__SCB_DCACHE_LINE_SIZE) - 1);
     constexpr static size_t backingBufferSizeBytes = requiredSizeRoundedUp + __SCB_DCACHE_LINE_SIZE - 1;
 #else
-    constexpr static size_t backingBufferSize = BufferSize * sizeof(DataT);
+    constexpr static size_t backingBufferSizeBytes = BufferSize * sizeof(DataT);
 #endif
 
     uint8_t _backingBuffer[backingBufferSizeBytes];
