@@ -26,6 +26,7 @@
 #include "drivers/DigitalOut.h"
 #include "platform/SingletonPtr.h"
 #include "platform/NonCopyable.h"
+#include "platform/CacheAlignedBuffer.h"
 
 #if defined MBED_CONF_DRIVERS_SPI_COUNT_MAX && DEVICE_SPI_COUNT > MBED_CONF_DRIVERS_SPI_COUNT_MAX
 #define SPI_PERIPHERALS_USED MBED_CONF_DRIVERS_SPI_COUNT_MAX
@@ -458,8 +459,9 @@ public:
      * @param tx_buffer The TX buffer with data to be transferred. If NULL is passed,
      *                  the default %SPI value is sent.
      * @param tx_length The length of TX buffer in bytes.
-     * @param rx_buffer The RX buffer which is used for received data. If NULL is passed,
-     *                  received data are ignored.
+     * @param rx_buffer The RX buffer which is used for received data.  Rather than a C array, a CacheAlignedBuffer
+     *                  structure must be passed so that cache alignment can be handled for data received from DMA.
+     *                  May be nullptr if rx_length is 0.
      * @param rx_length The length of RX buffer in bytes.
      * @param callback  The event callback function.
      * @param event     The logical OR of events to subscribe to.  May be #SPI_EVENT_ALL, or some combination
@@ -469,17 +471,17 @@ public:
      * @retval 0 If the transfer has started.
      * @retval -1 if the transfer could not be enqueued (increase drivers.spi_transaction_queue_len option)
      */
-    template<typename WordT>
+    template<typename WordT, size_t RxBufferLen>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer(const WordT *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
+    transfer(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> & rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
     {
-        return transfer_internal(tx_buffer, tx_length, rx_buffer, rx_length, callback, event);
+        return transfer_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, callback, event);
     }
 
     // Overloads of the above to support passing nullptr
-    template<typename WordT>
+    template<typename WordT, size_t RxBufferLen>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer(const std::nullptr_t *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
+    transfer(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> & rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
     {
         return transfer_internal(tx_buffer, tx_length, rx_buffer, rx_length, callback, event);
     }
@@ -502,8 +504,10 @@ public:
      * Internally, the chip vendor may implement this function using either DMA or interrupts.
      *
      * @param tx_buffer The TX buffer with data to be transferred.  May be nullptr if tx_length is 0.
-     * @param tx_length The length of TX buffer in bytes.  If 0, no transmission is done.
-     * @param rx_buffer The RX buffer, which is used for received data.  May be nullptr if tx_length is 0.
+     * @param tx_length The length of TX buffer in bytes.  If 0, the default %SPI data value is sent when receiving data.
+     * @param rx_buffer The RX buffer which is used for received data.  Rather than a C array, a CacheAlignedBuffer
+     *                  structure must be passed so that cache alignment can be handled for data received from DMA.
+     *                  May be nullptr if rx_length is 0.
      * @param rx_length The length of RX buffer in bytes  If 0, no reception is done.
      * @param timeout timeout value.  Use #rtos::Kernel::wait_for_u32_forever to wait forever (the default).
      *
@@ -513,19 +517,19 @@ public:
      * @retval 2 on other error
      * @retval 0 on success
      */
-    template<typename WordT>
+    template<typename WordT, size_t RxBufferLen>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer_and_wait(const WordT *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
+    transfer_and_wait(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> & rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
     {
-        return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer, rx_length, timeout);
+        return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, timeout);
     }
 
     // Overloads of the above to support passing nullptr
-    template<typename WordT>
+    template<typename WordT, size_t RxBufferLen>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer_and_wait(const std::nullptr_t *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
+    transfer_and_wait(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> & rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
     {
-        return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer, rx_length, timeout);
+        return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, timeout);
     }
     template<typename WordT>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
@@ -574,7 +578,8 @@ protected:
      *                  the default SPI value is sent
      * @param tx_length The length of TX buffer in bytes.
      * @param rx_buffer The RX buffer which is used for received data. If NULL is passed,
-     *                  received data are ignored.
+     *                  received data are ignored.  This buffer is guaranteed to be cache aligned
+     *                  if the MCU has a cache.
      * @param rx_length The length of RX buffer in bytes.
      * @param callback  The event callback function.
      * @param event     The event mask of events to modify.
@@ -599,6 +604,7 @@ protected:
      * @param tx_buffer The TX buffer with data to be transferred.  May be nullptr if tx_length is 0.
      * @param tx_length The length of TX buffer in bytes.  If 0, no transmission is done.
      * @param rx_buffer The RX buffer, which is used for received data.  May be nullptr if tx_length is 0.
+     *     This buffer is guaranteed to be cache aligned if the MCU has a cache.
      * @param rx_length The length of RX buffer in bytes  If 0, no reception is done.
      * @param timeout timeout value.  Use #rtos::Kernel::wait_for_u32_forever to wait forever (the default).
      *
@@ -722,6 +728,18 @@ protected:
      * iff start_transfer() has been called and the chip has been selected but irq_handler_asynch()
      * has NOT been called yet. */
     volatile bool _transfer_in_progress = false;
+
+    // If there is a transfer in progress, this indicates whether it used DMA and therefore requires a cache
+    // flush at the end
+    bool _transfer_in_progress_uses_dma;
+
+#if __DCACHE_PRESENT
+    // These variables store the location and length in bytes of the Rx buffer if an async transfer
+    // is in progress.  They are used for invalidating the cache after the transfer completes.
+    void * _transfer_in_progress_rx_buffer;
+    size_t _transfer_in_progress_rx_len;
+#endif
+
     /* Event flags used for transfer_and_wait() */
     rtos::EventFlags _transfer_and_wait_flags;
 #endif // DEVICE_SPI_ASYNCH
