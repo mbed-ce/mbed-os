@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2017 Nordic Semiconductor ASA
  * All rights reserved.
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
