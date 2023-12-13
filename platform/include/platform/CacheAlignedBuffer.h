@@ -25,33 +25,41 @@
 namespace mbed {
 
 namespace detail::cab {
-    /**
-     * @brief Calculate the needed capacity for a cache aligned buffer's backing buffer based on the
-     *    needed capacity and element size.
-     *
-     * @param neededCapacity Capacity needed for the buffer
-     * @param elementSize Size of each element
-     *
-     * @return Needed backing buffer size
-     */
-    constexpr inline size_t getNeededBackingBufferSize(size_t neededCapacity, size_t elementSize) {
+/**
+ * @brief Calculate the needed capacity for a cache aligned buffer's backing buffer based on the
+ *    needed capacity and element size.
+ *
+ * @param neededCapacity Capacity needed for the buffer
+ * @param elementSize Size of each element
+ *
+ * @return Needed backing buffer size
+ */
+constexpr inline size_t getNeededBackingBufferSize(size_t neededCapacity, size_t elementSize)
+{
 #if __DCACHE_PRESENT
-        // Allocate enough extra space that we can shift the start of the buffer towards higher addresses to be on a cache line.
-        // The worst case for this is when the first byte is allocated 1 byte past the start of a cache line, so we
-        // will need an additional (cache line size - 1) bytes.
-        // Additionally, since we are going to be invalidating this buffer, we can't allow any other variables to be
-        // in the same cache lines, or they might get corrupted.
-        // So, we need to round up the backing buffer size to the nearest multiple of the cache line size.
-        // The math for rounding up can be found here:
-        // https://community.st.com/t5/stm32-mcus-products/maintaining-cpu-data-cache-coherence-for-dma-buffers/td-p/95746
-        size_t requiredSizeRoundedUp = (neededCapacity * elementSize + __SCB_DCACHE_LINE_SIZE - 1) & ~((__SCB_DCACHE_LINE_SIZE) - 1);
-        return requiredSizeRoundedUp + __SCB_DCACHE_LINE_SIZE - 1;
+    // Allocate enough extra space that we can shift the start of the buffer towards higher addresses to be on a cache line.
+    // The worst case for this is when the first byte is allocated 1 byte past the start of a cache line, so we
+    // will need an additional (cache line size - 1) bytes.
+    // Additionally, since we are going to be invalidating this buffer, we can't allow any other variables to be
+    // in the same cache lines, or they might get corrupted.
+    // So, we need to round up the backing buffer size to the nearest multiple of the cache line size.
+    // The math for rounding up can be found here:
+    // https://community.st.com/t5/stm32-mcus-products/maintaining-cpu-data-cache-coherence-for-dma-buffers/td-p/95746
+    size_t requiredSizeRoundedUp = (neededCapacity * elementSize + __SCB_DCACHE_LINE_SIZE - 1) & ~((__SCB_DCACHE_LINE_SIZE) - 1);
+    return requiredSizeRoundedUp + __SCB_DCACHE_LINE_SIZE - 1;
 #else
-        // No cache on this platform so don't need any extra space.
-        return neededCapacity * elementSize;
+    // No cache on this platform so don't need any extra space.
+    return neededCapacity * elementSize;
 #endif
-    }
 }
+}
+
+/** \addtogroup platform-public-api */
+/** @{*/
+/**
+ * \defgroup platform_CacheAlignedBuffer CacheAlignedBuffer class
+ * @{
+ */
 
 /**
  * @brief CacheAlignedBuffer is used by Mbed in locations where we need a cache-aligned buffer.
@@ -67,7 +75,7 @@ namespace detail::cab {
  *
  * <p>%CacheAlignedBuffer provides an easy way to allocate the correct amount of space so that
  * a buffer of any size can be made cache-aligned.  To instantiate a %CacheAlignedBuffer, create one of its
- * subtypes, #StaticCacheAlignedBuffer or #DynamicCacheAlignedBuffer.</p>
+ * subtypes, StaticCacheAlignedBuffer or DynamicCacheAlignedBuffer.</p>
  *
  * <h2> Converting Code to use CacheAlignedBuffer </h2>
  * For code using static arrays, like this:
@@ -101,7 +109,7 @@ class CacheAlignedBuffer {
 
 protected:
     /// Pointer to the aligned buffer.  Must be set in each constructor of each subclass.
-    DataT * _alignedBufferPtr;
+    DataT *_alignedBufferPtr;
 
     /// Capacity of the aligned buffer, in terms of number of DataT elements
     size_t _alignedBufferCapacity;
@@ -274,7 +282,7 @@ public:
  */
 template<typename DataT>
 class DynamicCacheAlignedBuffer : public CacheAlignedBuffer<DataT> {
-    uint8_t * _heapMem;
+    uint8_t *_heapMem;
 public:
     /**
      * @brief Construct new cache-aligned buffer.  Buffer will be zero-initialized and allocated from the heap.
@@ -282,7 +290,7 @@ public:
      * @param capacity Number of elements the buffer shall hold
      */
     explicit DynamicCacheAlignedBuffer(size_t capacity):
-            _heapMem(new uint8_t[detail::cab::getNeededBackingBufferSize(capacity, sizeof(DataT))]())
+        _heapMem(new uint8_t[detail::cab::getNeededBackingBufferSize(capacity, sizeof(DataT))]())
     {
         this->_alignedBufferPtr = this->findCacheLineStart(_heapMem);
         this->_alignedBufferCapacity = capacity;
@@ -293,7 +301,7 @@ public:
      * its data will be copied from the other buffer.
      */
     DynamicCacheAlignedBuffer(DynamicCacheAlignedBuffer const &other):
-            _heapMem(new uint8_t[detail::cab::getNeededBackingBufferSize(other._alignedBufferCapacity, sizeof(DataT))])
+        _heapMem(new uint8_t[detail::cab::getNeededBackingBufferSize(other._alignedBufferCapacity, sizeof(DataT))])
     {
         this->_alignedBufferCapacity = other._alignedBufferCapacity;
         this->_alignedBufferPtr = this->findCacheLineStart(_heapMem);
@@ -313,8 +321,7 @@ public:
     DynamicCacheAlignedBuffer &operator=(DynamicCacheAlignedBuffer const &other)
     {
         // Check for self assignment
-        if(&other == this)
-        {
+        if (&other == this) {
             return *this;
         }
 
@@ -325,6 +332,8 @@ public:
         memcpy(this->_alignedBufferPtr, other._alignedBufferPtr, this->_alignedBufferCapacity * sizeof(DataT));
     }
 };
+
+/// @}
 
 }
 
