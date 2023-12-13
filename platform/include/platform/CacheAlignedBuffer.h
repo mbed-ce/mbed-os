@@ -79,27 +79,27 @@ constexpr inline size_t getNeededBackingBufferSize(size_t neededCapacity, size_t
  *
  * <h2> Converting Code to use CacheAlignedBuffer </h2>
  * For code using static arrays, like this:
- * \code{.cpp}
+ * @code
  * uint8_t rxBuffer[16];
  * spi.transfer_and_wait(nullptr, 0, rxBuffer, 16);
- * \endcode
+ * @endcode
  * Use a StaticCacheAlignedBuffer:
- * \code{.cpp}
+ * @code
  * StaticCacheAlignedBuffer<uint8_t, 16> rxBuffer;
  * spi.transfer_and_wait(nullptr, 0, rxBuffer, 16);
- * \endcode
+ * @endcode
  * For code using dynamic allocation to handle unknown buffer sizes, like:
- * \code{.cpp}
+ * @code
  * uint16_t * rxBuffer = new uint16_t[bufferSize];
  * spi.transfer_and_wait(nullptr, 0, rxBuffer, bufferSize);
  * ...
  * delete[] rxBuffer;
- * \endcode
+ * @endcode
  * use a DynamicCacheAlignedBuffer:
- * \code{.cpp}
+ * @code
  * DynamicCacheAlignedBuffer<uint16_t> rxBuffer(bufferSize);
  * spi.transfer_and_wait(nullptr, 0, rxBuffer, bufferSize);
- * \endcode
+ * @endcode
  *
  * @tparam DataT Type of the data to store in the buffer.  Note: %CacheAlignedBuffer is not designed for
  *    using class types as DataT, and will not call constructors.
