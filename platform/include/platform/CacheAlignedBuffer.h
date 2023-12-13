@@ -24,47 +24,90 @@
 
 namespace mbed {
 
+namespace detail::cab {
+    /**
+     * @brief Calculate the needed capacity for a cache aligned buffer's backing buffer based on the
+     *    needed capacity and element size.
+     *
+     * @param neededCapacity Capacity needed for the buffer
+     * @param elementSize Size of each element
+     *
+     * @return Needed backing buffer size
+     */
+    constexpr inline size_t getNeededBackingBufferSize(size_t neededCapacity, size_t elementSize) {
+#if __DCACHE_PRESENT
+        // Allocate enough extra space that we can shift the start of the buffer towards higher addresses to be on a cache line.
+        // The worst case for this is when the first byte is allocated 1 byte past the start of a cache line, so we
+        // will need an additional (cache line size - 1) bytes.
+        // Additionally, since we are going to be invalidating this buffer, we can't allow any other variables to be
+        // in the same cache lines, or they might get corrupted.
+        // So, we need to round up the backing buffer size to the nearest multiple of the cache line size.
+        // The math for rounding up can be found here:
+        // https://community.st.com/t5/stm32-mcus-products/maintaining-cpu-data-cache-coherence-for-dma-buffers/td-p/95746
+        size_t requiredSizeRoundedUp = (neededCapacity * elementSize + __SCB_DCACHE_LINE_SIZE - 1) & ~((__SCB_DCACHE_LINE_SIZE) - 1);
+        return requiredSizeRoundedUp + __SCB_DCACHE_LINE_SIZE - 1;
+#else
+        // No cache on this platform so don't need any extra space.
+        return neededCapacity * elementSize;
+#endif
+    }
+}
 
 /**
  * @brief CacheAlignedBuffer is used by Mbed in locations where we need a cache-aligned buffer.
  *
- * Cache alignment is desirable in several different situations in embedded programming -- one common
+ * <p>Cache alignment is desirable in several different situations in embedded programming -- one common
  * use is when working with DMA or other peripherals which write their results back to main memory.
  * After these peripherals do their work, the data will be correct in main memory, but the CPU cache
- * might also contain a value cached from that memory which is now incorrect.
+ * might also contain a value cached from that memory which is now incorrect.<p>
  *
- * In order to read those results from memory without risk of getting old data from the
+ * <p>In order to read those results from memory without risk of getting old data from the
  * CPU cache, one needs to align the buffer so it takes up an integer number of cache lines,
- * then invalidate the cache lines so that the data gets reread from RAM.
+ * then invalidate the cache lines so that the data gets reread from RAM.</p>
  *
- * CacheAlignedBuffer provides an easy way to allocate the correct amount of space so that
- * a buffer of any size can be made cache-aligned.
+ * <p>%CacheAlignedBuffer provides an easy way to allocate the correct amount of space so that
+ * a buffer of any size can be made cache-aligned.  To instantiate a %CacheAlignedBuffer, create one of its
+ * subtypes, #StaticCacheAlignedBuffer or #DynamicCacheAlignedBuffer.</p>
+ *
+ * <h2> Converting Code to use CacheAlignedBuffer </h2>
+ * For code using static arrays, like this:
+ * \code{.cpp}
+ * uint8_t rxBuffer[16];
+ * spi.transfer_and_wait(nullptr, 0, rxBuffer, 16);
+ * \endcode
+ * Use a StaticCacheAlignedBuffer:
+ * \code{.cpp}
+ * StaticCacheAlignedBuffer<uint8_t, 16> rxBuffer;
+ * spi.transfer_and_wait(nullptr, 0, rxBuffer, 16);
+ * \endcode
+ * For code using dynamic allocation to handle unknown buffer sizes, like:
+ * \code{.cpp}
+ * uint16_t * rxBuffer = new uint16_t[bufferSize];
+ * spi.transfer_and_wait(nullptr, 0, rxBuffer, bufferSize);
+ * ...
+ * delete[] rxBuffer;
+ * \endcode
+ * use a DynamicCacheAlignedBuffer:
+ * \code{.cpp}
+ * DynamicCacheAlignedBuffer<uint16_t> rxBuffer(bufferSize);
+ * spi.transfer_and_wait(nullptr, 0, rxBuffer, bufferSize);
+ * \endcode
  *
  * @tparam DataT Type of the data to store in the buffer.  Note: %CacheAlignedBuffer is not designed for
  *    using class types as DataT, and will not call constructors.
- * @tparam BufferSize Buffer size (number of elements) needed by the application for the buffer.
  */
-template<typename DataT, size_t BufferSize>
-struct
-    CacheAlignedBuffer {
-private:
-#if __DCACHE_PRESENT
-    // Allocate enough extra space that we can shift the start of the buffer forward to be on a cache line.
-    // The worst case for this is when the first byte is allocated 1 byte past the start of a cache line, so we
-    // will need an additional (cache line size - 1) bytes.
-    // Additionally, since we are going to be invalidating this buffer, we can't allow any other variables to be
-    // in the same cache lines, or they might get corrupted.
-    // So, we need to round up the backing buffer size to the nearest multiple of the cache line size.
-    // The math for rounding up can be found here:
-    // https://community.st.com/t5/stm32-mcus-products/maintaining-cpu-data-cache-coherence-for-dma-buffers/td-p/95746
-    constexpr static size_t requiredSizeRoundedUp = (BufferSize *sizeof(DataT) + __SCB_DCACHE_LINE_SIZE - 1) & ~((__SCB_DCACHE_LINE_SIZE) - 1);
-    constexpr static size_t backingBufferSizeBytes = requiredSizeRoundedUp + __SCB_DCACHE_LINE_SIZE - 1;
-#else
-    constexpr static size_t backingBufferSizeBytes = BufferSize * sizeof(DataT);
-#endif
+template<typename DataT>
+class CacheAlignedBuffer {
 
-    uint8_t _backingBuffer[backingBufferSizeBytes];
-    DataT *_alignedArrayPtr;
+protected:
+    /// Pointer to the aligned buffer.  Must be set in each constructor of each subclass.
+    DataT * _alignedBufferPtr;
+
+    /// Capacity of the aligned buffer, in terms of number of DataT elements
+    size_t _alignedBufferCapacity;
+
+    // Protected constructor to block instantiation
+    CacheAlignedBuffer() = default;
 
     /**
      * Find and return the first location in the given buffer that starts on a cache line.
@@ -74,7 +117,7 @@ private:
      *
      * @return Pointer to first data item, aligned at the start of a cache line.
      */
-    inline DataT *findCacheLineStart(uint8_t *buffer)
+    static inline DataT *findCacheLineStart(uint8_t *buffer)
     {
 #if __DCACHE_PRESENT
         // Use integer division to divide the address down to the cache line size, which
@@ -97,36 +140,11 @@ public:
     typedef DataT const *const_iterator;
 
     /**
-     * @brief Construct new cache-aligned buffer.  Buffer will be zero-initialized.
-     */
-    CacheAlignedBuffer():
-        _backingBuffer{},
-        _alignedArrayPtr(findCacheLineStart(_backingBuffer))
-    {}
-
-    /**
-     * @brief Copy from other cache-aligned buffer.  Buffer memory will be copied.
-     */
-    CacheAlignedBuffer(CacheAlignedBuffer const &other):
-        _alignedArrayPtr(findCacheLineStart(_backingBuffer))
-    {
-        memcpy(this->_alignedArrayPtr, other._alignedArrayPtr, BufferSize * sizeof(DataT));
-    }
-
-    /**
-     * @brief Assign from other cache-aligned buffer.  Buffer memory will be assigned.
-     */
-    CacheAlignedBuffer &operator=(CacheAlignedBuffer const &other)
-    {
-        memcpy(this->_alignedArrayPtr, other._alignedArrayPtr, BufferSize * sizeof(DataT));
-    }
-
-    /**
      * @brief Get a pointer to the aligned data array inside the buffer
      */
     DataT *data()
     {
-        return _alignedArrayPtr;
+        return _alignedBufferPtr;
     }
 
     /**
@@ -134,7 +152,7 @@ public:
      */
     DataT const *data() const
     {
-        return _alignedArrayPtr;
+        return _alignedBufferPtr;
     }
 
     /**
@@ -142,7 +160,7 @@ public:
      */
     DataT &operator[](size_t index)
     {
-        return _alignedArrayPtr[index];
+        return _alignedBufferPtr[index];
     }
 
     /**
@@ -150,7 +168,7 @@ public:
      */
     DataT operator[](size_t index) const
     {
-        return _alignedArrayPtr[index];
+        return _alignedBufferPtr[index];
     }
 
     /**
@@ -158,7 +176,7 @@ public:
      */
     iterator begin()
     {
-        return _alignedArrayPtr;
+        return _alignedBufferPtr;
     }
 
     /**
@@ -166,7 +184,7 @@ public:
      */
     const_iterator begin() const
     {
-        return _alignedArrayPtr;
+        return _alignedBufferPtr;
     }
 
     /**
@@ -174,7 +192,7 @@ public:
      */
     iterator end()
     {
-        return _alignedArrayPtr + BufferSize;
+        return _alignedBufferPtr + _alignedBufferCapacity;
     }
 
     /**
@@ -182,29 +200,129 @@ public:
      */
     const_iterator end() const
     {
-        return _alignedArrayPtr + BufferSize;
+        return _alignedBufferPtr + _alignedBufferCapacity;
     }
 
     /**
-     * @return The maximum amount of DataT elements that this buffer can hold
+     * @return The maximum amount of DataT elements that this buffer can hold.
      */
     constexpr size_t capacity()
     {
-        return BufferSize;
+        return _alignedBufferCapacity;
+    }
+};
+
+/**
+ * @brief CacheAlignedBuffer type designed for static allocation.
+ *
+ * Use a StaticCacheAlignedBuffer when you want to create a cache-aligned buffer with a fixed size
+ * at compile time.  %StaticCacheAlignedBuffers can be declared globally, as local variables, or using
+ * new[] and delete[].
+ *
+ * @tparam DataT Type of the data to store in the buffer.  Note: %CacheAlignedBuffer is not designed for
+ *    using class types as DataT, and will not call constructors.
+ * @tparam BufferSize Buffer size (number of elements) needed by the application for the buffer.
+ */
+template<typename DataT, size_t BufferSize>
+class StaticCacheAlignedBuffer : public CacheAlignedBuffer<DataT> {
+private:
+
+    uint8_t _backingBuffer[detail::cab::getNeededBackingBufferSize(BufferSize, sizeof(DataT))];
+
+public:
+
+    /**
+     * @brief Construct new cache-aligned buffer.  Buffer will be zero-initialized.
+     */
+    StaticCacheAlignedBuffer():
+        _backingBuffer{}
+    {
+        this->_alignedBufferPtr = this->findCacheLineStart(_backingBuffer);
+        this->_alignedBufferCapacity = BufferSize;
     }
 
     /**
-     * @brief If this MCU has a data cache, this function _invalidates_ the buffer in the data cache.
-     *
-     * Invalidation means that the next time code access the buffer data, it is guaranteed to be fetched from
-     * main memory rather than from the CPU cache.  If there are changes made to the data which have not been
-     * flushed back to main memory, those changes will be lost!
+     * @brief Copy from other cache-aligned buffer.  Buffer memory will be copied.
      */
-    void invalidate()
+    StaticCacheAlignedBuffer(StaticCacheAlignedBuffer const &other)
     {
-#if __DCACHE_PRESENT
-        SCB_InvalidateDCache_by_Addr(_alignedArrayPtr, BufferSize * sizeof(DataT));
-#endif
+        this->_alignedBufferPtr = this->findCacheLineStart(_backingBuffer);
+        memcpy(this->_alignedBufferPtr, other._alignedBufferPtr, BufferSize * sizeof(DataT));
+        this->_alignedBufferCapacity = BufferSize;
+    }
+
+    /**
+     * @brief Assign from other cache-aligned buffer.  Buffer memory will be assigned.
+     *
+     * Only a buffer with the same data type and size can be assigned.
+     */
+    StaticCacheAlignedBuffer &operator=(StaticCacheAlignedBuffer<DataT, BufferSize> const &other)
+    {
+        memmove(this->_alignedBufferPtr, other._alignedBufferPtr, BufferSize * sizeof(DataT));
+    }
+};
+
+/**
+ * @brief CacheAlignedBuffer type which allocates its backing buffer on the heap.
+ *
+ * Use a DynamicCacheAlignedBuffer when you want to create a cache-aligned buffer with a size
+ * known only at runtime.  When constructed, %DynamicCacheAlignedBuffers allocate backing memory off the
+ * heap for the provided number of elements.  The memory will be released when the buffer object is destroyed.
+ *
+ * @tparam DataT Type of the data to store in the buffer.  Note: %CacheAlignedBuffer is not designed for
+ *    using class types as DataT, and will not call constructors.
+ */
+template<typename DataT>
+class DynamicCacheAlignedBuffer : public CacheAlignedBuffer<DataT> {
+    uint8_t * _heapMem;
+public:
+    /**
+     * @brief Construct new cache-aligned buffer.  Buffer will be zero-initialized and allocated from the heap.
+     *
+     * @param capacity Number of elements the buffer shall hold
+     */
+    explicit DynamicCacheAlignedBuffer(size_t capacity):
+            _heapMem(new uint8_t[detail::cab::getNeededBackingBufferSize(capacity, sizeof(DataT))]())
+    {
+        this->_alignedBufferPtr = this->findCacheLineStart(_heapMem);
+        this->_alignedBufferCapacity = capacity;
+    }
+
+    /**
+     * @brief Copy from other cache-aligned buffer.  A new backing buffer will be allocated on the heap and
+     * its data will be copied from the other buffer.
+     */
+    DynamicCacheAlignedBuffer(DynamicCacheAlignedBuffer const &other):
+            _heapMem(new uint8_t[detail::cab::getNeededBackingBufferSize(other._alignedBufferCapacity, sizeof(DataT))])
+    {
+        this->_alignedBufferCapacity = other._alignedBufferCapacity;
+        this->_alignedBufferPtr = this->findCacheLineStart(_heapMem);
+        memcpy(this->_alignedBufferPtr, other._alignedBufferPtr, this->_alignedBufferCapacity * sizeof(DataT));
+    }
+
+    // Destructor
+    ~DynamicCacheAlignedBuffer()
+    {
+        delete[] this->_heapMem;
+    }
+
+    /**
+     * @brief Assign from other cache-aligned buffer with the same type.  A new buffer will be allocated
+     * of the correct size.
+     */
+    DynamicCacheAlignedBuffer &operator=(DynamicCacheAlignedBuffer const &other)
+    {
+        // Check for self assignment
+        if(&other == this)
+        {
+            return *this;
+        }
+
+        delete[] _heapMem;
+        _heapMem = new uint8_t[detail::cab::getNeededBackingBufferSize(other._alignedBufferCapacity, sizeof(DataT))];
+        this->_alignedBufferPtr = this->findCacheLineStart(_heapMem);
+
+        memcpy(this->_alignedBufferPtr, other._alignedBufferPtr, this->_alignedBufferCapacity * sizeof(DataT));
     }
 };
 

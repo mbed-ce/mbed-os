@@ -317,7 +317,7 @@ private:
 
 #if DEVICE_SPI_ASYNCH
     bool _async_spi_enabled = false;
-    mbed::CacheAlignedBuffer<uint8_t, _block_size> _async_data_buffer;
+    mbed::StaticCacheAlignedBuffer<uint8_t, _block_size> _async_data_buffer;
 #endif
 };
 

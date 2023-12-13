@@ -476,18 +476,20 @@ public:
      * @retval 0 If the transfer has started.
      * @retval -1 if the transfer could not be enqueued (increase drivers.spi_transaction_queue_len option)
      */
-    template<typename WordT, size_t RxBufferLen>
+    template<typename WordT>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> &rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
+    transfer(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT> &rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
     {
+        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity()));
         return transfer_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, callback, event);
     }
 
     // Overloads of the above to support passing nullptr
-    template<typename WordT, size_t RxBufferLen>
+    template<typename WordT>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> &rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
+    transfer(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT> &rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
     {
+        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity()));
         return transfer_internal(tx_buffer, tx_length, rx_buffer, rx_length, callback, event);
     }
     template<typename WordT>
@@ -522,18 +524,20 @@ public:
      * @retval 2 on other error
      * @retval 0 on success
      */
-    template<typename WordT, size_t RxBufferLen>
+    template<typename WordT>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer_and_wait(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> &rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
+    transfer_and_wait(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT> &rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
     {
+        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity()));
         return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, timeout);
     }
 
     // Overloads of the above to support passing nullptr
-    template<typename WordT, size_t RxBufferLen>
+    template<typename WordT>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    transfer_and_wait(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT, RxBufferLen> &rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
+    transfer_and_wait(const std::nullptr_t *tx_buffer, int tx_length, CacheAlignedBuffer<WordT> &rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
     {
+        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity()));
         return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, timeout);
     }
     template<typename WordT>
