@@ -45,7 +45,63 @@
 #include "hardware/clocks.h"
 #include "mbed_assert.h"
 
-const uint count_top = 1000;
+#include <math.h>
+
+/// Largest top count value supported by hardware.  Using this value will provide the highest duty cycle resolution,
+/// but will limit the period to a maximum of (1 / (125 MHz / 65534) =) 524 us
+const uint16_t MAX_TOP_COUNT = 65534;
+
+/// Value for PWM_CHn_DIV register that produces a division of 1
+const uint16_t PWM_CHn_DIV_1 = 0x010;
+
+/// Calculate the effective PWM period (in floating point seconds) based on a divider and top_count value
+static float calc_effective_pwm_period(float divider, uint16_t top_count)
+{
+    return 1.0f / (clock_get_hz(clk_sys) / divider / top_count);
+}
+
+/// Calculate the best possible top_count value (rounding up) for a divider and a desired pwm period
+static uint16_t calc_top_count_for_period(float divider, float desired_pwm_period)
+{
+    // Derivation:
+    // desired_pwm_period = 1.0f / ((clock_get_hz(clk_sys) / divider) / top_count)
+    // desired_pwm_period = top_count / (clock_get_hz(clk_sys) / divider)
+    // desired_pwm_period * (clock_get_hz(clk_sys) / divider) = top_count
+
+    return ceilf(desired_pwm_period * (clock_get_hz(clk_sys) / divider));
+}
+
+/// Calculate the best possible floating point divider value for a desired pwm period.
+/// This function assumes that top_count is set to MAX_TOP_COUNT.
+static uint16_t calc_divider_for_period(float desired_pwm_period)
+{
+    // Derivation:
+    // (desired_pwm_period * clock_get_hz(clk_sys)) / divider = top_count
+    // divider = (desired_pwm_period * clock_get_hz(clk_sys)) / top_count
+
+    return (desired_pwm_period * clock_get_hz(clk_sys)) / MAX_TOP_COUNT;
+}
+
+/// Convert PWM divider from floating point to a fixed point number (rounding up).
+/// The divider is returned as an 8.4 bit fixed point number, which is what the Pico registers use.
+static uint16_t pwm_divider_float_to_fixed(float divider_float)
+{
+    // To convert to a fixed point number, multiply by 16 and then round up
+    uint16_t divider_exact = ceil(divider_float * 16);
+
+    // Largest supported divider is 255 and 15/16
+    if(divider_exact > 0xFFF)
+    {
+        divider_exact = 0xFFF;
+    }
+    return divider_exact;
+}
+
+/// Convert PWM divider from the fixed point hardware value (8.4 bits) to a float.
+static float pwm_divider_fixed_to_float(uint16_t divider_fixed)
+{
+    return divider_fixed / 16.0f;
+}
 
 /** Initialize the pwm out peripheral and configure the pin
  *
@@ -60,11 +116,10 @@ void pwmout_init(pwmout_t *obj, PinName pin)
     obj->slice = pwm_gpio_to_slice_num(pin);
     obj->channel = pwm_gpio_to_channel(pin);
     obj->pin = pin;
-    obj->period = 0;
+    obj->top_count = MAX_TOP_COUNT;
     obj->percent = 0.5f;
-
     obj->cfg = pwm_get_default_config();
-    pwm_config_set_wrap(&(obj->cfg), count_top);
+    pwm_config_set_wrap(&(obj->cfg), obj->top_count);
 
     pwm_init(obj->slice, &(obj->cfg), false);
     gpio_set_function(pin, GPIO_FUNC_PWM);
@@ -89,7 +144,21 @@ void pwmout_free(pwmout_t *obj)
 void pwmout_write(pwmout_t *obj, float percent)
 {
     obj->percent = percent;
-    pwm_set_gpio_level(obj->pin, percent * (count_top + 1));
+
+    // Per datasheet section 4.5.2.2, a period value of top_count + 1 produces 100% duty cycle
+    int32_t reset_count = lroundf((obj->top_count + 1) * percent);
+
+    // Clamp to valid values
+    if(reset_count > obj->top_count + 1)
+    {
+        reset_count = obj->top_count + 1;
+    }
+    else if(reset_count < 0)
+    {
+        reset_count = 0;
+    }
+
+    pwm_set_chan_level(obj->slice, obj->channel, reset_count);
     pwm_set_enabled(obj->slice, true);
 }
 
@@ -114,8 +183,46 @@ float pwmout_read(pwmout_t *obj)
  */
 void pwmout_period(pwmout_t *obj, float period)
 {
-    /* Set new period. */
-    pwmout_period_us(obj, period * 1000000);
+    // Two possibilities here:
+    // - If the period is relatively short (< about 524 us), we want to keep the clock divider at 1
+    //    and reduce top_count to match the period
+    // - If the period is larger than what we can achieve with a clock divider of 1, we need to
+    //    use a higher clock divider, then recalculate the top_count to match
+
+    // Note: For math this complex, I wasn't able to avoid using floating point values.
+    // This function won't be too efficient, but for now I just want something that works and
+    // can access the full PWM range.
+
+    if(period <= calc_effective_pwm_period(1, MAX_TOP_COUNT))
+    {
+        // Short period.  Leave divider at 1 and reduce top_count to match the expected period
+        obj->clock_divider = 1.0f;
+        obj->cfg.div = PWM_CHn_DIV_1;
+        obj->top_count = calc_top_count_for_period(obj->clock_divider, period);
+    }
+    else
+    {
+        // Long period, need to use divider.
+
+        // Step 1: Calculate exact desired divider such that top_count would equal MAX_TOP_COUNT
+        float desired_divider = calc_divider_for_period(period);
+
+        // Step 2: Round desired divider upwards to the next value the hardware can do.
+        // We go upwards so that the top_count value can be trimmed downwards for the best period accuracy.
+        uint16_t divider_fixed_point = pwm_divider_float_to_fixed(desired_divider);
+        obj->cfg.div = divider_fixed_point;
+
+        // Step 3: Get the divider we'll actually be using as a float
+        obj->clock_divider = pwm_divider_fixed_to_float(divider_fixed_point);
+
+        // Step 4: For best accuracy, recalculate the top_count value using the divider.
+        obj->top_count = calc_top_count_for_period(obj->clock_divider, period);
+    }
+
+    // Save period for later
+    obj->period = period;
+
+    pwm_init(obj->slice, &(obj->cfg), false);
 }
 
 /** Set the PWM period specified in miliseconds, keeping the duty cycle the same
@@ -126,7 +233,7 @@ void pwmout_period(pwmout_t *obj, float period)
 void pwmout_period_ms(pwmout_t *obj, int period)
 {
     /* Set new period. */
-    pwmout_period_us(obj, period * 1000);
+    pwmout_period(obj, period / 1000.0f);
 }
 
 /** Set the PWM period specified in microseconds, keeping the duty cycle the same
@@ -136,18 +243,18 @@ void pwmout_period_ms(pwmout_t *obj, int period)
  */
 void pwmout_period_us(pwmout_t *obj, int period)
 {
-    obj->period = period;
-
-    // min_period should be 8us
-    uint32_t min_period = 1000000 * count_top / clock_get_hz(clk_sys);
-
-    pwm_config_set_clkdiv(&(obj->cfg), (float)period / (float)min_period);
-    pwm_init(obj->slice, &(obj->cfg), false);
+    /* Set new period. */
+    pwmout_period(obj, period / 1000000.0f);
 }
 
+/** Read the PWM period specified in microseconds
+ *
+ * @param obj The pwmout object
+ * @return A int output period
+ */
 int pwmout_read_period_us(pwmout_t *obj)
 {
-    return obj->period;
+    return lroundf(1000000 * calc_effective_pwm_period(obj->clock_divider, obj->top_count));
 }
 
 /** Set the PWM pulsewidth specified in seconds, keeping the period the same.
@@ -157,7 +264,7 @@ int pwmout_read_period_us(pwmout_t *obj)
  */
 void pwmout_pulsewidth(pwmout_t *obj, float pulse)
 {
-    pwmout_pulsewidth_us(obj, pulse * 1000000);
+    pwmout_write(obj, pulse / obj->period);
 }
 
 /** Set the PWM pulsewidth specified in miliseconds, keeping the period the same.
@@ -167,7 +274,7 @@ void pwmout_pulsewidth(pwmout_t *obj, float pulse)
  */
 void pwmout_pulsewidth_ms(pwmout_t *obj, int pulse)
 {
-    pwmout_pulsewidth_us(obj, pulse * 1000);
+    pwmout_write(obj, (pulse * .001f) / obj->period);
 }
 
 /** Set the PWM pulsewidth specified in microseconds, keeping the period the same.
@@ -177,19 +284,11 @@ void pwmout_pulsewidth_ms(pwmout_t *obj, int pulse)
  */
 void pwmout_pulsewidth_us(pwmout_t *obj, int pulse)
 {
-    /* Cap pulsewidth to period. */
-    if (pulse > obj->period) {
-        pulse = obj->period;
-    }
-
-    obj->percent = (float) pulse / (float) obj->period;
-
-    /* Restart instance with new values. */
-    pwmout_write(obj, obj->percent);
+    pwmout_write(obj, (pulse * .000001f) / obj->period);
 }
 
 int pwmout_read_pulsewidth_us(pwmout_t *obj) {
-    return (obj->period) * (obj->percent);
+    return lroundf(obj->period * obj->percent * 1000000);
 }
 
 const PinMap *pwmout_pinmap()
