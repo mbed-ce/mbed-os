@@ -1,3 +1,6 @@
+# Copyright (c) 2024 ARM Limited. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 """
 This script can be used to reimport a newer version of the RPi Pico SDK.
 
