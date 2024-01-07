@@ -195,12 +195,12 @@ void EMW3080B_SPI::spi_handler(int event)
 }
 
 
-int32_t EMW3080B_SPI::TransmitReceive(uint8_t *txdata, CacheAlignedBuffer<uint8_t> & rxdata, uint32_t datalen,
+int32_t EMW3080B_SPI::TransmitReceive(uint8_t *txdata, CacheAlignedBuffer<uint8_t> &rxdata, uint32_t datalen,
                                       uint32_t timeout)
 {
     int32_t ret = 0;
     debug_if(_debug_level >= DEBUG_LOG, "EMW3080B_SPI : Spi Tx Rx %" PRIu32 "\n", datalen);
-    SPI::transfer( txdata, (int) datalen, rxdata, (int) datalen, callback(this, &EMW3080B_SPI::spi_handler), SPI_EVENT_COMPLETE);
+    SPI::transfer(txdata, (int) datalen, rxdata, (int) datalen, callback(this, &EMW3080B_SPI::spi_handler), SPI_EVENT_COMPLETE);
     if (SEM_WAIT(spi_transfer_done_sem, timeout, NULL) != SEM_OK) {
         debug_if(_debug_level >= DEBUG_WARNING, "EMW3080B_SPI : Timeout on TransmitReceive %d\n", spi_handler_count);
         ret = -1;
@@ -210,7 +210,7 @@ int32_t EMW3080B_SPI::TransmitReceive(uint8_t *txdata, CacheAlignedBuffer<uint8_
 }
 
 
-int32_t EMW3080B_SPI::Transmit(uint8_t * const txdata, uint32_t datalen, uint32_t timeout)
+int32_t EMW3080B_SPI::Transmit(uint8_t *const txdata, uint32_t datalen, uint32_t timeout)
 {
     int32_t ret = 0;
     debug_if(_debug_level >= DEBUG_LOG, "EMW3080B_SPI : Spi Tx %" PRIu32 "\n", datalen);
@@ -222,7 +222,7 @@ int32_t EMW3080B_SPI::Transmit(uint8_t * const txdata, uint32_t datalen, uint32_
     return ret;
 }
 
-int32_t EMW3080B_SPI::Receive(CacheAlignedBuffer<uint8_t> & rxdata, uint32_t datalen, uint32_t timeout)
+int32_t EMW3080B_SPI::Receive(CacheAlignedBuffer<uint8_t> &rxdata, uint32_t datalen, uint32_t timeout)
 {
     int32_t ret = 0;
     debug_if(_debug_level >= DEBUG_LOG, "EMW3080B_SPI : Spi Rx %" PRIu32 "\n", datalen);
