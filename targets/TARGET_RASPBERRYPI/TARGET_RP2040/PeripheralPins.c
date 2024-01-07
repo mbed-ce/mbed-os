@@ -210,10 +210,10 @@ const PinMap PinMap_I2C_SCL[] = {
  * is the onboard temperature sensor.
  */
 const PinMap PinMap_ADC[] = {
-    { A0,       ADC0, 0},
-    { A1,       ADC0, 1},
-    { A2,       ADC0, 2},
-    { A3,       ADC0, 3},
+    { p26,       ADC0, 0},
+    { p27,       ADC0, 1},
+    { p28,       ADC0, 2},
+    { p29,       ADC0, 3},
     { ADC_TEMP, ADC0, 4},
     { NC,       NC,   0}
 };
