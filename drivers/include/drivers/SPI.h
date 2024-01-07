@@ -390,16 +390,16 @@ public:
     // Overloads of the above to support passing nullptr
     template<typename WordT>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    write(const std::nullptr_t *tx_buffer, int tx_length, WordT *rx_buffer, int rx_length)
+    write(const std::nullptr_t tx_buffer, int tx_length, WordT *rx_buffer, int rx_length)
     {
-        return write_internal(reinterpret_cast<char const *>(tx_buffer), tx_length, reinterpret_cast<char *>(rx_buffer), rx_length);
+        return write_internal(tx_buffer, tx_length, reinterpret_cast<char *>(rx_buffer), rx_length);
     }
 
     template<typename WordT>
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
-    write(const WordT *tx_buffer, int tx_length, std::nullptr_t *rx_buffer, int rx_length)
+    write(const WordT *tx_buffer, int tx_length, std::nullptr_t rx_buffer, int rx_length)
     {
-        return write_internal(reinterpret_cast<char const *>(tx_buffer), tx_length, reinterpret_cast<char *>(rx_buffer), rx_length);
+        return write_internal(reinterpret_cast<char const *>(tx_buffer), tx_length, rx_buffer, rx_length);
     }
 
     /**
