@@ -53,7 +53,6 @@ conf unset MBEDTLS_TIMING_C
 
 # not supported on all targets with mbed OS, nor used by mbed Client
 conf unset MBEDTLS_HAVE_TIME_DATE
-conf unset MBEDTLS_FS_IO
 conf unset MBEDTLS_PSA_ITS_FILE_C
 conf unset MBEDTLS_PSA_CRYPTO_STORAGE_C
 conf set MBEDTLS_NO_PLATFORM_ENTROPY
@@ -89,7 +88,6 @@ conf unset MBEDTLS_PEM_WRITE_C
 conf unset MBEDTLS_PKCS5_C
 conf unset MBEDTLS_PKCS12_C
 conf unset MBEDTLS_RIPEMD160_C
-conf unset MBEDTLS_SHA1_C
 conf unset MBEDTLS_XTEA_C
 
 conf set MBEDTLS_CMAC_C
