@@ -144,6 +144,7 @@ target_include_directories(mbed-raspberrypi
 
 target_sources(mbed-raspberrypi
     INTERFACE
+		pico-sdk/src/rp2_common/hardware_adc/adc.c
 		pico-sdk/src/rp2_common/hardware_flash/flash.c
 		pico-sdk/src/rp2_common/hardware_uart/uart.c
 		pico-sdk/src/rp2_common/hardware_spi/spi.c
