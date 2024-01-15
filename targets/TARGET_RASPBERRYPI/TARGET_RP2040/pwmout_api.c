@@ -27,8 +27,17 @@
 
 #include <math.h>
 
+// Change to 1 to enable debug prints of what's being calculated.
+// Must comment out the critical section calls in PwmOut to use.
+#define RP2040_PWMOUT_DEBUG 0
+
+#if RP2040_PWMOUT_DEBUG
+#include <stdio.h>
+#include <inttypes.h>
+#endif
+
 /// Largest top count value supported by hardware.  Using this value will provide the highest duty cycle resolution,
-/// but will limit the period to a maximum of (1 / (125 MHz / 65534) =) 524 us
+/// but will limit the period to a maximum of (1 / (125 MHz / (65534 + 1)) =) 524 us
 const uint16_t MAX_TOP_COUNT = 65534;
 
 /// Value for PWM_CHn_DIV register that produces a division of 1
@@ -37,29 +46,34 @@ const uint16_t PWM_CHn_DIV_1 = 0x010;
 /// Calculate the effective PWM period (in floating point seconds) based on a divider and top_count value
 static float calc_effective_pwm_period(float divider, uint16_t top_count)
 {
-    return 1.0f / (clock_get_hz(clk_sys) / divider / top_count);
+    // Note: The hardware counts to top_count *inclusively*, so we have to add 1
+    // to get the number of clock cycles that a given top_count value will produce
+    return 1.0f / ((clock_get_hz(clk_sys) / divider) / (top_count + 1));
 }
 
 /// Calculate the best possible top_count value (rounding up) for a divider and a desired pwm period
 static uint16_t calc_top_count_for_period(float divider, float desired_pwm_period)
 {
     // Derivation:
-    // desired_pwm_period = 1.0f / ((clock_get_hz(clk_sys) / divider) / top_count)
-    // desired_pwm_period = top_count / (clock_get_hz(clk_sys) / divider)
-    // desired_pwm_period * (clock_get_hz(clk_sys) / divider) = top_count
+    // desired_pwm_period = 1.0f / ((clock_get_hz(clk_sys) / divider) / (top_count + 1))
+    // desired_pwm_period = (top_count + 1) / (clock_get_hz(clk_sys) / divider)
+    // desired_pwm_period * (clock_get_hz(clk_sys) / divider) - 1 = top_count
 
-    return ceilf(desired_pwm_period * (clock_get_hz(clk_sys) / divider));
+    long top_count_float = lroundf(desired_pwm_period * (clock_get_hz(clk_sys) / divider) - 1);
+    MBED_ASSERT(top_count_float <= MAX_TOP_COUNT);
+    return (uint16_t)top_count_float;
 }
 
 /// Calculate the best possible floating point divider value for a desired pwm period.
 /// This function assumes that top_count is set to MAX_TOP_COUNT.
-static uint16_t calc_divider_for_period(float desired_pwm_period)
+static float calc_divider_for_period(float desired_pwm_period)
 {
     // Derivation:
-    // (desired_pwm_period * clock_get_hz(clk_sys)) / divider = top_count
-    // divider = (desired_pwm_period * clock_get_hz(clk_sys)) / top_count
+    // (desired_pwm_period * clock_get_hz(clk_sys)) / divider - 1 = top_count
+    // (desired_pwm_period * clock_get_hz(clk_sys)) / divider = top_count + 1
+    // divider = (desired_pwm_period * clock_get_hz(clk_sys)) / (top_count + 1)
 
-    return (desired_pwm_period * clock_get_hz(clk_sys)) / MAX_TOP_COUNT;
+    return (desired_pwm_period * clock_get_hz(clk_sys)) / (MAX_TOP_COUNT + 1);
 }
 
 /// Convert PWM divider from floating point to a fixed point number (rounding up).
@@ -126,19 +140,23 @@ void pwmout_write(pwmout_t *obj, float percent)
     obj->percent = percent;
 
     // Per datasheet section 4.5.2.2, a period value of top_count + 1 produces 100% duty cycle
-    int32_t reset_count = lroundf((obj->top_count + 1) * percent);
+    int32_t new_reset_counts = lroundf((obj->top_count + 1) * percent);
 
     // Clamp to valid values
-    if(reset_count > obj->top_count + 1)
+    if(new_reset_counts > obj->top_count + 1)
     {
-        reset_count = obj->top_count + 1;
+        new_reset_counts = obj->top_count + 1;
     }
-    else if(reset_count < 0)
+    else if(new_reset_counts < 0)
     {
-        reset_count = 0;
+        new_reset_counts = 0;
     }
 
-    pwm_set_chan_level(obj->slice, obj->channel, reset_count);
+#if RP2040_PWMOUT_DEBUG
+    printf("new_reset_counts: %" PRIu32 "\n", new_reset_counts);
+#endif
+
+    pwm_set_chan_level(obj->slice, obj->channel, new_reset_counts);
     pwm_set_enabled(obj->slice, true);
 }
 
@@ -197,11 +215,26 @@ void pwmout_period(pwmout_t *obj, float period)
 
         // Step 4: For best accuracy, recalculate the top_count value using the divider.
         obj->top_count = calc_top_count_for_period(obj->clock_divider, period);
+
+#if RP2040_PWMOUT_DEBUG
+        printf("period = %f, desired_divider = %f\n",
+               period,
+               desired_divider);
+#endif
     }
 
     // Save period for later
     obj->period = period;
 
+#if RP2040_PWMOUT_DEBUG
+    printf("obj->clock_divider = %f, obj->cfg.div = %" PRIu32 ", obj->top_count = %" PRIu16 "\n",
+           obj->clock_divider,
+           obj->cfg.div,
+           obj->top_count);
+#endif
+
+    // Set the new divider and top_count values.
+    pwm_config_set_wrap(&(obj->cfg), obj->top_count);
     pwm_init(obj->slice, &(obj->cfg), false);
 }
 
