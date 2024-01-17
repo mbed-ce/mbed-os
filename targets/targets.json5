@@ -3806,7 +3806,7 @@
         ],
         "config": {
             "clock_source": {
-                "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
+                "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             },
@@ -3815,7 +3815,7 @@
                 "value": 1
             },
             "lse_drive_load_level": {
-                "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH.  May require power cycle to board for changes to this setting to take effect!",
+                "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
             "i2c_timing_value_algo": {
@@ -9772,13 +9772,24 @@
             "PICO_TIME_DEFAULT_ALARM_POOL_DISABLED",
             "PICO_ON_DEVICE=1",
             "PICO_UART_ENABLE_CRLF_SUPPORT=0"
-        ]
-    },
-    "RASPBERRY_PI_PICO": {
-        "inherits": ["RASPBERRY_PI_PICO_SWD"],
+        ],
         "overrides": {
             "console-usb": true,
-            "console-uart": false
+            "console-uart": false,
+
+            // ADC_VDD sets the ADC reference voltage on this chip.
+            // Most RP2040 boards set this pin to 3.3V.
+            // Note that if the I/O voltage is set to less than the ADC reference voltage,
+            // voltages higher than the I/O voltage are illegal for the analog pins
+            // (so the ADC can never read 100%).
+            "default-adc-vref": 3.3
+        }
+    },
+    "RASPBERRY_PI_PICO_SWD": {
+        "inherits": ["RASPBERRY_PI_PICO"],
+        "overrides": {
+            "console-usb": false,
+            "console-uart": true
         }
     }
 }
