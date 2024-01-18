@@ -9764,7 +9764,7 @@
             "RTC"
         ]
     },
-    "RASPBERRY_PI_PICO_SWD": {
+    "RASPBERRY_PI_PICO": {
         "inherits": ["RP2040"],
         "macros_add": [
             "PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1",
