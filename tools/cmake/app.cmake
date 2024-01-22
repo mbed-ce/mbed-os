@@ -75,10 +75,18 @@ endif()
 # Load upload method configuration defaults for this target.
 # Loading the settings here makes sure they are set at global scope, and also makes sure that
 # the user can override them by changing variable values after including app.cmake.
-set(EXPECTED_MBED_UPLOAD_CFG_FILE_PATH targets/upload_method_cfg/${MBED_TARGET}.cmake)
-if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../${EXPECTED_MBED_UPLOAD_CFG_FILE_PATH})
+
+if(EXISTS ${CMAKE_SOURCE_DIR}/${MBED_TARGET}/${MBED_TARGET}.cmake)
+    set(EXPECTED_MBED_UPLOAD_CFG_FILE_PATH ${CMAKE_SOURCE_DIR}/${MBED_TARGET}/${MBED_TARGET}.cmake)
+    set(EXPECTED_MBED_UPLOAD_CFG_SEARCH_PATH ${EXPECTED_MBED_UPLOAD_CFG_FILE_PATH})
+else()
+    set(EXPECTED_MBED_UPLOAD_CFG_FILE_PATH targets/upload_method_cfg/${MBED_TARGET}.cmake)
+    set(EXPECTED_MBED_UPLOAD_CFG_SEARCH_PATH ${CMAKE_CURRENT_LIST_DIR}/../../${EXPECTED_MBED_UPLOAD_CFG_FILE_PATH})
+endif()
+
+if(EXISTS ${EXPECTED_MBED_UPLOAD_CFG_SEARCH_PATH})
     message(STATUS "Mbed: Loading default upload method configuration from ${EXPECTED_MBED_UPLOAD_CFG_FILE_PATH}")
-    include(${CMAKE_CURRENT_LIST_DIR}/../../${EXPECTED_MBED_UPLOAD_CFG_FILE_PATH})
+    include(${EXPECTED_MBED_UPLOAD_CFG_SEARCH_PATH})
 else()
     message(STATUS "Mbed: Target does not have any upload method configuration.  'make flash-' commands will not be available unless configured by the upper-level project.")
     set(UPLOAD_METHOD_DEFAULT "NONE")
