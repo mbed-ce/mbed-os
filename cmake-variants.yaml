@@ -1,0 +1,33 @@
+buildType:
+  default: Develop
+  choices:
+    Develop:
+      short: Develop
+      long: Emit debug information but also optimize
+      buildType: Develop
+    Debug:
+      short: Debug
+      long: Emit debug information and don't optimize
+      buildType: Debug
+    Release:
+      short: Release
+      long: Optimize generated code
+      buildType: Release
+board:
+  default: LPC1768
+  choices:
+    LPC1768:
+      short: LPC1768
+      settings:
+        MBED_TARGET: LPC1768
+        UPLOAD_METHOD: OPENOCD
+        MBED_GREENTEA_SERIAL_PORT: /dev/ttyLPC1768
+        OPENOCD_ADAPTER_SERIAL: 10102fa5c13a566eac31a28051fd06540eb7
+        OpenOCD: /usr/bin/openocd
+    NUCLEO_L452RE_P:
+      short: NUCLEO_L452RE_P
+      settings:
+        MBED_TARGET: NUCLEO_L452RE_P
+        UPLOAD_METHOD: OPENOCD
+        MBED_GREENTEA_SERIAL_PORT: /dev/ttyNUCLEO_L452RE_P
+        OPENOCD_ADAPTER_SERIAL: 066CFF515055657867071915
