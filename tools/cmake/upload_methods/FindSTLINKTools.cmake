@@ -18,7 +18,7 @@
 # STM32CubeProg_COMMAND - Command to run the STM32 command line programmer.
 # STLINK_gdbserver_COMMAND - Command to run the ST-Link GDB server.
 
-# first try to locate STM32CubeXXX tools in its default location
+# first try to locate STM32CubeXXX tools in their default location
 set(STM32CUBE_IDE_LINUX_HINTS "")
 set(STM32CUBE_IDE_WINDOWS_HINTS "")
 set(STM32CUBE_CLT_LINUX_HINTS "")
@@ -29,7 +29,7 @@ if(EXISTS "/opt/st")
     file(GLOB STM32CUBE_CLT_LINUX_HINTS LIST_DIRECTORIES TRUE "/opt/st/STM32CubeCLT*")
 endif()
 if(EXISTS "C:/ST/")
-    # On Windows, STM32CubeXXX tools by default is installed into a subdirectory of
+    # On Windows, STM32CubeXXX tools by default are installed into a subdirectory of
     # C:\ST\STM32CubeXXX_<version>\STM32CubeXXX, but may also be installed into
     # C:\ST\STM32CubeXXX directly
 
