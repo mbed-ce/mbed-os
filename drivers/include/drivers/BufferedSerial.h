@@ -339,8 +339,8 @@ private:
      *  By default buffer size is 256 for TX and 256 for RX. Configurable
      *  through mbed_app.json
      */
-    CircularBuffer<char, MBED_CONF_DRIVERS_UART_SERIAL_RXBUF_SIZE> _rxbuf;
-    CircularBuffer<char, MBED_CONF_DRIVERS_UART_SERIAL_TXBUF_SIZE> _txbuf;
+    CircularBuffer<uint16_t, MBED_CONF_DRIVERS_UART_SERIAL_RXBUF_SIZE> _rxbuf;
+    CircularBuffer<uint16_t, MBED_CONF_DRIVERS_UART_SERIAL_TXBUF_SIZE> _txbuf;
 
     rtos::Mutex _mutex;
 
