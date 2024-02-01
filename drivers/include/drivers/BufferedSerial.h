@@ -37,6 +37,9 @@
 #define MBED_CONF_DRIVERS_UART_SERIAL_TXBUF_SIZE  256
 #endif
 
+static_assert(MBED_CONF_DRIVERS_UART_SERIAL_RXBUF_SIZE <= (2**16), "Serial RX Buffer size too big");
+static_assert(MBED_CONF_DRIVERS_UART_SERIAL_TXBUF_SIZE <= (2**16), "Serial TX Buffer size too big");
+
 namespace mbed {
 /**
  * \defgroup drivers_BufferedSerial BufferedSerial class
