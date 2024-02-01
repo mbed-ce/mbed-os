@@ -72,12 +72,12 @@ void BufferedSerial::set_format(int bits, Parity parity, int stop_bits)
     api_unlock();
 }
 
-size_t BufferedSerial::txbuf_size()
+size_t BufferedSerial::txbuf_size() const
 {
     return _txbuf.size();
 }
 
-size_t BufferedSerial::rxbuf_size()
+size_t BufferedSerial::rxbuf_size() const
 {
     return _rxbuf.size();
 }
