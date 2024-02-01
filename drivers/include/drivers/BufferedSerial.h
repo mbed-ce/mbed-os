@@ -267,6 +267,18 @@ public:
         int bits = 8, Parity parity = BufferedSerial::None, int stop_bits = 1
     );
 
+    /** Get the current used size of the tx buffer
+     *
+     *  @return The number of elements in the tx buffer
+     */
+    size_t txbuf_size() const;
+
+    /** Get the current used size of the rx buffer
+     *
+     *  @return The number of elements in the rx buffer
+     */
+    size_t rxbuf_size() const;
+
 #if DEVICE_SERIAL_FC
     // For now use the base enum - but in future we may have extra options
     // such as XON/XOFF or manual GPIO RTSCTS.

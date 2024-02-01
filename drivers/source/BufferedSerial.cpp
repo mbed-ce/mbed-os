@@ -72,6 +72,16 @@ void BufferedSerial::set_format(int bits, Parity parity, int stop_bits)
     api_unlock();
 }
 
+size_t BufferedSerial::txbuf_size()
+{
+    return _txbuf.size();
+}
+
+size_t BufferedSerial::rxbuf_size()
+{
+    return _rxbuf.size();
+}
+
 #if DEVICE_SERIAL_FC
 void BufferedSerial::set_flow_control(Flow type, PinName flow1, PinName flow2)
 {
