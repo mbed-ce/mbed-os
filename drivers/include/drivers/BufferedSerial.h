@@ -271,13 +271,13 @@ public:
      *
      *  @return The number of elements in the tx buffer
      */
-    size_t txbuf_size() const;
+    uint16_t txbuf_size() const;
 
     /** Get the current used size of the rx buffer
      *
      *  @return The number of elements in the rx buffer
      */
-    size_t rxbuf_size() const;
+    uint16_t rxbuf_size() const;
 
 #if DEVICE_SERIAL_FC
     // For now use the base enum - but in future we may have extra options
