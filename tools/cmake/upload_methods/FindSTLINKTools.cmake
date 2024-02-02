@@ -46,7 +46,9 @@ find_path(STM32CUBE_IDE_PATH
         /Applications/STM32CubeIDE.app/Contents/Eclipse # OS X
         )
 find_path(STM32CUBE_CLT_PATH
-        NAMES uninstall.exe
+        NAMES    
+            uninstall.exe  # Windows
+            uninstall_clt.sh # Linux
         DOC "Path to STM32CubeCLT.  Used to find the ST-Link Tools"
         PATHS
             ${STM32CUBE_CLT_WINDOWS_HINTS} # Windows
