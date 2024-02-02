@@ -25,8 +25,8 @@ set(STM32CUBE_CLT_LINUX_HINTS "")
 set(STM32CUBE_CLT_WINDOWS_HINTS "")
 if(EXISTS "/opt/st")
     # Linux directory has version number
-    file(GLOB STM32CUBE_IDE_LINUX_HINTS LIST_DIRECTORIES TRUE "/opt/st/STM32CubeIDE*")
-    file(GLOB STM32CUBE_CLT_LINUX_HINTS LIST_DIRECTORIES TRUE "/opt/st/STM32CubeCLT*")
+    file(GLOB STM32CUBE_IDE_LINUX_HINTS LIST_DIRECTORIES TRUE "/opt/st/stm32cubeide*")
+    file(GLOB STM32CUBE_CLT_LINUX_HINTS LIST_DIRECTORIES TRUE "/opt/st/stm32cubeclt*")
 endif()
 if(EXISTS "C:/ST/")
     # On Windows, STM32CubeXXX tools by default are installed into a subdirectory of
