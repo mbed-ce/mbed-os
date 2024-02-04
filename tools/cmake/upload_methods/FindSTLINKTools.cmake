@@ -45,7 +45,7 @@ find_path(STM32CUBE_IDE_PATH
 find_path(STM32CUBE_CLT_PATH
         NAMES    
             STM32CubeCLT_metadata.bat # Windows
-            uninstall_clt.sh # Linux
+            STM32CubeCLT_metadata.sh # Linux
         DOC "Path to STM32CubeCLT.  Used to find the ST-Link Tools"
         PATHS
             ${STM32CUBE_CLT_WINDOWS_HINTS} # Windows
