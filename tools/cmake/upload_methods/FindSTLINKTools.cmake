@@ -5,11 +5,8 @@
 # CMake finder for STMicro's STM32 upload and debugging tools
 #
 # This module accepts the following components (blame ST for the capitalization, not me):
-#  - STM32CubeCLT/STM32CubeProg
-#  - STM32CubeCLT/STLINK_gdbserver
-# or alternative option
-#  - STM32CubeIDE/STM32CubeProg
-#  - STM32CubeIDE/STLINK_gdbserver
+# - STM32CubeProg
+# - STLINK_gdbserver
 #
 # This module defines:
 # STLINKTools_FOUND - Whether the requested components were found.
