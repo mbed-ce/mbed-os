@@ -2,5 +2,5 @@
 # SPDX-License-Identifier: Apache-2.0
 
 if("COMPONENT_MULTITECH_DRAGONFLY_NANO_CELLULAR=1" IN_LIST MBED_TARGET_DEFINITIONS)
-	add_subdirectory(DragonflyNano)
+	add_subdirectory(COMPONENT_MULTITECH_DRAGONFLY_NANO_CELLULAR)
 endif()
