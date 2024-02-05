@@ -1,8 +1,18 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+if("COMPONENT_QUECTEL_EC2X=1" IN_LIST MBED_TARGET_DEFINITIONS)
+	add_subdirectory(EC2X)
+endif()
+
+if("COMPONENT_QUECTEL_BG96=1" IN_LIST MBED_TARGET_DEFINITIONS OR ("COMPONENT_STMOD_CELLULAR=1" IN_LIST MBED_TARGET_DEFINITIONS AND "MBED_CONF_STMOD_CELLULAR_TYPE=STMOD_BG96"))
+	add_subdirectory(BG96)
+endif()
+
+if("COMPONENT_QUECTEL_UG96=1" IN_LIST MBED_TARGET_DEFINITIONS OR ("COMPONENT_STMOD_CELLULAR=1" IN_LIST MBED_TARGET_DEFINITIONS AND "MBED_CONF_STMOD_CELLULAR_TYPE=STMOD_UG96"))
+	add_subdirectory(UG96)
+endif()
+
 add_subdirectory(BC95)
-add_subdirectory(BG96)
-add_subdirectory(EC2X)
 add_subdirectory(M26)
-add_subdirectory(UG96)
+

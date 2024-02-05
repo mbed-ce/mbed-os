@@ -10,3 +10,7 @@ target_sources(mbed-cellular
     PRIVATE
         QUECTEL_EC2X.cpp
 )
+
+if("MTS_DRAGONFLY_L496VG" IN_LIST MBED_TARGET_LABELS)
+	add_subdirectory(TARGET_MTS_DRAGONFLY_L496VG)
+endif()

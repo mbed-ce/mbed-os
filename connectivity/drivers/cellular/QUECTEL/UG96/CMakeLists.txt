@@ -11,3 +11,7 @@ target_sources(mbed-cellular
         QUECTEL_UG96.cpp
         QUECTEL_UG96_CellularContext.cpp
 )
+
+if("TARGET_WIO_3G" IN_LIST MBED_TARGET_LABELS)
+	add_subdirectory(TARGET_WIO_3G)
+endif()

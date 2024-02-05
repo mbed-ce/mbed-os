@@ -15,3 +15,7 @@ target_sources(mbed-cellular
         QUECTEL_BG96_CellularStack.cpp
         QUECTEL_BG96_ControlPlane_netif.cpp
 )
+
+if("TARGET_WIO_BG96" IN_LIST MBED_TARGET_LABELS)
+	add_subdirectory(TARGET_WIO_BG96)
+endif()
