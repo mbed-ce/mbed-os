@@ -111,7 +111,7 @@ void ONBOARD_SARA4_PPP::onboard_modem_deinit()
 void ONBOARD_SARA4_PPP::onboard_modem_power_up()
 {
     // Make sure the radio is initialized so it can be powered on.
-    if (!initialized){
+    if (!initialized) {
         onboard_modem_init();
     }
 
@@ -129,7 +129,7 @@ void ONBOARD_SARA4_PPP::onboard_modem_power_up()
     uint8_t retries = 5;
     do {
         // If it hasn't turned on after multiple tries, exit and return.
-        if(0 == retries--) {
+        if (0 == retries--) {
             return;
         }
         // Activate PWR_ON for 150ms-3.2s to switch on. Reference ublox SARA-R4 data sheet.
@@ -153,7 +153,7 @@ void ONBOARD_SARA4_PPP::onboard_modem_power_down()
     }
 
     // Make sure the I/O are properly initialized.
-    if (!initialized){
+    if (!initialized) {
         onboard_modem_init();
     }
     // Activate PWR_ON for at least 1.5s to switch off. Reference ublox SARA-R4 data sheet.

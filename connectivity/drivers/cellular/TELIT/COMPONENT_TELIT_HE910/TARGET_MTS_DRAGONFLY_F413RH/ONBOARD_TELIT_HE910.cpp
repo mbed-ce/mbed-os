@@ -81,8 +81,7 @@ void ONBOARD_TELIT_HE910::power_up()
     // Do nothing if it's already powered.
     if (gpio_read(&radioOn)) {
         return;
-    }
-    else {
+    } else {
         // power it up.
         release_power_button();
     }
@@ -107,12 +106,11 @@ void ONBOARD_TELIT_HE910::power_down()
     // Do nothing if it's already off.
     if (!gpio_read(&radioOn)) {
         return;
-    }
-    else {
+    } else {
         // power down.
         press_power_button();
     }
-    
+
     // wait a max of 60s for 1.8v to go low.
     volatile int v1_8 = 1;
     uint8_t timeout = 60;

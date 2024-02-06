@@ -127,11 +127,11 @@ void ONBOARD_QUECTEL_EG25::onboard_modem_power_up()
 {
     // NET_STATUS = input. InterruptIn make LS LED follow.
     // LS_LED = output. Follow NET_STATUS.
-    net_status->rise(callback(this,&ONBOARD_QUECTEL_EG25::link_status));
-    net_status->fall(callback(this,&ONBOARD_QUECTEL_EG25::link_status));
+    net_status->rise(callback(this, &ONBOARD_QUECTEL_EG25::link_status));
+    net_status->fall(callback(this, &ONBOARD_QUECTEL_EG25::link_status));
 
     // Make sure the radio is initialized so it can be powered on.
-    if (!initialized){
+    if (!initialized) {
         onboard_modem_init();
     }
 
@@ -152,7 +152,7 @@ void ONBOARD_QUECTEL_EG25::onboard_modem_power_up()
     do {
         thread_sleep_for(1000);
         radio_off = gpio_read(&status);
-        if(!timeout--){
+        if (!timeout--) {
             press_power_button(550000);
             timeout = 10;
         }
@@ -186,7 +186,7 @@ void ONBOARD_QUECTEL_EG25::onboard_modem_power_down()
     }
 
     // Make sure the I/O are properly initialized.
-    if (!initialized){
+    if (!initialized) {
         onboard_modem_init();
     }
 
@@ -202,12 +202,10 @@ void ONBOARD_QUECTEL_EG25::onboard_modem_power_down()
 
         if (radio_off) {
             break;
-        }
-        else {
+        } else {
             onboard_modem_reset();
         }
-    }
-    while (!radio_off);
+    } while (!radio_off);
 }
 
 void ONBOARD_QUECTEL_EG25::onboard_modem_reset()
