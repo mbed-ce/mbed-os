@@ -1,4 +1,4 @@
-# Copyright (c) 2020 ARM Limited. All rights reserved.
+# Copyright (c) 2024 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 target_include_directories(mbed-cellular
@@ -8,5 +8,5 @@ target_include_directories(mbed-cellular
 
 target_sources(mbed-cellular
     PRIVATE
-        TELIT_HE910.cpp
+        ONBOARD_QUECTEL_BC95.cpp
 )

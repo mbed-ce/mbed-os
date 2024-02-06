@@ -78,10 +78,47 @@
             "friendly_name": "Quectel BG96"
         },
         "COMPONENT_QUECTEL_UG96": {
-        	"description": "3G module",
+        	"description": "3G cellular module",
             "friendly_name": "Quectel UG96"
         },
+        "COMPONENT_QUECTEL_BC95": {
+        	"description": "Narrowband Internet of Things (NB-IoT) cellular module",
+            "friendly_name": "Quectel BC95"
+        },
+        "COMPONENT_QUECTEL_M26": {
+        	"description": "GSM GPRS cellular module",
+            "friendly_name": "Quectel M26"
+        },
+        "COMPONENT_RIOTMICRO_RM1000": {
+    		"description": "LTE + NB-IoT cellular module",
+            "friendly_name": "Riot Micro RM1000"
+        },
+        "COMPONENT_TELIT_HE910": {
+        	"description": "3G module",
+            "friendly_name": "Telit HE910"
+        },
+        "COMPONENT_TELIT_ME310": {
+        	"description": "LTE + GSM + GNSS module",
+            "friendly_name": "Telit ME310"
+        },
+		"COMPONENT_TELIT_ME910": {
+        	"description": "LTE + GSM + GNSS module",
+            "friendly_name": "Telit ME910"
+        },
 
+// 802.15.4 modules -----------------------------------------------------------------
+		"COMPONENT_MICROCHIP_AT86RF": {
+        	"description": "AT86RF233 and AT86RF212B 802.15.4 modules",
+            "friendly_name": "Microchip/Atmel AT86RF"
+        },
+        "COMPONENT_NXP_MCR20A": {
+        	"description": "802.15.4 module",
+            "friendly_name": "NXP/Freescale MCR20A"
+        },
+        "COMPONENT_STM_S2_LP": {
+        	"description": "802.15.4 module, present on X-Nucleo-S2868A1 board",
+            "friendly_name": "NXP/Freescale MCR20A"
+        },
 
 // Other ----------------------------------------------------------------------------
 

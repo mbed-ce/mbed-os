@@ -14,3 +14,7 @@ target_sources(mbed-cellular
         QUECTEL_BC95_CellularNetwork.cpp
         QUECTEL_BC95_CellularStack.cpp
 )
+
+if("TARGET_ADV_WISE_1570" IN_LIST MBED_TARGET_LABELS)
+	add_subdirectory(TARGET_ADV_WISE_1570)
+endif()

@@ -1889,6 +1889,9 @@
         "device_name": "STM32F411RETx",
         "detect_code": [
             "0454"
+        ],
+        "components_add": [
+            "TELIT_HE910"
         ]
     },
     "MTS_MDOT_F411RE": {
@@ -2048,7 +2051,8 @@
             "SERIAL_FC"
         ],
         "components_add": [
-            "SPIF"
+            "SPIF",
+            "TELIT_HE910"
         ],
         "device_name": "STM32F413RHTx"
     },
@@ -4437,6 +4441,8 @@
         ],
         "device_name": "STM32L486RGTx"
     },
+    // AKA Advantech WISE-1570
+    // This board is EOL from the manufacturer so it is a candidate for removal.
     "ADV_WISE_1570": {
         "inherits": [
             "MCU_STM32L486xG"
@@ -4451,7 +4457,10 @@
             "WISE_1570"
         ],
         "device_name": "STM32L486RGTx",
-        "OUTPUT_EXT": "hex"
+        "OUTPUT_EXT": "hex",
+        "components_add": [
+            "QUECTEL_BC95"
+        ]
     },
     "MCU_STM32L496xG": {
         "inherits": [
@@ -6079,7 +6088,7 @@
             "RTC",
             "ANALOGIN",
             "CAN",
-            "ETHERNET",
+            "EMAC",
             "I2C",
             "I2CSLAVE",
             "I2C_ASYNCH",
@@ -6350,7 +6359,6 @@
             "PORTINOUT",
             "PORTOUT",
             "PWMOUT",
-            "SD",
             "SERIAL",
             "SERIAL_FC",
             "SPI",
@@ -8603,8 +8611,6 @@
             "BLE"
         ],
         "components_add": [
-            "CAT1A",
-            "CAT1",
             "WHD",
             "4343W",
             "CYW43XXX"
@@ -9173,7 +9179,7 @@
             "network-default-interface-type": "ETHERNET"
         }
     },
-    "EP_AGORA": {
+    "EP_AGORA": { // AKA Embedded Planet Agora (w/ dev kit for flashing and debugging) https://www.embeddedplanet.com/agora/
         "inherits": [
             "MCU_NRF52840"
         ],
@@ -9189,7 +9195,10 @@
                 "help": "Enable inclusion of objects_extensions.h",
                 "value": false
             }
-        }
+        },
+        "components_add": [
+            "TELIT_ME910"
+        ]
     },
     "MCU_M261": {
         "core": "Cortex-M23",
@@ -9374,7 +9383,7 @@
             "3701"
         ]
     },
-    "EP_ATLAS": {
+    "EP_ATLAS": { // AKA Embedded Planet Atlas board. https://www.embeddedplanet.com/chronos/#atlas
         "inherits": ["MCU_NRF52840"],
         "device_name": "nRF52840_xxAA",
         "supported_form_factors": [],
@@ -9390,7 +9399,7 @@
                 "macro_name": "MODEM_ON_BOARD_UART"
             }
         },
-        "components_add": ["SPIF"],
+        "components_add": ["SPIF", "TELIT_ME310"],
         "components_remove": ["QSPIF"],
         "release_versions": ["5"],
         "macros_add": [

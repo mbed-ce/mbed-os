@@ -3,7 +3,8 @@
 
 add_library(mbed-802.15.4-rf STATIC EXCLUDE_FROM_ALL)
 
-target_link_libraries(mbed-802.15.4-rf PUBLIC mbed-core-flags)
+# Nanostack drivers always require Mbed RTOS
+target_link_libraries(mbed-802.15.4-rf PUBLIC mbed-core-flags mbed-rtos-flags)
 
 if("Freescale" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_Freescale)
