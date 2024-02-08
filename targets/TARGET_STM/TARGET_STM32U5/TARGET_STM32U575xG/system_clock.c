@@ -103,6 +103,7 @@ MBED_WEAK void SetSysClock(void)
 
 // Output clock on LSCO pin(PA2) for debugging purpose
 // LSE is set with the low power ticker
+HAL_RCCEx_DisableLSCO();
 #if DEBUG_LSCO == 1
     HAL_RCCEx_EnableLSCO(RCC_LSCOSOURCE_LSE); // 32 kHz
 #endif
