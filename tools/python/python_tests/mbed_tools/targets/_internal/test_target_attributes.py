@@ -21,7 +21,7 @@ class TestExtractTargetAttributes(TestCase):
             "Target_2": "some more attributes",
         }
         with self.assertRaises(TargetNotFoundError):
-            _extract_target_attributes(all_targets_data, "Unlisted_Target")
+            _extract_target_attributes(all_targets_data, "Unlisted_Target", False)
 
     def test_target_found(self):
         target_attributes = {"attribute1": "something"}
@@ -31,7 +31,7 @@ class TestExtractTargetAttributes(TestCase):
             "Target_2": "some more attributes",
         }
         # When not explicitly included public is assumed to be True
-        self.assertEqual(_extract_target_attributes(all_targets_data, "Target_1"), target_attributes)
+        self.assertEqual(_extract_target_attributes(all_targets_data, "Target_1", False), target_attributes)
 
     def test_target_public(self):
         all_targets_data = {
@@ -39,7 +39,7 @@ class TestExtractTargetAttributes(TestCase):
             "Target_2": "some more attributes",
         }
         # The public attribute affects visibility but is removed from result
-        self.assertEqual(_extract_target_attributes(all_targets_data, "Target_1"), {"attribute1": "something"})
+        self.assertEqual(_extract_target_attributes(all_targets_data, "Target_1", False), {"attribute1": "something"})
 
     def test_target_private(self):
         all_targets_data = {
@@ -47,7 +47,10 @@ class TestExtractTargetAttributes(TestCase):
             "Target_2": "some more attributes",
         }
         with self.assertRaises(TargetNotFoundError):
-            _extract_target_attributes(all_targets_data, "Target_1"),
+            _extract_target_attributes(all_targets_data, "Target_1", False)
+
+        # Should be able to get it if we pass the allow non public flag
+        self.assertEqual(_extract_target_attributes(all_targets_data, "Target_1", True), {"attribute1": "something"})
 
 
 class TestGetTargetAttributes(TestCase):
