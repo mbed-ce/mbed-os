@@ -23,7 +23,6 @@ if("WICED" IN_LIST MBED_TARGET_LABELS)
 endif()
 
 if("STM" IN_LIST MBED_TARGET_LABELS)
-	create_mbed_wifi_target()
     add_subdirectory(TARGET_STM EXCLUDE_FROM_ALL)
 endif()
 
