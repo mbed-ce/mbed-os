@@ -63,9 +63,9 @@ class TestGetTargetAttributes(TestCase):
         build_attributes = {"attribute": "value"}
         extract_target_attributes.return_value = build_attributes
 
-        result = get_target_attributes(targets_json_data, target_name)
+        result = get_target_attributes(targets_json_data, target_name, False)
 
-        extract_target_attributes.assert_called_once_with(targets_json_data, target_name)
+        extract_target_attributes.assert_called_once_with(targets_json_data, target_name, False)
         get_labels_for_target.assert_called_once_with(targets_json_data, target_name)
         extract_core_labels.assert_called_once_with(build_attributes.get("core", None))
         self.assertEqual(result, extract_target_attributes.return_value)
