@@ -77,7 +77,7 @@ endif()
 # the user can override them by changing variable values after including app.cmake.
 #
 # default expected paths
-set(EXPECTED_CUSTOM_UPLOAD_CFG_FILE_PATH ${CMAKE_SOURCE_DIR}/custom_targets/${MBED_TARGET}/${MBED_TARGET}.cmake)
+set(EXPECTED_CUSTOM_UPLOAD_CFG_FILE_PATH ${CMAKE_SOURCE_DIR}/custom_targets/upload_method_cfg/${MBED_TARGET}.cmake)
 set(EXPECTED_MBED_UPLOAD_CFG_FILE_PATH ${CMAKE_SOURCE_DIR}/mbed-os/targets/upload_method_cfg/${MBED_TARGET}.cmake)
 
 # check if a custom upload config path is defined in top lvl cmake
