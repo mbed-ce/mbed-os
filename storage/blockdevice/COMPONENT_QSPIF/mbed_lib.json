@@ -18,11 +18,16 @@
         "QSPI_POLARITY_MODE": 0,
         "QSPI_FREQ": "40000000",
         "QSPI_MIN_READ_SIZE": "1",
-        "QSPI_MIN_PROG_SIZE": "1"
+        "QSPI_MIN_PROG_SIZE": "1",
+        "QSPI_MACRONIX_NUM_STATUS_REGISTER": {
+            "help": "For most of Macronix QSPI flashes, they only have 2 status registers.  However, some, e.g. MX25R6435F, have 3.  This option can be used to control how many status registers the flash is assumed to have.",
+            "value": "2"
+        }
     },
     "target_overrides": {
         "MX25R6435F": {
-            "QSPI_FREQ": "8000000"
+            "QSPI_FREQ": "8000000",
+	        "QSPI_MACRONIX_NUM_STATUS_REGISTER":"3"
         },
         "MX25L51245G": {
             "QSPI_FREQ": "8000000"

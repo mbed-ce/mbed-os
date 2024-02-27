@@ -25,6 +25,10 @@
 #define MBED_CONF_MBED_TRACE_ENABLE        0
 #endif
 
+#ifndef MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER
+#define MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER 2
+#endif
+
 #include "mbed-trace/mbed_trace.h"
 #define TRACE_GROUP "QSPIF"
 
@@ -1108,12 +1112,12 @@ int QSPIFBlockDevice::_handle_vendor_quirks()
             break;
         case 0xc2:
             // Macronix devices have several quirks:
-            // 1. Have one status register and 2 config registers, with a nonstandard instruction for reading the config registers
+            // 1. Have one status register and several config registers, with a nonstandard instruction for reading the config registers
             // 2. Require setting a "fast mode" bit in config register 2 to operate at higher clock rates
             // 3. Should never attempt to enable 4-byte addressing (it causes reads and writes to fail)
             tr_debug("Applying quirks for macronix");
             _needs_fast_mode = true;
-            _num_status_registers = 3;
+            _num_status_registers = MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER;
             _read_status_reg_2_inst = QSPIF_INST_RDCR;
             break;
         case 0x9d:
