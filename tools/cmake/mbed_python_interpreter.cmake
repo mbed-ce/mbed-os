@@ -59,7 +59,7 @@ if(MBED_CREATE_PYTHON_VENV)
             COMMAND_ERROR_IS_FATAL ANY
         )
 
-        message("Mbed: venv created successfully")
+        message(STATUS "Mbed: venv created successfully")
         file(TOUCH ${VENV_STAMP_FILE})
     endif()
 
