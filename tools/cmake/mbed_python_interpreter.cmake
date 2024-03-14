@@ -27,12 +27,6 @@ if(MBED_CREATE_PYTHON_VENV)
     endif()
 
     if(NEED_TO_CREATE_VENV)
-        check_python_package(venv HAVE_PYTHON_VENV)
-        if(NOT HAVE_PYTHON_VENV)
-            message(FATAL_ERROR "Need the venv python package installed in interpreter at ${Python3_EXECUTABLE} to create a venv.
-To disable venv creation, set MBED_CREATE_PYTHON_VENV to false.")
-        endif()
-
         # Using approach from here: https://discourse.cmake.org/t/possible-to-create-a-python-virtual-env-from-cmake-and-then-find-it-with-findpython3/1132/2
         message(STATUS "Mbed: Creating virtual environment with Python interpreter ${Python3_EXECUTABLE}")
         execute_process(
