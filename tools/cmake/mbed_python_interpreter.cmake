@@ -4,18 +4,22 @@
 # CMake script to find the Python interpreter and either install or find
 # Mbed's dependencies.
 
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
-include(CheckPythonPackage)
-
 option(MBED_CREATE_PYTHON_VENV "If true, Mbed OS will create its own virtual environment (venv) and install its Python packages there.  This removes the need to manually install Python packages." TRUE)
 
 if(MBED_CREATE_PYTHON_VENV)
-    # Create venv.
+    # Use the venv.
+
     # Note: venv is stored in the source directory as it can be shared between all the build directories
     # (not target specific)
     set(MBED_VENV_LOCATION ${CMAKE_SOURCE_DIR}/mbed-os/venv)
     set(VENV_STAMP_FILE ${MBED_VENV_LOCATION}/mbed-venv.stamp)
     set(MBED_REQUIREMENTS_TXT_LOCATION "${CMAKE_CURRENT_LIST_DIR}/../requirements.txt")
+
+    # Find Python3, using the venv if it already exists
+    set (ENV{VIRTUAL_ENV} ${MBED_VENV_LOCATION})
+    set (Python3_FIND_VIRTUALENV FIRST)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    include(CheckPythonPackage)
 
     set(NEED_TO_CREATE_VENV FALSE)
     set(NEED_TO_INSTALL_PACKAGES FALSE)
@@ -27,17 +31,14 @@ if(MBED_CREATE_PYTHON_VENV)
     endif()
 
     if(NEED_TO_CREATE_VENV)
+        # Create venv.
         # Using approach from here: https://discourse.cmake.org/t/possible-to-create-a-python-virtual-env-from-cmake-and-then-find-it-with-findpython3/1132/2
         message(STATUS "Mbed: Creating virtual environment with Python interpreter ${Python3_EXECUTABLE}")
         execute_process(
             COMMAND ${Python3_EXECUTABLE} -m venv ${MBED_VENV_LOCATION}
             COMMAND_ERROR_IS_FATAL ANY
         )
-
-        ## update the environment with VIRTUAL_ENV variable (mimic the activate script)
-        set (ENV{VIRTUAL_ENV} ${MBED_VENV_LOCATION})
-        ## change the context of the search
-        set (Python3_FIND_VIRTUALENV ONLY)
+        
         ## Reset FindPython3 cache variables so it will run again
         unset(Python3_EXECUTABLE)
         unset(_Python3_EXECUTABLE CACHE)
@@ -67,6 +68,10 @@ if(MBED_CREATE_PYTHON_VENV)
     set(HAVE_MEMAP_DEPS TRUE)
 
 else()
+
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    include(CheckPythonPackage)
+
 
     # Check python packages
     set(PYTHON_PACKAGES_TO_CHECK intelhex prettytable future jinja2)
