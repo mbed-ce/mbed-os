@@ -107,9 +107,11 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 #if HSE_VALUE==8000000
     RCC_OscInitStruct.PLL.PLLM = 4;   // 2 MHz
     RCC_OscInitStruct.PLL.PLLN = 480; // 960 MHz
+    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_1; // HSE_VALUE / DIVM is between 2 and 4 MHz
 #elif HSE_VALUE==25000000
     RCC_OscInitStruct.PLL.PLLM = 5;   // 5 MHz
     RCC_OscInitStruct.PLL.PLLN = 192; // 960 MHz
+    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_2; // HSE_VALUE / DIVM is between 4 and 8 MHz
 #else
 #error Unsupported externall clock value, check HSE_VALUE define
 #endif
@@ -118,7 +120,6 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     RCC_OscInitStruct.PLL.PLLR = 2;
     RCC_OscInitStruct.PLL.PLLFRACN = 0;
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
-    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_1;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         return 0; // FAIL
     }
@@ -158,18 +159,25 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 /******************************************************************************/
 uint8_t SetSysClock_PLL_HSI(void)
 {
-    RCC_ClkInitTypeDef RCC_ClkInitStruct;
-    RCC_OscInitTypeDef RCC_OscInitStruct;
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
-    /* Configure the main internal regulator output voltage */
+    /* First step voltage regulator up to full voltage */
     __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
     while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
+
+    /* Then enable overdrive mode (needed to hit 480MHz) */
+    __HAL_RCC_SYSCFG_CLK_ENABLE();
+    __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
+
+    while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
 
     // Enable HSI oscillator and activate PLL with HSI as source
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_CSI;
     RCC_OscInitStruct.HSIState = RCC_HSI_ON;
     RCC_OscInitStruct.HSEState = RCC_HSE_OFF;
     RCC_OscInitStruct.CSIState = RCC_CSI_OFF;
+    RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
     RCC_OscInitStruct.PLL.PLLM = 8;    // 8 MHz
@@ -178,7 +186,7 @@ uint8_t SetSysClock_PLL_HSI(void)
     RCC_OscInitStruct.PLL.PLLQ = 96;   // PLL1Q used for FDCAN = 10 MHz
     RCC_OscInitStruct.PLL.PLLR = 2;
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
-    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_2;
+    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3; // HSI freq (64MHz) / DIVM is between 8 and 16 MHz
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         return 0; // FAIL
     }
