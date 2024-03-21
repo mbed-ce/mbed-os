@@ -25,7 +25,7 @@
 #include "PeripheralPins.h"
 
 
-void analogin_pll_configuration(void)
+void analogin_clock_configuration(void)
 {
 #if defined(DUAL_CORE)
     while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID)) {
@@ -34,15 +34,7 @@ void analogin_pll_configuration(void)
 
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-    PeriphClkInitStruct.PLL2.PLL2M = 4;
-    PeriphClkInitStruct.PLL2.PLL2N = 240;
-    PeriphClkInitStruct.PLL2.PLL2P = 2;
-    PeriphClkInitStruct.PLL2.PLL2Q = 2;
-    PeriphClkInitStruct.PLL2.PLL2R = 2;
-    PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_1;
-    PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
-    PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
-    PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
+    PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_CLKP;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         error("analogin_init HAL_RCCEx_PeriphCLKConfig");
     }
@@ -77,6 +69,8 @@ void analogin_init(analogin_t *obj, PinName pin)
     MBED_ASSERT(obj->handle.Instance != (ADC_TypeDef *)NC);
     MBED_ASSERT(function != (uint32_t)NC);
 
+    analogin_clock_configuration();
+
     obj->channel = STM_PIN_CHANNEL(function);
     obj->differential = STM_PIN_INVERTED(function);
 
@@ -85,7 +79,12 @@ void analogin_init(analogin_t *obj, PinName pin)
 
     // Configure ADC object structures
     obj->handle.State = HAL_ADC_STATE_RESET;
-    obj->handle.Init.ClockPrescaler           = ADC_CLOCK_ASYNC_DIV4;
+    
+    // With PER_CLK as the ADC async clock source, this gives 32MHz f_adc_ker_clk, which is
+    // the max supported.  Note that there is an additional /2 fixed divider so dividing by 1
+    // here actually divides by 2.
+    obj->handle.Init.ClockPrescaler           = ADC_CLOCK_ASYNC_DIV1;
+
     obj->handle.Init.Resolution               = ADC_RESOLUTION_16B;
     obj->handle.Init.ScanConvMode             = ADC_SCAN_DISABLE;
     obj->handle.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
@@ -100,8 +99,6 @@ void analogin_init(analogin_t *obj, PinName pin)
     obj->handle.Init.Overrun                  = ADC_OVR_DATA_OVERWRITTEN;
     obj->handle.Init.LeftBitShift             = ADC_LEFTBITSHIFT_NONE;
     obj->handle.Init.OversamplingMode         = DISABLE;
-
-    analogin_pll_configuration();
 
 #if defined(ADC1)
     if ((ADCName)obj->handle.Instance == ADC_1) {
@@ -142,9 +139,6 @@ void analogin_init(analogin_t *obj, PinName pin)
 uint16_t adc_read(analogin_t *obj)
 {
     ADC_ChannelConfTypeDef sConfig = {0};
-
-    /* Reconfigure PLL as it could be lost during deepsleep */
-    analogin_pll_configuration();
 
     // Configure ADC channel
     sConfig.Rank         = ADC_REGULAR_RANK_1;
