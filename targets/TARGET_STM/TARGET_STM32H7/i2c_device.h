@@ -30,6 +30,11 @@ extern "C" {
 #define I2C_IP_VERSION_V2
 
 // Note: Below values are generated using STM32Cube IDE
+#define TIMING_VAL_140M_CLK_100KHZ 0x70B1445E   // Standard mode with Rise Time = 400ns and Fall Time = 100ns
+#define TIMING_VAL_140M_CLK_400KHZ 0x30C11233   // Fast mode with Rise Time = 250ns and Fall Time = 100ns
+#define TIMING_VAL_140M_CLK_1MHZ   0x00F41B47   // Fast mode Plus with Rise Time = 60ns and Fall Time = 100ns
+#define I2C_PCLK_140M              140000000    // 140 MHz
+
 #define TIMING_VAL_137M5_CLK_100KHZ 0x70B1445B   // Standard mode with Rise Time = 400ns and Fall Time = 100ns
 #define TIMING_VAL_137M5_CLK_400KHZ 0x80510815   // Fast mode with Rise Time = 250ns and Fall Time = 100ns
 #define TIMING_VAL_137M5_CLK_1MHZ   0x00F41A46   // Fast mode Plus with Rise Time = 60ns and Fall Time = 100ns
@@ -39,6 +44,11 @@ extern "C" {
 #define TIMING_VAL_120M_CLK_400KHZ 0x20C11434   // Fast mode with Rise Time = 250ns and Fall Time = 100ns
 #define TIMING_VAL_120M_CLK_1MHZ   0x00C31536   // Fast mode Plus with Rise Time = 60ns and Fall Time = 100ns
 #define I2C_PCLK_120M              120000000    // 120 MHz
+
+#define TIMING_VAL_112M5_CLK_100KHZ 0x80813142   // Standard mode with Rise Time = 400ns and Fall Time = 100ns
+#define TIMING_VAL_112M5_CLK_400KHZ 0x20D11337   // Fast mode with Rise Time = 250ns and Fall Time = 100ns
+#define TIMING_VAL_112M5_CLK_1MHZ   0x00C31538   // Fast mode Plus with Rise Time = 60ns and Fall Time = 100ns
+#define I2C_PCLK_112M5              112500000    // 112.5 MHz
 
 #define TIMING_VAL_100M_CLK_100KHZ 0x50A14159   // Standard mode with Rise Time = 400ns and Fall Time = 100ns
 #define TIMING_VAL_100M_CLK_400KHZ 0x20B11130   // Fast mode with Rise Time = 250ns and Fall Time = 100ns

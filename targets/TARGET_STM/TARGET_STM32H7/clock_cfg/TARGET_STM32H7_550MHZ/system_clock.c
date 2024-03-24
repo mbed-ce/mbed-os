@@ -35,7 +35,8 @@
   * 
   * Note that 550MHz is the "overdrive" mode and is basically an overclock.  It is only supported
   * under certain conditions (LDO in use) and cannot be used over the full temperature range.
-  * For industrial applications it is recommended to disable overdrive.
+  * For industrial applications it is recommended to disable overdrive. Overdrive can be enabled/
+  * disabled via the "target.enable-overdrive-mode" option in mbed_app.json.
   * 
 **/
 
@@ -45,7 +46,7 @@
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC     0x8  // Use external clock (ST Link MCO or CMOS oscillator)
 #define USE_PLL_HSE_XTAL     0x4  // Use external xtal (not provided by default on nucleo boards)
-#define USE_PLL_HSI          0x2  // Use HSI internal clock
+#define USE_PLL_HSI          0x2  // Use HSI internal (VCO) clock
 
 #if ( ((CLOCK_SOURCE) & USE_PLL_HSE_XTAL) || ((CLOCK_SOURCE) & USE_PLL_HSE_EXTC) )
 uint8_t SetSysClock_PLL_HSE(uint8_t bypass);
@@ -141,9 +142,9 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
         RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_1; // PLL1 input clock is between 2 and 4 MHz
 
 #if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
-        RCC_OscInitStruct.PLL.PLLN = 275; // PLL1 internal clock = 550 MHz
+        RCC_OscInitStruct.PLL.PLLN = 275; // PLL1 internal (VCO) clock = 550 MHz
 #else
-        RCC_OscInitStruct.PLL.PLLN = 200; // PLL1 internal clock = 400 MHz
+        RCC_OscInitStruct.PLL.PLLN = 200; // PLL1 internal (VCO) clock = 400 MHz
 #endif
     }
     else if(HSE_VALUE % 5000000 == 0)
@@ -152,9 +153,9 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
         RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_2; // PLL1 input clock is between 4 and 8 MHz
 
 #if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
-        RCC_OscInitStruct.PLL.PLLN = 110; // PLL1 internal clock = 550 MHz
+        RCC_OscInitStruct.PLL.PLLN = 110; // PLL1 internal (VCO) clock = 550 MHz
 #else
-        RCC_OscInitStruct.PLL.PLLN = 80; // PLL1 internal clock = 400 MHz
+        RCC_OscInitStruct.PLL.PLLN = 80; // PLL1 internal (VCO) clock = 400 MHz
 #endif
     }
     else
@@ -162,10 +163,15 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
         error("HSE_VALUE not divisible by 2MHz or 5MHz\n");
     }
 
-    RCC_OscInitStruct.PLL.PLLP = 1;    // 550 MHz
-    RCC_OscInitStruct.PLL.PLLQ = 5;    // 110 MHz
-    RCC_OscInitStruct.PLL.PLLR = 2;    // 275 MHz
-    RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
+    RCC_OscInitStruct.PLL.PLLP = 1;    // 550/400 MHz
+
+#if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
+    RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE; // PLL1 VCO clock is between 192 and 836 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 55;  // PLL1Q used for FDCAN = 10 MHz
+#else
+    RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOMEDIUM; // PLL1 VCO clock is between 150 and 420 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 40;  // PLL1Q used for FDCAN = 10 MHz
+#endif
 
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         return 0; // FAIL
@@ -229,17 +235,24 @@ uint8_t SetSysClock_PLL_HSI(void)
     RCC_OscInitStruct.PLL.PLLM = 32; // PLL1 input clock = 2MHz
 
 #if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
-    RCC_OscInitStruct.PLL.PLLN = 275; // PLL1 internal clock = 550 MHz
+    RCC_OscInitStruct.PLL.PLLN = 275; // PLL1 internal (VCO) clock = 550 MHz
 #else
-    RCC_OscInitStruct.PLL.PLLN = 200; // PLL1 internal clock = 400 MHz
+    RCC_OscInitStruct.PLL.PLLN = 200; // PLL1 internal (VCO) clock = 400 MHz
 #endif
 
-    RCC_OscInitStruct.PLL.PLLP = 1;    // 550 MHz
-    RCC_OscInitStruct.PLL.PLLQ = 5;    // 110 MHz
+    RCC_OscInitStruct.PLL.PLLP = 1;    // 550/400 MHz
+
+#if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
+    RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE; // PLL1 VCO clock is between 192 and 836 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 55;  // PLL1Q used for FDCAN = 10 MHz
+#else
+    RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOMEDIUM; // PLL1 VCO clock is between 150 and 420 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 40;  // PLL1Q used for FDCAN = 10 MHz
+#endif
+
     RCC_OscInitStruct.PLL.PLLR = 2;    // 275 MHz
-    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
-    RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
-    RCC_OscInitStruct.PLL.PLLFRACN = 3072;
+    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_1; // PLL1 input clock is between 2 and 4 MHz
+    
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         return 0; // FAIL
     }

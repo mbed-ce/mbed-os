@@ -3172,7 +3172,7 @@
                 "value": false
             },
             "enable-overdrive-mode": {
-                "help": "Enable 'overdrive mode' (also known as VOS0) and raise core clock to the maximum value (generally 480MHz instead of 400MHz).  Only supported when the internal LDO is used for system clock source.  Reduces the temperature range of the chip, see datasheet for details.",
+                "help": "Enable 'overdrive mode' (also known as VOS0) and raise core clock to the maximum value.  Only supported when the internal LDO is used for core voltage source.  Reduces the temperature range of the chip, see datasheet for details.",
                 "value": 1
             },
             "hse_value": {
@@ -3701,7 +3701,8 @@
             "STM32H7A3xIQ"
         ],
         "macros_add": [
-            "STM32H7A3xxQ"
+            "STM32H7A3xxQ",
+            "STM32H7_280MHZ"
         ],
         "overrides": {
             "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
@@ -3713,12 +3714,6 @@
         "inherits": [
             "MCU_STM32H7A3xIQ"
         ],
-        "config": {
-            "hse_value": {
-                "value": "8000000",
-                "macro_name": "HSE_VALUE"
-            }
-        },
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
@@ -3738,7 +3733,8 @@
         "mbed_ram_start": "0x24000000",
         "mbed_ram_size": "0x100000",
         "extra_labels_add": [
-            "STM32H7B3xIQ"
+            "STM32H7B3xIQ",
+            "STM32H7_280MHZ"
         ],
         "macros_add": [
             "STM32H7B3xxQ"

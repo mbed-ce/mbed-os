@@ -2211,6 +2211,25 @@ uint32_t i2c_get_timing(I2CName i2c, uint32_t current_timing, int current_hz,
                 }
                 break;
 #endif
+#if defined (I2C_PCLK_112M5)
+            case I2C_PCLK_112M5:
+                switch (hz) {
+                    case 100000:
+                        tim = TIMING_VAL_112M5_CLK_100KHZ;
+                        break;
+                    case 400000:
+                        tim = TIMING_VAL_112M5_CLK_400KHZ;
+                        break;
+                    case 1000000:
+                        tim = TIMING_VAL_112M5_CLK_1MHZ;
+                        break;
+                    default:
+                        MBED_ASSERT((hz == 100000) || (hz == 400000) || \
+                                    (hz == 1000000));
+                        break;
+                }
+                break;
+#endif
 #if defined (I2C_PCLK_120M)
             case I2C_PCLK_120M:
                 switch (hz) {
@@ -2241,6 +2260,25 @@ uint32_t i2c_get_timing(I2CName i2c, uint32_t current_timing, int current_hz,
                         break;
                     case 1000000:
                         tim = TIMING_VAL_137M5_CLK_1MHZ;
+                        break;
+                    default:
+                        MBED_ASSERT((hz == 100000) || (hz == 400000) || \
+                                    (hz == 1000000));
+                        break;
+                }
+                break;
+#endif
+#if defined (I2C_PCLK_140M)
+            case I2C_PCLK_140M:
+                switch (hz) {
+                    case 100000:
+                        tim = TIMING_VAL_140M_CLK_100KHZ;
+                        break;
+                    case 400000:
+                        tim = TIMING_VAL_140M_CLK_400KHZ;
+                        break;
+                    case 1000000:
+                        tim = TIMING_VAL_140M_CLK_1MHZ;
                         break;
                     default:
                         MBED_ASSERT((hz == 100000) || (hz == 400000) || \
