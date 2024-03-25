@@ -3213,8 +3213,7 @@
             "STM32H723xx",
         ],
         "overrides": {
-            "system_power_supply": "PWR_LDO_SUPPLY",
-            "i2c_timing_value_algo": true
+            "system_power_supply": "PWR_LDO_SUPPLY"
         }
     },
     "MCU_STM32H725xE": {
@@ -3614,7 +3613,10 @@
             "lpticker_delay_ticks": 0,
             "network-default-interface-type": "ETHERNET",
             "i2c_timing_value_algo": true,
-            "hse_value": 25000000
+            "hse_value": 25000000,
+            // Can use overdrive because LDO is regulating core voltage (even though
+            // the LDO power comes from the SMPS).
+            "enable-overdrive-mode": 1
         },
         "device_name": "STM32H747XIHx"
     },
@@ -3661,7 +3663,8 @@
         "mbed_ram_start": "0x24000000",
         "mbed_ram_size": "0x80000",
         "extra_labels_add": [
-            "STM32H750xB"
+            "STM32H750xB",
+            "STM32H7_480MHZ"
         ],
         "macros_add": [
             "STM32H750xx"
