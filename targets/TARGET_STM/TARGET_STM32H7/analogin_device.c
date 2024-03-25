@@ -80,9 +80,9 @@ void analogin_init(analogin_t *obj, PinName pin)
     // Configure ADC object structures
     obj->handle.State = HAL_ADC_STATE_RESET;
 
-    // PER_CLK is set to 64MHz HSI by the clock init file.  We want 32MHz for the ADC clock since
+    // PER_CLK is set to 64MHz HSI by SetSystemClock().  We want 32MHz for the ADC clock since
     // that's the highest we can get to that's under 50MHz.
-    // On STM32H743 rev Y, the ADC does not have an internal divider so we need to divide the clock
+    // On STM32H74x rev Y, the ADC does not have an internal divider so we need to divide the clock
     // by 2.  On all other STM32H7 chips, there is an internal /2 divider.
 #ifdef TARGET_STM32H7_480MHZ
     if(HAL_GetREVID() <= REV_ID_Y)

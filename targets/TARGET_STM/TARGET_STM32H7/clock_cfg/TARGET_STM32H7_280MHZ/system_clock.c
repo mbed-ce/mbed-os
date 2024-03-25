@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  ******************************************************************************
  *
- * Copyright (c) 2015-2020 STMicroelectronics.
+ * Copyright (c) 2015-2024 STMicroelectronics.
  * All rights reserved.
  *
  * This software component is licensed by ST under BSD 3-Clause license,
@@ -39,9 +39,9 @@
 #include "mbed_error.h"
 
 // clock source is selected with CLOCK_SOURCE in json config
-#define USE_PLL_HSE_EXTC     0x8  // Use external clock (ST Link MCO)
+#define USE_PLL_HSE_EXTC     0x8  // Use external clock (ST Link MCO or CMOS oscillator)
 #define USE_PLL_HSE_XTAL     0x4  // Use external xtal (not provided by default on nucleo boards)
-#define USE_PLL_HSI          0x2  // Use HSI internal (VCO) clock
+#define USE_PLL_HSI          0x2  // Use HSI internal clock
 
 #if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
 #define FLASH_LATENCY FLASH_LATENCY_6

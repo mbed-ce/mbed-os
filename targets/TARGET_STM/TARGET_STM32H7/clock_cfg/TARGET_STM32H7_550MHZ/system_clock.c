@@ -46,7 +46,7 @@
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC     0x8  // Use external clock (ST Link MCO or CMOS oscillator)
 #define USE_PLL_HSE_XTAL     0x4  // Use external xtal (not provided by default on nucleo boards)
-#define USE_PLL_HSI          0x2  // Use HSI internal (VCO) clock
+#define USE_PLL_HSI          0x2  // Use HSI internal clock
 
 #if ( ((CLOCK_SOURCE) & USE_PLL_HSE_XTAL) || ((CLOCK_SOURCE) & USE_PLL_HSE_EXTC) )
 uint8_t SetSysClock_PLL_HSE(uint8_t bypass);
