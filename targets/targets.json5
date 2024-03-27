@@ -3310,7 +3310,7 @@
             "USBDEVICE"
         ],
         "overrides": {
-            "network-default-interface-type": "ETHERNET",
+            "network-default-interface-type": "ETHERNET"
         },
         "supported_form_factors": [
             "ARDUINO_UNO"
