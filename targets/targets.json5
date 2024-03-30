@@ -3187,6 +3187,7 @@
         ],
         "overrides": {
             "lpticker_delay_ticks": 0,
+            // Mbed's clock code does not initialize PLL2, so we have to disable USE_LPUART_CLK_PCLK1 here.
             "lpuart_clock_source": "USE_LPUART_CLK_LSE|USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
         },
         "device_has_add": [
