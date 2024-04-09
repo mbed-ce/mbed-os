@@ -1,6 +1,6 @@
 // This JSON5 file contains a list of all the drivers used in Mbed.
 // There are three types of drivers:
-// Peripherals - Drivers a peripheral present on this target MCU and supported by Mbed CE.
+// Peripherals - Drives a peripheral present on this target MCU and supported by Mbed CE.
 //     Peripheral drivers have names starting with DEVICE.
 // Feature - A larger Mbed OS optional feature supported for this target.
 // Component - A driver for an external component present on a given board.  This is commonly
