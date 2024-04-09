@@ -4812,7 +4812,8 @@
             "TRNG",
             "SERIAL_ASYNCH",
             "SPI_32BIT_WORDS"
-        ]
+        ],
+        "is_mcu_family_target": true
     },
 	"MCU_STM32U575xI": {
         "inherits": [

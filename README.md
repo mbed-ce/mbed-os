@@ -36,8 +36,10 @@ Additionally, the [discussions page](https://github.com/mbed-ce/mbed-os/discussi
 
 ## Documentation
 
+### Original ARM Mbed OS Docs
 For more information about Mbed OS, please see [the published Mbed OS documentation](https://os.mbed.com/docs/latest). It includes general overview information, step-by-step tutorials, porting information and background reference materials about our architecture and tools.
 
-For the Mbed OS CE code-level documentation (Doxygen), see [here](https://mbed-ce.github.io/mbed-os/group__mbed-os-public.html)
+### Mbed CE Docs
+Mbed CD is still working on more complete documentation infrastructure. For the Mbed CE code-level documentation (Doxygen), see [here](https://mbed-ce.github.io/mbed-os/group__mbed-os-public.html).  For an auto-generated listing of target boards supported by Mbed, and the drivers & features each target supports, see the [targets index here](https://mbed-ce.github.io/mbed-ce-test-tools/targets/) and the [drivers index here](https://mbed-ce.github.io/mbed-ce-test-tools/drivers/).
 
 
