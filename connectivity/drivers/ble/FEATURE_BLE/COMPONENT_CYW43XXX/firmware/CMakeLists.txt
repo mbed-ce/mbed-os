@@ -13,6 +13,10 @@ if("4343W" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(COMPONENT_4343W)
 endif()
 
+if("4343W_FS" IN_LIST MBED_TARGET_LABELS)
+    add_subdirectory(COMPONENT_4343W_FS)
+endif()
+
 if("CYW9P62S1_43012EVB_01" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_CYW9P62S1_43012EVB_01)
 endif()

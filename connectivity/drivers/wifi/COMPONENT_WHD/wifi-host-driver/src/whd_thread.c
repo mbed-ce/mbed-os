@@ -91,7 +91,7 @@ whd_result_t whd_thread_init(whd_driver_t whd_driver)
         return retval;
     }
 
-    retval = cy_rtos_create_thread(&whd_driver->thread_info.whd_thread, (cy_thread_entry_fn_t)whd_thread_func,
+    retval = cy_rtos_create_thread(&whd_driver->thread_info.whd_thread, (cy_thread_entry_fn_t)(void*)whd_thread_func,
                                    "WHD", whd_driver->thread_info.thread_stack_start,
                                    whd_driver->thread_info.thread_stack_size,
                                    whd_driver->thread_info.thread_priority, (cy_thread_arg_t)whd_driver);

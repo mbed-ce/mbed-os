@@ -1018,6 +1018,8 @@ static whd_result_t whd_bus_sdio_download_firmware(whd_driver_t whd_driver)
     CHECK_RETURN(whd_bus_write_register_value(whd_driver, BACKPLANE_FUNCTION, SDIO_FUNCTION2_WATERMARK, (uint8_t)1,
                                               (uint32_t)SDIO_F2_WATERMARK) );
 
+    printf("WHD module wifi firmware is responsive!\n");
+
     return WHD_SUCCESS;
 }
 

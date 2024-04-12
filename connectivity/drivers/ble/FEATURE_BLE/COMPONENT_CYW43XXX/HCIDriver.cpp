@@ -378,6 +378,16 @@ private:
 #endif /* BT_UART_NO_3M_SUPPORT */
     }
 
+    void inject_bdaddr(uint8_t* pBuf)
+    {
+        if (service_pack_ptr + service_pack_index == brcm_patchram_buf) {
+            uint8_t bdAddr[6] = { 0xFF, 0xFF, 0xFF, 0x0A, 0x61, 0xA8 };
+            uint32_t uniqueId = HAL_GetUIDw0() ^ HAL_GetUIDw1() ^ HAL_GetUIDw2();
+            memcpy(bdAddr, &uniqueId, 3);
+            memcpy(&pBuf[33], bdAddr, sizeof(bdAddr));
+        }
+}
+
     void send_service_pack_command(void)
     {
         uint16_t cmd_len = service_pack_ptr[service_pack_index + 2];
@@ -385,6 +395,7 @@ private:
         uint8_t *pBuf = hciCmdAlloc(cmd_opcode, cmd_len);
         if (pBuf) {
             memcpy(pBuf + HCI_CMD_HDR_LEN, service_pack_ptr + service_pack_index + HCI_CMD_HDR_LEN, cmd_len);
+            inject_bdaddr(pBuf);
             hciCmdSend(pBuf);
         } else {
         }

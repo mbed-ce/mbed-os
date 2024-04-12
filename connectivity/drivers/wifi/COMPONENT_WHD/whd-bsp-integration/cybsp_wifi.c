@@ -28,6 +28,7 @@
 #include "cyabs_rtos.h"
 #include "whd_types.h"
 #include "cyhal.h"
+#include <stdio.h>
 #if defined(COMPONENT_BSP_DESIGN_MODUS) || defined(COMPONENT_CUSTOM_DESIGN_MODUS)
 #include "cycfg.h"
 #endif
@@ -43,7 +44,7 @@ extern "C" {
 #define WLAN_POWER_UP_DELAY_MS          250
 #define WLAN_CBUCK_DISCHARGE_MS         10
 
-#define SDIO_ENUMERATION_TRIES          500
+#define SDIO_ENUMERATION_TRIES          50
 #define SDIO_RETRY_DELAY_MS             1
 #define SDIO_BUS_LEVEL_MAX_RETRIES      5
 
@@ -163,6 +164,16 @@ static cy_rslt_t cybsp_sdio_enumerate(const cyhal_sdio_t* sdio_object)
         result = sdio_try_send_cmd(sdio_object, CYHAL_WRITE, CYHAL_SDIO_CMD_SELECT_CARD, rel_addr,
                                    &response_ignored);
     }
+
+    if(result == CY_RSLT_SUCCESS)
+    {
+        printf("Successfully found SDIO wifi module at addr 0x%lx\n", rel_addr);
+    }
+    else
+    {
+        printf("Failed to enumerate SDIO wifi module.\n");
+    }
+
     return result;
 }
 

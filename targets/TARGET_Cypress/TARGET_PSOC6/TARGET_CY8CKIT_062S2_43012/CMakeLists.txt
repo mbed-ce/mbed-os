@@ -73,15 +73,6 @@ if("CM0P_SLEEP" IN_LIST MBED_TARGET_LABELS)
     )
 endif()
 
-if("WHD" IN_LIST MBED_TARGET_LABELS)
-    target_link_libraries(mbed-cy8ckit-062s2-43012
-        INTERFACE
-            mbed-cy-psoc6-whd
-            mbed-cy-psoc6-whd-43012
-            mbed-cy8ckit-062s2-43012-whd
-    )
-endif()
-
 target_compile_definitions(mbed-cy8ckit-062s2-43012
     INTERFACE
         "CY8C624ABZI_D44"

@@ -24,6 +24,10 @@
 #include "whd_debug.h"
 #include "whd.h"
 
+#ifdef USES_RESOURCE_GENERIC_FILESYSTEM
+#include <wiced_filesystem.h>
+#endif
+
 /******************************************************
 *                      Macros
 ******************************************************/
@@ -100,6 +104,7 @@ resource_result_t resource_read(const resource_hnd_t *resource, uint32_t offset,
     if (resource->location == RESOURCE_IN_MEMORY)
     {
         memcpy(buffer, &resource->val.mem.data[offset], *size);
+        return RESOURCE_SUCCESS;
     }
 #ifdef USES_RESOURCES_IN_EXTERNAL_STORAGE
     else if (resource->location == RESOURCE_IN_EXTERNAL_STORAGE)
@@ -130,6 +135,8 @@ resource_result_t resource_read(const resource_hnd_t *resource, uint32_t offset,
         }
         *size = (uint32_t)size64;
         wiced_filesystem_file_close (&file_handle);
+
+        return RESOURCE_SUCCESS;
     }
 #else
 #ifdef USES_RESOURCE_FILESYSTEM
@@ -155,10 +162,11 @@ resource_result_t resource_read(const resource_hnd_t *resource, uint32_t offset,
         }
 
         wicedfs_fclose(&file_hnd);
+        return RESOURCE_SUCCESS;
     }
-#endif /* ifdef USES_RESOURCE_FILESYSTEM */
+#endif
 #endif /* USES_RESOURCE_GENERIC_FILESYSTEM */
-    return RESOURCE_SUCCESS;
+    return RESOURCE_UNSUPPORTED;
 }
 
 uint32_t host_platform_resource_size(whd_driver_t whd_drv, whd_resource_type_t resource, uint32_t *size_out)

@@ -1,26 +1,30 @@
 # Copyright (c) 2020-2021 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(mbed-cy-psoc6-common-network STATIC EXCLUDE_FROM_ALL)
-
-target_include_directories(mbed-cy-psoc6-common-network
+target_include_directories(mbed-wifi
     PUBLIC
         .
 )
 
-target_sources(mbed-cy-psoc6-common-network
+target_sources(mbed-wifi
     PRIVATE
         cy_network_buffer.c
         cybsp_wifi.c
 )
 
-target_link_libraries(mbed-cy-psoc6-common-network
+target_link_libraries(mbed-wifi
     PUBLIC
         mbed-lwipstack
-        mbed-emac
+		mbed-cy-rtos-abstraction
 )
 
-target_compile_definitions(mbed-cy-psoc6-common-network
-    PUBLIC
-        MBED_CONF_cy-psoc6-common-network_PRESENT=1
-)
+if("DEVICE_EMAC=1" IN_LIST MBED_TARGET_DEFINITIONS)
+    target_link_libraries(mbed-wifi
+	    PUBLIC
+	        mbed-emac
+	)
+endif()
+
+if(NOT "Cypress" IN_LIST MBED_TARGET_LABELS)
+	target_link_libraries(mbed-wifi PUBLIC mbed-minimal-cyhal)
+endif()
