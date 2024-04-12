@@ -3657,6 +3657,39 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "device_name": "STM32H747XIHx"
     },
+    "ARDUINO_GIGA": {
+        public: false,
+        inherits: ["STM32H747_ARDUINO"],
+        overrides: {
+            system_power_supply: "PWR_LDO_SUPPLY",
+            "enable-overdrive-mode": 1,
+            clock_source: "USE_PLL_HSE_XTAL | USE_PLL_HSI",
+            "network-default-interface-type": "WIFI",
+            lpuart_clock_source: "USE_LPUART_CLK_HSI",
+            "hse_value": 16000000
+        },
+        macros_add: [
+            "BT_UART_NO_3M_SUPPORT"
+        ],
+        components_add: [
+            "QSPIF"
+        ],
+        "image_url": "https://store-usa.arduino.cc/cdn/shop/products/ABX00063_00.default_643x483.jpg?v=1677493878"
+    },
+    "ARDUINO_GIGA_CM7": {
+        inherits: ["ARDUINO_GIGA"],
+        "core": "Cortex-M7FD",
+        "mbed_rom_start": "0x08000000",
+        "mbed_rom_size" : "0x100000",
+        "mbed_ram_start": "0x24000000",
+        "mbed_ram_size" : "0x80000",
+        "extra_labels_add": [
+            "STM32H747xI_CM7"
+        ],
+        "macros_add": [
+            "CORE_CM7"
+        ]
+    },
     "ARDUINO_PORTENTA_H7": {
         "public": false,
         "detect_code": ["0813"],
