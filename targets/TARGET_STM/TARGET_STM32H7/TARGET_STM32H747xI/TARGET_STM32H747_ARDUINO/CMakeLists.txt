@@ -9,3 +9,4 @@ target_sources(mbed-stm32h747-arduino INTERFACE
 	PeripheralPins.c)
 
 add_subdirectory(TARGET_ARDUINO_PORTENTA_H7)
+add_subdirectory(TARGET_ARDUINO_GIGA)
