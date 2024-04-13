@@ -2,6 +2,9 @@
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
+# Notes:
+# 1. LPC1768 is supposed to be supported by LinkServer, and I am able to get through flashing it, but it errors out at the end.
+
 # General config parameters
 # -------------------------------------------------------------
 set(UPLOAD_METHOD_DEFAULT MBED)
@@ -33,3 +36,8 @@ set(MBED_RESET_BAUDRATE 115200)
 set(OPENOCD_UPLOAD_ENABLED TRUE)
 set(OPENOCD_CHIP_CONFIG_COMMANDS
     -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/lpc1768.cfg)
+
+# Config options for LINKSERVER
+# -------------------------------------------------------------
+set(LINKSERVER_UPLOAD_ENABLED TRUE)
+set(LINKSERVER_DEVICE LPC1768)
