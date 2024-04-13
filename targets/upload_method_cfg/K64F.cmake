@@ -8,7 +8,13 @@
 
 # General config parameters
 # -------------------------------------------------------------
-set(UPLOAD_METHOD_DEFAULT JLINK)
+set(UPLOAD_METHOD_DEFAULT MBED)
+
+# Config options for MBED
+# -------------------------------------------------------------
+
+set(MBED_UPLOAD_ENABLED TRUE)
+set(MBED_RESET_BAUDRATE 115200)
 
 # Config options for PYOCD
 # -------------------------------------------------------------
