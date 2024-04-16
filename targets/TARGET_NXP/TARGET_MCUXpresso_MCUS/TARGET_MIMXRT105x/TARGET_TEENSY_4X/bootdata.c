@@ -40,7 +40,7 @@
  */
 
 #include <stdint.h>
-#include <mimxrt_flash_info.h>
+#include <mimxrt_memory_info.h>
 
 extern void Reset_Handler(void);
 extern unsigned long _estack;
