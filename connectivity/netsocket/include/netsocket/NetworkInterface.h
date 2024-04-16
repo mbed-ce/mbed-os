@@ -102,7 +102,9 @@ public:
      *  @retval         NSAPI_ERROR_OK on success
      *  @retval         NSAPI_ERROR_UNSUPPORTED if this feature is not supported
      *  @retval         NSAPI_ERROR_PARAMETER if hostname is not valid
-     *  @retval         NSAPI_ERROR_BUSY if hostname couldn't be set
+     *  @retval         NSAPI_ERROR_BUSY if hostname couldn't be set (e.g. for
+     *                  LwIP stack, hostname can only be set before calling
+     *                  \c EthernetInterface::connect method)
      */
     virtual nsapi_error_t set_hostname(const char *hostname);
 
