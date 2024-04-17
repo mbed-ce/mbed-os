@@ -97,6 +97,21 @@ void spi_frequency(spi_t *obj, int hz)
 
     spibase->TCR = (spibase->TCR & ~LPSPI_TCR_PRESCALE_MASK) | LPSPI_TCR_PRESCALE(tcrPrescaleValue);
 
+    // We also need to recalculate the CCR.DBT field, as this register
+    // controls the length of the half clock cycle between the end of one frame and the start of the next.
+    // FSL HAL isn't smart enough to do this automatically.
+
+    // Step 1: Get the current SCLK period, in LPSPI functional clock periods, that was calculated by
+    // LPSPI_MasterSetBaudRate(). This is given by the CCR.SCKDIV bitfield plus 2.
+    const uint32_t sclkPeriodClocks = ((spibase->CCR & LPSPI_CCR_SCKDIV_MASK) >> LPSPI_CCR_SCKDIV_SHIFT) + 2;
+
+    // Step 2: Divide by 2, rounding up
+    const uint32_t sclkLowTimeClocks = (sclkPeriodClocks + 1) / 2;
+
+    // Step 3: Set this value into the DBT field.  The value used by HW is one higher than the value in the register
+    // so we have to subtract.
+    spibase->CCR = (spibase->CCR & ~LPSPI_CCR_DBT_MASK) | LPSPI_CCR_DBT(sclkLowTimeClocks - 1);
+
     /* Enable the LPSPI module */
     LPSPI_Enable(spibase, true);
 }
