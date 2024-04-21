@@ -3,7 +3,7 @@
 
 if(MBED_ENABLE_OS_INTERNAL_TESTS)
     if(MBED_BUILD_GREENTEA_TESTS)
-        # add greentea test
+        add_subdirectory(tests/TESTS)
     else()
         add_subdirectory(COMPONENT_QSPIF)
         add_subdirectory(tests/UNITTESTS)

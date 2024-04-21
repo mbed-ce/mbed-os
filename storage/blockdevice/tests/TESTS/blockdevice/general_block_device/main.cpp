@@ -49,7 +49,7 @@
 #include "SDBlockDevice.h"
 #endif
 
-#if COMPONENT_FLASHIAP
+#if DEVICE_FLASH
 #include "FlashIAPBlockDevice.h"
 #endif
 
@@ -108,7 +108,7 @@ static SingletonPtr<rtos::Mutex> _mutex;
 
 BlockDevice *block_device = NULL;
 
-#if COMPONENT_FLASHIAP
+#if DEVICE_FLASH
 static inline uint32_t align_up(uint32_t val, uint32_t size)
 {
     return (((val - 1) / size) + 1) * size;
@@ -210,7 +210,7 @@ static BlockDevice *get_bd_instance(uint8_t bd_type)
             break;
         }
         case flashiap: {
-#if COMPONENT_FLASHIAP
+#if DEVICE_FLASH
 #if (MBED_CONF_FLASHIAP_BLOCK_DEVICE_SIZE == 0) && (MBED_CONF_FLASHIAP_BLOCK_DEVICE_BASE_ADDRESS == 0xFFFFFFFF)
 
             size_t flash_size;
@@ -907,7 +907,7 @@ void test_get_type_functionality()
     TEST_ASSERT_EQUAL(0, strcmp(bd_type, "DATAFLASH"));
 #elif COMPONENT_SD
     TEST_ASSERT_EQUAL(0, strcmp(bd_type, "SD"));
-#elif COMPONENT_FLASHIAP
+#elif DEVICE_FLASH
     TEST_ASSERT_EQUAL(0, strcmp(bd_type, "FLASHIAP"));
 #elif COMPONENT_SPINAND
     TEST_ASSERT_EQUAL(0, strcmp(bd_type, "SPINAND"));
@@ -966,7 +966,7 @@ int get_bd_count()
 #if COMPONENT_SD
     bd_arr[count++] = sd;             //3
 #endif
-#if COMPONENT_FLASHIAP
+#if DEVICE_FLASH
     bd_arr[count++] = flashiap;       //4
 #endif
 #if COMPONENT_OSPIF
