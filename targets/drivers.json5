@@ -134,15 +134,15 @@
 
 // LoRa modules ---------------------------------------------------------------------
 		"COMPONENT_SX126x": {
-            "description": "LoRa Connect™ 150-960MHz Transcievers",
-            "friendly_name": "Semtech SX1272"
+            "description": "LoRa Connect™ 150-960MHz Transceivers",
+            "friendly_name": "Semtech SX126x"
         },
 		"COMPONENT_SX1272": {
-            "description": "LoRa Connect™ 860-1000MHz Transciever",
+            "description": "LoRa Connect™ 860-1000MHz Transceiver",
             "friendly_name": "Semtech SX1272"
         },
 		"COMPONENT_SX1276": {
-            "description": "LoRa Connect™ 137-1020MHz Transciever",
+            "description": "LoRa Connect™ 137-1020MHz Transceiver",
             "friendly_name": "Semtech SX1276"
         },
 

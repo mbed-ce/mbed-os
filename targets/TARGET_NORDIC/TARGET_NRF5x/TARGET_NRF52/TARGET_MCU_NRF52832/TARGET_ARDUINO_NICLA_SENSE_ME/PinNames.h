@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2016 Nordic Semiconductor ASA
  * All rights reserved.
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -172,11 +173,15 @@ typedef enum {
 #define SPI_COPI       SPI_PSELMOSI0
 #define SPI_CIPO       SPI_PSELMISO0
 
-#define I2C_SDA0  p15
-#define I2C_SCL0  p16
+// Note: Arduino convention is for I2C1 to be the "internal" I2C and for I2C0
+// to be the "external" I2C available on the pins.  Unfortunately this is backward to
+// how they are named in the schematic...
 
-#define I2C_SDA1  p22
-#define I2C_SCL1  p23
+#define I2C_SDA0  p22
+#define I2C_SCL0  p23
+
+#define I2C_SDA1  p15
+#define I2C_SCL1  p16
 
 // LEDs & buttons
 #define BUTTON1 p21
