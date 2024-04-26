@@ -197,7 +197,11 @@ void spi_get_capabilities(PinName ssel, bool slave, spi_capabilities_t *cap);
 
 /** Initialize the SPI peripheral
  *
- * Configures the pins used by SPI, sets a default format and frequency, and enables the peripheral
+ * Configures the pins used by SPI and enables the peripheral.
+ *
+ * After this function is called by the driver layer, spi_format() and spi_frequency() will
+ * be called *before* the SPI bus is used.
+ * 
  * @param[out] obj  The SPI object to initialize
  * @param[in]  pinmap pointer to structure which holds static pinmap
  */
@@ -205,7 +209,11 @@ void spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap);
 
 /** Initialize the SPI peripheral
  *
- * Configures the pins used by SPI, sets a default format and frequency, and enables the peripheral
+ * Configures the pins used by SPI and enables the peripheral
+ *
+ * After this function is called by the driver layer, spi_format() and spi_frequency() will
+ * be called *before* the SPI bus is used.
+ *
  * @param[out] obj  The SPI object to initialize
  * @param[in]  mosi The pin to use for MOSI
  * @param[in]  miso The pin to use for MISO

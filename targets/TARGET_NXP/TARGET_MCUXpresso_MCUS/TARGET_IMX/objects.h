@@ -57,6 +57,7 @@ struct i2c_s {
 struct spi_s {
     uint32_t instance;
     uint8_t bits;
+    uint32_t frequency;
 };
 
 struct dac_s {

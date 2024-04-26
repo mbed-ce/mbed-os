@@ -32,17 +32,25 @@ static LPSPI_Type *const spi_address[] = LPSPI_BASE_PTRS;
 extern uint32_t spi_get_clock(void);
 extern void spi_setup_clock();
 
-void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel)
+SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName sclk)
 {
-    // determine the SPI to use
     uint32_t spi_mosi = pinmap_peripheral(mosi, PinMap_SPI_MOSI);
     uint32_t spi_miso = pinmap_peripheral(miso, PinMap_SPI_MISO);
     uint32_t spi_sclk = pinmap_peripheral(sclk, PinMap_SPI_SCLK);
-    uint32_t spi_ssel = pinmap_peripheral(ssel, PinMap_SPI_SSEL);
     uint32_t spi_data = pinmap_merge(spi_mosi, spi_miso);
-    uint32_t spi_cntl = pinmap_merge(spi_sclk, spi_ssel);
 
-    obj->instance = pinmap_merge(spi_data, spi_cntl);
+    SPIName spi_instance = pinmap_merge(spi_sclk, spi_data);
+    return spi_instance;
+}
+
+void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel)
+{
+    // determine the SPI to use
+    SPIName spi_for_data_lines = spi_get_peripheral_name(mosi, miso, sclk);
+    uint32_t spi_ssel = pinmap_peripheral(ssel, PinMap_SPI_SSEL);
+    uint32_t spi_cntl = pinmap_merge(spi_for_data_lines, spi_ssel);
+
+    obj->instance = pinmap_merge(spi_for_data_lines, spi_cntl);
     MBED_ASSERT((int)obj->instance != NC);
 
     // pin out the spi pins
@@ -53,12 +61,40 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
         pinmap_pinout(ssel, PinMap_SPI_SSEL);
     }
 
+    // Default frequency (just so we have something to set if spi_format() is called
+    // before spi_frequency())
+    obj->frequency = 1000000;
+
     spi_setup_clock();
 }
 
 void spi_free(spi_t *obj)
 {
     LPSPI_Deinit(spi_address[obj->instance]);
+}
+
+/*
+ * This function updates the `CCR.DBT` bitfield, which controls the length of the half
+ * clock cycle between the end of one frame and the start of the next when in continuous mode.
+ * It must be updated whenever the SPI clock frequency is changed.
+ *
+ * The MIMXRT HAL does not properly set this register so we end up with clock glitches
+ * when doing multibyte SPI transfers.
+ *
+ * Note: The LPSPI must be disabled when calling this function.
+ */
+static void mimxrt_spi_update_dbt(LPSPI_Type * spibase)
+{
+    // Step 1: Get the current SCLK period, in LPSPI functional clock periods, that was calculated by
+    // LPSPI_MasterSetBaudRate(). This is given by the CCR.SCKDIV bitfield plus 2.
+    const uint32_t sclkPeriodClocks = ((spibase->CCR & LPSPI_CCR_SCKDIV_MASK) >> LPSPI_CCR_SCKDIV_SHIFT) + 2;
+
+    // Step 2: Divide by 2, rounding up
+    const uint32_t sclkLowTimeClocks = (sclkPeriodClocks + 1) / 2;
+
+    // Step 3: Set this value into the DBT field.  The value used by HW is one higher than the value in the register
+    // so we have to subtract.
+    spibase->CCR = (spibase->CCR & ~LPSPI_CCR_DBT_MASK) | LPSPI_CCR_DBT(sclkLowTimeClocks - 1);
 }
 
 void spi_format(spi_t *obj, int bits, int mode, int slave)
@@ -74,14 +110,21 @@ void spi_format(spi_t *obj, int bits, int mode, int slave)
         slave_config.cpha = (mode & 0x1) ? kLPSPI_ClockPhaseSecondEdge : kLPSPI_ClockPhaseFirstEdge;
         LPSPI_SlaveInit(spi_address[obj->instance], &slave_config);
     } else {
+
         /* Master config */
         LPSPI_MasterGetDefaultConfig(&master_config);
         master_config.bitsPerFrame = (uint32_t)bits;;
         master_config.cpol = (mode & 0x2) ? kLPSPI_ClockPolarityActiveLow : kLPSPI_ClockPolarityActiveHigh;
         master_config.cpha = (mode & 0x1) ? kLPSPI_ClockPhaseSecondEdge : kLPSPI_ClockPhaseFirstEdge;
         master_config.direction = kLPSPI_MsbFirst;
+        master_config.baudRate = obj->frequency;
 
         LPSPI_MasterInit(spi_address[obj->instance], &master_config, spi_get_clock());
+
+        // Update the DBT field which gets overwritten by LPSPI_MasterInit
+        LPSPI_Enable(spi_address[obj->instance], false);
+        mimxrt_spi_update_dbt(spi_address[obj->instance]);
+        LPSPI_Enable(spi_address[obj->instance], true);
     }
 }
 
@@ -97,23 +140,14 @@ void spi_frequency(spi_t *obj, int hz)
 
     spibase->TCR = (spibase->TCR & ~LPSPI_TCR_PRESCALE_MASK) | LPSPI_TCR_PRESCALE(tcrPrescaleValue);
 
-    // We also need to recalculate the CCR.DBT field, as this register
-    // controls the length of the half clock cycle between the end of one frame and the start of the next.
-    // FSL HAL isn't smart enough to do this automatically.
-
-    // Step 1: Get the current SCLK period, in LPSPI functional clock periods, that was calculated by
-    // LPSPI_MasterSetBaudRate(). This is given by the CCR.SCKDIV bitfield plus 2.
-    const uint32_t sclkPeriodClocks = ((spibase->CCR & LPSPI_CCR_SCKDIV_MASK) >> LPSPI_CCR_SCKDIV_SHIFT) + 2;
-
-    // Step 2: Divide by 2, rounding up
-    const uint32_t sclkLowTimeClocks = (sclkPeriodClocks + 1) / 2;
-
-    // Step 3: Set this value into the DBT field.  The value used by HW is one higher than the value in the register
-    // so we have to subtract.
-    spibase->CCR = (spibase->CCR & ~LPSPI_CCR_DBT_MASK) | LPSPI_CCR_DBT(sclkLowTimeClocks - 1);
+    // Update the DBT field which gets overwritten by LPSPI_MasterSetBaudRate
+    mimxrt_spi_update_dbt(spi_address[obj->instance]);
 
     /* Enable the LPSPI module */
     LPSPI_Enable(spibase, true);
+
+    // Save frequency for later
+    obj->frequency = hz;
 }
 
 static inline int spi_readable(spi_t * obj)
