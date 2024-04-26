@@ -201,7 +201,7 @@ void spi_get_capabilities(PinName ssel, bool slave, spi_capabilities_t *cap);
  *
  * After this function is called by the driver layer, spi_format() and spi_frequency() will
  * be called *before* the SPI bus is used.
- * 
+ *
  * @param[out] obj  The SPI object to initialize
  * @param[in]  pinmap pointer to structure which holds static pinmap
  */
