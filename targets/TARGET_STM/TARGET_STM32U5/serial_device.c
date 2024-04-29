@@ -17,7 +17,7 @@
 
 #include "serial_api_hal.h"
 
-#define UART_NUM (6) // USART1, USART2, USART3, UART4, UART5, LPUART1
+#define UART_NUM (7) // USART1, USART2, USART3, UART4, UART5, USART6, LPUART1
 
 uint32_t serial_irq_ids[UART_NUM] = {0};
 UART_HandleTypeDef uart_handlers[UART_NUM];
@@ -93,6 +93,13 @@ static void uart5_irq(void)
 }
 #endif
 
+#if defined(USART6_BASE)
+static void uart6_irq(void)
+{
+    uart_irq(UART_6);
+}
+#endif
+
 #if defined(LPUART1_BASE)
 static void lpuart1_irq(void)
 {
@@ -144,6 +151,12 @@ void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
         case UART_5:
             irq_n = UART5_IRQn;
             vector = (uint32_t)&uart5_irq;
+            break;
+#endif
+#if defined(USART6_BASE)
+        case UART_6:
+            irq_n = USART6_IRQn;
+            vector = (uint32_t)&uart6_irq;
             break;
 #endif
 #if defined(LPUART1_BASE)
@@ -335,6 +348,11 @@ static IRQn_Type serial_get_irq_n(UARTName uart_name)
 #if defined(UART5_BASE)
         case UART_5:
             irq_n = UART5_IRQn;
+            break;
+#endif
+#if defined(USART6_BASE)
+        case UART_6:
+            irq_n = USART6_IRQn;
             break;
 #endif
 #if defined(LPUART1_BASE)
