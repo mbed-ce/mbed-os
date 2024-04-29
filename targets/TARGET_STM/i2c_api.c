@@ -172,7 +172,7 @@ static uint32_t      I2c_valid_timing_nbr = 0;
 #endif
 
 /*  Family specific description for I2C */
-#define I2C_NUM (5)
+#define I2C_NUM (6)
 static I2C_HandleTypeDef *i2c_handles[I2C_NUM];
 
 /* Timeout values are based on core clock and I2C clock.
@@ -242,10 +242,18 @@ static void i2c4_irq(void)
     HAL_I2C_ER_IRQHandler(handle);
 }
 #endif
-#if defined(I2C5_BASE) // STM32H7
+#if defined(I2C5_BASE) // STM32H7/U5
 static void i2c5_irq(void)
 {
     I2C_HandleTypeDef *handle = i2c_handles[4];
+    HAL_I2C_EV_IRQHandler(handle);
+    HAL_I2C_ER_IRQHandler(handle);
+}
+#endif
+#if defined(I2C6_BASE) // STM32H7/U5
+static void i2c6_irq(void)
+{
+    I2C_HandleTypeDef *handle = i2c_handles[5];
     HAL_I2C_EV_IRQHandler(handle);
     HAL_I2C_ER_IRQHandler(handle);
 }
@@ -329,6 +337,11 @@ uint32_t i2c_get_irq_handler(i2c_t *obj)
             handler = (uint32_t)&i2c5_irq;
             break;
 #endif
+#if defined(I2C6_BASE)
+        case 5:
+            handler = (uint32_t)&i2c6_irq;
+            break;
+#endif
 #if defined(FMPI2C1_BASE)
         case 4:
             handler = (uint32_t)&i2c5_irq;
@@ -383,6 +396,12 @@ void i2c_hw_reset(i2c_t *obj)
     if (obj_s->i2c == I2C_5) {
         __HAL_RCC_I2C5_FORCE_RESET();
         __HAL_RCC_I2C5_RELEASE_RESET();
+    }
+#endif
+#if defined I2C6_BASE
+    if (obj_s->i2c == I2C_6) {
+        __HAL_RCC_I2C6_FORCE_RESET();
+        __HAL_RCC_I2C6_RELEASE_RESET();
     }
 #endif
 #if defined FMPI2C1_BASE
@@ -492,6 +511,15 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
         obj_s->error_i2cIRQ = I2C5_ER_IRQn;
     }
 #endif
+#if defined I2C6_BASE
+    // Enable I2C6 clock and pinout if not done
+    if (obj_s->i2c == I2C_6) {
+        obj_s->index = 5;
+        __HAL_RCC_I2C6_CLK_ENABLE();
+        obj_s->event_i2cIRQ = I2C6_EV_IRQn;
+        obj_s->error_i2cIRQ = I2C6_ER_IRQn;
+    }
+#endif
 #if defined FMPI2C1_BASE
     // Enable I2C3 clock and pinout if not done
     if (obj_s->i2c == FMPI2C_1) {
@@ -578,6 +606,11 @@ void i2c_deinit_internal(i2c_t *obj)
 #if defined I2C5_BASE
     if (obj_s->i2c == I2C_5) {
         __HAL_RCC_I2C5_CLK_DISABLE();
+    }
+#endif
+#if defined I2C6_BASE
+    if (obj_s->i2c == I2C_6) {
+        __HAL_RCC_I2C6_CLK_DISABLE();
     }
 #endif
 #if defined FMPI2C1_BASE
@@ -678,6 +711,13 @@ void i2c_frequency(i2c_t *obj, int hz)
         }
 #endif
 #endif
+#if defined(I2C6_BASE) && defined (I2C_FASTMODEPLUS_I2C6)  // sometimes I2C_FASTMODEPLUS_I2Cx is define even if not supported by the chip
+#if defined(SYSCFG_CFGR1_I2C_FMP_I2C6) || defined(SYSCFG_CFGR1_I2C6_FMP) || defined(SYSCFG_PMC_I2C6_FMP) || defined(SYSCFG_PMCR_I2C6_FMP) || defined(SYSCFG_CFGR2_I2C6_FMP)
+        if (obj_s->i2c == I2C_6) {
+            HAL_I2CEx_EnableFastModePlus(I2C_FASTMODEPLUS_I2C6);
+        }
+#endif
+#endif
     }
 #endif //I2C_IP_VERSION_V2
 
@@ -709,6 +749,11 @@ void i2c_frequency(i2c_t *obj, int hz)
 #if defined(I2C5_BASE) && defined(__HAL_RCC_I2C5_CONFIG)
     if (obj_s->i2c == I2C_5) {
         __HAL_RCC_I2C5_CONFIG(I2CAPI_I2C5_CLKSRC);
+    }
+#endif
+#if defined(I2C6_BASE) && defined(__HAL_RCC_I2C6_CONFIG)
+    if (obj_s->i2c == I2C_6) {
+        __HAL_RCC_I2C6_CONFIG(I2CAPI_I2C6_CLKSRC);
     }
 #endif
 #if defined(DUAL_CORE) && (TARGET_STM32H7)

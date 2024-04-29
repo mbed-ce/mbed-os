@@ -4894,6 +4894,58 @@
             "887"
         ]
     },
+    "MCU_STM32U545xE": {
+        "inherits": [
+            "MCU_STM32U5"
+        ],
+        "public": false,
+        "mbed_rom_start": "0x08000000",
+        "mbed_rom_size": "0x80000",
+        "mbed_ram_start": "0x20000000",
+        "mbed_ram_size": "0x40000",
+        "extra_labels_add": [
+            "STM32U545xE"
+        ],
+        "macros_add": [
+            "STM32U545xx"
+        ]
+    },
+    "NUCLEO_U545RE_Q": {
+        "inherits": [
+            "MCU_STM32U545xE"
+        ],
+        "public": true,
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "device_name": "STM32U545RETx"
+    },
+    "MCU_STM32U5A5xJ": {
+        "inherits": [
+            "MCU_STM32U5"
+        ],
+        "public": false,
+        "mbed_rom_start": "0x08000000",
+        "mbed_rom_size": "0x400000",
+        "mbed_ram_start": "0x20000000",
+        "mbed_ram_size": "0x270000",
+        "extra_labels_add": [
+            "STM32U5A5xJ"
+        ],
+        "macros_add": [
+            "STM32U5A5xx"
+        ]
+    },
+    "NUCLEO_U5A5ZJ_Q": {
+        "inherits": [
+            "MCU_STM32U5A5xJ"
+        ],
+        "public": true,
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "device_name": "STM32U5A5ZJTx"
+    },        
     "MCU_STM32WB": {
         "inherits": [
             "MCU_STM32"

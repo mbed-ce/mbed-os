@@ -33,10 +33,15 @@ typedef enum {
 
 typedef enum {
     UART_1 = (int)USART1_BASE,
+#if defined(USART2_BASE)
     UART_2 = (int)USART2_BASE,
+#endif
     UART_3 = (int)USART3_BASE,
     UART_4 = (int)UART4_BASE,
     UART_5 = (int)UART5_BASE,
+#if defined(USART6_BASE)
+    UART_6 = (int)USART6_BASE,
+#endif
     LPUART_1 = (int)LPUART1_BASE
 } UARTName;
 
@@ -50,7 +55,13 @@ typedef enum {
     I2C_1 = (int)I2C1_BASE,
     I2C_2 = (int)I2C2_BASE,
     I2C_3 = (int)I2C3_BASE,
-    I2C_4 = (int)I2C4_BASE
+    I2C_4 = (int)I2C4_BASE,
+#ifdef I2C5_BASE
+    I2C_5 = (int)I2C5_BASE,
+#endif
+#ifdef I2C6_BASE
+    I2C_6 = (int)I2C6_BASE
+#endif
 } I2CName;
 
 typedef enum {
@@ -71,17 +82,28 @@ typedef enum {
 
 typedef enum {
     QSPI_1 = (int)OCTOSPI1_R_BASE,
-	QSPI_2 = (int)OCTOSPI2_R_BASE
+#if defined(OCTOSPI2_R_BASE)
+    QSPI_2 = (int)OCTOSPI2_R_BASE
+#endif
 } QSPIName;
 
 typedef enum {
     OSPI_1 = (int)OCTOSPI1_R_BASE,
-    OSPI_2 = (int)OCTOSPI2_R_BASE	
+#if defined(OCTOSPI2_R_BASE)
+    OSPI_2 = (int)OCTOSPI2_R_BASE
+#endif	
 } OSPIName;
 
+#if defined(USB_OTG_FS_BASE) || defined(USB_DRD_BASE)
 typedef enum {
+#if defined(USB_OTG_FS_BASE)
     USB_FS = (int)USB_OTG_FS_BASE
+#endif
+#if defined(USB_DRD_BASE)
+    USB_FS = (int)USB_DRD_BASE
+#endif
 } USBName;
+#endif
 
 #ifdef __cplusplus
 }
