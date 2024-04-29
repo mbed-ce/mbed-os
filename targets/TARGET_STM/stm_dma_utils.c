@@ -27,6 +27,27 @@
 // Note: arrays are 0-indexed, so DMA1 Channel2 is at stmDMAHandles[0][1].
 static DMA_HandleTypeDef * stmDMAHandles[NUM_DMA_CONTROLLERS][MAX_DMA_CHANNELS_PER_CONTROLLER];
 
+DMA_TypeDef * stm_get_dma_instance(DMALinkInfo const * dmaLink)
+{
+    switch(dmaLink->dmaIdx)
+    {
+#ifdef DMA1
+        case 1:
+            return DMA1;
+#endif
+#ifdef DMA2
+        case 2:
+            return DMA2;
+#endif
+#ifdef GPDMA1
+        case 1:
+            return GPDMA1;
+#endif
+        default:
+            mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA controller", dmaLink->dmaIdx, MBED_FILENAME, __LINE__);
+    }
+}
+
 DMA_Channel_TypeDef * stm_get_dma_channel(const DMALinkInfo *dmaLink)
 {
     switch(dmaLink->dmaIdx)
@@ -521,6 +542,33 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
             mbed_error(MBED_ERROR_ITEM_NOT_FOUND, "Invalid DMA controller", dmaLink->dmaIdx, MBED_FILENAME, __LINE__);
 
     }
+}
+
+bool stm_set_dma_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef *handle)
+{
+#ifdef DMA_IP_VERSION_V2
+    // Channels start from 1 in IP v2 only
+    uint8_t channelIdx = dmaLink->channelIdx - 1;
+#else
+    uint8_t channelIdx = dmaLink->channelIdx;
+#endif
+    if(stmDMAHandles[dmaLink->dmaIdx - 1][channelIdx] != NULL && handle != NULL)
+    {
+        return false;
+    }
+    stmDMAHandles[dmaLink->dmaIdx - 1][channelIdx] = handle;
+    return true;
+}
+
+DMA_HandleTypeDef *stm_get_dma_link(DMALinkInfo const * dmaLink)
+{
+#ifdef DMA_IP_VERSION_V2
+    // Channels start from 1 in IP v2 only
+    uint8_t channelIdx = dmaLink->channelIdx - 1;
+#else
+    uint8_t channelIdx = dmaLink->channelIdx;
+#endif
+    return stmDMAHandles[dmaLink->dmaIdx - 1][channelIdx];
 }
 
 DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direction, bool periphInc, bool memInc,

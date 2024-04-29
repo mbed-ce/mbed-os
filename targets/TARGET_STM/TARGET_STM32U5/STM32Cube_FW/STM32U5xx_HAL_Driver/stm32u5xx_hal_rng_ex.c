@@ -77,7 +77,7 @@
   *         RNG_ConfigTypeDef.
   * @param  hrng pointer to a RNG_HandleTypeDef structure that contains
   *          the configuration information for RNG.
-  * @param  pConf: pointer to a RNG_ConfigTypeDef structure that contains
+  * @param  pConf pointer to a RNG_ConfigTypeDef structure that contains
   *         the configuration information for RNG module
 
   * @retval HAL status
@@ -129,6 +129,9 @@ HAL_StatusTypeDef HAL_RNGEx_SetConfig(RNG_HandleTypeDef *hrng, const RNG_ConfigT
     /* RNG health test control in accordance with NIST */
     WRITE_REG(hrng->Instance->HTCR, pConf->HealthTest);
 
+    /* RNG noise source control in accordance with NIST */
+    WRITE_REG(hrng->Instance->NSCR, pConf->NoiseSource);
+
     /* Writing bit CONDRST=0*/
     CLEAR_BIT(hrng->Instance->CR, RNG_CR_CONDRST);
     /* Get tick */
@@ -173,7 +176,7 @@ HAL_StatusTypeDef HAL_RNGEx_SetConfig(RNG_HandleTypeDef *hrng, const RNG_ConfigT
   *         RNG_ConfigTypeDef.
   * @param  hrng pointer to a RNG_HandleTypeDef structure that contains
   *          the configuration information for RNG.
-  * @param  pConf: pointer to a RNG_ConfigTypeDef structure that contains
+  * @param  pConf pointer to a RNG_ConfigTypeDef structure that contains
   *         the configuration information for RNG module
 
   * @retval HAL status

@@ -70,9 +70,9 @@ once the ADC is enabled */
 /* and CPU clock frequencies.                                                 */
 /* Example of profile low frequency : ADC frequency minimum 140kHz (cf        */
 /* datasheet for ADC4), CPU frequency 160MHz.                                 */
-/* Calibration time max = 25502 / fADC (refer to datasheet)                   */
-/*                      = 29M CPU cycles                                      */
-#define ADC_CALIBRATION_TIMEOUT         (29000000U)   /*!< ADC calibration time-out value */
+/* Calibration time max = 31849 / fADC (refer to datasheet)                   */
+/*                      = 36M CPU cycles                                      */
+#define ADC_CALIBRATION_TIMEOUT         (36400000U)   /*!< ADC calibration time-out value */
 
 /**
   * @}
@@ -210,8 +210,11 @@ HAL_StatusTypeDef HAL_ADCEx_Calibration_Start(ADC_HandleTypeDef *hadc, uint32_t 
 
         if (tmp_hal_status == HAL_OK)
         {
+          /* Use a Data Memory Barrier instruction to avoid synchronization issues when accessing ADC registers */
           MODIFY_REG(hadc->Instance->CR, ADC_CR_CALINDEX, 0x9UL << ADC_CR_CALINDEX_Pos);
-          MODIFY_REG(hadc->Instance->CALFACT2, 0x00FF0000UL, 0x00020000UL);
+          __DMB();
+          MODIFY_REG(hadc->Instance->CALFACT2, 0xFFFFFF00UL, 0x03021100UL);
+          __DMB();
           SET_BIT(hadc->Instance->CALFACT, ADC_CALFACT_LATCH_COEF);
 
           tmp_hal_status = ADC_Disable(hadc);

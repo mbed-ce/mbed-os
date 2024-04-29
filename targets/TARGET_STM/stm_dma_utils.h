@@ -42,6 +42,10 @@
 #include "stm_dma_ip_v1.h"
 #endif
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 /*
  * Structure containing info about a peripheral's link to the DMA controller.
  */
@@ -66,6 +70,13 @@ typedef struct DMALinkInfo {
 } DMALinkInfo;
 
 /**
+ * @brief Get the DMA instance for a DMA link
+ *
+ * @param dmaLink DMA instance
+ */
+DMA_TypeDef * stm_get_dma_instance(DMALinkInfo const * dmaLink);
+
+/**
  * @brief Get the DMA channel instance for a DMA link
  *
  * @param dmaLink DMA link instance
@@ -78,6 +89,27 @@ DMA_Channel_TypeDef * stm_get_dma_channel(DMALinkInfo const * dmaLink);
  * @param dmaLink DMA link instance
  */
 IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink);
+
+/**
+ * @brief Store a externaly initialized DMA handle to the DMA handles matrix
+ *
+ * @param dmaLink DMA link instance
+ * @param handle DMA handle or NULL
+ *
+ * @return true if the handle is stored successfully
+ * @return false if handle is not NULL and the DMA channel used by the link has already been used
+ */
+bool stm_set_dma_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef *handle);
+
+/**
+ * @brief Get the handle of a DMA link
+ *
+ * @param dmaLink DMA link instance
+ *
+ * @return Pointer to DMA handle
+ * @return NULL if the DMA channel used by the link is not allocated
+ */
+DMA_HandleTypeDef * stm_get_dma_link(DMALinkInfo const * dmaLink);
 
 /**
  * @brief Initialize a DMA link for use.
@@ -105,5 +137,9 @@ DMA_HandleTypeDef * stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t dire
  * @param dmaLink DMA link ponter to free.
  */
 void stm_free_dma_link(DMALinkInfo const * dmaLink);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif //MBED_OS_STM_DMA_UTILS_H

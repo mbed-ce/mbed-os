@@ -252,8 +252,8 @@ extern "C" {
 #define LL_PWR_SRAM6_STOP_PAGE8_RETENTION  (PWR_CR5_SRAM6PDS8)  /*!< SRAM6 page 8 (64 KB) retention in Stop mode (Stop 0, 1, 2, 3)   */
 #define LL_PWR_SRAM6_STOP_FULL_RETENTION   (PWR_CR5_SRAM6PDS1  | PWR_CR5_SRAM6PDS2  | PWR_CR5_SRAM6PDS3  | \
                                             PWR_CR5_SRAM6PDS4  | PWR_CR5_SRAM6PDS5  | PWR_CR5_SRAM6PDS6  | \
-                                            PWR_CR5_SRAM6PDS7  | PWR_CR5_SRAM6PDS8)
-                                                                /*!< SRAM6 pages (1 to 8) retention in Stop modes (Stop 0, 1, 2, 3)  */
+                                            PWR_CR5_SRAM6PDS7  | \
+                                            PWR_CR5_SRAM6PDS8)  /*!< SRAM6 pages (1 to 8) retention in Stop modes (Stop 0, 1, 2, 3)  */
 /**
   * @}
   */
@@ -557,13 +557,13 @@ extern "C" {
 #define LL_PWR_WAKEUP_PIN8_SEC  PWR_SECCFGR_WUP8SEC /*!< Wake up pin 8 secure mode             */
 
 #define LL_PWR_LPM_NSEC 0U                  /*!< Low-power modes nsecure mode                  */
-#define LL_PWR_LPM_SEC  PWR_SECCFGR_WUP8SEC /*!< Low-power modes secure mode                   */
+#define LL_PWR_LPM_SEC  PWR_SECCFGR_LPMSEC  /*!< Low-power modes secure mode                   */
 #define LL_PWR_VDM_NSEC 0U                  /*!< Voltage detection and monitoring nsecure mode */
-#define LL_PWR_VDM_SEC  PWR_SECCFGR_WUP8SEC /*!< Voltage detection and monitoring secure mode  */
+#define LL_PWR_VDM_SEC  PWR_SECCFGR_VDMSEC  /*!< Voltage detection and monitoring secure mode  */
 #define LL_PWR_VB_NSEC  0U                  /*!< Backup domain nsecure mode                    */
-#define LL_PWR_VB_SEC   PWR_SECCFGR_WUP8SEC /*!< Backup domain secure mode                     */
+#define LL_PWR_VB_SEC   PWR_SECCFGR_VBSEC   /*!< Backup domain secure mode                     */
 #define LL_PWR_APC_NSEC 0U                  /*!< Pull-up/pull-down nsecure mode                */
-#define LL_PWR_APC_SEC  PWR_SECCFGR_WUP8SEC /*!< Pull-up/pull-down secure mode                 */
+#define LL_PWR_APC_SEC  PWR_SECCFGR_APCSEC  /*!< Pull-up/pull-down secure mode                 */
 /**
   * @}
   */
@@ -1252,7 +1252,7 @@ __STATIC_INLINE uint32_t LL_PWR_GetSRAM5StopRetention(void)
   * @rmtoll CR5    SRAM6PDS6       LL_PWR_SetSRAM6StopRetention\n
   * @rmtoll CR5    SRAM6PDS7       LL_PWR_SetSRAM6StopRetention\n
   * @rmtoll CR5    SRAM6PDS8       LL_PWR_SetSRAM6StopRetention
-  * @param  SRAM5PageRetention : This parameter can be one of the following values:
+  * @param  SRAM6PageRetention : This parameter can be one of the following values:
   *         @arg @ref LL_PWR_SRAM6_STOP_NO_RETENTION
   *         @arg @ref LL_PWR_SRAM6_STOP_FULL_RETENTION
   *                      Or can be a combination of the following values:
@@ -1434,6 +1434,7 @@ __STATIC_INLINE uint32_t LL_PWR_GetPeriphRAMStopRetention(void)
   return ((~(READ_BIT(PWR->CR2, LL_PWR_PERIPHRAM_STOP_FULL_RETENTION))) & LL_PWR_PERIPHRAM_STOP_FULL_RETENTION);
 }
 
+#if defined (PWR_CR2_PKARAMPDS)
 /**
   * @brief  Set the PKA32 SRAM page retention in Stop mode.
   * @rmtoll CR2    PKARAMPDS       LL_PWR_SetPKARAMStopRetention
@@ -1458,6 +1459,7 @@ __STATIC_INLINE uint32_t LL_PWR_GetPKARAMStopRetention(void)
 {
   return ((~(READ_BIT(PWR->CR2, LL_PWR_PKARAM_STOP_FULL_RETENTION))) & LL_PWR_PKARAM_STOP_FULL_RETENTION);
 }
+#endif /* defined (PWR_CR2_PKARAMPDS) */
 
 #if defined (PWR_CR2_GPRAMPDS)
 /**
@@ -1519,7 +1521,7 @@ __STATIC_INLINE uint32_t LL_PWR_GetDSIRAMStopRetention(void)
 /**
   * @brief  Set the JPEG SRAM page retention in Stop mode.
   * @rmtoll CR2    JPEGRAMPDS       LL_PWR_SetJPEGRAMStopRetention
-  * @param  DSIRAMPageRetention : This parameter can be one of the following values:
+  * @param  JPEGRAMPageRetention : This parameter can be one of the following values:
   *         @arg @ref LL_PWR_JPEGRAM_STOP_NO_RETENTION
   *         @arg @ref LL_PWR_JPEGRAM_STOP_FULL_RETENTION
   * @retval None
@@ -1909,213 +1911,234 @@ __STATIC_INLINE uint32_t LL_PWR_IsEnabledPVD(void)
 
 /**
   * @brief  Enable the independent USB supply.
-  * @rmtoll SVMCR    USV       LL_PWR_EnableVDDUSB
+  * @rmtoll SVMCR    USV       LL_PWR_EnableVddUSB
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_EnableVDDUSB(void)
+__STATIC_INLINE void LL_PWR_EnableVddUSB(void)
 {
   SET_BIT(PWR->SVMCR, PWR_SVMCR_USV);
 }
+#define LL_PWR_EnableVDDUSB  LL_PWR_EnableVddUSB         /* for legacy purpose */
 
 /**
   * @brief  Disable the independent USB supply.
   * @rmtoll SVMCR    USV       LL_PWR_DisableVDDUSB
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_DisableVDDUSB(void)
+__STATIC_INLINE void LL_PWR_DisableVddUSB(void)
 {
   CLEAR_BIT(PWR->SVMCR, PWR_SVMCR_USV);
 }
+#define LL_PWR_DisableVDDUSB  LL_PWR_DisableVddUSB       /* for legacy purpose */
 
 /**
   * @brief  Check if the independent USB supply is enabled.
-  * @rmtoll SVMCR    USV       LL_PWR_IsEnabledVDDUSB
+  * @rmtoll SVMCR    USV       LL_PWR_IsEnabledVddUSB
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_PWR_IsEnabledVDDUSB(void)
+__STATIC_INLINE uint32_t LL_PWR_IsEnabledVddUSB(void)
 {
   return ((READ_BIT(PWR->SVMCR, PWR_SVMCR_USV) == (PWR_SVMCR_USV)) ? 1UL : 0UL);
 }
+#define LL_PWR_IsEnabledVDDUSB  LL_PWR_IsEnabledVddUSB   /* for legacy purpose */
 
 /**
   * @brief  Enable the independent I/Os supply.
-  * @rmtoll SVMCR    IO2SV       LL_PWR_EnableVDDIO2
+  * @rmtoll SVMCR    IO2SV       LL_PWR_EnableVddIO2
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_EnableVDDIO2(void)
+__STATIC_INLINE void LL_PWR_EnableVddIO2(void)
 {
   SET_BIT(PWR->SVMCR, PWR_SVMCR_IO2SV);
 }
+#define LL_PWR_EnableVDDIO2  LL_PWR_EnableVddIO2         /* for legacy purpose */
 
 /**
   * @brief  Disable the independent I/Os supply.
-  * @rmtoll SVMCR    IO2SV       LL_PWR_DisableVDDIO2
+  * @rmtoll SVMCR    IO2SV       LL_PWR_DisableVddIO2
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_DisableVDDIO2(void)
+__STATIC_INLINE void LL_PWR_DisableVddIO2(void)
 {
   CLEAR_BIT(PWR->SVMCR, PWR_SVMCR_IO2SV);
 }
+#define LL_PWR_DisableVDDIO2  LL_PWR_DisableVddIO2       /* for legacy purpose */
 
 /**
   * @brief  Check if the independent I/Os supply is enabled.
-  * @rmtoll SVMCR    IO2SV       LL_PWR_IsEnabledVDDIO2
+  * @rmtoll SVMCR    IO2SV       LL_PWR_IsEnabledVddIO2
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_PWR_IsEnabledVDDIO2(void)
+__STATIC_INLINE uint32_t LL_PWR_IsEnabledVddIO2(void)
 {
   return ((READ_BIT(PWR->SVMCR, PWR_SVMCR_IO2SV) == (PWR_SVMCR_IO2SV)) ? 1UL : 0UL);
 }
+#define LL_PWR_IsEnabledVDDIO2  LL_PWR_IsEnabledVddIO2   /* for legacy purpose */
 
 /**
   * @brief  Enable the independent analog supply.
-  * @rmtoll SVMCR    ASV       LL_PWR_EnableVDDA
+  * @rmtoll SVMCR    ASV       LL_PWR_EnableVddA
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_EnableVDDA(void)
+__STATIC_INLINE void LL_PWR_EnableVddA(void)
 {
   SET_BIT(PWR->SVMCR, PWR_SVMCR_ASV);
 }
+#define LL_PWR_EnableVDDA  LL_PWR_EnableVddA             /* for legacy purpose */
 
 /**
   * @brief  Disable the independent analog supply.
-  * @rmtoll SVMCR    ASV       LL_PWR_DisableVDDA
+  * @rmtoll SVMCR    ASV       LL_PWR_DisableVddA
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_DisableVDDA(void)
+__STATIC_INLINE void LL_PWR_DisableVddA(void)
 {
   CLEAR_BIT(PWR->SVMCR, PWR_SVMCR_ASV);
 }
+#define LL_PWR_DisableVDDA  LL_PWR_DisableVddA           /* for legacy purpose */
 
 /**
   * @brief  Check if the independent analog supply is enabled.
-  * @rmtoll SVMCR    ASV       LL_PWR_IsEnabledVDDA
+  * @rmtoll SVMCR    ASV       LL_PWR_IsEnabledVddA
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_PWR_IsEnabledVDDA(void)
+__STATIC_INLINE uint32_t LL_PWR_IsEnabledVddA(void)
 {
   return ((READ_BIT(PWR->SVMCR, PWR_SVMCR_ASV) == (PWR_SVMCR_ASV)) ? 1UL : 0UL);
 }
+#define LL_PWR_IsEnabledVDDA  LL_PWR_IsEnabledVddA       /* for legacy purpose */
 
 /**
   * @brief  Enable the independent USB supply monitor.
-  * @rmtoll SVMCR    UVMEN       LL_PWR_EnableVDDUSBMonitor
+  * @rmtoll SVMCR    UVMEN       LL_PWR_EnableVddUSBMonitor
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_EnableVDDUSBMonitor(void)
+__STATIC_INLINE void LL_PWR_EnableVddUSBMonitor(void)
 {
   SET_BIT(PWR->SVMCR, PWR_SVMCR_UVMEN);
 }
+#define LL_PWR_EnableVDDUSBMonitor  LL_PWR_EnableVddUSBMonitor   /* for legacy purpose */
 
 /**
   * @brief  Disable the independent USB supply monitor.
-  * @rmtoll SVMCR    UVMEN       LL_PWR_DisableVDDUSBMonitor
+  * @rmtoll SVMCR    UVMEN       LL_PWR_DisableVddUSBMonitor
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_DisableVDDUSBMonitor(void)
+__STATIC_INLINE void LL_PWR_DisableVddUSBMonitor(void)
 {
   CLEAR_BIT(PWR->SVMCR, PWR_SVMCR_UVMEN);
 }
+#define LL_PWR_DisableVDDUSBMonitor  LL_PWR_DisableVddUSBMonitor  /* for legacy purpose */
 
 /**
   * @brief  Check if the independent USB supply monitor is enabled.
-  * @rmtoll SVMCR    UVMEN       LL_PWR_IsEnabledVDDUSBMonitor
+  * @rmtoll SVMCR    UVMEN       LL_PWR_IsEnabledVddUSBMonitor
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_PWR_IsEnabledVDDUSBMonitor(void)
+__STATIC_INLINE uint32_t LL_PWR_IsEnabledVddUSBMonitor(void)
 {
   return ((READ_BIT(PWR->SVMCR, PWR_SVMCR_UVMEN) == (PWR_SVMCR_UVMEN)) ? 1UL : 0UL);
 }
+#define LL_PWR_IsEnabledVDDUSBMonitor  LL_PWR_IsEnabledVddUSBMonitor   /* for legacy purpose */
 
 /**
   * @brief  Enable the independent I/Os supply monitor.
-  * @rmtoll SVMCR    IO2VMEN       LL_PWR_EnableVDDIO2Monitor
+  * @rmtoll SVMCR    IO2VMEN       LL_PWR_EnableVddIO2Monitor
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_EnableVDDIO2Monitor(void)
+__STATIC_INLINE void LL_PWR_EnableVddIO2Monitor(void)
 {
   SET_BIT(PWR->SVMCR, PWR_SVMCR_IO2VMEN);
 }
+#define LL_PWR_EnableVDDIO2Monitor  LL_PWR_EnableVddIO2Monitor         /* for legacy purpose */
 
 /**
   * @brief  Disable the independent I/Os supply monitor.
-  * @rmtoll SVMCR    IO2VMEN       LL_PWR_DisableVDDIO2Monitor
+  * @rmtoll SVMCR    IO2VMEN       LL_PWR_DisableVddIO2Monitor
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_DisableVDDIO2Monitor(void)
+__STATIC_INLINE void LL_PWR_DisableVddIO2Monitor(void)
 {
   CLEAR_BIT(PWR->SVMCR, PWR_SVMCR_IO2VMEN);
 }
+#define LL_PWR_DisableVDDIO2Monitor  LL_PWR_DisableVddIO2Monitor       /* for legacy purpose */
 
 /**
   * @brief  Check if the independent I/Os supply monitor is enabled.
-  * @rmtoll SVMCR    IO2VMEN       LL_PWR_IsEnabledVDDIO2Monitor
+  * @rmtoll SVMCR    IO2VMEN       LL_PWR_IsEnabledVddIO2Monitor
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_PWR_IsEnabledVDDIO2Monitor(void)
+__STATIC_INLINE uint32_t LL_PWR_IsEnabledVddIO2Monitor(void)
 {
   return ((READ_BIT(PWR->SVMCR, PWR_SVMCR_IO2VMEN) == (PWR_SVMCR_IO2VMEN)) ? 1UL : 0UL);
 }
+#define LL_PWR_IsEnabledVDDIO2Monitor  LL_PWR_IsEnabledVddIO2Monitor   /* for legacy purpose */
 
 /**
   * @brief  Enable the independent analog supply monitor 1.
-  * @rmtoll SVMCR    AVM1EN       LL_PWR_EnableVDDAMonitor1
+  * @rmtoll SVMCR    AVM1EN       LL_PWR_EnableVddAMonitor1
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_EnableVDDAMonitor1(void)
+__STATIC_INLINE void LL_PWR_EnableVddAMonitor1(void)
 {
   SET_BIT(PWR->SVMCR, PWR_SVMCR_AVM1EN);
 }
+#define LL_PWR_EnableVDDAMonitor1  LL_PWR_EnableVddAMonitor1           /* for legacy purpose */
 
 /**
   * @brief  Disable the independent analog supply monitor 1.
-  * @rmtoll SVMCR    AVM1EN       LL_PWR_DisableVDDAMonitor1
+  * @rmtoll SVMCR    AVM1EN       LL_PWR_DisableVddAMonitor1
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_DisableVDDAMonitor1(void)
+__STATIC_INLINE void LL_PWR_DisableVddAMonitor1(void)
 {
   CLEAR_BIT(PWR->SVMCR, PWR_SVMCR_AVM1EN);
 }
+#define LL_PWR_DisableVDDAMonitor1  LL_PWR_DisableVddAMonitor1         /* for legacy purpose */
 
 /**
   * @brief  Check if the independent analog supply monitor 1 is enabled.
-  * @rmtoll SVMCR    AVM1EN       LL_PWR_IsEnabledVDDAMonitor1
+  * @rmtoll SVMCR    AVM1EN       LL_PWR_IsEnabledVddAMonitor1
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_PWR_IsEnabledVDDAMonitor1(void)
+__STATIC_INLINE uint32_t LL_PWR_IsEnabledVddAMonitor1(void)
 {
   return ((READ_BIT(PWR->SVMCR, PWR_SVMCR_AVM1EN) == (PWR_SVMCR_AVM1EN)) ? 1UL : 0UL);
 }
+#define LL_PWR_IsEnabledVDDAMonitor1  LL_PWR_IsEnabledVddAMonitor1     /* for legacy purpose */
 
 /**
   * @brief  Enable the independent analog supply monitor 2.
-  * @rmtoll SVMCR    AVM2EN       LL_PWR_EnableVDDAMonitor2
+  * @rmtoll SVMCR    AVM2EN       LL_PWR_EnableVddAMonitor2
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_EnableVDDAMonitor2(void)
+__STATIC_INLINE void LL_PWR_EnableVddAMonitor2(void)
 {
   SET_BIT(PWR->SVMCR, PWR_SVMCR_AVM2EN);
 }
+#define LL_PWR_EnableVDDAMonitor2  LL_PWR_EnableVddAMonitor2           /* for legacy purpose */
 
 /**
   * @brief  Disable the independent analog supply monitor 2.
-  * @rmtoll SVMCR    AVM2EN       LL_PWR_DisableVDDAMonitor2
+  * @rmtoll SVMCR    AVM2EN       LL_PWR_DisableVddAMonitor2
   * @retval None
   */
-__STATIC_INLINE void LL_PWR_DisableVDDAMonitor2(void)
+__STATIC_INLINE void LL_PWR_DisableVddAMonitor2(void)
 {
   CLEAR_BIT(PWR->SVMCR, PWR_SVMCR_AVM2EN);
 }
+#define LL_PWR_DisableVDDAMonitor2  LL_PWR_DisableVddAMonitor2         /* for legacy purpose */
 
 /**
   * @brief  Check if the independent analog supply monitor 2 is enabled.
-  * @rmtoll SVMCR    AVM2EN       LL_PWR_IsEnabledVDDAMonitor2
+  * @rmtoll SVMCR    AVM2EN       LL_PWR_IsEnabledVddAMonitor2
   * @retval State of bit (1 or 0).
   */
-__STATIC_INLINE uint32_t LL_PWR_IsEnabledVDDAMonitor2(void)
+__STATIC_INLINE uint32_t LL_PWR_IsEnabledVddAMonitor2(void)
 {
   return ((READ_BIT(PWR->SVMCR, PWR_SVMCR_AVM2EN) == (PWR_SVMCR_AVM2EN)) ? 1UL : 0UL);
 }
+#define LL_PWR_IsEnabledVDDAMonitor2  LL_PWR_IsEnabledVddAMonitor2     /* for legacy purpose */
 
 /**
   * @brief  Enable the wake up pin_x.

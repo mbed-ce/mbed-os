@@ -479,14 +479,24 @@ static qspi_status_t _qspi_init_direct(qspi_t *obj, const qspi_pinmap_t *pinmap,
         OSPIM_Cfg_Struct.ClkPort = 1;
         OSPIM_Cfg_Struct.DQSPort    = 1;
         OSPIM_Cfg_Struct.NCSPort = 1;
+#if QSPI_OSPIM_IOPORT_HIGH
+        OSPIM_Cfg_Struct.IOLowPort = HAL_OSPIM_IOPORT_1_HIGH;
+        OSPIM_Cfg_Struct.IOHighPort = HAL_OSPIM_IOPORT_NONE;
+#else
         OSPIM_Cfg_Struct.IOLowPort = HAL_OSPIM_IOPORT_1_LOW;
         OSPIM_Cfg_Struct.IOHighPort = HAL_OSPIM_IOPORT_1_HIGH;
+#endif
     } else {
         OSPIM_Cfg_Struct.ClkPort = 2;
         OSPIM_Cfg_Struct.DQSPort    = 2;
         OSPIM_Cfg_Struct.NCSPort = 2;
+#if QSPI_OSPIM_IOPORT_HIGH
+        OSPIM_Cfg_Struct.IOLowPort = HAL_OSPIM_IOPORT_2_HIGH;
+        OSPIM_Cfg_Struct.IOHighPort = HAL_OSPIM_IOPORT_NONE;
+#else
         OSPIM_Cfg_Struct.IOLowPort = HAL_OSPIM_IOPORT_2_LOW;
         OSPIM_Cfg_Struct.IOHighPort = HAL_OSPIM_IOPORT_2_HIGH;
+#endif
     }
 
     if (HAL_OSPIM_Config(&obj->handle, &OSPIM_Cfg_Struct, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
