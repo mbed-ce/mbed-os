@@ -19,6 +19,18 @@
 #include "cmsis.h"
 #include "pinmap.h"
 
+#include <math.h>
+#include <stdlib.h>
+
+// Change to 1 to enable debug prints of what's being calculated.
+// Must comment out the critical section calls in PwmOut to use.
+#define LPC1768_PWMOUT_DEBUG 0
+
+#if LPC1768_PWMOUT_DEBUG
+#include <stdio.h>
+#include <inttypes.h>
+#endif
+
 #define TCR_CNT_EN       0x00000001
 #define TCR_RESET        0x00000002
 
@@ -53,7 +65,7 @@ __IO uint32_t *PWM_MATCH[] = {
 
 #define TCR_PWM_EN       0x00000008
 
-static unsigned int pwm_clock_mhz;
+static unsigned int pwm_clocks_per_us;
 
 void pwmout_init(pwmout_t *obj, PinName pin)
 {
@@ -67,7 +79,8 @@ void pwmout_init(pwmout_t *obj, PinName pin)
     // ensure the power is on
     LPC_SC->PCONP |= 1 << 6;
 
-    // ensure clock to /4
+    // Set PWM clock to CCLK / 4.  This means that the PWM counter will increment every (4 / SystemCoreClock) seconds,
+    // or 41.7ns (1us/24) with default clock settings.
     LPC_SC->PCLKSEL0 &= ~(0x3 << 12);     // pclk = /4
     LPC_PWM1->PR = 0;                     // no pre-scale
 
@@ -77,7 +90,8 @@ void pwmout_init(pwmout_t *obj, PinName pin)
     // enable the specific PWM output
     LPC_PWM1->PCR |= 1 << (8 + pwm);
 
-    pwm_clock_mhz = SystemCoreClock / 4000000;
+    // Calculate microseconds -> clocks conversion, factoring in the prescaler of 4 we set earlier.
+    pwm_clocks_per_us = SystemCoreClock / 4 / 1000000;
 
     // default to 20ms: standard for servos, and fine for e.g. brightness control
     pwmout_period_ms(obj, 20);
@@ -89,7 +103,8 @@ void pwmout_init(pwmout_t *obj, PinName pin)
 
 void pwmout_free(pwmout_t *obj)
 {
-    // [TODO]
+    // Turn off this output of the PWM module by clearing the PWMENAx bit
+    LPC_PWM1->PCR &= ~(1 << (8 + obj->pwm));
 }
 
 void pwmout_write(pwmout_t *obj, float value)
@@ -101,14 +116,21 @@ void pwmout_write(pwmout_t *obj, float value)
     }
 
     // set channel match to percentage
-    uint32_t v = (uint32_t)((float)(LPC_PWM1->MR0) * value);
+    uint32_t v = (uint32_t)lroundf((float)(LPC_PWM1->MR0) * value);
 
-    // workaround for PWM1[1] - Never make it equal MR0, else we get 1 cycle dropout
+    // workaround for the LPC1768 PWM1[1] errata - bad stuff happens for output 1 if the MR register equals the MR0 register
+    // for the module (this could happen if the user tries to set exactly 100% duty cycle).  To avoid this, 
+    // if the match register value would equal MR0, increment it again to make it greater than MR0.  This doesn't
+    // cause any side effects so long as we make sure MR0 is less than UINT32_MAX - 1.
     if (v == LPC_PWM1->MR0) {
         v++;
     }
 
     *obj->MR = v;
+
+#if LPC1768_PWMOUT_DEBUG
+    printf("Calculated MR=%" PRIu32 " for duty cycle %.06f (MR0 = %" PRIu32 ")\n", v, value, LPC_PWM1->MR0);
+#endif
 
     // accept on next period start
     LPC_PWM1->LER |= 1 << obj->pwm;
@@ -133,19 +155,30 @@ void pwmout_period_ms(pwmout_t *obj, int ms)
 // Set the PWM period, keeping the duty cycle the same.
 void pwmout_period_us(pwmout_t *obj, int us)
 {
+    // If the passed value is larger than this, it will overflow the MR0 register and bad stuff will happen
+    const uint32_t max_period_us = (UINT32_MAX - 2) / pwm_clocks_per_us;
+
     // calculate number of ticks
-    uint32_t ticks = pwm_clock_mhz * us;
+    if((uint32_t)us > max_period_us)
+    {
+        us = max_period_us;
+    }
+    if(us < 1)
+    {
+        us = 1;
+    }
+    uint32_t ticks = pwm_clocks_per_us * us;
 
     // set reset
     LPC_PWM1->TCR = TCR_RESET;
 
-    // set the global match register
-    LPC_PWM1->MR0 = ticks;
-
     // Scale the pulse width to preserve the duty ratio
-    if (LPC_PWM1->MR0 > 0) {
-        *obj->MR = (*obj->MR * ticks) / LPC_PWM1->MR0;
-    }
+    *obj->MR = (*obj->MR * ticks) / LPC_PWM1->MR0;
+
+    // set the global match register.  Note that based on testing we do *not* need to subtract 1 here,
+    // e.g. setting MR0 to 4 causes the PWM to reset every 4 clocks.  This appears to be because the internal
+    // counter starts at 1 from reset, not 0.
+    LPC_PWM1->MR0 = ticks;
 
     // set the channel latch to update value at next period start
     LPC_PWM1->LER |= 1 << 0;
@@ -156,7 +189,8 @@ void pwmout_period_us(pwmout_t *obj, int us)
 
 int pwmout_read_period_us(pwmout_t *obj)
 {
-    return (LPC_PWM1->MR0);
+    // Add half a us worth of clocks for correct integer rounding.
+    return (LPC_PWM1->MR0 + pwm_clocks_per_us/2) / pwm_clocks_per_us;
 }
 
 void pwmout_pulsewidth(pwmout_t *obj, float seconds)
@@ -172,9 +206,9 @@ void pwmout_pulsewidth_ms(pwmout_t *obj, int ms)
 void pwmout_pulsewidth_us(pwmout_t *obj, int us)
 {
     // calculate number of ticks
-    uint32_t v = pwm_clock_mhz * us;
+    uint32_t v = pwm_clocks_per_us * us;
 
-    // workaround for PWM1[1] - Never make it equal MR0, else we get 1 cycle dropout
+    // workaround for PWM1[1] - Never make it equal MR0, else we get 1 cycle dropout.  See pwmout_write() for more details.
     if (v == LPC_PWM1->MR0) {
         v++;
     }
@@ -188,7 +222,13 @@ void pwmout_pulsewidth_us(pwmout_t *obj, int us)
 
 int pwmout_read_pulsewidth_us(pwmout_t *obj)
 {
-    return (*obj->MR);
+    uint32_t mr_ticks = *(obj->MR);
+    if(mr_ticks > LPC_PWM1->MR0)
+    {
+        mr_ticks = LPC_PWM1->MR0;
+    }
+    // Add half a us worth of clocks for correct integer rounding.
+    return (mr_ticks + pwm_clocks_per_us/2) / pwm_clocks_per_us;
 }
 
 const PinMap *pwmout_pinmap()
