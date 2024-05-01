@@ -99,7 +99,7 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink);
  * @return true if the handle is stored successfully
  * @return false if handle is not NULL and the DMA channel used by the link has already been used
  */
-bool stm_set_dma_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef *handle);
+bool stm_set_dma_handle_for_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef *handle);
 
 /**
  * @brief Get the handle of a DMA link
@@ -109,7 +109,7 @@ bool stm_set_dma_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef *handle);
  * @return Pointer to DMA handle
  * @return NULL if the DMA channel used by the link is not allocated
  */
-DMA_HandleTypeDef * stm_get_dma_link(DMALinkInfo const * dmaLink);
+DMA_HandleTypeDef * stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink);
 
 /**
  * @brief Initialize a DMA link for use.

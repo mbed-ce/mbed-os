@@ -544,7 +544,7 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
     }
 }
 
-bool stm_set_dma_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef *handle)
+bool stm_set_dma_handle_for_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef *handle)
 {
 #ifdef DMA_IP_VERSION_V2
     // Channels start from 1 in IP v2 only
@@ -560,7 +560,7 @@ bool stm_set_dma_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef *handle)
     return true;
 }
 
-DMA_HandleTypeDef *stm_get_dma_link(DMALinkInfo const * dmaLink)
+DMA_HandleTypeDef *stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink)
 {
 #ifdef DMA_IP_VERSION_V2
     // Channels start from 1 in IP v2 only

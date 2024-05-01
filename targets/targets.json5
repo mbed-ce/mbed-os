@@ -4795,6 +4795,11 @@
             "i2c_timing_value_algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
+            },
+            "qspi_ospim_ioport_high": {
+                "help": "When using the OSPI peripheral in QSPI mode, set value 1 to use IO 7~4 for data, or 0 to use IO 3~0. Affects both OCTOSPI1 and OCTOSPI2 instances.",
+                "value": 0,
+                "macro_name": "QSPI_OSPIM_IOPORT_HIGH"
             }
         },
         "overrides": {
@@ -4918,7 +4923,13 @@
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "device_name": "STM32U545RETx"
+        "device_name": "STM32U545RETx",
+        "overrides": {
+            "clock_source": "USE_PLL_HSI",
+            // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
+            // Jumper JP5 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
+            "default-adc-vref": 3.3
+        }
     },
     "MCU_STM32U5A5xJ": {
         "inherits": [
@@ -4944,7 +4955,13 @@
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "device_name": "STM32U5A5ZJTx"
+        "device_name": "STM32U5A5ZJTx",
+        "overrides": {
+            "clock_source": "USE_PLL_HSI",
+            // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
+            // Jumper JP4 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
+            "default-adc-vref": 3.3
+        }
     },        
     "MCU_STM32WB": {
         "inherits": [
