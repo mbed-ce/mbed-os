@@ -142,8 +142,9 @@ void PwmOut::resume()
     core_util_critical_section_enter();
     if (!_initialized) {
         PwmOut::init();
-        PwmOut::period_us(_period_us);
         PwmOut::write(_duty_cycle);
+        PwmOut::period_us(_period_us);
+        
     }
     core_util_critical_section_exit();
 }

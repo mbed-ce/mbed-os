@@ -170,18 +170,22 @@ void pwmout_period_us(pwmout_t *obj, int us)
     {
         us = 1;
     }
-    uint32_t ticks = pwm_clocks_per_us * us;
+    uint32_t new_mr0_val = pwm_clocks_per_us * us;
 
     // set reset
     LPC_PWM1->TCR = TCR_RESET;
 
-    // Scale the pulse width to preserve the duty ratio
-    *obj->MR = (*obj->MR * ticks) / LPC_PWM1->MR0;
+    // Scale the pulse width to preserve the duty ratio.  Must use 64-bit math as the numerator can fairly easily overflow 32 bits.
+    uint32_t new_mr_val = (*obj->MR * ((uint64_t)new_mr0_val)) / LPC_PWM1->MR0;
+#if LPC1768_PWMOUT_DEBUG
+    printf("Changing MR0 from %" PRIu32 " to %" PRIu32 ", changing MR from %" PRIu32 " to %" PRIu32 " to preserve duty cycle\n", LPC_PWM1->MR0, new_mr0_val, *obj->MR, new_mr_val);
+#endif
+    *obj->MR = new_mr_val;
 
     // set the global match register.  Note that based on testing we do *not* need to subtract 1 here,
     // e.g. setting MR0 to 4 causes the PWM to reset every 4 clocks.  This appears to be because the internal
     // counter starts at 1 from reset, not 0.
-    LPC_PWM1->MR0 = ticks;
+    LPC_PWM1->MR0 = new_mr0_val;
 
     // set the channel latch to update value at next period start
     LPC_PWM1->LER = 1 << 0;
