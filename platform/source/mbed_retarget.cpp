@@ -1570,7 +1570,7 @@ extern "C" void exit(int return_code)
     fsync(STDERR_FILENO);
 #endif
 
-#if DEVICE_SEMIHOST
+#if MBED_CONF_TARGET_SEMIHOSTING_ENABLED
     if (mbed_interface_connected()) {
         semihost_exit();
     }

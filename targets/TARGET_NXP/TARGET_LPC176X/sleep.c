@@ -27,7 +27,7 @@
 
 void hal_sleep(void) {
 
-#if (DEVICE_SEMIHOST == 1)
+#if (MBED_CONF_TARGET_SEMIHOSTING_ENABLED == 1)
     // ensure debug is disconnected
     mbed_interface_disconnect();
 #endif
@@ -70,7 +70,7 @@ void hal_sleep(void) {
 
 void hal_deepsleep(void) {
 
-#if (DEVICE_SEMIHOST == 1)
+#if (MBED_CONF_TARGET_SEMIHOSTING_ENABLED == 1)
     // ensure debug is disconnected
     mbed_interface_disconnect();
 #endif

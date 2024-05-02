@@ -115,7 +115,7 @@ function(mbed_greentea_add_test)
     # the serial port.  Doing that type of reset also seems to give the Pitaya-Link probe trouble.
     # However, for targets which support semihosting (currently just LPC1768), we do need the reset as otherwise
     # semihosting stuff like localfilesystem won't work.
-    if(NOT "DEVICE_SEMIHOST=1" IN_LIST MBED_TARGET_DEFINITIONS)
+    if(NOT "MBED_CONF_TARGET_SEMIHOSTING_ENABLED=1" IN_LIST MBED_CONFIG_DEFINITIONS)
         list(APPEND MBED_HTRUN_ARGUMENTS --skip-reset)
     endif()
 

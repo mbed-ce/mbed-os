@@ -229,7 +229,7 @@ utest::v1::status_t greentea_test_setup(const size_t number_of_cases)
 #endif
     ticker_suspend(get_us_ticker_data());
 
-#ifdef DEVICE_SEMIHOST
+#ifdef MBED_CONF_TARGET_SEMIHOSTING_ENABLED
     // Disconnect semihosting now, because otherwise it will get disconnected on the first sleep call and
     // cause said call to take several milliseconds, leading to a test failure.
     mbed_interface_disconnect();

@@ -103,8 +103,11 @@ void pwmout_init(pwmout_t *obj, PinName pin)
 
 void pwmout_free(pwmout_t *obj)
 {
-    // Turn off this output of the PWM module by clearing the PWMENAx bit
-    LPC_PWM1->PCR &= ~(1 << (8 + obj->pwm));
+    // From testing, it seems like if you just disable the output by clearing the the bit in PCR, the output can get stuck 
+    // at either 0 or 1 depending on what level the PWM was at when it was disabled.
+    // Instead, we just set the duty cycle of the output to 0 so that it's guaranteed to go low.
+    *obj->MR = 0;
+    LPC_PWM1->LER = 1 << obj->pwm;
 }
 
 void pwmout_write(pwmout_t *obj, float value)
@@ -133,7 +136,7 @@ void pwmout_write(pwmout_t *obj, float value)
 #endif
 
     // accept on next period start
-    LPC_PWM1->LER |= 1 << obj->pwm;
+    LPC_PWM1->LER = 1 << obj->pwm;
 }
 
 float pwmout_read(pwmout_t *obj)
@@ -181,7 +184,7 @@ void pwmout_period_us(pwmout_t *obj, int us)
     LPC_PWM1->MR0 = ticks;
 
     // set the channel latch to update value at next period start
-    LPC_PWM1->LER |= 1 << 0;
+    LPC_PWM1->LER = 1 << 0;
 
     // enable counter and pwm, clear reset
     LPC_PWM1->TCR = TCR_CNT_EN | TCR_PWM_EN;
@@ -217,7 +220,7 @@ void pwmout_pulsewidth_us(pwmout_t *obj, int us)
     *obj->MR = v;
 
     // set the channel latch to update value at next period start
-    LPC_PWM1->LER |= 1 << obj->pwm;
+    LPC_PWM1->LER = 1 << obj->pwm;
 }
 
 int pwmout_read_pulsewidth_us(pwmout_t *obj)

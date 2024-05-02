@@ -47,7 +47,7 @@
 extern "C" {
 #endif
 
-#if DEVICE_SEMIHOST
+#if MBED_CONF_TARGET_SEMIHOSTING_ENABLED
 
 /**
  * \defgroup platform_interface interface functions

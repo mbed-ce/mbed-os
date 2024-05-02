@@ -19,7 +19,7 @@
 
 #include "platform/mbed_semihost_api.h"
 
-#if DEVICE_SEMIHOST
+#if MBED_CONF_TARGET_SEMIHOSTING_ENABLED
 
 // return true if a debugger is attached, indicating mbed interface is connected
 int mbed_interface_connected(void)
@@ -90,7 +90,7 @@ WEAK int mbed_uid(char *uid)
 
 WEAK void mbed_mac_address(char *mac)
 {
-#if DEVICE_SEMIHOST
+#if MBED_CONF_TARGET_SEMIHOSTING_ENABLED
     char uid[DEVICE_ID_LENGTH + 1];
     int i;
 
@@ -115,7 +115,7 @@ WEAK void mbed_mac_address(char *mac)
         mac[3] = 0xF0;
         mac[4] = 0x00;
         mac[5] = 0x00;
-#if DEVICE_SEMIHOST
+#if MBED_CONF_TARGET_SEMIHOSTING_ENABLED
     }
 #endif
 }
