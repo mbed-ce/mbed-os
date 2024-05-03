@@ -4925,7 +4925,6 @@
         ],
         "device_name": "STM32U545RETx",
         "overrides": {
-            "clock_source": "USE_PLL_HSI",
             // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
             // Jumper JP5 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
             "default-adc-vref": 3.3
@@ -4957,7 +4956,6 @@
         ],
         "device_name": "STM32U5A5ZJTx",
         "overrides": {
-            "clock_source": "USE_PLL_HSI",
             // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
             // Jumper JP4 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
             "default-adc-vref": 3.3

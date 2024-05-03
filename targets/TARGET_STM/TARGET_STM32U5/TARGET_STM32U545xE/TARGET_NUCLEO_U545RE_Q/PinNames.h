@@ -12,10 +12,10 @@
  *
  ******************************************************************************
  *
- * Automatically generated from STM32CubeMX/db/mcu/STM32U575ZITxQ.xml
+ * Automatically generated from STM32CubeMX/db/mcu/STM32U545RETxQ.xml
  */
 
-/* MBED TARGET LIST: NUCLEO_U575ZI_Q */
+/* MBED TARGET LIST: NUCLEO_U545RE_Q */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H

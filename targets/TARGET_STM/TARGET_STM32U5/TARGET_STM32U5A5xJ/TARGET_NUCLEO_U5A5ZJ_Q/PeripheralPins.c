@@ -12,7 +12,7 @@
  *
  ******************************************************************************
  *
- * Automatically generated from STM32CubeMX/db/mcu/STM32U575ZITxQ.xml
+ * Automatically generated from STM32CubeMX/db/mcu/STM32U5A5ZJTxQ.xml
  */
 
 #include "PeripheralPins.h"
