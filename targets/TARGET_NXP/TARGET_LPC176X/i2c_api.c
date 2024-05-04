@@ -22,6 +22,14 @@
 #include "cmsis.h"
 #include "pinmap.h"
 
+// Change to 1 to enable debug prints.
+#define LPC1768_I2C_DEBUG 0
+
+#if LPC1768_I2C_DEBUG
+#include <stdio.h>
+#include <inttypes.h>
+#endif
+
 static const PinMap PinMap_I2C_SDA[] = {
     {P0_0 , I2C_1, 3},
     {P0_10, I2C_2, 2},
@@ -83,6 +91,10 @@ static int i2c_wait_SI(i2c_t *obj) {
     return 0;
 }
 
+static inline void i2c_interface_disable(i2c_t *obj) {
+    I2C_CONCLR(obj) = 0x40;
+}
+
 static inline void i2c_interface_enable(i2c_t *obj) {
     I2C_CONSET(obj) = 0x40;
 }
@@ -107,16 +119,29 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl) {
     
     // set default frequency at 100k
     i2c_frequency(obj, 100000);
+
+    // Reset the I2C bus by clearing all flags, including I2EN.
+    // This does a software reset of sorts, which is important because the I2C::recover()
+    // function, which is called before initializing the bus, seems to put the I2C 
+    // peripheral in a weird state where the next transaction will fail.
+    i2c_interface_disable(obj);
     i2c_conclr(obj, 1, 1, 1, 1);
+
     i2c_interface_enable(obj);
     
     pinmap_pinout(sda, PinMap_I2C_SDA);
+    pin_mode(sda, OpenDrain);
     pinmap_pinout(scl, PinMap_I2C_SCL);
+    pin_mode(scl, OpenDrain);
 }
 
 inline int i2c_start(i2c_t *obj) {
     int status = 0;
     int isInterrupted = I2C_CONSET(obj) & (1 << 3);
+
+#if LPC1768_I2C_DEBUG
+    printf("i2c_start(): status was originally 0x%x\n", i2c_status(obj));
+#endif
 
     // 8.1 Before master mode can be entered, I2CON must be initialised to:
     //  - I2EN STA STO SI AA - -
@@ -134,6 +159,10 @@ inline int i2c_start(i2c_t *obj) {
 
     i2c_wait_SI(obj);
     status = i2c_status(obj);
+
+#if LPC1768_I2C_DEBUG
+    printf("i2c_start(): status is now 0x%x\n", status);
+#endif
 
     // Clear start bit now that it's transmitted
     i2c_conclr(obj, 1, 0, 0, 0);
@@ -303,6 +332,10 @@ int i2c_byte_read(i2c_t *obj, int last) {
 int i2c_byte_write(i2c_t *obj, int data) {
     int ack;
     int status = i2c_do_write(obj, (data & 0xFF), 0);
+
+#if LPC1768_I2C_DEBUG
+    printf("i2c_do_write(0x%hhx) returned 0x%x\n", data & 0xFF, status);
+#endif
     
     switch(status) {
         case 0x18: case 0x28:       // Master transmit ACKs
