@@ -31,6 +31,9 @@ typedef enum {
     PIN_OUTPUT
 } PinDirection;
 
+/* If this macro is defined, you can use constexpr utility functions for pin map search. */
+#define STATIC_PINMAP_READY 1
+
 #define PORT_SHIFT  5
 
 typedef enum {

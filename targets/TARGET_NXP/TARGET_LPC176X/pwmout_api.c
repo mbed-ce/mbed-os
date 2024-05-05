@@ -17,7 +17,7 @@
 #include "mbed_assert.h"
 #include "pwmout_api.h"
 #include "cmsis.h"
-#include "pinmap.h"
+#include "PeripheralPinMaps.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -34,25 +34,6 @@
 #define TCR_CNT_EN       0x00000001
 #define TCR_RESET        0x00000002
 
-//  PORT ID, PWM ID, Pin function
-static const PinMap PinMap_PWM[] = {
-    {P1_18, PWM_1, 2},
-    {P1_20, PWM_2, 2},
-    {P1_21, PWM_3, 2},
-    {P1_23, PWM_4, 2},
-    {P1_24, PWM_5, 2},
-    {P1_26, PWM_6, 2},
-    {P2_0, PWM_1, 1},
-    {P2_1, PWM_2, 1},
-    {P2_2, PWM_3, 1},
-    {P2_3, PWM_4, 1},
-    {P2_4, PWM_5, 1},
-    {P2_5, PWM_6, 1},
-    {P3_25, PWM_2, 3},
-    {P3_26, PWM_3, 3},
-    {NC, NC, 0}
-};
-
 __IO uint32_t *PWM_MATCH[] = {
     &(LPC_PWM1->MR0),
     &(LPC_PWM1->MR1),
@@ -67,11 +48,10 @@ __IO uint32_t *PWM_MATCH[] = {
 
 static unsigned int pwm_clocks_per_us;
 
-void pwmout_init(pwmout_t *obj, PinName pin)
+void pwmout_init_direct(pwmout_t *obj, const PinMap *pinmap)
 {
     // determine the channel
-    PWMName pwm = (PWMName)pinmap_peripheral(pin, PinMap_PWM);
-    MBED_ASSERT(pwm != (PWMName)NC);
+    PWMName pwm = (PWMName)pinmap->peripheral;
 
     obj->pwm = pwm;
     obj->MR = PWM_MATCH[pwm];
@@ -98,7 +78,19 @@ void pwmout_init(pwmout_t *obj, PinName pin)
     pwmout_write(obj, 0);
 
     // Wire pinout
-    pinmap_pinout(pin, PinMap_PWM);
+    pin_function(pinmap->pin, pinmap->function);
+    pin_mode(pinmap->pin, PullNone);
+}
+
+void pwmout_init(pwmout_t *obj, PinName pin)
+{
+    PinMap pinmap;
+    pinmap.pin = pin;
+    pinmap.function = pinmap_find_function(pin, PinMap_PWM);
+    pinmap.peripheral = pinmap_peripheral(pin, PinMap_PWM);
+    MBED_ASSERT(pinmap.peripheral != NC);
+
+    pwmout_init_direct(obj, &pinmap);
 }
 
 void pwmout_free(pwmout_t *obj)

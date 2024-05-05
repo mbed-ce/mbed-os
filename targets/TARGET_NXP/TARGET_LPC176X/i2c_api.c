@@ -22,6 +22,8 @@
 #include "cmsis.h"
 #include "pinmap.h"
 
+#include "PeripheralPinMaps.h"
+
 // Change to 1 to enable debug prints.
 #define LPC1768_I2C_DEBUG 0
 
@@ -29,22 +31,6 @@
 #include <stdio.h>
 #include <inttypes.h>
 #endif
-
-static const PinMap PinMap_I2C_SDA[] = {
-    {P0_0 , I2C_1, 3},
-    {P0_10, I2C_2, 2},
-    {P0_19, I2C_1, 3},
-    {P0_27, I2C_0, 1},
-    {NC   , NC   , 0}
-};
-
-static const PinMap PinMap_I2C_SCL[] = {
-    {P0_1 , I2C_1, 3},
-    {P0_11, I2C_2, 2},
-    {P0_20, I2C_1, 3},
-    {P0_28, I2C_0, 1},
-    {NC   , NC,    0}
-};
 
 #define I2C_CONSET(x)       (x->i2c->I2CONSET)
 #define I2C_CONCLR(x)       (x->i2c->I2CONCLR)
@@ -107,13 +93,10 @@ static inline void i2c_power_enable(i2c_t *obj) {
     }
 }
 
-void i2c_init(i2c_t *obj, PinName sda, PinName scl) {
-    // determine the SPI to use
-    I2CName i2c_sda = (I2CName)pinmap_peripheral(sda, PinMap_I2C_SDA);
-    I2CName i2c_scl = (I2CName)pinmap_peripheral(scl, PinMap_I2C_SCL);
-    obj->i2c = (LPC_I2C_TypeDef *)pinmap_merge(i2c_sda, i2c_scl);
-    MBED_ASSERT((int)obj->i2c != NC);
-    
+void i2c_init_direct(i2c_t *obj, const i2c_pinmap_t *pinmap)
+{
+    obj->i2c = (LPC_I2C_TypeDef *)pinmap->peripheral;
+
     // enable power
     i2c_power_enable(obj);
     
@@ -129,11 +112,32 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl) {
 
     i2c_interface_enable(obj);
     
-    pinmap_pinout(sda, PinMap_I2C_SDA);
-    pin_mode(sda, OpenDrain);
-    pinmap_pinout(scl, PinMap_I2C_SCL);
-    pin_mode(scl, OpenDrain);
+    // Map pins
+    pin_function(pinmap->sda_pin, pinmap->sda_function);
+    pin_mode(pinmap->sda_pin, OpenDrain);
+    pin_function(pinmap->scl_pin, pinmap->scl_function);
+    pin_mode(pinmap->scl_pin, OpenDrain);
 }
+
+void i2c_init(i2c_t *obj, PinName sda, PinName scl) {
+
+    i2c_pinmap_t pinmap;
+    pinmap.sda_pin = sda;
+    pinmap.scl_pin = scl;
+
+    // Determine peripheral associated with these pins
+    I2CName i2c_sda = (I2CName)pinmap_peripheral(sda, PinMap_I2C_SDA);
+    I2CName i2c_scl = (I2CName)pinmap_peripheral(scl, PinMap_I2C_SCL);
+    pinmap.peripheral = pinmap_merge(i2c_sda, i2c_scl);
+    MBED_ASSERT((int)pinmap.peripheral != NC);
+
+    // Get pin functions
+    pinmap.sda_function = pinmap_find_function(sda, PinMap_I2C_SDA);
+    pinmap.scl_function = pinmap_find_function(scl, PinMap_I2C_SCL);
+
+    i2c_init_direct(obj, &pinmap);
+}
+
 
 inline int i2c_start(i2c_t *obj) {
     int status = 0;

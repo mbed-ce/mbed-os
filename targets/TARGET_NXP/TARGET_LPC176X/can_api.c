@@ -18,7 +18,7 @@
 #include "can_api.h"
 
 #include "cmsis.h"
-#include "pinmap.h"
+#include "PeripheralPinMaps.h"
 
 #include <math.h>
 #include <string.h>
@@ -35,22 +35,6 @@
 http://www.port.de/engl/canprod/sv_req_form.html
 http://www.kvaser.com/can/index.htm
 */
-
-static const PinMap PinMap_CAN_RD[] = {
-    {P0_0 , CAN_1, 1},
-    {P0_4 , CAN_2, 2},
-    {P0_21, CAN_1, 3},
-    {P2_7 , CAN_2, 1},
-    {NC   , NC   , 0}
-};
-
-static const PinMap PinMap_CAN_TD[] = {
-    {P0_1 , CAN_1, 1},
-    {P0_5 , CAN_2, 2},
-    {P0_22, CAN_1, 3},
-    {P2_8 , CAN_2, 1},
-    {NC   , NC   , 0}
-};
 
 // Type definition to hold a CAN message
 struct CANMsg {
@@ -293,10 +277,8 @@ static unsigned int can_speed(unsigned int sclk, unsigned int pclk, unsigned int
 
 }
 
-void can_init_freq(can_t *obj, PinName rd, PinName td, int hz) {
-    CANName can_rd = (CANName)pinmap_peripheral(rd, PinMap_CAN_RD);
-    CANName can_td = (CANName)pinmap_peripheral(td, PinMap_CAN_TD);
-    obj->dev = (LPC_CAN_TypeDef *)pinmap_merge(can_rd, can_td);
+void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz) {
+    obj->dev = (LPC_CAN_TypeDef *)pinmap->peripheral;
     MBED_ASSERT((int)obj->dev != NC);
 
     switch ((int)obj->dev) {
@@ -304,8 +286,11 @@ void can_init_freq(can_t *obj, PinName rd, PinName td, int hz) {
         case CAN_2: LPC_SC->PCONP |= 1 << 14; break;
     }
 
-    pinmap_pinout(rd, PinMap_CAN_RD);
-    pinmap_pinout(td, PinMap_CAN_TD);
+    // Map pins
+    pin_function(pinmap->rd_pin, pinmap->rd_function);
+    pin_mode(pinmap->rd_pin, PullNone);
+    pin_function(pinmap->td_pin, pinmap->td_function);
+    pin_mode(pinmap->td_pin, PullNone);
     
     switch ((int)obj->dev) {
         case CAN_1: obj->index = 0; break;
@@ -317,6 +302,28 @@ void can_init_freq(can_t *obj, PinName rd, PinName td, int hz) {
     can_frequency(obj, hz);
 
     LPC_CANAF->AFMR = ACCF_BYPASS; // Bypass Filter
+}
+
+void can_init_freq(can_t *obj, PinName rd, PinName td, int hz) {
+    can_pinmap_t pinmap;
+    pinmap.rd_pin = rd;
+    pinmap.td_pin = td;
+
+    // Determine peripheral associated with these pins
+    CANName can_rd = (CANName)pinmap_peripheral(rd, PinMap_CAN_RD);
+    CANName can_td = (CANName)pinmap_peripheral(td, PinMap_CAN_TD);
+    pinmap.peripheral = pinmap_merge(can_rd, can_td);
+    MBED_ASSERT((int)pinmap.peripheral != NC);
+
+    // Get pin functions
+    pinmap.rd_function = pinmap_find_function(rd, PinMap_CAN_RD);
+    pinmap.td_function = pinmap_find_function(td, PinMap_CAN_TD);
+
+    can_init_freq_direct(obj, &pinmap, hz);
+}
+
+void can_init_direct(can_t *obj, const can_pinmap_t *pinmap) {
+    can_init_freq_direct(obj, pinmap, 100000);
 }
 
 void can_init(can_t *obj, PinName rd, PinName td) {

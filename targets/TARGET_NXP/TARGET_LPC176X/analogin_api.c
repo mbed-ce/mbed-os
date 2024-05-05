@@ -18,7 +18,7 @@
 #include "analogin_api.h"
 
 #include "cmsis.h"
-#include "pinmap.h"
+#include "PeripheralPinMaps.h"
 
 #define ANALOGIN_MEDIAN_FILTER      1
 
@@ -29,23 +29,10 @@ static inline int div_round_up(int x, int y) {
   return (x + (y - 1)) / y;
 }
 
-static const PinMap PinMap_ADC[] = {
-    {P0_23, ADC0_0, 1},
-    {P0_24, ADC0_1, 1},
-    {P0_25, ADC0_2, 1},
-    {P0_26, ADC0_3, 1},
-    {P1_30, ADC0_4, 3},
-    {P1_31, ADC0_5, 3},
-    {P0_2,  ADC0_7, 2},
-    {P0_3,  ADC0_6, 2},
-    {NC,    NC,     0}
-};
-
 #define ADC_RANGE    ADC_12BIT_RANGE
 
-void analogin_init(analogin_t *obj, PinName pin) {
-    obj->adc = (ADCName)pinmap_peripheral(pin, PinMap_ADC);
-    MBED_ASSERT(obj->adc != (ADCName)NC);
+void analogin_init_direct(analogin_t *obj, const PinMap *pinmap) {
+    obj->adc = pinmap->peripheral;
     
     // ensure power is turned on
     LPC_SC->PCONP |= (1 << 12);
@@ -69,7 +56,19 @@ void analogin_init(analogin_t *obj, PinName pin) {
                   | (0 << 24)     // START: 0 = no start
                   | (0 << 27);    // EDGE: not applicable
     
-    pinmap_pinout(pin, PinMap_ADC);
+    // Map pin
+    pin_function(pinmap->pin, pinmap->function);
+    pin_mode(pinmap->pin, PullNone);
+}
+
+void analogin_init(analogin_t *obj, PinName pin) {
+    PinMap pinmap;
+    pinmap.pin = pin;
+    pinmap.function = pinmap_find_function(pin, PinMap_ADC);
+    pinmap.peripheral = pinmap_peripheral(pin, PinMap_ADC);
+    MBED_ASSERT(pinmap.peripheral != NC);
+
+    analogin_init_direct(obj, &pinmap);
 }
 
 static inline uint32_t adc_read(analogin_t *obj) {

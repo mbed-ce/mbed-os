@@ -324,12 +324,12 @@ void serial_pinout_tx(PinName tx);
 
 #if DEVICE_SERIAL_FC
 /** Configure the serial for the flow control. It sets flow control in the hardware
- *  if a serial peripheral supports it, otherwise software emulation is used.
+ *  if a serial peripheral supports it, otherwise software emulation shall be used.
  *
  * @param obj    The serial object
  * @param type   The type of the flow control. Look at the available FlowControl types.
- * @param rxflow The TX pin name
- * @param txflow The RX pin name
+ * @param rxflow The TX (RTS) pin name
+ * @param txflow The RX (CTS) pin name
  */
 void serial_set_flow_control(serial_t *obj, FlowControl type, PinName rxflow, PinName txflow);
 

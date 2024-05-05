@@ -24,47 +24,12 @@
 #include "cmsis.h"
 #include "pinmap.h"
 #include "gpio_api.h"
+#include "PeripheralPinMaps.h"
 
 /******************************************************************************
  * INITIALIZATION
  ******************************************************************************/
 #define UART_NUM    4
-
-static const PinMap PinMap_UART_TX[] = {
-    {P0_0,  UART_3, 2},
-    {P0_2,  UART_0, 1},
-    {P0_10, UART_2, 1},
-    {P0_15, UART_1, 1},
-    {P0_25, UART_3, 3},
-    {P2_0 , UART_1, 2},
-    {P2_8 , UART_2, 2},
-    {P4_28, UART_3, 3},
-    {NC   , NC    , 0}
-};
-
-static const PinMap PinMap_UART_RX[] = {
-    {P0_1 , UART_3, 2},
-    {P0_3 , UART_0, 1},
-    {P0_11, UART_2, 1},
-    {P0_16, UART_1, 1},
-    {P0_26, UART_3, 3},
-    {P2_1 , UART_1, 2},
-    {P2_9 , UART_2, 2},
-    {P4_29, UART_3, 3},
-    {NC   , NC    , 0}
-};
-
-static const PinMap PinMap_UART_RTS[] = {
-    {P0_22, UART_1, 1},
-    {P2_7,  UART_1, 2},
-    {NC,    NC,     0}
-};
-
-static const PinMap PinMap_UART_CTS[] = {
-    {P0_17, UART_1, 1},
-    {P2_2,  UART_1, 2},
-    {NC,    NC,     0}
-};
 
 #define UART_MCR_RTSEN_MASK     (1 << 6)
 #define UART_MCR_CTSEN_MASK     (1 << 7)
@@ -83,18 +48,12 @@ struct serial_global_data_s {
 
 static struct serial_global_data_s uart_data[UART_NUM];
 
-void serial_init(serial_t *obj, PinName tx, PinName rx) {
-    int is_stdio_uart = 0;
+void serial_init_direct(serial_t *obj, const serial_pinmap_t *pinmap)
+{
+    obj->uart = (LPC_UART_TypeDef *)pinmap->peripheral;
 
-    // determine the UART to use
-    UARTName uart_tx = (UARTName)pinmap_peripheral(tx, PinMap_UART_TX);
-    UARTName uart_rx = (UARTName)pinmap_peripheral(rx, PinMap_UART_RX);
-    UARTName uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
-    MBED_ASSERT((int)uart != NC);
-
-    obj->uart = (LPC_UART_TypeDef *)uart;
     // enable power
-    switch (uart) {
+    switch ((int)obj->uart) {
         case UART_0: LPC_SC->PCONP |= 1 <<  3; break;
         case UART_1: LPC_SC->PCONP |= 1 <<  4; break;
         case UART_2: LPC_SC->PCONP |= 1 << 24; break;
@@ -116,19 +75,17 @@ void serial_init(serial_t *obj, PinName tx, PinName rx) {
     serial_baud  (obj, 9600);
     serial_format(obj, 8, ParityNone, 1);
 
-    // pinout the chosen uart
-    pinmap_pinout(tx, PinMap_UART_TX);
-    pinmap_pinout(rx, PinMap_UART_RX);
-
-    // set rx/tx pins in PullUp mode
-    if (tx != NC) {
-        pin_mode(tx, PullUp);
+    // Map pins
+    if (pinmap->tx_pin != NC) {
+        pin_function(pinmap->tx_pin, pinmap->tx_function);
+        pin_mode(pinmap->tx_pin, PullUp);
     }
-    if (rx != NC) {
-        pin_mode(rx, PullUp);
+    if (pinmap->rx_pin != NC) {
+        pin_function(pinmap->rx_pin, pinmap->rx_function);
+        pin_mode(pinmap->rx_pin, PullUp);
     }
 
-    switch (uart) {
+    switch ((int)obj->uart) {
         case UART_0: obj->index = 0; break;
         case UART_1: obj->index = 1; break;
         case UART_2: obj->index = 2; break;
@@ -138,12 +95,28 @@ void serial_init(serial_t *obj, PinName tx, PinName rx) {
     uart_data[obj->index].sw_cts.pin = NC;
     serial_set_flow_control(obj, FlowControlNone, NC, NC);
 
-    is_stdio_uart = (uart == STDIO_UART) ? (1) : (0);
-
-    if (is_stdio_uart) {
+    if ((int)obj->uart == STDIO_UART) {
         stdio_uart_inited = 1;
         memcpy(&stdio_uart, obj, sizeof(serial_t));
     }
+}
+
+void serial_init(serial_t *obj, PinName tx, PinName rx) {
+    serial_pinmap_t pinmap;
+    pinmap.tx_pin = tx;
+    pinmap.rx_pin = rx;
+
+    // determine the UART to use
+    UARTName uart_tx = (UARTName)pinmap_peripheral(tx, PinMap_UART_TX);
+    UARTName uart_rx = (UARTName)pinmap_peripheral(rx, PinMap_UART_RX);
+    pinmap.peripheral = pinmap_merge(uart_tx, uart_rx);
+    MBED_ASSERT(pinmap.peripheral != NC);
+
+    // Get pin functions
+    pinmap.tx_function = pinmap_find_function(tx, PinMap_UART_TX);
+    pinmap.rx_function = pinmap_find_function(rx, PinMap_UART_RX);
+
+    serial_init_direct(obj, &pinmap);
 }
 
 void serial_free(serial_t *obj) {
@@ -396,7 +369,8 @@ void serial_break_clear(serial_t *obj) {
     obj->uart->LCR &= ~(1 << 6);
 }
 
-void serial_set_flow_control(serial_t *obj, FlowControl type, PinName rxflow, PinName txflow) {
+void serial_set_flow_control_direct(serial_t *obj, FlowControl type, const serial_fc_pinmap_t *pinmap)
+{
     // Only UART1 has hardware flow control on LPC176x
     LPC_UART1_TypeDef *uart1 = (uint32_t)obj->uart == (uint32_t)LPC_UART1 ? LPC_UART1 : NULL;
     int index = obj->index;
@@ -408,37 +382,64 @@ void serial_set_flow_control(serial_t *obj, FlowControl type, PinName rxflow, Pi
     serial_flow_irq_set(obj, 0);
     if (FlowControlNone == type)
         return;
+
     // Check type(s) of flow control to use
-    UARTName uart_rts = (UARTName)pinmap_find_peripheral(rxflow, PinMap_UART_RTS);
-    UARTName uart_cts = (UARTName)pinmap_find_peripheral(txflow, PinMap_UART_CTS);
-    if (((FlowControlCTS == type) || (FlowControlRTSCTS == type)) && (NC != txflow)) {
+    if (((FlowControlCTS == type) || (FlowControlRTSCTS == type)) && (NC != pinmap->tx_flow_pin)) {
         // Can this be enabled in hardware?
-        if ((UART_1 == uart_cts) && (NULL != uart1)) {
+        if (pinmap->tx_flow_function) {
             // Enable auto-CTS mode
             uart1->MCR |= UART_MCR_CTSEN_MASK;
-            pinmap_pinout(txflow, PinMap_UART_CTS);
+            pin_function(pinmap->tx_flow_pin, pinmap->tx_flow_function);
+            pin_mode(pinmap->tx_flow_pin, PullNone);
         } else {
             // Can't enable in hardware, use software emulation
-            gpio_init_in(&uart_data[index].sw_cts, txflow);
+            gpio_init_in(&uart_data[index].sw_cts, pinmap->tx_flow_pin);
         }
     }
-    if (((FlowControlRTS == type) || (FlowControlRTSCTS == type)) && (NC != rxflow)) {
+    if (((FlowControlRTS == type) || (FlowControlRTSCTS == type)) && (NC != pinmap->rx_flow_pin)) {
         // Enable FIFOs, trigger level of 1 char on RX FIFO
         obj->uart->FCR = 1 << 0  // FIFO Enable - 0 = Disables, 1 = Enabled
                        | 1 << 1  // Rx Fifo Reset
                        | 1 << 2  // Tx Fifo Reset
                        | 0 << 6; // Rx irq trigger level - 0 = 1 char, 1 = 4 chars, 2 = 8 chars, 3 = 14 chars
          // Can this be enabled in hardware?
-        if ((UART_1 == uart_rts) && (NULL != uart1)) {
+        if (pinmap->rx_flow_function) {
             // Enable auto-RTS mode
             uart1->MCR |= UART_MCR_RTSEN_MASK;
-            pinmap_pinout(rxflow, PinMap_UART_RTS);
+            pin_function(pinmap->rx_flow_pin, pinmap->rx_flow_function);
+            pin_mode(pinmap->rx_flow_pin, PullNone);
         } else { // can't enable in hardware, use software emulation
-            gpio_init_out_ex(&uart_data[index].sw_rts, rxflow, 0);
+            gpio_init_out_ex(&uart_data[index].sw_rts, pinmap->rx_flow_pin, 0);
             // Enable RX interrupt
             serial_flow_irq_set(obj, 1);
         }
     }
+}
+
+void serial_set_flow_control(serial_t *obj, FlowControl type, PinName rxflow, PinName txflow) {
+    serial_fc_pinmap_t pinmap;
+    pinmap.rx_flow_pin = rxflow;
+    pinmap.tx_flow_pin = txflow;
+
+    UARTName uart_rts = (UARTName)pinmap_find_peripheral(rxflow, PinMap_UART_RTS);
+    if((int)uart_rts == NC) {
+        pinmap.rx_flow_function = NC; // use SW emulation
+    }
+    else {
+        pinmap.rx_flow_function = pinmap_find_function(rxflow, PinMap_UART_RTS);
+    }
+
+    UARTName uart_cts = (UARTName)pinmap_find_peripheral(txflow, PinMap_UART_CTS);
+    if((int)uart_cts == NC) {
+        pinmap.tx_flow_function = NC; // use SW emulation
+    }
+    else {
+        pinmap.tx_flow_function = pinmap_find_function(rxflow, PinMap_UART_CTS);
+    }
+
+    pinmap.peripheral = pinmap_merge(uart_rts, uart_cts);
+
+    serial_set_flow_control_direct(obj, type, &pinmap);
 }
 
 const PinMap *serial_tx_pinmap()

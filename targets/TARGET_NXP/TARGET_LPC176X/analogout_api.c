@@ -18,24 +18,29 @@
 #include "analogout_api.h"
 
 #include "cmsis.h"
-#include "pinmap.h"
+#include "PeripheralPinMaps.h"
 
-static const PinMap PinMap_DAC[] = {
-    {P0_26, DAC_0, 2},
-    {NC   , NC   , 0}
-};
-
-void analogout_init(dac_t *obj, PinName pin) {
-    obj->dac = (DACName)pinmap_peripheral(pin, PinMap_DAC);
-    MBED_ASSERT(obj->dac != (DACName)NC);
+void analogout_init_direct(dac_t *obj, const PinMap *pinmap) {
+    obj->dac = (DACName)pinmap->peripheral;
     
     // power is on by default, set DAC clk divider is /4
     LPC_SC->PCLKSEL0 &= ~(0x3 << 22);
     
     // map out (must be done before accessing registers)
-    pinmap_pinout(pin, PinMap_DAC);
+    pin_function(pinmap->pin, pinmap->function);
+    pin_mode(pinmap->pin, PullNone);
     
     analogout_write_u16(obj, 0);
+}
+
+void analogout_init(dac_t *obj, PinName pin) {
+    PinMap pinmap;
+    pinmap.pin = pin;
+    pinmap.function = pinmap_find_function(pin, PinMap_DAC);
+    pinmap.peripheral = pinmap_peripheral(pin, PinMap_DAC);
+    MBED_ASSERT(pinmap.peripheral != NC);
+
+    analogout_init_direct(obj, &pinmap);
 }
 
 void analogout_free(dac_t *obj) {}

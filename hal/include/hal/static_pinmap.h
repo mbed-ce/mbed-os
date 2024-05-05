@@ -165,7 +165,7 @@ MSTD_CONSTEXPR_FN_14 serial_fc_pinmap_t get_uart_fc_pinmap(const PinName rxflow,
 #endif // DEVICE_SERIAL
 
 #if defined(DEVICE_SPI) && defined(PINMAP_SPI_MOSI) && defined(PINMAP_SPI_MISO) && defined(PINMAP_SPI_SCLK) && defined(PINMAP_SPI_SSEL)
-MSTD_CONSTEXPR_FN_14 spi_pinmap_t get_spi_pinmap(const PinName mosi, const PinName miso, const PinName sclk, const PinName ssel)
+MSTD_CONSTEXPR_FN_14 spi_pinmap_t get_spi_pinmap(const PinName mosi, const PinName miso, const PinName sclk, const PinName ssel = NC)
 {
     const PinMap *mosi_map = nullptr;
     for (const PinMap &pinmap : PINMAP_SPI_MOSI) {

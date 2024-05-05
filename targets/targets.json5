@@ -346,7 +346,7 @@
         },
         "overrides": {
             "network-default-interface-type": "ETHERNET",
-            "semihosting-enabled": true // needed for LOCALFILESYSTEM
+            "target.default-adc-vref": 3.3 // Per "mbed-005.1" schematic, Vref is 3.3V
         },
         "supported_c_libs": {
             "arm": [
