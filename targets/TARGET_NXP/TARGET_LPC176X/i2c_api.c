@@ -120,7 +120,7 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl) {
     // set default frequency at 100k
     i2c_frequency(obj, 100000);
 
-    // Reset the I2C bus by clearing all flags, including I2EN.
+    // Reset the I2C peripheral by clearing all flags, including I2EN.
     // This does a software reset of sorts, which is important because the I2C::recover()
     // function, which is called before initializing the bus, seems to put the I2C 
     // peripheral in a weird state where the next transaction will fail.
