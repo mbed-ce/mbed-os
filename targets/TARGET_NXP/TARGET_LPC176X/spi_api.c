@@ -48,6 +48,16 @@ void spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap) {
     }
 }
 
+SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName sclk)
+{
+    SPIName spi_mosi = (SPIName)pinmap_peripheral(mosi, PinMap_SPI_MOSI);
+    SPIName spi_miso = (SPIName)pinmap_peripheral(miso, PinMap_SPI_MISO);
+    SPIName spi_sclk = (SPIName)pinmap_peripheral(sclk, PinMap_SPI_SCLK);
+    SPIName spi_data = (SPIName)pinmap_merge(spi_mosi, spi_miso);
+    SPIName spi_periph = (SPIName)pinmap_merge(spi_sclk, spi_data);
+    return spi_periph;
+}
+
 void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel) {
     spi_pinmap_t pinmap;
     pinmap.mosi_pin = mosi;
@@ -56,14 +66,10 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
     pinmap.ssel_pin = ssel;
 
     // determine the SPI to use
-    SPIName spi_mosi = (SPIName)pinmap_peripheral(mosi, PinMap_SPI_MOSI);
-    SPIName spi_miso = (SPIName)pinmap_peripheral(miso, PinMap_SPI_MISO);
-    SPIName spi_sclk = (SPIName)pinmap_peripheral(sclk, PinMap_SPI_SCLK);
-    SPIName spi_ssel = (SPIName)pinmap_peripheral(ssel, PinMap_SPI_SSEL);
-    SPIName spi_data = (SPIName)pinmap_merge(spi_mosi, spi_miso);
-    SPIName spi_cntl = (SPIName)pinmap_merge(spi_sclk, spi_ssel);
-    pinmap.peripheral = pinmap_merge(spi_data, spi_cntl);
-    MBED_ASSERT((int)obj->spi != NC);
+    SPIName spi_mosi_miso_sclk_periph = spi_get_peripheral_name(mosi, miso, sclk);
+    SPIName spi_ssel_periph = (SPIName)pinmap_peripheral(ssel, PinMap_SPI_SSEL);
+    pinmap.peripheral = pinmap_merge(spi_mosi_miso_sclk_periph, spi_ssel_periph);
+    MBED_ASSERT(pinmap.peripheral != NC);
 
     // Get pin functions
     pinmap.mosi_function = pinmap_find_function(mosi, PinMap_SPI_MOSI);
@@ -80,6 +86,7 @@ void spi_format(spi_t *obj, int bits, int mode, int slave) {
     ssp_disable(obj);
     MBED_ASSERT(((bits >= 4) && (bits <= 16)) && (mode >= 0 && mode <= 3));
     
+    obj->bits_per_word = bits;
     int polarity = (mode & 0x2) ? 1 : 0;
     int phase = (mode & 0x1) ? 1 : 0;
     
@@ -186,11 +193,39 @@ int spi_master_block_write(spi_t *obj, const char *tx_buffer, int tx_length,
                            char *rx_buffer, int rx_length, char write_fill) {
     int total = (tx_length > rx_length) ? tx_length : rx_length;
 
-    for (int i = 0; i < total; i++) {
-        char out = (i < tx_length) ? tx_buffer[i] : write_fill;
-        char in = spi_master_write(obj, out);
-        if (i < rx_length) {
-            rx_buffer[i] = in;
+    if(obj->bits_per_word > 8) {
+        // 2 bytes per write/read operation
+        MBED_ASSERT(tx_length % 2 == 0);
+        MBED_ASSERT(rx_length % 2 == 0);
+
+        // Extend write fill value to 16 bits
+        const uint16_t write_fill_u16 = (((uint16_t)write_fill) << 8) | write_fill;
+
+        // Access input and output arrays as 16-bit words.
+        // This might do unaligned access, but that's OK for integers on Cortex-M3
+        uint16_t const * const tx_buffer_u16 = (uint16_t const *)tx_buffer;
+        uint16_t * const rx_buffer_u16 = (uint16_t *)rx_buffer;
+
+        const int tx_length_u16 = tx_length / 2;
+        const int rx_length_u16 = rx_length / 2;
+
+        for (int i = 0; i < total / 2; i++) {
+            uint16_t out = (i < tx_length_u16) ? tx_buffer_u16[i] : write_fill_u16;
+            uint16_t in = spi_master_write(obj, out);
+            if (i < rx_length_u16) {
+                rx_buffer_u16[i] = in;
+                printf("rx_buffer_u16[%d] <= 0x%hx\n", i, in);
+            }
+        }
+    }
+    else {
+        // 1 byte per read/write operation
+        for (int i = 0; i < total; i++) {
+            uint16_t out = (i < tx_length) ? tx_buffer[i] : write_fill;
+            uint16_t in = spi_master_write(obj, out);
+            if (i < rx_length) {
+                rx_buffer[i] = in;
+            }
         }
     }
 

@@ -48,6 +48,7 @@ typedef enum {
 
 // Note: We only use the two SSP peripherals in Mbed, not SPI0.  This is because
 // SPI0 is a legacy version of the SSP peripheral and cannot be used at the same time as SSP0.
+#define DEVICE_SPI_COUNT 2
 typedef enum {
     SPI_0 = (int)LPC_SSP0_BASE,
     SPI_1 = (int)LPC_SSP1_BASE

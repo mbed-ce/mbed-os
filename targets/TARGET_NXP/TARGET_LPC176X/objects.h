@@ -70,6 +70,7 @@ struct i2c_s {
 
 struct spi_s {
     LPC_SSP_TypeDef *spi;
+    uint8_t bits_per_word;
 };
 
 struct flash_s {
