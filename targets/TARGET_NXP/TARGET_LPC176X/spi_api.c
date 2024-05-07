@@ -48,6 +48,32 @@ void spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap) {
     }
 }
 
+void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel) {
+    spi_pinmap_t pinmap;
+    pinmap.mosi_pin = mosi;
+    pinmap.miso_pin = miso;
+    pinmap.sclk_pin = sclk;
+    pinmap.ssel_pin = ssel;
+
+    // determine the SPI to use
+    SPIName spi_mosi = (SPIName)pinmap_peripheral(mosi, PinMap_SPI_MOSI);
+    SPIName spi_miso = (SPIName)pinmap_peripheral(miso, PinMap_SPI_MISO);
+    SPIName spi_sclk = (SPIName)pinmap_peripheral(sclk, PinMap_SPI_SCLK);
+    SPIName spi_ssel = (SPIName)pinmap_peripheral(ssel, PinMap_SPI_SSEL);
+    SPIName spi_data = (SPIName)pinmap_merge(spi_mosi, spi_miso);
+    SPIName spi_cntl = (SPIName)pinmap_merge(spi_sclk, spi_ssel);
+    pinmap.peripheral = pinmap_merge(spi_data, spi_cntl);
+    MBED_ASSERT((int)obj->spi != NC);
+
+    // Get pin functions
+    pinmap.mosi_function = pinmap_find_function(mosi, PinMap_SPI_MOSI);
+    pinmap.miso_function = pinmap_find_function(miso, PinMap_SPI_MISO);
+    pinmap.sclk_function = pinmap_find_function(sclk, PinMap_SPI_SCLK);
+    pinmap.ssel_function = pinmap_find_function(ssel, PinMap_SPI_SSEL);
+
+    spi_init_direct(obj, &pinmap);
+}
+
 SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName sclk)
 {
     SPIName spi_mosi = (SPIName)pinmap_peripheral(mosi, PinMap_SPI_MOSI);

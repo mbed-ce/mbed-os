@@ -20,8 +20,6 @@
 #if DEVICE_I2C
 
 #include "cmsis.h"
-#include "pinmap.h"
-
 #include "PeripheralPinMaps.h"
 
 // Change to 1 to enable debug prints.
