@@ -44,7 +44,7 @@ set(OPENOCD_CHIP_CONFIG_COMMANDS
 
 set(STM32CUBE_UPLOAD_ENABLED TRUE)
 set(STM32CUBE_CONNECT_COMMAND -c port=SWD reset=HWrst)
-set(STM32CUBE_GDBSERVER_ARGS --swd)
+set(STM32CUBE_GDBSERVER_ARGS --swd --initialize-reset)
 
 # Config options for stlink
 # -------------------------------------------------------------
