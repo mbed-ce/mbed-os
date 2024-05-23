@@ -399,7 +399,7 @@ int i2c_slave_read(i2c_t *obj, char *data, int length) {
     i2c_conset(obj, 0, 0, 0, length > 0); // Set AA flag to acknowledge write as long as we have buffer space to store a byte in
     i2c_clear_SI(obj);
 
-    // This is implemented as a state machine according to section 19.10.8 in the datasheet.
+    // This is implemented as a state machine according to section 19.10.8 in the reference manual.
     while(true) {
 
         // Wait until the I2C peripheral has an event for us
@@ -469,7 +469,7 @@ int i2c_slave_write(i2c_t *obj, const char *data, int length) {
     i2c_conset(obj, 0, 0, 0, 1); // Set AA flag to acknowledge read as long as we have something to transmit
     i2c_clear_SI(obj);
 
-    // This is implemented as a state machine according to section 19.10.9 in the datasheet.
+    // This is implemented as a state machine according to section 19.10.9 in the reference manual.
     while(true) {
 
         // Wait until the I2C peripheral has an event for us

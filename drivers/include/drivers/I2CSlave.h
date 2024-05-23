@@ -165,8 +165,10 @@ public:
      */
     int receive(void);
 
-    /** 
+    /**
      * @brief Read bytes transmitted to this MCU from an I2C master.
+     *
+     * Call this function only once \c receive() returns WriteAddressed or WriteGeneral.
      *
      *  @param data   Pointer to the buffer to read data into.
      *  @param length Maximum number of bytes to read.
@@ -181,9 +183,9 @@ public:
      */
     int read(void);
 
-    /** 
+    /**
      * @brief Write to an I2C master which is addressing this slave device.
-     * 
+     *
      * Call this function only once \c receive() returns ReadAddressed.
      * This will send the given data bytes to the master and then send a NACK to end the read transaction.
      *
