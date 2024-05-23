@@ -331,7 +331,7 @@ int  i2c_slave_read(i2c_t *obj, char *data, int length);
  *  @param obj The I2C object
  *  @param data    The buffer for sending
  *  @param length  Number of bytes to write
- *  @return non-zero if a value is available
+ *  @return number of bytes actually written to the master, or negative value on error.
  */
 int  i2c_slave_write(i2c_t *obj, const char *data, int length);
 

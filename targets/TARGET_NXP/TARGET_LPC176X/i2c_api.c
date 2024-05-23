@@ -382,56 +382,127 @@ int i2c_slave_receive(i2c_t *obj) {
 }
 
 int i2c_slave_read(i2c_t *obj, char *data, int length) {
+
     int count = 0;
-    int status;
-    
-    do {
-        i2c_clear_SI(obj);
-        i2c_wait_SI(obj);
-        status = i2c_status(obj);
-        if((status == 0x80) || (status == 0x90)) {
-            data[count] = I2C_DAT(obj) & 0xFF;
-        }
-        count++;
-    } while (((status == 0x80) || (status == 0x90) ||
-            (status == 0x060) || (status == 0x70)) && (count < length));
- 
-    // Clear old status and wait for Serial Interrupt. 
-    i2c_clear_SI(obj);
-    i2c_wait_SI(obj);
- 
-    // Obtain new status.
-    status = i2c_status(obj);
- 
-    if(status != 0xA0) {
-        i2c_stop(obj);
+
+    if(i2c_status(obj) != 0x60 && i2c_status(obj) != 0x70) {
+        return -1; // I2C peripheral not in setup-write-to-slave mode
     }
- 
+
+    if(i2c_status(obj) == 0x70) {
+        // When addressed with the general call address, per the manual we can only receive a max of 1 byte.
+        if(length > 1) {
+            length = 1;
+        }
+    }
+
+    i2c_conset(obj, 0, 0, 0, length > 0); // Set AA flag to acknowledge write as long as we have buffer space to store a byte in
     i2c_clear_SI(obj);
-    
-    return count;
+
+    // This is implemented as a state machine according to section 19.10.8 in the datasheet.
+    while(true) {
+
+        // Wait until the I2C peripheral has an event for us
+        i2c_wait_SI(obj);
+
+#if LPC1768_I2C_DEBUG
+        printf("i2c_slave_read(): in state 0x%hhx\n", i2c_status(obj));
+#endif
+
+        switch(i2c_status(obj)) {
+        case 0x68:
+        case 0x78:
+            // Arbitration Lost event.  I'm a bit confused about how this can happen as a slave device but the manual says it can...
+            i2c_conclr(obj, 1, 0, 0, 1); // Clear start and ack
+            i2c_clear_SI(obj);
+            
+            // Reset the I2C state machine. This doesn't actually send a STOP condition in slave mode.
+            i2c_stop(obj);
+            return -2; // Arbitration lost
+
+        case 0x80:
+        case 0x90:
+            // Received another data byte from master.  ACK has been returned.
+            data[count++] = I2C_DAT(obj) & 0xFF;
+            
+            if(count >= length) {
+                // Out of buffer space, NACK the next byte
+                i2c_conclr(obj, 0, 0, 0, 1);
+                i2c_clear_SI(obj);
+            }
+            else {
+                // Ack the next byte
+                i2c_conset(obj, 0, 0, 0, 1);
+                i2c_clear_SI(obj);
+            }
+            break;
+
+        case 0x88:
+        case 0x98:
+            // Master wrote us a byte and we NACKed it.  Slave receive mode has been exited.
+            i2c_conset(obj, 0, 0, 0, 1); // Set AA flag so that we go back to idle slave state
+            i2c_clear_SI(obj);
+            return count;
+
+        case 0xA0:
+            // Stop condition received.  Slave receive mode has been exited.
+            i2c_conset(obj, 0, 0, 0, 1); // Set AA flag so that we go back to idle slave state
+            i2c_clear_SI(obj);
+            return count;
+        }
+    }
 }
 
 int i2c_slave_write(i2c_t *obj, const char *data, int length) {
-    int count = 0;
-    int status;
-    
-    if(length <= 0) {
-        return(0);
+
+    int next_byte_idx = 0;
+
+    if(i2c_status(obj) != 0xA8) {
+        return -1; // I2C peripheral not in setup-read-from-slave mode
     }
     
-    do {
-        status = i2c_do_write(obj, data[count], 0);
-        count++;
-    } while ((count < length) && (status == 0xB8));
-    
-    if ((status != 0xC0) && (status != 0xC8)) {
-        i2c_stop(obj);
-    }
-    
+    // Write first data byte.  Note that there's no way for the slave to NACK a read-from-slave event, so if we run out of bytes,
+    // just send zeroes.
+    I2C_DAT(obj) = (next_byte_idx < length) ? data[next_byte_idx] : 0;
+    ++next_byte_idx;
+
+    i2c_conset(obj, 0, 0, 0, 1); // Set AA flag to acknowledge read as long as we have something to transmit
     i2c_clear_SI(obj);
-    
-    return(count);
+
+    // This is implemented as a state machine according to section 19.10.9 in the datasheet.
+    while(true) {
+
+        // Wait until the I2C peripheral has an event for us
+        i2c_wait_SI(obj);
+
+        switch(i2c_status(obj)) {
+        case 0xB0:
+            // Arbitration Lost event.  I'm a bit confused about how this can happen as a slave device but the manual says it can...
+            i2c_conclr(obj, 1, 0, 0, 1); // Clear start and ack
+            i2c_clear_SI(obj);
+            
+            // Reset the I2C state machine. This doesn't actually send a STOP condition in slave mode.
+            i2c_stop(obj);
+            return -2; // Arbitration lost
+
+        case 0xB8:
+            // Prev data byte has been transmitted.  ACK has been received.  Write the next data byte.
+            I2C_DAT(obj) = (next_byte_idx < length) ? data[next_byte_idx] : 0;
+            ++next_byte_idx;
+
+            i2c_conset(obj, 0, 0, 0, 1); // Set AA flag to acknowledge read as long as we have something to transmit
+            i2c_clear_SI(obj);
+            break;
+
+        case 0xC0:
+        case 0xC8:
+            // Last data byte transmitted (ended either by us not setting AA, or by the master NACKing)
+            i2c_conset(obj, 0, 0, 0, 1); // Set AA flag so that we go back to idle slave state
+            i2c_clear_SI(obj);
+
+            return next_byte_idx;
+        }
+    }
 }
 
 void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask) {
