@@ -28,6 +28,7 @@ namespace mbed {
 
 PwmOut::PwmOut(PinName pin) :
     _pin(pin),
+    _pinmap(nullptr),
     _deep_sleep_locked(false),
     _initialized(false),
     _duty_cycle(0),
@@ -36,11 +37,15 @@ PwmOut::PwmOut(PinName pin) :
     PwmOut::init();
 }
 
-PwmOut::PwmOut(const PinMap &pinmap) : _deep_sleep_locked(false)
+PwmOut::PwmOut(const PinMap &pinmap) : 
+    _pin(NC),
+    _pinmap(&pinmap),
+    _deep_sleep_locked(false),
+    _initialized(false),
+    _duty_cycle(0),
+    _period_us(0)
 {
-    core_util_critical_section_enter();
-    pwmout_init_direct(&_pwm, &pinmap);
-    core_util_critical_section_exit();
+    PwmOut::init();
 }
 
 PwmOut::~PwmOut()
@@ -169,7 +174,13 @@ void PwmOut::init()
     core_util_critical_section_enter();
 
     if (!_initialized) {
-        pwmout_init(&_pwm, _pin);
+        if(_pinmap != nullptr) {
+            pwmout_init_direct(&_pwm, _pinmap);
+        }
+        else {
+            pwmout_init(&_pwm, _pin);
+        }
+        
         lock_deep_sleep();
         _initialized = true;
     }

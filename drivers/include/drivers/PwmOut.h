@@ -63,7 +63,8 @@ public:
 
     /** Create a PwmOut connected to the specified pin
      *
-     *  @param pinmap reference to structure which holds static pinmap.
+     * @param pinmap reference to structure which holds static pinmap.
+     *   This reference is stored in the PwmOut, so the pinmap needs to live as long as this object does.
      */
     PwmOut(const PinMap &pinmap);
     PwmOut(const PinMap &&) = delete; // prevent passing of temporary objects
@@ -206,7 +207,10 @@ protected:
     void deinit();
 
     pwmout_t _pwm;
-    PinName _pin;
+    
+    const PinName _pin; // Pin, NC if using static pinmap
+    PinMap const * const _pinmap; // Static pinmap, nullptr if not used
+
     bool _deep_sleep_locked;
     bool _initialized;
     float _duty_cycle;
