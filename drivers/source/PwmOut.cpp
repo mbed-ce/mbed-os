@@ -29,6 +29,7 @@ namespace mbed {
 PwmOut::PwmOut(PinName pin) :
     _pin(pin),
     _pinmap(nullptr),
+    _init_func(_call_pwmout_init),
     _deep_sleep_locked(false),
     _initialized(false),
     _duty_cycle(0),
@@ -40,6 +41,7 @@ PwmOut::PwmOut(PinName pin) :
 PwmOut::PwmOut(const PinMap &pinmap) : 
     _pin(NC),
     _pinmap(&pinmap),
+    _init_func(_call_pwmout_init_direct),
     _deep_sleep_locked(false),
     _initialized(false),
     _duty_cycle(0),
@@ -169,17 +171,24 @@ void PwmOut::unlock_deep_sleep()
     }
 }
 
+void PwmOut::_call_pwmout_init_direct(PwmOut * thisPtr)
+{
+    pwmout_init_direct(&thisPtr->_pwm, thisPtr->_pinmap);
+}
+
+void PwmOut::_call_pwmout_init(PwmOut * thisPtr)
+{
+    pwmout_init(&thisPtr->_pwm, thisPtr->_pin);
+}
+
 void PwmOut::init()
 {
     core_util_critical_section_enter();
 
     if (!_initialized) {
-        if(_pinmap != nullptr) {
-            pwmout_init_direct(&_pwm, _pinmap);
-        }
-        else {
-            pwmout_init(&_pwm, _pin);
-        }
+
+        // Call either pwmout_init() or pwmout_init_direct(), depending on whether we have a PinName or a static pinmap
+        _init_func(this);
         
         lock_deep_sleep();
         _initialized = true;
