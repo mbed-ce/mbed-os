@@ -200,13 +200,13 @@ protected:
     /** Unlock deep sleep in case it is locked */
     void unlock_deep_sleep();
 
-    // Functions which call the underlying HAL init function.  The direct one calls the static 
+    // Functions which call the underlying HAL init function.  The direct one calls the static
     // pinmap version (pwmout_init_direct()) and the normal one calls the PinName-accepting one (pwmout_init()).
     // A pointer to one of these two functions is stored in the _init_func member.
     // It's done this way so that references to pwmout_init(), and therefore to the pinmap tables,
     // can be removed by the linker if only the static pinmap version is used.
-    static void _call_pwmout_init_direct(PwmOut * thisPtr);
-    static void _call_pwmout_init(PwmOut * thisPtr);
+    static void _call_pwmout_init_direct(PwmOut *thisPtr);
+    static void _call_pwmout_init(PwmOut *thisPtr);
 
     /** Initialize this instance */
     void init();
@@ -215,9 +215,9 @@ protected:
     void deinit();
 
     pwmout_t _pwm;
-    
+
     const PinName _pin; // Pin, NC if using static pinmap
-    PinMap const * const _pinmap; // Static pinmap, nullptr if not used
+    PinMap const *const _pinmap;  // Static pinmap, nullptr if not used
 
     /* Pointer to HAL init function */
     void (*_init_func)(PwmOut *);

@@ -38,7 +38,7 @@ PwmOut::PwmOut(PinName pin) :
     PwmOut::init();
 }
 
-PwmOut::PwmOut(const PinMap &pinmap) : 
+PwmOut::PwmOut(const PinMap &pinmap) :
     _pin(NC),
     _pinmap(&pinmap),
     _init_func(_call_pwmout_init_direct),
@@ -171,12 +171,12 @@ void PwmOut::unlock_deep_sleep()
     }
 }
 
-void PwmOut::_call_pwmout_init_direct(PwmOut * thisPtr)
+void PwmOut::_call_pwmout_init_direct(PwmOut *thisPtr)
 {
     pwmout_init_direct(&thisPtr->_pwm, thisPtr->_pinmap);
 }
 
-void PwmOut::_call_pwmout_init(PwmOut * thisPtr)
+void PwmOut::_call_pwmout_init(PwmOut *thisPtr)
 {
     pwmout_init(&thisPtr->_pwm, thisPtr->_pin);
 }
@@ -189,7 +189,7 @@ void PwmOut::init()
 
         // Call either pwmout_init() or pwmout_init_direct(), depending on whether we have a PinName or a static pinmap
         _init_func(this);
-        
+
         lock_deep_sleep();
         _initialized = true;
     }
