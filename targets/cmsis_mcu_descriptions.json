@@ -234,670 +234,671 @@
         "vendor": "Ambiq Micro:120"
     },
     "CY8C6245LQI-S3D72": {
-        "name": "CY8C6245LQI-S3D72",
-        "memories": {
-            "IROM1": {
-                "access": {
-                    "read": true,
-                    "write": false,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 268435456,
-                "size": 524288,
-                "startup": true,
-                "default": true
-            },
-            "IRAM1": {
-                "access": {
-                    "read": true,
-                    "write": true,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 134217728,
-                "size": 262144,
-                "startup": false,
-                "default": true
-            }
-        },
         "algorithms": [
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xx5.FLM",
-                "start": 268435456,
-                "size": 524288,
-                "default": false,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 524288,
+                "start": 268435456
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xx5_sect256KB.FLM",
-                "start": 268435456,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 524288,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 268435456
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxA_WFLASH.FLM",
-                "start": 335544320,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 32768,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 335544320
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxA_SFLASH_USER.FLM",
-                "start": 369100800,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 2048,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369100800
             },
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xxA_SFLASH_NAR.FLM",
-                "start": 369105408,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 512,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369105408
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxA_SFLASH_PKEY.FLM",
-                "start": 369121792,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 3072,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369121792
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxA_SFLASH_TOC2.FLM",
-                "start": 369130496,
-                "size": 1024,
-                "default": true,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1024,
+                "start": 369130496
             },
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xxA_SMIF.FLM",
-                "start": 402653184,
-                "size": 134217728,
-                "default": false,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 134217728,
+                "start": 402653184
             },
             {
-                "file_name": "Flash/CY8C6xxA_EFUSE.FLM",
-                "start": 2423259136,
-                "size": 1024,
                 "default": false,
+                "file_name": "Flash/CY8C6xxA_EFUSE.FLM",
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1024,
+                "start": 2423259136
             }
         ],
+        "family": "PSoC 62",
+        "from_pack": {
+            "pack": "PSoC6_DFP",
+            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/",
+            "vendor": "Cypress",
+            "version": "1.0.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 262144,
+                "start": 134217728,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 524288,
+                "start": 268435456,
+                "startup": true
+            }
+        },
+        "name": "CY8C6245LQI-S3D72",
         "processor": {
             "Asymmetric": {
                 "Cortex-M0p": {
-                    "units": 1,
                     "core": "CortexM0Plus",
                     "fpu": "None",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 },
                 "Cortex-M4": {
-                    "units": 1,
                     "core": "CortexM4",
                     "fpu": "SinglePrecision",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 }
             }
         },
-        "from_pack": {
-            "vendor": "Cypress",
-            "pack": "PSoC6_DFP",
-            "version": "1.0.0",
-            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/"
-        },
-        "vendor": "Cypress:19",
-        "family": "PSoC 62",
-        "sub_family": null
+        "sub_family": null,
+        "vendor": "Cypress:19"
     },
     "CY8C6247BZI-D54": {
-        "name": "CY8C6247BZI-D54",
-        "memories": {
-            "IROM1": {
-                "access": {
-                    "read": true,
-                    "write": false,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 268435456,
-                "size": 1048576,
-                "startup": true,
-                "default": true
-            },
-            "IRAM1": {
-                "access": {
-                    "read": true,
-                    "write": true,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 134217728,
-                "size": 294912,
-                "startup": false,
-                "default": true
-            }
-        },
         "algorithms": [
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xx7.FLM",
-                "start": 268435456,
-                "size": 1048576,
-                "default": false,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1048576,
+                "start": 268435456
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xx7_sect256KB.FLM",
-                "start": 268435456,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 1048576,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 268435456
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_WFLASH.FLM",
-                "start": 335544320,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 32768,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 335544320
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_SFLASH_USER.FLM",
-                "start": 369100800,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 2048,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369100800
             },
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xxx_SFLASH_NAR.FLM",
-                "start": 369105408,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 512,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369105408
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_SFLASH_PKEY.FLM",
-                "start": 369121792,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 3072,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369121792
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_SFLASH_TOC2.FLM",
-                "start": 369130496,
-                "size": 1024,
-                "default": true,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1024,
+                "start": 369130496
             },
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xxx_SMIF.FLM",
-                "start": 402653184,
-                "size": 134217728,
-                "default": false,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 134217728,
+                "start": 402653184
             },
             {
-                "file_name": "Flash/CY8C6xxx_EFUSE.FLM",
-                "start": 2423259136,
-                "size": 1024,
                 "default": false,
+                "file_name": "Flash/CY8C6xxx_EFUSE.FLM",
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1024,
+                "start": 2423259136
             }
         ],
+        "family": "PSoC 62",
+        "from_pack": {
+            "pack": "PSoC6_DFP",
+            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/",
+            "vendor": "Cypress",
+            "version": "1.0.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 294912,
+                "start": 134217728,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 1048576,
+                "start": 268435456,
+                "startup": true
+            }
+        },
+        "name": "CY8C6247BZI-D54",
         "processor": {
             "Asymmetric": {
                 "Cortex-M0p": {
-                    "units": 1,
                     "core": "CortexM0Plus",
                     "fpu": "None",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 },
                 "Cortex-M4": {
-                    "units": 1,
                     "core": "CortexM4",
                     "fpu": "SinglePrecision",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 }
             }
         },
-        "from_pack": {
-            "vendor": "Cypress",
-            "pack": "PSoC6_DFP",
-            "version": "1.0.0",
-            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/"
-        },
-        "vendor": "Cypress:19",
-        "family": "PSoC 62",
-        "sub_family": null
+        "sub_family": null,
+        "vendor": "Cypress:19"
     },
     "CY8C6247FDI-D52": {
-        "name": "CY8C6247FDI-D52",
-        "memories": {
-            "IROM1": {
-                "access": {
-                    "read": true,
-                    "write": false,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 268435456,
-                "size": 1048576,
-                "startup": true,
-                "default": true
-            },
-            "IRAM1": {
-                "access": {
-                    "read": true,
-                    "write": true,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 134217728,
-                "size": 294912,
-                "startup": false,
-                "default": true
-            }
-        },
         "algorithms": [
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xx7.FLM",
-                "start": 268435456,
-                "size": 1048576,
-                "default": false,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1048576,
+                "start": 268435456
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xx7_sect256KB.FLM",
-                "start": 268435456,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 1048576,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 268435456
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_WFLASH.FLM",
-                "start": 335544320,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 32768,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 335544320
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_SFLASH_USER.FLM",
-                "start": 369100800,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 2048,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369100800
             },
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xxx_SFLASH_NAR.FLM",
-                "start": 369105408,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 512,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369105408
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_SFLASH_PKEY.FLM",
-                "start": 369121792,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 3072,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369121792
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_SFLASH_TOC2.FLM",
-                "start": 369130496,
-                "size": 1024,
-                "default": true,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1024,
+                "start": 369130496
             },
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xxx_SMIF.FLM",
-                "start": 402653184,
-                "size": 134217728,
-                "default": false,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 134217728,
+                "start": 402653184
             },
             {
-                "file_name": "Flash/CY8C6xxx_EFUSE.FLM",
-                "start": 2423259136,
-                "size": 1024,
                 "default": false,
+                "file_name": "Flash/CY8C6xxx_EFUSE.FLM",
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1024,
+                "start": 2423259136
             }
         ],
+        "family": "PSoC 62",
+        "from_pack": {
+            "pack": "PSoC6_DFP",
+            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/",
+            "vendor": "Cypress",
+            "version": "1.0.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 294912,
+                "start": 134217728,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 1048576,
+                "start": 268435456,
+                "startup": true
+            }
+        },
+        "name": "CY8C6247FDI-D52",
         "processor": {
             "Asymmetric": {
                 "Cortex-M0p": {
-                    "units": 1,
                     "core": "CortexM0Plus",
                     "fpu": "None",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 },
                 "Cortex-M4": {
-                    "units": 1,
                     "core": "CortexM4",
                     "fpu": "SinglePrecision",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 }
             }
         },
-        "from_pack": {
-            "vendor": "Cypress",
-            "pack": "PSoC6_DFP",
-            "version": "1.0.0",
-            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/"
-        },
-        "vendor": "Cypress:19",
-        "family": "PSoC 62",
-        "sub_family": null
+        "sub_family": null,
+        "vendor": "Cypress:19"
     },
     "CY8C624ABZI-D44": {
-        "name": "CY8C624ABZI-D44",
+        "algorithms": [
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 2097152,
+                "start": 268435456
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_sect256KB.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 2097152,
+                "start": 268435456
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_WFLASH.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 32768,
+                "start": 335544320
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_SFLASH_USER.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 2048,
+                "start": 369100800
+            },
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA_SFLASH_NAR.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 512,
+                "start": 369105408
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_SFLASH_PKEY.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 3072,
+                "start": 369121792
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_SFLASH_TOC2.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 1024,
+                "start": 369130496
+            },
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA_SMIF.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 134217728,
+                "start": 402653184
+            },
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA_EFUSE.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 1024,
+                "start": 2423259136
+            }
+        ],
+        "family": "PSoC 62",
+        "from_pack": {
+            "pack": "PSoC6_DFP",
+            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/",
+            "vendor": "Cypress",
+            "version": "1.0.0"
+        },
         "memories": {
             "IRAM1": {
                 "access": {
-                    "read": true,
-                    "write": true,
                     "execute": true,
-                    "peripheral": false,
-                    "secure": false,
                     "non_secure": false,
-                    "non_secure_callable": false
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
                 },
-                "start": 134217728,
+                "default": true,
                 "size": 1048576,
-                "startup": false,
-                "default": true
+                "start": 134217728,
+                "startup": false
             },
             "IROM1": {
                 "access": {
-                    "read": true,
-                    "write": false,
                     "execute": true,
-                    "peripheral": false,
-                    "secure": false,
                     "non_secure": false,
-                    "non_secure_callable": false
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
                 },
-                "start": 268435456,
+                "default": true,
                 "size": 2097152,
-                "startup": true,
-                "default": true
+                "start": 268435456,
+                "startup": true
             }
         },
-        "algorithms": [
-            {
-                "file_name": "Flash/CY8C6xxA.FLM",
-                "start": 268435456,
-                "size": 2097152,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_sect256KB.FLM",
-                "start": 268435456,
-                "size": 2097152,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_WFLASH.FLM",
-                "start": 335544320,
-                "size": 32768,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SFLASH_USER.FLM",
-                "start": 369100800,
-                "size": 2048,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SFLASH_NAR.FLM",
-                "start": 369105408,
-                "size": 512,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SFLASH_PKEY.FLM",
-                "start": 369121792,
-                "size": 3072,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SFLASH_TOC2.FLM",
-                "start": 369130496,
-                "size": 1024,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SMIF.FLM",
-                "start": 402653184,
-                "size": 134217728,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_EFUSE.FLM",
-                "start": 2423259136,
-                "size": 1024,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            }
-        ],
+        "name": "CY8C624ABZI-D44",
         "processor": {
             "Asymmetric": {
                 "Cortex-M0p": {
-                    "units": 1,
                     "core": "CortexM0Plus",
                     "fpu": "None",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 },
                 "Cortex-M4": {
-                    "units": 1,
                     "core": "CortexM4",
                     "fpu": "SinglePrecision",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 }
             }
         },
-        "from_pack": {
-            "vendor": "Cypress",
-            "pack": "PSoC6_DFP",
-            "version": "1.0.0",
-            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/"
-        },
-        "vendor": "Cypress:19",
-        "family": "PSoC 62",
-        "sub_family": null
+        "sub_family": null,
+        "vendor": "Cypress:19"
     },
     "CY8C624AFNI-S2D43": {
-        "name": "CY8C624AFNI-S2D43",
+        "algorithms": [
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 2097152,
+                "start": 268435456
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_sect256KB.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 2097152,
+                "start": 268435456
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_WFLASH.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 32768,
+                "start": 335544320
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_SFLASH_USER.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 2048,
+                "start": 369100800
+            },
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA_SFLASH_NAR.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 512,
+                "start": 369105408
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_SFLASH_PKEY.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 3072,
+                "start": 369121792
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_SFLASH_TOC2.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 1024,
+                "start": 369130496
+            },
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA_SMIF.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 134217728,
+                "start": 402653184
+            },
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA_EFUSE.FLM",
+                "ram_size": 32768,
+                "ram_start": 134374400,
+                "size": 1024,
+                "start": 2423259136
+            }
+        ],
+        "family": "PSoC 62",
+        "from_pack": {
+            "pack": "PSoC6_DFP",
+            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/",
+            "vendor": "Cypress",
+            "version": "1.0.0"
+        },
         "memories": {
             "IRAM1": {
                 "access": {
-                    "read": true,
-                    "write": true,
                     "execute": true,
-                    "peripheral": false,
-                    "secure": false,
                     "non_secure": false,
-                    "non_secure_callable": false
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
                 },
-                "start": 134217728,
+                "default": true,
                 "size": 1048576,
-                "startup": false,
-                "default": true
+                "start": 134217728,
+                "startup": false
             },
             "IROM1": {
                 "access": {
-                    "read": true,
-                    "write": false,
                     "execute": true,
-                    "peripheral": false,
-                    "secure": false,
                     "non_secure": false,
-                    "non_secure_callable": false
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
                 },
-                "start": 268435456,
+                "default": true,
                 "size": 2097152,
-                "startup": true,
-                "default": true
+                "start": 268435456,
+                "startup": true
             }
         },
-        "algorithms": [
-            {
-                "file_name": "Flash/CY8C6xxA.FLM",
-                "start": 268435456,
-                "size": 2097152,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_sect256KB.FLM",
-                "start": 268435456,
-                "size": 2097152,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_WFLASH.FLM",
-                "start": 335544320,
-                "size": 32768,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SFLASH_USER.FLM",
-                "start": 369100800,
-                "size": 2048,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SFLASH_NAR.FLM",
-                "start": 369105408,
-                "size": 512,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SFLASH_PKEY.FLM",
-                "start": 369121792,
-                "size": 3072,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SFLASH_TOC2.FLM",
-                "start": 369130496,
-                "size": 1024,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_SMIF.FLM",
-                "start": 402653184,
-                "size": 134217728,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            },
-            {
-                "file_name": "Flash/CY8C6xxA_EFUSE.FLM",
-                "start": 2423259136,
-                "size": 1024,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
-            }
-        ],
+        "name": "CY8C624AFNI-S2D43",
         "processor": {
             "Asymmetric": {
                 "Cortex-M0p": {
-                    "units": 1,
                     "core": "CortexM0Plus",
                     "fpu": "None",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 },
                 "Cortex-M4": {
-                    "units": 1,
                     "core": "CortexM4",
                     "fpu": "SinglePrecision",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 }
             }
-        },
-        "from_pack": {
-            "vendor": "Cypress",
-            "pack": "PSoC6_DFP",
-            "version": "1.0.0",
-            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/"
         },
         "sectors": [
             [
@@ -905,143 +906,142 @@
                 512
             ]
         ],
-        "vendor": "Cypress:19",
-        "family": "PSoC 62",
-        "sub_family": null
+        "sub_family": null,
+        "vendor": "Cypress:19"
     },
     "CY8C6347BZI-BLD53": {
-        "name": "CY8C6347BZI-BLD53",
-        "memories": {
-            "IROM1": {
-                "access": {
-                    "read": true,
-                    "write": false,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 268435456,
-                "size": 1048576,
-                "startup": true,
-                "default": true
-            },
-            "IRAM1": {
-                "access": {
-                    "read": true,
-                    "write": true,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 134217728,
-                "size": 294912,
-                "startup": false,
-                "default": true
-            }
-        },
         "algorithms": [
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xx7.FLM",
-                "start": 268435456,
-                "size": 1048576,
-                "default": false,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1048576,
+                "start": 268435456
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xx7_sect256KB.FLM",
-                "start": 268435456,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 1048576,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 268435456
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_WFLASH.FLM",
-                "start": 335544320,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 32768,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 335544320
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_SFLASH_USER.FLM",
-                "start": 369100800,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 2048,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369100800
             },
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xxx_SFLASH_NAR.FLM",
-                "start": 369105408,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 512,
-                "default": false,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369105408
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_SFLASH_PKEY.FLM",
-                "start": 369121792,
+                "ram_size": 32768,
+                "ram_start": 134374400,
                 "size": 3072,
-                "default": true,
-                "ram_start": 134374400,
-                "ram_size": 32768
+                "start": 369121792
             },
             {
+                "default": true,
                 "file_name": "Flash/CY8C6xxx_SFLASH_TOC2.FLM",
-                "start": 369130496,
-                "size": 1024,
-                "default": true,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1024,
+                "start": 369130496
             },
             {
+                "default": false,
                 "file_name": "Flash/CY8C6xxx_SMIF.FLM",
-                "start": 402653184,
-                "size": 134217728,
-                "default": false,
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 134217728,
+                "start": 402653184
             },
             {
-                "file_name": "Flash/CY8C6xxx_EFUSE.FLM",
-                "start": 2423259136,
-                "size": 1024,
                 "default": false,
+                "file_name": "Flash/CY8C6xxx_EFUSE.FLM",
+                "ram_size": 32768,
                 "ram_start": 134374400,
-                "ram_size": 32768
+                "size": 1024,
+                "start": 2423259136
             }
         ],
+        "family": "PSoC 63",
+        "from_pack": {
+            "pack": "PSoC6_DFP",
+            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/",
+            "vendor": "Cypress",
+            "version": "1.0.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 294912,
+                "start": 134217728,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 1048576,
+                "start": 268435456,
+                "startup": true
+            }
+        },
+        "name": "CY8C6347BZI-BLD53",
         "processor": {
             "Asymmetric": {
                 "Cortex-M0p": {
-                    "units": 1,
                     "core": "CortexM0Plus",
                     "fpu": "None",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 },
                 "Cortex-M4": {
-                    "units": 1,
                     "core": "CortexM4",
                     "fpu": "SinglePrecision",
-                    "mpu": "Present"
+                    "mpu": "Present",
+                    "units": 1
                 }
             }
         },
-        "from_pack": {
-            "vendor": "Cypress",
-            "pack": "PSoC6_DFP",
-            "version": "1.0.0",
-            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/"
-        },
-        "vendor": "Cypress:19",
-        "family": "PSoC 63",
-        "sub_family": "PSoC 63 Dual-Core"
+        "sub_family": "PSoC 63 Dual-Core",
+        "vendor": "Cypress:19"
     },
     "EFM32GG11B820F2048GL192": {
         "algorithms": [
@@ -2125,6 +2125,82 @@
         "sub_family": "M451",
         "vendor": "Nuvoton:18"
     },
+    "M467HJHAE": {
+        "algorithms": [
+            {
+                "default": false,
+                "file_name": "Flash/M460_LD_8.FLM",
+                "ram_size": null,
+                "ram_start": null,
+                "size": 8192,
+                "start": 252706816
+            },
+            {
+                "default": true,
+                "file_name": "Flash/M460_AP_1M.FLM",
+                "ram_size": null,
+                "ram_start": null,
+                "size": 1048576,
+                "start": 0
+            }
+        ],
+        "family": "NuMicro M4 Family",
+        "from_pack": {
+            "pack": "NuMicro_DFP",
+            "url": "http://www.nuvoton.com/hq/enu/Documents/KEILSoftwarePack",
+            "vendor": "Nuvoton",
+            "version": "1.3.13"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 524288,
+                "start": 536870912,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 1048576,
+                "start": 0,
+                "startup": true
+            }
+        },
+        "name": "M467HJHAE",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM4",
+                "fpu": "SinglePrecision",
+                "mpu": "NotPresent",
+                "units": 1
+            }
+        },
+        "sectors": [
+            [
+                0,
+                4096
+            ]
+        ],
+        "sub_family": "M460",
+        "vendor": "Nuvoton:18"
+    },
     "M487JIDAE": {
         "algorithms": [
             {
@@ -2215,82 +2291,6 @@
             ]
         ],
         "sub_family": "M480",
-        "vendor": "Nuvoton:18"
-    },
-    "M467HJHAE": {
-        "algorithms": [
-            {
-                "default": false,
-                "file_name": "Flash/M460_LD_8.FLM",
-                "ram_size": null,
-                "ram_start": null,
-                "size": 8192,
-                "start": 252706816
-            },
-            {
-                "default": true,
-                "file_name": "Flash/M460_AP_1M.FLM",
-                "ram_size": null,
-                "ram_start": null,
-                "size": 1048576,
-                "start": 0
-            }
-        ],
-        "family": "NuMicro M4 Family",
-        "from_pack": {
-            "pack": "NuMicro_DFP",
-            "url": "http://www.nuvoton.com/hq/enu/Documents/KEILSoftwarePack",
-            "vendor": "Nuvoton",
-            "version": "1.3.13"
-        },
-        "memories": {
-            "IRAM1": {
-                "access": {
-                    "execute": false,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": true,
-                "size": 524288,
-                "start": 536870912,
-                "startup": false
-            },
-            "IROM1": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": false
-                },
-                "default": true,
-                "size": 1048576,
-                "start": 0,
-                "startup": true
-            }
-        },
-        "name": "M467HJHAE",
-        "processor": {
-            "Symmetric": {
-                "core": "CortexM4",
-                "fpu": "SinglePrecision",
-                "mpu": "NotPresent",
-                "units": 1
-            }
-        },
-        "sectors": [
-            [
-                0,
-                4096
-            ]
-        ],
-        "sub_family": "M460",
         "vendor": "Nuvoton:18"
     },
     "MAX32620": {
@@ -2536,6 +2536,119 @@
                 1610612736,
                 4096
             ]
+        ],
+        "sub_family": null,
+        "vendor": "NXP:11"
+    },
+    "MIMXRT1062DVL6B": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "devices/MIMXRT1062/arm/MIMXRT106x_QSPI_4KB_SEC.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 8388608,
+                "start": 1610612736,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "devices/MIMXRT1062/arm/MIMXRT106x_16MB_QSPI_4KB_SEC.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 16777216,
+                "start": 1610612736,
+                "style": "Keil"
+            }
+        ],
+        "family": "MIMXRT1062",
+        "from_pack": {
+            "pack": "MIMXRT1062_DFP",
+            "url": "https://mcuxpresso.nxp.com/cmsis_pack/repo/",
+            "vendor": "NXP",
+            "version": "18.0.0"
+        },
+        "memories": {
+            "SRAM_DTC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 131072,
+                "start": 536870912,
+                "startup": false
+            },
+            "SRAM_ITC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 131072,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_OC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 262144,
+                "start": 539492352,
+                "startup": false
+            },
+            "SRAM_OC2": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 524288,
+                "start": 538968064,
+                "startup": false
+            }
+        },
+        "name": "MIMXRT1062DVL6B",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM7",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "DoublePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "devices/MIMXRT1062/MIMXRT1062.xml",
+                "unit": 0
+            }
         ],
         "sub_family": null,
         "vendor": "NXP:11"
@@ -7712,89 +7825,6 @@
         "sub_family": "STM32H743",
         "vendor": "STMicroelectronics:13"
     },
-    "STM32H7A3ZITxQ": {
-        "algorithms": [
-            {
-                "default": true,
-                "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
-                "ram_size": 32768,
-                "ram_start": 536870912,
-                "size": 2097152,
-                "start": 134217728
-            }
-        ],
-        "family": "STM32H7 Series",
-        "from_pack": {
-            "pack": "STM32H7xx_DFP",
-            "url": "https://www.keil.com/pack/",
-            "vendor": "Keil",
-            "version": "2.7.0"
-        },
-        "memories": {
-            "IRAM1": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": true,
-                "size": 1048576,
-                "start": 603979776,
-                "startup": false
-            },
-            "IRAM2": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": true,
-                "size": 131072,
-                "start": 536870912,
-                "startup": false
-            },
-            "IROM1": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": false
-                },
-                "default": true,
-                "size": 2097152,
-                "start": 134217728,
-                "startup": true
-            }
-        },
-        "name": "STM32H7A3ZITxQ",
-        "processor": {
-            "Symmetric": {
-                "core": "CortexM7",
-                "fpu": "DoublePrecision",
-                "mpu": "Present",
-                "units": 1
-            }
-        },
-        "sectors": [
-            [
-                134217728,
-                131072
-            ]
-        ],
-        "sub_family": "STM32H7A3",
-        "vendor": "STMicroelectronics:13"
-    },
     "STM32H745ZITx": {
         "algorithms": [
             {
@@ -8149,6 +8179,89 @@
             ]
         ],
         "sub_family": "STM32H747",
+        "vendor": "STMicroelectronics:13"
+    },
+    "STM32H7A3ZITxQ": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 2097152,
+                "start": 134217728
+            }
+        ],
+        "family": "STM32H7 Series",
+        "from_pack": {
+            "pack": "STM32H7xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "2.7.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 1048576,
+                "start": 603979776,
+                "startup": false
+            },
+            "IRAM2": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 131072,
+                "start": 536870912,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 2097152,
+                "start": 134217728,
+                "startup": true
+            }
+        },
+        "name": "STM32H7A3ZITxQ",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM7",
+                "fpu": "DoublePrecision",
+                "mpu": "Present",
+                "units": 1
+            }
+        },
+        "sectors": [
+            [
+                134217728,
+                131072
+            ]
+        ],
+        "sub_family": "STM32H7A3",
         "vendor": "STMicroelectronics:13"
     },
     "STM32L072CZTx": {
@@ -9996,13 +10109,6 @@
         "vendor": "STMicroelectronics:13"
     },
     "STM32L552ZETxQ": {
-        "family": "STM32L5 Series",
-        "from_pack": {
-            "pack": "STM32L5xx_DFP",
-            "url": "http://www.keil.com/pack",
-            "vendor": "Keil",
-            "version": "1.3.0"
-        },
         "algorithms": [
             {
                 "default": true,
@@ -10013,6 +10119,13 @@
                 "start": 134217728
             }
         ],
+        "family": "STM32L5 Series",
+        "from_pack": {
+            "pack": "STM32L5xx_DFP",
+            "url": "http://www.keil.com/pack",
+            "vendor": "Keil",
+            "version": "1.3.0"
+        },
         "memories": {
             "IRAM1": {
                 "access": {
@@ -10064,13 +10177,6 @@
         "vendor": "STMicroelectronics:13"
     },
     "STM32L562QEIxQ": {
-        "family": "STM32L5 Series",
-        "from_pack": {
-            "pack": "STM32L5xx_DFP",
-            "url": "http://www.keil.com/pack",
-            "vendor": "Keil",
-            "version": "1.3.0"
-        },
         "algorithms": [
             {
                 "default": true,
@@ -10081,6 +10187,13 @@
                 "start": 134217728
             }
         ],
+        "family": "STM32L5 Series",
+        "from_pack": {
+            "pack": "STM32L5xx_DFP",
+            "url": "http://www.keil.com/pack",
+            "vendor": "Keil",
+            "version": "1.3.0"
+        },
         "memories": {
             "IRAM1": {
                 "access": {
@@ -10132,13 +10245,6 @@
         "vendor": "STMicroelectronics:13"
     },
     "STM32U575ZITx": {
-        "family": "STM32U5 Series",
-        "from_pack": {
-            "pack": "STM32U5xx_DFP",
-            "url": "http://www.keil.com/pack",
-            "vendor": "Keil",
-            "version": "1.0.5"
-        },
         "algorithms": [
             {
                 "default": true,
@@ -10149,6 +10255,13 @@
                 "start": 134217728
             }
         ],
+        "family": "STM32U5 Series",
+        "from_pack": {
+            "pack": "STM32U5xx_DFP",
+            "url": "http://www.keil.com/pack",
+            "vendor": "Keil",
+            "version": "1.0.5"
+        },
         "memories": {
             "IRAM1": {
                 "access": {
@@ -10200,13 +10313,6 @@
         "vendor": "STMicroelectronics:13"
     },
     "STM32U585AIIx": {
-        "family": "STM32U5 Series",
-        "from_pack": {
-            "pack": "STM32U5xx_DFP",
-            "url": "http://www.keil.com/pack",
-            "vendor": "Keil",
-            "version": "1.0.5"
-        },
         "algorithms": [
             {
                 "default": true,
@@ -10217,6 +10323,13 @@
                 "start": 134217728
             }
         ],
+        "family": "STM32U5 Series",
+        "from_pack": {
+            "pack": "STM32U5xx_DFP",
+            "url": "http://www.keil.com/pack",
+            "vendor": "Keil",
+            "version": "1.0.5"
+        },
         "memories": {
             "IRAM1": {
                 "access": {
@@ -10267,2317 +10380,2317 @@
         "sub_family": "STM32U585",
         "vendor": "STMicroelectronics:13"
     },
-    "STM32WL55JCIx": {
-        "name": "STM32WL55JCIx:CM4",
+    "STM32WB15CCUx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32WB_M4.FLM",
+                "ram_size": null,
+                "ram_start": null,
+                "size": 1048576,
+                "start": 134217728
+            }
+        ],
+        "family": "STM32WB Series",
+        "from_pack": {
+            "pack": "STM32WBxx_DFP",
+            "url": "http://www.keil.com/pack",
+            "vendor": "Keil",
+            "version": "1.2.0"
+        },
         "memories": {
             "IRAM1": {
                 "access": {
-                    "read": true,
-                    "write": true,
                     "execute": false,
-                    "peripheral": false,
-                    "secure": false,
                     "non_secure": false,
-                    "non_secure_callable": false
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
                 },
+                "default": true,
+                "size": 49152,
                 "start": 536870912,
-                "size": 65536,
-                "startup": false,
-                "default": true
+                "startup": false
             },
             "IROM1": {
                 "access": {
-                    "read": true,
-                    "write": false,
                     "execute": true,
-                    "peripheral": false,
-                    "secure": false,
                     "non_secure": false,
-                    "non_secure_callable": false
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
                 },
+                "default": true,
+                "size": 327680,
                 "start": 134217728,
-                "size": 262144,
-                "startup": true,
-                "default": true
+                "startup": true
             }
         },
-        "algorithms": [
-            {
-                "file_name": "CMSIS/Flash/STM32WLxx_CM4.FLM",
-                "start": 134217728,
-                "size": 262144,
-                "default": true,
-                "ram_start": null,
-                "ram_size": null
-            }
-        ],
+        "name": "STM32WB15CCUx",
         "processor": {
             "Symmetric": {
-                "units": 1,
                 "core": "CortexM4",
-                "fpu": "None",
-                "mpu": "Present"
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "units": 1
             }
         },
+        "sectors": [
+            [
+                134217728,
+                4096
+            ]
+        ],
+        "sub_family": "STM32WB15",
+        "vendor": "STMicroelectronics:13"
+    },
+    "STM32WB55RGVx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32WB_M4.FLM",
+                "ram_size": null,
+                "ram_start": null,
+                "size": 1048576,
+                "start": 134217728
+            }
+        ],
+        "family": "STM32WB Series",
         "from_pack": {
+            "pack": "STM32WBxx_DFP",
+            "url": "http://www.keil.com/pack",
             "vendor": "Keil",
-            "pack": "STM32WLxx_DFP",
-            "version": "1.0.0",
-            "url": "http://www.keil.com/pack"
+            "version": "1.0.0"
         },
-        "vendor": "STMicroelectronics:13",
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 262144,
+                "start": 536870912,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 1048576,
+                "start": 134217728,
+                "startup": true
+            }
+        },
+        "name": "STM32WB55RGVx",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM4",
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "units": 1
+            }
+        },
+        "sectors": [
+            [
+                134217728,
+                4096
+            ],
+            [
+                134221824,
+                4096
+            ],
+            [
+                134225920,
+                4096
+            ],
+            [
+                134230016,
+                4096
+            ],
+            [
+                134234112,
+                4096
+            ],
+            [
+                134238208,
+                4096
+            ],
+            [
+                134242304,
+                4096
+            ],
+            [
+                134246400,
+                4096
+            ],
+            [
+                134250496,
+                4096
+            ],
+            [
+                134254592,
+                4096
+            ],
+            [
+                134258688,
+                4096
+            ],
+            [
+                134262784,
+                4096
+            ],
+            [
+                134266880,
+                4096
+            ],
+            [
+                134270976,
+                4096
+            ],
+            [
+                134275072,
+                4096
+            ],
+            [
+                134279168,
+                4096
+            ],
+            [
+                134283264,
+                4096
+            ],
+            [
+                134287360,
+                4096
+            ],
+            [
+                134291456,
+                4096
+            ],
+            [
+                134295552,
+                4096
+            ],
+            [
+                134299648,
+                4096
+            ],
+            [
+                134303744,
+                4096
+            ],
+            [
+                134307840,
+                4096
+            ],
+            [
+                134311936,
+                4096
+            ],
+            [
+                134316032,
+                4096
+            ],
+            [
+                134320128,
+                4096
+            ],
+            [
+                134324224,
+                4096
+            ],
+            [
+                134328320,
+                4096
+            ],
+            [
+                134332416,
+                4096
+            ],
+            [
+                134336512,
+                4096
+            ],
+            [
+                134340608,
+                4096
+            ],
+            [
+                134344704,
+                4096
+            ],
+            [
+                134348800,
+                4096
+            ],
+            [
+                134352896,
+                4096
+            ],
+            [
+                134356992,
+                4096
+            ],
+            [
+                134361088,
+                4096
+            ],
+            [
+                134365184,
+                4096
+            ],
+            [
+                134369280,
+                4096
+            ],
+            [
+                134373376,
+                4096
+            ],
+            [
+                134377472,
+                4096
+            ],
+            [
+                134381568,
+                4096
+            ],
+            [
+                134385664,
+                4096
+            ],
+            [
+                134389760,
+                4096
+            ],
+            [
+                134393856,
+                4096
+            ],
+            [
+                134397952,
+                4096
+            ],
+            [
+                134402048,
+                4096
+            ],
+            [
+                134406144,
+                4096
+            ],
+            [
+                134410240,
+                4096
+            ],
+            [
+                134414336,
+                4096
+            ],
+            [
+                134418432,
+                4096
+            ],
+            [
+                134422528,
+                4096
+            ],
+            [
+                134426624,
+                4096
+            ],
+            [
+                134430720,
+                4096
+            ],
+            [
+                134434816,
+                4096
+            ],
+            [
+                134438912,
+                4096
+            ],
+            [
+                134443008,
+                4096
+            ],
+            [
+                134447104,
+                4096
+            ],
+            [
+                134451200,
+                4096
+            ],
+            [
+                134455296,
+                4096
+            ],
+            [
+                134459392,
+                4096
+            ],
+            [
+                134463488,
+                4096
+            ],
+            [
+                134467584,
+                4096
+            ],
+            [
+                134471680,
+                4096
+            ],
+            [
+                134475776,
+                4096
+            ],
+            [
+                134479872,
+                4096
+            ],
+            [
+                134483968,
+                4096
+            ],
+            [
+                134488064,
+                4096
+            ],
+            [
+                134492160,
+                4096
+            ],
+            [
+                134496256,
+                4096
+            ],
+            [
+                134500352,
+                4096
+            ],
+            [
+                134504448,
+                4096
+            ],
+            [
+                134508544,
+                4096
+            ],
+            [
+                134512640,
+                4096
+            ],
+            [
+                134516736,
+                4096
+            ],
+            [
+                134520832,
+                4096
+            ],
+            [
+                134524928,
+                4096
+            ],
+            [
+                134529024,
+                4096
+            ],
+            [
+                134533120,
+                4096
+            ],
+            [
+                134537216,
+                4096
+            ],
+            [
+                134541312,
+                4096
+            ],
+            [
+                134545408,
+                4096
+            ],
+            [
+                134549504,
+                4096
+            ],
+            [
+                134553600,
+                4096
+            ],
+            [
+                134557696,
+                4096
+            ],
+            [
+                134561792,
+                4096
+            ],
+            [
+                134565888,
+                4096
+            ],
+            [
+                134569984,
+                4096
+            ],
+            [
+                134574080,
+                4096
+            ],
+            [
+                134578176,
+                4096
+            ],
+            [
+                134582272,
+                4096
+            ],
+            [
+                134586368,
+                4096
+            ],
+            [
+                134590464,
+                4096
+            ],
+            [
+                134594560,
+                4096
+            ],
+            [
+                134598656,
+                4096
+            ],
+            [
+                134602752,
+                4096
+            ],
+            [
+                134606848,
+                4096
+            ],
+            [
+                134610944,
+                4096
+            ],
+            [
+                134615040,
+                4096
+            ],
+            [
+                134619136,
+                4096
+            ],
+            [
+                134623232,
+                4096
+            ],
+            [
+                134627328,
+                4096
+            ],
+            [
+                134631424,
+                4096
+            ],
+            [
+                134635520,
+                4096
+            ],
+            [
+                134639616,
+                4096
+            ],
+            [
+                134643712,
+                4096
+            ],
+            [
+                134647808,
+                4096
+            ],
+            [
+                134651904,
+                4096
+            ],
+            [
+                134656000,
+                4096
+            ],
+            [
+                134660096,
+                4096
+            ],
+            [
+                134664192,
+                4096
+            ],
+            [
+                134668288,
+                4096
+            ],
+            [
+                134672384,
+                4096
+            ],
+            [
+                134676480,
+                4096
+            ],
+            [
+                134680576,
+                4096
+            ],
+            [
+                134684672,
+                4096
+            ],
+            [
+                134688768,
+                4096
+            ],
+            [
+                134692864,
+                4096
+            ],
+            [
+                134696960,
+                4096
+            ],
+            [
+                134701056,
+                4096
+            ],
+            [
+                134705152,
+                4096
+            ],
+            [
+                134709248,
+                4096
+            ],
+            [
+                134713344,
+                4096
+            ],
+            [
+                134717440,
+                4096
+            ],
+            [
+                134721536,
+                4096
+            ],
+            [
+                134725632,
+                4096
+            ],
+            [
+                134729728,
+                4096
+            ],
+            [
+                134733824,
+                4096
+            ],
+            [
+                134737920,
+                4096
+            ],
+            [
+                134742016,
+                4096
+            ],
+            [
+                134746112,
+                4096
+            ],
+            [
+                134750208,
+                4096
+            ],
+            [
+                134754304,
+                4096
+            ],
+            [
+                134758400,
+                4096
+            ],
+            [
+                134762496,
+                4096
+            ],
+            [
+                134766592,
+                4096
+            ],
+            [
+                134770688,
+                4096
+            ],
+            [
+                134774784,
+                4096
+            ],
+            [
+                134778880,
+                4096
+            ],
+            [
+                134782976,
+                4096
+            ],
+            [
+                134787072,
+                4096
+            ],
+            [
+                134791168,
+                4096
+            ],
+            [
+                134795264,
+                4096
+            ],
+            [
+                134799360,
+                4096
+            ],
+            [
+                134803456,
+                4096
+            ],
+            [
+                134807552,
+                4096
+            ],
+            [
+                134811648,
+                4096
+            ],
+            [
+                134815744,
+                4096
+            ],
+            [
+                134819840,
+                4096
+            ],
+            [
+                134823936,
+                4096
+            ],
+            [
+                134828032,
+                4096
+            ],
+            [
+                134832128,
+                4096
+            ],
+            [
+                134836224,
+                4096
+            ],
+            [
+                134840320,
+                4096
+            ],
+            [
+                134844416,
+                4096
+            ],
+            [
+                134848512,
+                4096
+            ],
+            [
+                134852608,
+                4096
+            ],
+            [
+                134856704,
+                4096
+            ],
+            [
+                134860800,
+                4096
+            ],
+            [
+                134864896,
+                4096
+            ],
+            [
+                134868992,
+                4096
+            ],
+            [
+                134873088,
+                4096
+            ],
+            [
+                134877184,
+                4096
+            ],
+            [
+                134881280,
+                4096
+            ],
+            [
+                134885376,
+                4096
+            ],
+            [
+                134889472,
+                4096
+            ],
+            [
+                134893568,
+                4096
+            ],
+            [
+                134897664,
+                4096
+            ],
+            [
+                134901760,
+                4096
+            ],
+            [
+                134905856,
+                4096
+            ],
+            [
+                134909952,
+                4096
+            ],
+            [
+                134914048,
+                4096
+            ],
+            [
+                134918144,
+                4096
+            ],
+            [
+                134922240,
+                4096
+            ],
+            [
+                134926336,
+                4096
+            ],
+            [
+                134930432,
+                4096
+            ],
+            [
+                134934528,
+                4096
+            ],
+            [
+                134938624,
+                4096
+            ],
+            [
+                134942720,
+                4096
+            ],
+            [
+                134946816,
+                4096
+            ],
+            [
+                134950912,
+                4096
+            ],
+            [
+                134955008,
+                4096
+            ],
+            [
+                134959104,
+                4096
+            ],
+            [
+                134963200,
+                4096
+            ],
+            [
+                134967296,
+                4096
+            ],
+            [
+                134971392,
+                4096
+            ],
+            [
+                134975488,
+                4096
+            ],
+            [
+                134979584,
+                4096
+            ],
+            [
+                134983680,
+                4096
+            ],
+            [
+                134987776,
+                4096
+            ],
+            [
+                134991872,
+                4096
+            ],
+            [
+                134995968,
+                4096
+            ],
+            [
+                135000064,
+                4096
+            ],
+            [
+                135004160,
+                4096
+            ],
+            [
+                135008256,
+                4096
+            ],
+            [
+                135012352,
+                4096
+            ],
+            [
+                135016448,
+                4096
+            ],
+            [
+                135020544,
+                4096
+            ],
+            [
+                135024640,
+                4096
+            ],
+            [
+                135028736,
+                4096
+            ],
+            [
+                135032832,
+                4096
+            ],
+            [
+                135036928,
+                4096
+            ],
+            [
+                135041024,
+                4096
+            ],
+            [
+                135045120,
+                4096
+            ],
+            [
+                135049216,
+                4096
+            ],
+            [
+                135053312,
+                4096
+            ],
+            [
+                135057408,
+                4096
+            ],
+            [
+                135061504,
+                4096
+            ],
+            [
+                135065600,
+                4096
+            ],
+            [
+                135069696,
+                4096
+            ],
+            [
+                135073792,
+                4096
+            ],
+            [
+                135077888,
+                4096
+            ],
+            [
+                135081984,
+                4096
+            ],
+            [
+                135086080,
+                4096
+            ],
+            [
+                135090176,
+                4096
+            ],
+            [
+                135094272,
+                4096
+            ],
+            [
+                135098368,
+                4096
+            ],
+            [
+                135102464,
+                4096
+            ],
+            [
+                135106560,
+                4096
+            ],
+            [
+                135110656,
+                4096
+            ],
+            [
+                135114752,
+                4096
+            ],
+            [
+                135118848,
+                4096
+            ],
+            [
+                135122944,
+                4096
+            ],
+            [
+                135127040,
+                4096
+            ],
+            [
+                135131136,
+                4096
+            ],
+            [
+                135135232,
+                4096
+            ],
+            [
+                135139328,
+                4096
+            ],
+            [
+                135143424,
+                4096
+            ],
+            [
+                135147520,
+                4096
+            ],
+            [
+                135151616,
+                4096
+            ],
+            [
+                135155712,
+                4096
+            ],
+            [
+                135159808,
+                4096
+            ],
+            [
+                135163904,
+                4096
+            ],
+            [
+                135168000,
+                4096
+            ],
+            [
+                135172096,
+                4096
+            ],
+            [
+                135176192,
+                4096
+            ],
+            [
+                135180288,
+                4096
+            ],
+            [
+                135184384,
+                4096
+            ],
+            [
+                135188480,
+                4096
+            ],
+            [
+                135192576,
+                4096
+            ],
+            [
+                135196672,
+                4096
+            ],
+            [
+                135200768,
+                4096
+            ],
+            [
+                135204864,
+                4096
+            ],
+            [
+                135208960,
+                4096
+            ],
+            [
+                135213056,
+                4096
+            ],
+            [
+                135217152,
+                4096
+            ],
+            [
+                135221248,
+                4096
+            ],
+            [
+                135225344,
+                4096
+            ],
+            [
+                135229440,
+                4096
+            ],
+            [
+                135233536,
+                4096
+            ],
+            [
+                135237632,
+                4096
+            ],
+            [
+                135241728,
+                4096
+            ],
+            [
+                135245824,
+                4096
+            ],
+            [
+                135249920,
+                4096
+            ],
+            [
+                135254016,
+                4096
+            ],
+            [
+                135258112,
+                4096
+            ],
+            [
+                135262208,
+                4096
+            ]
+        ],
+        "sub_family": "STM32WB55",
+        "vendor": "STMicroelectronics:13"
+    },
+    "STM32WB55VGYx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32WB_M4.FLM",
+                "ram_size": null,
+                "ram_start": null,
+                "size": 1048576,
+                "start": 134217728
+            }
+        ],
+        "family": "STM32WB Series",
+        "from_pack": {
+            "pack": "STM32WBxx_DFP",
+            "url": "http://www.keil.com/pack",
+            "vendor": "Keil",
+            "version": "1.0.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 262144,
+                "start": 536870912,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 1048576,
+                "start": 134217728,
+                "startup": true
+            }
+        },
+        "name": "STM32WB55VGYx",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM4",
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "units": 1
+            }
+        },
+        "sectors": [
+            [
+                134217728,
+                4096
+            ],
+            [
+                134221824,
+                4096
+            ],
+            [
+                134225920,
+                4096
+            ],
+            [
+                134230016,
+                4096
+            ],
+            [
+                134234112,
+                4096
+            ],
+            [
+                134238208,
+                4096
+            ],
+            [
+                134242304,
+                4096
+            ],
+            [
+                134246400,
+                4096
+            ],
+            [
+                134250496,
+                4096
+            ],
+            [
+                134254592,
+                4096
+            ],
+            [
+                134258688,
+                4096
+            ],
+            [
+                134262784,
+                4096
+            ],
+            [
+                134266880,
+                4096
+            ],
+            [
+                134270976,
+                4096
+            ],
+            [
+                134275072,
+                4096
+            ],
+            [
+                134279168,
+                4096
+            ],
+            [
+                134283264,
+                4096
+            ],
+            [
+                134287360,
+                4096
+            ],
+            [
+                134291456,
+                4096
+            ],
+            [
+                134295552,
+                4096
+            ],
+            [
+                134299648,
+                4096
+            ],
+            [
+                134303744,
+                4096
+            ],
+            [
+                134307840,
+                4096
+            ],
+            [
+                134311936,
+                4096
+            ],
+            [
+                134316032,
+                4096
+            ],
+            [
+                134320128,
+                4096
+            ],
+            [
+                134324224,
+                4096
+            ],
+            [
+                134328320,
+                4096
+            ],
+            [
+                134332416,
+                4096
+            ],
+            [
+                134336512,
+                4096
+            ],
+            [
+                134340608,
+                4096
+            ],
+            [
+                134344704,
+                4096
+            ],
+            [
+                134348800,
+                4096
+            ],
+            [
+                134352896,
+                4096
+            ],
+            [
+                134356992,
+                4096
+            ],
+            [
+                134361088,
+                4096
+            ],
+            [
+                134365184,
+                4096
+            ],
+            [
+                134369280,
+                4096
+            ],
+            [
+                134373376,
+                4096
+            ],
+            [
+                134377472,
+                4096
+            ],
+            [
+                134381568,
+                4096
+            ],
+            [
+                134385664,
+                4096
+            ],
+            [
+                134389760,
+                4096
+            ],
+            [
+                134393856,
+                4096
+            ],
+            [
+                134397952,
+                4096
+            ],
+            [
+                134402048,
+                4096
+            ],
+            [
+                134406144,
+                4096
+            ],
+            [
+                134410240,
+                4096
+            ],
+            [
+                134414336,
+                4096
+            ],
+            [
+                134418432,
+                4096
+            ],
+            [
+                134422528,
+                4096
+            ],
+            [
+                134426624,
+                4096
+            ],
+            [
+                134430720,
+                4096
+            ],
+            [
+                134434816,
+                4096
+            ],
+            [
+                134438912,
+                4096
+            ],
+            [
+                134443008,
+                4096
+            ],
+            [
+                134447104,
+                4096
+            ],
+            [
+                134451200,
+                4096
+            ],
+            [
+                134455296,
+                4096
+            ],
+            [
+                134459392,
+                4096
+            ],
+            [
+                134463488,
+                4096
+            ],
+            [
+                134467584,
+                4096
+            ],
+            [
+                134471680,
+                4096
+            ],
+            [
+                134475776,
+                4096
+            ],
+            [
+                134479872,
+                4096
+            ],
+            [
+                134483968,
+                4096
+            ],
+            [
+                134488064,
+                4096
+            ],
+            [
+                134492160,
+                4096
+            ],
+            [
+                134496256,
+                4096
+            ],
+            [
+                134500352,
+                4096
+            ],
+            [
+                134504448,
+                4096
+            ],
+            [
+                134508544,
+                4096
+            ],
+            [
+                134512640,
+                4096
+            ],
+            [
+                134516736,
+                4096
+            ],
+            [
+                134520832,
+                4096
+            ],
+            [
+                134524928,
+                4096
+            ],
+            [
+                134529024,
+                4096
+            ],
+            [
+                134533120,
+                4096
+            ],
+            [
+                134537216,
+                4096
+            ],
+            [
+                134541312,
+                4096
+            ],
+            [
+                134545408,
+                4096
+            ],
+            [
+                134549504,
+                4096
+            ],
+            [
+                134553600,
+                4096
+            ],
+            [
+                134557696,
+                4096
+            ],
+            [
+                134561792,
+                4096
+            ],
+            [
+                134565888,
+                4096
+            ],
+            [
+                134569984,
+                4096
+            ],
+            [
+                134574080,
+                4096
+            ],
+            [
+                134578176,
+                4096
+            ],
+            [
+                134582272,
+                4096
+            ],
+            [
+                134586368,
+                4096
+            ],
+            [
+                134590464,
+                4096
+            ],
+            [
+                134594560,
+                4096
+            ],
+            [
+                134598656,
+                4096
+            ],
+            [
+                134602752,
+                4096
+            ],
+            [
+                134606848,
+                4096
+            ],
+            [
+                134610944,
+                4096
+            ],
+            [
+                134615040,
+                4096
+            ],
+            [
+                134619136,
+                4096
+            ],
+            [
+                134623232,
+                4096
+            ],
+            [
+                134627328,
+                4096
+            ],
+            [
+                134631424,
+                4096
+            ],
+            [
+                134635520,
+                4096
+            ],
+            [
+                134639616,
+                4096
+            ],
+            [
+                134643712,
+                4096
+            ],
+            [
+                134647808,
+                4096
+            ],
+            [
+                134651904,
+                4096
+            ],
+            [
+                134656000,
+                4096
+            ],
+            [
+                134660096,
+                4096
+            ],
+            [
+                134664192,
+                4096
+            ],
+            [
+                134668288,
+                4096
+            ],
+            [
+                134672384,
+                4096
+            ],
+            [
+                134676480,
+                4096
+            ],
+            [
+                134680576,
+                4096
+            ],
+            [
+                134684672,
+                4096
+            ],
+            [
+                134688768,
+                4096
+            ],
+            [
+                134692864,
+                4096
+            ],
+            [
+                134696960,
+                4096
+            ],
+            [
+                134701056,
+                4096
+            ],
+            [
+                134705152,
+                4096
+            ],
+            [
+                134709248,
+                4096
+            ],
+            [
+                134713344,
+                4096
+            ],
+            [
+                134717440,
+                4096
+            ],
+            [
+                134721536,
+                4096
+            ],
+            [
+                134725632,
+                4096
+            ],
+            [
+                134729728,
+                4096
+            ],
+            [
+                134733824,
+                4096
+            ],
+            [
+                134737920,
+                4096
+            ],
+            [
+                134742016,
+                4096
+            ],
+            [
+                134746112,
+                4096
+            ],
+            [
+                134750208,
+                4096
+            ],
+            [
+                134754304,
+                4096
+            ],
+            [
+                134758400,
+                4096
+            ],
+            [
+                134762496,
+                4096
+            ],
+            [
+                134766592,
+                4096
+            ],
+            [
+                134770688,
+                4096
+            ],
+            [
+                134774784,
+                4096
+            ],
+            [
+                134778880,
+                4096
+            ],
+            [
+                134782976,
+                4096
+            ],
+            [
+                134787072,
+                4096
+            ],
+            [
+                134791168,
+                4096
+            ],
+            [
+                134795264,
+                4096
+            ],
+            [
+                134799360,
+                4096
+            ],
+            [
+                134803456,
+                4096
+            ],
+            [
+                134807552,
+                4096
+            ],
+            [
+                134811648,
+                4096
+            ],
+            [
+                134815744,
+                4096
+            ],
+            [
+                134819840,
+                4096
+            ],
+            [
+                134823936,
+                4096
+            ],
+            [
+                134828032,
+                4096
+            ],
+            [
+                134832128,
+                4096
+            ],
+            [
+                134836224,
+                4096
+            ],
+            [
+                134840320,
+                4096
+            ],
+            [
+                134844416,
+                4096
+            ],
+            [
+                134848512,
+                4096
+            ],
+            [
+                134852608,
+                4096
+            ],
+            [
+                134856704,
+                4096
+            ],
+            [
+                134860800,
+                4096
+            ],
+            [
+                134864896,
+                4096
+            ],
+            [
+                134868992,
+                4096
+            ],
+            [
+                134873088,
+                4096
+            ],
+            [
+                134877184,
+                4096
+            ],
+            [
+                134881280,
+                4096
+            ],
+            [
+                134885376,
+                4096
+            ],
+            [
+                134889472,
+                4096
+            ],
+            [
+                134893568,
+                4096
+            ],
+            [
+                134897664,
+                4096
+            ],
+            [
+                134901760,
+                4096
+            ],
+            [
+                134905856,
+                4096
+            ],
+            [
+                134909952,
+                4096
+            ],
+            [
+                134914048,
+                4096
+            ],
+            [
+                134918144,
+                4096
+            ],
+            [
+                134922240,
+                4096
+            ],
+            [
+                134926336,
+                4096
+            ],
+            [
+                134930432,
+                4096
+            ],
+            [
+                134934528,
+                4096
+            ],
+            [
+                134938624,
+                4096
+            ],
+            [
+                134942720,
+                4096
+            ],
+            [
+                134946816,
+                4096
+            ],
+            [
+                134950912,
+                4096
+            ],
+            [
+                134955008,
+                4096
+            ],
+            [
+                134959104,
+                4096
+            ],
+            [
+                134963200,
+                4096
+            ],
+            [
+                134967296,
+                4096
+            ],
+            [
+                134971392,
+                4096
+            ],
+            [
+                134975488,
+                4096
+            ],
+            [
+                134979584,
+                4096
+            ],
+            [
+                134983680,
+                4096
+            ],
+            [
+                134987776,
+                4096
+            ],
+            [
+                134991872,
+                4096
+            ],
+            [
+                134995968,
+                4096
+            ],
+            [
+                135000064,
+                4096
+            ],
+            [
+                135004160,
+                4096
+            ],
+            [
+                135008256,
+                4096
+            ],
+            [
+                135012352,
+                4096
+            ],
+            [
+                135016448,
+                4096
+            ],
+            [
+                135020544,
+                4096
+            ],
+            [
+                135024640,
+                4096
+            ],
+            [
+                135028736,
+                4096
+            ],
+            [
+                135032832,
+                4096
+            ],
+            [
+                135036928,
+                4096
+            ],
+            [
+                135041024,
+                4096
+            ],
+            [
+                135045120,
+                4096
+            ],
+            [
+                135049216,
+                4096
+            ],
+            [
+                135053312,
+                4096
+            ],
+            [
+                135057408,
+                4096
+            ],
+            [
+                135061504,
+                4096
+            ],
+            [
+                135065600,
+                4096
+            ],
+            [
+                135069696,
+                4096
+            ],
+            [
+                135073792,
+                4096
+            ],
+            [
+                135077888,
+                4096
+            ],
+            [
+                135081984,
+                4096
+            ],
+            [
+                135086080,
+                4096
+            ],
+            [
+                135090176,
+                4096
+            ],
+            [
+                135094272,
+                4096
+            ],
+            [
+                135098368,
+                4096
+            ],
+            [
+                135102464,
+                4096
+            ],
+            [
+                135106560,
+                4096
+            ],
+            [
+                135110656,
+                4096
+            ],
+            [
+                135114752,
+                4096
+            ],
+            [
+                135118848,
+                4096
+            ],
+            [
+                135122944,
+                4096
+            ],
+            [
+                135127040,
+                4096
+            ],
+            [
+                135131136,
+                4096
+            ],
+            [
+                135135232,
+                4096
+            ],
+            [
+                135139328,
+                4096
+            ],
+            [
+                135143424,
+                4096
+            ],
+            [
+                135147520,
+                4096
+            ],
+            [
+                135151616,
+                4096
+            ],
+            [
+                135155712,
+                4096
+            ],
+            [
+                135159808,
+                4096
+            ],
+            [
+                135163904,
+                4096
+            ],
+            [
+                135168000,
+                4096
+            ],
+            [
+                135172096,
+                4096
+            ],
+            [
+                135176192,
+                4096
+            ],
+            [
+                135180288,
+                4096
+            ],
+            [
+                135184384,
+                4096
+            ],
+            [
+                135188480,
+                4096
+            ],
+            [
+                135192576,
+                4096
+            ],
+            [
+                135196672,
+                4096
+            ],
+            [
+                135200768,
+                4096
+            ],
+            [
+                135204864,
+                4096
+            ],
+            [
+                135208960,
+                4096
+            ],
+            [
+                135213056,
+                4096
+            ],
+            [
+                135217152,
+                4096
+            ],
+            [
+                135221248,
+                4096
+            ],
+            [
+                135225344,
+                4096
+            ],
+            [
+                135229440,
+                4096
+            ],
+            [
+                135233536,
+                4096
+            ],
+            [
+                135237632,
+                4096
+            ],
+            [
+                135241728,
+                4096
+            ],
+            [
+                135245824,
+                4096
+            ],
+            [
+                135249920,
+                4096
+            ],
+            [
+                135254016,
+                4096
+            ],
+            [
+                135258112,
+                4096
+            ],
+            [
+                135262208,
+                4096
+            ]
+        ],
+        "sub_family": "STM32WB55",
+        "vendor": "STMicroelectronics:13"
+    },
+    "STM32WL55JCIx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32WLxx_CM4.FLM",
+                "ram_size": null,
+                "ram_start": null,
+                "size": 262144,
+                "start": 134217728
+            }
+        ],
         "family": "STM32WL Series",
+        "from_pack": {
+            "pack": "STM32WLxx_DFP",
+            "url": "http://www.keil.com/pack",
+            "vendor": "Keil",
+            "version": "1.0.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 65536,
+                "start": 536870912,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 262144,
+                "start": 134217728,
+                "startup": true
+            }
+        },
+        "name": "STM32WL55JCIx:CM4",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM4",
+                "fpu": "None",
+                "mpu": "Present",
+                "units": 1
+            }
+        },
         "sectors": [
             [
                 134217728,
                 2048
             ]
         ],
-        "sub_family": "STM32WL55"
-    },
-    "STM32WB15CCUx": {
-        "name": "STM32WB15CCUx",
-        "memories": {
-            "IROM1": {
-                "access": {
-                    "read": true,
-                    "write": false,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 134217728,
-                "size": 327680,
-                "startup": true,
-                "default": true
-            },
-            "IRAM1": {
-                "access": {
-                    "read": true,
-                    "write": true,
-                    "execute": false,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 536870912,
-                "size": 49152,
-                "startup": false,
-                "default": true
-            }
-        },
-        "algorithms": [
-            {
-                "file_name": "CMSIS/Flash/STM32WB_M4.FLM",
-                "start": 134217728,
-                "size": 1048576,
-                "default": true,
-                "ram_start": null,
-                "ram_size": null
-            }
-        ],
-        "processor": {
-            "Symmetric": {
-                "units": 1,
-                "core": "CortexM4",
-                "fpu": "SinglePrecision",
-                "mpu": "Present"
-            }
-        },
-        "from_pack": {
-            "vendor": "Keil",
-            "pack": "STM32WBxx_DFP",
-            "version": "1.2.0",
-            "url": "http://www.keil.com/pack"
-        },
-        "sectors": [
-            [
-                134217728,
-                4096
-            ]
-        ],
-        "vendor": "STMicroelectronics:13",
-        "family": "STM32WB Series",
-        "sub_family": "STM32WB15"
-    },
-    "STM32WB55RGVx": {
-        "name": "STM32WB55RGVx",
-        "memories": {
-            "IROM1": {
-                "access": {
-                    "read": true,
-                    "write": false,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 134217728,
-                "size": 1048576,
-                "startup": true,
-                "default": true
-            },
-            "IRAM1": {
-                "access": {
-                    "read": true,
-                    "write": true,
-                    "execute": false,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 536870912,
-                "size": 262144,
-                "startup": false,
-                "default": true
-            }
-        },
-        "algorithms": [
-            {
-                "file_name": "CMSIS/Flash/STM32WB_M4.FLM",
-                "start": 134217728,
-                "size": 1048576,
-                "default": true,
-                "ram_start": null,
-                "ram_size": null
-            }
-        ],
-        "processor": {
-            "Symmetric": {
-                "units": 1,
-                "core": "CortexM4",
-                "fpu": "SinglePrecision",
-                "mpu": "Present"
-            }
-        },
-        "from_pack": {
-            "vendor": "Keil",
-            "pack": "STM32WBxx_DFP",
-            "version": "1.0.0",
-            "url": "http://www.keil.com/pack"
-        },
-        "sectors": [
-            [
-                134217728,
-                4096
-            ],
-            [
-                134221824,
-                4096
-            ],
-            [
-                134225920,
-                4096
-            ],
-            [
-                134230016,
-                4096
-            ],
-            [
-                134234112,
-                4096
-            ],
-            [
-                134238208,
-                4096
-            ],
-            [
-                134242304,
-                4096
-            ],
-            [
-                134246400,
-                4096
-            ],
-            [
-                134250496,
-                4096
-            ],
-            [
-                134254592,
-                4096
-            ],
-            [
-                134258688,
-                4096
-            ],
-            [
-                134262784,
-                4096
-            ],
-            [
-                134266880,
-                4096
-            ],
-            [
-                134270976,
-                4096
-            ],
-            [
-                134275072,
-                4096
-            ],
-            [
-                134279168,
-                4096
-            ],
-            [
-                134283264,
-                4096
-            ],
-            [
-                134287360,
-                4096
-            ],
-            [
-                134291456,
-                4096
-            ],
-            [
-                134295552,
-                4096
-            ],
-            [
-                134299648,
-                4096
-            ],
-            [
-                134303744,
-                4096
-            ],
-            [
-                134307840,
-                4096
-            ],
-            [
-                134311936,
-                4096
-            ],
-            [
-                134316032,
-                4096
-            ],
-            [
-                134320128,
-                4096
-            ],
-            [
-                134324224,
-                4096
-            ],
-            [
-                134328320,
-                4096
-            ],
-            [
-                134332416,
-                4096
-            ],
-            [
-                134336512,
-                4096
-            ],
-            [
-                134340608,
-                4096
-            ],
-            [
-                134344704,
-                4096
-            ],
-            [
-                134348800,
-                4096
-            ],
-            [
-                134352896,
-                4096
-            ],
-            [
-                134356992,
-                4096
-            ],
-            [
-                134361088,
-                4096
-            ],
-            [
-                134365184,
-                4096
-            ],
-            [
-                134369280,
-                4096
-            ],
-            [
-                134373376,
-                4096
-            ],
-            [
-                134377472,
-                4096
-            ],
-            [
-                134381568,
-                4096
-            ],
-            [
-                134385664,
-                4096
-            ],
-            [
-                134389760,
-                4096
-            ],
-            [
-                134393856,
-                4096
-            ],
-            [
-                134397952,
-                4096
-            ],
-            [
-                134402048,
-                4096
-            ],
-            [
-                134406144,
-                4096
-            ],
-            [
-                134410240,
-                4096
-            ],
-            [
-                134414336,
-                4096
-            ],
-            [
-                134418432,
-                4096
-            ],
-            [
-                134422528,
-                4096
-            ],
-            [
-                134426624,
-                4096
-            ],
-            [
-                134430720,
-                4096
-            ],
-            [
-                134434816,
-                4096
-            ],
-            [
-                134438912,
-                4096
-            ],
-            [
-                134443008,
-                4096
-            ],
-            [
-                134447104,
-                4096
-            ],
-            [
-                134451200,
-                4096
-            ],
-            [
-                134455296,
-                4096
-            ],
-            [
-                134459392,
-                4096
-            ],
-            [
-                134463488,
-                4096
-            ],
-            [
-                134467584,
-                4096
-            ],
-            [
-                134471680,
-                4096
-            ],
-            [
-                134475776,
-                4096
-            ],
-            [
-                134479872,
-                4096
-            ],
-            [
-                134483968,
-                4096
-            ],
-            [
-                134488064,
-                4096
-            ],
-            [
-                134492160,
-                4096
-            ],
-            [
-                134496256,
-                4096
-            ],
-            [
-                134500352,
-                4096
-            ],
-            [
-                134504448,
-                4096
-            ],
-            [
-                134508544,
-                4096
-            ],
-            [
-                134512640,
-                4096
-            ],
-            [
-                134516736,
-                4096
-            ],
-            [
-                134520832,
-                4096
-            ],
-            [
-                134524928,
-                4096
-            ],
-            [
-                134529024,
-                4096
-            ],
-            [
-                134533120,
-                4096
-            ],
-            [
-                134537216,
-                4096
-            ],
-            [
-                134541312,
-                4096
-            ],
-            [
-                134545408,
-                4096
-            ],
-            [
-                134549504,
-                4096
-            ],
-            [
-                134553600,
-                4096
-            ],
-            [
-                134557696,
-                4096
-            ],
-            [
-                134561792,
-                4096
-            ],
-            [
-                134565888,
-                4096
-            ],
-            [
-                134569984,
-                4096
-            ],
-            [
-                134574080,
-                4096
-            ],
-            [
-                134578176,
-                4096
-            ],
-            [
-                134582272,
-                4096
-            ],
-            [
-                134586368,
-                4096
-            ],
-            [
-                134590464,
-                4096
-            ],
-            [
-                134594560,
-                4096
-            ],
-            [
-                134598656,
-                4096
-            ],
-            [
-                134602752,
-                4096
-            ],
-            [
-                134606848,
-                4096
-            ],
-            [
-                134610944,
-                4096
-            ],
-            [
-                134615040,
-                4096
-            ],
-            [
-                134619136,
-                4096
-            ],
-            [
-                134623232,
-                4096
-            ],
-            [
-                134627328,
-                4096
-            ],
-            [
-                134631424,
-                4096
-            ],
-            [
-                134635520,
-                4096
-            ],
-            [
-                134639616,
-                4096
-            ],
-            [
-                134643712,
-                4096
-            ],
-            [
-                134647808,
-                4096
-            ],
-            [
-                134651904,
-                4096
-            ],
-            [
-                134656000,
-                4096
-            ],
-            [
-                134660096,
-                4096
-            ],
-            [
-                134664192,
-                4096
-            ],
-            [
-                134668288,
-                4096
-            ],
-            [
-                134672384,
-                4096
-            ],
-            [
-                134676480,
-                4096
-            ],
-            [
-                134680576,
-                4096
-            ],
-            [
-                134684672,
-                4096
-            ],
-            [
-                134688768,
-                4096
-            ],
-            [
-                134692864,
-                4096
-            ],
-            [
-                134696960,
-                4096
-            ],
-            [
-                134701056,
-                4096
-            ],
-            [
-                134705152,
-                4096
-            ],
-            [
-                134709248,
-                4096
-            ],
-            [
-                134713344,
-                4096
-            ],
-            [
-                134717440,
-                4096
-            ],
-            [
-                134721536,
-                4096
-            ],
-            [
-                134725632,
-                4096
-            ],
-            [
-                134729728,
-                4096
-            ],
-            [
-                134733824,
-                4096
-            ],
-            [
-                134737920,
-                4096
-            ],
-            [
-                134742016,
-                4096
-            ],
-            [
-                134746112,
-                4096
-            ],
-            [
-                134750208,
-                4096
-            ],
-            [
-                134754304,
-                4096
-            ],
-            [
-                134758400,
-                4096
-            ],
-            [
-                134762496,
-                4096
-            ],
-            [
-                134766592,
-                4096
-            ],
-            [
-                134770688,
-                4096
-            ],
-            [
-                134774784,
-                4096
-            ],
-            [
-                134778880,
-                4096
-            ],
-            [
-                134782976,
-                4096
-            ],
-            [
-                134787072,
-                4096
-            ],
-            [
-                134791168,
-                4096
-            ],
-            [
-                134795264,
-                4096
-            ],
-            [
-                134799360,
-                4096
-            ],
-            [
-                134803456,
-                4096
-            ],
-            [
-                134807552,
-                4096
-            ],
-            [
-                134811648,
-                4096
-            ],
-            [
-                134815744,
-                4096
-            ],
-            [
-                134819840,
-                4096
-            ],
-            [
-                134823936,
-                4096
-            ],
-            [
-                134828032,
-                4096
-            ],
-            [
-                134832128,
-                4096
-            ],
-            [
-                134836224,
-                4096
-            ],
-            [
-                134840320,
-                4096
-            ],
-            [
-                134844416,
-                4096
-            ],
-            [
-                134848512,
-                4096
-            ],
-            [
-                134852608,
-                4096
-            ],
-            [
-                134856704,
-                4096
-            ],
-            [
-                134860800,
-                4096
-            ],
-            [
-                134864896,
-                4096
-            ],
-            [
-                134868992,
-                4096
-            ],
-            [
-                134873088,
-                4096
-            ],
-            [
-                134877184,
-                4096
-            ],
-            [
-                134881280,
-                4096
-            ],
-            [
-                134885376,
-                4096
-            ],
-            [
-                134889472,
-                4096
-            ],
-            [
-                134893568,
-                4096
-            ],
-            [
-                134897664,
-                4096
-            ],
-            [
-                134901760,
-                4096
-            ],
-            [
-                134905856,
-                4096
-            ],
-            [
-                134909952,
-                4096
-            ],
-            [
-                134914048,
-                4096
-            ],
-            [
-                134918144,
-                4096
-            ],
-            [
-                134922240,
-                4096
-            ],
-            [
-                134926336,
-                4096
-            ],
-            [
-                134930432,
-                4096
-            ],
-            [
-                134934528,
-                4096
-            ],
-            [
-                134938624,
-                4096
-            ],
-            [
-                134942720,
-                4096
-            ],
-            [
-                134946816,
-                4096
-            ],
-            [
-                134950912,
-                4096
-            ],
-            [
-                134955008,
-                4096
-            ],
-            [
-                134959104,
-                4096
-            ],
-            [
-                134963200,
-                4096
-            ],
-            [
-                134967296,
-                4096
-            ],
-            [
-                134971392,
-                4096
-            ],
-            [
-                134975488,
-                4096
-            ],
-            [
-                134979584,
-                4096
-            ],
-            [
-                134983680,
-                4096
-            ],
-            [
-                134987776,
-                4096
-            ],
-            [
-                134991872,
-                4096
-            ],
-            [
-                134995968,
-                4096
-            ],
-            [
-                135000064,
-                4096
-            ],
-            [
-                135004160,
-                4096
-            ],
-            [
-                135008256,
-                4096
-            ],
-            [
-                135012352,
-                4096
-            ],
-            [
-                135016448,
-                4096
-            ],
-            [
-                135020544,
-                4096
-            ],
-            [
-                135024640,
-                4096
-            ],
-            [
-                135028736,
-                4096
-            ],
-            [
-                135032832,
-                4096
-            ],
-            [
-                135036928,
-                4096
-            ],
-            [
-                135041024,
-                4096
-            ],
-            [
-                135045120,
-                4096
-            ],
-            [
-                135049216,
-                4096
-            ],
-            [
-                135053312,
-                4096
-            ],
-            [
-                135057408,
-                4096
-            ],
-            [
-                135061504,
-                4096
-            ],
-            [
-                135065600,
-                4096
-            ],
-            [
-                135069696,
-                4096
-            ],
-            [
-                135073792,
-                4096
-            ],
-            [
-                135077888,
-                4096
-            ],
-            [
-                135081984,
-                4096
-            ],
-            [
-                135086080,
-                4096
-            ],
-            [
-                135090176,
-                4096
-            ],
-            [
-                135094272,
-                4096
-            ],
-            [
-                135098368,
-                4096
-            ],
-            [
-                135102464,
-                4096
-            ],
-            [
-                135106560,
-                4096
-            ],
-            [
-                135110656,
-                4096
-            ],
-            [
-                135114752,
-                4096
-            ],
-            [
-                135118848,
-                4096
-            ],
-            [
-                135122944,
-                4096
-            ],
-            [
-                135127040,
-                4096
-            ],
-            [
-                135131136,
-                4096
-            ],
-            [
-                135135232,
-                4096
-            ],
-            [
-                135139328,
-                4096
-            ],
-            [
-                135143424,
-                4096
-            ],
-            [
-                135147520,
-                4096
-            ],
-            [
-                135151616,
-                4096
-            ],
-            [
-                135155712,
-                4096
-            ],
-            [
-                135159808,
-                4096
-            ],
-            [
-                135163904,
-                4096
-            ],
-            [
-                135168000,
-                4096
-            ],
-            [
-                135172096,
-                4096
-            ],
-            [
-                135176192,
-                4096
-            ],
-            [
-                135180288,
-                4096
-            ],
-            [
-                135184384,
-                4096
-            ],
-            [
-                135188480,
-                4096
-            ],
-            [
-                135192576,
-                4096
-            ],
-            [
-                135196672,
-                4096
-            ],
-            [
-                135200768,
-                4096
-            ],
-            [
-                135204864,
-                4096
-            ],
-            [
-                135208960,
-                4096
-            ],
-            [
-                135213056,
-                4096
-            ],
-            [
-                135217152,
-                4096
-            ],
-            [
-                135221248,
-                4096
-            ],
-            [
-                135225344,
-                4096
-            ],
-            [
-                135229440,
-                4096
-            ],
-            [
-                135233536,
-                4096
-            ],
-            [
-                135237632,
-                4096
-            ],
-            [
-                135241728,
-                4096
-            ],
-            [
-                135245824,
-                4096
-            ],
-            [
-                135249920,
-                4096
-            ],
-            [
-                135254016,
-                4096
-            ],
-            [
-                135258112,
-                4096
-            ],
-            [
-                135262208,
-                4096
-            ]
-        ],
-        "vendor": "STMicroelectronics:13",
-        "family": "STM32WB Series",
-        "sub_family": "STM32WB55"
-    },
-    "STM32WB55VGYx": {
-        "name": "STM32WB55VGYx",
-        "memories": {
-            "IRAM1": {
-                "access": {
-                    "read": true,
-                    "write": true,
-                    "execute": false,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 536870912,
-                "size": 262144,
-                "startup": false,
-                "default": true
-            },
-            "IROM1": {
-                "access": {
-                    "read": true,
-                    "write": false,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 134217728,
-                "size": 1048576,
-                "startup": true,
-                "default": true
-            }
-        },
-        "algorithms": [
-            {
-                "file_name": "CMSIS/Flash/STM32WB_M4.FLM",
-                "start": 134217728,
-                "size": 1048576,
-                "default": true,
-                "ram_start": null,
-                "ram_size": null
-            }
-        ],
-        "processor": {
-            "Symmetric": {
-                "units": 1,
-                "core": "CortexM4",
-                "fpu": "SinglePrecision",
-                "mpu": "Present"
-            }
-        },
-        "from_pack": {
-            "vendor": "Keil",
-            "pack": "STM32WBxx_DFP",
-            "version": "1.0.0",
-            "url": "http://www.keil.com/pack"
-        },
-        "sectors": [
-            [
-                134217728,
-                4096
-            ],
-            [
-                134221824,
-                4096
-            ],
-            [
-                134225920,
-                4096
-            ],
-            [
-                134230016,
-                4096
-            ],
-            [
-                134234112,
-                4096
-            ],
-            [
-                134238208,
-                4096
-            ],
-            [
-                134242304,
-                4096
-            ],
-            [
-                134246400,
-                4096
-            ],
-            [
-                134250496,
-                4096
-            ],
-            [
-                134254592,
-                4096
-            ],
-            [
-                134258688,
-                4096
-            ],
-            [
-                134262784,
-                4096
-            ],
-            [
-                134266880,
-                4096
-            ],
-            [
-                134270976,
-                4096
-            ],
-            [
-                134275072,
-                4096
-            ],
-            [
-                134279168,
-                4096
-            ],
-            [
-                134283264,
-                4096
-            ],
-            [
-                134287360,
-                4096
-            ],
-            [
-                134291456,
-                4096
-            ],
-            [
-                134295552,
-                4096
-            ],
-            [
-                134299648,
-                4096
-            ],
-            [
-                134303744,
-                4096
-            ],
-            [
-                134307840,
-                4096
-            ],
-            [
-                134311936,
-                4096
-            ],
-            [
-                134316032,
-                4096
-            ],
-            [
-                134320128,
-                4096
-            ],
-            [
-                134324224,
-                4096
-            ],
-            [
-                134328320,
-                4096
-            ],
-            [
-                134332416,
-                4096
-            ],
-            [
-                134336512,
-                4096
-            ],
-            [
-                134340608,
-                4096
-            ],
-            [
-                134344704,
-                4096
-            ],
-            [
-                134348800,
-                4096
-            ],
-            [
-                134352896,
-                4096
-            ],
-            [
-                134356992,
-                4096
-            ],
-            [
-                134361088,
-                4096
-            ],
-            [
-                134365184,
-                4096
-            ],
-            [
-                134369280,
-                4096
-            ],
-            [
-                134373376,
-                4096
-            ],
-            [
-                134377472,
-                4096
-            ],
-            [
-                134381568,
-                4096
-            ],
-            [
-                134385664,
-                4096
-            ],
-            [
-                134389760,
-                4096
-            ],
-            [
-                134393856,
-                4096
-            ],
-            [
-                134397952,
-                4096
-            ],
-            [
-                134402048,
-                4096
-            ],
-            [
-                134406144,
-                4096
-            ],
-            [
-                134410240,
-                4096
-            ],
-            [
-                134414336,
-                4096
-            ],
-            [
-                134418432,
-                4096
-            ],
-            [
-                134422528,
-                4096
-            ],
-            [
-                134426624,
-                4096
-            ],
-            [
-                134430720,
-                4096
-            ],
-            [
-                134434816,
-                4096
-            ],
-            [
-                134438912,
-                4096
-            ],
-            [
-                134443008,
-                4096
-            ],
-            [
-                134447104,
-                4096
-            ],
-            [
-                134451200,
-                4096
-            ],
-            [
-                134455296,
-                4096
-            ],
-            [
-                134459392,
-                4096
-            ],
-            [
-                134463488,
-                4096
-            ],
-            [
-                134467584,
-                4096
-            ],
-            [
-                134471680,
-                4096
-            ],
-            [
-                134475776,
-                4096
-            ],
-            [
-                134479872,
-                4096
-            ],
-            [
-                134483968,
-                4096
-            ],
-            [
-                134488064,
-                4096
-            ],
-            [
-                134492160,
-                4096
-            ],
-            [
-                134496256,
-                4096
-            ],
-            [
-                134500352,
-                4096
-            ],
-            [
-                134504448,
-                4096
-            ],
-            [
-                134508544,
-                4096
-            ],
-            [
-                134512640,
-                4096
-            ],
-            [
-                134516736,
-                4096
-            ],
-            [
-                134520832,
-                4096
-            ],
-            [
-                134524928,
-                4096
-            ],
-            [
-                134529024,
-                4096
-            ],
-            [
-                134533120,
-                4096
-            ],
-            [
-                134537216,
-                4096
-            ],
-            [
-                134541312,
-                4096
-            ],
-            [
-                134545408,
-                4096
-            ],
-            [
-                134549504,
-                4096
-            ],
-            [
-                134553600,
-                4096
-            ],
-            [
-                134557696,
-                4096
-            ],
-            [
-                134561792,
-                4096
-            ],
-            [
-                134565888,
-                4096
-            ],
-            [
-                134569984,
-                4096
-            ],
-            [
-                134574080,
-                4096
-            ],
-            [
-                134578176,
-                4096
-            ],
-            [
-                134582272,
-                4096
-            ],
-            [
-                134586368,
-                4096
-            ],
-            [
-                134590464,
-                4096
-            ],
-            [
-                134594560,
-                4096
-            ],
-            [
-                134598656,
-                4096
-            ],
-            [
-                134602752,
-                4096
-            ],
-            [
-                134606848,
-                4096
-            ],
-            [
-                134610944,
-                4096
-            ],
-            [
-                134615040,
-                4096
-            ],
-            [
-                134619136,
-                4096
-            ],
-            [
-                134623232,
-                4096
-            ],
-            [
-                134627328,
-                4096
-            ],
-            [
-                134631424,
-                4096
-            ],
-            [
-                134635520,
-                4096
-            ],
-            [
-                134639616,
-                4096
-            ],
-            [
-                134643712,
-                4096
-            ],
-            [
-                134647808,
-                4096
-            ],
-            [
-                134651904,
-                4096
-            ],
-            [
-                134656000,
-                4096
-            ],
-            [
-                134660096,
-                4096
-            ],
-            [
-                134664192,
-                4096
-            ],
-            [
-                134668288,
-                4096
-            ],
-            [
-                134672384,
-                4096
-            ],
-            [
-                134676480,
-                4096
-            ],
-            [
-                134680576,
-                4096
-            ],
-            [
-                134684672,
-                4096
-            ],
-            [
-                134688768,
-                4096
-            ],
-            [
-                134692864,
-                4096
-            ],
-            [
-                134696960,
-                4096
-            ],
-            [
-                134701056,
-                4096
-            ],
-            [
-                134705152,
-                4096
-            ],
-            [
-                134709248,
-                4096
-            ],
-            [
-                134713344,
-                4096
-            ],
-            [
-                134717440,
-                4096
-            ],
-            [
-                134721536,
-                4096
-            ],
-            [
-                134725632,
-                4096
-            ],
-            [
-                134729728,
-                4096
-            ],
-            [
-                134733824,
-                4096
-            ],
-            [
-                134737920,
-                4096
-            ],
-            [
-                134742016,
-                4096
-            ],
-            [
-                134746112,
-                4096
-            ],
-            [
-                134750208,
-                4096
-            ],
-            [
-                134754304,
-                4096
-            ],
-            [
-                134758400,
-                4096
-            ],
-            [
-                134762496,
-                4096
-            ],
-            [
-                134766592,
-                4096
-            ],
-            [
-                134770688,
-                4096
-            ],
-            [
-                134774784,
-                4096
-            ],
-            [
-                134778880,
-                4096
-            ],
-            [
-                134782976,
-                4096
-            ],
-            [
-                134787072,
-                4096
-            ],
-            [
-                134791168,
-                4096
-            ],
-            [
-                134795264,
-                4096
-            ],
-            [
-                134799360,
-                4096
-            ],
-            [
-                134803456,
-                4096
-            ],
-            [
-                134807552,
-                4096
-            ],
-            [
-                134811648,
-                4096
-            ],
-            [
-                134815744,
-                4096
-            ],
-            [
-                134819840,
-                4096
-            ],
-            [
-                134823936,
-                4096
-            ],
-            [
-                134828032,
-                4096
-            ],
-            [
-                134832128,
-                4096
-            ],
-            [
-                134836224,
-                4096
-            ],
-            [
-                134840320,
-                4096
-            ],
-            [
-                134844416,
-                4096
-            ],
-            [
-                134848512,
-                4096
-            ],
-            [
-                134852608,
-                4096
-            ],
-            [
-                134856704,
-                4096
-            ],
-            [
-                134860800,
-                4096
-            ],
-            [
-                134864896,
-                4096
-            ],
-            [
-                134868992,
-                4096
-            ],
-            [
-                134873088,
-                4096
-            ],
-            [
-                134877184,
-                4096
-            ],
-            [
-                134881280,
-                4096
-            ],
-            [
-                134885376,
-                4096
-            ],
-            [
-                134889472,
-                4096
-            ],
-            [
-                134893568,
-                4096
-            ],
-            [
-                134897664,
-                4096
-            ],
-            [
-                134901760,
-                4096
-            ],
-            [
-                134905856,
-                4096
-            ],
-            [
-                134909952,
-                4096
-            ],
-            [
-                134914048,
-                4096
-            ],
-            [
-                134918144,
-                4096
-            ],
-            [
-                134922240,
-                4096
-            ],
-            [
-                134926336,
-                4096
-            ],
-            [
-                134930432,
-                4096
-            ],
-            [
-                134934528,
-                4096
-            ],
-            [
-                134938624,
-                4096
-            ],
-            [
-                134942720,
-                4096
-            ],
-            [
-                134946816,
-                4096
-            ],
-            [
-                134950912,
-                4096
-            ],
-            [
-                134955008,
-                4096
-            ],
-            [
-                134959104,
-                4096
-            ],
-            [
-                134963200,
-                4096
-            ],
-            [
-                134967296,
-                4096
-            ],
-            [
-                134971392,
-                4096
-            ],
-            [
-                134975488,
-                4096
-            ],
-            [
-                134979584,
-                4096
-            ],
-            [
-                134983680,
-                4096
-            ],
-            [
-                134987776,
-                4096
-            ],
-            [
-                134991872,
-                4096
-            ],
-            [
-                134995968,
-                4096
-            ],
-            [
-                135000064,
-                4096
-            ],
-            [
-                135004160,
-                4096
-            ],
-            [
-                135008256,
-                4096
-            ],
-            [
-                135012352,
-                4096
-            ],
-            [
-                135016448,
-                4096
-            ],
-            [
-                135020544,
-                4096
-            ],
-            [
-                135024640,
-                4096
-            ],
-            [
-                135028736,
-                4096
-            ],
-            [
-                135032832,
-                4096
-            ],
-            [
-                135036928,
-                4096
-            ],
-            [
-                135041024,
-                4096
-            ],
-            [
-                135045120,
-                4096
-            ],
-            [
-                135049216,
-                4096
-            ],
-            [
-                135053312,
-                4096
-            ],
-            [
-                135057408,
-                4096
-            ],
-            [
-                135061504,
-                4096
-            ],
-            [
-                135065600,
-                4096
-            ],
-            [
-                135069696,
-                4096
-            ],
-            [
-                135073792,
-                4096
-            ],
-            [
-                135077888,
-                4096
-            ],
-            [
-                135081984,
-                4096
-            ],
-            [
-                135086080,
-                4096
-            ],
-            [
-                135090176,
-                4096
-            ],
-            [
-                135094272,
-                4096
-            ],
-            [
-                135098368,
-                4096
-            ],
-            [
-                135102464,
-                4096
-            ],
-            [
-                135106560,
-                4096
-            ],
-            [
-                135110656,
-                4096
-            ],
-            [
-                135114752,
-                4096
-            ],
-            [
-                135118848,
-                4096
-            ],
-            [
-                135122944,
-                4096
-            ],
-            [
-                135127040,
-                4096
-            ],
-            [
-                135131136,
-                4096
-            ],
-            [
-                135135232,
-                4096
-            ],
-            [
-                135139328,
-                4096
-            ],
-            [
-                135143424,
-                4096
-            ],
-            [
-                135147520,
-                4096
-            ],
-            [
-                135151616,
-                4096
-            ],
-            [
-                135155712,
-                4096
-            ],
-            [
-                135159808,
-                4096
-            ],
-            [
-                135163904,
-                4096
-            ],
-            [
-                135168000,
-                4096
-            ],
-            [
-                135172096,
-                4096
-            ],
-            [
-                135176192,
-                4096
-            ],
-            [
-                135180288,
-                4096
-            ],
-            [
-                135184384,
-                4096
-            ],
-            [
-                135188480,
-                4096
-            ],
-            [
-                135192576,
-                4096
-            ],
-            [
-                135196672,
-                4096
-            ],
-            [
-                135200768,
-                4096
-            ],
-            [
-                135204864,
-                4096
-            ],
-            [
-                135208960,
-                4096
-            ],
-            [
-                135213056,
-                4096
-            ],
-            [
-                135217152,
-                4096
-            ],
-            [
-                135221248,
-                4096
-            ],
-            [
-                135225344,
-                4096
-            ],
-            [
-                135229440,
-                4096
-            ],
-            [
-                135233536,
-                4096
-            ],
-            [
-                135237632,
-                4096
-            ],
-            [
-                135241728,
-                4096
-            ],
-            [
-                135245824,
-                4096
-            ],
-            [
-                135249920,
-                4096
-            ],
-            [
-                135254016,
-                4096
-            ],
-            [
-                135258112,
-                4096
-            ],
-            [
-                135262208,
-                4096
-            ]
-        ],
-        "vendor": "STMicroelectronics:13",
-        "family": "STM32WB Series",
-        "sub_family": "STM32WB55"
+        "sub_family": "STM32WL55",
+        "vendor": "STMicroelectronics:13"
     },
     "TMPM46BF10FG": {
         "algorithms": [
@@ -12742,166 +12855,6 @@
         "sub_family": "M4G",
         "vendor": "Toshiba:92"
     },
-    "TMPM4KNFYAFG": {
-        "name": "TMPM4KNFYAFG",
-        "memories": {
-            "IROM1": {
-                "access": {
-                    "read": true,
-                    "write": false,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 0,
-                "size": 262144,
-                "startup": true,
-                "default": true
-            },
-            "IRAM1": {
-                "access": {
-                    "read": true,
-                    "write": true,
-                    "execute": false,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 536870912,
-                "size": 24576,
-                "startup": false,
-                "default": true
-            }
-        },
-        "algorithms": [
-            {
-                "file_name": "Flash/TMPM4Kx_code_256.FLM",
-                "start": 0,
-                "size": 262144,
-                "default": true,
-                "ram_start": 536870912,
-                "ram_size": 8192
-            },
-            {
-                "file_name": "Flash/TMPM4Kx_data_32.FLM",
-                "start": 805306368,
-                "size": 32768,
-                "default": true,
-                "ram_start": 536870912,
-                "ram_size": 8192
-            }
-        ],
-        "processor": {
-            "Symmetric": {
-                "units": 1,
-                "core": "CortexM4",
-                "fpu": "SinglePrecision",
-                "mpu": "Present"
-            }
-        },
-        "from_pack": {
-            "vendor": "Toshiba",
-            "pack": "TXZ4Aplus-M4K2_DFP",
-            "version": "1.0.0",
-            "url": "https://toshiba.semicon-storage.com/content/dam/toshiba-ss/shared/docs/product/micro/device-family-Pack/"
-        },
-        "sectors": [
-            [
-                0,
-                4096
-            ],
-            [
-                805306368,
-                4096
-            ]
-        ],
-        "vendor": "Toshiba:92",
-        "family": "TXZ4A+ Series",
-        "sub_family": "M4K(2)"
-    },
-    "TMPM4NRF20FG": {
-        "name": "TMPM4NRF20FG",
-        "memories": {
-            "IROM1": {
-                "access": {
-                    "read": true,
-                    "write": false,
-                    "execute": true,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 0,
-                "size": 2097152,
-                "startup": true,
-                "default": true
-            },
-            "IRAM1": {
-                "access": {
-                    "read": true,
-                    "write": true,
-                    "execute": false,
-                    "peripheral": false,
-                    "secure": false,
-                    "non_secure": false,
-                    "non_secure_callable": false
-                },
-                "start": 536870912,
-                "size": 262144,
-                "startup": false,
-                "default": true
-            }
-        },
-        "algorithms": [
-            {
-                "file_name": "Flash/TMPM4Nx_code_2048.FLM",
-                "start": 0,
-                "size": 2097152,
-                "default": true,
-                "ram_start": 536870912,
-                "ram_size": 8192
-            },
-            {
-                "file_name": "Flash/TMPM4Nx_data_32.FLM",
-                "start": 805306368,
-                "size": 32768,
-                "default": true,
-                "ram_start": 536870912,
-                "ram_size": 8192
-            }
-        ],
-        "processor": {
-            "Symmetric": {
-                "units": 1,
-                "core": "CortexM4",
-                "fpu": "SinglePrecision",
-                "mpu": "Present"
-            }
-        },
-        "from_pack": {
-            "vendor": "Toshiba",
-            "pack": "TXZ4Aplus-M4N1_DFP",
-            "version": "1.0.1",
-            "url": "https://toshiba.semicon-storage.com/content/dam/toshiba-ss/shared/docs/product/micro/device-family-Pack/"
-        },
-        "sectors": [
-            [
-                0,
-                4096
-            ],
-            [
-                805306368,
-                4096
-            ]
-        ],
-        "vendor": "Toshiba:92",
-        "family": "TXZ4A+ Series",
-        "sub_family": "M4N(1)"
-    },
     "TMPM4GRF20FG": {
         "algorithms": [
             {
@@ -12980,6 +12933,166 @@
             ]
         ],
         "sub_family": "M4G(1)",
+        "vendor": "Toshiba:92"
+    },
+    "TMPM4KNFYAFG": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "Flash/TMPM4Kx_code_256.FLM",
+                "ram_size": 8192,
+                "ram_start": 536870912,
+                "size": 262144,
+                "start": 0
+            },
+            {
+                "default": true,
+                "file_name": "Flash/TMPM4Kx_data_32.FLM",
+                "ram_size": 8192,
+                "ram_start": 536870912,
+                "size": 32768,
+                "start": 805306368
+            }
+        ],
+        "family": "TXZ4A+ Series",
+        "from_pack": {
+            "pack": "TXZ4Aplus-M4K2_DFP",
+            "url": "https://toshiba.semicon-storage.com/content/dam/toshiba-ss/shared/docs/product/micro/device-family-Pack/",
+            "vendor": "Toshiba",
+            "version": "1.0.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 24576,
+                "start": 536870912,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 262144,
+                "start": 0,
+                "startup": true
+            }
+        },
+        "name": "TMPM4KNFYAFG",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM4",
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "units": 1
+            }
+        },
+        "sectors": [
+            [
+                0,
+                4096
+            ],
+            [
+                805306368,
+                4096
+            ]
+        ],
+        "sub_family": "M4K(2)",
+        "vendor": "Toshiba:92"
+    },
+    "TMPM4NRF20FG": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "Flash/TMPM4Nx_code_2048.FLM",
+                "ram_size": 8192,
+                "ram_start": 536870912,
+                "size": 2097152,
+                "start": 0
+            },
+            {
+                "default": true,
+                "file_name": "Flash/TMPM4Nx_data_32.FLM",
+                "ram_size": 8192,
+                "ram_start": 536870912,
+                "size": 32768,
+                "start": 805306368
+            }
+        ],
+        "family": "TXZ4A+ Series",
+        "from_pack": {
+            "pack": "TXZ4Aplus-M4N1_DFP",
+            "url": "https://toshiba.semicon-storage.com/content/dam/toshiba-ss/shared/docs/product/micro/device-family-Pack/",
+            "vendor": "Toshiba",
+            "version": "1.0.1"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 262144,
+                "start": 536870912,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 2097152,
+                "start": 0,
+                "startup": true
+            }
+        },
+        "name": "TMPM4NRF20FG",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM4",
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "units": 1
+            }
+        },
+        "sectors": [
+            [
+                0,
+                4096
+            ],
+            [
+                805306368,
+                4096
+            ]
+        ],
+        "sub_family": "M4N(1)",
         "vendor": "Toshiba:92"
     },
     "nRF52832_xxAA": {
