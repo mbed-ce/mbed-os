@@ -17,6 +17,7 @@ from mbed_tools.cli.list_connected_devices import list_connected_devices
 from mbed_tools.cli.project_management import new, import_, deploy
 from mbed_tools.cli.build import build
 from mbed_tools.cli.sterm import sterm
+from mbed_tools.cli.cmsis_mcu_descr import cmsis_mcu_descr
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 LOGGER = logging.getLogger(__name__)
@@ -79,6 +80,7 @@ cli.add_command(deploy, "deploy")
 cli.add_command(import_, "import")
 cli.add_command(build, "compile")
 cli.add_command(sterm, "sterm")
+cli.add_command(cmsis_mcu_descr)
 
 if __name__ == '__main__':
     cli()

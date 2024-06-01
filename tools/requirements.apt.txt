@@ -19,3 +19,4 @@ python3-junit.xml
 python3-cryptography
 python3-cbor
 python3-json5
+python3-humanize

@@ -25,6 +25,7 @@ lockfile
 six>=1.0,<2.0
 colorama>=0.3,<0.5
 json5
+humanize~=4.9.0
 
 # beautifulsoup only needed for USB device detection on Mac
 beautifulsoup4; sys_platform == 'darwin'
@@ -33,3 +34,6 @@ lxml; sys_platform == 'darwin'
 # needed for signing secure images
 cryptography
 cbor
+
+# Needed for downloading CMSIS MCU descriptions
+cmsis-pack-manager~=0.5.0
