@@ -3317,7 +3317,7 @@
             "STM32H723ZG"
         ],
         "config": {
-            
+
             "d11_configuration": {
                 "help": "Value: PB_5 for the default board configuration, PA_7 in case of solder bridge update (SB33 on/ SB35 off)",
                 "value": "PB_5",
@@ -5537,7 +5537,8 @@
         ],
         "release_versions": [
             "5"
-        ]
+        ],
+        "image_url": "https://os.mbed.com/media/cache/platforms/t17_VBxJMp4.png.250x250_q85.png"
     },
 
     // ARM MPS2 FPGA prototyping targets -------------------------------------------------------------------------------
@@ -6210,7 +6211,7 @@
     },
     "MAX32620FTHR": {
         "inherits": [
-            "MCU_MAX32620C"
+            "MCU_MAX32620"
         ],
         "detect_code": [
             "0418"
@@ -6219,7 +6220,7 @@
     },
     "SDT32620B": {
         "inherits": [
-            "MCU_MAX32620C"
+            "MCU_MAX32620"
         ],
         "detect_code": [
             "3101"
