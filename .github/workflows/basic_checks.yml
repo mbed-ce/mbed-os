@@ -164,16 +164,24 @@ jobs:
       -
         name: Checkout repo
         uses: actions/checkout@v3
+        
+      - name: Install python3-venv
+        run: |
+          apt-get update
+          apt-get install -y python3-venv
 
       -
         name: install dependencies
         run: |
-          xargs sudo apt-get install -y < tools/requirements.apt.txt
-          xargs sudo apt-get install -y < tools/python/python_tests/requirements.apt.txt
+          python3 -m venv venv
+          source venv/bin/activate.sh
+          pip install -r tools/requirements.txt
+          pip install -r tools/python/python_tests/requirements.txt
 
       -
         name: Python Tests
         run: |
+          source venv/bin/activate.sh
           cd tools/python
           ./run_python_tests.sh
 
