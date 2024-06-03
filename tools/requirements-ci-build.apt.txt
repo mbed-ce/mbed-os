@@ -1,3 +1,0 @@
-python3-usb
-python3-hidapi
-udisks2
