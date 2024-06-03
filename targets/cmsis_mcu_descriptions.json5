@@ -10397,6 +10397,270 @@
         "sub_family": "STM32U585",
         "vendor": "STMicroelectronics:13"
     },
+    "STM32U545RETx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32U5xx_512K_0800.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 524288,
+                "start": 134217728,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32U5xx_512K_0C00.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 524288,
+                "start": 201326592,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32U575I-EVAL.FLM",
+                "ram_size": 655360,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 1879048192,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32U585I_IOT02A.FLM",
+                "ram_size": 655360,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 1879048192,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32U599J-DK.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32U5 Series",
+        "from_pack": {
+            "pack": "STM32U5xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "2.2.1"
+        },
+        "memories": {
+            "Flash": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 524288,
+                "start": 134217728,
+                "startup": true
+            },
+            "SRAM1_2": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 262144,
+                "start": 536870912,
+                "startup": false
+            },
+            "SRAM3": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "p_name": null,
+                "size": 16384,
+                "start": 671088640,
+                "startup": false
+            }
+        },
+        "name": "STM32U545RETx",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM33",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32U545.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32U545",
+        "vendor": "STMicroelectronics:13"
+    },
+    "STM32U5A5ZJTx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32U59x_4M_0800.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 4194304,
+                "start": 134217728,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32U59x_4M_0C00.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 4194304,
+                "start": 201326592,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32U575I-EVAL.FLM",
+                "ram_size": 655360,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 1879048192,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32U585I_IOT02A.FLM",
+                "ram_size": 655360,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 1879048192,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32U599J-DK.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32U5 Series",
+        "from_pack": {
+            "pack": "STM32U5xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "2.2.1"
+        },
+        "memories": {
+            "Flash": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 4194304,
+                "start": 134217728,
+                "startup": true
+            },
+            "SRAM1235": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 2555904,
+                "start": 536870912,
+                "startup": false
+            },
+            "SRAM4": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 16384,
+                "start": 671088640,
+                "startup": false
+            },
+            "SRAM_GFXMM": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 16777216,
+                "start": 603979776,
+                "startup": false
+            }
+        },
+        "name": "STM32U5A5ZJTx",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM33",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32U5A5.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32U5A5",
+        "vendor": "STMicroelectronics:13"
+    },
     "STM32WB15CCUx": {
         "algorithms": [
             {

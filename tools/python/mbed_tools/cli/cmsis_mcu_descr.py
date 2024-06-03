@@ -147,16 +147,17 @@ def fetch_missing():
         print("No missing MCUs, no work to do.")
         return
 
-    # Load CMSIS cache to install new MCUs
+    # Load CMSIS cache to access new MCUs
     cmsis_cache = open_cmsis_cache()
+
+    missing_mcus_dict = {}
 
     for mcu in missing_mcu_names:
         if mcu not in cmsis_cache.index:
             raise RuntimeError(f"MCU {mcu} is not present in the CMSIS MCU index ({cmsis_cache.index_path}).  Maybe "
                                f"wrong part number, or this MCU simply doesn't exist in the CMSIS index and has "
                                f"to be added manually?")
+        missing_mcus_dict[mcu] = cmsis_cache.index[mcu]
 
     print(f"Add the following entries to {str(CMSIS_MCU_DESCRIPTIONS_JSON_PATH.name)}:")
-
-    for mcu in missing_mcu_names:
-        print(json.dumps(cmsis_cache.index[mcu], indent=4, sort_keys=True))
+    print(json.dumps(missing_mcus_dict, indent=4, sort_keys=True))
