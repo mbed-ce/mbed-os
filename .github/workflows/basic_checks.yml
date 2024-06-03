@@ -174,14 +174,14 @@ jobs:
         name: install dependencies
         run: |
           python3 -m venv venv
-          source venv/bin/activate.sh
+          source venv/bin/activate
           pip install -r tools/requirements.txt
           pip install -r tools/python/python_tests/requirements.txt
 
       -
         name: Python Tests
         run: |
-          source venv/bin/activate.sh
+          source venv/bin/activate
           cd tools/python
           ./run_python_tests.sh
 
