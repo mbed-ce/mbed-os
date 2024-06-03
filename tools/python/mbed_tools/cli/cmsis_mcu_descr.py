@@ -1,3 +1,8 @@
+#
+# Copyright (c) 2024 Arm Limited and Contributors. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+
 """
 Subcommands to allow managing the list of CMSIS MCU descriptions that comes with Mbed.
 The MCU description list is used both for generating docs, and for providing information to the code
@@ -27,7 +32,7 @@ LOGGER = logging.getLogger(__name__)
 THIS_SCRIPT_DIR = pathlib.Path(os.path.dirname(__file__))
 MBED_OS_DIR = THIS_SCRIPT_DIR.parent.parent.parent.parent
 TARGETS_JSON5_PATH = MBED_OS_DIR / "targets" / "targets.json5"
-CMSIS_MCU_DESCRIPTIONS_JSON_PATH = MBED_OS_DIR / "targets" / "cmsis_mcu_descriptions.json"
+CMSIS_MCU_DESCRIPTIONS_JSON_PATH = MBED_OS_DIR / "targets" / "cmsis_mcu_descriptions.json5"
 
 
 # Top-level command
@@ -92,9 +97,10 @@ def reload_cache():
 
 
 @cmsis_mcu_descr.command(
-    short_help="Remove MCU descriptions that are not used by targets.json5."
+    name="find-unused",
+    short_help="Find MCU descriptions that are not used by targets.json5."
 )
-def prune():
+def find_unused():
     """
     Remove MCU descriptions that are not used by targets.json5.
     Use this command after removing targets from Mbed to clean up old MCU definitions.
@@ -107,33 +113,21 @@ def prune():
     available_mcu_names = set(cmsis_mcu_descriptions_json_contents.keys())
 
     # Figure out which MCUs can be removed
-    prunable_mcus = sorted(available_mcu_names - used_mcu_names)
+    removable_mcus = sorted(available_mcu_names - used_mcu_names)
 
-    if len(prunable_mcus) == 0:
+    if len(removable_mcus) == 0:
         print("No MCU descriptions can be pruned, all are used.")
         return
 
-    # Ask the user before pruning
     print("The following MCU descriptions are not used and will be pruned from cmsis_mcu_descriptions.json")
-    print("\n".join(prunable_mcus))
-    response = input("Continue? (y/n) ")
-    if response.lower() != "y":
-        print("Canceled.")
-        return
-
-    for mcu in prunable_mcus:
-        del cmsis_mcu_descriptions_json_contents[mcu]
-
-    # Write out JSON file again
-    with open(CMSIS_MCU_DESCRIPTIONS_JSON_PATH, "w") as cmsis_mcu_descriptions_file:
-        json.dump(cmsis_mcu_descriptions_json_contents, cmsis_mcu_descriptions_file, indent=4, sort_keys=True)
+    print("\n".join(removable_mcus))
 
 
 @cmsis_mcu_descr.command(
-    name="add-missing",
-    short_help="Add missing MCU descriptions used by targets.json5."
+    name="fetch-missing",
+    short_help="Fetch any missing MCU descriptions used by targets.json5."
 )
-def add_missing():
+def fetch_missing():
     """
     Scans through cmsis_mcu_descriptions.json for any missing MCU descriptions that are referenced by
     targets.json5.  If any are found, they are imported from the CMSIS cache.
@@ -162,11 +156,7 @@ def add_missing():
                                f"wrong part number, or this MCU simply doesn't exist in the CMSIS index and has "
                                f"to be added manually?")
 
-        print("Adding description for MCU " + mcu)
+    print(f"Add the following entries to {str(CMSIS_MCU_DESCRIPTIONS_JSON_PATH.name)}:")
 
-        # Copy over description
-        cmsis_mcu_descriptions_json_contents[mcu] = cmsis_cache.index[mcu]
-
-    # Write out JSON file again
-    with open(CMSIS_MCU_DESCRIPTIONS_JSON_PATH, "w") as cmsis_mcu_descriptions_file:
-        json.dump(cmsis_mcu_descriptions_json_contents, cmsis_mcu_descriptions_file, indent=4, sort_keys=True)
+    for mcu in missing_mcu_names:
+        print(json.dumps(cmsis_cache.index[mcu], indent=4, sort_keys=True))

@@ -2472,6 +2472,13 @@
             "version": "10.0.0"
         },
         "memories": {
+
+            // Note: In Mbed, we reconfigure the RAM at boot to assign:
+            //  - 128kiB OCRAM
+            //  - 256kiB DTCM
+            //  - 128kiB ITCM
+            // We execute out of DTCM when there's no external RAM because it's the fastest.
+
             "SRAM_DTC": {
                 "access": {
                     "execute": false,
@@ -2483,13 +2490,13 @@
                     "write": true
                 },
                 "default": false,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x40000,
+                "start": 0x20000000,
                 "startup": false
             },
             "SRAM_ITC": {
                 "access": {
-                    "execute": false,
+                    "execute": true,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -2498,7 +2505,7 @@
                     "write": true
                 },
                 "default": false,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 0,
                 "startup": false
             },
@@ -2513,8 +2520,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 262144,
-                "start": 538968064,
+                "size": 0x20000,
+                "start": 0x20200000,
                 "startup": false
             }
         },
@@ -2568,6 +2575,13 @@
             "vendor": "NXP",
             "version": "18.0.0"
         },
+
+        // Note: In Mbed, we reconfigure the RAM at boot to assign:
+        //  - 128kiB OCRAM
+        //  - 256kiB DTCM
+        //  - 128kiB ITCM
+        // We execute out of DTCM when there's no external RAM because it's the fastest.
+
         "memories": {
             "SRAM_DTC": {
                 "access": {
@@ -2581,13 +2595,13 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x40000,
+                "start": 0x20000000,
                 "startup": false
             },
             "SRAM_ITC": {
                 "access": {
-                    "execute": false,
+                    "execute": true,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -2597,7 +2611,7 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 0,
                 "startup": false
             },
@@ -2613,8 +2627,8 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 262144,
-                "start": 539492352,
+                "size": 0x20000,
+                "start": 0x20280000,
                 "startup": false
             },
             "SRAM_OC2": {
@@ -2629,8 +2643,8 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 524288,
-                "start": 538968064,
+                "size": 0x80000,
+                "start": 0x20200000,
                 "startup": false
             }
         },
@@ -6747,22 +6761,10 @@
                 "start": 536870912,
                 "startup": false
             },
-            "IROM1": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": false
-                },
-                "default": true,
-                "size": 2097152,
-                "start": 134217728,
-                "startup": true
-            },
-            "IROM2": {
+
+            // We have 2 views of the same memory bank, one via ITCM for instruction access and one
+            // via AXIM for data access.
+            "ROM_VIA_ITCM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6773,9 +6775,24 @@
                     "write": false
                 },
                 "default": false,
-                "size": 2097152,
-                "start": 2097152,
+                "size": 0x200000,
+                "start": 0x200000,
                 "startup": false
+            },
+            "ROM_VIA_AXIM_BUS": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x200000,
+                "start": 0x8000000,
+                "startup": true
             }
         },
         "name": "STM32F767ZITx",
