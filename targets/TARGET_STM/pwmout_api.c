@@ -37,7 +37,25 @@
 #include "PeripheralPins.h"
 #include "pwmout_device.h"
 
+#include <math.h>
+
 static TIM_HandleTypeDef TimHandle;
+
+// Maximum counts per timer cycle.
+// Note: Hardware can do 65536, but I don't believe you can have 100% duty cycle with 65536 counts/cycle.
+#define MAX_COUNTS_PER_CYCLE 65535
+
+// Maximum prescaler division possible
+#define MAX_PRESCALER 65536 
+
+// Change to 1 to enable debug prints of what's being calculated.
+// Must comment out the critical section calls in PwmOut to use.
+#define STM_PWMOUT_DEBUG 0
+
+#if STM_PWMOUT_DEBUG
+#include <stdio.h>
+#include <inttypes.h>
+#endif
 
 /* Convert STM32 Cube HAL channel to LL channel */
 uint32_t TIM_ChannelConvert_HAL2LL(uint32_t channel, pwmout_t *obj)
@@ -200,8 +218,8 @@ static void _pwmout_init_direct(pwmout_t *obj, const PinMap *pinmap)
 
     obj->pin = pinmap->pin;
     obj->period = 0;
-    obj->pulse = 0;
-    obj->prescaler = 1;
+    obj->compare_value = 0;
+    obj->counts = 1;
 
     pwmout_period_us(obj, 20000); // 20 ms per default
 }
@@ -219,7 +237,7 @@ void pwmout_init(pwmout_t *obj, PinName pin)
 void pwmout_free(pwmout_t *obj)
 {
     // Configure GPIO back to reset value
-    pin_function(obj->pin, STM_PIN_DATA(STM_MODE_ANALOG, GPIO_NOPULL, 0));
+    pin_function(obj->pin, STM_PIN_DATA(STM_MODE_INPUT, GPIO_NOPULL, 0));
 }
 
 void pwmout_write(pwmout_t *obj, float value)
@@ -235,11 +253,22 @@ void pwmout_write(pwmout_t *obj, float value)
         value = 1.0;
     }
 
-    obj->pulse = (uint32_t)((float)obj->period * value + 0.5);
+    // Calculate the correct compare value.  The PWM output changes to 0 once the counter becomes
+    // >= the compare value.
+    // Examples:
+    // - if value is .999 and counts is 3, we want to write 3 so the PWM is on all the time
+    // - if value is .33 and counts is 3, we want to write 1 so that we turn off after the counter becomes 1.
+    // - if value is .1 and counts is 3, that rounds to 0 so we want to write 0 so that the PWM is off all the time
+
+    obj->compare_value = lroundf((float)obj->counts * value);
+
+#if STM_PWMOUT_DEBUG
+    printf("Setting compare value to %" PRIu32 "\n", obj->compare_value);
+#endif
 
     // Configure channels
     sConfig.OCMode       = TIM_OCMODE_PWM1;
-    sConfig.Pulse        = obj->pulse / obj->prescaler;
+    sConfig.Pulse        = obj->compare_value;
     sConfig.OCPolarity   = TIM_OCPOLARITY_HIGH;
     sConfig.OCFastMode   = TIM_OCFAST_DISABLE;
 #if defined(TIM_OCIDLESTATE_RESET)
@@ -292,7 +321,7 @@ float pwmout_read(pwmout_t *obj)
 {
     float value = 0;
     if (obj->period > 0) {
-        value = (float)(obj->pulse) / (float)(obj->period);
+        value = (float)(obj->compare_value) / (float)(obj->counts);
     }
     return ((value > (float)1.0) ? (float)(1.0) : (value));
 }
@@ -341,35 +370,41 @@ void pwmout_period_us(pwmout_t *obj, int us)
 #endif
     }
 
-
-    /* By default use, 1us as SW pre-scaler */
-    obj->prescaler = 1;
     // TIMxCLK = PCLKx when the APB prescaler = 1 else TIMxCLK = 2 * PCLKx
+    uint32_t timxClk;
     if (APBxCLKDivider == RCC_HCLK_DIV1) {
-        TimHandle.Init.Prescaler = (((PclkFreq) / 1000000)) - 1; // 1 us tick
+        timxClk = PclkFreq;
     } else {
-        TimHandle.Init.Prescaler = (((PclkFreq * 2) / 1000000)) - 1; // 1 us tick
-    }
-    TimHandle.Init.Period = (us - 1);
-
-    /*  In case period or pre-scalers are out of range, loop-in to get valid values */
-    while ((TimHandle.Init.Period > 0xFFFF) || (TimHandle.Init.Prescaler > 0xFFFF)) {
-        obj->prescaler = obj->prescaler * 2;
-        if (APBxCLKDivider == RCC_HCLK_DIV1) {
-            TimHandle.Init.Prescaler = (((PclkFreq) / 1000000) * obj->prescaler) - 1;
-        } else {
-            TimHandle.Init.Prescaler = (((PclkFreq * 2) / 1000000) * obj->prescaler) - 1;
-        }
-        TimHandle.Init.Period = (us - 1) / obj->prescaler;
-        /*  Period decreases and prescaler increases over loops, so check for
-         *  possible out of range cases */
-        if ((TimHandle.Init.Period < 0xFFFF) && (TimHandle.Init.Prescaler > 0xFFFF)) {
-            error("Cannot initialize PWM\n");
-            break;
-        }
+        timxClk = PclkFreq * 2;
     }
 
-    TimHandle.Init.ClockDivision = 0;
+    // To generate the desired frequency, we have 2 knobs to play with: the reload value and the
+    // duty cycle.  We generally want to have the reload value as high as possible since that will
+    // give the best duty cycle resolution at high frequencies.
+
+    // Step 1: Calculate the smallest prescaler that will allow the desired period to be achieved by
+    // tuning the reload value.
+    // (prescaler * reloadValue) / (timxClk) = period
+    // prescaler = (period * timxClk) / reloadValue
+    // minimum needed prescaler (floating point) = (period * timxClk) / 65536
+
+    const float periodSeconds = us * 1e-6f;
+    const uint32_t prescaler = ceilf(periodSeconds * timxClk / MAX_COUNTS_PER_CYCLE);
+    MBED_ASSERT(prescaler <= MAX_PRESCALER);
+
+    // Step 2: Calculate top count based on determined prescaler
+    // reloadValue = period * timxClk / prescaler
+    uint32_t topCount = lroundf(periodSeconds * timxClk / prescaler);
+    MBED_ASSERT(topCount <= MAX_COUNTS_PER_CYCLE);
+
+#if STM_PWMOUT_DEBUG
+    printf("Setting prescaler to %" PRIu32 " and top count to %" PRIu32 "\n", prescaler, topCount);
+#endif
+
+    TimHandle.Init.Prescaler = prescaler - 1; // value of 0 means divide by 1
+    TimHandle.Init.Period = topCount - 1; // value of 0 means count once
+
+    TimHandle.Init.ClockDivision = 0; // Dead time generators and digital filters use CK_INT directly
     TimHandle.Init.CounterMode   = TIM_COUNTERMODE_UP;
 
     if (HAL_TIM_PWM_Init(&TimHandle) != HAL_OK) {
@@ -378,6 +413,7 @@ void pwmout_period_us(pwmout_t *obj, int us)
 
     // Save for future use
     obj->period = us;
+    obj->counts = topCount;
 
     // Set duty cycle again
     pwmout_write(obj, dc);
@@ -409,7 +445,7 @@ void pwmout_pulsewidth_us(pwmout_t *obj, int us)
 int pwmout_read_pulsewidth_us(pwmout_t *obj)
 {
     float pwm_duty_cycle = pwmout_read(obj);
-    return (int)(pwm_duty_cycle * (float)obj->period);
+    return lroundf(pwm_duty_cycle * (float)obj->period);
 }
 
 const PinMap *pwmout_pinmap()
