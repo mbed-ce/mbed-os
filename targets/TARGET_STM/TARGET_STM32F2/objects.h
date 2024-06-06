@@ -125,16 +125,6 @@ struct i2c_s {
 #endif
 };
 
-struct pwmout_s {
-    PWMName pwm;
-    PinName pin;
-    uint32_t prescaler;
-    uint32_t period;
-    uint32_t pulse;
-    uint8_t channel;
-    uint8_t inverted;
-};
-
 #if DEVICE_CAN
 struct can_s {
     CAN_HandleTypeDef CanHandle;

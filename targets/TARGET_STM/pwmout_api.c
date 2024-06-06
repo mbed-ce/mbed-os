@@ -219,7 +219,7 @@ static void _pwmout_init_direct(pwmout_t *obj, const PinMap *pinmap)
     obj->pin = pinmap->pin;
     obj->period = 0;
     obj->compare_value = 0;
-    obj->counts = 1;
+    obj->top_count = 1;
 
     pwmout_period_us(obj, 20000); // 20 ms per default
 }
@@ -260,7 +260,7 @@ void pwmout_write(pwmout_t *obj, float value)
     // - if value is .33 and counts is 3, we want to write 1 so that we turn off after the counter becomes 1.
     // - if value is .1 and counts is 3, that rounds to 0 so we want to write 0 so that the PWM is off all the time
 
-    obj->compare_value = lroundf((float)obj->counts * value);
+    obj->compare_value = lroundf((float)obj->top_count * value);
 
 #if STM_PWMOUT_DEBUG
     printf("Setting compare value to %" PRIu32 "\n", obj->compare_value);
@@ -321,7 +321,7 @@ float pwmout_read(pwmout_t *obj)
 {
     float value = 0;
     if (obj->period > 0) {
-        value = (float)(obj->compare_value) / (float)(obj->counts);
+        value = (float)(obj->compare_value) / (float)(obj->top_count);
     }
     return ((value > (float)1.0) ? (float)(1.0) : (value));
 }
@@ -413,7 +413,7 @@ void pwmout_period_us(pwmout_t *obj, int us)
 
     // Save for future use
     obj->period = us;
-    obj->counts = topCount;
+    obj->top_count = topCount;
 
     // Set duty cycle again
     pwmout_write(obj, dc);

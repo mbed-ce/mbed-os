@@ -47,23 +47,6 @@ struct port_s {
     __IO uint32_t *reg_out;
 };
 
-struct pwmout_s {
-    PWMName pwm;
-    PinName pin;
-    uint32_t period;
-
-    // Current compare value.  Once the PWM counter becomes >= this value,
-    // the PWM turns off.
-    uint32_t compare_value;
-    
-    // How many counts the PWM timer makes before it resets.
-    // Example: if counts = 3, the timer will count 0, 1, 2, 0, 1, 2, etc.
-    uint16_t counts;
-
-    uint8_t channel;
-    uint8_t inverted;
-};
-
 struct serial_s {
     UARTName uart;
     int index;
