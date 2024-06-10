@@ -73,7 +73,7 @@ def get_mcu_names_used_by_targets_json5() -> Set[str]:
     LOGGER.info("Scanning targets.json5 for used MCU names...")
     used_mcu_names = set()
     targets_json5_contents = decode_json_file(TARGETS_JSON5_PATH)
-    for mbed_target, target_details in targets_json5_contents.items():
+    for target_details in targets_json5_contents.values():
         if "device_name" in target_details:
             used_mcu_names.add(target_details["device_name"])
     return used_mcu_names
@@ -112,7 +112,7 @@ def find_unused():
     # Accumulate set of all keys in cmsis_mcu_descriptions.json
     LOGGER.info("Scanning cmsis_mcu_descriptions.json for MCUs to be pruned...")
     cmsis_mcu_descriptions_json_contents: Dict[str, Any] = decode_json_file(CMSIS_MCU_DESCRIPTIONS_JSON_PATH)
-    available_mcu_names = set(cmsis_mcu_descriptions_json_contents.keys())
+    available_mcu_names = cmsis_mcu_descriptions_json_contents.keys()
 
     # Figure out which MCUs can be removed
     removable_mcus = sorted(available_mcu_names - used_mcu_names)
@@ -121,7 +121,7 @@ def find_unused():
         print("No MCU descriptions can be pruned, all are used.")
         return
 
-    print("The following MCU descriptions are not used and will be pruned from cmsis_mcu_descriptions.json")
+    print("The following MCU descriptions are not used and should be pruned from cmsis_mcu_descriptions.json")
     print("\n".join(removable_mcus))
 
 
@@ -141,7 +141,7 @@ def fetch_missing():
     # Accumulate set of all keys in cmsis_mcu_descriptions.json
     LOGGER.info("Scanning cmsis_mcu_descriptions.json for missing MCUs...")
     cmsis_mcu_descriptions_json_contents: Dict[str, Any] = decode_json_file(CMSIS_MCU_DESCRIPTIONS_JSON_PATH)
-    available_mcu_names = set(cmsis_mcu_descriptions_json_contents.keys())
+    available_mcu_names = cmsis_mcu_descriptions_json_contents.keys()
 
     # Are there any missing?
     missing_mcu_names = used_mcu_names - available_mcu_names
@@ -161,5 +161,5 @@ def fetch_missing():
                                f"to be added manually?")
         missing_mcus_dict[mcu] = cmsis_cache.index[mcu]
 
-    print(f"Add the following entries to {str(CMSIS_MCU_DESCRIPTIONS_JSON_PATH.name)}:")
+    print(f"Add the following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:")
     print(json.dumps(missing_mcus_dict, indent=4, sort_keys=True))
