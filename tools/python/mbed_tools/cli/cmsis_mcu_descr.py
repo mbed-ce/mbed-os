@@ -57,9 +57,11 @@ def open_cmsis_cache(must_exist=True) -> cmsis_pack_manager.Cache:
     if not index_file_path.exists() and must_exist:
         raise RuntimeError("CMSIS device descriptor cache does not exist!  Run 'python -m mbed_tools.cli.main cmsis-mcu-descr reload-cache' to populate it!")
 
-    # Check how old the index file is
-    index_age = humanize.naturaltime(datetime.datetime.fromtimestamp(index_file_path.stat().st_mtime))
-    LOGGER.info("CMSIS MCU description cache was last updated " + index_age)
+    if index_file_path.exists():
+        # Check how old the index file is
+        index_file_modified_time = datetime.datetime.fromtimestamp(index_file_path.stat().st_mtime)
+        index_age = humanize.naturaltime(index_file_modified_time)
+        LOGGER.info("CMSIS MCU description cache was last updated: %s", index_age)
 
     return cmsis_cache
 
