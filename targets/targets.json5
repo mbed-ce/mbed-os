@@ -1371,6 +1371,8 @@
         "device_name": "STM32F091RCTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF261500.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
+
+    // STM32F1 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F1": {
         "inherits": [
             "MCU_STM32"
@@ -1395,7 +1397,8 @@
         ],
         "device_has_remove": [
             "LPTICKER"
-        ]
+        ],
+        "is_mcu_family_target": true
     },
     "MCU_STM32F103x8": {
         "inherits": [
@@ -1431,7 +1434,8 @@
         "detect_code": [
             "0700"
         ],
-        "device_name": "STM32F103RB"
+        "device_name": "STM32F103RB",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF259875.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32F103xC": {
         "inherits": [
@@ -1493,6 +1497,7 @@
             "MPU"
         ]
     },
+    // STM32F2 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F2": {
         "inherits": [
             "MCU_STM32"
@@ -1561,8 +1566,11 @@
         "device_name": "STM32F207ZGTx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        }
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
+
+    // STM32F3 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F3": {
         "inherits": [
             "MCU_STM32"
@@ -1634,7 +1642,8 @@
         "detect_code": [
             "0775"
         ],
-        "device_name": "STM32F303K8Tx"
+        "device_name": "STM32F303K8Tx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262544.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32F303xC": {
         "inherits": [
@@ -1679,7 +1688,8 @@
         "detect_code": [
             "0745"
         ],
-        "device_name": "STM32F303RETx"
+        "device_name": "STM32F303RETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_F303ZE": {
         "inherits": [
@@ -1694,7 +1704,8 @@
         "device_has_add": [
             "USBDEVICE"
         ],
-        "device_name": "STM32F303ZETx"
+        "device_name": "STM32F303ZETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32F334x8": {
         "inherits": [
@@ -1709,6 +1720,8 @@
             "STM32F334x8"
         ]
     },
+
+    // STM32F4 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F4": {
         "inherits": [
             "MCU_STM32"
@@ -1757,7 +1770,8 @@
         "detect_code": [
             "0720"
         ],
-        "device_name": "STM32F401RETx"
+        "device_name": "STM32F401RETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260000.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32F407xE": {
         "inherits": [
@@ -1803,7 +1817,8 @@
         },
         "detect_code": [
             "9011"
-        ]
+        ],
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/1881/MFG_102110014.jpg"
     },
     "MCU_STM32F411xE": {
         "inherits": [
@@ -1827,9 +1842,10 @@
         "detect_code": [
             "0740"
         ],
-        "device_name": "STM32F411RETx"
+        "device_name": "STM32F411RETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
-    "MTS_DRAGONFLY_F411RE": {
+    "MTS_DRAGONFLY_F411RE": { // AKA MTQ-MNA1-B01/MTQ-MNA1-B02
         "inherits": [
             "MCU_STM32F411xE"
         ],
@@ -1852,7 +1868,8 @@
         ],
         "components_add": [
             "TELIT_HE910"
-        ]
+        ],
+        "image_url": "https://static-data2.manualslib.com/product-images/de1/2702201/multitech-multiconnect-dragonfly-mtq-mna1-b02.jpg"
     },
     "MTS_MDOT_F411RE": {
         "inherits": [
@@ -1871,7 +1888,8 @@
         "device_name": "STM32F411RETx",
         "detect_code": [
             "0320"
-        ]
+        ],
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/1290/MTDOT-868-X1P-SMA-1.jpg"
     },
     "BLACKPILL_F411CE": {
         "inherits": [
@@ -1890,7 +1908,8 @@
         "detect_code": [
             "0740"
         ],
-        "device_name": "STM32F411CEYx"
+        "device_name": "STM32F411CEYx",
+        "image_url": "https://user-images.githubusercontent.com/1301112/69389644-eb5fb080-0ccc-11ea-8002-67d3db851250.png"
     },
     "MCU_STM32F412xE": {
         "inherits": [
@@ -1937,7 +1956,8 @@
         "device_has_add": [
             "USBDEVICE"
         ],
-        "device_name": "STM32F412ZGTx"
+        "device_name": "STM32F412ZGTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     // Also known as MXChip EMW3166
     "WIO_EMW3166": {
@@ -1955,7 +1975,8 @@
         },
         "detect_code": [
             "0451"
-        ]
+        ],
+        "image_url": "https://cdn.mxchip.com/mxchip_official_website/img/EMW3166-P-%E7%99%BD-%E6%AD%A3.jpg"
     },
     "MCU_STM32F413xH": {
         "inherits": [
@@ -1984,6 +2005,11 @@
             "TRNG"
         ]
     },
+    // As of 2024, I am unable to find any device being sold by multitech that
+    // is called a dragonfly and has an STM32F413RHTx MCU.
+    // That would make this target a candidate for removal.
+    // It was originally added via a rather vague PR here:
+    // https://github.com/ARMmbed/mbed-os/pull/11573
     "MTS_DRAGONFLY_F413RH": {
         "inherits": [
             "MCU_STM32F413xH"
@@ -2012,7 +2038,8 @@
             "SPIF",
             "TELIT_HE910"
         ],
-        "device_name": "STM32F413RHTx"
+        "device_name": "STM32F413RHTx",
+        "image_url": "https://static-data2.manualslib.com/product-images/de1/2702201/multitech-multiconnect-dragonfly-mtq-mna1-b02.jpg"
     },
     "DISCO_F413ZH": {
         "inherits": [
@@ -2034,7 +2061,8 @@
             "QSPI",
             "USBDEVICE"
         ],
-        "device_name": "STM32F413ZHTx"
+        "device_name": "STM32F413ZHTx",
+        "image_url": "https://www.mouser.com/images/marketingid/2017/img/128173244_STMicroelectronics_32F413HDISCOVERYDiscoveryKit.png?v=070223.0256"
     },
     "NUCLEO_F413ZH": {
         "inherits": [
@@ -2049,7 +2077,8 @@
         "device_has_add": [
             "USBDEVICE"
         ],
-        "device_name": "STM32F413ZHTx"
+        "device_name": "STM32F413ZHTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32F429xI": {
         "inherits": [
@@ -2102,7 +2131,8 @@
         "device_name": "STM32F429ZITx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        }
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "DISCO_F429ZI": {
         "inherits": [
@@ -2123,7 +2153,8 @@
         "device_name": "STM32F429ZITx",
         "detect_code": [
             "0795"
-        ]
+        ],
+        "image_url": "https://m.media-amazon.com/images/I/71M-Bd6yaJL._AC_UF894,1000_QL80_.jpg"
     },
     "MCU_STM32F439xI": {
         "inherits": [
@@ -2166,7 +2197,8 @@
         "components_add": [
             "QUECTEL_UG96"
         ],
-        "device_name": "STM32F439VITx"
+        "device_name": "STM32F439VITx",
+        "image_url": "https://os.mbed.com/media/cache/platforms/Wio_3G.png.250x250_q85.png"
     },
 
     // Note: It seems like Seeed no longer sells any WIO boards with BG96 cellular modules.
@@ -2196,7 +2228,8 @@
         "components_add": [
             "SD",
             "QUECTEL_BG96"
-        ]
+        ],
+        "image_url": "https://os.mbed.com/media/cache/platforms/Wio_3G-1.png.250x250_q85.png.250x250_q85.png"
     },
     "NUCLEO_F439ZI": {
         "inherits": [
@@ -2226,7 +2259,8 @@
         "device_name": "STM32F439ZITx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        }
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32F446xE": {
         "inherits": [
@@ -2254,7 +2288,8 @@
         "detect_code": [
             "0777"
         ],
-        "device_name": "STM32F446RETx"
+        "device_name": "STM32F446RETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_F446ZE": {
         "inherits": [
@@ -2275,7 +2310,8 @@
         "device_has_add": [
             "USBDEVICE"
         ],
-        "device_name": "STM32F446ZETx"
+        "device_name": "STM32F446ZETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32F469xI": {
         "inherits": [
@@ -2317,7 +2353,8 @@
             "QSPI",
             "USBDEVICE"
         ],
-        "device_name": "STM32F469NIHx"
+        "device_name": "STM32F469NIHx",
+        "image_url": "https://static5.arrow.com/pdfs/2015/11/30/5/10/19/531/st_/manual/stm32f469i-disco_fig.1_1.jpg"
     },
     "SDP_K1": {
         "inherits": [
@@ -2351,8 +2388,11 @@
         "device_name": "STM32F469NIHx",
         "detect_code": [
             "0604"
-        ]
+        ],
+        "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-images/images/eval-sdp-ck1ztop-web.gif?rev=2b0d46c94afe490cb3543819752a0471&sc_lang=en&h=270&thn=1&hash=C1A2567A6E5A569665B40C5DCFE1B8C3"
     },
+
+    // STM32F7 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F7": {
         "inherits": [
             "MCU_STM32"
@@ -2419,7 +2459,8 @@
         "detect_code": [
             "0812"
         ],
-        "device_name": "STM32F722ZETx"
+        "device_name": "STM32F722ZETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "DISCO_F746NG": {
         "inherits": [
@@ -2457,7 +2498,8 @@
             "QSPI",
             "USBDEVICE"
         ],
-        "device_name": "STM32F746NGHx"
+        "device_name": "STM32F746NGHx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF261641.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_F746ZG": {
         "inherits": [
@@ -2490,7 +2532,8 @@
         "device_name": "STM32F746ZGTx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        }
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_F756ZG": {
         "inherits": [
@@ -2524,7 +2567,8 @@
         "device_name": "STM32F756ZGTx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        }
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "UHURU_RAVEN": {
         "inherits": [
@@ -2549,7 +2593,8 @@
         "device_has_remove": [
             "SERIAL_FC"
         ],
-        "device_name": "STM32F767VITx"
+        "device_name": "STM32F767VITx",
+        "image_url": "https://uhuru.co.jp/wp-content/uploads/2019/02/20190222_pr_raven_02.jpg"
     },
     "NUCLEO_F767ZI": {
         "inherits": [
@@ -2586,7 +2631,8 @@
         "device_name": "STM32F767ZITx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        }
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "DISCO_F769NI": {
         "inherits": [
@@ -2627,8 +2673,11 @@
         "device_name": "STM32F769NIHx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        }
+        },
+        "image_url": "https://www.mouser.com/images/marketingid/2016/img/167234246_STMicro_32F769IDISCOVERYDiscoveryKit.png?v=070223.0222"
     },
+
+    // STM32G0 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32G0": {
         "inherits": [
             "MCU_STM32"
@@ -2718,7 +2767,8 @@
         "detect_code": [
             "0852"
         ],
-        "device_name": "STM32G031K8Tx"
+        "device_name": "STM32G031K8Tx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267508.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32G041x8": {
         "inherits": [
@@ -2845,7 +2895,8 @@
         "detect_code": [
             "0221"
         ],
-        "device_name": "STM32G071RBTx"
+        "device_name": "STM32G071RBTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF265386.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32G081xB": {
         "inherits": [
@@ -2903,7 +2954,8 @@
         "detect_code": [
             "0872"
         ],
-        "device_name": "STM32G0B1RETx"
+        "device_name": "STM32G0B1RETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF265386.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32G0C1xE": {
         "inherits": [
@@ -2920,6 +2972,8 @@
             "ANALOGOUT"
         ]
     },
+
+    // STM32G4 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32G4": {
         "inherits": [
             "MCU_STM32"
@@ -2996,7 +3050,8 @@
         "overrides": {
             "hse_value": 24000000
         },
-        "device_name": "STM32G431RBTx"
+        "device_name": "STM32G431RBTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267029.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_G431KB": {
         "inherits": [
@@ -3009,7 +3064,8 @@
       "detect_code": [
         "0851"
       ],
-      "device_name": "STM32G431KBTx"
+      "device_name": "STM32G431KBTx",
+      "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267030.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32G441xB": {
         "inherits": [
@@ -3072,7 +3128,8 @@
         "detect_code": [
             "0841"
         ],
-        "device_name": "STM32G474RETx"
+        "device_name": "STM32G474RETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267029.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32G483xE": {
         "inherits": [
@@ -3122,6 +3179,8 @@
             "STM32G4A1xx"
         ]
     },
+
+    // STM32H7 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32H7": {
         "inherits": [
             "MCU_STM32"
@@ -3220,7 +3279,7 @@
             "system_power_supply": "PWR_LDO_SUPPLY"
         }
     },
-    "WIO_H725AE": {
+    "WIO_H725AE": { // AKA "Seeed Wio Lite AI"
         "inherits": [
             "MCU_STM32H725xE"
         ],
@@ -3240,7 +3299,8 @@
             "lse_drive_load_level": "RCC_LSEDRIVE_MEDIUMLOW",
             "enable-overdrive-mode": 0
         },
-        "device_name": "STM32H725AEIx"
+        "device_name": "STM32H725AEIx",
+        "image_url": "https://www.mouser.com/images/seeedstudios/hd/102110607_SPL.jpg"
     },
     "MCU_STM32H735xG": {
         "inherits": [
@@ -3304,7 +3364,8 @@
         "detect_code": [
             "0836"
         ],
-        "device_name": "STM32H743ZITx"
+        "device_name": "STM32H743ZITx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_H723ZG": {
         "inherits": [
@@ -3343,7 +3404,8 @@
         "detect_code": [
             "0836"
         ],
-        "device_name": "STM32H723ZGTx"
+        "device_name": "STM32H723ZGTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32H745xI": {
         "inherits": [
@@ -3422,7 +3484,8 @@
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
-        "device_name": "STM32H745ZITx"
+        "device_name": "STM32H745ZITx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_H745ZI_Q_CM4": {
         "inherits": [
@@ -3449,7 +3512,8 @@
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
-        "device_name": "STM32H745ZITx"
+        "device_name": "STM32H745ZITx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_H745ZI_Q" : {
         "inherits" : [
@@ -3513,12 +3577,14 @@
         "detect_code": [
             "0814"
         ],
-        "device_name": "STM32H747XIHx"
+        "device_name": "STM32H747XIHx",
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/310/MFG_STM32H747I-DISCO.jpg"
     },
     "DISCO_H747I": {
         "inherits": [
             "DISCO_H747I_CM7"
-        ]
+        ],
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/310/MFG_STM32H747I-DISCO.jpg"
     },
     "MCU_STM32H747xI_CM4": {
         "inherits": [
@@ -3557,7 +3623,8 @@
             "STMOD",
             "PMOD"
         ],
-        "device_name": "STM32H747XIHx"
+        "device_name": "STM32H747XIHx",
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/310/MFG_STM32H747I-DISCO.jpg"
     },
     "PORTENTA_H7": {
         "public": false,
@@ -3604,7 +3671,8 @@
             // the LDO power comes from the SMPS).
             "enable-overdrive-mode": 1
         },
-        "device_name": "STM32H747XIHx"
+        "device_name": "STM32H747XIHx",
+        "image_url": "https://store.arduino.cc/cdn/shop/products/ABX00042_00.iso_1200x900.jpg?v=1675840144"
     },
     "PORTENTA_H7_M7": {
         "inherits": ["PORTENTA_H7"],
@@ -3709,7 +3777,8 @@
         "device_name": "STM32H7A3ZITxQ",
         "detect_code": [
             "0860"
-        ]
+        ],
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267690.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32H7B3xIQ": {
         "inherits": [
@@ -3734,6 +3803,8 @@
             "enable-overdrive-mode": 0
         }
     },
+
+    // STM32L0 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32L0": {
         "inherits": [
             "MCU_STM32"
@@ -3844,7 +3915,7 @@
             "TRNG"
         ]
     },
-    "DISCO_L072CZ_LRWAN1": {
+    "DISCO_L072CZ_LRWAN1": { // AKA B-L072Z-LRWAN1
         "inherits": [
             "MCU_STM32L072xZ"
         ],
@@ -3857,7 +3928,8 @@
         "detect_code": [
             "0833"
         ],
-        "device_name": "STM32L072CZTx"
+        "device_name": "STM32L072CZTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF264368.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32L073xZ": {
         "inherits": [
@@ -3885,7 +3957,8 @@
         "detect_code": [
             "0760"
         ],
-        "device_name": "STM32L073RZTx"
+        "device_name": "STM32L073RZTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32L082xZ": {
         "inherits": [
@@ -3903,6 +3976,8 @@
             "TRNG"
         ]
     },
+
+    // STM32L1 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32L1": {
         "inherits": [
             "MCU_STM32"
@@ -3988,15 +4063,19 @@
         "device_name": "STM32L151CCTx",
         "detect_code": [
             "0350"
-        ]
+        ],
+        "image_url": "https://multitech.com/wp-content/uploads/elementor/thumbs/MT_xDot_Kit_MTMDK-NX-XDOT_clear_hp1000px-qiietlpii6czroara761mb7hrzdtvfj6350luxui2o.png"
     },
-    "FF1705_L151CC": {
+    // As of 2024, L-Tek no longer sells the FF1705 as far as I can tell from their webshop.
+    // It was delisted sometime after 2021.
+    "FF1705_L151CC": { // AKA L-Tek FF1705
         "inherits": [
             "XDOT_L151CC"
         ],
         "detect_code": [
             "8080"
-        ]
+        ],
+        "image_url": "https://os.mbed.com/media/cache/platforms/LTEK-xdot.jpg.250x250_q85.jpg"
     },
     "MCU_STM32L152xC": {
         "inherits": [
@@ -4010,7 +4089,7 @@
             "STM32L152xC"
         ]
     },
-    "MOTE_L152RC": {
+    "MOTE_L152RC": { // AKA SX1272LM1CEP or NAMote72 or Semtech LoRaMote
         "inherits": [
             "MCU_STM32L152xC"
         ],
@@ -4026,7 +4105,8 @@
         "device_has_remove": [
             "SERIAL_FC"
         ],
-        "device_name": "STM32L152RCTx"
+        "device_name": "STM32L152RCTx",
+        "image_url": "https://www.newark.com/productimages/large/en_US/14AC8252-40.jpg"
     },
     "MCU_STM32L152xE": {
         "inherits": [
@@ -4050,8 +4130,11 @@
         "detect_code": [
             "0710"
         ],
-        "device_name": "STM32L152RETx"
+        "device_name": "STM32L152RETx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
+
+    // STM32L4 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32L4": {
         "inherits": [
             "MCU_STM32"
@@ -4135,7 +4218,8 @@
         "detect_code": [
             "0770"
         ],
-        "device_name": "STM32L432KCUx"
+        "device_name": "STM32L432KCUx",
+        "image_url": "https://eu.mouser.com/images/marketingid/2019/img/168228755.png?v=021424.0917"
     },
     "MCU_STM32L433xC": {
         "inherits": [
@@ -4159,7 +4243,8 @@
         "detect_code": [
             "0779"
         ],
-        "device_name": "STM32L433RCTx"
+        "device_name": "STM32L433RCTx",
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2508/MFG_NUCLEO-L433RC-P.jpg"
     },
     "MCU_STM32L443xC": {
         "inherits": [
@@ -4175,6 +4260,7 @@
             "STM32L443xx"
         ]
     },
+    // Note: Advantech WISE-DK1510 required as external debugger
     "ADV_WISE_1510": {
         "inherits": [
             "MCU_STM32L443xC"
@@ -4189,7 +4275,8 @@
         "device_name": "STM32L443RCTx",
         "detect_code": [
             "0458"
-        ]
+        ],
+        "image_url": "https://www.mouser.com/images/advantechcorporation/lrg/WISE-1510WMB-SDA1E_DSL.jpg"
     },
     "MCU_STM32L452xE": {
         "inherits": [
@@ -4214,7 +4301,8 @@
         "detect_code": [
             "0829"
         ],
-        "device_name": "STM32L452RETx"
+        "device_name": "STM32L452RETx",
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2508/MFG_NUCLEO-L433RC-P.jpg"
     },
     "MCU_STM32L471xG": {
         "inherits": [
@@ -4242,7 +4330,8 @@
         "components_add": [
             "MULTITECH_DRAGONFLY_NANO_CELLULAR",
         ],
-        "device_name": "STM32L471QGIx"
+        "device_name": "STM32L471QGIx",
+        "image_url": "https://www.mouser.com/images/marketingid/2021/img/175572858.png?v=011524.1015"
     },
     "MCU_STM32L475xG": {
         "inherits": [
@@ -4286,7 +4375,8 @@
         "features": [
             "BLE"
         ],
-        "device_name": "STM32L475VGTx"
+        "device_name": "STM32L475VGTx",
+        "image_url": "https://www.mouser.com/images/stmicroelectronics/lrg/B_L475E_IOT01A1_SPL.jpg"
     },
     "MCU_STM32L476xG": {
         "inherits": [
@@ -4314,7 +4404,8 @@
         "detect_code": [
             "0765"
         ],
-        "device_name": "STM32L476RGTx"
+        "device_name": "STM32L476RGTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "DISCO_L476VG": {
         "inherits": [
@@ -4333,8 +4424,12 @@
             "QSPI",
             "USBDEVICE"
         ],
-        "device_name": "STM32L476VGTx"
+        "device_name": "STM32L476VGTx",
+        "image_url": "https://static5.arrow.com/pdfs/2015/11/2/7/58/36/906/st_/manual/stm32l476g-disco_fig.1.jpg"
     },
+    // As of 2024, rhomb.io seems to be effectively dead as a company -- their website is down, and
+    // their github and twitter have been inactive since 2021.
+    // So, this board seems to no longer exist and is a candidate for removal.
     "RHOMBIO_L476DMW1K": {
         "inherits": [
             "MCU_STM32L476xG"
@@ -4377,7 +4472,8 @@
         "detect_code": [
             "0827"
         ],
-        "device_name": "STM32L486RGTx"
+        "device_name": "STM32L486RGTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     // AKA Advantech WISE-1570
     // This board is EOL from the manufacturer so it is a candidate for removal.
@@ -4398,7 +4494,8 @@
         "OUTPUT_EXT": "hex",
         "components_add": [
             "QUECTEL_BC95"
-        ]
+        ],
+        "image_url": "https://www.sphinxcomputer.de/produktdb/images/products/6821_25480.png"
     },
     "MCU_STM32L496xG": {
         "inherits": [
@@ -4437,7 +4534,8 @@
             "USBDEVICE",
             "QSPI"
         ],
-        "device_name": "STM32L496AGIx"
+        "device_name": "STM32L496AGIx",
+        "image_url": "https://www.mouser.com/images/marketingid/2017/img/121062128_STmicro_32L496GDISCOVERYDiscoveryBoard.png?v=070223.0249"
     },
     "NUCLEO_L496ZG": {
         "inherits": [
@@ -4452,7 +4550,8 @@
         "device_has_add": [
             "USBDEVICE"
         ],
-        "device_name": "STM32L496ZGTx"
+        "device_name": "STM32L496ZGTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267690.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_L496ZG_P": {
         "inherits": [
@@ -4528,7 +4627,8 @@
         "device_has_add": [
             "USBDEVICE"
         ],
-        "device_name": "STM32L4R5ZITx"
+        "device_name": "STM32L4R5ZITx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267690.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_L4R5ZI_P": {
         "inherits": [
@@ -4576,7 +4676,8 @@
             "QSPI",
             "OSPI",
             "USBDEVICE"
-        ]
+        ],
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF264782.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
     "MCU_STM32L4S5xI": {
         "inherits": [
@@ -4621,7 +4722,8 @@
         "features": [
             "BLE"
         ],
-        "device_name": "STM32L4S5VITx"
+        "device_name": "STM32L4S5VITx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF270120.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
     "MCU_STM32L5": {
         "inherits": [
