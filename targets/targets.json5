@@ -4725,6 +4725,8 @@
         "device_name": "STM32L4S5VITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF270120.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
+
+    // STM32L5 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32L5": {
         "inherits": [
             "MCU_STM32"
@@ -4795,7 +4797,8 @@
         "device_name": "STM32L552ZETxQ",
         "detect_code": [
             "0854"
-        ]
+        ],
+        "image_url": "https://cdn11.bigcommerce.com/s-3fd3md1ghs/images/stencil/500x659/products/30236/11949/NUCLEO-L552ZE-Q__51179.1642762880.jpg?c=2"
     },
     "MCU_STM32L562xE": {
         "inherits": [
@@ -4837,8 +4840,11 @@
         "device_name": "STM32L562QEIxQ",
         "detect_code": [
             "0854"
-        ]
+        ],
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF268050.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
+
+    // STM32U5 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32U5": {
         "inherits": [
             "MCU_STM32"
@@ -4919,7 +4925,8 @@
             // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
             // Jumper JP4 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
             "default-adc-vref": 3.3
-        }
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271812.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32U575xG": {
         "inherits": [
@@ -4971,7 +4978,8 @@
         },
         "detect_code": [
             "887"
-        ]
+        ],
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271412.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
     "MCU_STM32U545xE": {
         "inherits": [
@@ -5002,7 +5010,8 @@
             // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
             // Jumper JP5 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
             "default-adc-vref": 3.3
-        }
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF273877.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32U5A5xJ": {
         "inherits": [
@@ -5033,8 +5042,11 @@
             // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
             // Jumper JP4 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
             "default-adc-vref": 3.3
-        }
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271812.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },        
+
+    // STM32WB Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32WB": {
         "inherits": [
             "MCU_STM32"
@@ -5109,7 +5121,8 @@
         "detect_code": [
             "0883"
         ],
-        "device_name": "STM32WB15CCUx"
+        "device_name": "STM32WB15CCUx",
+        "image_url": "https://www.mouser.com/images/stmicroelectronics/hd/NUCLEO-WB15CC_SPL.jpg"
     },
     "MCU_STM32WB55xG": {
         "inherits": [
@@ -5138,7 +5151,8 @@
         "device_has_add": [
             "USBDEVICE"
         ],
-        "device_name": "STM32WB55RGVx"
+        "device_name": "STM32WB55RGVx",
+        "image_url": "https://www.mouser.com/images/stmicroelectronics/hd/NUCLEO-WB15CC_SPL.jpg"
     },
     "MCU_STM32WB5MxG": {
         "inherits": [
@@ -5154,7 +5168,7 @@
             "MBEDTLS_CONFIG_HW_SUPPORT"
         ]
     },
-    "DISCO_WB5MMG": {
+    "DISCO_WB5MMG": { // AKA STM32WB5MM-DK
         "inherits": [
             "MCU_STM32WB5MxG"
         ],
@@ -5164,8 +5178,11 @@
         "detect_code": [
             "0884"
         ],
-        "device_name": "STM32WB55VGYx"
+        "device_name": "STM32WB55VGYx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271050.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
+
+    // STM32WL Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32WL": {
         "inherits": [
             "MCU_STM32"
@@ -5229,7 +5246,8 @@
         "detect_code": [
             "0866"
         ],
-        "device_name": "STM32WL55JCIx"
+        "device_name": "STM32WL55JCIx",
+        "image_url": "https://www.mouser.com/images/marketingid/2020/img/114771861.png?v=012324.0355"
     },
     "MCU_STM32WLE5xC": {
         "inherits": [
@@ -6258,7 +6276,7 @@
         "image_url": "https://www.renesas.com/sites/default/files/media/images/gr-mango-top.png"
     },
 
-    // Maxim Targets ---------------------------------------------------------------------------------------------------
+    // Maxim (now Analog Devices) Targets ------------------------------------------------------------------------------
     "MCU_MAX32620": {
         "inherits": [
             "Target"
@@ -6401,7 +6419,8 @@
         ],
         "detect_code": [
             "3102"
-        ]
+        ],
+        "image_url": "https://www.devicemart.co.kr/data/collect_img/kind_0/goods/large/6500287.jpg"
     },
     "MAX32625PICO": {
         "inherits": [
@@ -6413,7 +6432,8 @@
         "bootloader_supported": true,
         "detect_code": [
             "0444"
-        ]
+        ],
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2592/MAX32625PICO%23.jpg"
     },
     "MAX32630FTHR": {
         "inherits": [
@@ -6471,7 +6491,8 @@
             "iar": [
                 "std"
             ]
-        }
+        },
+        "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-maxim-images/max32630fthr.png?rev=38a579856b25448c9369e8f1931bef09&h=270&hash=55F09D9FF86FDDA9FDAE27520485245E"
     },
     "MAX32660": {
         "inherits": [
@@ -6549,7 +6570,8 @@
         },
         "detect_code": [
             "0421"
-        ]
+        ],
+        "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-maxim-images/max32660evsys.png?rev=1b007b133cb349f692e1695e7e55de01&h=270&hash=81B37460C25087CDD9A37B6B87FCB0A5"
     },
     "MAX32670": {
         "inherits": [
@@ -6631,7 +6653,8 @@
         ],
         "detect_code": [
             "0424"
-        ]
+        ],
+        "image_url": "https://os.mbed.com/media/uploads/sadik_maxim/max32670evkit_daplink_fw_update.png"
     },
     "EFM32": {
         "inherits": [
