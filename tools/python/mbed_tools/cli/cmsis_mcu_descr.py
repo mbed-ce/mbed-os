@@ -46,7 +46,7 @@ def cmsis_mcu_descr():
     LOGGER.setLevel(logging.INFO)
 
 
-def open_cmsis_cache(must_exist=True) -> cmsis_pack_manager.Cache:
+def open_cmsis_cache(*, must_exist: bool = True) -> cmsis_pack_manager.Cache:
     """
     Open an accessor to the CMSIS cache.  Also prints how old the cache is.
     """
@@ -91,7 +91,7 @@ def reload_cache():
     So, if the target you are looking for does not exist after running this command, you might
     just have to try again the next day.  It's happened to me several times...
     """
-    cmsis_cache = open_cmsis_cache(False)
+    cmsis_cache = open_cmsis_cache(must_exist=False)
 
     LOGGER.info("Cleaning and redownloading CMSIS device descriptions, this may take some time...")
     cmsis_cache.cache_clean()
