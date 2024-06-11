@@ -7067,12 +7067,11 @@
             "3104"
         ],
         "device_name": "nRF52832_xxAA",
-        "image_url": "https://www.devicemart.co.kr/data/collect_img/kind_0/goods/large/6500289.jpg"
+        "image_url": "https://os.mbed.com/media/cache/platforms/SDT52832B_size.png.250x250_q85.png"
     },
     "ARDUINO_NICLA_SENSE_ME": {
         "inherits": ["MCU_NRF52832"],
         "components_add": [
-            "FLASHIAP",
             "SPIF"
         ],
         "device_name": "nRF52832_xxAA",
@@ -7096,6 +7095,8 @@
         ],
         "image_url": "https://store-usa.arduino.cc/cdn/shop/products/ABX00050_03.front_1000x750.jpg?v=1631089821"
     },
+
+    // Nordic NRF52840 Targets------------------------------------------------------------------------------------------
     "MCU_NRF52840": {
         "inherits": [
             "Target"
@@ -7237,7 +7238,8 @@
         },
         "supported_application_profiles": [
             "full", "bare-metal"
-        ]
+        ],
+        "image_url": "https://www.nordicsemi.com/-/media/Images/Products/DevKits/nRF52-Series/nRF52840-DK/nRF52840-DK/nRF52840-DK-prod-page.png?h=750&iar=0&mw=350&w=350&hash=3DB140F6AE70CAE159FD911D8E6E9109"
     },
     "ARDUINO_NANO33BLE": {
         "inherits": [
@@ -7261,7 +7263,8 @@
             "console-usb": true,
             "console-uart": false
         },
-        "OUTPUT_EXT": "bin"
+        "OUTPUT_EXT": "bin",
+        "image_url": "https://m.media-amazon.com/images/I/61bGcUKwSzL.jpg"
     },
     "ARDUINO_NANO33BLE_SWD": {
         "inherits": [
@@ -7279,6 +7282,28 @@
             "MBED_APP_START=0x10000",
             "MBED_APP_SIZE=0xf0000"
         ]
+    },
+    "EP_AGORA": { // AKA Embedded Planet Agora (w/ dev kit for flashing and debugging) https://www.embeddedplanet.com/agora/
+        "inherits": [
+            "MCU_NRF52840"
+        ],
+        "supported_form_factors": [],
+        "macros_add": [
+            "CONFIG_GPIO_AS_PINRESET"
+        ],
+        "detect_code": [
+            "2600"
+        ],
+        "config": {
+            "enable-objects-extensions": {
+                "help": "Enable inclusion of objects_extensions.h",
+                "value": false
+            }
+        },
+        "components_add": [
+            "TELIT_ME910"
+        ],
+        "image_url": "https://www.embeddedplanet.com/wp-content/uploads/2019/02/EPM2M-AG-CELL-page.jpg"
     },
     "NUMAKER_PFM_NUC472": {
         "core": "Cortex-M4F",
@@ -9205,27 +9230,6 @@
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         }
-    },
-    "EP_AGORA": { // AKA Embedded Planet Agora (w/ dev kit for flashing and debugging) https://www.embeddedplanet.com/agora/
-        "inherits": [
-            "MCU_NRF52840"
-        ],
-        "supported_form_factors": [],
-        "macros_add": [
-            "CONFIG_GPIO_AS_PINRESET"
-        ],
-        "detect_code": [
-            "2600"
-        ],
-        "config": {
-            "enable-objects-extensions": {
-                "help": "Enable inclusion of objects_extensions.h",
-                "value": false
-            }
-        },
-        "components_add": [
-            "TELIT_ME910"
-        ]
     },
     "MCU_M261": {
         "core": "Cortex-M23",
