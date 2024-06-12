@@ -1043,6 +1043,136 @@
         "sub_family": "PSoC 63 Dual-Core",
         "vendor": "Cypress:19"
     },
+    "CYB0644ABZI-S2D44": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "Flash/CYxx64xA.FLM",
+                "ram_size": 49152,
+                "ram_start": 135135232,
+                "size": 1900544,
+                "start": 268435456,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_WFLASH.FLM",
+                "ram_size": 49152,
+                "ram_start": 135135232,
+                "size": 32768,
+                "start": 335544320,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA_SMIF_S25FL512S.FLM",
+                "ram_size": 49152,
+                "ram_start": 135135232,
+                "size": 134217728,
+                "start": 402653184,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CYxx64xA.FLM",
+                "ram_size": 911360,
+                "ram_start": 134223872,
+                "size": 1900544,
+                "start": 268435456,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "Flash/CY8C6xxA_WFLASH.FLM",
+                "ram_size": 911360,
+                "ram_start": 134223872,
+                "size": 32768,
+                "start": 335544320,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "Flash/CY8C6xxA_SMIF_S25FL512S.FLM",
+                "ram_size": 911360,
+                "ram_start": 134223872,
+                "size": 134217728,
+                "start": 402653184,
+                "style": "Keil"
+            }
+        ],
+        "family": "PSoC 64",
+        "from_pack": {
+            "pack": "PSoC6_DFP",
+            "url": "https://github.com/cypresssemiconductorco/cmsis-packs/raw/master/PSoC6_DFP/",
+            "vendor": "Cypress",
+            "version": "1.2.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 1048576,
+                "start": 134217728,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 1900544,
+                "start": 268435456,
+                "startup": true
+            }
+        },
+        "name": "CYB0644ABZI-S2D44",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM0Plus",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "None",
+                "mpu": "Present",
+                "name": "Cortex-M0p",
+                "svd": "SVD/psoc6_02.svd",
+                "unit": 0
+            },
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM4",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "name": "Cortex-M4",
+                "svd": "SVD/psoc6_02.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": null,
+        "vendor": "Cypress:19"
+    },
     "EFM32GG11B820F2048GL192": {
         "algorithms": [
             {

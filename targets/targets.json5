@@ -7305,6 +7305,32 @@
         ],
         "image_url": "https://www.embeddedplanet.com/wp-content/uploads/2019/02/EPM2M-AG-CELL-page.jpg"
     },
+    "EP_ATLAS": { // AKA Embedded Planet Atlas board. https://www.embeddedplanet.com/chronos/#atlas
+        "inherits": ["MCU_NRF52840"],
+        "device_name": "nRF52840_xxAA",
+        "supported_form_factors": [],
+        "config": {
+            "modem_is_on_board": {
+                "help": "Value: Tells the build system that the modem is on-board as oppose to a plug-in shield/module.",
+                "value": 1,
+                "macro_name": "MODEM_ON_BOARD"
+            },
+            "modem_data_connection_type": {
+                "help": "Value: Defines how an on-board modem is wired up to the MCU, e.g., data connection can be a UART or USB and so forth.",
+                "value": 1,
+                "macro_name": "MODEM_ON_BOARD_UART"
+            }
+        },
+        "components_add": ["SPIF", "TELIT_ME310"],
+        "components_remove": ["QSPIF"],
+        "release_versions": ["5"],
+        "macros_add": [
+            "CONFIG_GPIO_AS_PINRESET"
+        ],
+        "image_url": "https://www.embeddedplanet.com/wp-content/uploads/2021/04/Atlas_4-768x719.png"
+    },
+
+    // Nuvoton Targets -------------------------------------------------------------------------------------------------
     "NUMAKER_PFM_NUC472": {
         "core": "Cortex-M4F",
         "default_toolchain": "ARM",
@@ -7417,7 +7443,8 @@
         },
         "supported_application_profiles": [
             "full", "bare-metal"
-        ]
+        ],
+        "image_url": "https://os.mbed.com/media/uploads/MACRUM/img_9240.jpg"
     },
     "NUMAKER_PFM_M453": {
         "core": "Cortex-M4F",
@@ -7537,7 +7564,8 @@
         },
         "detect_code": [
             "1303"
-        ]
+        ],
+        "image_url": "https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.6.0/zephyr/_images/pfm_m487.jpg"
     },
     "NUMAKER_PFM_NANO130": {
         "core": "Cortex-M0",
@@ -7650,7 +7678,8 @@
         },
         "detect_code": [
             "1306"
-        ]
+        ],
+        "image_url": "https://www.nuvoton.com/export/sites/nuvoton/images/Microcontrollers/NuMaker-PFM-M487KM.png_576589920.png"
     },
     "MCU_M460": {
         "core": "Cortex-M4F",
@@ -7837,7 +7866,8 @@
             "hbi-mfp-reg-list": "0x40000534, 0x4000057C, 0x40000590, 0x40000594",
             "hbi-mfp-reg-msk-list": "0xFFFFFF00, 0xFFFFFFFF, 0xFFFF0000, 0xFFFFFFFF",
             "hbi-mfp-reg-val-list": "0x10101000, 0x10101010, 0x10100000, 0x10101010"
-        }
+        },
+        "image_url": "https://os.mbed.com/media/cache/platforms/NuMaker-IoT-M467_V1.1_F.png.250x250_q85.png"
     },
     "MCU_M480": {
         "core": "Cortex-M4F",
@@ -7999,7 +8029,8 @@
             "usb-uart-rx": "PB_12",
             "spim-ccm-enable": 1,
             "network-default-interface-type": "ETHERNET"
-        }
+        },
+        "image_url": "https://os.mbed.com/media/cache/platforms/NuMaker-PFM-M487.png.250x250_q85.png"
     },
     "NUMAKER_IOT_M487": {
         "inherits": [
@@ -8020,181 +8051,8 @@
             "usb-uart-rx": "PB_12",
             "spim-ccm-enable": 1,
             "network-default-interface-type": "WIFI"
-        }
-    },
-    "TMPM46B": {
-        "inherits": [
-            "Target"
-        ],
-        "core": "Cortex-M4F",
-        "is_disk_virtual": true,
-        "extra_labels": [
-            "TOSHIBA"
-        ],
-        "macros": [
-            "__TMPM46B__"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "device_has": [
-            "USTICKER",
-            "ANALOGIN",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "RESET_REASON",
-            "RTC",
-            "SERIAL",
-            "SERIAL_FC",
-            "SPI",
-            "SPISLAVE",
-            "SPI_ASYNCH",
-            "I2C",
-            "I2CSLAVE",
-            "I2C_ASYNCH",
-            "TRNG",
-            "FLASH",
-            "SLEEP"
-        ],
-        "device_name": "TMPM46BF10FG",
-        "detect_code": [
-            "7013"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "bootloader_supported": true,
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        }
-    },
-    "ARM_FM": {
-        "inherits": [
-            "Target"
-        ],
-        "public": false,
-        "extra_labels": [
-            "ARM_FM"
-        ]
-    },
-    "FVP_MPS2": {
-        "inherits": [
-            "ARM_FM"
-        ],
-        "features_add": [
-            "PSA"
-        ],
-        "extra_labels_add": [
-            "MBED_PSA_SRV"
-        ],
-        "public": false,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "OUTPUT_EXT": "elf",
-        "device_has": [
-            "AACI",
-            "ANALOGIN",
-            "CLCD",
-            "EMAC",
-            "FLASH",
-            "I2C",
-            "INTERRUPTIN",
-            "LPTICKER",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "SERIAL",
-            "SLEEP",
-            "SPI",
-            "SPISLAVE",
-            "TSC",
-            "TRNG",
-            "USTICKER"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
         },
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "is_mcu_family_target": true
-    },
-    "FVP_MPS2_M0": {
-        "inherits": [
-            "FVP_MPS2"
-        ],
-        "core": "Cortex-M0",
-        "macros_add": [
-            "CMSDK_CM0"
-        ]
-    },
-    "FVP_MPS2_M0P": {
-        "inherits": [
-            "FVP_MPS2"
-        ],
-        "core": "Cortex-M0+",
-        "macros_add": [
-            "CMSDK_CM0plus"
-        ]
-    },
-    "FVP_MPS2_M3": {
-        "inherits": [
-            "FVP_MPS2"
-        ],
-        "core": "Cortex-M3",
-        "macros_add": [
-            "CMSDK_CM3"
-        ],
-        "device_has_add": [
-            "MPU"
-        ]
-    },
-    "FVP_MPS2_M4": {
-        "inherits": [
-            "FVP_MPS2"
-        ],
-        "core": "Cortex-M4F",
-        "macros_add": [
-            "CMSDK_CM4"
-        ],
-        "device_has_add": [
-            "MPU"
-        ]
-    },
-    "FVP_MPS2_M7": {
-        "inherits": [
-            "FVP_MPS2"
-        ],
-        "core": "Cortex-M7FD",
-        "macros_add": [
-            "CMSDK_CM7"
-        ],
-        "device_has_add": [
-            "MPU"
-        ]
+        "image_url": "https://direct.nuvoton.com/989/numaker-iot-m487.jpg"
     },
     "MCU_M2354": {
         "inherits": [
@@ -8310,7 +8168,7 @@
         "forced_reset_timeout": 5,
         "is_mcu_family_target": true
     },
-    "NU_M2354": {
+    "NU_M2354": { // AKA NUMAKER-M2354
         "inherits": [
             "MCU_M2354"
         ],
@@ -8342,7 +8200,8 @@
             "ARMCLANG",
             "GNUARM"
         ],
-        "tfm_delivery_dir": "TARGET_NUVOTON/TARGET_M2354/TARGET_TFM/TARGET_NU_M2354/COMPONENT_TFM_S_FW"
+        "tfm_delivery_dir": "TARGET_NUVOTON/TARGET_M2354/TARGET_TFM/TARGET_NU_M2354/COMPONENT_TFM_S_FW",
+        "image_url": "https://direct.nuvoton.com/1085-large_default/numaker-m2354.jpg"
     },
     "MCU_M251": {
         "core": "Cortex-M23",
@@ -8478,7 +8337,7 @@
         ],
         "is_mcu_family_target": true
     },
-    "NUMAKER_IOT_M252": {
+    "NUMAKER_IOT_M252": { // AKA NuMaker-LoRaD-M252
         "inherits": [
             "MCU_M251"
         ],
@@ -8494,54 +8353,65 @@
             "usb-uart": "UART_0",
             "usb-uart-tx": "PB_13",
             "usb-uart-rx": "PB_12"
-        }
+        },
+        "image_url": "https://os.mbed.com/media/cache/platforms/NuMaker-LoRaD-M252_V1.0_dAwfIUu.jpg.250x250_q85.jpg"
     },
-    "TMPM4G9": {
+
+    // ARM Fast Model (FM) Fixed Virtual Platforms (FVPs) --------------------------------------------------------------
+    // Unlike the MPS2 targets, which are real targets that can be run on an FPGA, Fast Models are entirely
+    // software based.  They simulate an ARM core, the associated peripherals, and hardware connected to the MCU.
+
+    "ARM_FM": {
         "inherits": [
             "Target"
         ],
-        "core": "Cortex-M4F",
-        "is_disk_virtual": true,
+        "public": false,
         "extra_labels": [
-            "TOSHIBA"
+            "ARM_FM"
         ],
-        "macros": [
-            "__TMPM4G9__"
+        "is_mcu_target_family": true
+    },
+    "FVP_MPS2": {
+        "inherits": [
+            "ARM_FM"
         ],
+        "features_add": [
+            "PSA"
+        ],
+        "extra_labels_add": [
+            "MBED_PSA_SRV"
+        ],
+        "public": false,
         "supported_toolchains": [
             "GCC_ARM"
         ],
+        "OUTPUT_EXT": "elf",
         "device_has": [
+            "AACI",
             "ANALOGIN",
-            "ANALOGOUT",
+            "CLCD",
+            "EMAC",
+            "FLASH",
+            "I2C",
             "INTERRUPTIN",
+            "LPTICKER",
             "PORTIN",
             "PORTINOUT",
             "PORTOUT",
-            "PWMOUT",
-            "RESET_REASON",
             "SERIAL",
-            "SERIAL_FC",
+            "SLEEP",
             "SPI",
             "SPISLAVE",
-            "SPI_ASYNCH",
-            "I2C",
-            "I2CSLAVE",
-            "I2C_ASYNCH",
-            "RTC",
-            "FLASH",
-            "SLEEP",
-            "USTICKER",
-            "MPU"
-        ],
-        "device_name": "TMPM4G9F15FG",
-        "detect_code": [
-            "7015"
+            "TSC",
+            "TRNG",
+            "USTICKER"
         ],
         "release_versions": [
             "5"
         ],
-        "bootloader_supported": true,
+        "overrides": {
+            "network-default-interface-type": "ETHERNET"
+        },
         "supported_application_profiles" : ["full", "bare-metal"],
         "supported_c_libs": {
             "arm": [
@@ -8552,8 +8422,65 @@
                 "std",
                 "small"
             ]
-        }
+        },
+        "is_mcu_family_target": true
     },
+    "FVP_MPS2_M0": {
+        "inherits": [
+            "FVP_MPS2"
+        ],
+        "core": "Cortex-M0",
+        "macros_add": [
+            "CMSDK_CM0"
+        ]
+    },
+    "FVP_MPS2_M0P": {
+        "inherits": [
+            "FVP_MPS2"
+        ],
+        "core": "Cortex-M0+",
+        "macros_add": [
+            "CMSDK_CM0plus"
+        ]
+    },
+    "FVP_MPS2_M3": {
+        "inherits": [
+            "FVP_MPS2"
+        ],
+        "core": "Cortex-M3",
+        "macros_add": [
+            "CMSDK_CM3"
+        ],
+        "device_has_add": [
+            "MPU"
+        ]
+    },
+    "FVP_MPS2_M4": {
+        "inherits": [
+            "FVP_MPS2"
+        ],
+        "core": "Cortex-M4F",
+        "macros_add": [
+            "CMSDK_CM4"
+        ],
+        "device_has_add": [
+            "MPU"
+        ]
+    },
+    "FVP_MPS2_M7": {
+        "inherits": [
+            "FVP_MPS2"
+        ],
+        "core": "Cortex-M7FD",
+        "macros_add": [
+            "CMSDK_CM7"
+        ],
+        "device_has_add": [
+            "MPU"
+        ]
+    },
+
+    // Cypress (now Infineon) PSOC6 Targets ----------------------------------------------------------------------------
     "MCU_PSOC6": {
         "inherits": [
             "Target"
@@ -8695,7 +8622,8 @@
         ],
         "overrides": {
             "network-default-interface-type": "WIFI"
-        }
+        },
+        "image_url": "https://www.mouser.com/images/cypresssemiconductor/lrg/CY8CPROTO-062-4343W_t.jpg"
     },
     "CY8CKIT_062S2_43012": {
         "inherits": [
@@ -8732,7 +8660,8 @@
         ],
         "overrides": {
             "network-default-interface-type": "WIFI"
-        }
+        },
+        "image_url": "https://iotexpert.com/wp-content/uploads/2021/02/Screen-Shot-2021-02-24-at-6.55.57-AM-1024x713.jpg"
     },
     "CY8CPROTO_062S3_4343W": {
         "inherits": [
@@ -8767,9 +8696,10 @@
         ],
         "overrides": {
             "network-default-interface-type": "WIFI"
-        }
+        },
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/4218/MFG_CY8CPROTO-062S3-4343W.jpg"
     },
-    "CY8CKIT_062_WIFI_BT": {
+    "CY8CKIT_062_WIFI_BT": { // AKA PSoC 6 WiFi-BT Pioneer Kit
         "inherits": [
             "MCU_PSOC6_M4"
         ],
@@ -8811,9 +8741,10 @@
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
-        "program_cycle_s": 10
+        "program_cycle_s": 10,
+        "image_url": "https://os.mbed.com/media/cache/platforms/P6_WiFi_Pionner_Kit.PNG.250x250_q85.png"
     },
-    "CY8CKIT_062_BLE": {
+    "CY8CKIT_062_BLE": { // AKA PSoC 6 BLE Pioneer Kit
         "inherits": [
             "MCU_PSOC6_M4"
         ],
@@ -8842,9 +8773,10 @@
                 512
             ]
         ],
-        "bootloader_supported": false
+        "bootloader_supported": false,
+        "image_url": "https://os.mbed.com/media/cache/platforms/SS2_3797_with_out_USB_cable.jpg.250x250_q85.jpg"
     },
-    "CYW9P62S1_43438EVB_01": {
+    "CYW9P62S1_43438EVB_01": { // AKA CYW9P62S1-43438EVB-01 PSoC 62S1 Wi-Fi BT Pioneer Kit
         "inherits": [
             "MCU_PSOC6_M4"
         ],
@@ -8886,9 +8818,12 @@
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
-        "program_cycle_s": 10
+        "program_cycle_s": 10,
+
+        // This is not a great picture but it's the best I could find...
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/424/MFG_CY8CKIT-062S2-43012.jpg"
     },
-    "CYW9P62S1_43012EVB_01": {
+    "CYW9P62S1_43012EVB_01": { // AKA CYW9P62S1-43012EVB-01 PSoC 62S1 Wi-Fi BT Pioneer Kit
         "inherits": [
             "MCU_PSOC6_M4"
         ],
@@ -8925,9 +8860,10 @@
         ],
         "overrides": {
             "network-default-interface-type": "WIFI"
-        }
+        },
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/4905/CYW9P62S1-43012EVB-01.jpg"
     },
-    "CY8CKIT064B0S2_4343W": {
+    "CY8CKIT064B0S2_4343W": { // AKA CY8CKIT-064B0S2-4343W PSoC 64 Secure Boot Wi-Fi BT Pioneer Kit
         "inherits": [
             "MCU_PSOC6_M4"
         ],
@@ -8977,9 +8913,11 @@
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
-        "program_cycle_s": 10
+        "program_cycle_s": 10,
+        "device_name": "CYB0644ABZI-S2D44",
+        "image_url": "https://os.mbed.com/media/cache/platforms/SSP_8683_Ywwh0ix.jpg.250x250_q85.jpg"
     },
-    "CYTFM_064B0S2_4343W": {
+    "CYTFM_064B0S2_4343W": { // Same as
         "inherits": [
             "MCU_PSOC6_M4"
         ],
@@ -9044,7 +8982,9 @@
             "GNUARM"
         ],
         "tfm_delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_CYTFM_064B0S2_4343W/COMPONENT_TFM_S_FW",
-        "TFM_OUTPUT_EXT": "hex"
+        "TFM_OUTPUT_EXT": "hex",
+        "device_name": "CYB0644ABZI-S2D44",
+        "image_url": "https://os.mbed.com/media/cache/platforms/SSP_8683_Ywwh0ix.jpg.250x250_q85.jpg"
     },
     // Also known as CYSBSYSKIT-DEV-01 Rapid IoT Connect Developer Kit
     // However, as of 2024, I cannot find this board anywhere for sale, so it may be a candidate for removal.
@@ -9105,7 +9045,8 @@
                 "help": "Value: Tells the np to connect to wifi with its network credentials or wait till cp provides network credentials to it",
                 "value": false
             }
-        }
+        },
+        "image_url": "https://manuals.plus/wp-content/uploads/2023/05/infineon-CYSBSYSKIT-DEV-01-Rapid-IoT-Connect-Developer-Kit-PRODUCT.png"
     },
     "GD32_Target": {
         "inherits": [
@@ -9411,30 +9352,6 @@
             "3701"
         ]
     },
-    "EP_ATLAS": { // AKA Embedded Planet Atlas board. https://www.embeddedplanet.com/chronos/#atlas
-        "inherits": ["MCU_NRF52840"],
-        "device_name": "nRF52840_xxAA",
-        "supported_form_factors": [],
-        "config": {
-            "modem_is_on_board": {
-                "help": "Value: Tells the build system that the modem is on-board as oppose to a plug-in shield/module.",
-                "value": 1,
-                "macro_name": "MODEM_ON_BOARD"
-            },
-            "modem_data_connection_type": {
-                "help": "Value: Defines how an on-board modem is wired up to the MCU, e.g., data connection can be a UART or USB and so forth.",
-                "value": 1,
-                "macro_name": "MODEM_ON_BOARD_UART"
-            }
-        },
-        "components_add": ["SPIF", "TELIT_ME310"],
-        "components_remove": ["QSPIF"],
-        "release_versions": ["5"],
-        "macros_add": [
-            "CONFIG_GPIO_AS_PINRESET"
-        ],
-        "image_url": "https://www.embeddedplanet.com/wp-content/uploads/2021/04/Atlas_4-768x719.png"
-    },
     "S1SBP6A": {
         "inherits": ["Target"],
         "core": "Cortex-M4F",
@@ -9552,9 +9469,122 @@
         "inherits": ["AMA3B1KK"],
         "components_add": ["lis2dh12", "hm01b0"]
     },
-    "__build_tools_metadata__": {
-        "version": "1",
-        "public": false
+    // Toshiba Targets -------------------------------------------------------------------------------------------------
+    "TMPM46B": { // AKA AdBun-M46B
+        "inherits": [
+            "Target"
+        ],
+        "core": "Cortex-M4F",
+        "is_disk_virtual": true,
+        "extra_labels": [
+            "TOSHIBA"
+        ],
+        "macros": [
+            "__TMPM46B__"
+        ],
+        "supported_toolchains": [
+            "GCC_ARM"
+        ],
+        "device_has": [
+            "USTICKER",
+            "ANALOGIN",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "RESET_REASON",
+            "RTC",
+            "SERIAL",
+            "SERIAL_FC",
+            "SPI",
+            "SPISLAVE",
+            "SPI_ASYNCH",
+            "I2C",
+            "I2CSLAVE",
+            "I2C_ASYNCH",
+            "TRNG",
+            "FLASH",
+            "SLEEP"
+        ],
+        "device_name": "TMPM46BF10FG",
+        "detect_code": [
+            "7013"
+        ],
+        "release_versions": [
+            "5"
+        ],
+        "bootloader_supported": true,
+        "supported_application_profiles" : ["full", "bare-metal"],
+        "supported_c_libs": {
+            "arm": [
+                "std",
+                "small"
+            ],
+            "gcc_arm": [
+                "std",
+                "small"
+            ]
+        },
+        "image_url": "https://www.chip1stop.com/img/product/SSST/0109140533_5a544d9d16351.JPG"
+    },
+    "TMPM4G9": {
+        "inherits": [
+            "Target"
+        ],
+        "core": "Cortex-M4F",
+        "is_disk_virtual": true,
+        "extra_labels": [
+            "TOSHIBA"
+        ],
+        "macros": [
+            "__TMPM4G9__"
+        ],
+        "supported_toolchains": [
+            "GCC_ARM"
+        ],
+        "device_has": [
+            "ANALOGIN",
+            "ANALOGOUT",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "RESET_REASON",
+            "SERIAL",
+            "SERIAL_FC",
+            "SPI",
+            "SPISLAVE",
+            "SPI_ASYNCH",
+            "I2C",
+            "I2CSLAVE",
+            "I2C_ASYNCH",
+            "RTC",
+            "FLASH",
+            "SLEEP",
+            "USTICKER",
+            "MPU"
+        ],
+        "device_name": "TMPM4G9F15FG",
+        "detect_code": [
+            "7015"
+        ],
+        "release_versions": [
+            "5"
+        ],
+        "bootloader_supported": true,
+        "supported_application_profiles" : ["full", "bare-metal"],
+        "supported_c_libs": {
+            "arm": [
+                "std",
+                "small"
+            ],
+            "gcc_arm": [
+                "std",
+                "small"
+            ]
+        }
     },
     "TMPM4KN": {
         "inherits": ["Target"],
