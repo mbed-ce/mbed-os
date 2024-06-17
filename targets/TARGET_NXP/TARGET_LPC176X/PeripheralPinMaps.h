@@ -30,7 +30,7 @@
 // bitfield for this pin.
 // See section 8.5 in the LPC1768 user manual for the source of these pinmappings.
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_TX[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_TX[] = {
     {P0_0,  UART_3, 2},
     {P0_2,  UART_0, 1},
     {P0_10, UART_2, 1},
@@ -42,7 +42,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_TX[] = {
     {NC   , NC    , 0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_RX[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_RX[] = {
     {P0_1 , UART_3, 2},
     {P0_3 , UART_0, 1},
     {P0_11, UART_2, 1},
@@ -55,19 +55,19 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_RX[] = {
 };
 
 // Only UART1 has hardware flow control on LPC176x
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_RTS[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_RTS[] = {
     {P0_22, UART_1, 1},
     {P2_7,  UART_1, 2},
     {NC,    NC,     0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_CTS[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_UART_CTS[] = {
     {P0_17, UART_1, 1},
     {P2_2,  UART_1, 2},
     {NC,    NC,     0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_SCLK[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_SCLK[] = {
     {P0_7 , SPI_1, 2},
     {P0_15, SPI_0, 2},
     {P1_20, SPI_0, 3},
@@ -75,7 +75,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_SCLK[] = {
     {NC   , NC   , 0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_MOSI[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_MOSI[] = {
     {P0_9 , SPI_1, 2},
     {P0_13, SPI_1, 2},
     {P0_18, SPI_0, 2},
@@ -83,7 +83,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_MOSI[] = {
     {NC   , NC   , 0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_MISO[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_MISO[] = {
     {P0_8 , SPI_1, 2},
     {P0_12, SPI_1, 2},
     {P0_17, SPI_0, 2},
@@ -91,7 +91,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_MISO[] = {
     {NC   , NC   , 0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_SSEL[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_SSEL[] = {
     {P0_6 , SPI_1, 2},
     {P0_11, SPI_1, 2},
     {P0_16, SPI_0, 2},
@@ -99,7 +99,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_SPI_SSEL[] = {
     {NC   , NC   , 0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_ADC[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_ADC[] = {
     {P0_23, ADC0_0, 1},
     {P0_24, ADC0_1, 1},
     {P0_25, ADC0_2, 1},
@@ -111,13 +111,13 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_ADC[] = {
     {NC,    NC,     0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_DAC[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_DAC[] = {
     {P0_26, DAC_0, 2},
     {NC   , NC   , 0}
 };
 
 // NOTE: For I2C, only the P0_27/P0_28 pinmapping is fully electrically compliant to the I2C standard.
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_I2C_SDA[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_I2C_SDA[] = {
     {P0_27, I2C_0, 1},
     {P0_0 , I2C_1, 3},
     {P0_19, I2C_1, 3},
@@ -125,7 +125,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_I2C_SDA[] = {
     {NC   , NC   , 0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_I2C_SCL[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_I2C_SCL[] = {
     {P0_28, I2C_0, 1},
     {P0_1 , I2C_1, 3},
     {P0_20, I2C_1, 3},
@@ -133,7 +133,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_I2C_SCL[] = {
     {NC   , NC,    0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_PWM[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_PWM[] = {
     {P1_18, PWM_1, 2},
     {P1_20, PWM_2, 2},
     {P1_21, PWM_3, 2},
@@ -151,7 +151,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_PWM[] = {
     {NC, NC, 0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_CAN_RD[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_CAN_RD[] = {
     {P0_0 , CAN_1, 1},
     {P0_4 , CAN_2, 2},
     {P0_21, CAN_1, 3},
@@ -159,7 +159,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_CAN_RD[] = {
     {NC   , NC   , 0}
 };
 
-MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_CAN_TD[] = {
+static MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_CAN_TD[] = {
     {P0_1 , CAN_1, 1},
     {P0_5 , CAN_2, 2},
     {P0_22, CAN_1, 3},
