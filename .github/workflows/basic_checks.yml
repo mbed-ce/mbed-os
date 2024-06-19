@@ -207,9 +207,8 @@ jobs:
           source venv/bin/activate
           cd tools/python
           python -m mbed_tools.cli.main cmsis-mcu-descr find-unused
-          python -m mbed_tools.cli.main cmsis-mcu-descr find-unused
+          python -m mbed_tools.cli.main cmsis-mcu-descr check-missing
 
-      - name: Veri
 
   pin-validation:
     runs-on: ubuntu-latest
