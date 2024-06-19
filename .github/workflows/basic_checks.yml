@@ -163,7 +163,7 @@ jobs:
     steps:
       -
         name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Install python3-venv
         run: |
@@ -185,6 +185,31 @@ jobs:
           cd tools/python
           ./run_python_tests.sh
 
+  check-cmsis-mcu-descriptions-matches-target-list:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install python3-venv
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-venv
+
+      - name: install dependencies
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -r tools/requirements.txt
+
+      - name: Verify that cmsis_mcu_descriptions.json5 is in sync with targets.json5
+        run: |
+          source venv/bin/activate
+          cd tools/python
+          python -m mbed_tools.cli.main cmsis-mcu-descr find-unused
+          python -m mbed_tools.cli.main cmsis-mcu-descr find-unused
+
+      - name: Veri
 
   pin-validation:
     runs-on: ubuntu-latest
