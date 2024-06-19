@@ -13,6 +13,7 @@ from mbed_tools.targets import get_target_by_name
 from mbed_tools.build._internal.cmake_file import render_mbed_config_cmake_template
 from mbed_tools.build._internal.config.assemble_build_config import Config, assemble_config
 from mbed_tools.build._internal.write_files import write_file
+from mbed_tools.build._internal.memory_bank_info_loader import add_memory_bank_macros
 from mbed_tools.build.exceptions import MbedBuildError
 
 CMAKE_CONFIG_FILE = "mbed_config.cmake"
@@ -36,6 +37,7 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> T
     config = assemble_config(
         target_build_attributes, [program.root, program.mbed_os.root], program.files.app_config_file
     )
+    add_memory_bank_macros(program, config)
     cmake_file_contents = render_mbed_config_cmake_template(
         target_name=target_name, config=config, toolchain_name=toolchain,
     )
