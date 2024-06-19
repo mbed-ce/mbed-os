@@ -1969,42 +1969,6 @@
             "TRNG"
         ]
     },
-    // As of 2024, I am unable to find any device being sold by multitech that
-    // is called a dragonfly and has an STM32F413RHTx MCU.
-    // That would make this target a candidate for removal.
-    // It was originally added via a rather vague PR here:
-    // https://github.com/ARMmbed/mbed-os/pull/11573
-    "MTS_DRAGONFLY_F413RH": {
-        "inherits": [
-            "MCU_STM32F413xH"
-        ],
-        "supported_form_factors": [
-            "ARDUINO_UNO"
-        ],
-        "config": {
-            "hse_value": {
-                "help": "HSE via 26MHz xtal",
-                "value": "26000000",
-                "macro_name": "HSE_VALUE"
-            }
-        },
-        "overrides": {
-            "tickless-from-us-ticker": true,
-            "lse_available": 0
-        },
-        "detect_code": [
-            "0316"
-        ],
-        "device_has_remove": [
-            "SERIAL_FC"
-        ],
-        "components_add": [
-            "SPIF",
-            "TELIT_HE910"
-        ],
-        "device_name": "STM32F413RHTx",
-        "image_url": "https://static-data2.manualslib.com/product-images/de1/2702201/multitech-multiconnect-dragonfly-mtq-mna1-b02.jpg"
-    },
     "DISCO_F413ZH": {
         "inherits": [
             "MCU_STM32F413xH"
@@ -2137,63 +2101,6 @@
             "CAN",
             "TRNG"
         ]
-    },
-    // Note: It seems like Seeed no longer sells this board.
-    // That would make this target a candidate for removal.
-    "WIO_3G": {
-        "inherits": [
-            "MCU_STM32F439xI"
-        ],
-        "config": {
-            "clock_source_usb": {
-                "help": "As 48 Mhz clock is configured for USB, SYSCLK has to be reduced from 180 to 168 MHz (set 0 for the max SYSCLK value)",
-                "value": "1",
-                "macro_name": "CLOCK_SOURCE_USB"
-            }
-        },
-        "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
-            "network-default-interface-type": "CELLULAR"
-        },
-        "detect_code": [
-            "9014"
-        ],
-        "components_add": [
-            "QUECTEL_UG96"
-        ],
-        "device_name": "STM32F439VITx",
-        "image_url": "https://os.mbed.com/media/cache/platforms/Wio_3G.png.250x250_q85.png"
-    },
-
-    // Note: It seems like Seeed no longer sells any WIO boards with BG96 cellular modules.
-    // That would make this target a candidate for removal.
-    "WIO_BG96": {
-        "inherits": [
-            "MCU_STM32F439xI"
-        ],
-        "config": {
-            "clock_source_usb": {
-                "help": "As 48 Mhz clock is configured for USB, SYSCLK has to be reduced from 180 to 168 MHz (set 0 for the max SYSCLK value)",
-                "value": "0",
-                "macro_name": "CLOCK_SOURCE_USB"
-            }
-        },
-        "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
-            "network-default-interface-type": "CELLULAR"
-        },
-        "device_has_remove": [
-            "CAN"
-        ],
-        "detect_code": [
-            "9015"
-        ],
-        "device_name": "STM32F439VITx",
-        "components_add": [
-            "SD",
-            "QUECTEL_BG96"
-        ],
-        "image_url": "https://os.mbed.com/media/cache/platforms/Wio_3G-1.png.250x250_q85.png.250x250_q85.png"
     },
     "NUCLEO_F439ZI": {
         "inherits": [
@@ -4391,24 +4298,6 @@
         "device_name": "STM32L476VGTx",
         "image_url": "https://static5.arrow.com/pdfs/2015/11/2/7/58/36/906/st_/manual/stm32l476g-disco_fig.1.jpg"
     },
-    // As of 2024, rhomb.io seems to be effectively dead as a company -- their website is down, and
-    // their github and twitter have been inactive since 2021.
-    // So, this board seems to no longer exist and is a candidate for removal.
-    "RHOMBIO_L476DMW1K": {
-        "inherits": [
-            "MCU_STM32L476xG"
-        ],
-        "components_add": [
-            "QSPIF"
-        ],
-        "detect_code": [
-            "1500"
-        ],
-        "device_has_add": [
-            "QSPI"
-        ],
-        "device_name": "STM32L476VGTx"
-    },
     "MCU_STM32L486xG": {
         "inherits": [
             "MCU_STM32L4"
@@ -4438,28 +4327,6 @@
         ],
         "device_name": "STM32L486RGTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
-    },
-    // AKA Advantech WISE-1570
-    // This board is EOL from the manufacturer so it is a candidate for removal.
-    "ADV_WISE_1570": {
-        "inherits": [
-            "MCU_STM32L486xG"
-        ],
-        "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL"
-        },
-        "detect_code": [
-            "0460"
-        ],
-        "macros_add": [
-            "WISE_1570"
-        ],
-        "device_name": "STM32L486RGTx",
-        "OUTPUT_EXT": "hex",
-        "components_add": [
-            "QUECTEL_BC95"
-        ],
-        "image_url": "https://www.sphinxcomputer.de/produktdb/images/products/6821_25480.png"
     },
     "MCU_STM32L496xG": {
         "inherits": [
@@ -4524,31 +4391,6 @@
         "detect_code": [
             "0828"
         ]
-    },
-
-    // Note: I have not been able to find any record of a board with this target ID ever being
-    // sold by Multitech.  It was added by this PR: https://github.com/ARMmbed/mbed-os/pull/15012
-    // If you cannot actually buy the board that this target is for, that would make it a candidate for removal.
-    // I have emailed multitech about it, and they never responded.
-    "MTS_DRAGONFLY_L496VG": {
-        "inherits": [
-            "MCU_STM32L496xG"
-        ],
-        "supported_form_factors": [
-            "ARDUINO_UNO"
-        ],
-        "components_add": [
-            "QSPIF",
-            "QUECTEL_EC2X"
-        ],
-        "device_has_add": [
-            "USBDEVICE",
-            "QSPI"
-        ],
-        "detect_code": [
-            "0313"
-        ],
-        "device_name": "STM32L496VGTx"
     },
     "MCU_STM32L4P5xG": {
         "inherits": [
