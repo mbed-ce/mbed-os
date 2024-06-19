@@ -9077,45 +9077,6 @@
 
     // Samsung Targets -------------------------------------------------------------------------------------------------
 
-    // As of June 2024, I cannot find evidence of this board being sold anywhere.
-    // It isn't documented on Samsung's site either.  However, the datasheet
-    // and other information does seem to be available here:
-    // https://github.com/ARMmbed/Samsung_CMSIS_Pack/blob/master/Samsung.S5JS100.pdsc
-    // But the datasheet in there is encrypted and cannot be opened!!
-    // So, back to square 1.  I'd say that this makes this board a candidate for removal.
-    "S5JS100": { // AKA S5JS100_SIDK
-        "inherits": [
-            "Target"
-        ],
-        "core": "Cortex-M7",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "default_toolchain": "GCC_ARM",
-        "extra_labels": [
-            "Samsung",
-            "SIDK_S5JS100"
-        ],
-        "macros": [
-            "CMSDK_CM7",
-            "MBED_MPU_CUSTOM",
-            "CMSIS_NVIC_VIRTUAL",
-            "MBEDTLS_CONFIG_HW_SUPPORT"
-        ],
-        "device_has": [
-            "INTERRUPTIN",
-            "USTICKER",
-            "SERIAL",
-            "SLEEP",
-            "TRNG"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "detect_code": [
-            "3701"
-        ]
-    },
     "S1SBP6A": { // AKA Samsung Bio-Processor S1SBP6A
         "inherits": ["Target"],
         "core": "Cortex-M4F",
