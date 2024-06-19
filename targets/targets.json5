@@ -8792,68 +8792,6 @@
         "device_name": "CYB0644ABZI-S2D44",
         "image_url": "https://os.mbed.com/media/cache/platforms/SSP_8683_Ywwh0ix.jpg.250x250_q85.jpg"
     },
-    // Also known as CYSBSYSKIT-DEV-01 Rapid IoT Connect Developer Kit
-    // However, as of 2024, I cannot find this board anywhere for sale, so it may be a candidate for removal.
-    "CYSBSYSKIT_01": {
-        "inherits": [
-            "MCU_PSOC6_M4"
-        ],
-        "components_add": [
-            "SCL",
-            "43012",
-            "CYW43XXX"
-        ],
-        "device_has_remove": [
-            "ANALOGOUT"
-        ],
-        "components_remove": [
-            "CM0P_SLEEP"
-        ],
-        "extra_labels_add": [
-            "PSOC6_02",
-            "MXCRYPTO_02"
-        ],
-        "macros_add": [
-            "CY8C624AFNI_S2D43"
-        ],
-        "macros_remove": [
-            "MBED_TICKLESS"
-        ],
-        "detect_code": [
-            "1912"
-        ],
-        "device_name": "CY8C624AFNI-S2D43",
-        "mbed_ram_start": "0x08080000",
-        "mbed_ram_size": "0x0007F800",
-        "mbed_rom_start": "0x10180000",
-        "mbed_rom_size": "0x80000",
-        "bootloader_supported": true,
-        "sectors": [
-            [
-                270008320,
-                512
-            ]
-        ],
-        "forced_reset_timeout": 5,
-        "post_binary_hook": {
-            "function": "PSOC6Code.complete"
-        },
-        "overrides": {
-            "network-default-interface-type": "WIFI",
-            "deep-sleep-latency": 0
-        },
-        "config": {
-            "np_cloud_disable": {
-                "help": "Value: Tells the np to connect to cloud or not",
-                "value": false
-            },
-            "np_wifi_enable": {
-                "help": "Value: Tells the np to connect to wifi with its network credentials or wait till cp provides network credentials to it",
-                "value": false
-            }
-        },
-        "image_url": "https://manuals.plus/wp-content/uploads/2023/05/infineon-CYSBSYSKIT-DEV-01-Rapid-IoT-Connect-Developer-Kit-PRODUCT.png"
-    },
     "MCU_M261": {
         "core": "Cortex-M23",
         "default_toolchain": "ARMC6",
