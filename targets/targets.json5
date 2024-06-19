@@ -9194,18 +9194,6 @@
     "SFE_ARTEMIS_THING_PLUS": { // AKA SparkFun Thing Plus - Artemis
         "inherits": ["AMA3B1KK"]
     },
-    // This target has been retired by the manufacturer (as far as I can tell), making it a candidate for removal
-    "SFE_EDGE": {
-        "inherits": ["AMA3B1KK"],
-        "components_add": ["lis2dh12", "hm01b0"]
-    },
-
-    // This target has been retired by the manufacturer, making it a candidate for removal
-    "SFE_EDGE2": { // AKE SparkFun Edge 2 Development Board - Artemis
-        "inherits": ["AMA3B1KK"],
-        "components_add": ["lis2dh12", "hm01b0"],
-        "image_url": "https://cdn.sparkfun.com/r/455-455/assets/parts/1/3/9/7/5/15420-SparkFun_Edge_2_Development_Board_-_Artemis-01.jpg"
-    },
     // Toshiba Targets -------------------------------------------------------------------------------------------------
     "TMPM46B": { // AKA AdBun-M46B
         "inherits": [
