@@ -81,28 +81,8 @@
             "description": "Cellular module from this Multitech board.  I have been unable to figure out its exact part number from the available docs...",
             "friendly_name": "Multitech Dragonfly Nano Cellular"
         },
-        "COMPONENT_QUECTEL_EC2X": {
-            "description": "EC2X and EG25 families of cellular modules",
-            "friendly_name": "Quectel EC2X"
-        },
-        "COMPONENT_QUECTEL_BG96": {
-        	"description": "LTE module",
-            "friendly_name": "Quectel BG96"
-        },
-        "COMPONENT_QUECTEL_UG96": {
-        	"description": "3G cellular module",
-            "friendly_name": "Quectel UG96"
-        },
-        "COMPONENT_QUECTEL_BC95": {
-        	"description": "Narrowband Internet of Things (NB-IoT) cellular module",
-            "friendly_name": "Quectel BC95"
-        },
-        "COMPONENT_QUECTEL_M26": {
-        	"description": "GSM GPRS cellular module",
-            "friendly_name": "Quectel M26"
-        },
         "COMPONENT_RIOTMICRO_RM1000": {
-    		"description": "LTE + NB-IoT cellular module",
+    		"description": "LTE + Narrowband Internet of Things (NB-IoT) cellular module",
             "friendly_name": "Riot Micro RM1000"
         },
         "COMPONENT_TELIT_HE910": {

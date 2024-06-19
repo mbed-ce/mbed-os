@@ -28,10 +28,6 @@
     },
     "target_overrides": {
         "*": {
-            "QUECTEL_BG96.provide-default": false,
-            "QUECTEL_BC95.provide-default": false,
-            "UBLOX_N2XX.provide-default": false,
-
             "cellular.clear-on-connect": true,
             "cellular.radio-access-technology": 9,
 

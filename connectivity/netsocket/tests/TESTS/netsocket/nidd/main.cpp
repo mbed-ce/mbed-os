@@ -51,11 +51,7 @@ void drop_bad_packets(CellularNonIPSocket &sock, int orig_timeout)
 bool check_oversized_packets(nsapi_error_t error, int &size)
 {
     if (error == NSAPI_ERROR_PARAMETER) {
-#if MBED_CONF_QUECTEL_BG96_PROVIDE_DEFAULT
-        size = 100; // see BG96 driver
-#else
         size = 1280; // see TS 23.060 for MTU recommendations
-#endif
         return true;
     }
     return false;
