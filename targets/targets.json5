@@ -398,22 +398,19 @@
         ],
         "image_url": "https://os.mbed.com/media/cache/platforms/LPC1114_1_hXXAnmW.jpg.250x250_q85.jpg"
     },
-    "LPC1768": {
+    "MCU_LPC1768": {
         "inherits": [
             "LPCTarget"
         ],
+        "public": false,
         "core": "Cortex-M3",
         "extra_labels": [
             "NXP",
             "LPC176X",
-            "MBED_LPC1768",
             "NXP_EMAC"
         ],
         "supported_toolchains": [
             "GCC_ARM"
-        ],
-        "detect_code": [
-            "1010"
         ],
         "device_has": [
             "RTC",
@@ -441,9 +438,6 @@
             "WATCHDOG",
             "RESET_REASON"
         ],
-        "components_add": [
-            "LOCALFILESYSTEM"
-        ],
         "release_versions": [
             "5"
         ],
@@ -457,7 +451,6 @@
         },
         "overrides": {
             "network-default-interface-type": "ETHERNET",
-            "default-adc-vref": 3.3 // Per "mbed-005.1" schematic, Vref is 3.3V
         },
         "supported_c_libs": {
             "arm": [
@@ -470,33 +463,31 @@
         "supported_application_profiles": [
             "full", "bare-metal"
         ],
-        "is_mcu_family_target": true,
+        "is_mcu_family_target": true
+    },
+    "LPC1768": {
+        "inherits": [
+            "MCU_LPC1768"
+        ],
+        "core": "Cortex-M3",
+        "extra_labels_add": [
+            "MBED_LPC1768",
+        ],
+        "detect_code": [
+            "1010"
+        ],
+        "components_add": [
+            "LOCALFILESYSTEM"
+        ],
+        "overrides": {
+            "default-adc-vref": 3.3 // Per "mbed-005.1" schematic, Vref is 3.3V
+        },
         "image_url": "https://os.mbed.com/media/cache/platforms/LPC1768.jpg.250x250_q85.jpg"
     },
     "ARCH_PRO": {
         "supported_form_factors": [
             "ARDUINO"
         ],
-        "core": "Cortex-M3",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-         "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
         "extra_labels": [
             "NXP",
             "LPC176X",
@@ -506,41 +497,14 @@
             "TARGET_LPC1768"
         ],
         "inherits": [
-            "LPCTarget"
+            "MCU_LPC1768"
         ],
-        "device_has": [
-            "ANALOGIN",
-            "ANALOGOUT",
-            "CAN",
-            "DEBUG_AWARENESS",
-            "EMAC",
-            "I2C",
-            "I2CSLAVE",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "SERIAL",
-            "SERIAL_FC",
-            "SLEEP",
-            "SPI",
-            "SPISLAVE",
-            "FLASH",
-            "MPU",
-            "USBDEVICE",
-            "USTICKER",
-            "WATCHDOG",
-            "RESET_REASON"
-        ],
-        "device_name": "LPC1768",
-        "bootloader_supported": true,
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        },
         "detect_code": [
             "9004"
         ],
+        "overrides": {
+            "default-adc-vref": 3.3 // Per schematic, Vref is 3.3V
+        },
         "image_url": "https://files.seeedstudio.com/wiki/Arch_Pro/img/Arch_pro.jpg"
     },
 
@@ -4565,7 +4529,7 @@
     // Note: I have not been able to find any record of a board with this target ID ever being
     // sold by Multitech.  It was added by this PR: https://github.com/ARMmbed/mbed-os/pull/15012
     // If you cannot actually buy the board that this target is for, that would make it a candidate for removal.
-    // I have emailed multitech about it, we will see if they get back to me...
+    // I have emailed multitech about it, and they never responded.
     "MTS_DRAGONFLY_L496VG": {
         "inherits": [
             "MCU_STM32L496xG"
@@ -5044,7 +5008,7 @@
             "default-adc-vref": 3.3
         },
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271812.en.feature-description-include-personalized-no-cpn-medium.jpg"
-    },        
+    },
 
     // STM32WB Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32WB": {
@@ -6420,7 +6384,7 @@
         "detect_code": [
             "3102"
         ],
-        "image_url": "https://www.devicemart.co.kr/data/collect_img/kind_0/goods/large/6500287.jpg"
+        "image_url": "https://os.mbed.com/media/cache/platforms/SDT32625B_size_ZxsNDPt.png.250x250_q85.png"
     },
     "MAX32625PICO": {
         "inherits": [
@@ -7565,7 +7529,7 @@
         "detect_code": [
             "1303"
         ],
-        "image_url": "https://developer.nordicsemi.com/nRF_Connect_SDK/doc/2.6.0/zephyr/_images/pfm_m487.jpg"
+        "image_url": "https://os.mbed.com/media/cache/platforms/Nu-mbed_M453_board_square.jpg.250x250_q85.jpg"
     },
     "NUMAKER_PFM_NANO130": {
         "core": "Cortex-M0",
@@ -9048,130 +9012,6 @@
         },
         "image_url": "https://manuals.plus/wp-content/uploads/2023/05/infineon-CYSBSYSKIT-DEV-01-Rapid-IoT-Connect-Developer-Kit-PRODUCT.png"
     },
-    "GD32_Target": {
-        "inherits": [
-            "Target"
-        ],
-        "public": false,
-        "extra_labels_add": [
-            "GigaDevice"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "device_has_add": [
-            "USTICKER",
-            "ANALOGIN",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "SERIAL"
-        ],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ]
-    },
-    "GD32_F307VG": {
-        "inherits": [
-            "GD32_Target"
-        ],
-        "supported_form_factors": [
-            "ARDUINO"
-        ],
-        "core": "Cortex-M4F",
-        "extra_labels_add": [
-            "GD32F30X",
-            "GD32F307VG",
-            "GD_EMAC"
-        ],
-        "device_has_add": [
-            "RTC",
-            "I2C",
-            "CAN",
-            "I2CSLAVE",
-            "ANALOGOUT",
-            "SPI",
-            "SPISLAVE",
-            "SERIAL_ASYNCH",
-            "SERIAL_FC",
-            "EMAC",
-            "FLASH",
-            "SLEEP",
-            "MPU"
-        ],
-        "detect_code": [
-            "1701"
-        ],
-        "macros_add": [
-            "GD32F30X_CL"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        }
-    },
-    "GD32_F450ZI": {
-        "inherits": [
-            "GD32_Target"
-        ],
-        "supported_form_factors": [
-            "ARDUINO"
-        ],
-        "core": "Cortex-M4F",
-        "extra_labels_add": [
-            "GD32F4XX",
-            "GD32F450ZI",
-            "GD_EMAC",
-            "MBED_PSA_SRV"
-        ],
-        "features_add": [
-            "PSA"
-        ],
-        "device_has_add": [
-            "RTC",
-            "I2C",
-            "CAN",
-            "I2CSLAVE",
-            "ANALOGOUT",
-            "SPI",
-            "SPISLAVE",
-            "SERIAL_ASYNCH",
-            "SERIAL_FC",
-            "EMAC",
-            "FLASH",
-            "SLEEP",
-            "MPU",
-            "TRNG"
-        ],
-        "device_name": "GD32F450ZI",
-        "detect_code": [
-            "1702"
-        ],
-        "macros_add": [
-            "GD32F450"
-        ],
-        "bootloader_supported": true,
-        "release_versions": [
-            "5"
-        ],
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        }
-    },
     "MCU_M261": {
         "core": "Cortex-M23",
         "default_toolchain": "ARMC6",
@@ -9303,7 +9143,8 @@
         },
         "supported_application_profiles": [
             "full", "bare-metal"
-        ]
+        ],
+        "is_mcu_family_target": true
     },
     "NUMAKER_IOT_M263A": {
         "inherits": [
@@ -9317,9 +9158,152 @@
             "usb-uart": "UART_0",
             "usb-uart-tx": "PB_13",
             "usb-uart-rx": "PB_12"
-        }
+        },
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/3720/MFG_NuMaker-IoT-M263A_V2%28F%29.jpg"
     },
-    "S5JS100": {
+
+    // GigaDevices Targets ---------------------------------------------------------------------------------------------
+    "GD32_Target": {
+        "inherits": [
+            "Target"
+        ],
+        "public": false,
+        "extra_labels_add": [
+            "GigaDevice"
+        ],
+        "supported_toolchains": [
+            "GCC_ARM"
+        ],
+        "device_has_add": [
+            "USTICKER",
+            "ANALOGIN",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "SERIAL"
+        ],
+        "supported_c_libs": {
+            "arm": [
+                "std",
+                "small"
+            ],
+            "gcc_arm": [
+                "std",
+                "small"
+            ]
+        },
+        "supported_application_profiles": [
+            "full", "bare-metal"
+        ]
+    },
+
+    // As of Jun 2024, I cannot find the GD32 boards for sale anywhere.  Even people on the forums are wondering:
+    // https://os.mbed.com/questions/87215/GigaDevice-Board-GD32-F307VG-any-idea-wh/
+    // https://os.mbed.com/questions/86201/Purchase-this-board/
+    // But apparently it may still be available in Chinese language only shops.
+    "GD32_F307VG": {
+        "inherits": [
+            "GD32_Target"
+        ],
+        "supported_form_factors": [
+            "ARDUINO"
+        ],
+        "core": "Cortex-M4F",
+        "extra_labels_add": [
+            "GD32F30X",
+            "GD32F307VG",
+            "GD_EMAC"
+        ],
+        "device_has_add": [
+            "RTC",
+            "I2C",
+            "CAN",
+            "I2CSLAVE",
+            "ANALOGOUT",
+            "SPI",
+            "SPISLAVE",
+            "SERIAL_ASYNCH",
+            "SERIAL_FC",
+            "EMAC",
+            "FLASH",
+            "SLEEP",
+            "MPU"
+        ],
+        "detect_code": [
+            "1701"
+        ],
+        "macros_add": [
+            "GD32F30X_CL"
+        ],
+        "release_versions": [
+            "5"
+        ],
+        "overrides": {
+            "network-default-interface-type": "ETHERNET"
+        },
+        "image_url": "https://os.mbed.com/media/uploads/Ray_Chen/307-1.png"
+    },
+    "GD32_F450ZI": {
+        "inherits": [
+            "GD32_Target"
+        ],
+        "supported_form_factors": [
+            "ARDUINO"
+        ],
+        "core": "Cortex-M4F",
+        "extra_labels_add": [
+            "GD32F4XX",
+            "GD32F450ZI",
+            "GD_EMAC",
+            "MBED_PSA_SRV"
+        ],
+        "features_add": [
+            "PSA"
+        ],
+        "device_has_add": [
+            "RTC",
+            "I2C",
+            "CAN",
+            "I2CSLAVE",
+            "ANALOGOUT",
+            "SPI",
+            "SPISLAVE",
+            "SERIAL_ASYNCH",
+            "SERIAL_FC",
+            "EMAC",
+            "FLASH",
+            "SLEEP",
+            "MPU",
+            "TRNG"
+        ],
+        "device_name": "GD32F450ZI",
+        "detect_code": [
+            "1702"
+        ],
+        "macros_add": [
+            "GD32F450"
+        ],
+        "bootloader_supported": true,
+        "release_versions": [
+            "5"
+        ],
+        "overrides": {
+            "network-default-interface-type": "ETHERNET"
+        },
+        "image_url": "https://os.mbed.com/media/cache/platforms/2-1_W6zHQ3F.jpg.250x250_q85.jpg"
+    },
+
+    // Samsung Targets -------------------------------------------------------------------------------------------------
+
+    // As of June 2024, I cannot find evidence of this board being sold anywhere.
+    // It isn't documented on Samsung's site either.  However, the datasheet
+    // and other information does seem to be available here:
+    // https://github.com/ARMmbed/Samsung_CMSIS_Pack/blob/master/Samsung.S5JS100.pdsc
+    // But the datasheet in there is encrypted and cannot be opened!!
+    // So, back to square 1.  I'd say that this makes this board a candidate for removal.
+    "S5JS100": { // AKA S5JS100_SIDK
         "inherits": [
             "Target"
         ],
@@ -9352,7 +9336,7 @@
             "3701"
         ]
     },
-    "S1SBP6A": {
+    "S1SBP6A": { // AKA Samsung Bio-Processor S1SBP6A
         "inherits": ["Target"],
         "core": "Cortex-M4F",
         "supported_toolchains": [
@@ -9389,8 +9373,12 @@
         },
         "supported_application_profiles": [
             "full", "bare-metal"
-        ]
+        ],
+        "device_name": "S1SBP6A",
+        "image_url": "https://os.mbed.com/media/uploads/heuisam/pinout2.jpg"
     },
+
+    // Ambiq Micro Targets ---------------------------------------------------------------------------------------------
     "FAMILY_Apollo3": {
         "inherits": ["Target"],
         "core": "Cortex-M4F",
@@ -9441,33 +9429,41 @@
         "device_name": "AMA3B1KK-KBR",
         "is_mcu_family_target": true
     },
-    "SFE_ARTEMIS": {
-        "inherits": ["AMA3B1KK"]
+    "SFE_ARTEMIS": { // AKA SparkFun RedBoard Artemis
+        "inherits": ["AMA3B1KK"],
+        "image_url": "https://cdn.sparkfun.com/r/455-455/assets/parts/1/4/0/1/9/15444-SparkFun_RedBoard_Artemis-01.jpg"
     },
-    "SFE_ARTEMIS_ATP": {
-        "inherits": ["AMA3B1KK"]
+    "SFE_ARTEMIS_ATP": { // AKA SparkFun RedBoard Artemis ATP
+        "inherits": ["AMA3B1KK"],
+        "image_url": "https://cdn.sparkfun.com/r/455-455/assets/parts/1/4/0/1/7/15442-SparkFun_RedBoard_Artemis_ATP-05.jpg"
     },
-    "SFE_ARTEMIS_DK": {
+    "SFE_ARTEMIS_DK": { // AKA SparkFun Artemis Development Kit
         "inherits": ["AMA3B1KK"],
         "components_add": ["lis2dh12", "hm01b0"],
         "image_url": "https://cdn.sparkfun.com/assets/parts/1/5/7/4/6/16828-SparkFun_Artemis_Development_Kit-01.jpg"
     },
     "SFE_ARTEMIS_MODULE": {
+        "inherits": ["AMA3B1KK"],
+        "image_url": "https://cdn.sparkfun.com/r/455-455/assets/parts/1/4/0/7/4/15484-SparkFun_Artemis_Module_-_Low_Power_Machine_Learning_BLE_Cortex-M4F-01b.jpg"
+    },
+    "SFE_ARTEMIS_NANO": { // AKA SparkFun RedBoard Artemis Nano
+        "inherits": ["AMA3B1KK"],
+        "image_url": "https://cdn.sparkfun.com/r/455-455/assets/parts/1/4/0/1/8/15443-SparkFun_RedBoard_Artemis_Nano-05.jpg"
+    },
+    "SFE_ARTEMIS_THING_PLUS": { // AKA SparkFun Thing Plus - Artemis
         "inherits": ["AMA3B1KK"]
     },
-    "SFE_ARTEMIS_NANO": {
-        "inherits": ["AMA3B1KK"]
-    },
-    "SFE_ARTEMIS_THING_PLUS": {
-        "inherits": ["AMA3B1KK"]
-    },
+    // This target has been retired by the manufacturer (as far as I can tell), making it a candidate for removal
     "SFE_EDGE": {
         "inherits": ["AMA3B1KK"],
         "components_add": ["lis2dh12", "hm01b0"]
     },
-    "SFE_EDGE2": {
+
+    // This target has been retired by the manufacturer, making it a candidate for removal
+    "SFE_EDGE2": { // AKE SparkFun Edge 2 Development Board - Artemis
         "inherits": ["AMA3B1KK"],
-        "components_add": ["lis2dh12", "hm01b0"]
+        "components_add": ["lis2dh12", "hm01b0"],
+        "image_url": "https://cdn.sparkfun.com/r/455-455/assets/parts/1/3/9/7/5/15420-SparkFun_Edge_2_Development_Board_-_Artemis-01.jpg"
     },
     // Toshiba Targets -------------------------------------------------------------------------------------------------
     "TMPM46B": { // AKA AdBun-M46B
@@ -9528,7 +9524,7 @@
         },
         "image_url": "https://www.chip1stop.com/img/product/SSST/0109140533_5a544d9d16351.JPG"
     },
-    "TMPM4G9": {
+    "TMPM4G9": { // AKA AdBun-M4G9
         "inherits": [
             "Target"
         ],
@@ -9584,9 +9580,17 @@
                 "std",
                 "small"
             ]
-        }
+        },
+        "image_url": "https://os.mbed.com/media/cache/platforms/AdBun-TMPM4G9_Wm9FG1c.png.250x250_q85.jpg"
     },
-    "TMPM4KN": {
+    // As of Jun 2024, this board can still apparently be purchased by sending an email (!!)
+    // to these guys: https://www.esp.jp/tose/sub1.html
+    // Manual (Japanese): https://www.esp.jp/tose/SBK-M4KN-KIT.pdf
+    // I managed to find the schematics for this one on the Japanese version of the
+    // manufacturer's site:
+    // https://www.esp.jp/tos/sch/SBK-M4KN.pdf
+    // https://www.esp.jp/tos/sch/KES-P2.pdf
+    "TMPM4KN": { // AKA TMPM-M4KN-SBK from ESP Co.
         "inherits": ["Target"],
         "core": "Cortex-M4F",
         "is_disk_virtual": true,
@@ -9594,23 +9598,23 @@
         "macros": ["__TMPM4KN__"],
         "supported_toolchains": ["GCC_ARM"],
         "device_has": [
-        "ANALOGIN",
-        "INTERRUPTIN",
-        "CRC",
-        "I2C",
-        "I2CSLAVE",
-        "PORTIN",
-        "PORTINOUT",
-        "PORTOUT",
-        "PWMOUT",
-        "RESET_REASON",
-        "SERIAL",
-        "SLEEP",
-        "SPI",
-        "SPISLAVE",
-        "USTICKER",
-        "MPU",
-        "FLASH"
+            "ANALOGIN",
+            "INTERRUPTIN",
+            "CRC",
+            "I2C",
+            "I2CSLAVE",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "RESET_REASON",
+            "SERIAL",
+            "SLEEP",
+            "SPI",
+            "SPISLAVE",
+            "USTICKER",
+            "MPU",
+            "FLASH"
         ],
         "device_name": "TMPM4KNFYAFG",
         "detect_code": ["7020"],
@@ -9624,9 +9628,10 @@
             "gcc_arm": [
                 "std"
             ]
-        }
+        },
+        "image_url": "https://os.mbed.com/media/cache/platforms/M4KN_mbed_tw2kBoh.png.250x250_q85.png"
     },
-    "TMPM4NR": {
+    "TMPM4NR": { // AKA AdBun-M4NR
         "inherits": [
             "Target"
         ],
@@ -9640,7 +9645,7 @@
         ],
         "supported_toolchains": [
             "GCC_ARM"
-    ],
+        ],
         "device_has": [
             "ANALOGIN",
             "ANALOGOUT",
@@ -9681,10 +9686,10 @@
                 "std",
                 "small"
             ]
-        }
-
+        },
+        "image_url": "https://wiki.segger.com/images/thumb/8/8a/tmpm4nr.jpg/300px-tmpm4nr.jpg"
     },
-    "TMPM4GR": {
+    "TMPM4GR": { // AKA AdBun-M4GR
         "inherits": [
             "Target"
         ],
@@ -9698,7 +9703,7 @@
         ],
         "supported_toolchains": [
             "GCC_ARM"
-    ],
+        ],
         "device_has": [
             "ANALOGIN",
             "ANALOGOUT",
@@ -9739,7 +9744,8 @@
                 "std",
                 "small"
             ]
-        }
+        },
+        "image_url": "https://wiki.segger.com/images/thumb/6/68/tmpm4gr.jpg/402px-tmpm4gr.jpg"
     },
     "RP2040": {
         "public": false,
@@ -9772,7 +9778,8 @@
             "RESET_REASON",
             "RTC"
         ],
-        "is_mcu_family_target": true,
+        "device_name": "RP2040",
+        "is_mcu_family_target": true
     },
     "RASPBERRY_PI_PICO": {
         "inherits": ["RP2040"],
@@ -9793,7 +9800,8 @@
             // voltages higher than the I/O voltage are illegal for the analog pins
             // (so the ADC can never read 100%).
             "default-adc-vref": 3.3
-        }
+        },
+        "image_url": "https://cdn11.bigcommerce.com/s-2fbyfnm8ev/images/stencil/1280x1280/products/1212/4275/Pico3__75642.1611086462.jpg?c=2"
     },
     "RASPBERRY_PI_PICO_SWD": {
         "inherits": ["RASPBERRY_PI_PICO"],

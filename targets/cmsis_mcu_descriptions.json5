@@ -13689,5 +13689,104 @@
         ],
         "sub_family": null,
         "vendor": "Nordic Semiconductor:54"
+    },
+
+    // Manually added targets (not in CMSIS pack index)
+    "S1SBP6A": {
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x40000, // 256kiB
+                "start": 0x20000000,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x200000, // 2MiB
+                "start": 0,
+                "startup": true
+            }
+        },
+        "name": "S1SBP6A",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM4",
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "units": 1
+            }
+        },
+        "vendor": "Samsung:47"
+    },
+    "RP2040": {
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x40000, // 256kiB
+                "start": 0x20000000,
+                "startup": false
+            },
+
+
+            // Scratch banks are commonly used for critical data and functions accessed only by
+            // one core (when only one core is accessing the RAM bank, there is no opportunity for stalls).
+            "SCRATCH_X": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x1000, // 4kiB
+                "start": 0x20040000,
+                "startup": false
+            },
+            "SCRATCH_Y": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x1000, // 4kiB
+                "start": 0x20041000,
+                "startup": false
+            }
+        },
+        "name": "RP2040",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM0Plus",
+                "fpu": "None",
+                "mpu": "Present",
+                "units": 2
+            }
+        },
+        "vendor": "Raspberry Pi:x"
     }
 }
