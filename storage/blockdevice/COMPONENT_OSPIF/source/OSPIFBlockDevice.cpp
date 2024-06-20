@@ -389,7 +389,7 @@ int OSPIFBlockDevice::deinit()
     _wait_flag = NOT_STARTED;
 #endif
 
-    change_mode(SPI);
+    change_mode(OSPIF_OPI_MODE_SPI);
 
     // Disable Device for Writing
     ospi_status_t status = _ospi_send_general_command(OSPIF_INST_WRDI, OSPI_NO_ADDRESS_COMMAND, NULL, 0, NULL, 0);
@@ -723,13 +723,13 @@ int OSPIFBlockDevice::change_mode(int mode)
     int status = OSPIF_BD_ERROR_OK;
     char config_reg2 = 0;
 
-    if (((mode == SPI) && (_read_instruction == OSPIF_INST_READ_4B)) ||
-            ((mode == SOPI) && (_read_instruction == DTROSPIF_INST_READ_OCTA_STR)) ||
-            ((mode == DOPI) && (_read_instruction == DTROSPIF_INST_READ_OCTA_DTR))) {
+    if (((mode == OSPIF_OPI_MODE_SPI) && (_read_instruction == OSPIF_INST_READ_4B)) ||
+            ((mode == OSPIF_OPI_MODE_SOPI) && (_read_instruction == DTROSPIF_INST_READ_OCTA_STR)) ||
+            ((mode == OSPIF_OPI_MODE_DOPI) && (_read_instruction == DTROSPIF_INST_READ_OCTA_DTR))) {
         tr_debug("Flash does not need change mode");
     }
 
-    if (mode == SOPI) {
+    if (mode == OSPIF_OPI_MODE_SOPI) {
         if ((_read_instruction != OSPIF_INST_READ_4B) && (_read_instruction != OSPIF_INST_READ_DEFAULT)) { //change mode from DOPI to SPI
             // Write new Status Register Setup
             if (_set_write_enable() != 0) {
@@ -781,7 +781,7 @@ int OSPIFBlockDevice::change_mode(int mode)
 
         _ospi.configure_format(_inst_width, _inst_size, _address_width, _address_size, OSPI_CFG_BUS_SINGLE,
                                0, _data_width, 0);
-    } else if (mode == DOPI) {
+    } else if (mode == OSPIF_OPI_MODE_DOPI) {
         if ((_read_instruction != OSPIF_INST_READ_4B) && (_read_instruction != OSPIF_INST_READ_DEFAULT)) {//chang mode from SOPI to SPI
             // Write new Status Register Setup
             if (_set_write_enable() != 0) {
@@ -833,7 +833,7 @@ int OSPIFBlockDevice::change_mode(int mode)
 
         _ospi.configure_format(_inst_width, _inst_size, _address_width, _address_size, OSPI_CFG_BUS_SINGLE,
                                0, _data_width, 0);
-    } else if (mode == SPI) {
+    } else if (mode == OSPIF_OPI_MODE_SPI) {
         // Write new Status Register Setup
         if (_set_write_enable() != 0) {
             tr_error("Write Enabe failed");
@@ -996,7 +996,7 @@ int OSPIFBlockDevice::_sfdp_parse_basic_param_table(Callback<int(bd_addr_t, mbed
     // Detect and Set fastest Bus mode (default 1-1-1)
     _sfdp_detect_best_bus_read_mode(param_table, sfdp_info.bptbl.size, shouldSetQuadEnable, is_qpi_mode, is_opi_mode);
     if (true == is_opi_mode) {
-        change_mode(DOPI);
+        change_mode(OSPIF_OPI_MODE_DOPI);
         tr_debug("Init - Setting DOPI mode");
     }
     if (true == shouldSetQuadEnable) {

@@ -85,10 +85,14 @@ enum ospif_bd_error {
     OSPIF_BD_ERROR_DEVICE_MAX_EXCEED     = -4007  /* Max active OSPIF devices exceeded */
 };
 
-enum _mode {
-    SPI,
-    SOPI,
-    DOPI
+/** Enum ospif opi modes
+ * 
+ *  @enum ospif_opi_mode
+ */
+enum ospif_opi_mode {
+    OSPIF_OPI_MODE_SPI = 0, /* SPI mode (OPI modes disabled)*/
+    OSPIF_OPI_MODE_SOPI,    /* STR-OPI mode */
+    OSPIF_OPI_MODE_DOPI     /* DTR-OPI mode */
 };
 
 /** Enum ospif polarity mode
