@@ -86,7 +86,7 @@ enum ospif_bd_error {
 };
 
 /** Enum ospif opi modes
- * 
+ *
  *  @enum ospif_opi_mode
  */
 enum ospif_opi_mode {
