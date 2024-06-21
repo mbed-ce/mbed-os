@@ -112,7 +112,7 @@ public:
      * in the background while data is going to and from the card.
      *
      * @param enabled Whether usage of async %SPI is enabled.
-     * @param dma_usage_hint DMA usage hint to pass to the underlying %SPI instance.
+     * @param dma_usage_hint DMA usage hint to pass to the underlying #mbed::SPI instance.
      */
     void set_async_spi_mode(bool enabled, DMAUsage dma_usage_hint = DMAUsage::DMA_USAGE_NEVER);
 #endif
