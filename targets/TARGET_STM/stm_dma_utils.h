@@ -122,12 +122,13 @@ DMA_HandleTypeDef * stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink);
  * @param periphInc Whether the Peripheral address register should be incremented or not.
  * @param memInc Whether the Memory address register should be incremented or not.
  * @param periphDataAlignment Alignment value of the peripheral data.  1, 2, or 4.
- * @param memDataAlignment \c DMA_MDATAALIGN_BYTE, \c DMA_MDATAALIGN_HALFWORD, or \c DMA_MDATAALIGN_WORD
+ * @param memDataAlignment Alignment value of the memory data.  1, 2, or 4.
+ * @param mode Mode of the DMA transaction.  DMA_NORMAL, DMA_CIRCULAR, etc
  *
  * @return Pointer to DMA handle allocated by this module.
  * @return NULL if the DMA channel used by the link has already been allocated by something else.
  */
-DMA_HandleTypeDef * stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t direction, bool periphInc, bool memInc, uint8_t periphDataAlignment, uint8_t memDataAlignment);
+DMA_HandleTypeDef * stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t direction, bool periphInc, bool memInc, uint8_t periphDataAlignment, uint8_t memDataAlignment, uint32_t mode);
 
 /**
  * @brief Free a DMA link.

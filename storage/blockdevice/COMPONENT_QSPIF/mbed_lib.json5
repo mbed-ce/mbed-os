@@ -54,6 +54,12 @@
         "MCU_LPC546XX": {
             "QSPI_MIN_READ_SIZE": "4",
             "QSPI_MIN_PROG_SIZE": "4"
+        },
+        "ARDUINO_GIGA": {
+            "QSPI_POLARITY_MODE": "QSPIF_POLARITY_MODE_1",
+            // The flash on this board (AT25SF128A) is quite old and does not have reset information in its
+            // SFDP table.
+            "enable-and-reset": true
         }
     }
 }

@@ -3666,7 +3666,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             clock_source: "USE_PLL_HSE_XTAL | USE_PLL_HSI",
             "network-default-interface-type": "WIFI",
             lpuart_clock_source: "USE_LPUART_CLK_HSI",
-            "hse_value": 16000000
+            "hse_value": 16000000,
+
+            // Arduino Giga connects the primary USB port (USB-C port) to the USB Full Speed pins.
+            // TODO eventually this needs to be runtime configurable so that the two USB ports
+            // can use different speeds.  With the current setting, Mbed will not be able to use
+            // the host mode port as that port uses high speed.
+            "usb_speed": "USE_USB_OTG_FS",
         },
         macros_add: [
             "BT_UART_NO_3M_SUPPORT"
