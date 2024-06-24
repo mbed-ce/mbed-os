@@ -3497,7 +3497,8 @@
         "device_name": "STM32H747XIHx",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/310/MFG_STM32H747I-DISCO.jpg"
     },
-    "PORTENTA_H7": {
+    // Umbrella target for all Arduino boards that use an H747 chip
+    "STM32H747_ARDUINO": {
         "public": false,
         "inherits": ["MCU_STM32H747xI"],
         "config": {
@@ -3506,17 +3507,16 @@
                 "value": "USE_USB_OTG_HS"
             }
         },
-        "macros_add": [
-            "CM4_BOOT_BY_APPLICATION",
-            "QSPI_NO_SAMPLE_SHIFT",
-            "CYW43XXX_UNBUFFERED_UART"
-        ],
-        "detect_code": ["0813"],
         "components_add": [
             "QSPIF",
             "WHD",
             "4343W_FS",
             "CYW43XXX"
+        ],
+        "macros_add": [
+            "CM4_BOOT_BY_APPLICATION",
+            "QSPI_NO_SAMPLE_SHIFT",
+            "CYW43XXX_UNBUFFERED_UART"
         ],
         "extra_labels_add": [
             "CORDIO"
@@ -3526,17 +3526,27 @@
         ],
         "device_has_add": [
             "USBDEVICE",
-            "EMAC",
             "QSPI"
+        ],
+        "overrides": {
+            "lse_available": 1,
+            "lpticker_delay_ticks": 0,
+            "i2c_timing_value_algo": true
+        },
+        "device_name": "STM32H747XIHx"
+    },
+    "ARDUINO_PORTENTA_H7": {
+        "public": false,
+        "detect_code": ["0813"],
+        inherits: ["STM32H747_ARDUINO"],
+        "device_has_add": [
+            "EMAC"
         ],
         "overrides": {
             "system_power_supply": "PWR_SMPS_1V8_SUPPLIES_LDO",
             "clock_source": "USE_PLL_HSE_EXTC",
-            "lse_available": 1,
             "lse_bypass": 1,
-            "lpticker_delay_ticks": 0,
             "network-default-interface-type": "ETHERNET",
-            "i2c_timing_value_algo": true,
             "hse_value": 25000000,
             // Can use overdrive because LDO is regulating core voltage (even though
             // the LDO power comes from the SMPS).
@@ -3545,8 +3555,8 @@
         "device_name": "STM32H747XIHx",
         "image_url": "https://store.arduino.cc/cdn/shop/products/ABX00042_00.iso_1200x900.jpg?v=1675840144"
     },
-    "PORTENTA_H7_M7": {
-        "inherits": ["PORTENTA_H7"],
+    "ARDUINO_PORTENTA_H7_M7": {
+        "inherits": ["ARDUINO_PORTENTA_H7"],
         "core": "Cortex-M7FD",
         "mbed_rom_start": "0x08000000",
         "mbed_rom_size" : "0x100000",
@@ -3559,8 +3569,8 @@
             "CORE_CM7"
         ]
     },
-    "PORTENTA_H7_M4": {
-        "inherits": ["PORTENTA_H7"],
+    "ARDUINO_PORTENTA_H7_M4": {
+        "inherits": ["ARDUINO_PORTENTA_H7"],
         "core": "Cortex-M4F",
         "mbed_rom_start": "0x08100000",
         "mbed_rom_size" : "0x100000",

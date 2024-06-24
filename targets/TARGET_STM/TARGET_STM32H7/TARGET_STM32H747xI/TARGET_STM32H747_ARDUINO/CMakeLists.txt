@@ -8,5 +8,4 @@ target_link_libraries(mbed-stm32h747-arduino INTERFACE mbed-stm32h747xi-cm7)
 target_sources(mbed-stm32h747-arduino INTERFACE
 	PeripheralPins.c)
 
-add_subdirectory(TARGET_ARDUINO_GIGA)
 add_subdirectory(TARGET_ARDUINO_PORTENTA_H7)
