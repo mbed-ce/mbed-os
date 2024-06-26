@@ -21,6 +21,9 @@ target_link_libraries(mbed-minimal-cyhal PUBLIC
 # This is needed in order to make cybsp_wifi.h include cycfg.h
 target_compile_definitions(mbed-minimal-cyhal PUBLIC COMPONENT_CUSTOM_DESIGN_MODUS)
 
+# This is needed in order to make cyabs_rtos_internal.h include cyhal.h
+target_compile_definitions(mbed-minimal-cyhal PUBLIC CY_USING_HAL)
+
 if(STM32H7 IN_LIST MBED_TARGET_LABELS)
 	target_sources(mbed-minimal-cyhal PRIVATE
 		TARGET_STM32H7/cyhal_sdio.c)

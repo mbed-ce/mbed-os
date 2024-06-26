@@ -1,0 +1,2 @@
+# Cypress RTOS RTX Adapter
+The code in this directory is a shim to allow things that expect a Cypress RTOS API (e.g. the Cypress BSP and the Cypress WHD wifi driver) to interoperate with Mbed's RTX RTOS.

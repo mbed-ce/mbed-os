@@ -284,3 +284,7 @@ target_sources(mbed-psoc6
 )
 
 target_link_libraries(mbed-psoc6 INTERFACE mbed-cmsis-cortex-m)
+
+# When linking in the RTOS, make sure CY_RTOS_AWARE gets defined so that the HAL code
+# becomes RTOS aware
+target_compile_definitions(mbed-rtos-flags INTERFACE CY_RTOS_AWARE)

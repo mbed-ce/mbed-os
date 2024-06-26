@@ -52,7 +52,7 @@ if("COMPONENT_4343W_FS=1" IN_LIST MBED_TARGET_DEFINITIONS)
 	)
 endif()
 
-# Grab wifi_nvram_image.h from the correct folder
+# Grab wifi_nvram_image.h and generated_mac_address.txt from the correct folder
 set(TARGETS_WITH_NVRAM_IMAGE
 	CY8CKIT_062S2_43012
 	CY8CKIT_062S2_4343W
@@ -71,6 +71,7 @@ set(TARGETS_WITH_NVRAM_IMAGE
 	CYW9P62S1_43012EVB_01
 	CYW9P62S1_43438EVB_01
 	CY8CKIT_064B0S2_4343W
+	Cypress
 	STM32H747_ARDUINO)
 
 foreach(TARGET ${TARGETS_WITH_NVRAM_IMAGE})

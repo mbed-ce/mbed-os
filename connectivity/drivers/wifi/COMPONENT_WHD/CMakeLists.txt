@@ -6,7 +6,6 @@ if(NOT "Cypress" IN_LIST MBED_TARGET_LABELS)
 	add_subdirectory(minimal-cyhal)
 endif()
 
-add_subdirectory(abstraction-rtos)
 add_subdirectory(whd-bsp-integration)
 add_subdirectory(wifi-host-driver)
 add_subdirectory(whd_mac)
