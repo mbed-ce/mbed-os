@@ -22,7 +22,8 @@
 #include <stdio.h>
 #include "cyhal.h"
 #include "cybsp.h"
-#include "mbed.h"
+#include "drivers/DigitalIn.h"
+#include "drivers/InterruptIn.h"
 
 #include <minimal_cyhal_config.h>
 
