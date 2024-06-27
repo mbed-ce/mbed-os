@@ -127,5 +127,7 @@ void cyhal_gpio_free(cyhal_gpio_t pin)
 {
     // Delete any objects associated with the pins
     delete interruptIns[pin];
+    interruptIns[pin] = nullptr;
     delete digitalOuts[pin];
+    digitalOuts[pin] = nullptr;
 }
