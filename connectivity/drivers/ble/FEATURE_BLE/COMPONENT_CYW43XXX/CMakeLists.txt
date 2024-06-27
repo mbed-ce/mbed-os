@@ -5,6 +5,10 @@ if("PSOC6" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_PSOC6)
 endif()
 
+if("STM32H747_ARDUINO" IN_LIST MBED_TARGET_LABELS)
+    add_subdirectory(TARGET_STM32H747_ARDUINO)
+endif()
+
 add_subdirectory(firmware)
 
 target_include_directories(mbed-ble

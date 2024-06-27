@@ -21,8 +21,6 @@ add_subdirectory(TARGET_CYTFM_064B0S2_4343W EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_CYW9P62S1_43012EVB_01 EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_CYW9P62S1_43438EVB_01 EXCLUDE_FROM_ALL)
 
-add_subdirectory(abstraction-rtos EXCLUDE_FROM_ALL)
-
 add_library(mbed-cm0p-bless INTERFACE)
 target_sources(mbed-cm0p-bless
     INTERFACE
@@ -287,7 +285,6 @@ target_sources(mbed-psoc6
 
 target_link_libraries(mbed-psoc6 INTERFACE mbed-cmsis-cortex-m)
 
-# TODO: Include only if mbed-baremetal is not used
-if("CY_RTOS_AWARE" IN_LIST MBED_CONFIG_DEFINITIONS)
-    target_link_libraries(mbed-psoc6 INTERFACE mbed-cy-rtos mbed-cy-rtx)
-endif()
+# When linking in the RTOS, make sure CY_RTOS_AWARE gets defined so that the HAL code
+# becomes RTOS aware
+target_compile_definitions(mbed-rtos-flags INTERFACE CY_RTOS_AWARE)

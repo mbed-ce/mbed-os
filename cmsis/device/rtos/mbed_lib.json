@@ -86,9 +86,6 @@
         "NUVOTON": {
             "idle-thread-stack-size-debug-extra": 512
         },
-        "MCU_PSOC6_M4": {
-            "target.macros_add": ["CY_RTOS_AWARE"]
-        },
         "ARM_MUSCA_B1": {
             "mutex-num": 4
         },

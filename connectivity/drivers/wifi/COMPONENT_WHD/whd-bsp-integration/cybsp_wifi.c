@@ -163,6 +163,7 @@ static cy_rslt_t cybsp_sdio_enumerate(const cyhal_sdio_t* sdio_object)
         result = sdio_try_send_cmd(sdio_object, CYHAL_WRITE, CYHAL_SDIO_CMD_SELECT_CARD, rel_addr,
                                    &response_ignored);
     }
+
     return result;
 }
 

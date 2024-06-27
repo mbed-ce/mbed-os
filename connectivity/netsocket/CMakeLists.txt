@@ -53,6 +53,7 @@ target_link_libraries(mbed-netsocket-api
     PUBLIC
         mbed-core-flags
         mbed-mbedtls
+        mbed-nanostack-libservice
 )
 
 # Currently, netsocket-api needs to link to whichever library is providing an implementation

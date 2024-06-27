@@ -34,6 +34,7 @@
 
 #include "cy_result.h"
 #include "whd_wifi_api.h"
+#include <stddef.h>
 
 #if defined(__cplusplus)
 extern "C" {

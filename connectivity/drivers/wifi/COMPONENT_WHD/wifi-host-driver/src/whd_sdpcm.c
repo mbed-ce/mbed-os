@@ -567,8 +567,10 @@ void whd_send_to_bus(whd_driver_t whd_driver, whd_buffer_t buffer,
         /* Fatal error */
         result = whd_buffer_release(whd_driver, buffer, WHD_NETWORK_TX);
         if (result != WHD_SUCCESS)
-            WPRINT_WHD_ERROR( ("buffer release failed in %s at %d \n", __func__, __LINE__) )
-            return;
+        {
+            WPRINT_WHD_ERROR(("buffer release failed in %s at %d \n", __func__, __LINE__))
+        }
+        return;
     }
 
     whd_sdpcm_set_next_buffer_in_queue(whd_driver, NULL, buffer);
