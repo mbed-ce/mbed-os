@@ -2,11 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(STM32Cube_FW EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_STM32H503xB EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_STM32H563XI EXCLUDE_FROM_ALL)
 
 add_library(mbed-stm32h5 INTERFACE)
 
 target_sources(mbed-stm32h5
     INTERFACE
+	gpio_irq_device.c
+    serial_device.c
 )
 
 target_include_directories(mbed-stm32h5
