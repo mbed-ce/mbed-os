@@ -3050,7 +3050,140 @@
             "STM32G4A1xx"
         ]
     },
-
+	
+    // STM32H5 Targets -------------------------------------------------------------------------------------------------
+	"MCU_STM32H5": {
+        "inherits": [
+            "MCU_STM32"
+        ],
+        "public": false,
+        "extra_labels_add": [
+            "STM32H5"
+        ],
+        "config": {
+            "clock_source": {
+                "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
+                "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI|USE_PLL_HSE_XTAL",
+                "macro_name": "CLOCK_SOURCE"
+            },
+            "lpticker_lptim": {
+                "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
+                "value": 1
+            },
+            "lse_drive_load_level": {
+                "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
+                "value": "RCC_LSEDRIVE_LOW"
+            },
+            "i2c_timing_value_algo": {
+                "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
+                "value": true
+            }
+        },
+        "overrides": {
+            "lpticker_delay_ticks": 0
+        },
+        "macros_add": [
+            "EXTRA_IDLE_STACK_REQUIRED",
+            "MBED_TICKLESS"
+        ],
+        "device_has_add": [
+            "MPU"
+        ]
+    },
+	"MCU_STM32H503xB": {
+        "inherits": [
+            "MCU_STM32H5"
+        ],
+        "public": false,
+        "core": "Cortex-M33",
+        "extra_labels_add": [
+            "STM32H503xB"
+        ],
+        "macros_add": [
+            "STM32H503xx"
+        ]
+    },
+	"NUCLEO_H503RB": {
+        "inherits": [
+            "MCU_STM32H503xB"
+        ],
+        "macros_add": [
+            "HSE_VALUE=24000000U"
+        ],
+        "overrides": {
+            "lse_available":  1,
+            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
+        },
+        "device_has_remove": [
+            "ANALOGOUT",
+            "ANALOGOIN",
+            "PWMOUT",
+            "FLASH",
+            "LPTICKER",
+            "CAN",
+			"SERIAL_FC",
+			"I2C",
+			"I2C_ASYNCH",
+			"I2CSLAVE",
+			"SPI",
+            "SPISLAVE",
+            "SPI_ASYNCH",
+            "WATCHDOG"
+        ],
+        "detect_code": [
+            "0832"
+        ],
+        "device_name": "STM32H503RBTx"
+    },
+	"MCU_STM32H563xI": {
+        "inherits": [
+            "MCU_STM32H5"
+        ],
+        "public": false,
+        "core": "Cortex-M33",
+        "extra_labels_add": [
+            "STM32H563xI"
+        ],
+        "macros_add": [
+            "STM32H563xx"
+        ]
+    },
+	"NUCLEO_H563ZI": {
+        "inherits": [
+            "MCU_STM32H563xI"
+        ],
+        "macros_add": [
+            "HSE_VALUE=8000000U"
+        ],
+        "overrides": {
+            "lse_available":  1,
+            "clock_source": "USE_PLL_HSE_EXTC|USE_PLL_HSI"
+        },
+        "device_has_remove": [
+            "ANALOGOUT",
+            "ANALOGOIN",
+            "PWMOUT",
+            "FLASH",
+            "PWMOUT",
+            "LPTICKER",
+            "CAN",
+			"SERIAL_FC",
+			"I2C",
+			"I2C_ASYNCH",
+			"I2CSLAVE",
+			"SPI",
+            "SPISLAVE",
+            "SPI_ASYNCH",
+            "ETHERNET",
+            "WATCHDOG",
+            "EMAC"
+        ],
+        "detect_code": [
+            "0878"
+        ],
+        "device_name": "STM32H563ZITx"
+    },
+	
     // STM32H7 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32H7": {
         "inherits": [
