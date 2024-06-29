@@ -324,7 +324,7 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uintpt
     core_util_critical_section_enter();
 
     /* Enable SYSCFG Clock */
-#if (!defined(TARGET_STM32WB) && !defined(TARGET_STM32WL))
+#if (!defined(TARGET_STM32WB) && !defined(TARGET_STM32WL)&& !defined(TARGET_STM32H5))
     __HAL_RCC_SYSCFG_CLK_ENABLE();
 #endif
 
@@ -502,7 +502,7 @@ void gpio_irq_enable(gpio_irq_t *obj)
 
     /*  Select Source  */
 
-#if defined(STM32G0) || defined(STM32L5) || defined(STM32U5)
+#if defined(STM32G0) || defined(STM32L5) || defined(STM32U5) || defined(STM32H5)
     temp = EXTI->EXTICR[pin_index >> 2];
     CLEAR_BIT(temp, (0x0FU) << (8U * (pin_index & 0x03U)));
     SET_BIT(temp, port_index << (8U * (pin_index & 0x03U)));
