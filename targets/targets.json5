@@ -3133,7 +3133,8 @@
         "detect_code": [
             "0832"
         ],
-        "device_name": "STM32H503RBTx"
+        "device_name": "STM32H503RBTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF274336.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
 	"MCU_STM32H563xI": {
         "inherits": [
@@ -3181,7 +3182,8 @@
         "detect_code": [
             "0878"
         ],
-        "device_name": "STM32H563ZITx"
+        "device_name": "STM32H563ZITx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF274337.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
 	
     // STM32H7 Targets -------------------------------------------------------------------------------------------------
