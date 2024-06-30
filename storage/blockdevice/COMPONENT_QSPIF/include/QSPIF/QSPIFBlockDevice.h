@@ -59,7 +59,8 @@ enum qspif_bd_error {
     QSPIF_BD_ERROR_WREN_FAILED           = -4004, /* Write Enable Failed */
     QSPIF_BD_ERROR_INVALID_ERASE_PARAMS  = -4005, /* Erase command not on sector aligned addresses or exceeds device size */
     QSPIF_BD_ERROR_DEVICE_NOT_UNIQUE     = -4006, /* Only one instance per csel is allowed */
-    QSPIF_BD_ERROR_DEVICE_MAX_EXCEED     = -4007  /* Max active QSPIF devices exceeded */
+    QSPIF_BD_ERROR_DEVICE_MAX_EXCEED     = -4007, /* Max active QSPIF devices exceeded */
+    QSPIF_BD_ERROR_INVALID_ARGUMENT      = -4008  /* Max active QSPIF devices exceeded */
 };
 
 /** Enum qspif polarity mode
@@ -248,7 +249,7 @@ public:
      */
     virtual const char *get_type() const;
 
-private:
+protected:
     /********************************/
     /*   Different Device Csel Mgmt */
     /********************************/
@@ -334,7 +335,7 @@ private:
     // Detect 4-byte addressing mode and enable it if supported
     int _sfdp_detect_and_enable_4byte_addressing(uint8_t *basic_param_table_ptr, int basic_param_table_size);
 
-private:
+protected:
     enum qspif_clear_protection_method_t {
         QSPIF_BP_ULBPR,    // Issue global protection unlock instruction
         QSPIF_BP_CLEAR_SR, // Clear protection bits in status register 1

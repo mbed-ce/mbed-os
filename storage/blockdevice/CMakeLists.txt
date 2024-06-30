@@ -46,11 +46,6 @@ if("DEVICE_SPI=1" IN_LIST MBED_TARGET_DEFINITIONS)
     add_subdirectory(COMPONENT_SPIF)
 endif()
 
-if("DEVICE_QSPI=1" IN_LIST MBED_TARGET_DEFINITIONS)
-    add_subdirectory(COMPONENT_SPINAND)
-endif()
-
-
 target_include_directories(mbed-storage-blockdevice
     PUBLIC
         .
