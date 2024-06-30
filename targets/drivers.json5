@@ -161,17 +161,6 @@
 			"friendly_name": "SD/SDHC Card",
             "description": "Component for SD card support via the SPI bus."
         },
-        // Note: Currently I am unsure whether the SPINANDBlockDevice implementation
-        // requires a flash device with built-in ECC, or whether it does no error correcting
-        // at all and requires a flash which does error correcting.  Also, per the original
-        // PR: https://github.com/ARMmbed/mbed-os/pull/14397
-        // this block device has only been tested with Macronix MX31LF4GE4BC, so
-        // I'm unsure how generic it is, or whether it will only work with that flash device.
-        "COMPONENT_SPINAND": {
-        	"friendly_name": "QuadSPI NAND Flash",
-            "description": "Component for QuadSPI NAND flash devices."
-        },
-
 // Other ----------------------------------------------------------------------------
 
         "COMPONENT_CM0P_SECURE": {
