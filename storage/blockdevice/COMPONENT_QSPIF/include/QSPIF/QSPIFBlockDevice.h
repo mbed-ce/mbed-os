@@ -60,7 +60,7 @@ enum qspif_bd_error {
     QSPIF_BD_ERROR_INVALID_ERASE_PARAMS  = -4005, /* Erase command not on sector aligned addresses or exceeds device size */
     QSPIF_BD_ERROR_DEVICE_NOT_UNIQUE     = -4006, /* Only one instance per csel is allowed */
     QSPIF_BD_ERROR_DEVICE_MAX_EXCEED     = -4007, /* Max active QSPIF devices exceeded */
-    QSPIF_BD_ERROR_INVALID_ARGUMENT      = -4008  /* Max active QSPIF devices exceeded */
+    QSPIF_BD_ERROR_INVALID_ARGUMENT      = -4008  /* Invalid argument passed to function */
 };
 
 /** Enum qspif polarity mode
