@@ -36,9 +36,15 @@
 #define DEVICE_ID_LENGTH       24
 
 #include "objects.h"
+#if DEVICE_I2C
 #include "stm_i2c_api.h"
+#endif
+#if DEVICE_SPI
 #include "stm_spi_api.h"
+#endif
+#if DEVICE_PWMOUT
 #include "stm_pwmout_api.h"
+#endif
 
 #if DEVICE_USTICKER
 #include "us_ticker_defines.h"

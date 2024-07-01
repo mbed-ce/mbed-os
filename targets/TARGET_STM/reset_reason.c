@@ -88,11 +88,11 @@ reset_reason_t hal_reset_reason_get(void)
 
 uint32_t hal_reset_reason_get_raw(void)
 {
-#if TARGET_STM32H7
+#if TARGET_STM32H7 || TARGET_STM32H5
     return RCC->RSR;
-#else /* TARGET_STM32H7 */
+#else /* TARGET_STM32H7 || TARGET_STM32H5*/
     return RCC->CSR;
-#endif /* TARGET_STM32H7 */
+#endif /* TARGET_STM32H7 || TARGET_STM32H5*/
 }
 
 
