@@ -3066,6 +3066,11 @@
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI|USE_PLL_HSE_XTAL",
                 "macro_name": "CLOCK_SOURCE"
             },
+            "hse_value": {
+                "help": "Frequency in MHz of external oscillator / crystal.  Will be used to compute PLL parameters.",
+                "value": "8000000",
+                "macro_name": "HSE_VALUE"
+            },
             "lpticker_lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
@@ -3076,7 +3081,7 @@
             },
             "i2c_timing_value_algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
-                "value": true
+                "value": false
             }
         },
         "overrides": {
@@ -3107,10 +3112,8 @@
         "inherits": [
             "MCU_STM32H503xB"
         ],
-        "macros_add": [
-            "HSE_VALUE=24000000U"
-        ],
         "overrides": {
+            "hse_value": 24000000,
             "lse_available":  1,
             "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
         },
@@ -3121,11 +3124,11 @@
             "FLASH",
             "LPTICKER",
             "CAN",
-			"SERIAL_FC",
-			"I2C",
-			"I2C_ASYNCH",
-			"I2CSLAVE",
-			"SPI",
+            "SERIAL_FC",
+            "I2C",
+            "I2C_ASYNCH",
+            "I2CSLAVE",
+            "SPI",
             "SPISLAVE",
             "SPI_ASYNCH",
             "WATCHDOG"
@@ -3153,9 +3156,6 @@
         "inherits": [
             "MCU_STM32H563xI"
         ],
-        "macros_add": [
-            "HSE_VALUE=8000000U"
-        ],
         "overrides": {
             "lse_available":  1,
             "clock_source": "USE_PLL_HSE_EXTC|USE_PLL_HSI"
@@ -3168,11 +3168,11 @@
             "PWMOUT",
             "LPTICKER",
             "CAN",
-			"SERIAL_FC",
-			"I2C",
-			"I2C_ASYNCH",
-			"I2CSLAVE",
-			"SPI",
+            "SERIAL_FC",
+            "I2C",
+            "I2C_ASYNCH",
+            "I2CSLAVE",
+            "SPI",
             "SPISLAVE",
             "SPI_ASYNCH",
             "ETHERNET",
