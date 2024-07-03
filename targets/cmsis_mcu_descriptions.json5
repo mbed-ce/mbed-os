@@ -7254,6 +7254,191 @@
         "sub_family": "STM32G474",
         "vendor": "STMicroelectronics:13"
     },
+    "STM32H503RBTx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H503_128k_0800.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 131072,
+                "start": 134217728,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32H5 Series",
+        "from_pack": {
+            "pack": "STM32H5xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "1.3.0"
+        },
+        "memories": {
+            "Flash": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 131072,
+                "start": 134217728,
+                "startup": true
+            },
+            "SRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 16384,
+                "start": 536870912,
+                "startup": false
+            },
+            "SRAM2": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "p_name": null,
+                "size": 16384,
+                "start": 536887296,
+                "startup": false
+            }
+        },
+        "name": "STM32H503RBTx",
+        "processors": [
+            {
+                "address": null,
+                "ap": 1,
+                "apid": null,
+                "core": "CortexM33",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32H503.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32H503",
+        "vendor": "STMicroelectronics:13"
+    },
+    "STM32H563ZITx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H5xx_2M_0800.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 2097152,
+                "start": 134217728,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H5xx_2M_0C00.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 2097152,
+                "start": 201326592,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32H5 Series",
+        "from_pack": {
+            "pack": "STM32H5xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "1.3.0"
+        },
+        "memories": {
+            "Flash": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 2097152,
+                "start": 134217728,
+                "startup": true
+            },
+            "SRAM1_2": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 327680,
+                "start": 536870912,
+                "startup": false
+            },
+            "SRAM3": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "p_name": null,
+                "size": 327680,
+                "start": 537198592,
+                "startup": false
+            }
+        },
+        "name": "STM32H563ZITx",
+        "processors": [
+            {
+                "address": null,
+                "ap": 1,
+                "apid": null,
+                "core": "CortexM33",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32H563.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32H563",
+        "vendor": "STMicroelectronics:13"
+    },
     "STM32H723ZGTx": {
         "algorithms": [
             {
