@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  ******************************************************************************
  *
- * Copyright (c) 2015-2023 STMicroelectronics.
+ * Copyright (c) 2015-2024 STMicroelectronics.
  * All rights reserved.
  *
  * This software component is licensed by ST under BSD 3-Clause license,
@@ -16,8 +16,8 @@
 /**
   * This file configures the system clock as follows:
   *--------------------------------------------------------------------
-  * System clock source   | 1- USE_PLL_HSE_EXTC (ST-link's 8 MHz clock) - default
-  *                       | 2- USE_PLL_HSE_XTAL (Onboard crystal 25 MHz xtal) - Solder bridges modification required (User manual) 
+  * System clock source   | 1- USE_PLL_HSE_EXTC 
+  *                       | 2- USE_PLL_HSE_XTAL
   *                       | 3- USE_PLL_HSI (internal 64 MHz clock)
   *--------------------------------------------------------------------
   * SYSCLK(MHz)           |            250
@@ -97,17 +97,28 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
      */
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
-    if(bypass){
+    if(bypass) {
         RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+    } else {
+        RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+    }
+
+    if (HSE_VALUE == 8000000) {
         RCC_OscInitStruct.PLL.PLLM = 1;
         RCC_OscInitStruct.PLL.PLLN = 62;
         RCC_OscInitStruct.PLL.PLLFRACN = 4096;
-    } else {
-        RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+    } else if(HSE_VALUE == 24000000) {
+        RCC_OscInitStruct.PLL.PLLM = 3;
+        RCC_OscInitStruct.PLL.PLLN = 62;
+        RCC_OscInitStruct.PLL.PLLFRACN = 4096;
+    } else if(HSE_VALUE == 25000000) {
         RCC_OscInitStruct.PLL.PLLM = 2;
         RCC_OscInitStruct.PLL.PLLN = 40;
         RCC_OscInitStruct.PLL.PLLFRACN = 0;
+    } else {
+
     }
+
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLL1_SOURCE_HSE;
 
@@ -118,7 +129,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1_VCORANGE_WIDE;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
-        return 0; // NOK
+        return 0; // FAIL
     }
 
     /** Initializes the CPU, AHB and APB buses clocks
@@ -134,7 +145,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
     {
-        return 0; // NOK
+        return 0; // FAIL
     }
 
 #if DEVICE_USBDEVICE
@@ -168,11 +179,11 @@ uint8_t SetSysClock_PLL_HSI(void)
     /** Initializes the RCC Oscillators according to the specified parameters
      * in the RCC_OscInitTypeDef structure.
      */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_CSI;
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
     RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-    RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
     RCC_OscInitStruct.HSIDiv = RCC_HSI_DIV1;
     RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+    RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLL1_SOURCE_HSI;
     RCC_OscInitStruct.PLL.PLLM = 4;

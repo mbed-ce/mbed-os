@@ -11,6 +11,7 @@ target_sources(mbed-stm32h5
     INTERFACE
 	gpio_irq_device.c
     serial_device.c
+    clock_cfg/system_clock.c
 )
 
 target_include_directories(mbed-stm32h5

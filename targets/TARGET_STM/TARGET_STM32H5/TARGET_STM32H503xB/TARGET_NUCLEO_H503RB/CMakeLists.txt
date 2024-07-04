@@ -6,7 +6,6 @@ add_library(mbed-nucleo-h503rb INTERFACE)
 target_sources(mbed-nucleo-h503rb
     INTERFACE
         PeripheralPins.c
-	    system_clock.c
 )
 
 target_include_directories(mbed-nucleo-h503rb
