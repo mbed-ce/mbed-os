@@ -413,7 +413,11 @@ Remount count: 0
             self.assertIsNotNone(ret_with_details[0])
             self.assertEqual(ret[0]['target_id'], new_device_id)
             self.assertEqual(ret_with_details[0]['daplink_automation_allowed'], '0')
-            self.assertDictContainsSubset(ret[0], ret_with_details[0])
+
+            # Below is the recommended replacement for assertDictContainsSubset().
+            # See: https://stackoverflow.com/a/59777678/7083698
+            self.assertEqual(ret_with_details[0], {**ret_with_details[0], **ret[0]})
+            
             _read_htm.assert_called_with(device['mount_point'])
             _up_details.assert_called_with(device['mount_point'])
 
@@ -489,7 +493,7 @@ Remount count: 0
             self.assertIsNotNone(ret_with_details[0])
             self.assertEqual(ret[0]['target_id'], new_device_id)
             self.assertEqual(ret_with_details[0]['daplink_automation_allowed'], '0')
-            self.assertDictContainsSubset(ret[0], ret_with_details[0])
+            self.assertEqual(ret_with_details[0], {**ret_with_details[0], **ret[0]})
             _read_htm.assert_called_with(device['mount_point'])
             _up_details.assert_called_with(device['mount_point'])
 
@@ -511,7 +515,7 @@ Remount count: 0
             self.assertIsNotNone(ret_with_details[0])
             self.assertEqual(ret[0]['target_id'], new_device_id)
             self.assertEqual(ret_with_details[0]['daplink_automation_allowed'], '0')
-            self.assertDictContainsSubset(ret[0], ret_with_details[0])
+            self.assertEqual(ret_with_details[0], {**ret_with_details[0], **ret[0]})
             _read_htm.assert_called_with(device['mount_point'])
             _up_details.assert_called_with(device['mount_point'])
 

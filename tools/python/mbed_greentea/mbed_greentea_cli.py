@@ -22,7 +22,7 @@ import os
 import sys
 import random
 import optparse
-import imp
+import importlib
 import io
 from time import time
 try:
@@ -185,12 +185,13 @@ def main():
     )
 
     # Show --fm option only if "fm_agent" module installed
+    fm_help=optparse.SUPPRESS_HELP
     try:
-        imp.find_module('fm_agent')
-    except ImportError:
-        fm_help=optparse.SUPPRESS_HELP
-    else:
-        fm_help='Fast Model Connection: fastmodel name, config name, example FVP_MPS2_M3:DEFAULT'
+        if importlib.util.find_spec('fm_agent') is not None:
+            fm_help='Fast Model Connection: fastmodel name, config name, example FVP_MPS2_M3:DEFAULT'
+    except ModuleNotFoundError:
+        pass
+        
     parser.add_option('', '--fm',
                     dest='fast_model_connection',
                     help=fm_help)

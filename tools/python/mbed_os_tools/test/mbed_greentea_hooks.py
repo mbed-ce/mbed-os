@@ -117,7 +117,7 @@ class GreenteaCliTestHook(GreenteaTestHook):
         result = None
         if expandables:
             expansion_result = []
-            m = re.search('\[.*?\]', expr)
+            m = re.search(r'\[.*?\]', expr)
             if m:
                 expr_str_orig = m.group(0)
                 expr_str_base = m.group(0)[1:-1]
@@ -186,11 +186,11 @@ class LcovHook(GreenteaCliTestHook):
         expr = "lcov --gcov-tool gcov [(-a <<./build/{yotta_target_name}/{test_name_list}.info>>)] --output-file result.info"
         """
         result = expr
-        expr_strs_orig = re.findall('\(.*?\)', expr)
+        expr_strs_orig = re.findall(r'\(.*?\)', expr)
         for expr_str_orig in expr_strs_orig:
             expr_str_base = expr_str_orig[1:-1]
             result = result.replace(expr_str_orig, expr_str_base)
-            m = re.search('\<<.*?\>>', expr_str_base)
+            m = re.search(r'\<<.*?\>>', expr_str_base)
             if m:
                 expr_str_path = m.group(0)[2:-2]
                 # Remove option if file not exists OR if file exists but empty

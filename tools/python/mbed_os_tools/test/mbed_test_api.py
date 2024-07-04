@@ -121,7 +121,7 @@ def run_htrun(cmd, verbose):
         # int value > 0 notifies caller that starting of host test process failed
         return RUN_HOST_TEST_POPEN_ERROR
 
-    htrun_failure_line = re.compile('\[RXD\] (:\d+::FAIL: .*)')
+    htrun_failure_line = re.compile(r'\[RXD\] (:\d+::FAIL: .*)')
 
     for line in iter(p.stdout.readline, b''):
         decoded_line = line.decode("utf-8", "replace")

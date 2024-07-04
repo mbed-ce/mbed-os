@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import re
-import pkg_resources
 from .host_test_plugins import HostTestPluginBase
 
 
@@ -35,51 +34,8 @@ class HostTestPluginResetMethod_Mbed(HostTestPluginBase):
         '2.7'
         """
         HostTestPluginBase.__init__(self)
-        self.re_float = re.compile("^\d+\.\d+")
-        pyserial_version = pkg_resources.require("pyserial")[0].version
-        self.pyserial_version = self.get_pyserial_version(pyserial_version)
-        self.is_pyserial_v3 = float(self.pyserial_version) >= 3.0
 
-    def get_pyserial_version(self, pyserial_version):
-        """! Retrieve pyserial module version
-        @return Returns float with pyserial module number
-        """
-        version = 3.0
-        m = self.re_float.search(pyserial_version)
-        if m:
-            try:
-                version = float(m.group(0))
-            except ValueError:
-                version = 3.0   # We will assume you've got latest (3.0+)
-        return version
-
-    def safe_sendBreak(self, serial):
-        """! Closure for pyserial version dependant API calls
-        """
-        if self.is_pyserial_v3:
-            return self._safe_sendBreak_v3_0(serial)
-        return self._safe_sendBreak_v2_7(serial)
-
-    def _safe_sendBreak_v2_7(self, serial):
-        """! pyserial 2.7 API implementation of sendBreak/setBreak
-        @details
-        Below API is deprecated for pyserial 3.x versions!
-        http://pyserial.readthedocs.org/en/latest/pyserial_api.html#serial.Serial.sendBreak
-        http://pyserial.readthedocs.org/en/latest/pyserial_api.html#serial.Serial.setBreak
-        """
-        result = True
-        try:
-            serial.sendBreak()
-        except:
-            # In Linux a termios.error is raised in sendBreak and in setBreak.
-            # The following setBreak() is needed to release the reset signal on the target mcu.
-            try:
-                serial.setBreak(False)
-            except:
-                result = False
-        return result
-
-    def _safe_sendBreak_v3_0(self, serial):
+    def _safe_send_break(self, serial):
         """! pyserial 3.x API implementation of send_brea / break_condition
         @details
         http://pyserial.readthedocs.org/en/latest/pyserial_api.html#serial.Serial.send_break
@@ -121,7 +77,7 @@ class HostTestPluginResetMethod_Mbed(HostTestPluginBase):
             if kwargs['serial']:
                 if capability == 'default':
                     serial = kwargs['serial']
-                    result = self.safe_sendBreak(serial)
+                    result = self._safe_send_break(serial)
         return result
 
 

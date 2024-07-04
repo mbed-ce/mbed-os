@@ -293,7 +293,7 @@ def get_mbed_targets_from_yotta(mbed_classic_name):
     return result
 
 def parse_yotta_search_cmd_output(line):
-    m = re.search('([\w\d-]+) \d+\.\d+\.\d+[$:]?', line)
+    m = re.search(r'([\w\d-]+) \d+\.\d+\.\d+[$:]?', line)
     if m and len(m.groups()):
         yotta_target_name = m.groups()[0]
         return yotta_target_name

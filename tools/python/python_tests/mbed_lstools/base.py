@@ -20,7 +20,6 @@ import os
 import errno
 import logging
 import re
-import pkg_resources
 import json
 from mock import patch, MagicMock
 from copy import deepcopy

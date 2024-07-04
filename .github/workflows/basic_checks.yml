@@ -158,7 +158,6 @@ jobs:
           doxyfile-path: ./doxyfile_options
 
   python-tests:
-    # these tests run in 3.7, hence running in vm not in pre-built docker
     runs-on: ubuntu-latest
     steps:
       -

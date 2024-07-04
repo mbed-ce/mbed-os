@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import telnetlib
 import socket
 from .conn_primitive import ConnectorPrimitive, ConnectorPrimitiveException
 
