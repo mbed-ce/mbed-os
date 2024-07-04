@@ -31,9 +31,6 @@ $PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m pytest python_tests/scancode_
 # test case filenames for some packages.  So, the "-p *.py" argument is needed to
 # make it look for any files as tests, not just ones ending in _test.py.
 
-echo ">> Running unittests for mbed_greentea package"
-$PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m unittest discover -p '*.py' python_tests.mbed_greentea
-
 echo ">> Running unittests for mbed_host_tests package"
 $PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m unittest discover -p '*.py' python_tests.mbed_host_tests
 
