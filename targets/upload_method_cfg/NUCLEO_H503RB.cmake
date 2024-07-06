@@ -13,7 +13,7 @@ set(UPLOAD_METHOD_DEFAULT STM32CUBE)
 # Config options for MBED
 # -------------------------------------------------------------
 
-set(MBED_UPLOAD_ENABLED FALSE)
+set(MBED_UPLOAD_ENABLED TRUE)
 set(MBED_RESET_BAUDRATE 115200)
 
 # Config options for STM32CubeIDE
