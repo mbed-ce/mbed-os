@@ -25,11 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Create build directory
-        run: |
-          mkdir -p "$BUILD_DIR"
-          cd "$BUILD_DIR"
+        run: mkdir -p "$BUILD_DIR"
+
       - name: Configure cmake
         run: >
+          cd "$BUILD_DIR" &&
           cmake
           ${{ github.workspace }}
           -GNinja
@@ -40,9 +40,10 @@ jobs:
           -DUPLOAD_METHOD=${{ matrix.target.UPLOAD_METHOD }}
           -DOPENOCD_ADAPTER_SERIAL=${{ matrix.target.OPENOCD_ADAPTER_SERIAL }}
       - name: Compile
-        run: ninja
+        run: cd "$BUILD_DIR" && ninja
       - name: Run ctest
         run: >
+          cd "$BUILD_DIR" &&
           ctest
           --repeat until-pass:3
           --output-on-failure
