@@ -1,0 +1,57 @@
+name: target-tests
+run-name: Run tests on targets
+on: [push]
+jobs:
+  test-boards:
+    strategy:
+      matrix:
+        target:
+          # - MBED_TARGET: LPC1768
+          #   UPLOAD_METHOD: OPENOCD
+          #   MBED_GREENTEA_SERIAL_PORT: /dev/ttyLPC1768
+          #   OPENOCD_ADAPTER_SERIAL: 10102fa5c13a566eac31a28051fd06540eb7
+          - MBED_TARGET: NUCLEO_L452RE_P
+            UPLOAD_METHOD: OPENOCD
+            MBED_GREENTEA_SERIAL_PORT: /dev/ttyNUCLEO_L452RE_P
+            OPENOCD_ADAPTER_SERIAL: 066CFF515055657867071915
+          - MBED_TARGET: NUCLEO_H743ZI2
+            UPLOAD_METHOD: OPENOCD
+            MBED_GREENTEA_SERIAL_PORT: /dev/ttyNUCLEO_H743ZI2
+            OPENOCD_ADAPTER_SERIAL: 003C00193438510234313939
+    runs-on: ${{ matrix.target.MBED_TARGET }}
+    env:
+      BUILD_DIR: /home/github-runner-user/runner-shared/build_${{ matrix.target.MBED_TARGET }}
+      JUNIT_OUTPUT: ${{ github.workspace }}/mbed-tests-${{ matrix.target.MBED_TARGET }}.xml
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create build directory
+        run: |
+          mkdir -p "$BUILD_DIR"
+          cd "$BUILD_DIR"
+      - name: Configure cmake
+        run: >
+          cmake
+          ${{ github.workspace }}
+          -GNinja
+          -DCMAKE_BUILD_TYPE=Develop
+          -DMBED_TARGET=${{ matrix.target.MBED_TARGET }}
+          -DMBED_BUILD_GREENTEA_TESTS=ON
+          -DMBED_GREENTEA_SERIAL_PORT=${{ matrix.target.MBED_GREENTEA_SERIAL_PORT }}
+          -DUPLOAD_METHOD=${{ matrix.target.UPLOAD_METHOD }}
+          -DOPENOCD_ADAPTER_SERIAL=${{ matrix.target.OPENOCD_ADAPTER_SERIAL }}
+      - name: Compile
+        run: ninja
+      - name: Run ctest
+        run: >
+          ctest
+          --repeat until-pass:3
+          --output-on-failure
+          --output-junit "$JUNIT_OUTPUT"
+          --test-output-size-passed 100000
+          --test-output-size-failed 100000
+          .
+      - name: Archive ctest results
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: "$JUNIT_OUTPUT"
