@@ -28,9 +28,10 @@ jobs:
       JUNIT_OUTPUT: ${{ github.workspace }}/mbed-tests-${{ matrix.target.MBED_TARGET }}.xml
     steps:
       - uses: actions/checkout@v4
+      - name: echo path for debugging
+        run: echo $PATH
       - name: Create build directory
         run: mkdir -p "$BUILD_DIR"
-
       - name: Configure cmake
         run: >
           cd "$BUILD_DIR" &&
