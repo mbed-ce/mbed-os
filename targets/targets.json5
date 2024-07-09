@@ -3093,7 +3093,8 @@
         ],
         "device_has_add": [
             "MPU"
-        ]
+        ],
+        "is_mcu_family_target": true
     },
 	"MCU_STM32H503xB": {
         "inherits": [
