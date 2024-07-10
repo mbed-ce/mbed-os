@@ -4,6 +4,7 @@ on: [push]
 jobs:
   test-boards:
     strategy:
+      fail-fast: false
       matrix:
         target:
           # - MBED_TARGET: LPC1768
