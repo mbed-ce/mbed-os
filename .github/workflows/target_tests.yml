@@ -72,4 +72,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage-report
-          path: "$JUNIT_OUTPUT"
+          path: ${{ env.JUNIT_OUTPUT }}
