@@ -3097,20 +3097,19 @@
         "device_has_remove": [
             "ANALOGOUT",
             "ANALOGIN",
-            "PWMOUT",
             "FLASH",
             "PWMOUT",
             "LPTICKER",
             "CAN",
-            "SERIAL_FC",
+			"SERIAL_FC",
             "I2C",
             "I2C_ASYNCH",
             "I2CSLAVE",
             "SPI",
             "SPISLAVE",
             "SPI_ASYNCH",
-            "ETHERNET",
             "WATCHDOG",
+            "ETHERNET",
             "EMAC"
         ],
         "is_mcu_family_target": true
