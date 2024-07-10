@@ -69,6 +69,7 @@ jobs:
           --test-output-size-failed 100000
           .
       - name: Archive ctest results
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage-report
