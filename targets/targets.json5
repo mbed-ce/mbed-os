@@ -3094,6 +3094,25 @@
         "device_has_add": [
             "MPU"
         ],
+        "device_has_remove": [
+            "ANALOGOUT",
+            "ANALOGIN",
+            "PWMOUT",
+            "FLASH",
+            "PWMOUT",
+            "LPTICKER",
+            "CAN",
+            "SERIAL_FC",
+            "I2C",
+            "I2C_ASYNCH",
+            "I2CSLAVE",
+            "SPI",
+            "SPISLAVE",
+            "SPI_ASYNCH",
+            "ETHERNET",
+            "WATCHDOG",
+            "EMAC"
+        ],
         "is_mcu_family_target": true
     },
 	"MCU_STM32H503xB": {
@@ -3118,22 +3137,6 @@
             "lse_available":  1,
             "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
         },
-        "device_has_remove": [
-            "ANALOGOUT",
-            "ANALOGOIN",
-            "PWMOUT",
-            "FLASH",
-            "LPTICKER",
-            "CAN",
-            "SERIAL_FC",
-            "I2C",
-            "I2C_ASYNCH",
-            "I2CSLAVE",
-            "SPI",
-            "SPISLAVE",
-            "SPI_ASYNCH",
-            "WATCHDOG"
-        ],
         "detect_code": [
             "0832"
         ],
@@ -3161,25 +3164,6 @@
             "lse_available":  1,
             "clock_source": "USE_PLL_HSE_EXTC|USE_PLL_HSI"
         },
-        "device_has_remove": [
-            "ANALOGOUT",
-            "ANALOGOIN",
-            "PWMOUT",
-            "FLASH",
-            "PWMOUT",
-            "LPTICKER",
-            "CAN",
-            "SERIAL_FC",
-            "I2C",
-            "I2C_ASYNCH",
-            "I2CSLAVE",
-            "SPI",
-            "SPISLAVE",
-            "SPI_ASYNCH",
-            "ETHERNET",
-            "WATCHDOG",
-            "EMAC"
-        ],
         "detect_code": [
             "0878"
         ],
