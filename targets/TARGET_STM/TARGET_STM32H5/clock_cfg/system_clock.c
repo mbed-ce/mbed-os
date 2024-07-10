@@ -103,21 +103,21 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
         RCC_OscInitStruct.HSEState = RCC_HSE_ON;
     }
 
-    if (HSE_VALUE == 8000000) {
-        RCC_OscInitStruct.PLL.PLLM = 1;
-        RCC_OscInitStruct.PLL.PLLN = 62;
-        RCC_OscInitStruct.PLL.PLLFRACN = 4096;
-    } else if(HSE_VALUE == 24000000) {
-        RCC_OscInitStruct.PLL.PLLM = 3;
-        RCC_OscInitStruct.PLL.PLLN = 62;
-        RCC_OscInitStruct.PLL.PLLFRACN = 4096;
-    } else if(HSE_VALUE == 25000000) {
-        RCC_OscInitStruct.PLL.PLLM = 2;
-        RCC_OscInitStruct.PLL.PLLN = 40;
-        RCC_OscInitStruct.PLL.PLLFRACN = 0;
-    } else {
-
-    }
+#if (HSE_VALUE < 4000000) || (HSE_VALUE > 50000000) && !((HSE_VALUE % 2000000 != 0) || (HSE_VALUE % 5000000 != 0))
+#error HSE value must be >= 4MHz and <= 50MHz, and must be divisible by either 2 or 5!
+#endif
+if(HSE_VALUE % 2000000 == 0)
+{
+    RCC_OscInitStruct.PLL.PLLM = HSE_VALUE / 2000000; // Divide down input clock to 2MHz 
+    RCC_OscInitStruct.PLL.PLLN = 250; // Multiply up to 500MHz VCO clock
+    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1_VCIRANGE_1;
+}
+else // Divisible by 5MHz
+{
+    RCC_OscInitStruct.PLL.PLLM = HSE_VALUE / 5000000; // Divide down input clock to 5MHz
+    RCC_OscInitStruct.PLL.PLLN = 100; // Multiply up to 500MHz VCO clock
+    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1_VCIRANGE_2;
+}
 
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLL1_SOURCE_HSE;
@@ -125,7 +125,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     RCC_OscInitStruct.PLL.PLLP = 2;
     RCC_OscInitStruct.PLL.PLLQ = 2;
     RCC_OscInitStruct.PLL.PLLR = 2;
-    RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1_VCIRANGE_3;
+    RCC_OscInitStruct.PLL.PLLFRACN = 0;
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1_VCORANGE_WIDE;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
