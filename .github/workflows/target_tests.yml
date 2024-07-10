@@ -42,7 +42,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: echo path for debugging
-        run: echo $PATH
+        run: |
+          echo $PATH
+          echo $JUNIT_OUTPUT
       - name: Create build directory
         run: mkdir -p "$BUILD_DIR"
       - name: Configure cmake
