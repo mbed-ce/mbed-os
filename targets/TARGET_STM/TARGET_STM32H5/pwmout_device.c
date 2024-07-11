@@ -23,6 +23,33 @@ const pwm_apb_map_t pwm_apb_map_table[] = {
     {PWM_1, PWMOUT_ON_APB1},
     {PWM_2, PWMOUT_ON_APB1},
     {PWM_3, PWMOUT_ON_APB2},
+#if defined(TIM4_BASE)
+{PWM_4, PWMOUT_ON_APB2},
+#endif
+#if defined(TIM5_BASE)
+{PWM_5, PWMOUT_ON_APB1},
+#endif
+#if defined(TIM8_BASE)
+{PWM_8, PWMOUT_ON_APB2},
+#endif
+#if defined(TIM12_BASE)
+{PWM_12, PWMOUT_ON_APB1},
+#endif
+#if defined(TIM13_BASE)
+{PWM_13, PWMOUT_ON_APB2},
+#endif
+#if defined(TIM14_BASE)
+{PWM_14, PWMOUT_ON_APB1},
+#endif
+#if defined(TIM15_BASE)
+{PWM_15, PWMOUT_ON_APB2},
+#endif
+#if defined(TIM16_BASE)
+{PWM_16, PWMOUT_ON_APB1},
+#endif
+#if defined(TIM17_BASE)
+{PWM_17, PWMOUT_ON_APB2},
+#endif
     {(PWMName) 0, PWMOUT_UNKNOWN}
 };
 
