@@ -3098,7 +3098,6 @@
             "ANALOGOUT",
             "ANALOGIN",
             "FLASH",
-            "PWMOUT",
             "LPTICKER",
             "CAN",
 			"SERIAL_FC",

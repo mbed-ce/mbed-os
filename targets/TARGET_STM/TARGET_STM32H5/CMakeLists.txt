@@ -9,9 +9,10 @@ add_library(mbed-stm32h5 INTERFACE)
 
 target_sources(mbed-stm32h5
     INTERFACE
-	gpio_irq_device.c
-    serial_device.c
     clock_cfg/system_clock.c
+    gpio_irq_device.c
+    serial_device.c
+    pwmout_device.c
 )
 
 target_include_directories(mbed-stm32h5
