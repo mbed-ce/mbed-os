@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2018 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -125,6 +125,10 @@ void DSPI_MasterTransferCreateHandleEDMA(SPI_Type *base,
  * This function transfers data using eDMA. This is a non-blocking function, which returns right away. When all data
  * is transferred, the callback function is called.
  *
+ * note The max transfer size of each transfer depends on whether the instance's Tx/Rx shares the same DMA request. If
+ * FSL_FEATURE_DSPI_HAS_SEPARATE_DMA_RX_TX_REQn(x) is true, then the max transfer size is 32767 datawidth of data,
+ * otherwise is 511.
+ *
  * param base DSPI peripheral base address.
  * param handle A pointer to the dspi_master_edma_handle_t structure which stores the transfer state.
  * param transfer A pointer to the dspi_transfer_t structure.
@@ -179,18 +183,17 @@ status_t DSPI_MasterTransferEDMA(SPI_Type *base, dspi_master_edma_handle_t *hand
     DSPI_ClearStatusFlags(base, (uint32_t)kDSPI_AllStatusFlag);
 
     commandStruct.whichPcs =
-        (dspi_which_pcs_t)((uint32_t)1U << ((transfer->configFlags & DSPI_MASTER_PCS_MASK) >> DSPI_MASTER_PCS_SHIFT));
+            (uint8_t)((uint32_t)1U << ((transfer->configFlags & DSPI_MASTER_PCS_MASK) >> DSPI_MASTER_PCS_SHIFT));
     commandStruct.isEndOfQueue       = false;
     commandStruct.clearTransferCount = false;
-    commandStruct.whichCtar =
-        (dspi_ctar_selection_t)((transfer->configFlags & DSPI_MASTER_CTAR_MASK) >> DSPI_MASTER_CTAR_SHIFT);
+    commandStruct.whichCtar = (uint8_t)((transfer->configFlags & DSPI_MASTER_CTAR_MASK) >> DSPI_MASTER_CTAR_SHIFT);
     commandStruct.isPcsContinuous =
-        (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterPcsContinuous)) ? true : false;
+            (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterPcsContinuous)) ? true : false;
     handle->command = DSPI_MasterGetFormattedCommand(&(commandStruct));
 
     commandStruct.isEndOfQueue = true;
     commandStruct.isPcsContinuous =
-        (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterActiveAfterTransfer)) ? true : false;
+            (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterActiveAfterTransfer)) ? true : false;
     handle->lastCommand = DSPI_MasterGetFormattedCommand(&(commandStruct));
 
     handle->bitsPerFrame = ((base->CTAR[commandStruct.whichCtar] & SPI_CTAR_FMSZ_MASK) >> SPI_CTAR_FMSZ_SHIFT) + 1U;
@@ -198,11 +201,11 @@ status_t DSPI_MasterTransferEDMA(SPI_Type *base, dspi_master_edma_handle_t *hand
     tmpMCR = base->MCR;
     if ((0U != (tmpMCR & SPI_MCR_DIS_RXF_MASK)) || (0U != (tmpMCR & SPI_MCR_DIS_TXF_MASK)))
     {
-        handle->fifoSize = 1;
+        handle->fifoSize = 1U;
     }
     else
     {
-        handle->fifoSize = FSL_FEATURE_DSPI_FIFO_SIZEn(base);
+        handle->fifoSize = (uint8_t)FSL_FEATURE_DSPI_FIFO_SIZEn(base);
     }
     handle->txData                    = transfer->txData;
     handle->rxData                    = transfer->rxData;
@@ -213,31 +216,10 @@ status_t DSPI_MasterTransferEDMA(SPI_Type *base, dspi_master_edma_handle_t *hand
     /* If using a shared RX/TX DMA request, then this limits the amount of data we can transfer
      * due to the linked channel. The max bytes is 511 if 8-bit/frame or 1022 if 16-bit/frame
      */
-    uint32_t limited_size = 0;
-    if (1 == FSL_FEATURE_DSPI_HAS_SEPARATE_DMA_RX_TX_REQn(base))
+    if (transfer->dataSize > DSPI_EDMA_MAX_TRANSFER_SIZE(base, (handle->bitsPerFrame)))
     {
-        limited_size = 32767u;
-    }
-    else
-    {
-        limited_size = 511u;
-    }
-
-    if (handle->bitsPerFrame > 8U)
-    {
-        if (transfer->dataSize > (limited_size << 1u))
-        {
-            handle->state = (uint8_t)kDSPI_Idle;
-            return kStatus_DSPI_OutOfRange;
-        }
-    }
-    else
-    {
-        if (transfer->dataSize > limited_size)
-        {
-            handle->state = (uint8_t)kDSPI_Idle;
-            return kStatus_DSPI_OutOfRange;
-        }
+        handle->state = (uint8_t)kDSPI_Idle;
+        return kStatus_DSPI_OutOfRange;
     }
 
     /*The data size should be even if the bitsPerFrame is greater than 8 (that is 2 bytes per frame in dspi) */
@@ -369,7 +351,7 @@ status_t DSPI_MasterTransferEDMA(SPI_Type *base, dspi_master_edma_handle_t *hand
                     handle->remainingSendByteCount = 0;
                     base->PUSHR                    = (handle->lastCommand & 0xffff0000U) | wordToSend;
                 }
-                /* For all words except the last word */
+                    /* For all words except the last word */
                 else
                 {
                     if (NULL != handle->txData)
@@ -478,6 +460,14 @@ status_t DSPI_MasterTransferEDMA(SPI_Type *base, dspi_master_edma_handle_t *hand
                            (const edma_transfer_config_t *)(uint32_t)&transferConfigA, NULL);
     EDMA_EnableChannelInterrupts(handle->edmaRxRegToRxDataHandle->base, handle->edmaRxRegToRxDataHandle->channel,
                                  (uint32_t)kEDMA_MajorInterruptEnable);
+
+    if (handle->remainingSendByteCount == 0U)
+    {
+        EDMA_StartTransfer(handle->edmaRxRegToRxDataHandle);
+        DSPI_EnableDMA(base, (uint32_t)kDSPI_RxDmaEnable);
+        DSPI_StartTransfer(base);
+        return kStatus_Success;
+    }
 
     tmpRemainingSendByteCount = handle->remainingSendByteCount;
     /*Calculate the last data : handle->lastCommand*/
@@ -1147,7 +1137,11 @@ void DSPI_SlaveTransferCreateHandleEDMA(SPI_Type *base,
  * is transferred, the callback function is called.
  * Note that the slave eDMA transfer doesn't support transfer_size is 1 when the bitsPerFrame is greater
  * than eight.
-
+ *
+ * note The max transfer size of each transfer depends on whether the instance's Tx/Rx shares the same DMA request. If
+ * FSL_FEATURE_DSPI_HAS_SEPARATE_DMA_RX_TX_REQn(x) is true, then the max transfer size is 32767 datawidth of data,
+ * otherwise is 511.
+ *
  * param base DSPI peripheral base address.
  * param handle A pointer to the dspi_slave_edma_handle_t structure which stores the transfer state.
  * param transfer A pointer to the dspi_transfer_t structure.
@@ -1181,36 +1175,15 @@ status_t DSPI_SlaveTransferEDMA(SPI_Type *base, dspi_slave_edma_handle_t *handle
     uint32_t instance = DSPI_GetInstance(base);
     uint8_t whichCtar = (uint8_t)((transfer->configFlags & DSPI_SLAVE_CTAR_MASK) >> DSPI_SLAVE_CTAR_SHIFT);
     handle->bitsPerFrame =
-        (((base->CTAR_SLAVE[whichCtar]) & SPI_CTAR_SLAVE_FMSZ_MASK) >> SPI_CTAR_SLAVE_FMSZ_SHIFT) + 1U;
+            (((base->CTAR_SLAVE[whichCtar]) & SPI_CTAR_SLAVE_FMSZ_MASK) >> SPI_CTAR_SLAVE_FMSZ_SHIFT) + 1U;
 
     /* If using a shared RX/TX DMA request, then this limits the amount of data we can transfer
      * due to the linked channel. The max bytes is 511 if 8-bit/frame or 1022 if 16-bit/frame
      */
-    uint32_t limited_size = 0;
-    if (1 == FSL_FEATURE_DSPI_HAS_SEPARATE_DMA_RX_TX_REQn(base))
+    if (transfer->dataSize > DSPI_EDMA_MAX_TRANSFER_SIZE(base, (handle->bitsPerFrame)))
     {
-        limited_size = 32767u;
-    }
-    else
-    {
-        limited_size = 511u;
-    }
-
-    if (handle->bitsPerFrame > 8U)
-    {
-        if (transfer->dataSize > (limited_size << 1u))
-        {
-            handle->state = (uint8_t)kDSPI_Idle;
-            return kStatus_DSPI_OutOfRange;
-        }
-    }
-    else
-    {
-        if (transfer->dataSize > limited_size)
-        {
-            handle->state = (uint8_t)kDSPI_Idle;
-            return kStatus_DSPI_OutOfRange;
-        }
+        handle->state = (uint8_t)kDSPI_Idle;
+        return kStatus_DSPI_OutOfRange;
     }
 
     /*The data size should be even if the bitsPerFrame is greater than 8 (that is 2 bytes per frame in dspi) */
