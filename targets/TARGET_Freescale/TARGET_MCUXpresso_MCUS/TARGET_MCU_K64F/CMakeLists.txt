@@ -38,6 +38,7 @@ target_sources(mbed-mcu-k64f
         drivers/fsl_cmp.c
         drivers/fsl_cmt.c
         drivers/fsl_crc.c
+        drivers/fsl_common_arm.c
         drivers/fsl_dac.c
         drivers/fsl_dmamux.c
         drivers/fsl_dspi.c
