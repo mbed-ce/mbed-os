@@ -64,6 +64,11 @@ elseif("MBED_CONF_NSAPI_DEFAULT_STACK=NANOSTACK" IN_LIST MBED_CONFIG_DEFINITIONS
     target_link_libraries(mbed-netsocket-api PUBLIC mbed-nanostack)
 endif()
 
+# Pull in cellular if cellular is the default network interface (used by NetworkInterfaceDefaults.cpp)
+if("MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE=CELLULAR" IN_LIST MBED_CONFIG_DEFINITIONS)
+    target_link_libraries(mbed-netsocket-api PUBLIC mbed-cellular)
+endif()
+
 if("DEVICE_EMAC=1" IN_LIST MBED_TARGET_DEFINITIONS)
     target_link_libraries(mbed-netsocket-api
         INTERFACE

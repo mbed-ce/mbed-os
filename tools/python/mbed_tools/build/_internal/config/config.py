@@ -56,6 +56,16 @@ class Config(UserDict):
                     "Please check your target_overrides are correct.\n"
                     f"The parameter `{override.namespace}.{override.name}` will not be added to the configuration."
                 )
+
+                valid_params_in_namespace = list(filter(
+                    lambda x: x.namespace == override.namespace,
+                    self.data.get(CONFIG_SECTION, []),
+                ))
+                valid_param_names = [f'"{param.namespace}.{param.name}"' for param in valid_params_in_namespace]
+
+                if len(valid_param_names) > 0:
+                    logger.warning(f'Valid config parameters in this namespace are: {", ".join(valid_param_names)}. '
+                                   f'Maybe you meant one of those?')
             else:
                 setting.value = override.value
 

@@ -25,6 +25,28 @@ MBED_WEAK CellularInterface *CellularInterface::get_target_default_instance()
     return mbed::CellularContext::get_default_instance();
 }
 
+void CellularInterface::set_default_parameters()
+{
+    /* CellularInterface is expected to attempt to work without any parameters - we
+     * will try, at least.
+     */
+#ifdef MBED_CONF_NSAPI_DEFAULT_CELLULAR_APN
+#ifndef MBED_CONF_NSAPI_DEFAULT_CELLULAR_USERNAME
+#define MBED_CONF_NSAPI_DEFAULT_CELLULAR_USERNAME NULL
+#endif
+#ifndef MBED_CONF_NSAPI_DEFAULT_CELLULAR_PASSWORD
+#define MBED_CONF_NSAPI_DEFAULT_CELLULAR_PASSWORD NULL
+#endif
+    set_credentials(MBED_CONF_NSAPI_DEFAULT_CELLULAR_APN, MBED_CONF_NSAPI_DEFAULT_CELLULAR_USERNAME, MBED_CONF_NSAPI_DEFAULT_CELLULAR_PASSWORD);
+#endif
+#ifdef MBED_CONF_NSAPI_DEFAULT_CELLULAR_SIM_PIN
+    set_sim_pin(MBED_CONF_NSAPI_DEFAULT_CELLULAR_SIM_PIN);
+#endif
+#ifdef MBED_CONF_NSAPI_DEFAULT_CELLULAR_PLMN
+    set_plmn(MBED_CONF_NSAPI_DEFAULT_CELLULAR_PLMN);
+#endif
+}
+
 namespace mbed {
 
 MBED_WEAK CellularContext *CellularContext::get_default_instance()

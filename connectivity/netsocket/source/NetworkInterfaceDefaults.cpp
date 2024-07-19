@@ -43,13 +43,6 @@ MBED_WEAK MeshInterface *MeshInterface::get_default_instance()
     return get_target_default_instance();
 }
 
-#if MBED_CONF_CELLULAR_PRESENT
-MBED_WEAK CellularInterface *CellularInterface::get_default_instance()
-{
-    return get_target_default_instance();
-}
-#endif // MBED_CONF_CELLULAR_PRESENT
-
 /* For other types, we can provide a reasonable get_target_default_instance
  * in some cases. This is done in EthernetInterface.cpp, mbed-mesh-api and
  * OnboardCellularInterface.cpp. We have no implementation for WiFi, so a
@@ -91,30 +84,6 @@ void WiFiInterface::set_default_parameters()
     set_credentials(MBED_CONF_NSAPI_DEFAULT_WIFI_SSID, MBED_CONF_NSAPI_DEFAULT_WIFI_PASSWORD, SECURITY);
 #endif
 }
-
-#if MBED_CONF_CELLULAR_PRESENT
-void CellularInterface::set_default_parameters()
-{
-    /* CellularInterface is expected to attempt to work without any parameters - we
-     * will try, at least.
-     */
-#ifdef MBED_CONF_NSAPI_DEFAULT_CELLULAR_APN
-#ifndef MBED_CONF_NSAPI_DEFAULT_CELLULAR_USERNAME
-#define MBED_CONF_NSAPI_DEFAULT_CELLULAR_USERNAME NULL
-#endif
-#ifndef MBED_CONF_NSAPI_DEFAULT_CELLULAR_PASSWORD
-#define MBED_CONF_NSAPI_DEFAULT_CELLULAR_PASSWORD NULL
-#endif
-    set_credentials(MBED_CONF_NSAPI_DEFAULT_CELLULAR_APN, MBED_CONF_NSAPI_DEFAULT_CELLULAR_USERNAME, MBED_CONF_NSAPI_DEFAULT_CELLULAR_PASSWORD);
-#endif
-#ifdef MBED_CONF_NSAPI_DEFAULT_CELLULAR_SIM_PIN
-    set_sim_pin(MBED_CONF_NSAPI_DEFAULT_CELLULAR_SIM_PIN);
-#endif
-#ifdef MBED_CONF_NSAPI_DEFAULT_CELLULAR_PLMN
-    set_plmn(MBED_CONF_NSAPI_DEFAULT_CELLULAR_PLMN);
-#endif
-}
-#endif // MBED_CONF_CELLULAR_PRESENT
 
 /* Finally the dispatch from the JSON default interface type to the specific
  * subclasses. It's our job to configure - the default NetworkInterface is
