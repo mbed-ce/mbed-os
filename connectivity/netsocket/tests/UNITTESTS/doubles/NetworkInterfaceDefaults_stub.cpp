@@ -52,10 +52,6 @@ void WiFiInterface::set_default_parameters()
 {
 }
 
-void CellularInterface::set_default_parameters()
-{
-}
-
 MBED_WEAK NetworkInterface *NetworkInterface::get_target_default_instance()
 {
     return NULL;
