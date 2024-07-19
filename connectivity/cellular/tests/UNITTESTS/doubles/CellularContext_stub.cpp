@@ -16,7 +16,7 @@
  */
 
 #include "CellularContext.h"
-#include "CellularInterface.h"
+#include "netsocket/CellularInterface.h"
 
 void CellularInterface::set_default_parameters()
 {

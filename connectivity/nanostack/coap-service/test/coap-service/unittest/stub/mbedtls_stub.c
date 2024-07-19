@@ -403,12 +403,12 @@ void mbedtls_ssl_conf_dtls_cookies(mbedtls_ssl_config *conf,
                                    void *p_cookie)
 {
     if (mbedtls_stub.cookie_obj && f_cookie_check && mbedtls_stub.cookie_len > 0) {
-        f_cookie_check(mbedtls_stub.cookie_obj, &mbedtls_stub.cookie_value, mbedtls_stub.cookie_len, NULL, 0);
+        f_cookie_check(mbedtls_stub.cookie_obj, mbedtls_stub.cookie_value, mbedtls_stub.cookie_len, NULL, 0);
     }
     if (mbedtls_stub.cookie_obj && f_cookie_write && mbedtls_stub.cookie_len > 0) {
         unsigned char out[16];
-        unsigned char *ptr = &out;
-        f_cookie_write(mbedtls_stub.cookie_obj, &ptr, ptr + mbedtls_stub.cookie_len, NULL, 0);
+        unsigned char * ptr = out;
+        f_cookie_write(mbedtls_stub.cookie_obj, &ptr, out + mbedtls_stub.cookie_len, NULL, 0);
     }
 }
 
@@ -420,9 +420,9 @@ void mbedtls_ssl_conf_export_keys_cb(mbedtls_ssl_config *conf,
     if (f_export_keys && p_export_keys) {
         unsigned char value[40];
         memset(&value, 1, 40);
-        f_export_keys(p_export_keys, &value, "", 0, 0, 0); //failure case
+        f_export_keys(p_export_keys, value, "", 0, 0, 0); //failure case
 
-        f_export_keys(p_export_keys, &value, "", 0, 20, 0); //success case
+        f_export_keys(p_export_keys, value, "", 0, 20, 0); //success case
     }
 }
 #endif
