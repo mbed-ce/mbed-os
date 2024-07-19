@@ -407,7 +407,7 @@ void mbedtls_ssl_conf_dtls_cookies(mbedtls_ssl_config *conf,
     }
     if (mbedtls_stub.cookie_obj && f_cookie_write && mbedtls_stub.cookie_len > 0) {
         unsigned char out[16];
-        unsigned char * ptr = out;
+        unsigned char *ptr = out;
         f_cookie_write(mbedtls_stub.cookie_obj, &ptr, out + mbedtls_stub.cookie_len, NULL, 0);
     }
 }
