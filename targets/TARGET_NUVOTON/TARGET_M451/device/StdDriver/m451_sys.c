@@ -5,8 +5,8 @@
  * $Date: 15/08/11 10:26a $
  * @brief    M451 series SYS driver source file
  *
- * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
 
 #include "M451Series.h"

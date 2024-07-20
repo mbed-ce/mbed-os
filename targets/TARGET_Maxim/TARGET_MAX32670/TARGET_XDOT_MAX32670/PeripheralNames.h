@@ -29,6 +29,8 @@
  * property whatsoever. Maxim Integrated Products, Inc. retains all
  * ownership rights.
  *******************************************************************************
+ *
+ * @copyright SPDX-License-Identifier: MIT
  */
 
 #ifndef MBED_PERIPHERALNAMES_H

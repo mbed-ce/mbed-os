@@ -29,6 +29,8 @@
  * property whatsoever. Maxim Integrated Products, Inc. retains all
  * ownership rights.
  *******************************************************************************
+ *
+ * @copyright SPDX-License-Identifier: MIT
  */
 
 /* MBED TARGET LIST: MAX32670EVKIT */

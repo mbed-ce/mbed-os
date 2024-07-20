@@ -5,8 +5,8 @@
  * $Date: 15/08/24 4:52p $
  * @brief    M451 Series TK Driver Header File
  *
- * @note
- * Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ * @copyright Copyright (C) 2014~2015 Nuvoton Technology Corp. All rights reserved.
  *
  ******************************************************************************/
 #ifndef __TK_H__
