@@ -109,9 +109,6 @@ typedef enum {
     D13 = PC_1,
     D14 = PC_8,
     D15 = PC_9,
-
-    I2C_SCL = D15,
-    I2C_SDA = D14,
         
     // NOTE: other board-specific naming
     // UART naming
@@ -128,25 +125,27 @@ typedef enum {
     STDIO_UART_RX   = CONSOLE_RX,
 #endif
     SERIAL_TX = CONSOLE_TX,
-    SERIAL_RX = CONSOLE_RX,    
-    // LED naming
-    LED1 = PE_11,
-    LED2 = PE_10,
-    LED3 = PE_9,
-    LED4 = LED1,
-    LED_RED = LED3,
-    LED_GREEN = LED1,
-    LED_YELLOW = LED2,
-    // Button naming
-    SW1 = PE_5,
-    SW2 = PE_6,
-    BUTTON1 = SW1,
-    BUTTON2 = SW2,
+    SERIAL_RX = CONSOLE_RX,
 
     // Force PinName to 32-bit required by NU_PINNAME_BIND(...)
     FORCE_ENUM_PINNAME_32BIT = 0x7FFFFFFF,
 
 } PinName;
+
+// LEDs
+#define LED1 PE_11
+#define LED2 PE_10
+#define LED3 PE_9
+
+// Button naming
+#define SW1 PE_5
+#define SW2 PE_6
+#define BUTTON1 SW1
+#define BUTTON2 SW2
+
+// I2C
+#define I2C_SCL D15
+#define I2C_SDA D14
 
 #ifdef __cplusplus
 }

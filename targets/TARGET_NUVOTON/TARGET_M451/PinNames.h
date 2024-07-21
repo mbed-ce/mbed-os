@@ -162,7 +162,7 @@ typedef enum {
 #define LED3 PD_7
 
 // Button naming
-#define SW2 PA_15,
+#define SW2 PA_15
 #define SW3 PA_14
 #define BUTTON1 SW2
 #define BUTTON2 SW3
