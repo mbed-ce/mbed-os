@@ -6,6 +6,7 @@
  * @brief    NUC472/NUC442 system clock definition file
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2013 Nuvoton Technology Corp. All rights reserved.
  *****************************************************************************/
 #ifndef __SYSTEM_NUC472_442_H__

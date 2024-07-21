@@ -6,6 +6,7 @@
  * @brief    CMSIS ARM Cortex-M0 Core Device Startup File
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2013 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/  
 

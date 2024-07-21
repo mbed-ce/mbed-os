@@ -6,6 +6,7 @@
  * @brief    NUC472/NUC442 PS2 Driver Header File
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2013 Nuvoton Technology Corp. All rights reserved.
  ******************************************************************************/
 #ifndef __PS2_H__

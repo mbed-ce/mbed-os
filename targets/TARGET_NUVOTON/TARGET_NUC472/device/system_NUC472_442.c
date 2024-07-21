@@ -6,6 +6,7 @@
  * @brief    NUC472/NUC442 system clock init code and assert handler
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2013 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
 

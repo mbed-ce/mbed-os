@@ -6,6 +6,7 @@
  * @brief    NUC470 series Image Capture Driver Header File
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2013 Nuvoton Technology Corp. All rights reserved.
  *
  ******************************************************************************/

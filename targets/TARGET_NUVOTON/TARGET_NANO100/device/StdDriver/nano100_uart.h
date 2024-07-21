@@ -6,6 +6,7 @@
  * @brief    Nano100 Series uart control header file.
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2013 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
 

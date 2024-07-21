@@ -6,6 +6,7 @@
  * @brief    Nano100 series TIMER driver header file
  *
  * @note
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright (C) 2013 Nuvoton Technology Corp. All rights reserved.
  *****************************************************************************/
 #ifndef __TIMER_H__

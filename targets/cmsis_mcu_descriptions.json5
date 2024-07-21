@@ -2435,6 +2435,100 @@
         "sub_family": null,
         "vendor": "Maxim:23"
     },
+    "MAX32670": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "Flash/MAX32670.FLM",
+                "ram_size": null,
+                "ram_start": null,
+                "size": 393215,
+                "start": 268435456,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "FlashIAR/FlashMAX32670.flash",
+                "ram_size": 524288,
+                "ram_start": 536870912,
+                "size": 1048576,
+                "start": 268435456,
+                "style": "IAR"
+            }
+        ],
+        "family": "MAX32670 family",
+        "from_pack": {
+            "pack": "MAX32670",
+            "url": "http://www.mxim.net/microcontroller/pack/",
+            "vendor": "Maxim",
+            "version": "1.1.0"
+        },
+        "memories": {
+            "IRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 163839,
+                "start": 536870912,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 393215,
+                "start": 268435456,
+                "startup": true
+            }
+        },
+        "name": "MAX32670",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM4",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "NotPresent",
+                "name": "Cortex-M4",
+                "svd": null,
+                "unit": 0
+            },
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM4",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "NotPresent",
+                "name": "Cortex-M4",
+                "svd": null,
+                "unit": 1
+            }
+        ],
+        "sub_family": null,
+        "vendor": "Maxim:23"
+    },
     "MIMXRT1052DVL6A": {
         "algorithms": [
             {
