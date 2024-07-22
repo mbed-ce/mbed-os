@@ -29,7 +29,7 @@ jobs:
           echo "OPENOCD_ADAPTER_SERIAL=$(jq -r --arg RUNNER_NAME ${{ runner.name }} '.[$RUNNER_NAME].OPENOCD_ADAPTER_SERIAL' runners/runner_configuration.json)" >> $GITHUB_ENV
       - name: Configure cmake
         run: >
-          - cd "$BUILD_DIR" &&
+          cd "$BUILD_DIR" &&
           cmake
           ${{ github.workspace }}
           -GNinja
