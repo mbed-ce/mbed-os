@@ -16,17 +16,17 @@ jobs:
           # - MBED_TARGET: NUCLEO_H723ZG
     runs-on: ${{ matrix.target.MBED_TARGET }}
     env:
-      BUILD_DIR: ~/actions-runner/_build_${{ matrix.target.MBED_TARGET }}
       JUNIT_OUTPUT: ${{ github.workspace }}/mbed-tests-${{ matrix.target.MBED_TARGET }}.xml
     steps:
       - uses: actions/checkout@v4
-      - name: Create build directory
-        run: mkdir -p "$BUILD_DIR"
       - name: Set build variables
         run: |
           echo "MBED_GREENTEA_SERIAL_PORT=$(jq -r --arg RUNNER_NAME ${{ runner.name }} '.[$RUNNER_NAME].MBED_GREENTEA_SERIAL_PORT' runners/runner_configuration.json)" >> $GITHUB_ENV
           echo "UPLOAD_METHOD=$(jq -r --arg RUNNER_NAME ${{ runner.name }} '.[$RUNNER_NAME].UPLOAD_METHOD' runners/runner_configuration.json)" >> $GITHUB_ENV
           echo "OPENOCD_ADAPTER_SERIAL=$(jq -r --arg RUNNER_NAME ${{ runner.name }} '.[$RUNNER_NAME].OPENOCD_ADAPTER_SERIAL' runners/runner_configuration.json)" >> $GITHUB_ENV
+          echo "BUILD_DIR=$HOME/actions-runner/${{ runner.name }}/_build" >> $GITHUB_ENV
+      - name: Create build directory
+        run: mkdir -p "$BUILD_DIR"
       - name: Configure cmake
         run: >
           cd "$BUILD_DIR" &&
