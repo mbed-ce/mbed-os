@@ -16,7 +16,7 @@ jobs:
           # - MBED_TARGET: NUCLEO_H723ZG
     runs-on: ${{ matrix.target.MBED_TARGET }}
     env:
-      BUILD_DIR: /home/victor/runner-shared/build_${{ matrix.target.MBED_TARGET }}
+      BUILD_DIR: ~/actions-runner/_build_${{ matrix.target.MBED_TARGET }}
       JUNIT_OUTPUT: ${{ github.workspace }}/mbed-tests-${{ matrix.target.MBED_TARGET }}.xml
     steps:
       - uses: actions/checkout@v4
