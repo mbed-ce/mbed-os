@@ -10,6 +10,8 @@ add_library(mbed-stm32h5 INTERFACE)
 target_sources(mbed-stm32h5
     INTERFACE
     clock_cfg/system_clock.c
+    analogin_device.c
+    analogout_device.c
     gpio_irq_device.c
     serial_device.c
     pwmout_device.c

@@ -3092,11 +3092,10 @@
             "MBED_TICKLESS"
         ],
         "device_has_add": [
-            "MPU"
+            "MPU",
+            "ANALOGOUT"
         ],
         "device_has_remove": [
-            "ANALOGOUT",
-            "ANALOGIN",
             "FLASH",
             "LPTICKER",
             "CAN",
@@ -3135,6 +3134,9 @@
             "lse_available":  1,
             "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
         },
+        "device_has_remove": [
+            "ANALOGOUT" // both DAC pins are in conflict with LED1 and STDIO_UART_TX
+        ],
         "detect_code": [
             "0832"
         ],
