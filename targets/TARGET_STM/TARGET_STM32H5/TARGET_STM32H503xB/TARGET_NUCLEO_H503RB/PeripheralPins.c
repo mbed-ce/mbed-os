@@ -68,7 +68,7 @@ MBED_WEAK const PinMap PinMap_ADC_Internal[] = {
 };
 
 //*** DAC ***
-
+// Not usable in case of Nucleo-H503RB board because both pins are already used.
 MBED_WEAK const PinMap PinMap_DAC[] = {
     {PA_4,       DAC_1, STM_PIN_DATA_EXT(STM_MODE_ANALOG, GPIO_NOPULL, 0, 1, 0)}, // DAC1_OUT1 // Connected to STDIO_UART_TX
     {PA_5,       DAC_1, STM_PIN_DATA_EXT(STM_MODE_ANALOG, GPIO_NOPULL, 0, 2, 0)}, // DAC1_OUT2 // Connected to USER_LED
