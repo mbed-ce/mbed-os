@@ -480,7 +480,7 @@ public:
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
     transfer(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT> &rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
     {
-        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity()));
+        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity() * sizeof(WordT)));
         return transfer_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, callback, event);
     }
 
@@ -489,7 +489,7 @@ public:
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
     transfer(const std::nullptr_t tx_buffer, int tx_length, CacheAlignedBuffer<WordT> &rx_buffer, int rx_length, const event_callback_t &callback, int event = SPI_EVENT_COMPLETE)
     {
-        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity()));
+        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity() * sizeof(WordT)));
         return transfer_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, callback, event);
     }
     template<typename WordT>
@@ -528,7 +528,7 @@ public:
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
     transfer_and_wait(const WordT *tx_buffer, int tx_length, CacheAlignedBuffer<WordT> &rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
     {
-        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity()));
+        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity() * sizeof(WordT)));
         return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, timeout);
     }
 
@@ -537,7 +537,7 @@ public:
     typename std::enable_if<std::is_integral<WordT>::value, int>::type
     transfer_and_wait(const std::nullptr_t tx_buffer, int tx_length, CacheAlignedBuffer<WordT> &rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout = rtos::Kernel::wait_for_u32_forever)
     {
-        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity()));
+        MBED_ASSERT(rx_length <= static_cast<int>(rx_buffer.capacity() * sizeof(WordT)));
         return transfer_and_wait_internal(tx_buffer, tx_length, rx_buffer.data(), rx_length, timeout);
     }
     template<typename WordT>
@@ -549,6 +549,8 @@ public:
 
     /**
      * @brief Abort the on-going SPI transfer, if any, and continue with transfers in the queue, if any.
+     *
+     * @note If a transfer is aborted, its callback will not be called at all.
      */
     void abort_transfer();
 

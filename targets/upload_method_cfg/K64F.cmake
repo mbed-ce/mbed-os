@@ -5,6 +5,8 @@
 # Notes:
 # 1. PyOCD did not actually work in my testing as of Apr 2024, though this device is supposed to be supported
 # 2. Be sure to update the DAPLink firmware on the board via these instructions: https://os.mbed.com/blog/entry/DAPLink-bootloader-update/
+# 3. OpenOCD 0.12 flashes this device perfectly and can enter a debug session, but cannot hit breakpoints
+# 4. LinkServer can both flash and debug, so it's the recommended upload method for this device.
 
 # General config parameters
 # -------------------------------------------------------------
