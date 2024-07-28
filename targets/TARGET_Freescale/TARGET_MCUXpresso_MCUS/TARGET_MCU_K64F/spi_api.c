@@ -498,10 +498,6 @@ uint32_t spi_irq_handler_asynch(spi_t *obj)
         /* Interrupt implementation */
         obj->spi.status = kDSPI_Idle;
 
-        // Clear the end of queue flag.  This flag is used by FSL HAL to stop the interrupt-based transfer
-        // after the last word, but when set, it prevents any more bytes from being transferred.
-        DSPI_ClearStatusFlags(spi_address[obj->spi.instance], kDSPI_EndOfQueueFlag);
-
         // SPI transfer done, can enter deep sleep
         sleep_manager_unlock_deep_sleep();
 
