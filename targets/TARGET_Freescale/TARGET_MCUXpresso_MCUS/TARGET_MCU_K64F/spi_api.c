@@ -196,10 +196,7 @@ int spi_master_block_write(spi_t *obj, const char *tx_buffer, int tx_length,
 {
     int total = (tx_length > rx_length) ? tx_length : rx_length;
 
-    // Duplicate dummy byte for 16 bit mode if needed
-    uint16_t dummy_byte = write_fill | (((uint16_t)write_fill) << 8);
-
-    DSPI_SetDummyData(spi_address[obj->spi.instance], dummy_byte);
+    DSPI_SetDummyData(spi_address[obj->spi.instance], write_fill);
     DSPI_MasterTransferBlocking(spi_address[obj->spi.instance], &(dspi_transfer_t) {
         .txData = (uint8_t *)tx_buffer,
         .rxData = (uint8_t *)rx_buffer,
