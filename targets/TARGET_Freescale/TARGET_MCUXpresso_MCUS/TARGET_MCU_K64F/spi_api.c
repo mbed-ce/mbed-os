@@ -180,6 +180,12 @@ int spi_master_write(spi_t *obj, int value)
     DSPI_GetDefaultDataCommandConfig(&command);
     command.isEndOfQueue = true;
 
+    // Some other FSL HAL SPI functions (notably, interrupt and DMA based transfers) can leave junk in the FIFO
+    // and/or leave the end of queue flag set, which blocks bytes from being transferred.
+    // Clear that stuff out now, because if we don't, we will hang forever in the SPI write function!
+    DSPI_FlushFifo(spi_address[obj->spi.instance], true, true);
+    DSPI_ClearStatusFlags(spi_address[obj->spi.instance], kDSPI_EndOfQueueFlag);
+
     DSPI_MasterWriteDataBlocking(spi_address[obj->spi.instance], &command, (uint16_t)value);
 
     DSPI_ClearStatusFlags(spi_address[obj->spi.instance], kDSPI_TxFifoFillRequestFlag);
@@ -433,6 +439,7 @@ uint32_t spi_irq_handler_asynch(spi_t *obj)
 
     /* Determine whether the current scenario is DMA or IRQ, and act accordingly */
     if (obj->spi.spiDmaMasterRx.dmaUsageState == DMA_USAGE_ALLOCATED || obj->spi.spiDmaMasterRx.dmaUsageState == DMA_USAGE_TEMPORARY_ALLOCATED) {
+
         /* DMA implementation */
         /* Check If there is still data in the TX buffer */
         if (obj->tx_buff.pos < obj->tx_buff.length) {
