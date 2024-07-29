@@ -3627,6 +3627,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "usb_speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_HS"
+            },
+            "wifi_driver_in_qspi_flash": {
+                help: "If this is false, and wifi is used in the application, the wifi chip firmware will be included in the application firmware (+411kiB code size).  If true, then the wifi firmware is loaded from the external QSPI flash instead, and you must install it using the Arduino IDE sketch for this purpose.",
+                value: false
             }
         },
         "components_add": [

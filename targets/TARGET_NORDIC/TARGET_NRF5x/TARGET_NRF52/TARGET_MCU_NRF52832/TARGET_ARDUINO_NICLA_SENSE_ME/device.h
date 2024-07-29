@@ -1,8 +1,5 @@
 /* mbed Microcontroller Library
  * Copyright (c) 2006-2013 ARM Limited
-=======
-/*
- * Copyright 2024 Arduino SA
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,22 +20,3 @@
 #include "objects.h"
 
 #endif
-=======
-#include "cyhal_system.h"
-
-#include "mbed_critical.h"
-
-uint32_t cyhal_system_critical_section_enter(void)
-{
-    bool were_interrupts_enabled = !core_util_in_critical_section();
-
-    core_util_critical_section_enter();
-
-    return were_interrupts_enabled;
-}
-
-void cyhal_system_critical_section_exit(uint32_t old_state)
-{
-    (void)old_state;
-    core_util_critical_section_exit();
-}
