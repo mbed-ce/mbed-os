@@ -58,6 +58,8 @@ MBED_WEAK wiced_result_t whd_firmware_check_hook(const char *mounted_name, int m
     return WICED_ERROR;
 }
 
+wiced_filesystem_t resource_fs_handle = 0;
+
 wiced_result_t wiced_filesystem_setup()
 {
     static QSPIFBlockDevice *qspi_bd = nullptr;
@@ -82,6 +84,7 @@ wiced_result_t wiced_filesystem_setup()
         mbr_bd = new mbed::MBRBlockDevice(qspi_bd, WIFI_DEFAULT_PARTITION);
         if(mbr_bd->init() != mbed::BD_ERROR_OK)
         {
+            whd_firmware_check_hook(WIFI_DEFAULT_MOUNT_NAME, true);
             delete mbr_bd;
             mbr_bd = nullptr;
             return WICED_ERROR;

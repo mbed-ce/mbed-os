@@ -572,7 +572,7 @@ DMA_HandleTypeDef *stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink)
 }
 
 DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direction, bool periphInc, bool memInc,
-                                     uint8_t periphDataAlignment, uint8_t memDataAlignment){
+                                     uint8_t periphDataAlignment, uint8_t memDataAlignment, uint32_t mode){
 
 #ifdef DMA_IP_VERSION_V2
     // Channels start from 1 in IP v2 only
@@ -640,6 +640,7 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
 
 #endif
     dmaHandle->Init.Direction = direction;
+    dmaHandle->Init.Mode = mode;
 
     // IP v3 uses different fields for... basically everything in this struct
 #ifdef DMA_IP_VERSION_V3
@@ -760,8 +761,6 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
     }
 
 #endif
-
-    dmaHandle->Init.Mode = DMA_NORMAL;
 
     HAL_DMA_Init(dmaHandle);
 

@@ -21,7 +21,7 @@
 
 #define WIFI 2
 #if !defined(MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE) || \
-    (MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI && !defined(MBED_CONF_NSAPI_DEFAULT_WIFI_SSID))
+    (MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI && !defined(MBED_GREENTEA_WIFI_SECURE_SSID))
 #error [NOT_SUPPORTED] No network configuration found for this target.
 #else
 
@@ -61,7 +61,13 @@ void drop_bad_packets(UDPSocket &sock, int orig_timeout)
 }
 static void _ifup()
 {
+#if MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI
+    WiFiInterface * net = WiFiInterface::get_default_instance();
+    net->set_credentials(MBED_GREENTEA_WIFI_SECURE_SSID, MBED_GREENTEA_WIFI_SECURE_PASSWORD);
+#else
     NetworkInterface *net = NetworkInterface::get_default_instance();
+#endif
+
     TEST_ASSERT_NOT_NULL_MESSAGE(net, "No NetworkInterface configured");
     nsapi_error_t err = net->connect();
 
