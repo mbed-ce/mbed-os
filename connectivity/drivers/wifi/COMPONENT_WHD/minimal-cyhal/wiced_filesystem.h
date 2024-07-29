@@ -76,9 +76,9 @@ typedef int wiced_file_t;
  */
 typedef int wiced_filesystem_handle_type_t;
 
-// Global "FS handle" object.  Just here to match the WHD driver's expectations, we have one global
+// Global "FS handle" object.  Just here to match the WHD driver's expectations, we in fact have one global
 // filesystem object.
-static wiced_filesystem_t resource_fs_handle = 0;
+extern wiced_filesystem_t resource_fs_handle;
 
 /**
  * @brief Sets up the file system where the wifi module resources will be loaded from.

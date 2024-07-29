@@ -14,7 +14,7 @@ target_include_directories(mbed-core-flags
         .
         ./include
         ./include/drivers
-        ./include/drivers/internal
+        ./include/drivers/interfaces
 )
 
 target_sources(mbed-core-sources
