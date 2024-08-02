@@ -18,13 +18,6 @@
 #if !defined(MBED_CONF_RTOS_PRESENT)
 #error [NOT_SUPPORTED] dns test cases require a RTOS to run.
 #else
-
-#define WIFI 2
-#if !defined(MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE) || \
-    (MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI && !defined(MBED_CONF_NSAPI_DEFAULT_WIFI_SSID))
-#error [NOT_SUPPORTED] No network configuration found for this target.
-#else
-
 #include "mbed.h"
 #include "greentea-client/test_env.h"
 #include "unity.h"
@@ -167,7 +160,7 @@ static void net_bringup()
     nsapi_dns_reset();
     MBED_ASSERT(MBED_CONF_APP_DNS_TEST_HOSTS_NUM >= MBED_CONF_NSAPI_DNS_CACHE_SIZE && MBED_CONF_APP_DNS_TEST_HOSTS_NUM >= MBED_CONF_APP_DNS_SIMULT_QUERIES + 1);
 
-    net = NetworkInterface::get_default_instance();
+    net = get_network_interface();
     TEST_ASSERT_NOT_NULL_MESSAGE(net, "No NetworkInterface configured");
     nsapi_error_t err = net->connect();
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, err);
@@ -186,7 +179,7 @@ static void net_bringup()
 
 static void net_bringdown()
 {
-    NetworkInterface::get_default_instance()->disconnect();
+    get_network_interface()->disconnect();
     tr_info("MBED: ifdown");
 }
 
@@ -238,5 +231,4 @@ int main()
     return !Harness::run(specification);
 }
 
-#endif // !defined(MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE) || (MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI && !defined(MBED_CONF_NSAPI_DEFAULT_WIFI_SSID))
 #endif // !defined(MBED_CONF_RTOS_PRESENT)

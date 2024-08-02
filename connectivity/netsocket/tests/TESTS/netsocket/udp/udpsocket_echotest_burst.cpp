@@ -21,6 +21,8 @@
 #include "unity/unity.h"
 #include "utest.h"
 #include "udp_tests.h"
+#include "greentea_get_network_interface.h"
+
 #ifdef MBED_CONF_APP_BAUD_RATE
 #include "CellularDevice.h"
 #endif // MBED_CONF_CELLULAR_PRESENT
@@ -78,12 +80,12 @@ void UDPSOCKET_ECHOTEST_BURST()
 #endif
 
     SocketAddress udp_addr;
-    NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
+    get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
     udp_addr.set_port(ECHO_SERVER_PORT);
 
     UDPSocket sock;
     const int TIMEOUT = 5000; // [ms]
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
     sock.set_timeout(TIMEOUT);
     sock.sigio(callback(_sigio_handler, ThisThread::get_id()));
 
@@ -167,11 +169,11 @@ void UDPSOCKET_ECHOTEST_BURST_NONBLOCK()
 #endif
 
     SocketAddress udp_addr;
-    NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
+    get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
     udp_addr.set_port(ECHO_SERVER_PORT);
 
     UDPSocket sock;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
     sock.set_blocking(false);
     sock.sigio(callback(_sigio_handler, ThisThread::get_id()));
 

@@ -307,7 +307,7 @@ git checkout master
 cd ..
 ```
 
-Also, building socket test cases requires a special macro to enable all tests, so create an `mbed_app.json` file with the following content at minimum:
+To configure the echo server to a non-default IP and port, you can create an mbed_app.json with the following content: 
 
 ```
 {
@@ -336,77 +336,10 @@ Also, building socket test cases requires a special macro to enable all tests, s
 }
 ```
 
-Wi-Fi tests require some more configuration, so for Wi-Fi purposes, the `mbed_app.json` might look like this:
-
+Wi-Fi tests require configuration of your wifi network, so you might run CMake like this: 
 ```
-{
-    "config": {
-        "wifi-secure-ssid": {
-            "help": "WiFi SSID for WPA2 secured network",
-            "value": "\"test-network\""
-        },
-        "wifi-unsecure-ssid": {
-            "help": "WiFi SSID for unsecure netwrok",
-            "value": "\"unsecure-test-net\""
-        },
-        "wifi-password": {
-            "help": "WiFi Password",
-            "value": "\"password\""
-        },
-        "wifi-secure-protocol": {
-            "help": "WiFi security protocol, valid values are WEP, WPA, WPA2, WPA_WPA2",
-            "value": "\"WPA2\""
-        },
-        "wifi-ch-secure": {
-            "help": "Channel number of secure SSID",
-            "value": 6
-        },
-        "wifi-ch-unsecure": {
-            "help": "Channel number of unsecure SSID",
-            "value": 6
-        },
-        "ap-mac-secure": {
-            "help": "BSSID of secure AP in form of AA:BB:CC:DD:EE:FF",
-            "value": "\"58:8b:f3:99:f2:9c\""
-        },
-        "ap-mac-unsecure": {
-            "help": "BSSID of unsecure AP in form of \"AA:BB:CC:DD:EE:FF\"",
-            "value": "\"58:8b:f3:99:c2:08\""
-        },
-        "max-scan-size": {
-            "help": "How many networks may appear in Wifi scan result",
-            "value": 30
-        },
-        "echo-server-addr" : {
-            "help" : "IP address of echo server",
-            "value" : "\"echo.mbedcloudtesting.com\""
-        },
-        "echo-server-port" : {
-            "help" : "Port of echo server",
-            "value" : "7"
-        },
-        "echo-server-discard-port" : {
-            "help" : "Discard port of echo server",
-            "value" : "9"
-        },
-        "echo-server-port-tls" : {
-            "help" : "Port of echo server for TLS",
-            "value" : "2007"
-        },
-        "echo-server-discard-port-tls" : {
-            "help" : "Discard port of echo server for TLS",
-            "value" : "2009"
-        }
-    },
-    "target_overrides": {
-        "*": {
-            "target.network-default-interface-type": "WIFI",
-            "nsapi.default-wifi-ssid": "\"WIFI_SSID\"",
-            "nsapi.default-wifi-password": "\"WIFI_PASSWORD\"",
-            "nsapi.default-wifi-security": "WPA_WPA2"
-        }
-    }
-}
+cmake "-DMBED_GREENTEA_WIFI_SECURE_SSID=My Wifi Network Name" -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=MyWifiNetworkPassword 
+    -DMBED_GREENTEA_WIFI_SECURE_CHANNEL=5
 ```
 
 Cellular tests require some more configuration, so for cellular purposes, the `mbed_app.json` might look like this:

@@ -23,9 +23,6 @@
 
 using namespace utest::v1;
 
-#if defined(MBED_CONF_APP_WIFI_UNSECURE_SSID)
-
-#define SSID_MAX_LEN 32
 nsapi_connection_status_t status_connection;
 Semaphore sem_conn(0, 1);
 Semaphore sem_disconn(0, 1);
@@ -50,9 +47,7 @@ void status_callback(nsapi_event_t e, intptr_t d)
 
 void wifi_connect_disconnect_nonblock(void)
 {
-    WiFiInterface *wifi = get_interface();
-    char ssid[SSID_MAX_LEN + 1] = MBED_CONF_APP_WIFI_UNSECURE_SSID;
-    TEST_ASSERT_EQUAL_INT(NSAPI_ERROR_OK, wifi->set_credentials(ssid, NULL));
+    WiFiInterface *wifi = get_wifi_interface();
     wifi->attach(status_callback);
     TEST_SKIP_UNLESS(wifi->set_blocking(false) != NSAPI_ERROR_UNSUPPORTED);
     nsapi_error_t ret = wifi->connect();
@@ -61,20 +56,16 @@ void wifi_connect_disconnect_nonblock(void)
     TEST_ASSERT_EQUAL_INT(NSAPI_ERROR_OK, ret);
     TEST_ASSERT_EQUAL_INT(NSAPI_ERROR_BUSY, ret2);
     TEST_ASSERT_TRUE(ret3 == NSAPI_ERROR_BUSY || ret3 == NSAPI_ERROR_IS_CONNECTED);
-    bool res = sem_connecting.try_acquire_for(30000);
+    TEST_ASSERT_TRUE(sem_connecting.try_acquire_for(30s));
     TEST_ASSERT_EQUAL_INT(NSAPI_STATUS_CONNECTING, status_connection);
-    res = sem_conn.try_acquire_for(30000);
-    TEST_ASSERT_TRUE(res == true);
+    TEST_ASSERT_TRUE(sem_conn.try_acquire_for(30s));
     TEST_ASSERT_TRUE(status_connection == NSAPI_STATUS_GLOBAL_UP || status_connection == NSAPI_STATUS_LOCAL_UP);
     ret = wifi->disconnect();
     ret3 = wifi->disconnect();
     TEST_ASSERT_EQUAL_INT(NSAPI_ERROR_OK, ret);
     TEST_ASSERT_TRUE(ret3 == NSAPI_ERROR_BUSY || ret3 == NSAPI_ERROR_NO_CONNECTION);
-    res = sem_disconn.try_acquire_for(30000);
-    TEST_ASSERT_TRUE(res == true);
+    TEST_ASSERT_TRUE(sem_disconn.try_acquire_for(30s));
     TEST_ASSERT_EQUAL_INT(NSAPI_STATUS_DISCONNECTED, status_connection);
     wifi->set_blocking(true);
     wifi->attach(0);
 }
-
-#endif // defined(MBED_CONF_APP_WIFI_UNSECURE_SSID)

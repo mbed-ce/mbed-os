@@ -34,8 +34,8 @@ void TLSSOCKET_OPEN_TWICE()
         TEST_FAIL();
     }
 
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(NetworkInterface::get_default_instance()));
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_PARAMETER, sock->open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(get_network_interface()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_PARAMETER, sock->open(get_network_interface()));
 
     delete sock;
 }

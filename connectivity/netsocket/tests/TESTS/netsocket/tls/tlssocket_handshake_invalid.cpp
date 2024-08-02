@@ -30,7 +30,7 @@ void TLSSOCKET_HANDSHAKE_INVALID()
 {
     const int https_port = 443;
     SKIP_IF_TCP_UNSUPPORTED();
-    NetworkInterface *net = NetworkInterface::get_default_instance();
+    NetworkInterface *net = get_network_interface();
 
 #if (MBED_CONF_NSAPI_DEFAULT_STACK == NANOSTACK || (MBED_CONF_NSAPI_DEFAULT_STACK == LWIP && defined(MBED_CONF_LWIP_PPP_IPV6_ENABLED)))
     SocketAddress address;

@@ -21,6 +21,7 @@
 #include "unity/unity.h"
 #include "utest.h"
 #include "udp_tests.h"
+#include "greentea_get_network_interface.h"
 
 using namespace utest::v1;
 
@@ -30,10 +31,10 @@ void UDPSOCKET_SENDTO_TIMEOUT()
     fill_tx_buffer_ascii(tx_buffer, sizeof(tx_buffer));
 
     UDPSocket sock;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
 
     SocketAddress udp_addr;
-    NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
+    get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
     udp_addr.set_port(9);
 
     Timer timer;

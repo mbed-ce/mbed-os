@@ -21,6 +21,7 @@
 #include "UDPSocket.h"
 #include "unity/unity.h"
 #include "utest.h"
+#include "greentea_get_network_interface.h"
 
 using namespace utest::v1;
 
@@ -30,7 +31,7 @@ void UDPSOCKET_BIND_ADDRESS_INVALID()
     if (!sock) {
         TEST_FAIL();
     }
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(get_network_interface()));
 
     nsapi_error_t bind_result = NSAPI_ERROR_OK;
     if (get_ip_version() == NSAPI_IPv4) {

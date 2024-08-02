@@ -30,7 +30,7 @@ void TLSSOCKET_CONNECT_INVALID()
 {
     SKIP_IF_TCP_UNSUPPORTED();
     TLSSocket sock;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.set_root_ca_cert(tls_global::cert));
 
     SocketAddress address;

@@ -22,6 +22,7 @@
 #include "unity/unity.h"
 #include "utest.h"
 #include "udp_tests.h"
+#include "greentea_get_network_interface.h"
 
 using namespace std::chrono;
 using namespace utest::v1;
@@ -66,11 +67,11 @@ void UDPSOCKET_ECHOTEST_impl(bool use_sendto)
 {
     SocketAddress udp_addr;
     SocketAddress recv_addr;
-    NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
+    get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
     udp_addr.set_port(ECHO_SERVER_PORT);
 
     UDPSocket sock;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
 
     if (!use_sendto) {
         TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.connect(udp_addr));
@@ -173,14 +174,14 @@ void UDPSOCKET_ECHOTEST_NONBLOCK_impl(bool use_sendto)
     time_allotted = split2half_rmng_udp_test_time();
 
     SocketAddress udp_addr;
-    NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
+    get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
     udp_addr.set_port(ECHO_SERVER_PORT);
     sock = new UDPSocket();
     if (sock == NULL) {
         TEST_FAIL_MESSAGE("UDPSocket not created");
         return;
     }
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(get_network_interface()));
 
     if (!use_sendto) {
         TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->connect(udp_addr));

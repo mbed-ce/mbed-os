@@ -30,7 +30,7 @@ const int repeats = 5;
 
 void NETWORKINTERFACE_CONN_DISC_REPEAT()
 {
-    net = NetworkInterface::get_default_instance();
+    net = get_network_interface();
 
     for (int i = 0; i < repeats; i++) {
         nsapi_error_t err = net->connect();

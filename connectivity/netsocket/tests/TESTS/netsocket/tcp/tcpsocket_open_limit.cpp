@@ -48,7 +48,7 @@ void TCPSOCKET_OPEN_LIMIT()
             if (!sock) {
                 break;
             }
-            ret = sock->open(NetworkInterface::get_default_instance());
+            ret = sock->open(get_network_interface());
             if (ret == NSAPI_ERROR_NO_MEMORY || ret == NSAPI_ERROR_NO_SOCKET) {
                 tr_error("[round#%02d] unable to open new socket, error: %d", i, ret);
                 delete sock;

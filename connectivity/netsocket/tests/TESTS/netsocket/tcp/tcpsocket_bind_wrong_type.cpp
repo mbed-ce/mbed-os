@@ -30,7 +30,7 @@ void TCPSOCKET_BIND_WRONG_TYPE()
     SKIP_IF_TCP_UNSUPPORTED();
     TCPSocket sock;
 
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
     char addr_bytes[16] = {0xfe, 0x80, 0xff, 0x1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     SocketAddress sockAddr;
     if (get_ip_version() == NSAPI_IPv4) {

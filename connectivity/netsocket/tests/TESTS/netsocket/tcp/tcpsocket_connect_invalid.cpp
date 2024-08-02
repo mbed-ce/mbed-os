@@ -29,7 +29,7 @@ void TCPSOCKET_CONNECT_INVALID()
 {
     SKIP_IF_TCP_UNSUPPORTED();
     TCPSocket sock;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
 
     SocketAddress address;
     address.set_port(9);
@@ -37,7 +37,7 @@ void TCPSOCKET_CONNECT_INVALID()
     TEST_ASSERT_FALSE(address.set_ip_address(NULL));
 
     // Valid address for the final check
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &address));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &address));
     address.set_port(ECHO_SERVER_DISCARD_PORT);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.connect(address));
 

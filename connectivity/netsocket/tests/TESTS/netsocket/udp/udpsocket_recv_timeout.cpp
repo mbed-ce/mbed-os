@@ -21,6 +21,7 @@
 #include "unity/unity.h"
 #include "utest.h"
 #include "udp_tests.h"
+#include "greentea_get_network_interface.h"
 
 using namespace utest::v1;
 
@@ -38,14 +39,14 @@ static void _sigio_handler(osThreadId id)
 void UDPSOCKET_RECV_TIMEOUT()
 {
     SocketAddress udp_addr;
-    NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
+    get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &udp_addr);
     udp_addr.set_port(ECHO_SERVER_PORT);
 
     static const int DATA_LEN = 100;
     char buff[DATA_LEN] = {0};
 
     UDPSocket sock;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
     sock.set_timeout(100);
     sock.sigio(callback(_sigio_handler, ThisThread::get_id()));
 

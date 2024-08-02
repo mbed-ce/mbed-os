@@ -33,7 +33,7 @@ void TCPSOCKET_OPEN_DESTRUCT()
         if (!sock) {
             TEST_FAIL();
         }
-        TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(NetworkInterface::get_default_instance()));
+        TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(get_network_interface()));
         delete sock;
     }
 }

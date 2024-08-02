@@ -18,6 +18,8 @@
 #ifndef NETWORKINTERFACE_TESTS_H
 #define NETWORKINTERFACE_TESTS_H
 
+#include "greentea_get_network_interface.h"
+
 /*
  * Test cases
  */

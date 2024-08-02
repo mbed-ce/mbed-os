@@ -25,7 +25,7 @@ using namespace utest::v1;
 
 void wifi_scan_null(void)
 {
-    WiFiInterface *wifi = get_interface();
+    WiFiInterface *wifi = get_wifi_interface();
     TEST_ASSERT(wifi);
     if (wifi == NULL) {
         return;
