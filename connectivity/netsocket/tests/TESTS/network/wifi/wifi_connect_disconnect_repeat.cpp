@@ -35,8 +35,7 @@ void wifi_connect_disconnect_repeat(void)
         return;
     }
 
-    if(wifi->get_connection_status() != NSAPI_STATUS_DISCONNECTED)
-    {
+    if(wifi->get_connection_status() != NSAPI_STATUS_DISCONNECTED) {
         wifi->disconnect();
     }
 

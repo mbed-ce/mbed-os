@@ -44,11 +44,10 @@ inline nsapi_security get_wifi_security()
 /*
  * Get the wifi interface for this board, or nullptr if there is none
  */
-inline WiFiInterface * get_wifi_interface()
+inline WiFiInterface *get_wifi_interface()
 {
-    auto * const wifi_interface = WiFiInterface::get_default_instance();
-    if(wifi_interface == nullptr)
-    {
+    auto *const wifi_interface = WiFiInterface::get_default_instance();
+    if (wifi_interface == nullptr) {
         return nullptr;
     }
 
@@ -64,7 +63,7 @@ inline WiFiInterface * get_wifi_interface()
  * Get the default network interface for this board.
  * For wifi, this also configures in the credentials passed to CMake.
  */
-inline NetworkInterface * get_network_interface()
+inline NetworkInterface *get_network_interface()
 {
 #if MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI
     return get_wifi_interface();

@@ -56,7 +56,7 @@ void drop_bad_packets(UDPSocket &sock, int orig_timeout)
 }
 static void _ifup()
 {
-    NetworkInterface * net = get_network_interface();
+    NetworkInterface *net = get_network_interface();
 
     TEST_ASSERT_NOT_NULL_MESSAGE(net, "No NetworkInterface configured");
     nsapi_error_t err = net->connect();
