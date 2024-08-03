@@ -33,7 +33,7 @@ void wifi_connect_params_valid_secure(void)
         return;
     }
 
-    if(wifi->get_connection_status() != NSAPI_STATUS_DISCONNECTED) {
+    if (wifi->get_connection_status() != NSAPI_STATUS_DISCONNECTED) {
         wifi->disconnect();
     }
 
