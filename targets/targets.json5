@@ -3690,10 +3690,13 @@
     "ARDUINO_PORTENTA_H7_M7": {
         "inherits": ["ARDUINO_PORTENTA_H7"],
         "core": "Cortex-M7FD",
-        "mbed_rom_start": "0x08000000",
-        "mbed_rom_size" : "0x100000",
-        "mbed_ram_start": "0x24000000",
-        "mbed_ram_size" : "0x80000",
+        "memory_bank_config": {
+            // Select flash bank 1
+            "IROM1": {
+                "start": 0x08000000,
+                "size": 0x100000
+            }
+        },
         "extra_labels_add": [
             "STM32H747xI_CM7"
         ],
@@ -3704,10 +3707,13 @@
     "ARDUINO_PORTENTA_H7_M4": {
         "inherits": ["ARDUINO_PORTENTA_H7"],
         "core": "Cortex-M4F",
-        "mbed_rom_start": "0x08100000",
-        "mbed_rom_size" : "0x100000",
-        "mbed_ram_start": "0x10000000",
-        "mbed_ram_size" : "0x48000",
+        "memory_bank_config": {
+            // Select flash bank 2
+            "IROM1": {
+                "start": 0x08100000,
+                "size": 0x100000
+            }
+        },
         "extra_labels_add": [
             "STM32H747xI_CM4"
         ],
@@ -5309,6 +5315,35 @@
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
+        "memory_banks": {
+            "SDRAM": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x10000000, // 256MiB
+                "start": 0x80000000,
+                "startup": false
+            },
+            // MIMXRT1050 EVK uses hyperflash by default
+            "EXT_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x4000000, // 64MiB
+                "start": 0x60000000,
+                "startup": true
+            }
+        },
         "bootloader_supported": true,
         "device_name": "MIMXRT1052DVL6A",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/IMX_RT1050-EVKB_TOP-LR.jpg"
@@ -5334,6 +5369,35 @@
         ],
         "overrides": {
             "network-default-interface-type": "ETHERNET"
+        },
+        "memory_banks": {
+            "SDRAM": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x10000000, // 256MiB
+                "start": 0x80000000,
+                "startup": false
+            },
+            // MIMXRT1050 EVK uses QSPI flash by default
+            "EXT_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x800000, // 8MiB
+                "start": 0x60000000,
+                "startup": true
+            }
         },
         "device_name": "MIMXRT1062DVL6B",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/X-MIMXRT1060-EVK-BOARD-BOTTOM.jpg"

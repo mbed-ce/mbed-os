@@ -8178,8 +8178,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
-                "start": 135266304,
+                "size": 0x200000,
+                "start": 0x08000000,
                 "startup": true
             },
             "RAM_D3": {

@@ -27,6 +27,7 @@ MAIN_CPP_FILE_NAME = "main.cpp"
 MBED_OS_REFERENCE_FILE_NAME = "mbed-os.lib"
 MBED_OS_DIR_NAME = "mbed-os"
 TARGETS_JSON_FILE_PATH = Path("targets", "targets.json5")
+CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH = Path("targets", "cmsis_mcu_descriptions.json5")
 CUSTOM_TARGETS_JSON_FILE_NAME = "custom_targets.json"
 CUSTOM_TARGETS_JSON5_FILE_NAME = "custom_targets.json5"
 
@@ -149,21 +150,29 @@ class MbedOS:
 
     root: Path
     targets_json_file: Path
+    cmsis_mcu_descriptions_json_file: Path
 
     @classmethod
     def from_existing(cls, root_path: Path, check_root_path_exists: bool = True) -> "MbedOS":
         """Create MbedOS from a directory containing an existing MbedOS installation."""
         targets_json_file = root_path / TARGETS_JSON_FILE_PATH
+        cmsis_mcu_descriptions_json_file = root_path / CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH
 
         if check_root_path_exists and not root_path.exists():
             raise ValueError("The mbed-os directory does not exist.")
 
         if root_path.exists() and not targets_json_file.exists():
-            raise ValueError("This MbedOS copy does not contain a targets.json file.")
+            raise ValueError(f"This MbedOS copy does not contain a {TARGETS_JSON_FILE_PATH} file.")
 
-        return cls(root=root_path, targets_json_file=targets_json_file)
+        if root_path.exists() and not cmsis_mcu_descriptions_json_file.exists():
+            raise ValueError(f"This MbedOS copy does not contain a "
+                             f"{CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH.name} file.")
+
+        return cls(root=root_path, targets_json_file=targets_json_file,
+                   cmsis_mcu_descriptions_json_file=cmsis_mcu_descriptions_json_file)
 
     @classmethod
     def from_new(cls, root_path: Path) -> "MbedOS":
         """Create MbedOS from an empty or new directory."""
-        return cls(root=root_path, targets_json_file=root_path / TARGETS_JSON_FILE_PATH)
+        return cls(root=root_path, targets_json_file=root_path / TARGETS_JSON_FILE_PATH,
+                   cmsis_mcu_descriptions_json_file=root_path / CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH)

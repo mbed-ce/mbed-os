@@ -57,24 +57,14 @@ set(MBED_TARGET_DEFINITIONS{% for component in components %}
 {% for form_factor in supported_form_factors %}
     TARGET_FF_{{form_factor}}
 {%- endfor %}
-{% if mbed_rom_start is defined %}
-    MBED_ROM_START={{ mbed_rom_start | to_hex }}
-{%- endif %}
-{% if mbed_rom_size is defined %}
-    MBED_ROM_SIZE={{ mbed_rom_size | to_hex }}
-{%- endif %}
-{% if mbed_ram_start is defined %}
-    MBED_RAM_START={{ mbed_ram_start | to_hex }}
-{%- endif %}
-{% if mbed_ram_size is defined %}
-    MBED_RAM_SIZE={{ mbed_ram_size | to_hex }}
-{%- endif %}
     TARGET_LIKE_MBED
     __MBED__=1
 )
 
 # config
 set(MBED_CONFIG_DEFINITIONS
+
+    # Config settings
 {% for setting in config %}
     {%- if setting.macro_name -%}
         {%- set setting_name = setting.macro_name -%}
@@ -90,7 +80,14 @@ set(MBED_CONFIG_DEFINITIONS
     "{{setting_name}}={{value}}"
     {% endif -%}
 {%- endfor -%}
+
+    # Macros from JSON
 {% for macro in macros %}
     "{{macro|replace("\"", "\\\"")}}"
+{%- endfor %}
+
+    # Memory bank macros
+{% for macro in memory_bank_macros | sort %}
+    {{macro}}
 {%- endfor %}
 )

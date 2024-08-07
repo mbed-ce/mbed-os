@@ -24,7 +24,7 @@ from typing import Dict, List, Any, Deque, Set
 
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import ALL_ACCUMULATING_ATTRIBUTES
 
-MERGING_ATTRIBUTES = ("config", "overrides")
+MERGING_ATTRIBUTES = ("config", "overrides", "memory_banks", "memory_overrides")
 NON_OVERRIDING_ATTRIBUTES = ALL_ACCUMULATING_ATTRIBUTES + ("public", "inherits")
 
 
