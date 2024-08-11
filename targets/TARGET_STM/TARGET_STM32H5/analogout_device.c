@@ -29,6 +29,16 @@ static int channel1_used = 0;
 static int channel2_used = 0;
 #endif
 
+void analogout_clock_configuration(void)
+{
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_DAC;
+    PeriphClkInitStruct.AdcDacClockSelection = LL_RCC_ADCDAC_CLKSOURCE_HCLK;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
+        error("analogout_init HAL_RCCEx_PeriphCLKConfig");
+    }
+}
+
 void analogout_init(dac_t *obj, PinName pin)
 {
     DAC_ChannelConfTypeDef sConfig = {0};
@@ -64,6 +74,8 @@ void analogout_init(dac_t *obj, PinName pin)
     // Save the pin for future use
     obj->pin = pin;
 
+    analogout_clock_configuration();
+
     __GPIOA_CLK_ENABLE();
 
     __HAL_RCC_DAC1_CLK_ENABLE();
@@ -75,6 +87,7 @@ void analogout_init(dac_t *obj, PinName pin)
         error("HAL_DAC_Init failed");
     }
 
+    sConfig.DAC_HighFrequency = DAC_HIGH_FREQUENCY_INTERFACE_MODE_ABOVE_160MHZ;
     sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
     sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
 

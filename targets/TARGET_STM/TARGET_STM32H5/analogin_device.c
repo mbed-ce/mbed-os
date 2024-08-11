@@ -29,7 +29,7 @@ void analogin_clock_configuration(void)
 {
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-    PeriphClkInitStruct.AdcDacClockSelection = LL_RCC_ADCDAC_CLKSOURCE_HSE;
+    PeriphClkInitStruct.AdcDacClockSelection = LL_RCC_ADCDAC_CLKSOURCE_HCLK;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         error("analogin_init HAL_RCCEx_PeriphCLKConfig");
     }
@@ -69,7 +69,7 @@ void analogin_init(analogin_t *obj, PinName pin)
 
     // Configure ADC object structures
     obj->handle.State = HAL_ADC_STATE_RESET;
-    obj->handle.Init.ClockPrescaler           = ADC_CLOCK_ASYNC_DIV1;
+    obj->handle.Init.ClockPrescaler           = ADC_CLOCK_ASYNC_DIV10;
     obj->handle.Init.Resolution               = ADC_RESOLUTION_12B;
     obj->handle.Init.ScanConvMode             = ADC_SCAN_DISABLE;
     obj->handle.Init.EOCSelection             = ADC_EOC_SINGLE_CONV;
@@ -82,7 +82,8 @@ void analogin_init(analogin_t *obj, PinName pin)
     obj->handle.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_NONE;
     obj->handle.Init.Overrun                  = ADC_OVR_DATA_OVERWRITTEN;
     obj->handle.Init.OversamplingMode         = DISABLE;
-
+    obj->handle.Init.DataAlign                = ADC_DATAALIGN_RIGHT;
+    
     __HAL_RCC_ADC_CLK_ENABLE();
 
     if (HAL_ADC_Init(&obj->handle) != HAL_OK) {
