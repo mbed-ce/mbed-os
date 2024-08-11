@@ -23,17 +23,21 @@
 
 using namespace utest::v1;
 
-#if defined(MBED_CONF_APP_WIFI_SECURE_SSID)
+#if defined(MBED_GREENTEA_WIFI_SECURE_SSID)
 
 void wifi_connect_params_valid_secure(void)
 {
-    WiFiInterface *wifi = get_interface();
+    WiFiInterface *wifi = get_wifi_interface();
     TEST_ASSERT(wifi);
     if (wifi == NULL) {
         return;
     }
 
-    if (wifi->connect(MBED_CONF_APP_WIFI_SECURE_SSID, MBED_CONF_APP_WIFI_PASSWORD, get_security()) == NSAPI_ERROR_OK) {
+    if (wifi->get_connection_status() != NSAPI_STATUS_DISCONNECTED) {
+        wifi->disconnect();
+    }
+
+    if (wifi->connect(MBED_GREENTEA_WIFI_SECURE_SSID, MBED_GREENTEA_WIFI_SECURE_PASSWORD, get_wifi_security()) == NSAPI_ERROR_OK) {
         if (wifi->disconnect() == NSAPI_ERROR_OK) {
             return;
         }
@@ -42,4 +46,4 @@ void wifi_connect_params_valid_secure(void)
     TEST_FAIL();
 }
 
-#endif // defined(MBED_CONF_APP_WIFI_SECURE_SSID)
+#endif // defined(MBED_GREENTEA_WIFI_SECURE_SSID)

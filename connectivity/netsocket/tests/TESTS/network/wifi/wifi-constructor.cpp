@@ -25,6 +25,6 @@ using namespace utest::v1;
 
 void wifi_constructor()
 {
-    WiFiInterface *wifi = get_interface();
+    WiFiInterface *wifi = WiFiInterface::get_default_instance();
     TEST_ASSERT(wifi);
 }

@@ -33,9 +33,9 @@ void TCPSOCKET_BIND_ADDRESS()
         TEST_FAIL();
         return;
     }
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(get_network_interface()));
     SocketAddress sockAddr;
-    NetworkInterface::get_default_instance()->get_ip_address(&sockAddr);
+    get_network_interface()->get_ip_address(&sockAddr);
     sockAddr.set_port(80);
     nsapi_error_t bind_result = sock->bind(sockAddr);
     if (bind_result == NSAPI_ERROR_UNSUPPORTED) {

@@ -21,6 +21,7 @@
 #include "UDPSocket.h"
 #include "unity/unity.h"
 #include "utest.h"
+#include "greentea_get_network_interface.h"
 
 using namespace utest::v1;
 

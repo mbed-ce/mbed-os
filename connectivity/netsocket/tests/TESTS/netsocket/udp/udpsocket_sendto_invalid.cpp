@@ -21,13 +21,14 @@
 #include "unity/unity.h"
 #include "utest.h"
 #include "udp_tests.h"
+#include "greentea_get_network_interface.h"
 
 using namespace utest::v1;
 
 void UDPSOCKET_SENDTO_INVALID()
 {
     UDPSocket sock;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
 
     SocketAddress addr;
     addr.set_ip_address("");
@@ -35,7 +36,7 @@ void UDPSOCKET_SENDTO_INVALID()
     // UDP will be able to send 0 bytes, but no particular error is raised
     TEST_ASSERT_EQUAL(sock.sendto(addr, NULL, 0), 0);
 
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &addr));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &addr));
     addr.set_port(9);
     nsapi_error_t result = sock.sendto(addr, NULL, 0);
     if (result != NSAPI_ERROR_UNSUPPORTED) {

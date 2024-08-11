@@ -29,7 +29,7 @@ void TCPSOCKET_SETSOCKOPT_KEEPALIVE_VALID()
 {
     SKIP_IF_TCP_UNSUPPORTED();
     TCPSocket sock;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
     int32_t seconds = 7200;
 
     int ret = sock.setsockopt(NSAPI_SOCKET, NSAPI_KEEPALIVE, &seconds, sizeof(int));
@@ -42,7 +42,7 @@ void TCPSOCKET_SETSOCKOPT_KEEPALIVE_VALID()
 
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, ret);
     SocketAddress address;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &address));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &address));
     address.set_port(9);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.connect(address));
     // LWIP stack does not support getsockopt so the part below is commented out

@@ -47,7 +47,7 @@ void do_getaddrinfo(const char hosts[][DNS_TEST_HOST_LEN], unsigned int op_count
     SocketAddress hints{{NSAPI_UNSPEC}, 80};
     for (unsigned int i = 0; i < op_count; i++) {
         SocketAddress *result;
-        nsapi_error_t err = NetworkInterface::get_default_instance()->get_default_instance()->getaddrinfo(hosts[i], &hints, &result);
+        nsapi_error_t err = get_network_interface()->getaddrinfo(hosts[i], &hints, &result);
 
         if (err == NSAPI_ERROR_DNS_FAILURE) {
             (*exp_dns_failure)++;

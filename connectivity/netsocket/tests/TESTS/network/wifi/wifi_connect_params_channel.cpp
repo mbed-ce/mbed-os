@@ -23,11 +23,11 @@
 
 using namespace utest::v1;
 
-#if defined(MBED_CONF_APP_WIFI_SECURE_SSID)
+#if defined(MBED_GREENTEA_WIFI_SECURE_SSID)
 
 void wifi_connect_params_channel(void)
 {
-    WiFiInterface *wifi = get_interface();
+    WiFiInterface *wifi = get_wifi_interface();
     TEST_ASSERT(wifi);
     if (wifi == NULL) {
         return;
@@ -38,7 +38,7 @@ void wifi_connect_params_channel(void)
         return;
     }
 
-    nsapi_error_t error = wifi->connect(MBED_CONF_APP_WIFI_SECURE_SSID, MBED_CONF_APP_WIFI_PASSWORD, get_security(), MBED_CONF_APP_WIFI_CH_SECURE);
+    nsapi_error_t error = wifi->connect(MBED_GREENTEA_WIFI_SECURE_SSID, MBED_GREENTEA_WIFI_SECURE_PASSWORD, get_wifi_security(), MBED_GREENTEA_WIFI_SECURE_CHANNEL);
 
     wifi->set_channel(0);
 
@@ -47,4 +47,4 @@ void wifi_connect_params_channel(void)
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, error);
 }
 
-#endif // defined(MBED_CONF_APP_WIFI_SECURE_SSID)
+#endif // defined(MBED_GREENTEA_WIFI_SECURE_SSID)

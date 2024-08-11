@@ -18,36 +18,8 @@
 #define WIFI_TESTS_H
 
 #ifdef MBED_CONF_NSAPI_PRESENT
-#include "WiFiInterface.h"
 
-#if !defined(MBED_CONF_APP_WIFI_SECURE_SSID)
-#define MBED_CONF_APP_WIFI_SECURE_SSID MBED_CONF_NSAPI_DEFAULT_WIFI_SSID
-#endif
-
-#if !defined(MBED_CONF_APP_WIFI_PASSWORD)
-#define MBED_CONF_APP_WIFI_PASSWORD MBED_CONF_NSAPI_DEFAULT_WIFI_PASSWORD
-#endif
-
-#if !defined(MBED_CONF_APP_WIFI_SECURE_PROTOCOL)
-#define MBED_CONF_APP_WIFI_SECURE_PROTOCOL MBED_CONF_NSAPI_DEFAULT_WIFI_SECURITY
-#endif
-
-#if !defined(MBED_CONF_APP_WIFI_CH_SECURE)
-#define MBED_CONF_APP_WIFI_CH_SECURE 1
-#endif
-
-#if !defined(MBED_CONF_APP_MAX_SCAN_SIZE)
-#define MBED_CONF_APP_MAX_SCAN_SIZE 10
-#endif
-
-/** Get WiFiInterface based on provided
- * app_json. */
-WiFiInterface *get_interface(void);
-
-/**
- * Get security protocol to be used
- */
-nsapi_security get_security(void);
+#include "greentea_get_network_interface.h"
 
 /*
  * Test cases
@@ -78,17 +50,11 @@ void wifi_connect_params_channel(void);
 /** Test WiFiInterface::connect(ssid, pass, security, channel) with valid parameters for secure network using wrong channel number. */
 void wifi_connect_params_channel_fail(void);
 
-/** Test WiFiInterface::connect() without parameters. Use set_credentials() for setting parameters. */
-void wifi_connect(void);
-
 /** Test WiFiInterface::connect() and disconnect() in nonblocking mode. Use set_credentials() for setting parameters. */
 void wifi_connect_disconnect_nonblock(void);
 
 /** Test WiFiInterface::connect() without parameters. Don't set parameters with set_credentials() */
 void wifi_connect_nocredentials(void);
-
-/** Test WiFiInterface::connect() without parameters. Use secure settings for set_credentials. */
-void wifi_connect_secure(void);
 
 /** Test WiFiInterface::connect() failing with wrong password. */
 void wifi_connect_secure_fail(void);

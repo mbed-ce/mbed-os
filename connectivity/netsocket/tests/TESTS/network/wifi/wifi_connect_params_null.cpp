@@ -26,7 +26,7 @@ using namespace utest::v1;
 void wifi_connect_params_null(void)
 {
     nsapi_error_t error;
-    WiFiInterface *wifi = get_interface();
+    WiFiInterface *wifi = get_wifi_interface();
     TEST_ASSERT(wifi);
     if (wifi == NULL) {
         return;

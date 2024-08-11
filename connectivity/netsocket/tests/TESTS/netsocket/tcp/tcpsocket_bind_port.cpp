@@ -33,7 +33,7 @@ void TCPSOCKET_BIND_PORT()
         TEST_FAIL();
         return;
     }
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(get_network_interface()));
     nsapi_error_t bind_result = sock->bind(1024);
     if (bind_result == NSAPI_ERROR_UNSUPPORTED) {
         TEST_IGNORE_MESSAGE("bind() not supported");

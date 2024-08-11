@@ -65,7 +65,7 @@ void do_getaddrinfo_async(const char hosts[][DNS_TEST_HOST_LEN], unsigned int op
     unsigned int count = 0;
     for (unsigned int i = 0; i < op_count; i++) {
         data[i].semaphore = &semaphore;
-        nsapi_error_t err = NetworkInterface::get_default_instance()->getaddrinfo_async(hosts[i], &hints, mbed::Callback<void(nsapi_error_t, SocketAddress *)>(getaddrinfo_cb, (void *) &data[i]));
+        nsapi_error_t err = get_network_interface()->getaddrinfo_async(hosts[i], &hints, mbed::Callback<void(nsapi_error_t, SocketAddress *)>(getaddrinfo_cb, (void *) &data[i]));
         TEST_ASSERT(err >= 0 || err == NSAPI_ERROR_NO_MEMORY || err == NSAPI_ERROR_BUSY);
         if (err >= 0) {
             // Callback will be called

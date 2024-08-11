@@ -22,6 +22,7 @@
 #include "unity/unity.h"
 #include "utest.h"
 #include "SocketStats.h"
+#include "greentea_get_network_interface.h"
 
 using namespace utest::v1;
 
@@ -47,7 +48,7 @@ void UDPSOCKET_OPEN_LIMIT()
             if (!sock) {
                 break;
             }
-            ret = sock->open(NetworkInterface::get_default_instance());
+            ret = sock->open(get_network_interface());
             if (ret == NSAPI_ERROR_NO_MEMORY || ret == NSAPI_ERROR_NO_SOCKET) {
                 tr_info("[round#%02d] unable to open new socket, error: %d", i, ret);
                 delete sock;

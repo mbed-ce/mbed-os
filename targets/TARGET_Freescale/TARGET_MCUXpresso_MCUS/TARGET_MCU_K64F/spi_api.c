@@ -79,6 +79,7 @@ void spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
 
     /* Set the transfer status to idle */
     obj->spi.status = kDSPI_Idle;
+    obj->spi.last_set_frequency_hz = 500000; // Match FSL HAL default, though this can really be any value
 
     obj->spi.spiDmaMasterRx.dmaUsageState = DMA_USAGE_OPPORTUNISTIC;
 }
@@ -108,6 +109,13 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
 
 void spi_free(spi_t *obj)
 {
+    if(obj->spi.spiDmaMasterRx.dmaUsageState == DMA_USAGE_ALLOCATED || obj->spi.spiDmaMasterRx.dmaUsageState == DMA_USAGE_TEMPORARY_ALLOCATED)
+    {
+        dma_channel_free(obj->spi.spiDmaMasterRx.dmaChannel);
+        dma_channel_free(obj->spi.spiDmaMasterTx.dmaChannel);
+        dma_channel_free(obj->spi.spiDmaMasterIntermediary.dmaChannel);
+    }
+
     DSPI_Deinit(spi_address[obj->spi.instance]);
 }
 
@@ -136,7 +144,12 @@ void spi_format(spi_t *obj, int bits, int mode, int slave)
         master_config.ctarConfig.cpol = (mode & 0x2) ? kDSPI_ClockPolarityActiveLow : kDSPI_ClockPolarityActiveHigh;
         master_config.ctarConfig.cpha = (mode & 0x1) ? kDSPI_ClockPhaseSecondEdge : kDSPI_ClockPhaseFirstEdge;
         master_config.ctarConfig.direction = kDSPI_MsbFirst;
-        master_config.ctarConfig.pcsToSckDelayInNanoSec = 100;
+        master_config.ctarConfig.baudRate = obj->spi.last_set_frequency_hz;
+
+        // Half clock period delay before and after SPI transfer, 1 clock period between transfers
+        master_config.ctarConfig.pcsToSckDelayInNanoSec = 500000000 / obj->spi.last_set_frequency_hz;
+        master_config.ctarConfig.lastSckToPcsDelayInNanoSec = 500000000 / obj->spi.last_set_frequency_hz;
+        master_config.ctarConfig.betweenTransferDelayInNanoSec = 1000000000 / obj->spi.last_set_frequency_hz;
 
         DSPI_MasterInit(spi_address[obj->spi.instance], &master_config, CLOCK_GetFreq(spi_clocks[obj->spi.instance]));
     }
@@ -146,8 +159,13 @@ void spi_frequency(spi_t *obj, int hz)
 {
     uint32_t busClock = CLOCK_GetFreq(spi_clocks[obj->spi.instance]);
     DSPI_MasterSetBaudRate(spi_address[obj->spi.instance], kDSPI_Ctar0, (uint32_t)hz, busClock);
-    //Half clock period delay after SPI transfer
+
+    // Half clock period delay before and after SPI transfer, 1 clock period between transfers
     DSPI_MasterSetDelayTimes(spi_address[obj->spi.instance], kDSPI_Ctar0, kDSPI_LastSckToPcs, busClock, 500000000 / hz);
+    DSPI_MasterSetDelayTimes(spi_address[obj->spi.instance], kDSPI_Ctar0, kDSPI_PcsToSck, busClock, 500000000 / hz);
+    DSPI_MasterSetDelayTimes(spi_address[obj->spi.instance], kDSPI_Ctar0, kDSPI_BetweenTransfer, busClock, 1000000000 / obj->spi.last_set_frequency_hz);
+
+    obj->spi.last_set_frequency_hz = hz;
 }
 
 static inline int spi_readable(spi_t *obj)
@@ -161,6 +179,12 @@ int spi_master_write(spi_t *obj, int value)
     uint32_t rx_data;
     DSPI_GetDefaultDataCommandConfig(&command);
     command.isEndOfQueue = true;
+
+    // Some other FSL HAL SPI functions (notably, interrupt and DMA based transfers) can leave junk in the FIFO
+    // and/or leave the end of queue flag set, which blocks bytes from being transferred.
+    // Clear that stuff out now, because if we don't, we will hang forever in the SPI write function!
+    DSPI_FlushFifo(spi_address[obj->spi.instance], true, true);
+    DSPI_ClearStatusFlags(spi_address[obj->spi.instance], kDSPI_EndOfQueueFlag);
 
     DSPI_MasterWriteDataBlocking(spi_address[obj->spi.instance], &command, (uint16_t)value);
 
@@ -178,9 +202,7 @@ int spi_master_block_write(spi_t *obj, const char *tx_buffer, int tx_length,
 {
     int total = (tx_length > rx_length) ? tx_length : rx_length;
 
-    // Default write is done in each and every call, in future can create HAL API instead
     DSPI_SetDummyData(spi_address[obj->spi.instance], write_fill);
-
     DSPI_MasterTransferBlocking(spi_address[obj->spi.instance], &(dspi_transfer_t) {
         .txData = (uint8_t *)tx_buffer,
         .rxData = (uint8_t *)rx_buffer,
@@ -230,7 +252,13 @@ static int32_t spi_master_transfer_asynch(spi_t *obj)
     if (obj->spi.spiDmaMasterRx.dmaUsageState == DMA_USAGE_ALLOCATED ||
             obj->spi.spiDmaMasterRx.dmaUsageState == DMA_USAGE_TEMPORARY_ALLOCATED) {
         status = DSPI_MasterTransferEDMA(spi_address[obj->spi.instance], &obj->spi.spi_dma_master_handle, &masterXfer);
-        if (status ==  kStatus_DSPI_OutOfRange) {
+        if (status == kStatus_Success)
+        {
+            /* Save amount of TX done by DMA */
+            obj->tx_buff.pos += masterXfer.dataSize;
+            obj->rx_buff.pos += masterXfer.dataSize;
+        }
+        else if (status ==  kStatus_DSPI_OutOfRange) {
             if (obj->spi.bits > 8) {
                 transferSize = 1022;
             } else {
@@ -411,6 +439,7 @@ uint32_t spi_irq_handler_asynch(spi_t *obj)
 
     /* Determine whether the current scenario is DMA or IRQ, and act accordingly */
     if (obj->spi.spiDmaMasterRx.dmaUsageState == DMA_USAGE_ALLOCATED || obj->spi.spiDmaMasterRx.dmaUsageState == DMA_USAGE_TEMPORARY_ALLOCATED) {
+
         /* DMA implementation */
         /* Check If there is still data in the TX buffer */
         if (obj->tx_buff.pos < obj->tx_buff.length) {

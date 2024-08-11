@@ -29,7 +29,7 @@ void wifi_set_channel(void)
     bool is_2Ghz = false;
     bool is_5Ghz = false;
 
-    WiFiInterface *wifi = get_interface();
+    WiFiInterface *wifi = get_wifi_interface();
     TEST_ASSERT(wifi);
     if (wifi == NULL) {
         return;

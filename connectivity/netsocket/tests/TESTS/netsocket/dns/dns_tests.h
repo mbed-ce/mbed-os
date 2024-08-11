@@ -20,6 +20,7 @@
 
 #include "nsapi_dns.h"
 #include "mbed_trace.h"
+#include "greentea_get_network_interface.h"
 
 #define TRACE_GROUP "GRNT"
 

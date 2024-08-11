@@ -74,7 +74,7 @@ void ASYNCHRONOUS_DNS_TIMEOUTS()
     nsapi_error_t result;
     int count = MAX_TRIAL_ATTEMPTS;
     do {
-        result = NetworkInterface::get_default_instance()->gethostbyname(dns_test_hosts[0], &address);
+        result = get_network_interface()->gethostbyname(dns_test_hosts[0], &address);
         if (result == NSAPI_ERROR_OK) {
             return;
         }

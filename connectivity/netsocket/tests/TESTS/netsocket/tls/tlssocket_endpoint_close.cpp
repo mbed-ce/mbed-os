@@ -40,10 +40,10 @@ static nsapi_error_t _tlssocket_connect_to_daytime_srv(TLSSocket &sock)
 {
     SocketAddress tls_addr;
 
-    NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &tls_addr);
+    get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &tls_addr);
     tls_addr.set_port(2013);
 
-    nsapi_error_t err = sock.open(NetworkInterface::get_default_instance());
+    nsapi_error_t err = sock.open(get_network_interface());
     if (err != NSAPI_ERROR_OK) {
         return err;
     }

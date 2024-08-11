@@ -235,6 +235,9 @@ void spi_free(spi_t *obj);
  *
  * Set the number of bits per frame, configure clock polarity and phase, shift order and master/slave mode.
  * The default bit order is MSB.
+ *
+ * This function shall NOT modify the SPI frequency if the SPI frequency has previously been set.
+ *
  * @param[in,out] obj   The SPI object to configure
  * @param[in]     bits  The number of bits per frame
  * @param[in]     mode  The SPI mode (clock polarity, phase, and shift direction)

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2019 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -21,8 +21,8 @@
 
 /*! @name Driver version */
 /*@{*/
-/*! @brief DSPI driver version 2.2.2. */
-#define FSL_DSPI_DRIVER_VERSION (MAKE_VERSION(2, 2, 2))
+/*! @brief DSPI driver version 2.2.4. */
+#define FSL_DSPI_DRIVER_VERSION (MAKE_VERSION(2, 2, 4))
 /*@}*/
 
 #ifndef DSPI_DUMMY_DATA
@@ -30,8 +30,11 @@
 #define DSPI_DUMMY_DATA (0x00U) /*!< Dummy data used for Tx if there is no txData. */
 #endif
 
+/*! @brief Global variable for dummy data value setting. */
+extern volatile uint16_t g_dspiDummyData[];
+
 /*! @brief Status for the DSPI driver.*/
-enum _dspi_status
+enum
 {
     kStatus_DSPI_Busy       = MAKE_STATUS(kStatusGroup_DSPI, 0), /*!< DSPI transfer is busy.*/
     kStatus_DSPI_Error      = MAKE_STATUS(kStatusGroup_DSPI, 1), /*!< DSPI driver error. */
@@ -50,7 +53,7 @@ enum _dspi_flags
     kDSPI_RxFifoDrainRequestFlag = SPI_SR_RFDF_MASK,     /*!< Receive FIFO Drain Flag.*/
     kDSPI_TxAndRxStatusFlag      = SPI_SR_TXRXS_MASK,    /*!< The module is in Stopped/Running state.*/
     kDSPI_AllStatusFlag          = (int)(SPI_SR_TCF_MASK | SPI_SR_EOQF_MASK | SPI_SR_TFUF_MASK | SPI_SR_TFFF_MASK |
-                                SPI_SR_RFOF_MASK | SPI_SR_RFDF_MASK | SPI_SR_TXRXS_MASK) /*!< All statuses above.*/
+                                         SPI_SR_RFOF_MASK | SPI_SR_RFDF_MASK | SPI_SR_TXRXS_MASK) /*!< All statuses above.*/
 };
 
 /*! @brief DSPI interrupt source.*/
@@ -85,8 +88,7 @@ typedef enum _dspi_master_slave_mode
 
 /*!
  * @brief DSPI Sample Point: Controls when the DSPI master samples SIN in the Modified Transfer Format. This field is
- * valid
- * only when the CPHA bit in the CTAR register is 0.
+ * valid only when the CPHA bit in the CTAR register is 0.
  */
 typedef enum _dspi_master_sample_point
 {
@@ -171,10 +173,10 @@ typedef enum _dspi_ctar_selection
     kDSPI_Ctar7 = 7U  /*!< CTAR7 selection option for master mode only; note that some devices do not support CTAR7. */
 } dspi_ctar_selection_t;
 
-#define DSPI_MASTER_CTAR_SHIFT (0U)   /*!< DSPI master CTAR shift macro; used internally. */
-#define DSPI_MASTER_CTAR_MASK (0x0FU) /*!< DSPI master CTAR mask macro; used internally. */
-#define DSPI_MASTER_PCS_SHIFT (4U)    /*!< DSPI master PCS shift macro; used internally. */
-#define DSPI_MASTER_PCS_MASK (0xF0U)  /*!< DSPI master PCS mask macro; used internally. */
+#define DSPI_MASTER_CTAR_SHIFT (0U)    /*!< DSPI master CTAR shift macro; used internally. */
+#define DSPI_MASTER_CTAR_MASK  (0x0FU) /*!< DSPI master CTAR mask macro; used internally. */
+#define DSPI_MASTER_PCS_SHIFT  (4U)    /*!< DSPI master PCS shift macro; used internally. */
+#define DSPI_MASTER_PCS_MASK   (0xF0U) /*!< DSPI master PCS mask macro; used internally. */
 /*! @brief Use this enumeration for the DSPI master transfer configFlags. */
 enum _dspi_transfer_config_flag_for_master
 {
@@ -194,18 +196,18 @@ enum _dspi_transfer_config_flag_for_master
     kDSPI_MasterPcs4 = 4U << DSPI_MASTER_PCS_SHIFT, /*!< DSPI master transfer use PCS4 signal. */
     kDSPI_MasterPcs5 = 5U << DSPI_MASTER_PCS_SHIFT, /*!< DSPI master transfer use PCS5 signal. */
 
-    kDSPI_MasterPcsContinuous = 1U << 20, /*!< Indicates whether the PCS signal is continuous. */
-    kDSPI_MasterActiveAfterTransfer =
-        1U << 21, /*!< Indicates whether the PCS signal is active after the last frame transfer.*/
+    kDSPI_MasterPcsContinuous       = 1U << 20, /*!< Indicates whether the PCS signal is continuous. */
+    kDSPI_MasterActiveAfterTransfer = 1U << 21,
+    /*!< Indicates whether the PCS signal is active after the last frame transfer.*/
 };
 
-#define DSPI_SLAVE_CTAR_SHIFT (0U)   /*!< DSPI slave CTAR shift macro; used internally. */
-#define DSPI_SLAVE_CTAR_MASK (0x07U) /*!< DSPI slave CTAR mask macro; used internally. */
+#define DSPI_SLAVE_CTAR_SHIFT (0U)    /*!< DSPI slave CTAR shift macro; used internally. */
+#define DSPI_SLAVE_CTAR_MASK  (0x07U) /*!< DSPI slave CTAR mask macro; used internally. */
 /*! @brief Use this enumeration for the DSPI slave transfer configFlags. */
 enum _dspi_transfer_config_flag_for_slave
 {
-    kDSPI_SlaveCtar0 = 0U << DSPI_SLAVE_CTAR_SHIFT, /*!< DSPI slave transfer use CTAR0 setting. */
-                                                    /*!< DSPI slave can only use PCS0. */
+    kDSPI_SlaveCtar0 = 0U << DSPI_SLAVE_CTAR_SHIFT, /*!< DSPI slave transfer use CTAR0 setting.
+                                                         DSPI slave can only use PCS0. */
 };
 
 /*! @brief DSPI transfer state, which is used for DSPI transactional API state machine. */
@@ -219,12 +221,12 @@ enum _dspi_transfer_state
 /*! @brief DSPI master command date configuration used for the SPIx_PUSHR.*/
 typedef struct _dspi_command_data_config
 {
-    bool isPcsContinuous; /*!< Option to enable the continuous assertion of the chip select between transfers.*/
-    dspi_ctar_selection_t whichCtar; /*!< The desired Clock and Transfer Attributes
-                                          Register (CTAR) to use for CTAS.*/
-    dspi_which_pcs_t whichPcs;       /*!< The desired PCS signal to use for the data transfer.*/
-    bool isEndOfQueue;               /*!< Signals that the current transfer is the last in the queue.*/
-    bool clearTransferCount;         /*!< Clears the SPI Transfer Counter (SPI_TCNT) before transmission starts.*/
+    bool isPcsContinuous;    /*!< Option to enable the continuous assertion of the chip select between transfers.*/
+    uint8_t whichCtar;       /*!< The desired Clock and Transfer Attributes
+                                                Register (CTAR) to use for CTAS.*/
+    uint8_t whichPcs;        /*!< The desired PCS signal to use for the data transfer.*/
+    bool isEndOfQueue;       /*!< Signals that the current transfer is the last in the queue.*/
+    bool clearTransferCount; /*!< Clears the SPI Transfer Counter (SPI_TCNT) before transmission starts.*/
 } dspi_command_data_config_t;
 
 /*! @brief DSPI master ctar configuration structure.*/
@@ -241,8 +243,9 @@ typedef struct _dspi_master_ctar_config
     uint32_t lastSckToPcsDelayInNanoSec; /*!< The last SCK to PCS delay time in nanoseconds; setting to 0 sets the
                                             minimum delay. It also sets the boundary value if out of range.*/
 
-    uint32_t betweenTransferDelayInNanoSec; /*!< After the SCK delay time in nanoseconds; setting to 0 sets the minimum
-                                             delay. It also sets the boundary value if out of range.*/
+    uint32_t betweenTransferDelayInNanoSec;
+    /*!< After the SCK delay time in nanoseconds; setting to 0 sets the minimum
+        delay. It also sets the boundary value if out of range.*/
 } dspi_master_ctar_config_t;
 
 /*! @brief DSPI master configuration structure.*/
@@ -272,7 +275,7 @@ typedef struct _dspi_slave_ctar_config
     uint32_t bitsPerFrame;      /*!< Bits per frame, minimum 4, maximum 16.*/
     dspi_clock_polarity_t cpol; /*!< Clock polarity. */
     dspi_clock_phase_t cpha;    /*!< Clock phase. */
-                                /*!< Slave only supports MSB and does not support LSB.*/
+    /*!< Slave only supports MSB and does not support LSB.*/
 } dspi_slave_ctar_config_t;
 
 /*! @brief DSPI slave configuration structure.*/
@@ -293,14 +296,14 @@ typedef struct _dspi_slave_config
 } dspi_slave_config_t;
 
 /*!
- * @brief Forward declaration of the _dspi_master_handle typedefs.
+ * @brief Forward declaration of the @ref _dspi_master_handle typedefs.
  */
-typedef struct _dspi_master_handle dspi_master_handle_t;
+typedef struct _dspi_master_handle dspi_master_handle_t; /*!< The master handle. */
 
 /*!
- * @brief Forward declaration of the _dspi_slave_handle typedefs.
+ * @brief Forward declaration of the @ref _dspi_slave_handle typedefs.
  */
-typedef struct _dspi_slave_handle dspi_slave_handle_t;
+typedef struct _dspi_slave_handle dspi_slave_handle_t; /*!< The slave handle. */
 
 /*!
  * @brief Completion callback function pointer type.
@@ -334,21 +337,21 @@ typedef struct _dspi_transfer
     uint8_t *rxData;          /*!< Receive buffer. */
     volatile size_t dataSize; /*!< Transfer bytes. */
 
-    uint32_t configFlags; /*!< Transfer transfer configuration flags; set from _dspi_transfer_config_flag_for_master if
-                             the transfer is used for master or _dspi_transfer_config_flag_for_slave enumeration if the
-                             transfer is used for slave.*/
+    uint32_t configFlags; /*!< Transfer transfer configuration flags. Set from @ref
+                             _dspi_transfer_config_flag_for_master if the transfer is used for master or @ref
+                             _dspi_transfer_config_flag_for_slave enumeration if the transfer is used for slave.*/
 } dspi_transfer_t;
 
 /*! @brief DSPI half-duplex(master) transfer structure */
 typedef struct _dspi_half_duplex_transfer
 {
-    uint8_t *txData;            /*!< Send buffer */
-    uint8_t *rxData;            /*!< Receive buffer */
-    size_t txDataSize;          /*!< Transfer bytes for transmit */
-    size_t rxDataSize;          /*!< Transfer bytes */
-    uint32_t configFlags;       /*!< Transfer configuration flags; set from _dspi_transfer_config_flag_for_master. */
+    uint8_t *txData;      /*!< Send buffer */
+    uint8_t *rxData;      /*!< Receive buffer */
+    size_t txDataSize;    /*!< Transfer bytes for transmit */
+    size_t rxDataSize;    /*!< Transfer bytes */
+    uint32_t configFlags; /*!< Transfer configuration flags; set from @ref _dspi_transfer_config_flag_for_master. */
     bool isPcsAssertInTransfer; /*!< If Pcs pin keep assert between transmit and receive. true for assert and false for
-                                   deassert. */
+                                   de-assert. */
     bool isTransmitFirst;       /*!< True for transmit first and false for receive first. */
 } dspi_half_duplex_transfer_t;
 
@@ -362,7 +365,7 @@ struct _dspi_master_handle
     uint8_t fifoSize; /*!< FIFO dataSize. */
 
     volatile bool
-        isPcsActiveAfterTransfer;   /*!< Indicates whether the PCS signal is active after the last frame transfer.*/
+            isPcsActiveAfterTransfer;   /*!< Indicates whether the PCS signal is active after the last frame transfer.*/
     volatile bool isThereExtraByte; /*!< Indicates whether there are extra bytes.*/
 
     uint8_t *volatile txData;                  /*!< Send buffer. */
@@ -371,7 +374,7 @@ struct _dspi_master_handle
     volatile size_t remainingReceiveByteCount; /*!< A number of bytes remaining to receive.*/
     size_t totalByteCount;                     /*!< A number of transfer bytes*/
 
-    volatile uint8_t state; /*!< DSPI transfer state, see _dspi_transfer_state.*/
+    volatile uint8_t state; /*!< DSPI transfer state, see @ref _dspi_transfer_state.*/
 
     dspi_master_transfer_callback_t callback; /*!< Completion callback. */
     void *userData;                           /*!< Callback user data. */
@@ -434,13 +437,13 @@ extern "C" {
  *  @endcode
  *
  * @param base DSPI peripheral address.
- * @param masterConfig Pointer to the structure dspi_master_config_t.
+ * @param masterConfig Pointer to the structure @ref dspi_master_config_t.
  * @param srcClock_Hz Module source input clock in Hertz.
  */
 void DSPI_MasterInit(SPI_Type *base, const dspi_master_config_t *masterConfig, uint32_t srcClock_Hz);
 
 /*!
- * @brief Sets the dspi_master_config_t structure to default values.
+ * @brief Sets the @ref dspi_master_config_t structure to default values.
  *
  * The purpose of this API is to get the configuration structure initialized for the DSPI_MasterInit().
  * Users may use the initialized structure unchanged in the DSPI_MasterInit() or modify the structure
@@ -450,7 +453,7 @@ void DSPI_MasterInit(SPI_Type *base, const dspi_master_config_t *masterConfig, u
  *  dspi_master_config_t  masterConfig;
  *  DSPI_MasterGetDefaultConfig(&masterConfig);
  * @endcode
- * @param masterConfig pointer to dspi_master_config_t structure
+ * @param masterConfig pointer to @ref dspi_master_config_t structure
  */
 void DSPI_MasterGetDefaultConfig(dspi_master_config_t *masterConfig);
 
@@ -472,12 +475,12 @@ void DSPI_MasterGetDefaultConfig(dspi_master_config_t *masterConfig);
  *  @endcode
  *
  * @param base DSPI peripheral address.
- * @param slaveConfig Pointer to the structure dspi_master_config_t.
+ * @param slaveConfig Pointer to the structure @ref dspi_master_config_t.
  */
 void DSPI_SlaveInit(SPI_Type *base, const dspi_slave_config_t *slaveConfig);
 
 /*!
- * @brief Sets the dspi_slave_config_t structure to a default value.
+ * @brief Sets the @ref dspi_slave_config_t structure to a default value.
  *
  * The purpose of this API is to get the configuration structure initialized for the DSPI_SlaveInit().
  * Users may use the initialized structure unchanged in the DSPI_SlaveInit() or modify the structure
@@ -487,7 +490,7 @@ void DSPI_SlaveInit(SPI_Type *base, const dspi_slave_config_t *slaveConfig);
  *  dspi_slave_config_t  slaveConfig;
  *  DSPI_SlaveGetDefaultConfig(&slaveConfig);
  * @endcode
- * @param slaveConfig Pointer to the dspi_slave_config_t structure.
+ * @param slaveConfig Pointer to the @ref dspi_slave_config_t structure.
  */
 void DSPI_SlaveGetDefaultConfig(dspi_slave_config_t *slaveConfig);
 
@@ -538,9 +541,8 @@ static inline uint32_t DSPI_GetStatusFlags(SPI_Type *base)
  * @brief Clears the DSPI status flag.
  *
  * This function  clears the desired status bit by using a write-1-to-clear. The user passes in the base and the
- * desired status bit to clear.  The list of status bits is defined in the dspi_status_and_interrupt_request_t. The
- * function uses these bit positions in its algorithm to clear the desired flag state.
- * This is an example.
+ * desired status bit to clear.  The list of status bits is defined in the <b>dspi_status_and_interrupt_request_t</b>.
+ * The function uses these bit positions in its algorithm to clear the desired flag state. This is an example.
  * @code
  *  DSPI_ClearStatusFlags(base, kDSPI_TxCompleteFlag|kDSPI_EndOfQueueFlag);
  * @endcode
@@ -565,8 +567,8 @@ static inline void DSPI_ClearStatusFlags(SPI_Type *base, uint32_t statusFlags)
 /*!
  * @brief Enables the DSPI interrupts.
  *
- * This function configures the various interrupt masks of the DSPI.  The parameters are a base and an interrupt mask.
- * Note, for Tx Fill and Rx FIFO drain requests, enable the interrupt request and disable the DMA request.
+ * This function configures various interrupt masks of the DSPI.  The parameters are a base and an interrupt mask.
+ * @note For Tx Fill and Rx FIFO drain requests, enable the interrupt request and disable the DMA request.
  *       Do not use this API(write to RSER register) while DSPI is in running state.
  *
  * @code
@@ -574,7 +576,7 @@ static inline void DSPI_ClearStatusFlags(SPI_Type *base, uint32_t statusFlags)
  * @endcode
  *
  * @param base DSPI peripheral address.
- * @param mask The interrupt mask; use the enum _dspi_interrupt_enable.
+ * @param mask The interrupt mask; use the enum @ref _dspi_interrupt_enable.
  */
 void DSPI_EnableInterrupts(SPI_Type *base, uint32_t mask);
 
@@ -586,7 +588,7 @@ void DSPI_EnableInterrupts(SPI_Type *base, uint32_t mask);
  * @endcode
  *
  * @param base DSPI peripheral address.
- * @param mask The interrupt mask; use the enum _dspi_interrupt_enable.
+ * @param mask The interrupt mask; use the enum @ref _dspi_interrupt_enable.
  */
 static inline void DSPI_DisableInterrupts(SPI_Type *base, uint32_t mask)
 {
@@ -611,7 +613,7 @@ static inline void DSPI_DisableInterrupts(SPI_Type *base, uint32_t mask)
  * @endcode
  *
  * @param base DSPI peripheral address.
- * @param mask The interrupt mask; use the enum dspi_dma_enable.
+ * @param mask The interrupt mask; use the enum @ref _dspi_dma_enable.
  */
 static inline void DSPI_EnableDMA(SPI_Type *base, uint32_t mask)
 {
@@ -627,7 +629,7 @@ static inline void DSPI_EnableDMA(SPI_Type *base, uint32_t mask)
  * @endcode
  *
  * @param base DSPI peripheral address.
- * @param mask The interrupt mask; use the enum dspi_dma_enable.
+ * @param mask The interrupt mask; use the enum @ref _dspi_dma_enable.
  */
 static inline void DSPI_DisableDMA(SPI_Type *base, uint32_t mask)
 {
@@ -692,7 +694,7 @@ uint32_t DSPI_GetInstance(SPI_Type *base);
  * @brief Configures the DSPI for master or slave.
  *
  * @param base DSPI peripheral address.
- * @param mode Mode setting (master or slave) of type dspi_master_slave_mode_t.
+ * @param mode Mode setting (master or slave) of type @ref dspi_master_slave_mode_t.
  */
 static inline void DSPI_SetMasterSlaveMode(SPI_Type *base, dspi_master_slave_mode_t mode)
 {
@@ -707,14 +709,12 @@ static inline void DSPI_SetMasterSlaveMode(SPI_Type *base, dspi_master_slave_mod
  */
 static inline bool DSPI_IsMaster(SPI_Type *base)
 {
+    bool ismaster = false;
     if (0U != ((base->MCR) & SPI_MCR_MSTR_MASK))
     {
-        return true;
+        ismaster = true;
     }
-    else
-    {
-        return false;
-    }
+    return ismaster;
 }
 /*!
  * @brief Starts the DSPI transfers and clears HALT bit in MCR.
@@ -743,7 +743,7 @@ static inline void DSPI_StopTransfer(SPI_Type *base)
  * @brief Enables or disables the DSPI FIFOs.
  *
  * This function  allows the caller to disable/enable the Tx and Rx FIFOs independently.
- * Note that to disable, pass in a logic 0 (false) for the particular FIFO configuration.  To enable,
+ * @note To disable, pass in a logic 0 (false) for the particular FIFO configuration.  To enable,
  * pass in a logic 1 (true).
  *
  * @param base DSPI peripheral address.
@@ -777,7 +777,7 @@ static inline void DSPI_FlushFifo(SPI_Type *base, bool flushTxFifo, bool flushRx
  *  DSPI_SetAllPcsPolarity(base, kDSPI_Pcs0ActiveLow | kDSPI_Pcs1ActiveLow);
    @endcode
  * @param base DSPI peripheral address.
- * @param mask The PCS polarity mask; use the enum _dspi_pcs_polarity.
+ * @param mask The PCS polarity mask; use the enum @ref _dspi_pcs_polarity.
  */
 static inline void DSPI_SetAllPcsPolarity(SPI_Type *base, uint32_t mask)
 {
@@ -792,7 +792,7 @@ static inline void DSPI_SetAllPcsPolarity(SPI_Type *base, uint32_t mask)
  * caller also provide the frequency of the module source clock (in Hertz).
  *
  * @param base DSPI peripheral address.
- * @param whichCtar The desired Clock and Transfer Attributes Register (CTAR) of the type dspi_ctar_selection_t
+ * @param whichCtar The desired Clock and Transfer Attributes Register (CTAR) of the type @ref dspi_ctar_selection_t
  * @param baudRate_Bps The desired baud rate in bits per second
  * @param srcClock_Hz Module source input clock in Hertz
  * @return The actual calculated baud rate
@@ -808,20 +808,20 @@ uint32_t DSPI_MasterSetBaudRate(SPI_Type *base,
  * This function configures the PCS to SCK delay pre-scalar (PcsSCK) and scalar (CSSCK), after SCK delay pre-scalar
  * (PASC) and scalar (ASC), and the delay after transfer pre-scalar (PDT) and scalar (DT).
  *
- * These delay names are available in the type dspi_delay_type_t.
+ * These delay names are available in the type @ref dspi_delay_type_t.
  *
  * The user passes the delay to the configuration along with the prescaler and scaler value.
  * This allows the user to directly set the prescaler/scaler values if pre-calculated or
  * to manually increment either value.
  *
  * @param base DSPI peripheral address.
- * @param whichCtar The desired Clock and Transfer Attributes Register (CTAR) of type dspi_ctar_selection_t.
+ * @param whichCtar The desired Clock and Transfer Attributes Register (CTAR) of type @ref dspi_ctar_selection_t.
  * @param prescaler The prescaler delay value (can be an integer 0, 1, 2, or 3).
  * @param scaler The scaler delay value (can be any integer between 0 to 15).
- * @param whichDelay The desired delay to configure; must be of type dspi_delay_type_t
+ * @param whichDelay The desired delay to configure; must be of type @ref dspi_delay_type_t
  */
 void DSPI_MasterSetDelayScaler(
-    SPI_Type *base, dspi_ctar_selection_t whichCtar, uint32_t prescaler, uint32_t scaler, dspi_delay_type_t whichDelay);
+        SPI_Type *base, dspi_ctar_selection_t whichCtar, uint32_t prescaler, uint32_t scaler, dspi_delay_type_t whichDelay);
 
 /*!
  * @brief Calculates the delay prescaler and scaler based on the desired delay input in nanoseconds.
@@ -831,7 +831,7 @@ void DSPI_MasterSetDelayScaler(
  * After SCK delay pre-scalar (PASC) and scalar (ASC), or
  * Delay after transfer pre-scalar (PDT) and scalar (DT).
  *
- * These delay names are available in the type dspi_delay_type_t.
+ * These delay names are available in the type @ref dspi_delay_type_t.
  *
  * The user passes which delay to configure along with the desired delay value in nanoseconds.  The function
  * calculates the values needed for the prescaler and scaler. Note that returning the calculated delay as an exact
@@ -842,8 +842,8 @@ void DSPI_MasterSetDelayScaler(
  * input.
  *
  * @param base DSPI peripheral address.
- * @param whichCtar The desired Clock and Transfer Attributes Register (CTAR) of type dspi_ctar_selection_t.
- * @param whichDelay The desired delay to configure, must be of type dspi_delay_type_t
+ * @param whichCtar The desired Clock and Transfer Attributes Register (CTAR) of type @ref dspi_ctar_selection_t.
+ * @param whichDelay The desired delay to configure, must be of type @ref dspi_delay_type_t
  * @param srcClock_Hz Module source input clock in Hertz
  * @param delayTimeInNanoSec The desired delay value in nanoseconds.
  * @return The actual calculated delay value.
@@ -885,17 +885,16 @@ static inline void DSPI_MasterWriteData(SPI_Type *base, dspi_command_data_config
 }
 
 /*!
- * @brief Sets the dspi_command_data_config_t structure to default values.
+ * @brief Sets the @ref dspi_command_data_config_t structure to default values.
  *
- * The purpose of this API is to get the configuration structure initialized for use in the DSPI_MasterWrite_xx().
- * Users may use the initialized structure unchanged in the DSPI_MasterWrite_xx() or modify the structure
- * before calling the DSPI_MasterWrite_xx().
- * This is an example.
+ * The purpose of this API is to get the configuration structure initialized for use in the
+ * <b>DSPI_MasterWrite_xx()</b>. Users may use the initialized structure unchanged in the DSPI_MasterWrite_xx() or
+ * modify the structure before calling the DSPI_MasterWrite_xx(). This is an example.
  * @code
  *  dspi_command_data_config_t  command;
  *  DSPI_GetDefaultDataCommandConfig(&command);
  * @endcode
- * @param command Pointer to the dspi_command_data_config_t structure.
+ * @param command Pointer to the @ref dspi_command_data_config_t structure.
  */
 void DSPI_GetDefaultDataCommandConfig(dspi_command_data_config_t *command);
 
@@ -918,7 +917,7 @@ void DSPI_GetDefaultDataCommandConfig(dspi_command_data_config_t *command);
  *  DSPI_MasterWriteDataBlocking(base, &commandConfig, dataWord);
  * @endcode
  *
- * Note that this function does not return until after the transmit is complete. Also note that the DSPI must be
+ * @note  This function does not return until after the transmit is complete. Also note that the DSPI must be
  * enabled and running to transmit data (MCR[MDIS] & [HALT] = 0). Because the SPI is a synchronous protocol,
  * the received data is available when the transmit completes.
  *
@@ -933,13 +932,13 @@ void DSPI_MasterWriteDataBlocking(SPI_Type *base, dspi_command_data_config_t *co
  *
  * This function allows the caller to pass in the data command structure and returns the command word formatted
  * according to the DSPI PUSHR register bit field placement. The user can then "OR" the returned command word with the
- * desired data to send and use the function DSPI_HAL_WriteCommandDataMastermode or
- * DSPI_HAL_WriteCommandDataMastermodeBlocking to write the entire 32-bit command data word to the PUSHR. This helps
- * improve performance in cases where the command structure is constant. For example, the user calls this function
+ * desired data to send and use the function <b>DSPI_HAL_WriteCommandDataMastermode</b> or
+ * <b>DSPI_HAL_WriteCommandDataMastermodeBlocking</b> to write the entire 32-bit command data word to the PUSHR. This
+ * helps improve performance in cases where the command structure is constant. For example, the user calls this function
  * before starting a transfer to generate the command word. When they are ready to transmit the data, they OR
  * this formatted command word with the desired data to transmit. This process increases transmit performance when
- * compared to calling send functions, such as DSPI_HAL_WriteDataMastermode,  which format the command word each time a
- * data word is to be sent.
+ * compared to calling send functions, such as <b>DSPI_HAL_WriteDataMastermode</b>,  which format the command word each
+ * time a data word is to be sent.
  *
  * @param command Pointer to the command structure.
  * @return The command word formatted to the PUSHR data register bit field.
@@ -970,25 +969,29 @@ static inline uint32_t DSPI_MasterGetFormattedCommand(dspi_command_data_config_t
  *  DSPI_MasterWriteCommandDataBlocking(base, dataWord);
  * @endcode
  *
- * Note that this function does not return until after the transmit is complete. Also note that the DSPI must be
+ * @note This function does not return until after the transmit is complete. Also note that the DSPI must be
  * enabled and running to transmit data (MCR[MDIS] & [HALT] = 0).
  * Because the SPI is a synchronous protocol, the received data is available when the transmit completes.
  *
  *  For a blocking polling transfer, see methods below.
- *  Option 1:
- *   uint32_t command_to_send = DSPI_MasterGetFormattedCommand(&command);
- *   uint32_t data0 = command_to_send | data_need_to_send_0;
- *   uint32_t data1 = command_to_send | data_need_to_send_1;
- *   uint32_t data2 = command_to_send | data_need_to_send_2;
+ *    <table>
+ *    <tr><th>Option 1
+ *    <tr><td>uint32_t command_to_send = DSPI_MasterGetFormattedCommand(&command);
+ *    <tr><td>uint32_t data0 = command_to_send | data_need_to_send_0;
+ *    <tr><td>uint32_t data1 = command_to_send | data_need_to_send_1;
+ *    <tr><td>uint32_t data2 = command_to_send | data_need_to_send_2;
+ *    <tr><td>
+ *    <tr><td>DSPI_MasterWriteCommandDataBlocking(base,data0);
+ *    <tr><td>DSPI_MasterWriteCommandDataBlocking(base,data1);
+ *    <tr><td>DSPI_MasterWriteCommandDataBlocking(base,data2);
+ *    </table>
  *
- *   DSPI_MasterWriteCommandDataBlocking(base,data0);
- *   DSPI_MasterWriteCommandDataBlocking(base,data1);
- *   DSPI_MasterWriteCommandDataBlocking(base,data2);
- *
- *  Option 2:
- *   DSPI_MasterWriteDataBlocking(base,&command,data_need_to_send_0);
- *   DSPI_MasterWriteDataBlocking(base,&command,data_need_to_send_1);
- *   DSPI_MasterWriteDataBlocking(base,&command,data_need_to_send_2);
+ *    <table>
+ *    <tr><th>Option 2
+ *    <tr><td>DSPI_MasterWriteDataBlocking(base,&command,data_need_to_send_0);
+ *    <tr><td>DSPI_MasterWriteDataBlocking(base,&command,data_need_to_send_1);
+ *    <tr><td>DSPI_MasterWriteDataBlocking(base,&command,data_need_to_send_2);
+ *    </table>
  *
  * @param base DSPI peripheral address.
  * @param data The data word (command and data combined) to be sent.
@@ -1035,18 +1038,28 @@ static inline uint32_t DSPI_ReadData(SPI_Type *base)
  *
  * @param base DSPI peripheral address.
  * @param dummyData Data to be transferred when tx buffer is NULL.
+ *
+ * @note This version of the dummy data setter will construct the upper 8 bits of the dummy data
+ *    to be the same as the lower 8 bits.
  */
 void DSPI_SetDummyData(SPI_Type *base, uint8_t dummyData);
+
+/*!
+ * @brief Set up the dummy data as a 16-bit value.
+ *
+ * @param base DSPI peripheral address.
+ * @param dummyData Data to be transferred when tx buffer is NULL.
+ */
+void DSPI_SetDummyData16Bit(SPI_Type *base, uint16_t dummyData);
 
 /*!
  *@}
  */
 
 /*!
- * @name Transactional
+ * @name Transactional APIs
  * @{
  */
-/*Transactional APIs*/
 
 /*!
  * @brief Initializes the DSPI master handle.
@@ -1055,7 +1068,7 @@ void DSPI_SetDummyData(SPI_Type *base, uint8_t dummyData);
  * specified DSPI instance,  call this API once to get the initialized handle.
  *
  * @param base DSPI peripheral base address.
- * @param handle DSPI handle pointer to dspi_master_handle_t.
+ * @param handle DSPI handle pointer to @ref _dspi_master_handle.
  * @param callback DSPI callback.
  * @param userData Callback function parameter.
  */
@@ -1071,7 +1084,7 @@ void DSPI_MasterTransferCreateHandle(SPI_Type *base,
  * have been completed.
  *
  * @param base DSPI peripheral base address.
- * @param transfer Pointer to the dspi_transfer_t structure.
+ * @param transfer Pointer to the @ref dspi_transfer_t structure.
  * @return status of status_t.
  */
 status_t DSPI_MasterTransferBlocking(SPI_Type *base, dspi_transfer_t *transfer);
@@ -1083,8 +1096,8 @@ status_t DSPI_MasterTransferBlocking(SPI_Type *base, dspi_transfer_t *transfer);
  * data is transferred, the callback function is called.
 
  * @param base DSPI peripheral base address.
- * @param handle Pointer to the dspi_master_handle_t structure which stores the transfer state.
- * @param transfer Pointer to the dspi_transfer_t structure.
+ * @param handle Pointer to the @ref _dspi_master_handle structure which stores the transfer state.
+ * @param transfer Pointer to the @ref dspi_transfer_t structure.
  * @return status of status_t.
  */
 status_t DSPI_MasterTransferNonBlocking(SPI_Type *base, dspi_master_handle_t *handle, dspi_transfer_t *transfer);
@@ -1097,7 +1110,7 @@ status_t DSPI_MasterTransferNonBlocking(SPI_Type *base, dspi_master_handle_t *ha
  * users can set transmit first or receive first.
  *
  * @param base DSPI base pointer
- * @param xfer pointer to dspi_half_duplex_transfer_t structure
+ * @param xfer pointer to @ref dspi_half_duplex_transfer_t structure
  * @return status of status_t.
  */
 status_t DSPI_MasterHalfDuplexTransferBlocking(SPI_Type *base, dspi_half_duplex_transfer_t *xfer);
@@ -1110,8 +1123,8 @@ status_t DSPI_MasterHalfDuplexTransferBlocking(SPI_Type *base, dspi_half_duplex_
  * which returns right away. When all data is transferred, the callback function is called.
  *
  * @param base DSPI peripheral base address.
- * @param handle pointer to dspi_master_handle_t structure which stores the transfer state
- * @param xfer pointer to dspi_half_duplex_transfer_t structure
+ * @param handle pointer to @ref _dspi_master_handle structure which stores the transfer state
+ * @param xfer pointer to @ref dspi_half_duplex_transfer_t structure
  * @return status of status_t.
  */
 status_t DSPI_MasterHalfDuplexTransferNonBlocking(SPI_Type *base,
@@ -1124,7 +1137,7 @@ status_t DSPI_MasterHalfDuplexTransferNonBlocking(SPI_Type *base,
  * This function gets the master transfer count.
  *
  * @param base DSPI peripheral base address.
- * @param handle Pointer to the dspi_master_handle_t structure which stores the transfer state.
+ * @param handle Pointer to the @ref _dspi_master_handle structure which stores the transfer state.
  * @param count The number of bytes transferred by using the non-blocking transaction.
  * @return status of status_t.
  */
@@ -1136,7 +1149,7 @@ status_t DSPI_MasterTransferGetCount(SPI_Type *base, dspi_master_handle_t *handl
  * This function aborts a transfer using an interrupt.
  *
  * @param base DSPI peripheral base address.
- * @param handle Pointer to the dspi_master_handle_t structure which stores the transfer state.
+ * @param handle Pointer to the @ref _dspi_master_handle structure which stores the transfer state.
  */
 void DSPI_MasterTransferAbort(SPI_Type *base, dspi_master_handle_t *handle);
 
@@ -1146,7 +1159,7 @@ void DSPI_MasterTransferAbort(SPI_Type *base, dspi_master_handle_t *handle);
  * This function processes the DSPI transmit and receive IRQ.
 
  * @param base DSPI peripheral base address.
- * @param handle Pointer to the dspi_master_handle_t structure which stores the transfer state.
+ * @param handle Pointer to the @ref _dspi_master_handle structure which stores the transfer state.
  */
 void DSPI_MasterTransferHandleIRQ(SPI_Type *base, dspi_master_handle_t *handle);
 
@@ -1156,7 +1169,7 @@ void DSPI_MasterTransferHandleIRQ(SPI_Type *base, dspi_master_handle_t *handle);
  * This function initializes the DSPI handle, which can be used for other DSPI transactional APIs.  Usually, for a
  * specified DSPI instance, call this API once to get the initialized handle.
  *
- * @param handle DSPI handle pointer to the dspi_slave_handle_t.
+ * @param handle DSPI handle pointer to the @ref _dspi_slave_handle.
  * @param base DSPI peripheral base address.
  * @param callback DSPI callback.
  * @param userData Callback function parameter.
@@ -1173,8 +1186,8 @@ void DSPI_SlaveTransferCreateHandle(SPI_Type *base,
  * data is transferred, the callback function is called.
  *
  * @param base DSPI peripheral base address.
- * @param handle Pointer to the dspi_slave_handle_t structure which stores the transfer state.
- * @param transfer Pointer to the dspi_transfer_t structure.
+ * @param handle Pointer to the @ref _dspi_slave_handle structure which stores the transfer state.
+ * @param transfer Pointer to the @ref dspi_transfer_t structure.
  * @return status of status_t.
  */
 status_t DSPI_SlaveTransferNonBlocking(SPI_Type *base, dspi_slave_handle_t *handle, dspi_transfer_t *transfer);
@@ -1185,7 +1198,7 @@ status_t DSPI_SlaveTransferNonBlocking(SPI_Type *base, dspi_slave_handle_t *hand
  * This function gets the slave transfer count.
  *
  * @param base DSPI peripheral base address.
- * @param handle Pointer to the dspi_master_handle_t structure which stores the transfer state.
+ * @param handle Pointer to the @ref _dspi_master_handle structure which stores the transfer state.
  * @param count The number of bytes transferred by using the non-blocking transaction.
  * @return status of status_t.
  */
@@ -1197,7 +1210,7 @@ status_t DSPI_SlaveTransferGetCount(SPI_Type *base, dspi_slave_handle_t *handle,
  * This function aborts a transfer using an interrupt.
  *
  * @param base DSPI peripheral base address.
- * @param handle Pointer to the dspi_slave_handle_t structure which stores the transfer state.
+ * @param handle Pointer to the @ref _dspi_slave_handle structure which stores the transfer state.
  */
 void DSPI_SlaveTransferAbort(SPI_Type *base, dspi_slave_handle_t *handle);
 
@@ -1207,7 +1220,7 @@ void DSPI_SlaveTransferAbort(SPI_Type *base, dspi_slave_handle_t *handle);
  * This function processes the DSPI transmit and receive IRQ.
  *
  * @param base DSPI peripheral base address.
- * @param handle Pointer to the dspi_slave_handle_t structure which stores the transfer state.
+ * @param handle Pointer to the @ref _dspi_slave_handle structure which stores the transfer state.
  */
 void DSPI_SlaveTransferHandleIRQ(SPI_Type *base, dspi_slave_handle_t *handle);
 
@@ -1215,11 +1228,11 @@ void DSPI_SlaveTransferHandleIRQ(SPI_Type *base, dspi_slave_handle_t *handle);
  * brief Dummy data for each instance.
  *
  * The purpose of this API is to avoid MISRA rule8.5 : Multiple declarations of
- * externally-linked object or function g_dspiDummyData.
+ * externally-linked object or function @ref g_dspiDummyData.
  *
  * param base DSPI peripheral base address.
  */
-uint8_t DSPI_GetDummyDataInstance(SPI_Type *base);
+uint16_t DSPI_GetDummyDataInstance(SPI_Type *base);
 
 /*!
  *@}
@@ -1228,8 +1241,8 @@ uint8_t DSPI_GetDummyDataInstance(SPI_Type *base);
 #if defined(__cplusplus)
 }
 #endif /*_cplusplus*/
-       /*!
-        *@}
-        */
+/*!
+ *@}
+ */
 
 #endif /*_FSL_DSPI_H_*/

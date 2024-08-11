@@ -88,11 +88,11 @@ static void DSPI_MasterTransferPrepare(SPI_Type *base, dspi_master_handle_t *han
 /* Defines constant value arrays for the baud rate pre-scalar and scalar divider values.*/
 static const uint32_t s_baudratePrescaler[] = {2, 3, 5, 7};
 static const uint32_t s_baudrateScaler[]    = {2,   4,   6,    8,    16,   32,   64,    128,
-                                            256, 512, 1024, 2048, 4096, 8192, 16384, 32768};
+                                               256, 512, 1024, 2048, 4096, 8192, 16384, 32768};
 
 static const uint32_t s_delayPrescaler[] = {1, 3, 5, 7};
 static const uint32_t s_delayScaler[]    = {2,   4,    8,    16,   32,   64,    128,   256,
-                                         512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
+                                            512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
 
 /*! @brief Pointers to dspi bases for each instance. */
 static SPI_Type *const s_dspiBases[] = SPI_BASE_PTRS;
@@ -115,7 +115,7 @@ static dspi_master_isr_t s_dspiMasterIsr;
 static dspi_slave_isr_t s_dspiSlaveIsr;
 
 /* @brief Dummy data for each instance. This data is used when user's tx buffer is NULL*/
-volatile uint8_t g_dspiDummyData[ARRAY_SIZE(s_dspiBases)] = {0};
+volatile uint16_t g_dspiDummyData[ARRAY_SIZE(s_dspiBases)] = {0};
 /**********************************************************************************************************************
  * Code
  *********************************************************************************************************************/
@@ -150,20 +150,20 @@ uint32_t DSPI_GetInstance(SPI_Type *base)
  *
  * param base DSPI peripheral base address.
  */
-uint8_t DSPI_GetDummyDataInstance(SPI_Type *base)
+uint16_t DSPI_GetDummyDataInstance(SPI_Type *base)
 {
-    uint8_t instance = g_dspiDummyData[DSPI_GetInstance(base)];
+    uint16_t instance = g_dspiDummyData[DSPI_GetInstance(base)];
 
     return instance;
 }
 
-/*!
- * brief Set up the dummy data.
- *
- * param base DSPI peripheral address.
- * param dummyData Data to be transferred when tx buffer is NULL.
- */
 void DSPI_SetDummyData(SPI_Type *base, uint8_t dummyData)
+{
+    uint32_t instance         = DSPI_GetInstance(base);
+    g_dspiDummyData[instance] = (((uint16_t)dummyData << 8U) | (uint16_t)dummyData);
+}
+
+void DSPI_SetDummyData16Bit(SPI_Type *base, uint16_t dummyData)
 {
     uint32_t instance         = DSPI_GetInstance(base);
     g_dspiDummyData[instance] = dummyData;
@@ -428,7 +428,7 @@ uint32_t DSPI_MasterSetBaudRate(SPI_Type *base,
     /* for master mode configuration, if slave mode detected, return 0*/
     if (!DSPI_IsMaster(base))
     {
-        return 0;
+        return 0U;
     }
     uint32_t temp;
     uint32_t prescaler, bestPrescaler;
@@ -516,7 +516,7 @@ uint32_t DSPI_MasterSetBaudRate(SPI_Type *base,
  * param whichDelay The desired delay to configure; must be of type dspi_delay_type_t
  */
 void DSPI_MasterSetDelayScaler(
-    SPI_Type *base, dspi_ctar_selection_t whichCtar, uint32_t prescaler, uint32_t scaler, dspi_delay_type_t whichDelay)
+        SPI_Type *base, dspi_ctar_selection_t whichCtar, uint32_t prescaler, uint32_t scaler, dspi_delay_type_t whichDelay)
 {
     /* these settings are only relevant in master mode */
     if (DSPI_IsMaster(base))
@@ -577,7 +577,7 @@ uint32_t DSPI_MasterSetDelayTimes(SPI_Type *base,
     /* for master mode configuration, if slave mode detected, return 0 */
     if (!DSPI_IsMaster(base))
     {
-        return 0;
+        return 0U;
     }
 
     uint32_t prescaler, bestPrescaler;
@@ -670,8 +670,8 @@ void DSPI_GetDefaultDataCommandConfig(dspi_command_data_config_t *command)
     (void)memset(command, 0, sizeof(*command));
 
     command->isPcsContinuous    = false;
-    command->whichCtar          = kDSPI_Ctar0;
-    command->whichPcs           = kDSPI_Pcs0;
+    command->whichCtar          = (uint8_t)kDSPI_Ctar0;
+    command->whichPcs           = (uint8_t)kDSPI_Pcs0;
     command->isEndOfQueue       = false;
     command->clearTransferCount = false;
 }
@@ -888,7 +888,7 @@ status_t DSPI_MasterTransferBlocking(SPI_Type *base, dspi_transfer_t *transfer)
 
     uint16_t wordToSend   = 0;
     uint16_t wordReceived = 0;
-    uint8_t dummyData     = DSPI_GetDummyDataInstance(base);
+    uint16_t dummyData     = DSPI_GetDummyDataInstance(base);
     uint8_t bitsPerFrame;
 
     uint32_t command;
@@ -916,19 +916,18 @@ status_t DSPI_MasterTransferBlocking(SPI_Type *base, dspi_transfer_t *transfer)
 
     /*Calculate the command and lastCommand*/
     commandStruct.whichPcs =
-        (dspi_which_pcs_t)((uint32_t)1U << ((transfer->configFlags & DSPI_MASTER_PCS_MASK) >> DSPI_MASTER_PCS_SHIFT));
+            (uint8_t)((uint32_t)1U << ((transfer->configFlags & DSPI_MASTER_PCS_MASK) >> DSPI_MASTER_PCS_SHIFT));
     commandStruct.isEndOfQueue       = false;
     commandStruct.clearTransferCount = false;
-    commandStruct.whichCtar =
-        (dspi_ctar_selection_t)((transfer->configFlags & DSPI_MASTER_CTAR_MASK) >> DSPI_MASTER_CTAR_SHIFT);
+    commandStruct.whichCtar = (uint8_t)((transfer->configFlags & DSPI_MASTER_CTAR_MASK) >> DSPI_MASTER_CTAR_SHIFT);
     commandStruct.isPcsContinuous =
-        (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterPcsContinuous)) ? true : false;
+            (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterPcsContinuous)) ? true : false;
 
     command = DSPI_MasterGetFormattedCommand(&(commandStruct));
 
     commandStruct.isEndOfQueue = true;
     commandStruct.isPcsContinuous =
-        (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterActiveAfterTransfer)) ? true : false;
+            (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterActiveAfterTransfer)) ? true : false;
     lastCommand = DSPI_MasterGetFormattedCommand(&(commandStruct));
 
     /*Calculate the bitsPerFrame*/
@@ -946,7 +945,7 @@ status_t DSPI_MasterTransferBlocking(SPI_Type *base, dspi_transfer_t *transfer)
     }
     else
     {
-        fifoSize = FSL_FEATURE_DSPI_FIFO_SIZEn(base);
+        fifoSize = (uint32_t)FSL_FEATURE_DSPI_FIFO_SIZEn(base);
     }
 
     DSPI_StartTransfer(base);
@@ -1156,25 +1155,24 @@ static void DSPI_MasterTransferPrepare(SPI_Type *base, dspi_master_handle_t *han
     assert(NULL != transfer);
 
     uint32_t tmpMCR                          = 0;
-    dspi_command_data_config_t commandStruct = {false, kDSPI_Ctar0, kDSPI_Pcs0, false, false};
+    dspi_command_data_config_t commandStruct = {false, (uint8_t)kDSPI_Ctar0, (uint8_t)kDSPI_Pcs0, false, false};
 
     DSPI_StopTransfer(base);
     DSPI_FlushFifo(base, true, true);
     DSPI_ClearStatusFlags(base, (uint32_t)kDSPI_AllStatusFlag);
 
     commandStruct.whichPcs =
-        (dspi_which_pcs_t)((uint32_t)1U << ((transfer->configFlags & DSPI_MASTER_PCS_MASK) >> DSPI_MASTER_PCS_SHIFT));
+            (uint8_t)((uint32_t)1U << ((transfer->configFlags & DSPI_MASTER_PCS_MASK) >> DSPI_MASTER_PCS_SHIFT));
     commandStruct.isEndOfQueue       = false;
     commandStruct.clearTransferCount = false;
-    commandStruct.whichCtar =
-        (dspi_ctar_selection_t)((transfer->configFlags & DSPI_MASTER_CTAR_MASK) >> DSPI_MASTER_CTAR_SHIFT);
+    commandStruct.whichCtar = (uint8_t)((transfer->configFlags & DSPI_MASTER_CTAR_MASK) >> DSPI_MASTER_CTAR_SHIFT);
     commandStruct.isPcsContinuous =
-        (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterPcsContinuous)) ? true : false;
+            (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterPcsContinuous)) ? true : false;
     handle->command = DSPI_MasterGetFormattedCommand(&(commandStruct));
 
     commandStruct.isEndOfQueue = true;
     commandStruct.isPcsContinuous =
-        (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterActiveAfterTransfer)) ? true : false;
+            (0U != (transfer->configFlags & (uint32_t)kDSPI_MasterActiveAfterTransfer)) ? true : false;
     handle->lastCommand = DSPI_MasterGetFormattedCommand(&(commandStruct));
 
     handle->bitsPerFrame = ((base->CTAR[commandStruct.whichCtar] & SPI_CTAR_FMSZ_MASK) >> SPI_CTAR_FMSZ_SHIFT) + 1U;
@@ -1182,11 +1180,11 @@ static void DSPI_MasterTransferPrepare(SPI_Type *base, dspi_master_handle_t *han
     tmpMCR = base->MCR;
     if ((0U != (tmpMCR & SPI_MCR_DIS_RXF_MASK)) || (0U != (tmpMCR & SPI_MCR_DIS_TXF_MASK)))
     {
-        handle->fifoSize = 1;
+        handle->fifoSize = 1U;
     }
     else
     {
-        handle->fifoSize = FSL_FEATURE_DSPI_FIFO_SIZEn(base);
+        handle->fifoSize = (uint8_t)FSL_FEATURE_DSPI_FIFO_SIZEn(base);
     }
     handle->txData                    = transfer->txData;
     handle->rxData                    = transfer->rxData;
@@ -1418,7 +1416,7 @@ static void DSPI_MasterTransferComplete(SPI_Type *base, dspi_master_handle_t *ha
 
     /* Disable interrupt requests*/
     DSPI_DisableInterrupts(
-        base, ((uint32_t)kDSPI_RxFifoDrainRequestInterruptEnable | (uint32_t)kDSPI_TxFifoFillRequestInterruptEnable));
+            base, ((uint32_t)kDSPI_RxFifoDrainRequestInterruptEnable | (uint32_t)kDSPI_TxFifoFillRequestInterruptEnable));
 
     status_t status = 0;
     if (handle->state == (uint8_t)kDSPI_Error)
@@ -1442,7 +1440,7 @@ static void DSPI_MasterTransferFillUpTxFifo(SPI_Type *base, dspi_master_handle_t
     assert(NULL != handle);
 
     uint16_t wordToSend                 = 0;
-    uint8_t dummyData                   = DSPI_GetDummyDataInstance(base);
+    uint16_t dummyData                  = DSPI_GetDummyDataInstance(base);
     size_t tmpRemainingSendByteCount    = handle->remainingSendByteCount;
     size_t tmpRemainingReceiveByteCount = handle->remainingReceiveByteCount;
     uint8_t tmpFifoSize                 = handle->fifoSize;
@@ -1484,14 +1482,14 @@ static void DSPI_MasterTransferFillUpTxFifo(SPI_Type *base, dspi_master_handle_t
                 handle->remainingSendByteCount = 0;
                 base->PUSHR                    = handle->lastCommand | wordToSend;
             }
-            /* For all words except the last word */
+                /* For all words except the last word */
             else
             {
                 if (NULL != handle->txData)
                 {
                     wordToSend = *(handle->txData);
                     ++handle->txData; /* increment to next data byte */
-                    wordToSend |= (unsigned)(*(handle->txData)) << 8U;
+                    wordToSend |= (uint16_t)(*(handle->txData)) << 8U;
                     ++handle->txData; /* increment to next data byte */
                 }
                 else
@@ -1518,7 +1516,7 @@ static void DSPI_MasterTransferFillUpTxFifo(SPI_Type *base, dspi_master_handle_t
             tmpFifoSize                  = handle->fifoSize;
         } /* End of TX FIFO fill while loop */
     }
-    /* Optimized for bits/frame less than or equal to one byte. */
+        /* Optimized for bits/frame less than or equal to one byte. */
     else
     {
         /* Fill the fifo until it is full or until the send word count is 0 or until the difference
@@ -1584,7 +1582,7 @@ void DSPI_MasterTransferAbort(SPI_Type *base, dspi_master_handle_t *handle)
 
     /* Disable interrupt requests*/
     DSPI_DisableInterrupts(
-        base, ((uint32_t)kDSPI_RxFifoDrainRequestInterruptEnable | (uint32_t)kDSPI_TxFifoFillRequestInterruptEnable));
+            base, ((uint32_t)kDSPI_RxFifoDrainRequestInterruptEnable | (uint32_t)kDSPI_TxFifoFillRequestInterruptEnable));
 
     handle->state = (uint8_t)kDSPI_Idle;
 }
@@ -1658,7 +1656,7 @@ void DSPI_MasterTransferHandleIRQ(SPI_Type *base, dspi_master_handle_t *handle)
                 }
             } /* End of RX FIFO drain while loop */
         }
-        /* Optimized for bits/frame less than or equal to one byte. */
+            /* Optimized for bits/frame less than or equal to one byte. */
         else
         {
             while ((uint32_t)kDSPI_RxFifoDrainRequestFlag ==
@@ -1785,7 +1783,7 @@ status_t DSPI_SlaveTransferNonBlocking(SPI_Type *base, dspi_slave_handle_t *hand
 
     uint8_t whichCtar = (uint8_t)((transfer->configFlags & DSPI_SLAVE_CTAR_MASK) >> DSPI_SLAVE_CTAR_SHIFT);
     handle->bitsPerFrame =
-        (((base->CTAR_SLAVE[whichCtar]) & SPI_CTAR_SLAVE_FMSZ_MASK) >> SPI_CTAR_SLAVE_FMSZ_SHIFT) + 1U;
+            (((base->CTAR_SLAVE[whichCtar]) & SPI_CTAR_SLAVE_FMSZ_MASK) >> SPI_CTAR_SLAVE_FMSZ_SHIFT) + 1U;
 
     DSPI_StopTransfer(base);
 
@@ -1851,7 +1849,7 @@ static void DSPI_SlaveTransferFillUpTxFifo(SPI_Type *base, dspi_slave_handle_t *
     assert(NULL != handle);
 
     uint16_t transmitData = 0;
-    uint8_t dummyPattern  = DSPI_GetDummyDataInstance(base);
+    uint16_t dummyPattern  = DSPI_GetDummyDataInstance(base);
 
     /* Service the transmitter, if transmit buffer provided, transmit the data,
      * else transmit dummy pattern
@@ -1879,7 +1877,7 @@ static void DSPI_SlaveTransferFillUpTxFifo(SPI_Type *base, dspi_slave_handle_t *
                 /* Decrease remaining dataSize */
                 --handle->remainingSendByteCount;
             }
-            /* bits/frame is 2 bytes */
+                /* bits/frame is 2 bytes */
             else
             {
                 /* With multibytes per frame transmission, the transmit frame contains data from
@@ -1940,8 +1938,8 @@ static void DSPI_SlaveTransferComplete(SPI_Type *base, dspi_slave_handle_t *hand
 
     /* Disable interrupt requests */
     DSPI_DisableInterrupts(
-        base, ((uint32_t)kDSPI_TxFifoUnderflowInterruptEnable | (uint32_t)kDSPI_TxFifoFillRequestInterruptEnable |
-               (uint32_t)kDSPI_RxFifoOverflowInterruptEnable | (uint32_t)kDSPI_RxFifoDrainRequestInterruptEnable));
+            base, ((uint32_t)kDSPI_TxFifoUnderflowInterruptEnable | (uint32_t)kDSPI_TxFifoFillRequestInterruptEnable |
+                   (uint32_t)kDSPI_RxFifoOverflowInterruptEnable | (uint32_t)kDSPI_RxFifoDrainRequestInterruptEnable));
 
     /* The transfer is complete. */
     handle->txData                    = NULL;
@@ -1949,7 +1947,7 @@ static void DSPI_SlaveTransferComplete(SPI_Type *base, dspi_slave_handle_t *hand
     handle->remainingReceiveByteCount = 0;
     handle->remainingSendByteCount    = 0;
 
-    status_t status = 0;
+    status_t status;
     if (handle->state == (uint8_t)kDSPI_Error)
     {
         status = kStatus_DSPI_Error;
@@ -1983,8 +1981,8 @@ void DSPI_SlaveTransferAbort(SPI_Type *base, dspi_slave_handle_t *handle)
 
     /* Disable interrupt requests */
     DSPI_DisableInterrupts(
-        base, ((uint32_t)kDSPI_TxFifoUnderflowInterruptEnable | (uint32_t)kDSPI_TxFifoFillRequestInterruptEnable |
-               (uint32_t)kDSPI_RxFifoOverflowInterruptEnable | (uint32_t)kDSPI_RxFifoDrainRequestInterruptEnable));
+            base, ((uint32_t)kDSPI_TxFifoUnderflowInterruptEnable | (uint32_t)kDSPI_TxFifoFillRequestInterruptEnable |
+                   (uint32_t)kDSPI_RxFifoOverflowInterruptEnable | (uint32_t)kDSPI_RxFifoDrainRequestInterruptEnable));
 
     handle->state                     = (uint8_t)kDSPI_Idle;
     handle->remainingSendByteCount    = 0;
@@ -2003,7 +2001,7 @@ void DSPI_SlaveTransferHandleIRQ(SPI_Type *base, dspi_slave_handle_t *handle)
 {
     assert(NULL != handle);
 
-    uint8_t dummyPattern = DSPI_GetDummyDataInstance(base);
+    uint16_t dummyPattern = DSPI_GetDummyDataInstance(base);
     uint32_t dataReceived;
     uint32_t dataSend                     = 0;
     uint32_t tmpRemainingReceiveByteCount = 0;
@@ -2079,7 +2077,7 @@ void DSPI_SlaveTransferHandleIRQ(SPI_Type *base, dspi_slave_handle_t *handle)
                         handle->remainingReceiveByteCount -= 2U;
                     }
                 }
-                /* If no handle->rxData*/
+                    /* If no handle->rxData*/
                 else
                 {
                     if (handle->remainingReceiveByteCount == 1U)
@@ -2112,7 +2110,7 @@ void DSPI_SlaveTransferHandleIRQ(SPI_Type *base, dspi_slave_handle_t *handle)
                             handle->remainingSendByteCount -= 2U;
                         }
                     }
-                    /* If no handle->txData*/
+                        /* If no handle->txData*/
                     else
                     {
                         if (handle->remainingSendByteCount == 1U)
@@ -2156,7 +2154,7 @@ void DSPI_SlaveTransferHandleIRQ(SPI_Type *base, dspi_slave_handle_t *handle)
             /* Change state to error and clear flag */
             if (NULL != handle->txData)
             {
-                handle->state = kDSPI_Error;
+                handle->state = (uint8_t)kDSPI_Error;
             }
             handle->errorCount++;
         }
@@ -2171,7 +2169,7 @@ void DSPI_SlaveTransferHandleIRQ(SPI_Type *base, dspi_slave_handle_t *handle)
             /* Change state to error and clear flag */
             if (NULL != handle->txData)
             {
-                handle->state = kDSPI_Error;
+                handle->state = (uint8_t)kDSPI_Error;
             }
             handle->errorCount++;
         }
@@ -2188,14 +2186,11 @@ static void DSPI_CommonIRQHandler(SPI_Type *base, void *param)
     {
         s_dspiSlaveIsr(base, (dspi_slave_handle_t *)param);
     }
-/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
-  exception return operation might vector to incorrect interrupt */
-#if defined __CORTEX_M && (__CORTEX_M == 4U)
-    __DSB();
-#endif
+    SDK_ISR_EXIT_BARRIER;
 }
 
 #if defined(SPI0)
+void SPI0_DriverIRQHandler(void);
 void SPI0_DriverIRQHandler(void)
 {
     assert(NULL != g_dspiHandle[0]);
@@ -2204,6 +2199,7 @@ void SPI0_DriverIRQHandler(void)
 #endif
 
 #if defined(SPI1)
+void SPI1_DriverIRQHandler(void);
 void SPI1_DriverIRQHandler(void)
 {
     assert(NULL != g_dspiHandle[1]);
@@ -2212,6 +2208,7 @@ void SPI1_DriverIRQHandler(void)
 #endif
 
 #if defined(SPI2)
+void SPI2_DriverIRQHandler(void);
 void SPI2_DriverIRQHandler(void)
 {
     assert(NULL != g_dspiHandle[2]);
@@ -2220,6 +2217,7 @@ void SPI2_DriverIRQHandler(void)
 #endif
 
 #if defined(SPI3)
+void SPI3_DriverIRQHandler(void);
 void SPI3_DriverIRQHandler(void)
 {
     assert(NULL != g_dspiHandle[3]);
@@ -2228,6 +2226,7 @@ void SPI3_DriverIRQHandler(void)
 #endif
 
 #if defined(SPI4)
+void SPI4_DriverIRQHandler(void);
 void SPI4_DriverIRQHandler(void)
 {
     assert(NULL != g_dspiHandle[4]);
@@ -2236,6 +2235,7 @@ void SPI4_DriverIRQHandler(void)
 #endif
 
 #if defined(SPI5)
+void SPI5_DriverIRQHandler(void);
 void SPI5_DriverIRQHandler(void)
 {
     assert(NULL != g_dspiHandle[5]);

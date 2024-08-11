@@ -40,11 +40,11 @@ void TLSSOCKET_CERT_IN_FILESYSTEM()
     fclose(fp);
 
     TLSSocket sock;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(NetworkInterface::get_default_instance()));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.open(get_network_interface()));
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.set_root_ca_cert_path("/fs"));
 
     SocketAddress a;
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &a));
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &a));
     a.set_port(ECHO_SERVER_PORT_TLS);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.connect(a));
 }

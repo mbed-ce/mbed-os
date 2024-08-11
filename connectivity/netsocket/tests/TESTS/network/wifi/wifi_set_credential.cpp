@@ -25,7 +25,7 @@ using namespace utest::v1;
 
 void wifi_set_credential(void)
 {
-    WiFiInterface *iface = get_interface();
+    WiFiInterface *iface = WiFiInterface::get_default_instance();
     TEST_ASSERT(iface);
     if (iface == NULL) {
         return;
@@ -80,9 +80,9 @@ void wifi_set_credential(void)
     error = iface->set_credentials("OK", "12345678", NSAPI_SECURITY_WPA3_WPA2);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, error);
 
-    error = iface->set_credentials("OK", "kUjd0PHHeAqaDoyfcDDEOvbyiVbYMpUHDukGoR6EJZnO5iLzWsfwiM9JQqOngni", get_security());
+    error = iface->set_credentials("OK", "kUjd0PHHeAqaDoyfcDDEOvbyiVbYMpUHDukGoR6EJZnO5iLzWsfwiM9JQqOngni", get_wifi_security());
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, error);
 
-    error = iface->set_credentials("OK", "kUjd0PHHeAqaDoyfcDDEOvbyiVbYMpUHDukGoR6EJZnO5iLzWsfwiM9JQqOngni8", get_security());
+    error = iface->set_credentials("OK", "kUjd0PHHeAqaDoyfcDDEOvbyiVbYMpUHDukGoR6EJZnO5iLzWsfwiM9JQqOngni8", get_wifi_security());
     TEST_ASSERT_EQUAL(NSAPI_ERROR_PARAMETER, error);
 }

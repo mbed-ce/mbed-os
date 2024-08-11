@@ -25,7 +25,9 @@ using namespace utest::v1;
 
 void wifi_connect_nocredentials(void)
 {
-    WiFiInterface *wifi = get_interface();
+    // Note: This test must execute first, before anyone calls set_credentials()
+    // on the wifi interface.
+    WiFiInterface *wifi = WiFiInterface::get_default_instance();
     TEST_ASSERT(wifi);
     if (wifi == NULL) {
         return;

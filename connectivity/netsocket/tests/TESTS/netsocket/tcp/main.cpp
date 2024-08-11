@@ -19,12 +19,6 @@
 #error [NOT_SUPPORTED] tcp test cases require a RTOS to run
 #else
 
-#define WIFI 2
-#if !defined(MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE) || \
-    (MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI && !defined(MBED_CONF_NSAPI_DEFAULT_WIFI_SSID))
-#error [NOT_SUPPORTED] No network configuration found for this target.
-#else
-
 #include "mbed.h"
 #include "greentea-client/test_env.h"
 #include "unity/unity.h"
@@ -66,7 +60,7 @@ void drop_bad_packets(TCPSocket &sock, int orig_timeout)
 nsapi_version_t get_ip_version()
 {
     SocketAddress test;
-    if (NetworkInterface::get_default_instance()->get_ip_address(&test) != NSAPI_ERROR_OK) {
+    if (get_network_interface()->get_ip_address(&test) != NSAPI_ERROR_OK) {
         return NSAPI_UNSPEC;
     }
     return test.get_ip_version();
@@ -74,7 +68,7 @@ nsapi_version_t get_ip_version()
 
 static void _ifup()
 {
-    NetworkInterface *net = NetworkInterface::get_default_instance();
+    NetworkInterface *net = get_network_interface();
     TEST_ASSERT_NOT_NULL_MESSAGE(net, "No NetworkInterface configured");
     nsapi_error_t err = net->connect();
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, err);
@@ -93,7 +87,7 @@ static void _ifup()
 
 static void _ifdown()
 {
-    NetworkInterface::get_default_instance()->disconnect();
+    get_network_interface()->disconnect();
     tr_info("MBED: ifdown");
 }
 
@@ -101,12 +95,12 @@ nsapi_error_t tcpsocket_connect_to_srv(TCPSocket &sock, uint16_t port)
 {
     SocketAddress tcp_addr;
 
-    NetworkInterface::get_default_instance()->gethostbyname(ECHO_SERVER_ADDR, &tcp_addr);
+    get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &tcp_addr);
     tcp_addr.set_port(port);
 
     tr_info("MBED: Server '%s', port %d", tcp_addr.get_ip_address(), tcp_addr.get_port());
 
-    nsapi_error_t err = sock.open(NetworkInterface::get_default_instance());
+    nsapi_error_t err = sock.open(get_network_interface());
     if (err != NSAPI_ERROR_OK) {
         tr_error("Error from sock.open: %d", err);
         return err;
@@ -137,7 +131,7 @@ bool is_tcp_supported()
     static bool tested = false;
     if (!tested) {
         TCPSocket socket;
-        supported = socket.open(NetworkInterface::get_default_instance()) == NSAPI_ERROR_OK;
+        supported = socket.open(get_network_interface()) == NSAPI_ERROR_OK;
     }
     return supported;
 }
@@ -253,5 +247,4 @@ int main()
 }
 
 #endif // ECHO_SERVER_ADDR
-#endif // !defined(MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE) || (MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI && !defined(MBED_CONF_NSAPI_DEFAULT_WIFI_SSID))
 #endif // !defined(MBED_CONF_RTOS_PRESENT)

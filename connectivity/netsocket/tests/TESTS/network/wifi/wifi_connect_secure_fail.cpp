@@ -23,17 +23,19 @@
 
 using namespace utest::v1;
 
-#if defined(MBED_CONF_APP_WIFI_SECURE_SSID)
-
 void wifi_connect_secure_fail(void)
 {
-    WiFiInterface *wifi = get_interface();
+    WiFiInterface *wifi = get_wifi_interface();
     TEST_ASSERT(wifi);
     if (wifi == NULL) {
         return;
     }
 
-    TEST_ASSERT_EQUAL_INT(NSAPI_ERROR_OK, wifi->set_credentials(MBED_CONF_APP_WIFI_SECURE_SSID, "aaaaaaaa", get_security()));
+    if (wifi->get_connection_status() != NSAPI_STATUS_DISCONNECTED) {
+        wifi->disconnect();
+    }
+
+    TEST_ASSERT_EQUAL_INT(NSAPI_ERROR_OK, wifi->set_credentials(MBED_GREENTEA_WIFI_SECURE_SSID, "aaaaaaaa", get_wifi_security()));
     nsapi_error_t error;
     printf("Wifi connection with wrong password\n");
     error = wifi->connect();
@@ -44,5 +46,3 @@ void wifi_connect_secure_fail(void)
                 error == NSAPI_ERROR_NO_CONNECTION);
 
 }
-
-#endif // defined(MBED_CONF_APP_WIFI_SECURE_SSID)

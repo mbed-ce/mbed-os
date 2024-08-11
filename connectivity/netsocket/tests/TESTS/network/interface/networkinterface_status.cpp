@@ -74,7 +74,7 @@ void NETWORKINTERFACE_STATUS()
     status_read_counter = 0;
     current_status = NSAPI_STATUS_ERROR_UNSUPPORTED;
 
-    net = NetworkInterface::get_default_instance();
+    net = get_network_interface();
     TEST_ASSERT_NOT_NULL_MESSAGE(net, "No NetworkInterface configured");
     net->attach(status_cb);
     net->set_blocking(true);
@@ -110,7 +110,7 @@ void NETWORKINTERFACE_STATUS_NONBLOCK()
     status_read_counter = 0;
     current_status = NSAPI_STATUS_ERROR_UNSUPPORTED;
 
-    net = NetworkInterface::get_default_instance();
+    net = get_network_interface();
     net->attach(status_cb);
     net->set_blocking(false);
 
@@ -145,7 +145,7 @@ void NETWORKINTERFACE_STATUS_NONBLOCK()
 
 void NETWORKINTERFACE_STATUS_GET()
 {
-    net = NetworkInterface::get_default_instance();
+    net = get_network_interface();
     net->set_blocking(true);
 
     TEST_ASSERT_EQUAL(NSAPI_STATUS_DISCONNECTED, net->get_connection_status());

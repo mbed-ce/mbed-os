@@ -34,7 +34,7 @@ void TCPSOCKET_OPEN_CLOSE_REPEAT()
     }
 
     for (int i = 0; i < 2; i++) {
-        TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(NetworkInterface::get_default_instance()));
+        TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->open(get_network_interface()));
         TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->close());
     }
     delete sock;

@@ -8,13 +8,20 @@
 
 # General config parameters
 # -------------------------------------------------------------
-set(UPLOAD_METHOD_DEFAULT STM32CUBE)
+set(UPLOAD_METHOD_DEFAULT MBED)
 
 # Config options for MBED
 # -------------------------------------------------------------
 
 set(MBED_UPLOAD_ENABLED TRUE)
 set(MBED_RESET_BAUDRATE 115200)
+
+# Config options for PYOCD
+# -------------------------------------------------------------
+
+set(PYOCD_UPLOAD_ENABLED TRUE)
+set(PYOCD_TARGET_NAME stm32h503rbtx)
+set(PYOCD_CLOCK_SPEED 4000k)
 
 # Config options for STM32CubeIDE
 # -------------------------------------------------------------

@@ -21,21 +21,25 @@
 #include "utest.h"
 #include "wifi_tests.h"
 
+#include "greentea_get_network_interface.h"
+
 using namespace utest::v1;
 
-#if defined(MBED_CONF_APP_WIFI_SECURE_SSID)
+#if defined(MBED_GREENTEA_WIFI_SECURE_SSID)
 
 void wifi_connect_disconnect_repeat(void)
 {
-    WiFiInterface *wifi = get_interface();
+    WiFiInterface *wifi = get_wifi_interface();
     TEST_ASSERT(wifi);
     if (wifi == NULL) {
         return;
     }
-    nsapi_error_t error;
 
-    error = wifi->set_credentials(MBED_CONF_APP_WIFI_SECURE_SSID, MBED_CONF_APP_WIFI_PASSWORD, get_security());
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, error);
+    if (wifi->get_connection_status() != NSAPI_STATUS_DISCONNECTED) {
+        wifi->disconnect();
+    }
+
+    nsapi_error_t error;
 
     for (int i = 0; i < 10; i++) {
         printf("#%u connecting...\n", i);
@@ -47,4 +51,4 @@ void wifi_connect_disconnect_repeat(void)
     }
 }
 
-#endif // defined(MBED_CONF_APP_WIFI_SECURE_SSID)
+#endif // defined(MBED_GREENTEA_WIFI_SECURE_SSID)
