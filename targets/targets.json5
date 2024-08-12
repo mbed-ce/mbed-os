@@ -3100,7 +3100,7 @@
             "LPTICKER",
             "CAN",
 			"SERIAL_FC",
-            "I2C",
+            //"I2C",
             "I2C_ASYNCH",
             "I2CSLAVE",
             "SPI",

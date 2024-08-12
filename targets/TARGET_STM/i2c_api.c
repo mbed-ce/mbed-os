@@ -1909,6 +1909,7 @@ void i2c_abort_asynch(i2c_t *obj)
 
     STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
 }
+#endif // DEVICE_I2C_ASYNCH
 
 #if MBED_CONF_TARGET_I2C_TIMING_VALUE_ALGO
 /**
@@ -2396,7 +2397,5 @@ uint32_t i2c_get_timing(I2CName i2c, uint32_t current_timing, int current_hz,
 
 
 #endif /* I2C_IP_VERSION_V2 */
-
-#endif // DEVICE_I2C_ASYNCH
 
 #endif // DEVICE_I2C
