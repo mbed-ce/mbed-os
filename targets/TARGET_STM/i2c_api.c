@@ -1,6 +1,6 @@
 /* mbed Microcontroller Library
  *******************************************************************************
- * Copyright (c) 2015-2021, STMicroelectronics
+ * Copyright (c) 2015-2024, STMicroelectronics
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *

@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  ******************************************************************************
  *
- * Copyright (c) 2015-2021 STMicroelectronics.
+ * Copyright (c) 2015-2024 STMicroelectronics.
  * Copyright (c) 2020, Arduino SA.
  * All rights reserved.
  *
