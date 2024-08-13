@@ -27,7 +27,7 @@
 #include "nu_timer.h"
 #include "crypto-misc.h"
 #include "platform/SingletonPtr.h"
-#include "platform/PlatformMutex.h"
+#include "rtos/Mutex.h"
 #include "hal/trng_api.h"
 
 #if defined(MBEDTLS_CONFIG_HW_SUPPORT)
@@ -43,19 +43,19 @@
  */
 
 /* Mutex for crypto PRNG ACC management */
-static SingletonPtr<PlatformMutex> crypto_prng_mutex;
+static SingletonPtr<rtos::Mutex> crypto_prng_mutex;
 
 /* Mutex for crypto AES ACC management */
-static SingletonPtr<PlatformMutex> crypto_aes_mutex;
+static SingletonPtr<rtos::Mutex> crypto_aes_mutex;
 
 /* Mutex for crypto SHA ACC management */
-static SingletonPtr<PlatformMutex> crypto_sha_mutex;
+static SingletonPtr<rtos::Mutex> crypto_sha_mutex;
 
 /* Mutex for crypto ECC ACC management */
-static SingletonPtr<PlatformMutex> crypto_ecc_mutex;
+static SingletonPtr<rtos::Mutex> crypto_ecc_mutex;
 
 /* Mutex for crypto RSA ACC management */
-static SingletonPtr<PlatformMutex> crypto_rsa_mutex;
+static SingletonPtr<rtos::Mutex> crypto_rsa_mutex;
 
 /* Crypto init counter. Crypto keeps active as it is non-zero. */
 static uint16_t crypto_init_counter = 0U;
