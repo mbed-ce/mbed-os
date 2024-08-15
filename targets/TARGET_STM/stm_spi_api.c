@@ -76,7 +76,7 @@
 #define TIMEOUT_1_BYTE 10
 
 #if defined(SPI_FLAG_FRLVL) // STM32F0 STM32F3 STM32F7 STM32L4
-#if defined(STM32U5)
+#if defined(STM32U5) || defined(STM32H5)
 extern HAL_StatusTypeDef HAL_SPIEx_FlushRxFifo(const SPI_HandleTypeDef *hspi);
 #else
 extern HAL_StatusTypeDef HAL_SPIEx_FlushRxFifo(SPI_HandleTypeDef *hspi);
@@ -291,8 +291,10 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_SPI1;
 #if defined (RCC_SPI123CLKSOURCE_PLL)
         PeriphClkInit.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
+#elif defined (RCC_SPI1CLKSOURCE_SYSCLK)
+        PeriphClkInit.Spi1ClockSelection = RCC_SPI1CLKSOURCE_SYSCLK;   
 #else
-        PeriphClkInit.Spi1ClockSelection = RCC_SPI1CLKSOURCE_SYSCLK;
+        PeriphClkInit.Spi1ClockSelection = RCC_SPI1CLKSOURCE_PLL1Q;
 #endif
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
             error("HAL_RCCEx_PeriphCLKConfig\n");
@@ -314,8 +316,10 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_SPI2;
 #if defined (RCC_SPI123CLKSOURCE_PLL)
         PeriphClkInit.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
-#else
+#elif defined (RCC_SPI2CLKSOURCE_SYSCLK)
         PeriphClkInit.Spi2ClockSelection = RCC_SPI2CLKSOURCE_SYSCLK;
+#else
+        PeriphClkInit.Spi2ClockSelection = RCC_SPI2CLKSOURCE_PLL1Q; 
 #endif
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
             error("HAL_RCCEx_PeriphCLKConfig\n");
@@ -337,8 +341,10 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
         PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_SPI3;
 #if defined (RCC_SPI123CLKSOURCE_PLL)
         PeriphClkInit.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
-#else
+#elif defined (RCC_SPI2CLKSOURCE_SYSCLK)
         PeriphClkInit.Spi3ClockSelection = RCC_SPI3CLKSOURCE_SYSCLK;
+#else
+        PeriphClkInit.Spi3ClockSelection = RCC_SPI3CLKSOURCE_PLL1Q;
 #endif
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
             error("HAL_RCCEx_PeriphCLKConfig\n");
@@ -358,7 +364,11 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
     if (spiobj->spi == SPI_4) {
 #if defined(SPI_IP_VERSION_V2)
         PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_SPI4;
+#if defined  RCC_SPI45CLKSOURCE_PCLK1
         PeriphClkInit.Spi45ClockSelection = RCC_SPI45CLKSOURCE_PCLK1;
+#else
+        PeriphClkInit.Spi4ClockSelection = RCC_SPI4CLKSOURCE_PCLK2;
+#endif
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
             error("HAL_RCCEx_PeriphCLKConfig\n");
         }
@@ -377,7 +387,11 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
     if (spiobj->spi == SPI_5) {
 #if defined(SPI_IP_VERSION_V2)
         PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_SPI5;
+#if defined RCC_SPI45CLKSOURCE_PCLK1
         PeriphClkInit.Spi45ClockSelection = RCC_SPI45CLKSOURCE_PCLK1;
+#else
+        PeriphClkInit.Spi5ClockSelection = RCC_SPI5CLKSOURCE_PCLK3;
+#endif
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
             error("HAL_RCCEx_PeriphCLKConfig\n");
         }
@@ -396,7 +410,11 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
     if (spiobj->spi == SPI_6) {
 #if defined(SPI_IP_VERSION_V2)
         PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_SPI6;
+#if defined RCC_SPI6CLKSOURCE_PCLK4
         PeriphClkInit.Spi6ClockSelection = RCC_SPI6CLKSOURCE_PCLK4;
+#else
+        PeriphClkInit.Spi6ClockSelection = RCC_SPI6CLKSOURCE_PCLK2;
+#endif
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
             error("HAL_RCCEx_PeriphCLKConfig\n");
         }
@@ -508,7 +526,7 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
     SPI_INIT_DIRECT(obj, &explicit_spi_pinmap);
 }
 
-#ifdef STM32_SPI_CAPABILITY_DMA
+#if STM32_SPI_CAPABILITY_DMA
 
 /**
  * Initialize the DMA for an SPI object in the Tx direction.
