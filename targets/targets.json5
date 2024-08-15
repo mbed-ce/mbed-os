@@ -3100,9 +3100,6 @@
             "LPTICKER",
             "CAN",
 			"SERIAL_FC",
-            "SPI",
-            "SPISLAVE",
-            "SPI_ASYNCH",
             "WATCHDOG",
             "ETHERNET",
             "EMAC"
