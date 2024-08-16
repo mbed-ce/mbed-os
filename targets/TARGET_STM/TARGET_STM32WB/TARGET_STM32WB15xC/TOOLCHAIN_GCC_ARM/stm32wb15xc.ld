@@ -24,8 +24,8 @@
 
 #if !defined(MBED_APP_SIZE)
 /* MBED_APP_SIZE cannot be full ROM size as core M0 FW is using the end of FLASH */
-/* Size is defined in json with "mbed_rom_size" */
-#define MBED_APP_SIZE MBED_ROM_SIZE
+/* Size is defined in json with "memory_bank_config" */
+#define MBED_APP_SIZE MBED_CONFIGURED_ROM_SIZE
 #endif
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)

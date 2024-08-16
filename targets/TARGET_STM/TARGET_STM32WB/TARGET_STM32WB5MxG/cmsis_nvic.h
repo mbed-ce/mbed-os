@@ -21,10 +21,10 @@
 #define MBED_ROM_START  0x8000000
 #endif
 
-#if !defined(MBED_ROM_SIZE)
+#if !defined(MBED_CONFIGURED_ROM_SIZE)
 // MBED_ROM_SIZE cannot be full ROM size as core M0 FW is using the end of FLASH
-// Size is defined in json with "mbed_rom_size"
-#error "mbed_rom_size is missing"
+// Size is defined in json with "memory_bank_config"
+#error "memory_bank_config is missing"
 #endif
 
 #if !defined(MBED_RAM_START)

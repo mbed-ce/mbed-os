@@ -21,7 +21,7 @@
 #define MBED_ROM_START  0x8000000
 #endif
 
-#if !defined(MBED_ROM_SIZE)
+#if !defined(MBED_CONFIGURED_ROM_SIZE)
 #define MBED_ROM_SIZE  0x80000  // 512 KB
 #endif
 

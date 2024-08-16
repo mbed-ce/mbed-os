@@ -3311,10 +3311,6 @@
         ],
         "public": false,
         "core": "Cortex-M7FD",
-        "mbed_rom_start": "0x08000000",
-        "mbed_rom_size": "0x100000",
-        "mbed_ram_start": "0x24000000",
-        "mbed_ram_size": "0x50000",
         "extra_labels_add": [
             "STM32H735xG",
             "STM32H7_550MHZ"
@@ -3324,7 +3320,8 @@
         ],
         "overrides": {
             "system_power_supply": "PWR_LDO_SUPPLY"
-        }
+        },
+        "device_name": "STM32H735AGIx"
     },
     "MCU_STM32H743xI": {
         "inherits": [
@@ -3426,7 +3423,8 @@
             "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
             "enable-overdrive-mode": 0
-        }
+        },
+        "device_name": "STM32H745ZITx"
     },
     "MCU_STM32H745xI_CM4": {
         "inherits": [
@@ -3437,10 +3435,13 @@
             "STM32H745xI_CM4"
         ],
         "core": "Cortex-M4F",
-        "mbed_rom_start": "0x08100000",
-        "mbed_rom_size": "0x100000",
-        "mbed_ram_start": "0x10000000",
-        "mbed_ram_size": "0x48000",
+        "memory_bank_config": {
+            // Select flash bank 2
+            "IROM1": {
+                "start": 0x08100000,
+                "size": 0x100000
+            }
+        },
         "macros_add": [
             "CORE_CM4"
         ]
@@ -3454,10 +3455,13 @@
             "STM32H745xI_CM7"
         ],
         "core": "Cortex-M7FD",
-        "mbed_rom_start": "0x08000000",
-        "mbed_rom_size": "0x100000",
-        "mbed_ram_start": "0x24000000",
-        "mbed_ram_size": "0x80000",
+        "memory_bank_config": {
+            // Select flash bank 1
+            "IROM1": {
+                "start": 0x08000000,
+                "size": 0x100000
+            }
+        },
         "macros_add": [
             "CORE_CM7"
         ]
@@ -3487,7 +3491,6 @@
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
-        "device_name": "STM32H745ZITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_H745ZI_Q_CM4": {
@@ -3515,7 +3518,6 @@
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
-        "device_name": "STM32H745ZITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "NUCLEO_H745ZI_Q" : {
@@ -3550,10 +3552,13 @@
             "STM32H747xI_CM7"
         ],
         "core": "Cortex-M7FD",
-        "mbed_rom_start": "0x08000000",
-        "mbed_rom_size": "0x100000",
-        "mbed_ram_start": "0x24000000",
-        "mbed_ram_size": "0x80000",
+        "memory_bank_config": {
+            // Select flash bank 1
+            "IROM1": {
+                "start": 0x08000000,
+                "size": 0x100000
+            }
+        },
         "macros_add": [
             "CORE_CM7"
         ]
@@ -3598,10 +3603,13 @@
             "STM32H747xI_CM4"
         ],
         "core": "Cortex-M4F",
-        "mbed_rom_start": "0x08100000",
-        "mbed_rom_size": "0x100000",
-        "mbed_ram_start": "0x10000000",
-        "mbed_ram_size": "0x48000",
+        "memory_bank_config": {
+            // Select flash bank 2
+            "IROM1": {
+                "start": 0x08100000,
+                "size": 0x100000
+            }
+        },
         "macros_add": [
             "CORE_CM4"
         ],
@@ -4940,16 +4948,13 @@
             "MCU_STM32U5"
         ],
         "public": false,
-        "mbed_rom_start": "0x08000000",
-        "mbed_rom_size": "0x80000",
-        "mbed_ram_start": "0x20000000",
-        "mbed_ram_size": "0x40000",
         "extra_labels_add": [
             "STM32U545xE"
         ],
         "macros_add": [
             "STM32U545xx"
-        ]
+        ],
+        "device_name": "STM32U545RETx"
     },
     "NUCLEO_U545RE_Q": {
         "inherits": [
@@ -4959,7 +4964,7 @@
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "device_name": "STM32U545RETx",
+
         "overrides": {
             // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
             // Jumper JP5 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
@@ -4972,10 +4977,7 @@
             "MCU_STM32U5"
         ],
         "public": false,
-        "mbed_rom_start": "0x08000000",
-        "mbed_rom_size": "0x400000",
-        "mbed_ram_start": "0x20000000",
-        "mbed_ram_size": "0x270000",
+        "device_name": "STM32U5A5ZJTx",
         "extra_labels_add": [
             "STM32U5A5xJ"
         ],
@@ -4991,7 +4993,6 @@
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "device_name": "STM32U5A5ZJTx",
         "overrides": {
             // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
             // Jumper JP4 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
@@ -5011,7 +5012,6 @@
             "STM32WB",
             "CORDIO"
         ],
-        "mbed_rom_start": "0x08000000",
         "config": {
             "lpticker_lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
@@ -5057,7 +5057,14 @@
         "extra_labels_add": [
             "STM32WB15xC"
         ],
-        "mbed_rom_size": "0x32800",
+        "device_name": "STM32WB15CCUx",
+
+        // Reduce used flash to make room for the M0 core firmware
+        "memory_bank_config": {
+            "IROM1": {
+                "size": 0x32800 // 202kiB
+            }
+        },
         "overrides": {
             "boot-stack-size": "0x400"
         },
@@ -5075,7 +5082,6 @@
         "detect_code": [
             "0883"
         ],
-        "device_name": "STM32WB15CCUx",
         "image_url": "https://www.mouser.com/images/stmicroelectronics/hd/NUCLEO-WB15CC_SPL.jpg"
     },
     "MCU_STM32WB55xG": {
@@ -5086,7 +5092,14 @@
         "extra_labels_add": [
             "STM32WB55xG"
         ],
-        "mbed_rom_size": "0xCA000",
+        "device_name": "STM32WB55RGVx",
+
+        // Reduce used flash to make room for the M0 core firmware
+        "memory_bank_config": {
+            "IROM1": {
+                "size": 0xCA000 // 808kiB
+            }
+        },
         "macros_add": [
             "STM32WB55xx",
             "MBEDTLS_CONFIG_HW_SUPPORT"
@@ -5105,7 +5118,6 @@
         "device_has_add": [
             "USBDEVICE"
         ],
-        "device_name": "STM32WB55RGVx",
         "image_url": "https://www.mouser.com/images/stmicroelectronics/hd/NUCLEO-WB15CC_SPL.jpg"
     },
     "MCU_STM32WB5MxG": {
@@ -5116,7 +5128,15 @@
         "extra_labels_add": [
             "STM32WB5MxG"
         ],
-        "mbed_rom_size": "0xCA000",
+        "device_name": "STM32WB55VGYx",
+
+        // Reduce used flash to make room for the M0 core firmware
+        "memory_bank_config": {
+            "IROM1": {
+                "size": 0xCA000 // 808kiB
+            }
+        },
+
         "macros_add": [
             "STM32WB5Mxx",
             "MBEDTLS_CONFIG_HW_SUPPORT"
@@ -5132,7 +5152,6 @@
         "detect_code": [
             "0884"
         ],
-        "device_name": "STM32WB55VGYx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271050.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
 
@@ -6169,8 +6188,22 @@
         ],
         "device_name": "R7S72100",
         "bootloader_supported": true,
-        "mbed_rom_start": "0x18000000",
-        "mbed_rom_size": "0x800000",
+        // 8MB serial flash on the board
+        "memory_banks": {
+            "EXT_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x800000, // 8MiB
+                "start": 0x18000000,
+                "startup": true
+            }
+        },
         "sectors": [
             [
                 402653184,
@@ -6210,8 +6243,21 @@
         ],
         "device_name": "R7S72103",
         "bootloader_supported": true,
-        "mbed_rom_start": "0x18000000",
-        "mbed_rom_size": "0x800000",
+        "memory_banks": {
+            "EXT_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x800000, // 8MiB
+                "start": 0x18000000,
+                "startup": true
+            }
+        },
         "sectors": [
             [
                 402653184,
@@ -6276,8 +6322,23 @@
         "release_versions": ["5"],
         "device_name": "R7S921053",
         "bootloader_supported": true,
-        "mbed_rom_start"        : "0x50000000",
-        "mbed_rom_size"         : "0x1000000",
+
+        // 16MiB OSPI flash on PCB
+        "memory_banks": {
+            "EXT_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x1000000, // 16MiB
+                "start": 0x50000000,
+                "startup": true
+            }
+        },
         "sectors": [[1342177280,4096]],
         "overrides": {
             "network-default-interface-type": "ETHERNET"
@@ -8631,8 +8692,15 @@
             "CYBSP_WIFI_CAPABLE"
         ],
         "device_name": "CY8C624ABZI-D44",
-        "mbed_ram_start": "0x08002000",
-        "mbed_ram_size": "0x000FD800",
+
+        // Leave 0x2000 bytes at the start of RAM for the CM0+ application
+        "memory_bank_config": {
+            "IRAM1": {
+                "start": 0x08002000,
+                "size": 0x000FD800
+            }
+        },
+
         "detect_code": [
             "1901"
         ],

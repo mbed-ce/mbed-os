@@ -43,3 +43,6 @@ elseif("STM32H7_550MHZ" IN_LIST MBED_TARGET_LABELS)
 elseif("STM32H7_280MHZ" IN_LIST MBED_TARGET_LABELS)
     target_sources(mbed-stm32h7 INTERFACE clock_cfg/TARGET_STM32H7_280MHZ/system_clock.c)
 endif()
+
+# Add linker scripts
+add_subdirectory(linker_scripts)

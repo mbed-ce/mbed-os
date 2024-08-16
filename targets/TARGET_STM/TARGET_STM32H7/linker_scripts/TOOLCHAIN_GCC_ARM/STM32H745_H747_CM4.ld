@@ -17,15 +17,6 @@
 
 #include "../cmsis_nvic.h"
 
-
-#if !defined(MBED_APP_START)
-  #define MBED_APP_START  MBED_ROM_START
-#endif
-
-#if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE  MBED_ROM_SIZE
-#endif
-
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
     /* This value is normally defined by the tools
        to 0x1000 for bare metal and 0x400 for RTOS */
@@ -37,12 +28,12 @@
 
 MEMORY
 {
-  FLASH (rx)     : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
-  DTCMRAM (rwx)  : ORIGIN = NVIC_RAM_VECTOR_ADDRESS + VECTORS_SIZE, LENGTH = 128K - VECTORS_SIZE
-  RAM (xrw)      : ORIGIN = MBED_RAM_START, LENGTH = MBED_RAM_SIZE
-  RAM_D2 (xrw)   : ORIGIN = 0x30000000, LENGTH = 288K
-  RAM_D3 (xrw)   : ORIGIN = 0x38000000, LENGTH = 64K
-  ITCMRAM (xrw)  : ORIGIN = 0x00000000, LENGTH = 64K
+  FLASH (rx)     : ORIGIN = MBED_CONFIGURED_ROM_START, LENGTH = MBED_CONFIGURED_ROM_SIZE
+  DTCMRAM (rwx)  : ORIGIN = MBED_RAM_BANK_SRAM_DTC_START + VECTORS_SIZE, LENGTH = 128K - MBED_RAM_BANK_SRAM_DTC_SIZE
+  RAM (xrw)      : ORIGIN = MBED_RAM_BANK_SRAM_D1_START, LENGTH = MBED_RAM_BANK_SRAM_D1_SIZE
+  RAM_D2 (xrw)   : ORIGIN = MBED_RAM_BANK_SRAM_D2_START, LENGTH = MBED_RAM_BANK_SRAM_D2_SIZE
+  RAM_D3 (xrw)   : ORIGIN = MBED_RAM_BANK_SRAM_D3_START, LENGTH = MBED_RAM_BANK_SRAM_D3_SIZE
+  ITCMRAM (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_ITC_START, LENGTH = MBED_RAM_BANK_SRAM_ITC_SIZE
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -151,7 +142,7 @@ SECTIONS
         __data_end__ = .;
         _edata = .;
 
-    } > RAM
+    } > SRAM_D2
 
     /* Uninitialized data section
      * This region is not initialized by the C/C++ library and can be used to
@@ -164,7 +155,7 @@ SECTIONS
         KEEP(*(.keep.uninitialized))
         . = ALIGN(32);
         __uninitialized_end = .;
-    } > RAM
+    } > SRAM_D2
 
     .bss :
     {
@@ -176,16 +167,16 @@ SECTIONS
         . = ALIGN(8);
         __bss_end__ = .;
         _ebss = .;
-    } > RAM
+    } > SRAM_D2
 
     .heap (COPY):
     {
         __end__ = .;
         PROVIDE(end = .);
         *(.heap*)
-        . = ORIGIN(RAM) + LENGTH(RAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
+        . = ORIGIN(SRAM_D2) + LENGTH(SRAM_D2) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
         __HeapLimit = .;
-    } > RAM
+    } > SRAM_D2
 
     /* .stack_dummy section doesn't contains any symbols. It is only
      * used for linker to calculate size of stack sections, and assign
@@ -193,30 +184,15 @@ SECTIONS
     .stack_dummy (COPY):
     {
         *(.stack*)
-    } > RAM
+    } > SRAM_D2
 
-    /* Set stack top to end of RAM, and stack limit move down by
+    /* Set stack top to end of SRAM_D2, and stack limit move down by
      * size of stack_dummy section */
-    __StackTop = ORIGIN(RAM) + LENGTH(RAM);
+    __StackTop = ORIGIN(SRAM_D2) + LENGTH(SRAM_D2);
     _estack = __StackTop;
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
     PROVIDE(__stack = __StackTop);
 
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
-
-    .lwip_sec (NOLOAD) : {
-        . = ABSOLUTE(0x30040000);
-        *(.RxDecripSection)
-
-        . = ABSOLUTE(0x30040100);
-        *(.TxDecripSection)
-
-        . = ABSOLUTE(0x30040400);
-        *(.RxArraySection)
-
-        . = ABSOLUTE(0x30044000);
-        *(.ethusbram)
-
-    } >RAM_D2 AT> FLASH
 }
