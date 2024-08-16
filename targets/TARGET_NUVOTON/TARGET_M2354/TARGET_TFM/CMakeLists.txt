@@ -18,3 +18,8 @@ target_sources(mbed-m2354-tfm
         platform_extra_secure_compat.c
         tfm_ns_interface.c
 )
+
+target_link_libraries(mbed-m2354-tfm
+    INTERFACE
+        mbed-psa
+)
