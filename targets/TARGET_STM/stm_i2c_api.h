@@ -64,9 +64,6 @@ struct i2c_s {
     volatile uint8_t event;
 
     int current_hz;
-
-    /// If true, send a stop at the end of the current asynchronous transaction
-    bool stop;
     
 #if DEVICE_I2CSLAVE
     uint8_t slave;
@@ -81,6 +78,9 @@ struct i2c_s {
 #if DEVICE_I2C_ASYNCH
     /// Address that the current asynchronous transaction is talking to
     uint32_t address;
+
+    /// If true, send a stop at the end of the current asynchronous transaction
+    bool stop;
 
     /// Specifies which events (the I2C_EVENT_xxx defines) can be passed up to the application from the IRQ handler
     uint8_t available_events;
