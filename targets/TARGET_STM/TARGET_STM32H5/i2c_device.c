@@ -30,6 +30,12 @@ uint32_t i2c_get_pclk(I2CName i2c)
 {
     uint32_t clocksource;
     uint32_t pclk = 0;
+#if !defined(RCC_CR_PLL3ON)
+    PLL2_ClocksTypeDef pll2clock; //STM32H503
+#else
+    PLL3_ClocksTypeDef pll3clock; //STM32H563
+#endif
+
     if (i2c == I2C_1) {
         clocksource = __HAL_RCC_GET_I2C1_SOURCE();
         switch (clocksource) {
@@ -44,13 +50,11 @@ uint32_t i2c_get_pclk(I2CName i2c)
                 break;
 #if !defined(RCC_CR_PLL3ON)
             case RCC_I2C1CLKSOURCE_PLL2R:
-                PLL2_ClocksTypeDef pll2clock;
                 HAL_RCCEx_GetPLL2ClockFreq(&pll2clock);
                 pclk = pll2clock.PLL2_R_Frequency;
                 break;
 #else
             case RCC_I2C1CLKSOURCE_PLL3R:
-                PLL3_ClocksTypeDef pll3clock;
                 HAL_RCCEx_GetPLL3ClockFreq(&pll3clock);
                 pclk = pll3clock.PLL3_R_Frequency;
                 break;
@@ -70,14 +74,12 @@ uint32_t i2c_get_pclk(I2CName i2c)
                 pclk = HSI_VALUE;
                 break;
 #if !defined(RCC_CR_PLL3ON)
-           case RCC_I2C2CLKSOURCE_PLL2R:
-                PLL2_ClocksTypeDef pll2clock;
+            case RCC_I2C2CLKSOURCE_PLL2R:
                 HAL_RCCEx_GetPLL2ClockFreq(&pll2clock);
                 pclk = pll2clock.PLL2_R_Frequency;
                 break;
 #else
             case RCC_I2C2CLKSOURCE_PLL3R:
-                PLL3_ClocksTypeDef pll3clock;
                 HAL_RCCEx_GetPLL3ClockFreq(&pll3clock);
                 pclk = pll3clock.PLL3_R_Frequency;
                 break;
@@ -97,11 +99,12 @@ uint32_t i2c_get_pclk(I2CName i2c)
             case RCC_I2C3CLKSOURCE_HSI:
                 pclk = HSI_VALUE;
                 break;
+#if defined(RCC_CR_PLL3ON)
             case RCC_I2C3CLKSOURCE_PLL3R:
-                PLL3_ClocksTypeDef pll3clock;
                 HAL_RCCEx_GetPLL3ClockFreq(&pll3clock);
                 pclk = pll3clock.PLL3_R_Frequency;
                 break;
+#endif
         }
     }
 #endif
@@ -118,11 +121,12 @@ uint32_t i2c_get_pclk(I2CName i2c)
             case RCC_I2C4CLKSOURCE_HSI:
                 pclk = HSI_VALUE;
                 break;
+#if defined(RCC_CR_PLL3ON)
             case RCC_I2C4CLKSOURCE_PLL3R:
-                PLL3_ClocksTypeDef pll3clock;
                 HAL_RCCEx_GetPLL3ClockFreq(&pll3clock);
                 pclk = pll3clock.PLL3_R_Frequency;
                 break;
+#endif
         }
     }
 #endif
