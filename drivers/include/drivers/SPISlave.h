@@ -33,7 +33,7 @@ namespace mbed {
 
 /** A SPI slave, used for communicating with a SPI master device.
  *
- * The default format is set to 8 bits, mode 0 and a clock frequency of 1MHz.
+ * The default format is set to 8 bits, mode 0.
  *
  * @note Synchronization level: Not protected
  *
@@ -96,12 +96,6 @@ public:
      */
     void format(int bits, int mode = 0);
 
-    /** Set the SPI bus clock frequency.
-     *
-     *  @param hz Clock frequency in hz (default = 1MHz).
-     */
-    void frequency(int hz = 1000000);
-
     /** Polls the SPI to see if data has been received.
      *
      *  @return Presence of received data.
@@ -133,8 +127,6 @@ protected:
     int _bits;
     /* Clock phase and polarity */
     int _mode;
-    /* Clock frequency */
-    int _hz;
 
 #endif //!defined(DOXYGEN_ONLY)
 };

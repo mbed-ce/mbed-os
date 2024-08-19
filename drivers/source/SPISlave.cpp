@@ -24,23 +24,29 @@ namespace mbed {
 SPISlave::SPISlave(PinName mosi, PinName miso, PinName sclk, PinName ssel) :
     _spi(),
     _bits(8),
-    _mode(0),
-    _hz(1000000)
+    _mode(0)
 {
     spi_init(&_spi, mosi, miso, sclk, ssel);
     spi_format(&_spi, _bits, _mode, 1);
-    spi_frequency(&_spi, _hz);
+
+    // For legacy compatibility, tell the HAL to set the frequency to 1MHz.
+    // This is done even though it does not make sense to set the frequency of a slave device;
+    // it has to run at whatever SCLK frequency the master supplies.
+    spi_frequency(&_spi, 1000000);
 }
 
 SPISlave::SPISlave(const spi_pinmap_t &pinmap) :
     _spi(),
     _bits(8),
-    _mode(0),
-    _hz(1000000)
+    _mode(0)
 {
     spi_init_direct(&_spi, &pinmap);
     spi_format(&_spi, _bits, _mode, 1);
-    spi_frequency(&_spi, _hz);
+
+    // For legacy compatibility, tell the HAL to set the frequency to 1MHz.
+    // This is done even though it does not make sense to set the frequency of a slave device;
+    // it has to run at whatever SCLK frequency the master supplies.
+    spi_frequency(&_spi, 1000000);
 }
 
 void SPISlave::format(int bits, int mode)
@@ -48,12 +54,6 @@ void SPISlave::format(int bits, int mode)
     _bits = bits;
     _mode = mode;
     spi_format(&_spi, _bits, _mode, 1);
-}
-
-void SPISlave::frequency(int hz)
-{
-    _hz = hz;
-    spi_frequency(&_spi, _hz);
 }
 
 int SPISlave::receive(void)
