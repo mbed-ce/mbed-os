@@ -1472,6 +1472,7 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
     /* Get object ptr based on handler ptr */
     i2c_t *obj = get_i2c_obj(hi2c);
     struct i2c_s *obj_s = I2C_S(obj);
+#if DEVICE_I2C_ASYNCH
 #ifdef I2C_IP_VERSION_V1
     hi2c->PreviousState = I2C_STATE_NONE;
 #elif defined(I2C_IP_VERSION_V2)
@@ -1487,7 +1488,8 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
             obj_s->state = STM_I2C_IDLE;
         }
     }
-#endif
+#endif /* I2C_IP_VERSION_VX */
+#endif /* DEVICE_I2C_ASYNCH */
 
     // Set event flag.  Note: We still get the complete callback even if an error was encountered,
     // so use |= to preserve any error flags.
