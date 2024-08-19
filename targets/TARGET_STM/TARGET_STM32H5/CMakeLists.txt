@@ -15,6 +15,7 @@ target_sources(mbed-stm32h5
     gpio_irq_device.c
     i2c_device.c
     serial_device.c
+    spi_api.c
     pwmout_device.c
 )
 
