@@ -20,7 +20,7 @@ function(gen_upload_target TARGET_NAME BIN_FILE)
 
 	add_custom_target(flash-${TARGET_NAME}
 		COMMAND ${Python3_EXECUTABLE} -m install_bin_file
-			${BIN_FILE}
+			$<IF:$<BOOL:${MBED_OUTPUT_EXT}>,${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${TARGET_NAME}>.${MBED_OUTPUT_EXT},BIN_FILE>
 			${MBED_TARGET}
 			${MBED_RESET_BAUDRATE}
 			${MBED_TARGET_UID}
