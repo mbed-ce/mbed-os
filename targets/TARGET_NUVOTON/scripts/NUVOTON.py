@@ -28,16 +28,16 @@ from datetime import datetime
 SCRIPT_DIR = dirname(abspath(__file__))
 MBED_OS_ROOT = abspath(path_join(SCRIPT_DIR, os.pardir, os.pardir, os.pardir))
 
-def tfm_sign_image(tfm_import_path, signing_key, signing_key_1, non_secure_bin):
+def tfm_sign_image(tfm_import_path, signing_key, signing_key_1, non_secure_binhex):
     SECURE_ROOT = abspath(tfm_import_path)
 
     secure_bin = path_join(SECURE_ROOT, 'tfm_s.bin') 
     assert os.path.isfile(secure_bin)
 
-    non_secure_bin = abspath(non_secure_bin)
-    assert os.path.isfile(non_secure_bin)
+    non_secure_binhex = abspath(non_secure_binhex)
+    assert os.path.isfile(non_secure_binhex)
 
-    build_dir = dirname(non_secure_bin)
+    build_dir = dirname(non_secure_binhex)
     tempdir = path_join(build_dir, 'temp')
     if not isdir(tempdir):
         os.makedirs(tempdir)
@@ -46,10 +46,17 @@ def tfm_sign_image(tfm_import_path, signing_key, signing_key_1, non_secure_bin):
 
     bl2_bin = path_join(SECURE_ROOT, 'bl2.bin')
     s_bin_basename = splitext(basename(secure_bin))[0]
-    ns_bin_basename = splitext(basename(non_secure_bin))[0]
+    ns_bin_basename = splitext(basename(non_secure_binhex))[0]
 
     signing_key = path_join(SECURE_ROOT, 'signing_key', signing_key)
     assert os.path.isfile(signing_key)
+
+    # Create non_secure_bin for signing if non_secure_binhex is hex
+    non_secure_bin = splitext(non_secure_binhex)[0] + ".bin"
+    if os.path.splitext(non_secure_binhex)[1].lower() == ".hex":
+        non_secure_ih = IntelHex()
+        non_secure_ih.loadhex(non_secure_binhex)
+        non_secure_ih.tobinfile(non_secure_bin)
 
     # Find Python 3 command name across platforms
     python3_cmd = "python3" if shutil.which("python3") is not None else "python"
@@ -162,7 +169,7 @@ def tfm_sign_image(tfm_import_path, signing_key, signing_key_1, non_secure_bin):
         signed_concat_bin = abspath(path_join(tempdir, 'tfm_s_signed_' + ns_bin_basename + '_signed_concat' + '.bin'))
         s_update_bin = abspath(path_join(build_dir, s_bin_basename + '_update' + '.bin'))
         ns_update_bin = abspath(path_join(build_dir, ns_bin_basename + '_update' + '.bin'))
-        
+
         #1. Run wrapper to sign the secure TF-M binary
         cmd_wrapper[pos_wrapper_signing_key] = signing_key
         cmd_wrapper[pos_wrapper_layout] = image_macros_s
@@ -206,8 +213,8 @@ def tfm_sign_image(tfm_import_path, signing_key, signing_key_1, non_secure_bin):
         out_ih = IntelHex()
         out_ih.loadbin(bl2_bin)
         out_ih.loadbin(signed_concat_bin, flash_area_0_offset)
-        out_ih.tofile(splitext(non_secure_bin)[0] + ".hex", 'hex')
-        out_ih.tobinfile(non_secure_bin)
+        out_ih.tofile(splitext(non_secure_binhex)[0] + ".bin", 'bin')
+        out_ih.tofile(splitext(non_secure_binhex)[0] + ".hex", 'hex')
 
         # Generate firmware update file for PSA Firmware Update
         shutil.copy(s_signed_bin, s_update_bin)
@@ -250,8 +257,8 @@ def tfm_sign_image(tfm_import_path, signing_key, signing_key_1, non_secure_bin):
         out_ih = IntelHex()
         out_ih.loadbin(bl2_bin)
         out_ih.loadbin(concat_signed_bin, flash_area_0_offset)
-        out_ih.tofile(splitext(non_secure_bin)[0] + ".hex", 'hex')
-        out_ih.tobinfile(non_secure_bin)
+        out_ih.tofile(splitext(non_secure_binhex)[0] + ".bin", 'bin')
+        out_ih.tofile(splitext(non_secure_binhex)[0] + ".hex", 'hex')
 
         # Generate firmware update file for PSA Firmware Update
         shutil.copy(concat_signed_bin, update_bin)
@@ -357,7 +364,7 @@ def parse_args():
     )
 
     parser_tfm_sign_image.add_argument(
-        "--non-secure-bin",
+        "--non-secure-binhex",
         help="Path to the non-secure binary",
         required=True
     )
@@ -368,4 +375,4 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    args.func(args.tfm_import_path, args.signing_key, args.signing_key_1, args.non_secure_bin)
+    args.func(args.tfm_import_path, args.signing_key, args.signing_key_1, args.non_secure_binhex)

@@ -30,7 +30,7 @@ macro(mbed_post_build_nuvoton_tfm_sign_image
                         --tfm-import-path ${tfm_import_path}
                         --signing_key ${signing_key}
                         --signing_key_1 ${signing_key_1}
-                        --non-secure-bin $<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_BASE_NAME:${target}>.bin
+                        --non-secure-binhex $<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_BASE_NAME:${target}>.${MBED_OUTPUT_EXT}
                 )
             else()
                 add_custom_command(
@@ -43,7 +43,7 @@ macro(mbed_post_build_nuvoton_tfm_sign_image
                         tfm_sign_image
                         --tfm-import-path ${tfm_import_path}
                         --signing_key ${signing_key}
-                        --non-secure-bin $<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_BASE_NAME:${target}>.bin
+                        --non-secure-binhex $<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_BASE_NAME:${target}>.${MBED_OUTPUT_EXT}
                 )
             endif()
         endfunction()
