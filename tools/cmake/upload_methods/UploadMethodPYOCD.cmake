@@ -36,7 +36,7 @@ function(gen_upload_target TARGET_NAME BIN_FILE)
 		-f ${PYOCD_CLOCK_SPEED}
 		-t ${PYOCD_TARGET_NAME}
 		${PYOCD_PROBE_ARGS}
-		${BIN_FILE})
+		$<IF:$<BOOL:${MBED_OUTPUT_EXT}>,${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${TARGET_NAME}>.${MBED_OUTPUT_EXT},${BIN_FILE}>)
 
 	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
 endfunction(gen_upload_target)
