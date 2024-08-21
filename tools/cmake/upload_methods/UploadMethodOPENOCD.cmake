@@ -48,7 +48,7 @@ function(gen_upload_target TARGET_NAME BIN_FILE)
 		${OPENOCD_CHIP_CONFIG_COMMANDS}
 		${OPENOCD_ADAPTER_SERIAL_COMMAND}
 		-c "gdb_port disabled" # Don't start a GDB server when just programming
-		-c "program $<TARGET_FILE:${TARGET_NAME}> reset exit"
+		-c "program $<IF:$<BOOL:${MBED_OUTPUT_EXT}>,${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${TARGET_NAME}>.${MBED_OUTPUT_EXT},$<TARGET_FILE:${TARGET_NAME}>> reset exit"
 		VERBATIM)
 
 	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
