@@ -4,12 +4,10 @@
 add_subdirectory(TARGET_MAX32625MBED EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_MAX32625PICO EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_SDT32625B EXCLUDE_FROM_ALL)
-add_subdirectory(device EXCLUDE_FROM_ALL)
 
-if(${MBED_TOOLCHAIN} STREQUAL "ARM")
-    set(STARTUP_FILE device/TOOLCHAIN_ARM_STD/startup_MAX32625.S)
-elseif(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
+if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
     set(STARTUP_FILE device/TOOLCHAIN_GCC_ARM/startup_max32625.S)
+    set(LINKER_FILE device/TOOLCHAIN_GCC_ARM/max32625.ld)
 endif()
 
 add_library(mbed-max32625 INTERFACE)
@@ -70,5 +68,7 @@ target_sources(mbed-max32625
 
         ${STARTUP_FILE}
 )
+
+mbed_set_linker_script(mbed-max32625 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
 
 target_link_libraries(mbed-max32625 INTERFACE mbed-maxim)

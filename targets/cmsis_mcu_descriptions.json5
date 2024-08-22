@@ -2397,8 +2397,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 163840,
-                "start": 536870912,
+                "size": 0x28000,
+                "start": 0x20000000,
                 "startup": false
             },
             "IROM1": {
@@ -2412,7 +2412,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 524288,
+                "size": 0x80000,
                 "start": 0,
                 "startup": true
             }

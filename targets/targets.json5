@@ -6463,9 +6463,6 @@
         "inherits": [
             "MAX32625_BASE"
         ],
-        "extra_labels_add": [
-            "MAX32625_NO_BOOT"
-        ],
         "detect_code": [
             "0415"
         ],
@@ -6474,9 +6471,6 @@
     "SDT32625B": {
         "inherits": [
             "MAX32625_BASE"
-        ],
-        "extra_labels_add": [
-            "MAX32625_NO_BOOT"
         ],
         "detect_code": [
             "3102"
@@ -6487,10 +6481,16 @@
         "inherits": [
             "MAX32625_BASE"
         ],
-        "extra_labels_add": [
-            "MAX32625_BOOT"
-        ],
         "bootloader_supported": true,
+
+        // Reserve the first 64k of flash for the bootloader
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x00010000,
+                "size": 0x00070000
+            }
+        },
+
         "detect_code": [
             "0444"
         ],
