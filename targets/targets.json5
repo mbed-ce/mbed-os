@@ -3739,10 +3739,6 @@
         ],
         "public": false,
         "core": "Cortex-M7FD",
-        "mbed_rom_start": "0x08000000",
-        "mbed_rom_size": "0x20000",
-        "mbed_ram_start": "0x24000000",
-        "mbed_ram_size": "0x80000",
         "extra_labels_add": [
             "STM32H750xB",
             "STM32H7_480MHZ"
@@ -3752,7 +3748,8 @@
         ],
         "overrides": {
             "system_power_supply": "PWR_LDO_SUPPLY"
-        }
+        },
+        "device_name": "STM32H750ZBTx"
     },
     "MCU_STM32H753xI": {
         "inherits": [
@@ -3777,10 +3774,6 @@
         ],
         "public": false,
         "core": "Cortex-M7FD",
-        "mbed_rom_start": "0x08000000",
-        "mbed_rom_size": "0x200000",
-        "mbed_ram_start": "0x24000000",
-        "mbed_ram_size": "0x100000",
         "extra_labels_add": [
             "STM32H7A3xIQ"
         ],
@@ -3788,6 +3781,7 @@
             "STM32H7A3xxQ",
             "STM32H7_280MHZ"
         ],
+        "device_name": "STM32H7A3ZITxQ",
         "overrides": {
             "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
@@ -3801,7 +3795,6 @@
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "device_name": "STM32H7A3ZITxQ",
         "detect_code": [
             "0860"
         ],
@@ -3813,10 +3806,6 @@
         ],
         "public": false,
         "core": "Cortex-M7FD",
-        "mbed_rom_start": "0x08000000",
-        "mbed_rom_size": "0x200000",
-        "mbed_ram_start": "0x24000000",
-        "mbed_ram_size": "0x100000",
         "extra_labels_add": [
             "STM32H7B3xIQ",
             "STM32H7_280MHZ"
@@ -3824,6 +3813,7 @@
         "macros_add": [
             "STM32H7B3xxQ"
         ],
+        "device_name": "STM32H7B3ZITxQ",
         "overrides": {
             "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
@@ -5207,7 +5197,8 @@
         ],
         "macros_add": [
             "STM32WL55xx"
-        ]
+        ],
+        "device_name": "STM32WL55JCIx"
     },
     "NUCLEO_WL55JC": {
         "inherits": [
@@ -5219,7 +5210,6 @@
         "detect_code": [
             "0866"
         ],
-        "device_name": "STM32WL55JCIx",
         "image_url": "https://www.mouser.com/images/marketingid/2020/img/114771861.png?v=012324.0355"
     },
     "MCU_STM32WLE5xC": {
@@ -5233,10 +5223,7 @@
         "extra_labels_add": [
             "STM32WLE5xC"
         ],
-        "mbed_rom_start": "0x8000000",
-        "mbed_rom_size": "0x40000",
-        "mbed_ram_start": "0x20000000",
-        "mbed_ram_size": "0x10000"
+        "device_name": "STM32WLE5JCIx"
     },
     // NXP i.MX RT Targets ---------------------------------------------------------------------------------------------
 
@@ -8440,6 +8427,155 @@
         },
         "image_url": "https://os.mbed.com/media/cache/platforms/NuMaker-LoRaD-M252_V1.0_dAwfIUu.jpg.250x250_q85.jpg"
     },
+    "MCU_M261": {
+        "core": "Cortex-M23",
+        "default_toolchain": "ARMC6",
+        "public": false,
+        "extra_labels": [
+            "NUVOTON",
+            "M261",
+            "FLASH_CMSIS_ALGO"
+        ],
+        "macros": [
+            "LPTICKER_DELAY_TICKS=4"
+        ],
+        "is_disk_virtual": true,
+        "supported_toolchains": [
+            "GCC_ARM"
+        ],
+        "config": {
+            "hxt-present": {
+                "help": "High-speed external crystal oscillator HXT is present",
+                "options": [false, true],
+                "value": false
+            },
+            "lxt-present": {
+                "help": "Low-speed external crystal oscillator LXT is present",
+                "options": [false, true],
+                "value": true
+            },
+            "usb-uart": {
+                "help": "Configure USB_UART. USB_UART and USB_UART_TX/USB_UART_RX must be consistent.",
+                "value": null
+            },
+            "usb-uart-tx": {
+                "help": "Configure CONSOLE_TX. USB_UART and CONSOLE_TX/CONSOLE_RX must be consistent.",
+                "value": null
+            },
+            "usb-uart-rx": {
+                "help": "Configure CONSOLE_RX. USB_UART and CONSOLE_TX/CONSOLE_RX must be consistent.",
+                "value": null
+            },
+            "stdio-uart": {
+                "help": "Configure STDIO_UART. STDIO_UART and STDIO_UART_TX/STDIO_UART_RX must be consistent. STDIO_UART defaults to USB_UART.",
+                "value": null
+            },
+            "stdio-uart-tx": {
+                "help": "Configure STDIO_UART_TX. STDIO_UART and STDIO_UART_TX/STDIO_UART_RX must be consistent. STDIO_UART_TX defaults to CONSOLE_TX.",
+                "value": null
+            },
+            "stdio-uart-rx": {
+                "help": "Configure STDIO_UART_RX. STDIO_UART and STDIO_UART_TX/STDIO_UART_RX must be consistent. STDIO_UART_RX defaults to CONSOLE_RX.",
+                "value": null
+            },
+            "gpio-irq-debounce-enable": {
+                "help": "Enable GPIO IRQ debounce",
+                "value": 0
+            },
+            "gpio-irq-debounce-enable-list": {
+                "help": "Comma separated pin list to enable GPIO IRQ debounce",
+                "value": "NC"
+            },
+            "gpio-irq-debounce-clock-source": {
+                "help": "Select GPIO IRQ debounce clock source: GPIO_DBCTL_DBCLKSRC_HCLK or GPIO_DBCTL_DBCLKSRC_LIRC",
+                "value": "GPIO_DBCTL_DBCLKSRC_LIRC"
+            },
+            "gpio-irq-debounce-sample-rate": {
+                "help": "Select GPIO IRQ debounce sample rate: GPIO_DBCTL_DBCLKSEL_1, GPIO_DBCTL_DBCLKSEL_2, GPIO_DBCTL_DBCLKSEL_4, ..., or GPIO_DBCTL_DBCLKSEL_32768",
+                "value": "GPIO_DBCTL_DBCLKSEL_16"
+            },
+            "eadc-extsmpt-list": {
+                "help": "For EADC, comma separated {pin, value} list to extend sampling time in EADC clocks on per-pin basis. Value must be in the range [0, 255]."
+            }
+        },
+        "inherits": [
+            "Target"
+        ],
+        "device_has": [
+            "USTICKER",
+            "LPTICKER",
+            "RTC",
+            "ANALOGIN",
+            "ANALOGOUT",
+            "I2C",
+            "I2CSLAVE",
+            "I2C_ASYNCH",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "SERIAL",
+            "SERIAL_ASYNCH",
+            "SERIAL_FC",
+            "SLEEP",
+            "SPI",
+            "SPISLAVE",
+            "SPI_ASYNCH",
+            "TRNG",
+            "FLASH",
+            "MPU",
+            "WATCHDOG",
+            "USBDEVICE",
+            "CAN"
+        ],
+        "release_versions": [
+            "5"
+        ],
+        "sectors": [
+            [
+                0,
+                2048
+            ]
+        ],
+        "bootloader_supported": true,
+        "overrides": {
+            "hxt-present": false,
+            "lxt-present": true,
+            "deep-sleep-latency": 1,
+            "tickless-from-us-ticker": true
+        },
+        "forced_reset_timeout": 3,
+        "supported_c_libs": {
+            "arm": [
+                "std",
+                "small"
+            ],
+            "gcc_arm": [
+                "std",
+                "small"
+            ]
+        },
+        "supported_application_profiles": [
+            "full", "bare-metal"
+        ],
+        "is_mcu_family_target": true
+    },
+    "NUMAKER_IOT_M263A": {
+        "inherits": [
+            "MCU_M261"
+        ],
+        "device_name": "M263KIAAE",
+        "detect_code": [
+            "1310"
+        ],
+        "overrides": {
+            "usb-uart": "UART_0",
+            "usb-uart-tx": "PB_13",
+            "usb-uart-rx": "PB_12"
+        },
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/3720/MFG_NuMaker-IoT-M263A_V2%28F%29.jpg"
+    },
 
     // ARM Fast Model (FM) Fixed Virtual Platforms (FVPs) --------------------------------------------------------------
     // Unlike the MPS2 targets, which are real targets that can be run on an FPGA, Fast Models are entirely
@@ -8744,8 +8880,15 @@
             "CYBSP_WIFI_CAPABLE"
         ],
         "device_name": "CY8C624ABZI-D44",
-        "mbed_ram_start": "0x08002000",
-        "mbed_ram_size": "0x000FD800",
+
+        // Leave 0x2000 bytes at the start of RAM for the CM0+ application
+        "memory_bank_config": {
+            "IRAM1": {
+                "start": 0x08002000,
+                "size": 0x000FD800
+            }
+        },
+
         "detect_code": [
             "190B"
         ],
@@ -8780,8 +8923,15 @@
             "CYBSP_WIFI_CAPABLE"
         ],
         "device_name": "CY8C6245LQI-S3D72",
-        "mbed_ram_start": "0x08002000",
-        "mbed_ram_size": "0x0003D800",
+
+        // Leave 0x2000 bytes at the start of RAM for the CM0+ application
+        "memory_bank_config": {
+            "IRAM1": {
+                "start": 0x08002000,
+                "size": 0x0003D800
+            }
+        },
+
         "detect_code": [
             "190E"
         ],
@@ -8817,8 +8967,15 @@
             "CYBSP_WIFI_CAPABLE"
         ],
         "device_name": "CY8C6247BZI-D54",
-        "mbed_ram_start": "0x08002000",
-        "mbed_ram_size": "0x00045800",
+
+        // Leave 0x2000 bytes at the start of RAM for the CM0+ application
+        "memory_bank_config": {
+            "IRAM1": {
+                "start": 0x08002000,
+                "size": 0x00045800
+            }
+        },
+
         "detect_code": [
             "1900"
         ],
@@ -8853,8 +9010,15 @@
             "CY8C6347BZI_BLD53"
         ],
         "device_name": "CY8C6347BZI-BLD53",
-        "mbed_ram_start": "0x08002000",
-        "mbed_ram_size": "0x00045800",
+
+        // Leave 0x2000 bytes at the start of RAM for the CM0+ application
+        "memory_bank_config": {
+            "IRAM1": {
+                "start": 0x08002000,
+                "size": 0x00045800
+            }
+        },
+
         "detect_code": [
             "1902"
         ],
@@ -8894,8 +9058,15 @@
             "CYBSP_WIFI_CAPABLE"
         ],
         "device_name": "CY8C6247BZI-D54",
-        "mbed_ram_start": "0x08002000",
-        "mbed_ram_size": "0x00045800",
+
+        // Leave 0x2000 bytes at the start of RAM for the CM0+ application
+        "memory_bank_config": {
+            "IRAM1": {
+                "start": 0x08002000,
+                "size": 0x00045800
+            }
+        },
+
         "detect_code": [
             "1900"
         ],
@@ -8944,8 +9115,15 @@
             "CYBSP_WIFI_CAPABLE"
         ],
         "device_name": "CY8C6247FDI-D52",
-        "mbed_ram_start": "0x08002000",
-        "mbed_ram_size": "0x00045800",
+
+        // Leave 0x2000 bytes at the start of RAM for the CM0+ application
+        "memory_bank_config": {
+            "IRAM1": {
+                "start": 0x08002000,
+                "size": 0x00045800
+            }
+        },
+
         "detect_code": [
             "1903"
         ],
@@ -9076,155 +9254,6 @@
         "TFM_OUTPUT_EXT": "hex",
         "device_name": "CYB0644ABZI-S2D44",
         "image_url": "https://os.mbed.com/media/cache/platforms/SSP_8683_Ywwh0ix.jpg.250x250_q85.jpg"
-    },
-    "MCU_M261": {
-        "core": "Cortex-M23",
-        "default_toolchain": "ARMC6",
-        "public": false,
-        "extra_labels": [
-            "NUVOTON",
-            "M261",
-            "FLASH_CMSIS_ALGO"
-        ],
-        "macros": [
-            "LPTICKER_DELAY_TICKS=4"
-        ],
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "config": {
-            "hxt-present": {
-                "help": "High-speed external crystal oscillator HXT is present",
-                "options": [false, true],
-                "value": false
-            },
-            "lxt-present": {
-                "help": "Low-speed external crystal oscillator LXT is present",
-                "options": [false, true],
-                "value": true
-            },
-            "usb-uart": {
-                "help": "Configure USB_UART. USB_UART and USB_UART_TX/USB_UART_RX must be consistent.",
-                "value": null
-            },
-            "usb-uart-tx": {
-                "help": "Configure CONSOLE_TX. USB_UART and CONSOLE_TX/CONSOLE_RX must be consistent.",
-                "value": null
-            },
-            "usb-uart-rx": {
-                "help": "Configure CONSOLE_RX. USB_UART and CONSOLE_TX/CONSOLE_RX must be consistent.",
-                "value": null
-            },
-            "stdio-uart": {
-                "help": "Configure STDIO_UART. STDIO_UART and STDIO_UART_TX/STDIO_UART_RX must be consistent. STDIO_UART defaults to USB_UART.",
-                "value": null
-            },
-            "stdio-uart-tx": {
-                "help": "Configure STDIO_UART_TX. STDIO_UART and STDIO_UART_TX/STDIO_UART_RX must be consistent. STDIO_UART_TX defaults to CONSOLE_TX.",
-                "value": null
-            },
-            "stdio-uart-rx": {
-                "help": "Configure STDIO_UART_RX. STDIO_UART and STDIO_UART_TX/STDIO_UART_RX must be consistent. STDIO_UART_RX defaults to CONSOLE_RX.",
-                "value": null
-            },
-            "gpio-irq-debounce-enable": {
-                "help": "Enable GPIO IRQ debounce",
-                "value": 0
-            },
-            "gpio-irq-debounce-enable-list": {
-                "help": "Comma separated pin list to enable GPIO IRQ debounce",
-                "value": "NC"
-            },
-            "gpio-irq-debounce-clock-source": {
-                "help": "Select GPIO IRQ debounce clock source: GPIO_DBCTL_DBCLKSRC_HCLK or GPIO_DBCTL_DBCLKSRC_LIRC",
-                "value": "GPIO_DBCTL_DBCLKSRC_LIRC"
-            },
-            "gpio-irq-debounce-sample-rate": {
-                "help": "Select GPIO IRQ debounce sample rate: GPIO_DBCTL_DBCLKSEL_1, GPIO_DBCTL_DBCLKSEL_2, GPIO_DBCTL_DBCLKSEL_4, ..., or GPIO_DBCTL_DBCLKSEL_32768",
-                "value": "GPIO_DBCTL_DBCLKSEL_16"
-            },
-            "eadc-extsmpt-list": {
-                "help": "For EADC, comma separated {pin, value} list to extend sampling time in EADC clocks on per-pin basis. Value must be in the range [0, 255]."
-            }
-        },
-        "inherits": [
-            "Target"
-        ],
-        "device_has": [
-            "USTICKER",
-            "LPTICKER",
-            "RTC",
-            "ANALOGIN",
-            "ANALOGOUT",
-            "I2C",
-            "I2CSLAVE",
-            "I2C_ASYNCH",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "SERIAL",
-            "SERIAL_ASYNCH",
-            "SERIAL_FC",
-            "SLEEP",
-            "SPI",
-            "SPISLAVE",
-            "SPI_ASYNCH",
-            "TRNG",
-            "FLASH",
-            "MPU",
-            "WATCHDOG",
-            "USBDEVICE",
-            "CAN"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "sectors": [
-            [
-                0,
-                2048
-            ]
-        ],
-        "bootloader_supported": true,
-        "overrides": {
-            "hxt-present": false,
-            "lxt-present": true,
-            "deep-sleep-latency": 1,
-            "tickless-from-us-ticker": true
-        },
-        "forced_reset_timeout": 3,
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
-        "is_mcu_family_target": true
-    },
-    "NUMAKER_IOT_M263A": {
-        "inherits": [
-            "MCU_M261"
-        ],
-        "device_name": "M263KIAAE",
-        "detect_code": [
-            "1310"
-        ],
-        "overrides": {
-            "usb-uart": "UART_0",
-            "usb-uart-tx": "PB_13",
-            "usb-uart-rx": "PB_12"
-        },
-        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/3720/MFG_NuMaker-IoT-M263A_V2%28F%29.jpg"
     },
 
     // GigaDevices Targets ---------------------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import json
+from pyjson5 import pyjson5
 
 import pytest
 
@@ -21,5 +22,5 @@ def test_invalid_json5(tmp_path):
     lib_json_path = tmp_path / "mbed_lib.json5"
     lib_json_path.write_text("name")
 
-    with pytest.raises(ValueError):
+    with pytest.raises(pyjson5.Json5Exception):
         decode_json_file(lib_json_path)

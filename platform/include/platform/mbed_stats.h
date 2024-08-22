@@ -161,10 +161,10 @@ typedef struct {
     uint32_t cpu_id;                            /**< CPUID register data (Cortex-M only supported) */
     mbed_compiler_id_t compiler_id;             /**< Compiler ID \ref mbed_compiler_id_t */
     uint32_t compiler_version;                  /**< Compiler version */
-    uint32_t ram_start[MBED_MAX_MEM_REGIONS];   /**< Start addresses of all internal RAM memories */
-    uint32_t ram_size[MBED_MAX_MEM_REGIONS];    /**< Size of all internal RAM memories in target */
-    uint32_t rom_start[MBED_MAX_MEM_REGIONS];   /**< Start addresses of all internal ROM memories */
-    uint32_t rom_size[MBED_MAX_MEM_REGIONS];    /**< Size of all internal ROM memories in target */
+    uint32_t ram_start[MBED_MAX_MEM_REGIONS];   /**< Configured start addresses of all internal RAM memories */
+    uint32_t ram_size[MBED_MAX_MEM_REGIONS];    /**< Configured sizes of all internal RAM memories in target */
+    uint32_t rom_start[MBED_MAX_MEM_REGIONS];   /**< Configured start addresses of all internal ROM memories */
+    uint32_t rom_size[MBED_MAX_MEM_REGIONS];    /**< Configured sizes of all internal ROM memories in target */
 } mbed_stats_sys_t;
 
 /**

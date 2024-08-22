@@ -327,8 +327,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 262144,
-                "start": 134217728,
+                "size": 0x40000,
+                "start": 0x08000000,
                 "startup": false
             },
             "IROM1": {
@@ -461,8 +461,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 294912,
-                "start": 134217728,
+                "size": 0x48000,
+                "start": 0x08000000,
                 "startup": false
             },
             "IROM1": {
@@ -595,8 +595,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 294912,
-                "start": 134217728,
+                "size": 0x48000,
+                "start": 0x08000000,
                 "startup": false
             },
             "IROM1": {
@@ -980,8 +980,8 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 1048576,
-                "start": 134217728,
+                "size": 0x100000,
+                "start": 0x08000000,
                 "startup": false
             },
             "IROM1": {
@@ -7552,7 +7552,7 @@
             "version": "2.7.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM_D2": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -7563,13 +7563,13 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x8000,
+                "start": 0x30000000,
                 "startup": false
             },
-            "IRAM2": {
+            "SRAM_D1": {
                 "access": {
-                    "execute": true,
+                    "execute": false,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -7578,8 +7578,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 327680,
-                "start": 603979776,
+                "size": 0x50000,
+                "start": 0x24000000,
                 "startup": false
             },
             "IROM1": {
@@ -7593,13 +7593,13 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
-                "start": 134217728,
+                "size": 0x200000,
+                "start": 0x08000000,
                 "startup": true
             },
-            "RAM_D2": {
+            "SRAM_D3": {
                 "access": {
-                    "execute": true,
+                    "execute": false,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -7608,11 +7608,26 @@
                     "write": true
                 },
                 "default": true,
-                "size": 32768,
-                "start": 805306368,
+                "size": 0x4000,
+                "start": 0x38000000,
                 "startup": false
             },
-            "RAM_D3": {
+            "SRAM_DTC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x20000,
+                "start": 0x20000000,
+                "startup": false
+            },
+            "SRAM_ITC": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -7622,9 +7637,23 @@
                     "secure": false,
                     "write": true
                 },
-                "default": true,
-                "size": 16384,
-                "start": 939524096,
+                "default": false,
+                "size": 0x10000,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
                 "startup": false
             }
         },
@@ -7665,7 +7694,7 @@
             "version": "2.7.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM_D2": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -7676,13 +7705,13 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x8000,
+                "start": 0x30000000,
                 "startup": false
             },
-            "IRAM2": {
+            "SRAM_D1": {
                 "access": {
-                    "execute": true,
+                    "execute": false,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -7691,8 +7720,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
-                "start": 603979776,
+                "size": 0x50000,
+                "start": 0x24000000,
                 "startup": false
             },
             "IROM1": {
@@ -7706,13 +7735,13 @@
                     "write": false
                 },
                 "default": true,
-                "size": 524288,
-                "start": 134217728,
+                "size": 0x200000,
+                "start": 0x08000000,
                 "startup": true
             },
-            "RAM_D2": {
+            "SRAM_D3": {
                 "access": {
-                    "execute": true,
+                    "execute": false,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -7721,11 +7750,26 @@
                     "write": true
                 },
                 "default": true,
-                "size": 16384,
-                "start": 805306368,
+                "size": 0x4000,
+                "start": 0x38000000,
                 "startup": false
             },
-            "RAM_D3": {
+            "SRAM_DTC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x20000,
+                "start": 0x20000000,
+                "startup": false
+            },
+            "SRAM_ITC": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -7735,9 +7779,23 @@
                     "secure": false,
                     "write": true
                 },
-                "default": true,
-                "size": 16384,
-                "start": 805322752,
+                "default": false,
+                "size": 0x10000,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
                 "startup": false
             }
         },
@@ -7905,7 +7963,7 @@
             "version": "3.1.1"
         },
         "memories": {
-            "DTCMRAM": {
+            "SRAM_D2": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -7916,12 +7974,26 @@
                     "write": true
                 },
                 "default": true,
-                "p_name": null,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x8000,
+                "start": 0x30000000,
                 "startup": false
             },
-            "FLASH_Bank1": {
+            "SRAM_D1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x50000,
+                "start": 0x24000000,
+                "startup": false
+            },
+            "IROM1": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -7932,14 +8004,13 @@
                     "write": false
                 },
                 "default": true,
-                "p_name": null,
-                "size": 1048576,
-                "start": 134217728,
+                "size": 0x200000,
+                "start": 0x08000000,
                 "startup": true
             },
-            "RAM_D1": {
+            "SRAM_D3": {
                 "access": {
-                    "execute": true,
+                    "execute": false,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -7948,14 +8019,13 @@
                     "write": true
                 },
                 "default": true,
-                "p_name": null,
-                "size": 327680,
-                "start": 603979776,
+                "size": 0x4000,
+                "start": 0x38000000,
                 "startup": false
             },
-            "RAM_D2": {
+            "SRAM_DTC": {
                 "access": {
-                    "execute": true,
+                    "execute": false,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -7963,13 +8033,12 @@
                     "secure": false,
                     "write": true
                 },
-                "default": true,
-                "p_name": null,
-                "size": 32768,
-                "start": 805306368,
+                "default": false,
+                "size": 0x20000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "RAM_D3": {
+            "SRAM_ITC": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -7979,10 +8048,23 @@
                     "secure": false,
                     "write": true
                 },
-                "default": true,
-                "p_name": null,
-                "size": 16384,
-                "start": 939524096,
+                "default": false,
+                "size": 0x10000,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
                 "startup": false
             }
         },
@@ -8024,7 +8106,7 @@
             "version": "2.3.1"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM_D2": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -8035,8 +8117,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x48000,
+                "start": 0x30000000,
                 "startup": false
             },
             "SRAM_D1": {
@@ -8065,24 +8147,9 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
-                "start": 134217728,
+                "size": 0x200000,
+                "start": 0x08000000,
                 "startup": true
-            },
-            "RAM_D2": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": true,
-                "size": 0x48000,
-                "start": 0x30000000,
-                "startup": false
             },
             "SRAM_D3": {
                 "access": {
@@ -8097,6 +8164,50 @@
                 "default": true,
                 "size": 0x10000,
                 "start": 0x38000000,
+                "startup": false
+            },
+            "SRAM_DTC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x20000,
+                "start": 0x20000000,
+                "startup": false
+            },
+            "SRAM_ITC": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x10000,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
                 "startup": false
             }
         },
@@ -8248,8 +8359,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
-                "start": 135266304,
+                "size": 0x200000,
+                "start": 0x08000000,
                 "startup": true
             },
             "SRAM_D3": {
@@ -8295,6 +8406,20 @@
                 "default": false,
                 "size": 0x10000,
                 "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
                 "startup": false
             }
         },
@@ -8506,6 +8631,20 @@
                 "size": 0x10000,
                 "start": 0,
                 "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
+                "startup": false
             }
         },
         "name": "STM32H747XIHx:CM7",
@@ -8558,6 +8697,276 @@
         "sub_family": "STM32H747",
         "vendor": "STMicroelectronics:13"
     },
+    "STM32H750ZBTx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H7x_128k.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 131072,
+                "start": 134217728,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H7B3I_EVAL_FMC-NOR.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 1610612736,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H747I-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MTFC4GACAJCN_STM32H750B-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 536870912,
+                "start": 2684354560,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H7xx_MT25TL01G.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H750B-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H745I-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H743I-eval_FMC.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 16777216,
+                "start": 1610612736,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B3I-EVAL.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B3I-Disco.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B0-EVAL.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B0-Disco.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H735-Disco.FLM",
+                "ram_size": 65524,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H747I-EVAL.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H7xx_MT25TL01G_DUAL.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32H7 Series",
+        "from_pack": {
+            "pack": "STM32H7xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "3.1.1"
+        },
+        "memories": {
+            "SRAM_D2": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x48000,
+                "start": 0x30000000,
+                "startup": false
+            },
+            "SRAM_D1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x80000,
+                "start": 0x24000000,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x20000,
+                "start": 0x08000000,
+                "startup": true
+            },
+            "SRAM_D3": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x10000,
+                "start": 0x38000000,
+                "startup": false
+            },
+            "SRAM_DTC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x20000,
+                "start": 0x20000000,
+                "startup": false
+            },
+            "SRAM_ITC": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x10000,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
+                "startup": false
+            }
+        },
+        "name": "STM32H750ZBTx",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM7",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "DoublePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32H750.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32H750",
+        "vendor": "STMicroelectronics:13"
+    },
     "STM32H7A3ZITxQ": {
         "algorithms": [
             {
@@ -8577,7 +8986,7 @@
             "version": "2.7.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM_AHB": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -8588,13 +8997,13 @@
                     "write": true
                 },
                 "default": true,
-                "size": 1048576,
-                "start": 603979776,
+                "size": 0x20000,
+                "start": 0x30000000,
                 "startup": false
             },
-            "IRAM2": {
+            "SRAM_AXI": {
                 "access": {
-                    "execute": true,
+                    "execute": false,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -8603,8 +9012,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x100000,
+                "start": 0x24000000,
                 "startup": false
             },
             "IROM1": {
@@ -8618,9 +9027,68 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
-                "start": 134217728,
+                "size": 0x20000,
+                "start": 0x08000000,
                 "startup": true
+            },
+            "SRAM_D3": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x8000,
+                "start": 0x38000000,
+                "startup": false
+            },
+            "SRAM_DTC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x20000,
+                "start": 0x20000000,
+                "startup": false
+            },
+            "SRAM_ITC": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x10000,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
+                "startup": false
             }
         },
         "name": "STM32H7A3ZITxQ",
@@ -8639,6 +9107,276 @@
             ]
         ],
         "sub_family": "STM32H7A3",
+        "vendor": "STMicroelectronics:13"
+    },
+    "STM32H7B3ZITxQ": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H7A-B3_Flash_2M.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 2097152,
+                "start": 134217728,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H7B3I_EVAL_FMC-NOR.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 1610612736,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H747I-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MTFC4GACAJCN_STM32H750B-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 536870912,
+                "start": 2684354560,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H7xx_MT25TL01G.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H750B-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H745I-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H743I-eval_FMC.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 16777216,
+                "start": 1610612736,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B3I-EVAL.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B3I-Disco.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B0-EVAL.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B0-Disco.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H735-Disco.FLM",
+                "ram_size": 65524,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H747I-EVAL.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H7xx_MT25TL01G_DUAL.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32H7 Series",
+        "from_pack": {
+            "pack": "STM32H7xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "3.1.1"
+        },
+        "memories": {
+            "SRAM_AHB": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x20000,
+                "start": 0x30000000,
+                "startup": false
+            },
+            "SRAM_AXI": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x100000,
+                "start": 0x24000000,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x20000,
+                "start": 0x08000000,
+                "startup": true
+            },
+            "SRAM_D3": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x8000,
+                "start": 0x38000000,
+                "startup": false
+            },
+            "SRAM_DTC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x20000,
+                "start": 0x20000000,
+                "startup": false
+            },
+            "SRAM_ITC": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x10000,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
+                "startup": false
+            }
+        },
+        "name": "STM32H7B3ZITxQ",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM7",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "DoublePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32H7B3.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32H7B3",
         "vendor": "STMicroelectronics:13"
     },
     "STM32L072CZTx": {
@@ -13242,6 +13980,78 @@
         "sub_family": "STM32WL55",
         "vendor": "STMicroelectronics:13"
     },
+    "STM32WLE5JCIx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32WLxx_CM4.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 262144,
+                "start": 134217728,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32WL Series",
+        "from_pack": {
+            "pack": "STM32WLxx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "1.2.0"
+        },
+        "memories": {
+            "FLASH": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 0x40000,
+                "start": 0x08000000,
+                "startup": true
+            },
+            "SRAM": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 0x10000,
+                "start": 0x20000000,
+                "startup": false
+            },
+        },
+        "name": "STM32WLE5JCIx",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM4",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "None",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32WLE5_CM4.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32WLE5",
+        "vendor": "STMicroelectronics:13"
+    }
     "TMPM46BF10FG": {
         "algorithms": [
             {

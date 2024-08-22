@@ -43,3 +43,4 @@ def make_mbed_os_files(root):
     targets_dir = root / "targets"
     targets_dir.mkdir()
     (targets_dir / "targets.json5").touch()
+    (targets_dir / "cmsis_mcu_descriptions.json5").touch()

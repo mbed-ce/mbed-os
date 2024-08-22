@@ -200,4 +200,5 @@ def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> N
         "memory_banks": banks_by_type,
         "configured_memory_banks": configured_memory_banks
     }
+    mem_banks_json_file.parent.mkdir(parents=True, exist_ok=True)
     mem_banks_json_file.write_text(json.dumps(memory_banks_json_content, indent=4))

@@ -47,18 +47,12 @@ ENTRY(Reset_Handler)
 /* The size of the Cortex-M0+ application image at the start of FLASH */
 FLASH_CM0P_SIZE = 0x2000;
 
-/* MBED_APP_START is being used by the bootloader build script and
-* will be calculate by the system. In case if MBED_APP_START address is
-* customized by the bootloader config, the application image should not
-* include CM0p prebuilt image.
-*/
+/*
+ * Figure out start address and size of application, unless overridden by definitions
+ */
 #if !defined(MBED_APP_START)
   #define MBED_APP_START (MBED_CONFIGURED_ROM_BANK_IROM1_START + FLASH_CM0P_SIZE)
 #endif
-
-/* MBED_APP_SIZE is being  used by the bootloader build script and
-* will be calculate by the system.
-*/
 #if !defined(MBED_APP_SIZE)
   #define MBED_APP_SIZE (MBED_CONFIGURED_ROM_BANK_IROM1_SIZE - FLASH_CM0P_SIZE)
 #endif
