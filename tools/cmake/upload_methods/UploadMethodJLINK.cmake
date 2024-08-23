@@ -47,12 +47,12 @@ else()
 endif()
 
 ### Function to generate upload target
-function(gen_upload_target TARGET_NAME BIN_FILE HEX_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	# create command file for j-link
 	set(COMMAND_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/flash-${TARGET_NAME}.jlink)
 	file(GENERATE OUTPUT ${COMMAND_FILE_PATH} CONTENT
-"loadfile ${HEX_FILE}
+"loadfile ${BINARY_FILE}
 r
 go
 exit

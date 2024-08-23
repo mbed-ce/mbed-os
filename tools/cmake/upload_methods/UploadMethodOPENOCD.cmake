@@ -39,7 +39,7 @@ if { [adapter name] == \"hla\" } {
 	set(OPENOCD_ADAPTER_SERIAL_COMMAND -f ${CMAKE_BINARY_DIR}/openocd_adapter_config.cfg CACHE INTERNAL "" FORCE)
 endif()
 
-function(gen_upload_target TARGET_NAME BIN_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	# unlike other upload methods, OpenOCD uses the elf file
 	add_custom_target(flash-${TARGET_NAME}
@@ -48,7 +48,7 @@ function(gen_upload_target TARGET_NAME BIN_FILE)
 		${OPENOCD_CHIP_CONFIG_COMMANDS}
 		${OPENOCD_ADAPTER_SERIAL_COMMAND}
 		-c "gdb_port disabled" # Don't start a GDB server when just programming
-		-c "program $<IF:$<BOOL:${MBED_OUTPUT_EXT}>,${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${TARGET_NAME}>.${MBED_OUTPUT_EXT},$<TARGET_FILE:${TARGET_NAME}>> reset exit"
+		-c "program ${BINARY_FILE} reset exit"
 		VERBATIM)
 
 	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})

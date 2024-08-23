@@ -16,7 +16,7 @@ if("${ARDUINO_BOSSAC_SERIAL_PORT}" STREQUAL "")
 endif()
 
 ### Function to generate upload target
-function(gen_upload_target TARGET_NAME BIN_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	add_custom_target(flash-${TARGET_NAME}
 		COMMAND ${ArduinoBossac}
@@ -25,7 +25,7 @@ function(gen_upload_target TARGET_NAME BIN_FILE)
 		--usb-port=1
 		--info
 		--erase
-		--write ${BIN_FILE}
+		--write ${BINARY_FILE}
 		--reset)
 
 	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})

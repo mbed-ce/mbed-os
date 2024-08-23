@@ -22,7 +22,7 @@ else()
 endif()
 
 ### Function to generate upload target
-function(gen_upload_target TARGET_NAME BIN_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	add_custom_target(flash-${TARGET_NAME}
 		COMMENT "Flashing ${TARGET_NAME} with stlink..."
@@ -30,7 +30,7 @@ function(gen_upload_target TARGET_NAME BIN_FILE)
 		--reset # Reset chip after flashing
 		${STLINK_SERIAL_ARGUMENT}
 		${STLINK_ARGS}
-		write ${BIN_FILE} ${STLINK_LOAD_ADDRESS})
+		write ${BINARY_FILE} ${STLINK_LOAD_ADDRESS})
 
 	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
 endfunction(gen_upload_target)

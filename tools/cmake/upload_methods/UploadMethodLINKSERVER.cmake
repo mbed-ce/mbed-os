@@ -28,7 +28,7 @@ set(UPLOAD_LINKSERVER_FOUND ${LinkServer_FOUND})
 
 ### Function to generate upload target
 
-function(gen_upload_target TARGET_NAME BIN_FILE HEX_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	add_custom_target(flash-${TARGET_NAME}
 		COMMENT "Flashing ${TARGET_NAME} with LinkServer..."

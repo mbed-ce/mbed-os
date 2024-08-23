@@ -30,7 +30,7 @@ if(NOT "${STM32CUBE_PROBE_SN}" STREQUAL "")
 	set(STM32CUBE_GDB_PROBE_ARGS --serial-number ${STM32CUBE_PROBE_SN} CACHE INTERNAL "" FORCE)
 endif()
 
-function(gen_upload_target TARGET_NAME BIN_FILE HEX_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	add_custom_target(flash-${TARGET_NAME}
 		COMMENT "Flashing ${TARGET_NAME} with STM32CubeProg..."

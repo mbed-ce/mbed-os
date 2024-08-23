@@ -59,8 +59,9 @@ set(MBED_UPLOAD_RESTART_COMMANDS ${UPLOAD_RESTART_COMMANDS} CACHE INTERNAL "" FO
 
 function(mbed_generate_upload_target target)
 	# add upload target
-	gen_upload_target(${target}
-		${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.bin
-		${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.hex
-	)
+	if ("${MBED_OUTPUT_EXT}" STREQUAL "" OR MBED_OUTPUT_EXT STREQUAL "bin")
+		gen_upload_target(${target} ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.bin)
+	else()
+		gen_upload_target(${target} ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.hex)
+	endif()
 endfunction()

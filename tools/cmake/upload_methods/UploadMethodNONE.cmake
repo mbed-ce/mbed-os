@@ -9,7 +9,7 @@ set(UPLOAD_SUPPORTS_DEBUG FALSE)
 
 ### Function to generate upload target
 
-function(gen_upload_target TARGET_NAME BIN_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	# do nothing
 

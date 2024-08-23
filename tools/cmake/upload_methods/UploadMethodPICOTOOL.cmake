@@ -19,7 +19,7 @@ set(PICOTOOL_TARGET_BUS "" CACHE STRING "If set, the given bus number is passed 
 set(PICOTOOL_TARGET_ADDRESS "" CACHE STRING "If set, the given address is passed to picotool to select the desired pico to program.  You can get the address from running `picotool list` with multiple picos plugged in.")
 
 ### Function to generate upload target
-function(gen_upload_target TARGET_NAME BIN_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	set(PICOTOOL_TARGET_ARGS "")
 	if(NOT "${PICOTOOL_TARGET_BUS}" STREQUAL "")

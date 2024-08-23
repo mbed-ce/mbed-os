@@ -16,11 +16,11 @@ endif()
 set(MBED_TARGET_UID "" CACHE STRING "UID of mbed target to upload to if there are multiple connected.  You can get the UIDs from `python -m pyocd list`")
 
 ### Function to generate upload target
-function(gen_upload_target TARGET_NAME BIN_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	add_custom_target(flash-${TARGET_NAME}
 		COMMAND ${Python3_EXECUTABLE} -m install_bin_file
-			$<IF:$<BOOL:${MBED_OUTPUT_EXT}>,${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${TARGET_NAME}>.${MBED_OUTPUT_EXT},BIN_FILE>
+			${BINARY_FILE}
 			${MBED_TARGET}
 			${MBED_RESET_BAUDRATE}
 			${MBED_TARGET_UID}

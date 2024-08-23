@@ -24,7 +24,7 @@ if(NOT "${PYOCD_PROBE_UID}" STREQUAL "")
 	set(PYOCD_PROBE_ARGS --probe ${PYOCD_PROBE_UID} CACHE INTERNAL "" FORCE)
 endif()
 
-function(gen_upload_target TARGET_NAME BIN_FILE)
+function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	add_custom_target(flash-${TARGET_NAME}
 		COMMENT "Flashing ${TARGET_NAME} with pyOCD..."
@@ -36,7 +36,7 @@ function(gen_upload_target TARGET_NAME BIN_FILE)
 		-f ${PYOCD_CLOCK_SPEED}
 		-t ${PYOCD_TARGET_NAME}
 		${PYOCD_PROBE_ARGS}
-		${BIN_FILE})
+		${BINARY_FILE})
 
 	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
 endfunction(gen_upload_target)
