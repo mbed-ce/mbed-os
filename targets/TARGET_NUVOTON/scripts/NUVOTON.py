@@ -24,6 +24,7 @@ import shutil
 import argparse
 from intelhex import IntelHex
 from datetime import datetime
+import sys
 
 SCRIPT_DIR = dirname(abspath(__file__))
 MBED_OS_ROOT = abspath(path_join(SCRIPT_DIR, os.pardir, os.pardir, os.pardir))
@@ -59,7 +60,7 @@ def tfm_sign_image(tfm_import_path, signing_key, signing_key_1, non_secure_binhe
         non_secure_ih.tobinfile(non_secure_bin)
 
     # Find Python 3 command name across platforms
-    python3_cmd = "python3" if shutil.which("python3") is not None else "python"
+    python3_cmd = sys.executable
 
     # Specify image version
     #
