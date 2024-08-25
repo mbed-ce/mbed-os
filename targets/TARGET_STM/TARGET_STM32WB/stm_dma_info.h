@@ -35,7 +35,7 @@ static const DMALinkInfo SPITxDMALinks[] = {
 /// Mapping from SPI index to DMA link info for Rx
 static const DMALinkInfo SPIRxDMALinks[] = {
         {1, 2, DMA_REQUEST_SPI1_RX},
-#ifdef SPI4
+#ifdef SPI2
         {1, 4, DMA_REQUEST_SPI2_RX}
 #endif
 };
