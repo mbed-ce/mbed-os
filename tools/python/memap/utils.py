@@ -33,10 +33,6 @@ import logging
 from intelhex import IntelHex
 import io
 
-try:
-    unicode
-except NameError:
-    unicode = str
 
 def remove_if_in(lst, thing):
     if thing in lst:
@@ -427,7 +423,7 @@ def argparse_type(casedness, prefer_hyphen=False):
             the string, or the hyphens/underscores do not match the expected
             style of the argument.
             """
-            if not isinstance(string, unicode):
+            if not isinstance(string, str):
                 string = string.decode()
             if prefer_hyphen:
                 newstring = casedness(string).replace("_", "-")
@@ -447,10 +443,10 @@ def argparse_type(casedness, prefer_hyphen=False):
     return middle
 
 # short cuts for the argparse_type versions
-argparse_uppercase_type = argparse_type(unicode.upper, False)
-argparse_lowercase_type = argparse_type(unicode.lower, False)
-argparse_uppercase_hyphen_type = argparse_type(unicode.upper, True)
-argparse_lowercase_hyphen_type = argparse_type(unicode.lower, True)
+argparse_uppercase_type = argparse_type(str.upper, False)
+argparse_lowercase_type = argparse_type(str.lower, False)
+argparse_uppercase_hyphen_type = argparse_type(str.upper, True)
+argparse_lowercase_hyphen_type = argparse_type(str.lower, True)
 
 def argparse_force_type(case):
     """ validate that an argument passed in (as string) is a member of the list
@@ -458,11 +454,11 @@ def argparse_force_type(case):
     """
     def middle(lst, type_name):
         """ The parser type generator"""
-        if not isinstance(lst[0], unicode):
+        if not isinstance(lst[0], str):
             lst = [o.decode() for o in lst]
         def parse_type(string):
             """ The parser type"""
-            if not isinstance(string, unicode):
+            if not isinstance(string, str):
                 string = string.decode()
             for option in lst:
                 if case(string) == case(option):
@@ -474,8 +470,8 @@ def argparse_force_type(case):
     return middle
 
 # these two types convert the case of their arguments _before_ validation
-argparse_force_uppercase_type = argparse_force_type(unicode.upper)
-argparse_force_lowercase_type = argparse_force_type(unicode.lower)
+argparse_force_uppercase_type = argparse_force_type(str.upper)
+argparse_force_lowercase_type = argparse_force_type(str.lower)
 
 def argparse_many(func):
     """ An argument parser combinator that takes in an argument parser and

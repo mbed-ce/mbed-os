@@ -17,9 +17,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from __future__ import print_function, division, absolute_import
+from __future__ import absolute_import
 
-from abc import abstractmethod, ABCMeta
+import dataclasses
+from typing import Tuple, Optional, Dict, TextIO, List
+from abc import abstractmethod, ABC
 from sys import stdout, exit, argv, path
 from os import sep
 from os.path import (basename, dirname, join, relpath, abspath, commonprefix,
@@ -47,7 +49,22 @@ from .utils import (
 )  # noqa: E402
 
 
-class _Parser(with_metaclass(ABCMeta, object)):
+@dataclasses.dataclass
+class MemoryBankInfo:
+    # Name of the bank, from cmsis_mcu_descriptions.json
+    name: str
+
+    # Start address of memory bank
+    start_addr: int
+
+    # Total size of the memory bank in bytes
+    total_size: int
+
+    # Size used in the memory bank in bytes
+    used_size: int = 0
+
+
+class _Parser(ABC):
     """Internal interface for parsing"""
     SECTIONS = ('.text', '.data', '.bss', '.heap', '.stack')
     MISC_FLASH_SECTIONS = ('.interrupts', '.flash_config')
@@ -57,26 +74,32 @@ class _Parser(with_metaclass(ABCMeta, object)):
                       '.stabstr', '.ARM.exidx', '.ARM')
 
     def __init__(self):
-        self.modules = dict()
+        # Dict of object name to {section name, size}
+        self.symbols: Dict[str, Dict[str, int]] = {}
 
-    def module_add(self, object_name, size, section):
-        """ Adds a module or section to the list
+        # Memory bank info, by type (RAM/ROM)
+        self.memory_banks: Dict[str, List[MemoryBankInfo]] = {"RAM": [], "ROM": []}
+
+    def add_symbol(self, symbol_name: str, object_name: str, start_addr: int, size: int, section: str):
+        """ Adds information about a symbol (e.g. a function or global variable) to the data structures.
 
         Positional arguments:
-        object_name - name of the entry to add
-        size - the size of the module being added
-        section - the section the module contributes to
+        symbol_name - Descriptive name of the symbol, e.g. ".text.some_function"
+        object_name - name of the object file containing the symbol
+        start addr - start address of symbol
+        size - the size of the symbol being added
+        section - Name of the section, e.g. ".text".  Can also be "unknown".
         """
-        if not object_name or not size or not section:
+        if not object_name or not size:
             return
 
-        if object_name in self.modules:
-            self.modules[object_name].setdefault(section, 0)
-            self.modules[object_name][section] += size
+        if object_name in self.symbols:
+            self.symbols[object_name].setdefault(section, 0)
+            self.symbols[object_name][section] += size
             return
 
         obj_split = sep + basename(object_name)
-        for module_path, contents in self.modules.items():
+        for module_path, contents in self.symbols.items():
             if module_path.endswith(obj_split) or module_path == object_name:
                 contents.setdefault(section, 0)
                 contents[section] += size
@@ -84,17 +107,23 @@ class _Parser(with_metaclass(ABCMeta, object)):
 
         new_module = defaultdict(int)
         new_module[section] = size
-        self.modules[object_name] = new_module
+        self.symbols[object_name] = new_module
 
-    def module_replace(self, old_object, new_object):
-        """ Replaces an object name with a new one
+    def load_memory_banks_info(self, memory_banks_json_file: TextIO) -> None:
         """
-        if old_object in self.modules:
-            self.modules[new_object] = self.modules[old_object]
-            del self.modules[old_object]
+        Load the memory bank information from a memory_banks.json file
+        """
+        memory_banks_json = json.load(memory_banks_json_file)
+        for bank_type, banks in memory_banks_json["configured_memory_banks"].items():
+            for bank_name, bank_data in banks.items():
+                self.memory_banks["bank_type"].append(MemoryBankInfo(
+                    name=bank_name,
+                    start_addr=bank_data["start"],
+                    total_size=bank_data["size"]
+                ))
 
     @abstractmethod
-    def parse_mapfile(self, mapfile):
+    def parse_mapfile(self, file_desc: TextIO) -> Dict[str, Dict[str, int]]:
         """Parse a given file object pointing to a map file
 
         Positional arguments:
@@ -116,11 +145,15 @@ class _GccParser(_Parser):
     RE_TRANS_FILE = re.compile(r'^(.+\/|.+\.ltrans.o(bj)?)$')
     OBJECT_EXTENSIONS = (".o", ".obj")
 
+    # Gets the input section name from the line, if it exists.
+    # Input section names are always indented 1 space.
+    RE_INPUT_SECTION_NAME = re.compile(r'^ (\.\w+\.?\w*\.?\w*)')  # Note: This allows up to 3 dots... hopefully that's enough...
+
     ALL_SECTIONS = (
         _Parser.SECTIONS
         + _Parser.OTHER_SECTIONS
         + _Parser.MISC_FLASH_SECTIONS
-        + ('unknown', 'OUTPUT')
+        + ('unknown', )
     )
 
     def check_new_section(self, line):
@@ -132,16 +165,29 @@ class _GccParser(_Parser):
         return value - A section name, if a new section was found, None
                        otherwise
         """
-        line_s = line.strip()
         for i in self.ALL_SECTIONS:
-            if line_s.startswith(i):
+            if line.startswith(i):
                 return i
         if line.startswith('.'):
             return 'unknown'
         else:
             return None
 
-    def parse_object_name(self, line):
+    def check_input_section(self, line) -> Optional[str]:
+        """ Check whether a new input section in a map file has been detected.
+
+        Positional arguments:
+        line - the line to check for a new section
+
+        return value - Input section name if found, None otherwise
+        """
+        match = re.match(self.RE_INPUT_SECTION_NAME, line)
+        if not match:
+            return None
+
+        return match.group(1)
+
+    def parse_object_name(self, line) -> str:
         """ Parse a path to object file
 
         Positional arguments:
@@ -177,8 +223,8 @@ class _GccParser(_Parser):
                           % line)
                 return '[misc]'
 
-    def parse_section(self, line):
-        """ Parse data from a section of gcc map file
+    def parse_section(self, line: str) -> Tuple[str, int, int]:
+        """ Parse data from a section of gcc map file describing one symbol in the code.
 
         examples:
                         0x00004308       0x7c ./BUILD/K64F/GCC_ARM/spi_api.o
@@ -186,55 +232,78 @@ class _GccParser(_Parser):
 
         Positional arguments:
         line - the line to parse a section from
+
+        Returns tuple of (name, start addr, size)
         """
         is_fill = re.match(self.RE_FILL_SECTION, line)
         if is_fill:
             o_name = '[fill]'
+            o_start_addr = int(is_fill.group(1), 16)
             o_size = int(is_fill.group(2), 16)
-            return [o_name, o_size]
+            return o_name, o_start_addr, o_size
 
         is_section = re.match(self.RE_STD_SECTION, line)
         if is_section:
+            o_start_addr = int(is_section.group(1), 16)
             o_size = int(is_section.group(2), 16)
             if o_size:
                 o_name = self.parse_object_name(is_section.group(3))
-                return [o_name, o_size]
+                return o_name, o_start_addr, o_size
 
-        return ["", 0]
+        return "", 0, 0
 
-    def parse_mapfile(self, file_desc):
+    def parse_mapfile(self, file_desc: TextIO) -> Dict[str, Dict[str, int]]:
         """ Main logic to decode gcc map files
 
         Positional arguments:
         file_desc - a stream object to parse as a gcc map file
         """
+
+        # GCC can put the section/symbol info on its own line or on the same line as the size and address.
+        # So since this is a line oriented parser, we have to remember the most recently seen input & output
+        # section name for later.
+        # Note: section (AKA output section) is the section in the output application that a symbol is going into.
+        # Examples: .text, .data, .bss
+        # input_section is the section in the object file that a symbol comes from.  It is generally more specific,
+        # e.g. a function could be from .text.my_function
+        # The output section *might* be a prefix to the input section, but not always: a linker script can happily
+        # put stuff from any input section into .text or .data if it wants to!
         current_section = 'unknown'
+        current_input_section = 'unknown'
 
         with file_desc as infile:
             for line in infile:
                 if line.startswith('Linker script and memory map'):
-                    current_section = "unknown"
                     break
 
             for line in infile:
-                next_section = self.check_new_section(line)
-
-                if next_section == "OUTPUT":
+                if line.startswith("OUTPUT("):
+                    # Done with memory map part of the map file
                     break
-                elif next_section:
+
+                next_section = self.check_new_section(line)
+                if next_section is not None:
                     current_section = next_section
 
-                object_name, object_size = self.parse_section(line)
-                self.module_add(object_name, object_size, current_section)
+                next_input_section = self.check_input_section(line)
+                if next_input_section is not None:
+                    current_input_section = next_input_section
+
+                symbol_name, symbol_start_addr, symbol_size = self.parse_section(line)
+
+                # With GCC at least, the closest we can get to a descriptive symbol name is the input section
+                # name.  Thanks to the -ffunction-sections and -fdata-sections options, the section names should
+                # be unique for each symbol.
+                self.add_symbol(current_input_section, symbol_name, symbol_start_addr, symbol_size, current_section)
 
         common_prefix = dirname(commonprefix([
-            o for o in self.modules.keys()
+            o for o in self.symbols.keys()
             if (
                     o.endswith(self.OBJECT_EXTENSIONS)
                     and not o.startswith("[lib]")
             )]))
         new_modules = {}
-        for name, stats in self.modules.items():
+        for name, stats in self.symbols.items():
             if name.startswith("[lib]"):
                 new_modules[name] = stats
             elif name.endswith(self.OBJECT_EXTENSIONS):
@@ -242,280 +311,6 @@ class _GccParser(_Parser):
             else:
                 new_modules[name] = stats
         return new_modules
-
-
-class _ArmccParser(_Parser):
-    RE = re.compile(
-        r'^\s+0x(\w{8})\s+0x(\w{8})\s+(\w+)\s+(\w+)\s+(\d+)\s+[*]?.+\s+(.+)$')
-    RE_OBJECT = re.compile(r'(.+\.(l|a|ar))\((.+\.o(bj)?)\)')
-    OBJECT_EXTENSIONS = (".o", ".obj")
-
-    def parse_object_name(self, line):
-        """ Parse object file
-
-        Positional arguments:
-        line - the line containing the object or library
-        """
-        if line.endswith(self.OBJECT_EXTENSIONS):
-            return line
-
-        else:
-            is_obj = re.match(self.RE_OBJECT, line)
-            if is_obj:
-                return join(
-                    '[lib]', basename(is_obj.group(1)), is_obj.group(3)
-                )
-            else:
-                print(
-                    "Malformed input found when parsing ARMCC map: %s" % line
-                )
-                return '[misc]'
-
-    def parse_section(self, line):
-        """ Parse data from an armcc map file
-
-        Examples of armcc map file:
-            Base_Addr    Size         Type   Attr      Idx    E Section Name        Object
-            0x00000000   0x00000400   Data   RO        11222    self.RESET               startup_MK64F12.o
-            0x00000410   0x00000008   Code   RO        49364  * !!!main             c_w.l(__main.o)
-
-        Positional arguments:
-        line - the line to parse the section data from
-        """  # noqa: E501
-        test_re = re.match(self.RE, line)
-
-        if (
-            test_re
-            and "ARM_LIB_HEAP" not in line
-            ):
-            size = int(test_re.group(2), 16)
-
-            if test_re.group(4) == 'RO':
-                section = '.text'
-            else:
-                if test_re.group(3) == 'Data':
-                    section = '.data'
-                elif test_re.group(3) == 'Zero':
-                    section = '.bss'
-                elif test_re.group(3) == 'Code':
-                    section = '.text'
-                else:
-                    print(
-                        "Malformed input found when parsing armcc map: %s, %r"
-                        % (line, test_re.groups())
-                    )
-
-                    return ["", 0, ""]
-
-            # check name of object or library
-            object_name = self.parse_object_name(
-                test_re.group(6))
-
-            return [object_name, size, section]
-
-        else:
-            return ["", 0, ""]
-
-    def parse_mapfile(self, file_desc):
-        """ Main logic to decode armc5 map files
-
-        Positional arguments:
-        file_desc - a file like object to parse as an armc5 map file
-        """
-        with file_desc as infile:
-            # Search area to parse
-            for line in infile:
-                if line.startswith('    Base Addr    Size'):
-                    break
-
-            # Start decoding the map file
-            for line in infile:
-                self.module_add(*self.parse_section(line))
-
-        common_prefix = dirname(commonprefix([
-            o for o in self.modules.keys()
-            if (
-                o.endswith(self.OBJECT_EXTENSIONS)
-                and o != "anon$$obj.o"
-                and o != "anon$$obj.obj"
-                and not o.startswith("[lib]")
-            )]))
-        new_modules = {}
-        for name, stats in self.modules.items():
-            if (
-                name == "anon$$obj.o"
-                or name == "anon$$obj.obj"
-                or name.startswith("[lib]")
-            ):
-                new_modules[name] = stats
-            elif name.endswith(self.OBJECT_EXTENSIONS):
-                new_modules[relpath(name, common_prefix)] = stats
-            else:
-                new_modules[name] = stats
-        return new_modules
-
-
-class _IarParser(_Parser):
-    RE = re.compile(
-        r'^\s+(.+)\s+(zero|const|ro code|inited|uninit)\s'
-        r'+0x([\'\w]+)\s+0x(\w+)\s+(.+)\s.+$')
-
-    RE_CMDLINE_FILE = re.compile(r'^#\s+(.+\.o(bj)?)')
-    RE_LIBRARY = re.compile(r'^(.+\.a)\:.+$')
-    RE_OBJECT_LIBRARY = re.compile(r'^\s+(.+\.o(bj)?)\s.*')
-    OBJECT_EXTENSIONS = (".o", ".obj")
-
-    def __init__(self):
-        _Parser.__init__(self)
-        # Modules passed to the linker on the command line
-        # this is a dict because modules are looked up by their basename
-        self.cmd_modules = {}
-
-    def parse_object_name(self, object_name):
-        """ Parse object file
-
-        Positional arguments:
-        line - the line containing the object or library
-        """
-        if object_name.endswith(self.OBJECT_EXTENSIONS):
-            try:
-                return self.cmd_modules[object_name]
-            except KeyError:
-                return object_name
-        else:
-            return '[misc]'
-
-    def parse_section(self, line):
-        """ Parse data from an IAR map file
-
-        Examples of IAR map file:
-         Section             Kind        Address     Size  Object
-         .intvec             ro code  0x00000000    0x198  startup_MK64F12.o [15]
-         .rodata             const    0x00000198      0x0  zero_init3.o [133]
-         .iar.init_table     const    0x00008384     0x2c  - Linker created -
-         Initializer bytes   const    0x00000198     0xb2  <for P3 s0>
-         .data               inited   0x20000000     0xd4  driverAtmelRFInterface.o [70]
-         .bss                zero     0x20000598    0x318  RTX_Conf_CM.o [4]
-         .iar.dynexit        uninit   0x20001448    0x204  <Block tail>
-           HEAP              uninit   0x20001650  0x10000  <Block tail>
-
-        Positional_arguments:
-        line - the line to parse section data from
-        """  # noqa: E501
-        test_re = re.match(self.RE, line)
-        if test_re:
-            if (
-                test_re.group(2) == 'const' or
-                test_re.group(2) == 'ro code'
-            ):
-                section = '.text'
-            elif (test_re.group(2) == 'zero' or
-                  test_re.group(2) == 'uninit'):
-                if test_re.group(1)[0:4] == 'HEAP':
-                    section = '.heap'
-                elif test_re.group(1)[0:6] == 'CSTACK':
-                    section = '.stack'
-                else:
-                    section = '.bss'  # default section
-
-            elif test_re.group(2) == 'inited':
-                section = '.data'
-            else:
-                print("Malformed input found when parsing IAR map: %s" % line)
-                return ["", 0, ""]
-
-            # lookup object in dictionary and return module name
-            object_name = self.parse_object_name(test_re.group(5))
-
-            size = int(test_re.group(4), 16)
-            return [object_name, size, section]
-
-        else:
-            return ["", 0, ""]
-
-    def check_new_library(self, line):
-        """
-        Searches for libraries and returns name. Example:
-        m7M_tls.a: [43]
-
-        """
-        test_address_line = re.match(self.RE_LIBRARY, line)
-        if test_address_line:
-            return test_address_line.group(1)
-        else:
-            return ""
-
-    def check_new_object_lib(self, line):
-        """
-        Searches for objects within a library section and returns name.
-        Example:
-        rt7M_tl.a: [44]
-            ABImemclr4.o                 6
-            ABImemcpy_unaligned.o      118
-            ABImemset48.o               50
-            I64DivMod.o                238
-            I64DivZer.o                  2
-
-        """
-        test_address_line = re.match(self.RE_OBJECT_LIBRARY, line)
-        if test_address_line:
-            return test_address_line.group(1)
-        else:
-            return ""
-
-    def parse_command_line(self, lines):
-        """Parse the files passed on the command line to the iar linker
-
-        Positional arguments:
-        lines -- an iterator over the lines within a file
-        """
-        for line in lines:
-            if line.startswith("*"):
-                break
-            for arg in line.split(" "):
-                arg = arg.rstrip(" \n")
-                if (
-                    not arg.startswith("-")
-                    and arg.endswith(self.OBJECT_EXTENSIONS)
-                ):
-                    self.cmd_modules[basename(arg)] = arg
-
-        common_prefix = dirname(commonprefix(list(self.cmd_modules.values())))
-        self.cmd_modules = {s: relpath(f, common_prefix)
-                            for s, f in self.cmd_modules.items()}
-
-    def parse_mapfile(self, file_desc):
-        """ Main logic to decode IAR map files
-
-        Positional arguments:
-        file_desc - a file like object to parse as an IAR map file
-        """
-        with file_desc as infile:
-            self.parse_command_line(infile)
-
-            for line in infile:
-                if line.startswith('  Section  '):
-                    break
-
-            for line in infile:
-                self.module_add(*self.parse_section(line))
-
-                if line.startswith('*** MODULE SUMMARY'):  # finish section
-                    break
-
-            current_library = ""
-            for line in infile:
-                library = self.check_new_library(line)
-
-                if library:
-                    current_library = library
-
-                object_name = self.check_new_object_lib(line)
-
-                if object_name and current_library:
-                    temp = join('[lib]', current_library, object_name)
-                    self.module_replace(object_name, temp)
-        return self.modules
 
 
 class MemapParser(object):
@@ -757,7 +552,7 @@ class MemapParser(object):
         "Total Flash memory (text + data): {}({:+}) bytes\n"
     )
 
-    def generate_csv(self, file_desc):
+    def generate_csv(self, file_desc: TextIO) -> None:
         """Generate a CSV file from a memoy map
 
         Positional arguments:
@@ -880,12 +675,8 @@ class MemapParser(object):
         toolchain - the toolchain used to create the file
         """
         self.tc_name = toolchain.title()
-        if toolchain in ("ARM", "ARM_STD", "ARM_MICRO", "ARMC6"):
-            parser = _ArmccParser
-        elif toolchain == "GCC_ARM":
+        if toolchain == "GCC_ARM":
             parser = _GccParser
-        elif toolchain == "IAR":
-            parser = _IarParser
         else:
             return False
         try:

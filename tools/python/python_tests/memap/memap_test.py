@@ -149,12 +149,12 @@ def generate_test_helper(memap_parser, format, depth, sep, file_output=None):
     :param format:  the file type to output
     :param file_output: the file to output to
     """
-    old_modules = deepcopy(memap_parser.modules)
+    old_symbols = deepcopy(memap_parser.symbols)
 
     memap.sep = sep
     memap_parser.generate_output(format, depth, file_output=file_output)
 
-    assert memap_parser.modules == old_modules,\
+    assert memap_parser.symbols == old_symbols,\
         "generate_output modified the 'modules' property"
 
     for file_name in memap_parser.short_modules:
