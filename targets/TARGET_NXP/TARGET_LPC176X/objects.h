@@ -71,6 +71,12 @@ struct i2c_s {
 struct spi_s {
     LPC_SSP_TypeDef *spi;
     uint8_t bits_per_word;
+
+    // Pin names, so that we can unmap them when the SPI is freed
+    PinName mosi_pin;
+    PinName miso_pin;
+    PinName sclk_pin;
+    PinName ssel_pin;
 };
 
 struct flash_s {

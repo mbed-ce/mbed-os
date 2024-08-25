@@ -49,6 +49,11 @@ SPISlave::SPISlave(const spi_pinmap_t &pinmap) :
     spi_frequency(&_spi, 1000000);
 }
 
+SPISlave::~SPISlave()
+{
+    spi_free(&_spi);
+}
+
 void SPISlave::format(int bits, int mode)
 {
     _bits = bits;

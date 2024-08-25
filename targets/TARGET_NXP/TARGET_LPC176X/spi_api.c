@@ -34,18 +34,30 @@ void spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap) {
         case SPI_1: LPC_SC->PCONP |= 1 << 10; break;
     }
 
-    // pin out the spi pins
-    pin_function(pinmap->mosi_pin, pinmap->mosi_function);
-    pin_mode(pinmap->mosi_pin, PullNone);
-    pin_function(pinmap->miso_pin, pinmap->miso_function);
-    pin_mode(pinmap->miso_pin, PullNone);
+    // Pin out the spi pins.
+    // Note: SCLK is the only pin that is always required.
+    if(pinmap->mosi_pin != NC)
+    {
+        pin_function(pinmap->mosi_pin, pinmap->mosi_function);
+        pin_mode(pinmap->mosi_pin, PullNone);
+    }
+    if(pinmap->miso_pin != NC)
+    {
+        pin_function(pinmap->miso_pin, pinmap->miso_function);
+        pin_mode(pinmap->miso_pin, PullNone);
+    }
     pin_function(pinmap->sclk_pin, pinmap->sclk_function);
     pin_mode(pinmap->sclk_pin, PullNone);
-
     if (pinmap->ssel_pin != NC) {
         pin_function(pinmap->ssel_pin, pinmap->ssel_function);
         pin_mode(pinmap->ssel_pin, PullNone);
     }
+
+    // Save pins
+    obj->mosi_pin = pinmap->mosi_pin;
+    obj->miso_pin = pinmap->miso_pin;
+    obj->sclk_pin = pinmap->sclk_pin;
+    obj->ssel_pin = pinmap->ssel_pin;
 }
 
 SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName sclk)
@@ -80,7 +92,14 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
     spi_init_direct(obj, &pinmap);
 }
 
-void spi_free(spi_t *obj) {}
+void spi_free(spi_t *obj)
+{
+    // Reset all pins to GPIO function
+    if(obj->mosi_pin != NC) pin_function(obj->mosi_pin, 0);
+    if(obj->miso_pin != NC) pin_function(obj->miso_pin, 0);
+    pin_function(obj->sclk_pin, 0);
+    if(obj->ssel_pin != NC) pin_function(obj->ssel_pin, 0);
+}
 
 void spi_format(spi_t *obj, int bits, int mode, int slave) {
     ssp_disable(obj);

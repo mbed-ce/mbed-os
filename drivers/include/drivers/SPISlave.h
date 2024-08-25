@@ -80,6 +80,11 @@ public:
     SPISlave(const spi_pinmap_t &pinmap);
     SPISlave(const spi_pinmap_t &&) = delete; // prevent passing of temporary objects
 
+    /**
+     * @brief Destructor.  Frees the SPI peripheral so it can be used elsewhere.
+     */
+    ~SPISlave();
+
     /** Configure the data transmission format.
      *
      *  @param bits Number of bits per SPI frame (4 - 16).
