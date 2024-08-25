@@ -684,11 +684,11 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
     if(direction == DMA_PERIPH_TO_MEMORY || direction == DMA_MEMORY_TO_MEMORY)
     {
         // Destination is memory
-        dmaHandle->Init.DestInc = memInc ? DMA_SINC_INCREMENTED : DMA_SINC_FIXED;
+        dmaHandle->Init.DestInc = memInc ? DMA_DINC_INCREMENTED : DMA_DINC_FIXED;
 
         switch(memDataAlignment) {
             case 4:
-                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_BYTE;
+                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_WORD;
                 break;
             case 2:
                 dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_HALFWORD;
@@ -702,11 +702,11 @@ DMA_HandleTypeDef *stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direct
     }
     else {
         // Destination is a peripheral
-        dmaHandle->Init.DestInc = periphInc ? DMA_SINC_INCREMENTED : DMA_SINC_FIXED;
+        dmaHandle->Init.DestInc = periphInc ? DMA_DINC_INCREMENTED : DMA_DINC_FIXED;
 
         switch(periphDataAlignment) {
             case 4:
-                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_BYTE;
+                dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_WORD;
                 break;
             case 2:
                 dmaHandle->Init.DestDataWidth = DMA_DEST_DATAWIDTH_HALFWORD;

@@ -853,9 +853,8 @@ void spi_format(spi_t *obj, int bits, int mode, int slave)
             /*  SPI slave implemtation in MBED does not support the 3 wires SPI.
              *  (e.g. when MISO is not connected). So we're forcing slave in
              *  2LINES mode. As MISO is not connected, slave will only read
-             *  from master, and cannot write to it. Inform user.
+             *  from master, and cannot write to it.
              */
-            debug("3 wires SPI slave not supported - slave will only read\r\n");
             handle->Init.Direction = SPI_DIRECTION_2LINES;
         }
 
@@ -1536,6 +1535,63 @@ typedef enum {
     SPI_TRANSFER_TYPE_TXRX = 3,
 } transfer_type_t;
 
+/*
+ * Configure a DMA channel's transfer size to match the given SPI word size
+ */
+static void configure_dma_transfer_size(const uint32_t spiDataSize, DMA_HandleTypeDef * const dmaChannel)
+{
+#if DMA_IP_VERSION_V3
+    uint32_t * const transferSizePtr1 = &dmaChannel->Init.DestDataWidth;
+    uint32_t * const transferSizePtr2 = &dmaChannel->Init.SrcDataWidth;
+    uint32_t neededSizeVal1;
+    uint32_t neededSizeVal2;
+
+    if(spiDataSize <= SPI_DATASIZE_8BIT)
+    {
+        neededSizeVal1 = DMA_DEST_DATAWIDTH_BYTE;
+        neededSizeVal2 = DMA_SRC_DATAWIDTH_BYTE;
+    }
+    else if(spiDataSize <= SPI_DATASIZE_16BIT)
+    {
+        neededSizeVal1 = DMA_DEST_DATAWIDTH_HALFWORD;
+        neededSizeVal2 = DMA_SRC_DATAWIDTH_HALFWORD;
+    }
+    else
+    {
+        neededSizeVal1 = DMA_DEST_DATAWIDTH_WORD;
+        neededSizeVal2 = DMA_SRC_DATAWIDTH_WORD;
+    }
+#else
+    uint32_t * const transferSizePtr = &dmaHandle->Init.PeriphDataAlignment;
+    uint32_t * const transferSizePtr2 = &dmaHandle->Init.MemDataAlignment;
+    uint32_t neededSizeVal1;
+    uint32_t neededSizeVal2;
+
+    if(spiDataSize <= SPI_DATASIZE_8BIT)
+    {
+        neededSizeVal1 = DMA_PDATAALIGN_BYTE;
+        neededSizeVal2 = DMA_MDATAALIGN_BYTE;
+    }
+    else if(spiDataSize <= SPI_DATASIZE_16BIT)
+    {
+        neededSizeVal1 = DMA_PDATAALIGN_HALFWORD;
+        neededSizeVal2 = DMA_MDATAALIGN_HALFWORD;
+    }
+    else
+    {
+        neededSizeVal1 = DMA_PDATAALIGN_WORD;
+        neededSizeVal2 = DMA_MDATAALIGN_WORD;
+    }
+#endif
+
+    // Check values and reinit DMA if needed
+    if(*transferSizePtr1 != neededSizeVal1 || *transferSizePtr2 != neededSizeVal2)
+    {
+        *transferSizePtr1 = neededSizeVal1;
+        *transferSizePtr2 = neededSizeVal2;
+        HAL_DMA_Init(dmaChannel);
+    }
+}
 
 /// @returns True if DMA was used, false otherwise
 static bool spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfer_type, const void *tx, void *rx, size_t length, DMAUsage hint)
@@ -1580,6 +1636,18 @@ static bool spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfe
         }
 
         useDMA = true;
+
+        // Make sure that the DMA word size matches the SPI word size.  Also check address alignment.
+        if(transfer_type == SPI_TRANSFER_TYPE_TXRX || transfer_type == SPI_TRANSFER_TYPE_TX)
+        {
+            MBED_ASSERT(((ptrdiff_t)tx) % (1 << bitshift) == 0); // <-- if you hit this assert you passed an unaligned pointer to an SPI async transfer
+            configure_dma_transfer_size(handle->Init.DataSize, handle->hdmatx);
+        }
+        if(transfer_type == SPI_TRANSFER_TYPE_TXRX || transfer_type == SPI_TRANSFER_TYPE_RX)
+        {
+            MBED_ASSERT(((ptrdiff_t)rx) % (1 << bitshift) == 0); // <-- if you hit this assert you passed an unaligned pointer to an SPI async transfer
+            configure_dma_transfer_size(handle->Init.DataSize, handle->hdmarx);
+        }
     }
 
     obj->spi.curr_transfer_uses_dma = useDMA;
