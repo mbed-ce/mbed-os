@@ -3093,7 +3093,8 @@
         ],
         "device_has_add": [
             "MPU",
-            "ANALOGOUT"
+            "ANALOGOUT",
+            "SPI_32BIT_WORDS"
         ],
         "device_has_remove": [
             "FLASH",
