@@ -14,9 +14,4 @@ target_sources(mbed-stm32h745xi-cm7
         ${STARTUP_FILE}
 )
 
-target_include_directories(mbed-stm32h745xi-cm7
-    INTERFACE
-        .
-)
-
 target_link_libraries(mbed-stm32h745xi-cm7 INTERFACE mbed-stm32h745xi)
