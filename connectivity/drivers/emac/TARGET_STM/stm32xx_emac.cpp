@@ -33,6 +33,8 @@
 
 #include "mbed-trace/mbed_trace.h"
 
+#include "CacheAlignedBuffer.h"
+
 #if defined(ETH_IP_VERSION_V2)
 #define TRACE_GROUP "STE2"
 #else
@@ -76,45 +78,22 @@ using namespace std::chrono;
 #define STM_ETH_IF_NAME         "st"
 
 #ifndef ETH_IP_VERSION_V2
-
-#if defined (__ICCARM__)   /*!< IAR Compiler */
-#pragma data_alignment=4
+#define ETH_RX_DESC_CNT ETH_RXBUFNB
+#define ETH_TX_DESC_CNT ETH_TXBUFNB
 #endif
-__ALIGN_BEGIN ETH_DMADescTypeDef DMARxDscrTab[ETH_RXBUFNB] __ALIGN_END; /* Ethernet Rx DMA Descriptor */
 
-#if defined (__ICCARM__)   /*!< IAR Compiler */
-#pragma data_alignment=4
-#endif
-__ALIGN_BEGIN ETH_DMADescTypeDef DMATxDscrTab[ETH_TXBUFNB] __ALIGN_END; /* Ethernet Tx DMA Descriptor */
+ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".EthDescriptors"))); /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".EthDescriptors")));  /* Ethernet Tx DMA Descriptors */
 
-#if defined (__ICCARM__)   /*!< IAR Compiler */
-#pragma data_alignment=4
-#endif
-__ALIGN_BEGIN uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE] __ALIGN_END; /* Ethernet Receive Buffer */
+static_assert(ETH_MAX_PACKET_SIZE % sizeof(uint32_t) == 0, "ETH_MAX_PACKET_SIZE must be divisible by 4.");
 
-#if defined (__ICCARM__)   /*!< IAR Compiler */
-#pragma data_alignment=4
-#endif
-__ALIGN_BEGIN uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE] __ALIGN_END; /* Ethernet Transmit Buffer */
+// Rx buffer addresses need to be aligned 4 bytes and to cache lines because we cache invalidate the buffers after receiving them.
+mbed::StaticCacheAlignedBuffer<uint32_t, ETH_MAX_PACKET_SIZE / sizeof(uint32_t)> Rx_Buff[ETH_RX_DESC_CNT] __attribute__((section(".EthBuffers"))); /* Ethernet Receive Buffers */
 
-#else // ETH_IP_VERSION_V2
+// Tx buffers just need to be aligned to the nearest 4 bytes.
+uint32_t Tx_Buff[ETH_TX_DESC_CNT][ETH_MAX_PACKET_SIZE / sizeof(uint32_t)] __attribute__((section(".EthBuffers")));
 
-#if defined ( __ICCARM__ ) /*!< IAR Compiler */
-
-#pragma location=0x30040000
-ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
-#pragma location=0x30040100
-ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-#pragma location=0x30040400
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE]; /* Ethernet Receive Buffers */
-
-#elif defined ( __GNUC__ ) /* GCC & ARMC6*/
-
-ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
-ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_MAX_PACKET_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
-
-#endif
+#ifdef ETH_IP_VERSION_V2
 
 static lan8742_Object_t LAN8742;
 
@@ -131,8 +110,6 @@ static lan8742_IOCtx_t LAN8742_IOCtx = {
     ETH_PHY_IO_ReadReg,
     ETH_PHY_IO_GetTick
 };
-
-static ETH_TxPacketConfig TxConfig;
 
 #endif // ETH_IP_VERSION_V2
 
@@ -216,29 +193,13 @@ static void MPU_Config(void)
     /* Configure the MPU attributes as Device not cacheable
        for ETH DMA descriptors */
     MPU_InitStruct.Enable = MPU_REGION_ENABLE;
-    MPU_InitStruct.BaseAddress = 0x30040000;
+    MPU_InitStruct.BaseAddress = reinterpret_cast<uint32_t>(&DMARxDscrTab);
     MPU_InitStruct.Size = MPU_REGION_SIZE_1KB;
     MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
     MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
     MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
     MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
-    MPU_InitStruct.Number = MPU_REGION_NUMBER0;
-    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-    MPU_InitStruct.SubRegionDisable = 0x00;
-    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
-
-    HAL_MPU_ConfigRegion(&MPU_InitStruct);
-
-    /* Configure the MPU attributes as Cacheable write through
-       for LwIP RAM heap which contains the Tx buffers */
-    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
-    MPU_InitStruct.BaseAddress = 0x30044000;
-    MPU_InitStruct.Size = MPU_REGION_SIZE_16KB;
-    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-    MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
-    MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
-    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
-    MPU_InitStruct.Number = MPU_REGION_NUMBER1;
+    MPU_InitStruct.Number = MPU_REGION_NUMBER4; // Mbed OS MPU config can use regions 0 through 3
     MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
     MPU_InitStruct.SubRegionDisable = 0x00;
     MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
@@ -341,7 +302,7 @@ bool STM32_EMAC::low_level_init_successful()
     }
 
     /* Initialize Rx Descriptors list: Chain Mode  */
-    if (HAL_ETH_DMARxDescListInit(&EthHandle, DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB) != HAL_OK) {
+    if (HAL_ETH_DMARxDescListInit(&EthHandle, DMARxDscrTab, Rx_Buff[0].data(), ETH_RXBUFNB) != HAL_OK) {
         tr_error("HAL_ETH_DMARxDescListInit issue");
         return false;
     }
@@ -391,15 +352,10 @@ bool STM32_EMAC::low_level_init_successful()
 
     if (HAL_ETH_Init(&EthHandle) != HAL_OK) {
         return false;
-    }
-
-    memset(&TxConfig, 0, sizeof(ETH_TxPacketConfig));
-    TxConfig.Attributes = ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
-    TxConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
-    TxConfig.CRCPadCtrl = ETH_CRC_PAD_INSERT;
+    }    
 
     for (idx = 0; idx < ETH_RX_DESC_CNT; idx++) {
-        HAL_ETH_DescAssignMemory(&EthHandle, idx, Rx_Buff[idx], NULL);
+        HAL_ETH_DescAssignMemory(&EthHandle, idx, reinterpret_cast<uint8_t *>(Rx_Buff[idx].data()), NULL);
     }
 
     tr_info("low_level_init_successful");
@@ -503,56 +459,60 @@ error:
 #else // ETH_IP_VERSION_V2
 {
     bool success = false;
-    uint32_t i = 0;
-    uint32_t frameLength = 0;
-    struct pbuf *q;
-    ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT];
-    HAL_StatusTypeDef status;
-    struct pbuf *p = NULL;
-    p = (struct pbuf *)buf;
+    uint8_t * txBuffer;
+
     /* Get exclusive access */
     TXLockMutex.lock();
 
-    memset(Txbuffer, 0, ETH_TX_DESC_CNT * sizeof(ETH_BufferTypeDef));
-
-    /* copy frame from pbufs to driver buffers */
-    for (q = p; q != NULL; q = q->next) {
-        if (i >= ETH_TX_DESC_CNT) {
-            tr_error("Error : ETH_TX_DESC_CNT not sufficient");
-            goto error;
-        }
-
-        Txbuffer[i].buffer = (uint8_t *)q->payload;
-        Txbuffer[i].len = q->len;
-        frameLength += q->len;
-
-        if (i > 0) {
-            Txbuffer[i - 1].next = &Txbuffer[i];
-        }
-
-        if (q->next == NULL) {
-            Txbuffer[i].next = NULL;
-        }
-
-        i++;
+    // Check length
+    const size_t txLen = memory_manager->get_total_len(buf);
+    if(txLen > ETH_MAX_PACKET_SIZE)
+    {
+        goto error;
     }
 
-    TxConfig.Length = frameLength;
-    TxConfig.TxBuffer = Txbuffer;
+    // Find free Tx buffer
+    if(DMATxDscrTab[EthHandle.TxDescList.CurTxDesc].DESC3 & ETH_DMATXNDESCWBF_OWN)
+    {
+        // No free Tx DMA descriptors left
+        tr_error("Error : ETH_TX_DESC_CNT not sufficient");
+        goto error;
+    }
+    txBuffer = reinterpret_cast<uint8_t *>(Tx_Buff[EthHandle.TxDescList.CurTxDesc]);
 
-    status = HAL_ETH_Transmit(&EthHandle, &TxConfig, 50);
-    if (status == HAL_OK) {
-        success = 1;
-    } else {
-        tr_error("Error returned by HAL_ETH_Transmit (%d)", status);
-        success = 0;
+    // Copy data into Tx buffer
+    memory_manager->copy_from_buf(txBuffer, txLen, buf);
+
+#if defined(__DCACHE_PRESENT)
+    // For chips with a cache, we need to evict the Tx data data from cache to main memory.
+    // This ensures that the DMA controller can see the most up-to-date copy of the data.
+    SCB_CleanDCache_by_Addr(txBuffer, txLen);
+#endif
+
+    // Transmit the data in the buffer
+    {
+        ETH_BufferTypeDef txBufferDescriptor{
+            .buffer = txBuffer,
+            .len = txLen,
+            .next = nullptr
+        };
+        ETH_TxPacketConfig txConfig = {};
+        txConfig.Attributes = ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
+        txConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
+        txConfig.CRCPadCtrl = ETH_CRC_PAD_INSERT;
+        txConfig.TxBuffer = &txBufferDescriptor;
+
+        int status = HAL_ETH_Transmit_IT(&EthHandle, &txConfig);
+        if (status == HAL_OK) {
+            success = true;
+        } else {
+            tr_error("Error returned by HAL_ETH_Transmit (%d)", status);
+        }
     }
 
 error:
 
-    if (p->ref > 1) {
-        pbuf_free(p);
-    }
+    memory_manager->free(buf);
 
     /* Restore access */
     TXLockMutex.unlock();
@@ -590,6 +550,12 @@ int STM32_EMAC::low_level_input(emac_mem_buf_t **buf)
     /* Obtain the size of the packet and put it into the "len" variable. */
     len = EthHandle.RxFrameInfos.length;
     buffer = reinterpret_cast<uint8_t *>(EthHandle.RxFrameInfos.buffer);
+
+#if defined(__DCACHE_PRESENT)
+    /* Invalidate data cache for ETH Rx Buffers */
+    SCB_InvalidateDCache_by_Addr(buffer, len);
+#endif
+
     byteslefttocopy = len;
 
     dmarxdesc = EthHandle.RxFrameInfos.FSRxDesc;
@@ -661,7 +627,7 @@ int STM32_EMAC::low_level_input(emac_mem_buf_t **buf)
         /* Build Rx descriptor to be ready for next data reception */
         HAL_ETH_BuildRxDescriptors(&EthHandle);
 
-#if !(defined(DUAL_CORE) && defined(CORE_CM4))
+#if defined(__DCACHE_PRESENT)
         /* Invalidate data cache for ETH Rx Buffers */
         SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff.buffer, frameLength);
 #endif

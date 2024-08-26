@@ -37,7 +37,7 @@ set(PYOCD_CLOCK_SPEED 4000k)
 
 set(OPENOCD_UPLOAD_ENABLED TRUE)
 set(OPENOCD_CHIP_CONFIG_COMMANDS
-    -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/nucleo_h72x.cfg)
+    -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/stm32h72x.cfg)
 
 # Config options for STM32Cube
 # -------------------------------------------------------------

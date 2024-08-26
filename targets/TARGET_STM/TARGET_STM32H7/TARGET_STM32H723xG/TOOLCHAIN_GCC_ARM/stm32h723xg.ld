@@ -244,4 +244,10 @@ SECTIONS
 
     /* Check if data + heap exceeds SRAM limit */
     ASSERT(__HeapLimit <= (ORIGIN(SRAM)+LENGTH(SRAM)), "Heap is too big for SRAM")
+
+    /* Store Eth DMA buffers in otherwise unused SRAM_D2 */
+    .lwip_sec (NOLOAD) : {
+        *(.EthDescriptors)
+        *(.EthBuffers)
+    } > SRAM_D2
 }

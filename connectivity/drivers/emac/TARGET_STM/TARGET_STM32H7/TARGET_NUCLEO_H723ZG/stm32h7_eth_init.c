@@ -160,4 +160,8 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef *heth)
     }
 }
 
+// Blank, non-weak-override function to make sure the linker pulls in this file
+void stm32_eth_init_weak_symbol_helper()
+{}
+
 #endif /* USE_USER_DEFINED_HAL_ETH_MSPINIT */
