@@ -169,6 +169,12 @@ function(mbed_set_post_build target)
         mbed_generate_map_file(${target})
     endif()
 
+    # Give chance to adjust MBED_UPLOAD_LAUNCH_COMMANDS or MBED_UPLOAD_RESTART_COMMANDS
+    # for debug launch
+    if(COMMAND mbed_adjust_upload_debug_commands)
+        mbed_adjust_upload_debug_commands(${target})
+    endif()
+
     mbed_generate_upload_target(${target})
     mbed_generate_ide_debug_configuration(${target})
 endfunction()
