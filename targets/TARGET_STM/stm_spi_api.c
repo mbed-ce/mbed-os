@@ -1562,8 +1562,8 @@ static void configure_dma_transfer_size(const uint32_t spiDataSize, DMA_HandleTy
         neededSizeVal2 = DMA_SRC_DATAWIDTH_WORD;
     }
 #else
-    uint32_t * const transferSizePtr = &dmaHandle->Init.PeriphDataAlignment;
-    uint32_t * const transferSizePtr2 = &dmaHandle->Init.MemDataAlignment;
+    uint32_t * const transferSizePtr1 = &dmaChannel->Init.PeriphDataAlignment;
+    uint32_t * const transferSizePtr2 = &dmaChannel->Init.MemDataAlignment;
     uint32_t neededSizeVal1;
     uint32_t neededSizeVal2;
 
