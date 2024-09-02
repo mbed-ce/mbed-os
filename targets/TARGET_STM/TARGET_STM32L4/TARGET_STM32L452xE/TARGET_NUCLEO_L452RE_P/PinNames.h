@@ -120,9 +120,9 @@ typedef enum {
     ARDUINO_UNO_A4  = PC_1,
     ARDUINO_UNO_A5  = PC_0,
 
-    ARDUINO_UNO_D0  = PA_3,
-    ARDUINO_UNO_D1  = PA_2,
-    ARDUINO_UNO_D2  = PA_10,
+    ARDUINO_UNO_D0  = PA_10,
+    ARDUINO_UNO_D1  = PA_9,
+    ARDUINO_UNO_D2  = PA_12,
     ARDUINO_UNO_D3  = PB_3,
     ARDUINO_UNO_D4  = PB_5,
     ARDUINO_UNO_D5  = PA_15,

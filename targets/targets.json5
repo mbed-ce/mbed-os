@@ -4313,6 +4313,10 @@
         "detect_code": [
             "0829"
         ],
+        "overrides": {
+            // ADC vref on this board is connected to 3.3V VDD
+            "default-adc-vref": 3.3
+        },
         "device_name": "STM32L452RETx",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2508/MFG_NUCLEO-L433RC-P.jpg"
     },

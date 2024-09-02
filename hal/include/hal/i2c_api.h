@@ -338,7 +338,7 @@ int  i2c_slave_write(i2c_t *obj, const char *data, int length);
 /** Configure I2C address.
  *  @param obj     The I2C object
  *  @param idx     Currently not used
- *  @param address The address to be set
+ *  @param address The address to be set (8-bit, always a read address)
  *  @param mask    Currently not used
  */
 void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask);
