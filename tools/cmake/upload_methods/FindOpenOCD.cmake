@@ -43,6 +43,20 @@ find_path(OpenOCD_SCRIPT_DIR
     PATHS /usr/share/openocd/scripts/
     DOC "Path to OpenOCD scripts folder.  Should contain interface/cmsis-dap.cfg.")
 
-find_package_handle_standard_args(OpenOCD FOUND_VAR OpenOCD_FOUND REQUIRED_VARS OpenOCD OpenOCD_SCRIPT_DIR)
+if(OpenOCD AND EXISTS "${OpenOCD}")
+    # Detect version (it writes to stderr)
+    execute_process(COMMAND ${OpenOCD} --version
+        ERROR_VARIABLE OpenOCD_VERSION_OUTPUT)
+
+    # Use a regex to grab the version number
+    string(REGEX MATCH "Open On-Chip Debugger ([^ ]+)" OpenOCD_VERSION_UNUSED_MATCH "${OpenOCD_VERSION_OUTPUT}")
+    set(OpenOCD_VERSION ${CMAKE_MATCH_1})
+endif()
+
+find_package_handle_standard_args(OpenOCD
+    HANDLE_VERSION_RANGE
+    FOUND_VAR OpenOCD_FOUND
+    VERSION_VAR OpenOCD_VERSION
+    REQUIRED_VARS OpenOCD OpenOCD_SCRIPT_DIR)
 
 

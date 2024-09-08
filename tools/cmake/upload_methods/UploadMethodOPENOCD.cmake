@@ -6,11 +6,13 @@
 # OPENOCD_CHIP_CONFIG_COMMANDS - Specifies all OpenOCD commands needed to configure openocd for your target processor.
 # This method creates the following options:
 # OPENOCD_ADAPTER_SERIAL - Serial number of the debug adapter to select for OpenOCD.  Set to empty to detect any matching adapter.
+# OPENOCD_VERSION_RANGE - Acceptable version range of OpenOCD.  This may be a single version, in which case it is treated as
+#   a minimum, or a versionMin...<versionMax constraint, e.g. 0.12...<0.13, to accept any 0.12.x version but not 0.13 or higher.
 
 set(UPLOAD_SUPPORTS_DEBUG TRUE)
 
 ### Check if upload method can be enabled on this machine
-find_package(OpenOCD)
+find_package(OpenOCD ${OPENOCD_VERSION_RANGE})
 set(UPLOAD_OPENOCD_FOUND ${OpenOCD_FOUND})
 
 ### Setup options
