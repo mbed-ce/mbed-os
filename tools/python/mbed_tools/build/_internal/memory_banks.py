@@ -65,7 +65,7 @@ the missing MCU description?""")
     target_attributes["memory_banks"] = target_memory_banks_section
 
 
-def _pretty_print_size(size: int):
+def _pretty_print_size(size: int) -> str:
     """
     Pretty-print a memory size as MiB/KiB/B
     """
@@ -91,10 +91,10 @@ def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> N
     # Check for deprecated properties
     for property_name in DEPRECATED_MEM_CONFIG_PROPERTIES:
         if property_name in config:
-            logger.warning(f"Configuration uses old-style memory bank configuration property '{property_name}'.  "
-                           f"This is deprecated and is not processed anymore, replace it with a "
-                           f"'memory_bank_config' section.  See here for more: "
-                           f"https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information")
+            logger.warning("Configuration uses old-style memory bank configuration property %s. "
+                           "This is deprecated and is not processed anymore, replace it with a "
+                           "'memory_bank_config' section.  See here for more: "
+                           "https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information", property_name)
 
     # Check attributes, sort into rom and ram
     banks_by_type: Dict[str, Dict[str, Dict[str, Any]]] = {"ROM": {}, "RAM": {}}
@@ -116,7 +116,7 @@ def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> N
     for bank_name, bank_data in memory_bank_config.items():
 
         if bank_name not in configured_memory_banks["RAM"] and bank_name not in configured_memory_banks["ROM"]:
-            raise MbedBuildError(f"Attempt to configure memory bank {bank_name} which does not exist for this device.""")
+            raise MbedBuildError(f"Attempt to configure memory bank {bank_name} which does not exist for this device.")
         bank_type = "RAM" if bank_name in configured_memory_banks["RAM"] else "ROM"
 
         if len(set(bank_data.keys()) - {"size", "start"}):
@@ -141,8 +141,7 @@ def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> N
 
         print(f"Target {bank_type} banks: -----------------------------------------------------------")
 
-        bank_index = 0
-        for bank_name, bank_data in banks.items():
+        for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
 
             bank_size = bank_data["size"]
             bank_start = bank_data["start"]
@@ -158,19 +157,18 @@ def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> N
             if configured_start_addr != bank_start:
                 configured_start_addr_str = f" (configured to 0x{configured_start_addr:08x})"
 
-            print(f"{bank_index}. {bank_name}, start addr 0x{bank_start:08x}{configured_start_addr_str}, size {_pretty_print_size(bank_size)}{configured_size_str}")
+            print(f"{bank_index}. {bank_name}, "
+                  f"start addr 0x{bank_start:08x}{configured_start_addr_str}, "
+                  f"size {_pretty_print_size(bank_size)}{configured_size_str}")
 
-            bank_index += 1
-
-        print("")
+        print()
 
     # Define macros
     all_macros: Set[str] = set()
 
     for bank_type, banks in banks_by_type.items():
 
-        bank_index = 0
-        for bank_name, bank_data in banks.items():
+        for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
 
             bank_number_str = "" if bank_index == 0 else str(bank_index)
 
@@ -189,8 +187,6 @@ def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> N
             all_macros.add(f"MBED_CONFIGURED_{bank_type}{bank_number_str}_SIZE=0x{configured_bank_data['size']:x}")
             all_macros.add(f"MBED_CONFIGURED_{bank_type}_BANK_{bank_name}_START=0x{configured_bank_data['start']:x}")
             all_macros.add(f"MBED_CONFIGURED_{bank_type}_BANK_{bank_name}_SIZE=0x{configured_bank_data['size']:x}")
-
-            bank_index += 1
 
     # Save macros into configuration
     config["memory_bank_macros"] = all_macros

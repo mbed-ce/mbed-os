@@ -25,7 +25,7 @@ def decode_json_file(path: Path) -> Any:
     elif path.suffix == '.json5':
         try:
             logger.debug(f"Loading JSON file {path}")
-            with open(path, "r") as json_file:
+            with path.open() as json_file:
                 return pyjson5.decode_io(json_file)
         except ValueError:
             logger.error(f"Failed to decode JSON data in the file located at '{path}'")

@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-import pytest
 import pathlib
 
 from mbed_tools.build._internal.memory_banks import process_memory_banks
