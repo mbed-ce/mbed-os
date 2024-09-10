@@ -6,6 +6,7 @@
 import pathlib
 
 from typing import Any, Tuple
+import json
 
 from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.project import MbedProgram
@@ -39,7 +40,12 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> T
     config = assemble_config(
         target_build_attributes, [program.root, program.mbed_os.root], program.files.app_config_file
     )
-    process_memory_banks(config, program.files.cmake_build_dir / MEMORY_BANKS_JSON_FILE)
+
+    # Process memory banks and save JSON data for other tools (e.g. memap) to use
+    memory_banks_json_content = process_memory_banks(config)
+    program.files.cmake_build_dir.mkdir(parents=True, exist_ok=True)
+    (program.files.cmake_build_dir / MEMORY_BANKS_JSON_FILE).write_text(json.dumps(memory_banks_json_content, indent=4))
+
     cmake_file_contents = render_mbed_config_cmake_template(
         target_name=target_name, config=config, toolchain_name=toolchain,
     )

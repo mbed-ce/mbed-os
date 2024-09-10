@@ -3,13 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-import pathlib
-
 from mbed_tools.build._internal.memory_banks import process_memory_banks
 
 
 class TestMemoryBankProcessing:
-    def test_simple_memory_layout(self, tmp_path: pathlib.Path):
+    def test_simple_memory_layout(self):
         """
         Test a simple memory layout to ensure we process it correctly.
         """
@@ -52,8 +50,7 @@ class TestMemoryBankProcessing:
             }
         }
 
-        memory_banks_json_path = tmp_path / "memory_banks.json"
-        process_memory_banks(config, memory_banks_json_path)
+        print(repr(process_memory_banks(config)))
 
         assert config["memory_bank_macros"] == {
             # New style definitions (ROM)
@@ -81,7 +78,7 @@ class TestMemoryBankProcessing:
             'MBED_CONFIGURED_RAM_SIZE=0x100000',
             }
 
-    def test_memory_configuration(self, tmp_path: pathlib.Path):
+    def test_memory_configuration(self):
         """
         Test configuring the size and address of a memory bank
         """
@@ -135,8 +132,7 @@ class TestMemoryBankProcessing:
             }
         }
 
-        memory_banks_json_path = tmp_path / "memory_banks.json"
-        process_memory_banks(config, memory_banks_json_path)
+        process_memory_banks(config)
 
         assert config["memory_bank_macros"] == {
             # New style definitions (ROM)
@@ -164,7 +160,7 @@ class TestMemoryBankProcessing:
             'MBED_CONFIGURED_RAM_SIZE=0xa0000',
             }
 
-    def test_two_ram_banks(self, tmp_path: pathlib.Path):
+    def test_two_ram_banks(self):
         """
         Test to see if two RAM banks are handled correctly.
         """
@@ -221,8 +217,7 @@ class TestMemoryBankProcessing:
             }
         }
 
-        memory_banks_json_path = tmp_path / "memory_banks.json"
-        process_memory_banks(config, memory_banks_json_path)
+        process_memory_banks(config)
 
         # Note: IRAM2 should become MBED_RAM1 because it is listed second
         # in the dictionary

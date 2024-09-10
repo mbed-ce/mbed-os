@@ -3,7 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-from typing import Dict, Any, Set
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Dict, Any, Set, TypedDict, NotRequired
+
 import pathlib
 import copy
 import json
@@ -16,6 +21,27 @@ from mbed_tools.build.exceptions import MbedBuildError
 from mbed_tools.build._internal.config.config import Config
 
 logger = logging.getLogger(__name__)
+
+
+if TYPE_CHECKING:
+    # Type hints for memory bank config
+    class MemoryBankInfo(TypedDict):
+        """
+        Info about one memory bank
+        """
+        size: int
+        start: int
+        default: NotRequired[bool]
+        startup: NotRequired[bool]
+        access: Dict[str, bool]
+    
+
+    class BanksByType(TypedDict):
+        """
+        Info about all memory banks, ROM and RAM
+        """
+        ROM: Dict[str, MemoryBankInfo]
+        RAM: Dict[str, MemoryBankInfo]
 
 
 # Deprecated memory configuration properties from old (Mbed CLI 1) configuration system
@@ -65,20 +91,7 @@ the missing MCU description?""")
     target_attributes["memory_banks"] = target_memory_banks_section
 
 
-def _pretty_print_size(size: int) -> str:
-    """
-    Pretty-print a memory size as MiB/KiB/B
-    """
-    if size >= 1024*1024 and (size % (1024*1024)) == 0:
-        return f"{size//(1024*1024)} MiB"
-    elif size >= 1024 and (size % 1024) == 0:
-        return f"{size//1024} kiB"
-    else:
-        return f"{size} B"
-
-
-def _apply_configured_overrides(banks_by_type: Dict[str, Dict[str, Dict[str, Any]]],
-                                bank_config: Dict[str, Dict[str, int]]) -> Dict[str, Dict[str, Dict[str, Any]]]:
+def _apply_configured_overrides(banks_by_type: BanksByType, bank_config: Dict[str, Dict[str, int]]) -> BanksByType:
 
     """
     Apply overrides from configuration to the physical memory bank information, producing the configured
@@ -108,8 +121,19 @@ def _apply_configured_overrides(banks_by_type: Dict[str, Dict[str, Dict[str, Any
     return configured_memory_banks
 
 
-def _print_mem_bank_summary(banks_by_type: Dict[str, Dict[str, Dict[str, Any]]],
-                            configured_banks_by_type: Dict[str, Dict[str, Dict[str, Any]]]) -> None:
+def _pretty_print_size(size: int) -> str:
+    """
+    Pretty-print a memory size as MiB/KiB/B
+    """
+    if size >= 1024*1024 and (size % (1024*1024)) == 0:
+        return f"{size//(1024*1024)} MiB"
+    elif size >= 1024 and (size % 1024) == 0:
+        return f"{size//1024} kiB"
+    else:
+        return f"{size} B"
+
+
+def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type: BanksByType) -> None:
 
     """
     Print a summary of the memory banks to the console
@@ -151,8 +175,8 @@ def _print_mem_bank_summary(banks_by_type: Dict[str, Dict[str, Dict[str, Any]]],
         print()
 
 
-def _generate_macros_for_memory_banks(banks_by_type: Dict[str, Dict[str, Dict[str, Any]]],
-                            configured_banks_by_type: Dict[str, Dict[str, Dict[str, Any]]]) -> Set[str]:
+def _generate_macros_for_memory_banks(banks_by_type: BanksByType,
+                            configured_banks_by_type: BanksByType) -> Set[str]:
 
     """
     Generate a set of macros to define to pass the memory bank information into Mbed.
@@ -186,13 +210,13 @@ def _generate_macros_for_memory_banks(banks_by_type: Dict[str, Dict[str, Dict[st
     return all_macros
 
 
-def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> None:
+def process_memory_banks(config: Config) -> Dict[str, BanksByType]:
     """
     Process memory bank information in the config.  Reads the 'memory_banks' and
     'memory_bank_config' sections and adds the memory_bank_macros section accordingly.
 
     :param config: Config structure containing merged data from every JSON file (app, lib, and targets)
-    :param mem_banks_json_file: Memory banks JSON file is written here
+    :return: Memory bank information structure that shall be written to memory_banks.json
     """
 
     memory_banks = config.get("memory_banks", {})
@@ -206,7 +230,7 @@ def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> N
                            "https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information", property_name)
 
     # Check attributes, sort into rom and ram
-    banks_by_type: Dict[str, Dict[str, Dict[str, Any]]] = {"ROM": {}, "RAM": {}}
+    banks_by_type: BanksByType = {"ROM": {}, "RAM": {}}
     for bank_name, bank_data in memory_banks.items():
         if "access" not in bank_data or "start" not in bank_data or "size" not in bank_data:
             raise MbedBuildError(f"Memory bank '{bank_name}' must contain 'access', 'size', and 'start' elements")
@@ -229,9 +253,8 @@ def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> N
     config["memory_bank_macros"] = _generate_macros_for_memory_banks(banks_by_type, configured_banks_by_type)
 
     # Write out JSON file
-    memory_banks_json_content = {
+    return {
         "memory_banks": banks_by_type,
         "configured_memory_banks": configured_banks_by_type
     }
-    mem_banks_json_file.parent.mkdir(parents=True, exist_ok=True)
-    mem_banks_json_file.write_text(json.dumps(memory_banks_json_content, indent=4))
+
