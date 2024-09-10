@@ -77,6 +77,115 @@ def _pretty_print_size(size: int) -> str:
         return f"{size} B"
 
 
+def _apply_configured_overrides(banks_by_type: Dict[str, Dict[str, Dict[str, Any]]],
+                                bank_config: Dict[str, Dict[str, int]]) -> Dict[str, Dict[str, Dict[str, Any]]]:
+
+    """
+    Apply overrides from configuration to the physical memory bank information, producing the configured
+    memory bank information.
+    :param bank_config: memory_bank_config element from target JSON
+    :param banks_by_type: Physical memory bank information
+    """
+
+    configured_memory_banks = copy.deepcopy(banks_by_type)
+
+    for bank_name, bank_data in bank_config.items():
+
+        if bank_name not in configured_memory_banks["RAM"] and bank_name not in configured_memory_banks["ROM"]:
+            raise MbedBuildError(f"Attempt to configure memory bank {bank_name} which does not exist for this device.")
+        bank_type = "RAM" if bank_name in configured_memory_banks["RAM"] else "ROM"
+
+        if len(set(bank_data.keys()) - {"size", "start"}):
+            raise MbedBuildError("Only the size and start properties of a memory bank can be "
+                                 "configured in memory_bank_config")
+
+        for property_name, property_value in bank_data.items():
+            if not isinstance(property_value, int):
+                raise MbedBuildError(f"Memory bank '{bank_name}': configured {property_name} must be an integer")
+
+            configured_memory_banks[bank_type][bank_name][property_name] = property_value
+
+    return configured_memory_banks
+
+
+def _print_mem_bank_summary(banks_by_type: Dict[str, Dict[str, Dict[str, Any]]],
+                            configured_banks_by_type: Dict[str, Dict[str, Dict[str, Any]]]) -> None:
+
+    """
+    Print a summary of the memory banks to the console
+    :param banks_by_type: Physical memory bank information
+    :param configured_banks_by_type: Configured memory bank information
+    """
+
+    print("Summary of available memory banks:")
+    for bank_type, banks in banks_by_type.items():
+
+        if len(banks) == 0:
+            logger.warning("No %s banks are known to the Mbed configuration system!  This can cause problems with "
+                           "features like Mbed Stats and FlashIAPBlockDevice!  To fix this, define a 'device_name'"
+                           " property or specify 'memory_banks' in your target JSON.", bank_type)
+            continue
+
+        print(f"Target {bank_type} banks: -----------------------------------------------------------")
+
+        for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
+
+            bank_size = bank_data["size"]
+            bank_start = bank_data["start"]
+
+            configured_size = configured_banks_by_type[bank_type][bank_name]["size"]
+            configured_start_addr = configured_banks_by_type[bank_type][bank_name]["start"]
+
+            # If the configured sizes are different, add info to the summary
+            configured_size_str = ""
+            configured_start_addr_str = ""
+            if configured_size != bank_size:
+                configured_size_str = f" (configured to {_pretty_print_size(configured_size)})"
+            if configured_start_addr != bank_start:
+                configured_start_addr_str = f" (configured to 0x{configured_start_addr:08x})"
+
+            print(f"{bank_index}. {bank_name}, "
+                  f"start addr 0x{bank_start:08x}{configured_start_addr_str}, "
+                  f"size {_pretty_print_size(bank_size)}{configured_size_str}")
+
+        print()
+
+
+def _generate_macros_for_memory_banks(banks_by_type: Dict[str, Dict[str, Dict[str, Any]]],
+                            configured_banks_by_type: Dict[str, Dict[str, Dict[str, Any]]]) -> Set[str]:
+
+    """
+    Generate a set of macros to define to pass the memory bank information into Mbed.
+    :param banks_by_type: Physical memory bank information
+    :param configured_banks_by_type: Configured memory bank information
+    """
+    all_macros: Set[str] = set()
+
+    for bank_type, banks in banks_by_type.items():
+
+        for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
+
+            bank_number_str = "" if bank_index == 0 else str(bank_index)
+
+            configured_bank_data = configured_banks_by_type[bank_type][bank_name]
+
+            # Legacy numbered definitions
+            all_macros.add(f"MBED_{bank_type}{bank_number_str}_START=0x{bank_data['start']:x}")
+            all_macros.add(f"MBED_{bank_type}{bank_number_str}_SIZE=0x{bank_data['size']:x}")
+
+            # New style named definitions
+            all_macros.add(f"MBED_{bank_type}_BANK_{bank_name}_START=0x{bank_data['start']:x}")
+            all_macros.add(f"MBED_{bank_type}_BANK_{bank_name}_SIZE=0x{bank_data['size']:x}")
+
+            # Same as above but for configured bank
+            all_macros.add(f"MBED_CONFIGURED_{bank_type}{bank_number_str}_START=0x{configured_bank_data['start']:x}")
+            all_macros.add(f"MBED_CONFIGURED_{bank_type}{bank_number_str}_SIZE=0x{configured_bank_data['size']:x}")
+            all_macros.add(f"MBED_CONFIGURED_{bank_type}_BANK_{bank_name}_START=0x{configured_bank_data['start']:x}")
+            all_macros.add(f"MBED_CONFIGURED_{bank_type}_BANK_{bank_name}_SIZE=0x{configured_bank_data['size']:x}")
+
+    return all_macros
+
+
 def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> None:
     """
     Process memory bank information in the config.  Reads the 'memory_banks' and
@@ -111,90 +220,18 @@ def process_memory_banks(config: Config, mem_banks_json_file: pathlib.Path) -> N
 
     # Create configured memory bank structure
     memory_bank_config = config.get("memory_bank_config", {})
-    configured_memory_banks = copy.deepcopy(banks_by_type)
-
-    for bank_name, bank_data in memory_bank_config.items():
-
-        if bank_name not in configured_memory_banks["RAM"] and bank_name not in configured_memory_banks["ROM"]:
-            raise MbedBuildError(f"Attempt to configure memory bank {bank_name} which does not exist for this device.")
-        bank_type = "RAM" if bank_name in configured_memory_banks["RAM"] else "ROM"
-
-        if len(set(bank_data.keys()) - {"size", "start"}):
-            raise MbedBuildError("Only the size and start properties of a memory bank can be "
-                                 "configured in memory_bank_config")
-
-        for property_name, property_value in bank_data.items():
-            if not isinstance(property_value, int):
-                raise MbedBuildError(f"Memory bank '{bank_name}': configured {property_name} must be an integer")
-
-            configured_memory_banks[bank_type][bank_name][property_name] = property_value
+    configured_banks_by_type = _apply_configured_overrides(banks_by_type, memory_bank_config)
 
     # Print summary
-    print("Summary of available memory banks:")
-    for bank_type, banks in banks_by_type.items():
+    _print_mem_bank_summary(banks_by_type, configured_banks_by_type)
 
-        if len(banks) == 0:
-            logger.warning("No %s banks are known to the Mbed configuration system!  This can cause problems with "
-                           "features like Mbed Stats and FlashIAPBlockDevice!  To fix this, define a 'device_name'"
-                           " property or specify 'memory_banks' in your target JSON.", bank_type)
-            continue
-
-        print(f"Target {bank_type} banks: -----------------------------------------------------------")
-
-        for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
-
-            bank_size = bank_data["size"]
-            bank_start = bank_data["start"]
-
-            configured_size = configured_memory_banks[bank_type][bank_name]["size"]
-            configured_start_addr = configured_memory_banks[bank_type][bank_name]["start"]
-
-            # If the configured sizes are different, add info to the summary
-            configured_size_str = ""
-            configured_start_addr_str = ""
-            if configured_size != bank_size:
-                configured_size_str = f" (configured to {_pretty_print_size(configured_size)})"
-            if configured_start_addr != bank_start:
-                configured_start_addr_str = f" (configured to 0x{configured_start_addr:08x})"
-
-            print(f"{bank_index}. {bank_name}, "
-                  f"start addr 0x{bank_start:08x}{configured_start_addr_str}, "
-                  f"size {_pretty_print_size(bank_size)}{configured_size_str}")
-
-        print()
-
-    # Define macros
-    all_macros: Set[str] = set()
-
-    for bank_type, banks in banks_by_type.items():
-
-        for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
-
-            bank_number_str = "" if bank_index == 0 else str(bank_index)
-
-            configured_bank_data = configured_memory_banks[bank_type][bank_name]
-
-            # Legacy numbered definitions
-            all_macros.add(f"MBED_{bank_type}{bank_number_str}_START=0x{bank_data['start']:x}")
-            all_macros.add(f"MBED_{bank_type}{bank_number_str}_SIZE=0x{bank_data['size']:x}")
-
-            # New style named definitions
-            all_macros.add(f"MBED_{bank_type}_BANK_{bank_name}_START=0x{bank_data['start']:x}")
-            all_macros.add(f"MBED_{bank_type}_BANK_{bank_name}_SIZE=0x{bank_data['size']:x}")
-
-            # Same as above but for configured bank
-            all_macros.add(f"MBED_CONFIGURED_{bank_type}{bank_number_str}_START=0x{configured_bank_data['start']:x}")
-            all_macros.add(f"MBED_CONFIGURED_{bank_type}{bank_number_str}_SIZE=0x{configured_bank_data['size']:x}")
-            all_macros.add(f"MBED_CONFIGURED_{bank_type}_BANK_{bank_name}_START=0x{configured_bank_data['start']:x}")
-            all_macros.add(f"MBED_CONFIGURED_{bank_type}_BANK_{bank_name}_SIZE=0x{configured_bank_data['size']:x}")
-
-    # Save macros into configuration
-    config["memory_bank_macros"] = all_macros
+    # Generate define macros
+    config["memory_bank_macros"] = _generate_macros_for_memory_banks(banks_by_type, configured_banks_by_type)
 
     # Write out JSON file
     memory_banks_json_content = {
         "memory_banks": banks_by_type,
-        "configured_memory_banks": configured_memory_banks
+        "configured_memory_banks": configured_banks_by_type
     }
     mem_banks_json_file.parent.mkdir(parents=True, exist_ok=True)
     mem_banks_json_file.write_text(json.dumps(memory_banks_json_content, indent=4))
