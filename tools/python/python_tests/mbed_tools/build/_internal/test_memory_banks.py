@@ -50,7 +50,7 @@ class TestMemoryBankProcessing:
             }
         }
 
-        print(repr(process_memory_banks(config)))
+        process_memory_banks(config)
 
         assert config["memory_bank_macros"] == {
             # New style definitions (ROM)

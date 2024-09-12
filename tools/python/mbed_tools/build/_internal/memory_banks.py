@@ -9,10 +9,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Dict, Any, Set, TypedDict, NotRequired
 
-import pathlib
 import copy
-import json
 import logging
+
+import humanize
 
 from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.project import MbedProgram
@@ -34,7 +34,7 @@ if TYPE_CHECKING:
         default: NotRequired[bool]
         startup: NotRequired[bool]
         access: Dict[str, bool]
-    
+
 
     class BanksByType(TypedDict):
         """
@@ -55,6 +55,9 @@ DEPRECATED_MEM_CONFIG_PROPERTIES = {
     "mbed_ram1_start",
     "mbed_ram1_size",
 }
+
+
+BANK_TYPES = ("RAM", "ROM")
 
 
 def incorporate_memory_bank_data_from_cmsis(target_attributes: Dict[str, Any],
@@ -121,18 +124,6 @@ def _apply_configured_overrides(banks_by_type: BanksByType, bank_config: Dict[st
     return configured_memory_banks
 
 
-def _pretty_print_size(size: int) -> str:
-    """
-    Pretty-print a memory size as MiB/KiB/B
-    """
-    if size >= 1024*1024 and (size % (1024*1024)) == 0:
-        return f"{size//(1024*1024)} MiB"
-    elif size >= 1024 and (size % 1024) == 0:
-        return f"{size//1024} kiB"
-    else:
-        return f"{size} B"
-
-
 def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type: BanksByType) -> None:
 
     """
@@ -142,7 +133,8 @@ def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type
     """
 
     print("Summary of available memory banks:")
-    for bank_type, banks in banks_by_type.items():
+    for bank_type in BANK_TYPES:
+        banks = banks_by_type[bank_type]
 
         if len(banks) == 0:
             logger.warning("No %s banks are known to the Mbed configuration system!  This can cause problems with "
@@ -164,19 +156,19 @@ def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type
             configured_size_str = ""
             configured_start_addr_str = ""
             if configured_size != bank_size:
-                configured_size_str = f" (configured to {_pretty_print_size(configured_size)})"
+                configured_size_str = f" (configured to {humanize.naturalsize(configured_size, binary=True)})"
             if configured_start_addr != bank_start:
                 configured_start_addr_str = f" (configured to 0x{configured_start_addr:08x})"
 
             print(f"{bank_index}. {bank_name}, "
                   f"start addr 0x{bank_start:08x}{configured_start_addr_str}, "
-                  f"size {_pretty_print_size(bank_size)}{configured_size_str}")
+                  f"size {humanize.naturalsize(bank_size, binary=True)}{configured_size_str}")
 
         print()
 
 
 def _generate_macros_for_memory_banks(banks_by_type: BanksByType,
-                            configured_banks_by_type: BanksByType) -> Set[str]:
+                                      configured_banks_by_type: BanksByType) -> Set[str]:
 
     """
     Generate a set of macros to define to pass the memory bank information into Mbed.
@@ -185,7 +177,8 @@ def _generate_macros_for_memory_banks(banks_by_type: BanksByType,
     """
     all_macros: Set[str] = set()
 
-    for bank_type, banks in banks_by_type.items():
+    for bank_type in BANK_TYPES:
+        banks = banks_by_type[bank_type]
 
         for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
 
