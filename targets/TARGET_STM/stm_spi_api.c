@@ -1738,7 +1738,9 @@ static bool spi_master_start_asynch_transfer(spi_t *obj, transfer_type_t transfe
             LL_SPI_Enable(SPI_INST(obj));
         }
 #endif
-        DEBUG_PRINTF("SPI: RC=%u\n", rc);
+
+        // Unfortunately there is no way to propagate the error code back up, better to print a warning than swallow it entirely
+        printf("Warning: async SPI transfer start failed in STM32 HAL, error code = %d", rc);
     }
 
     return useDMA;
@@ -1907,7 +1909,17 @@ void spi_abort_asynch(spi_t *obj)
     // Use HAL abort function.
     // Conveniently, this is smart enough to automatically abort the DMA transfer
     // if DMA was used.
-    HAL_SPI_Abort_IT(handle);
+    HAL_StatusTypeDef rc = HAL_SPI_Abort_IT(handle);
+
+    if(rc != HAL_OK)
+    {
+        printf("Warning: async SPI abort failed in STM32 HAL, error code = %d\n", rc);
+    }
+    if((handle->hdmatx != NULL && handle->hdmatx->State != HAL_DMA_STATE_READY) || (handle->hdmarx != NULL && handle->hdmarx->State != HAL_DMA_STATE_READY))
+    {
+        printf("Warning: DMA did not return to ready state after abort!\n");
+        return;
+    }
 }
 
 #endif //DEVICE_SPI_ASYNCH

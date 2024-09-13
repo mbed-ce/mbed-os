@@ -116,6 +116,9 @@ target_sources(mbed-stm32h5cube-fw
         STM32H5xx_HAL_Driver/stm32h5xx_util_i3c.c
 )
 
+# Silence warning
+set_property(SOURCE STM32H5xx_HAL_Driver/stm32h5xx_hal_hcd.c PROPERTY COMPILE_OPTIONS -Wno-old-style-declaration)
+
 target_include_directories(mbed-stm32h5cube-fw
     INTERFACE
         .

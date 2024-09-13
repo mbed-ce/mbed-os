@@ -726,7 +726,11 @@ typedef struct
 
 #if defined(I3C2)
 #define LL_RCC_I3C2_CLKSOURCE_PCLK3         LL_CLKSOURCE(CCIPR4_OFFSET, RCC_CCIPR4_I3C2SEL, RCC_CCIPR4_I3C2SEL_Pos, 0x00000000U)              /*!< PCLK3 clock used as I3C2 clock source */
+#if defined(RCC_CR_PLL3ON)
+#define LL_RCC_I3C2_CLKSOURCE_PLL3R         LL_CLKSOURCE(CCIPR4_OFFSET, RCC_CCIPR4_I3C2SEL, RCC_CCIPR4_I3C2SEL_Pos, RCC_CCIPR4_I3C2SEL_0)     /*!< PLL3 R clock used as I3C2 clock source */
+#else
 #define LL_RCC_I3C2_CLKSOURCE_PLL2R         LL_CLKSOURCE(CCIPR4_OFFSET, RCC_CCIPR4_I3C2SEL, RCC_CCIPR4_I3C2SEL_Pos, RCC_CCIPR4_I3C2SEL_0)     /*!< PLL2 R clock used as I3C2 clock source */
+#endif /* PLL3 */
 #define LL_RCC_I3C2_CLKSOURCE_HSI           LL_CLKSOURCE(CCIPR4_OFFSET, RCC_CCIPR4_I3C2SEL, RCC_CCIPR4_I3C2SEL_Pos, RCC_CCIPR4_I3C2SEL_1)     /*!< HSI clock used as I3C2 clock source */
 #define LL_RCC_I3C2_CLKSOURCE_NONE          LL_CLKSOURCE(CCIPR4_OFFSET, RCC_CCIPR4_I3C2SEL, RCC_CCIPR4_I3C2SEL_Pos, RCC_CCIPR4_I3C2SEL)       /*!< NONE clock used as I3C2 clock source */
 #endif /* I3C2 */
@@ -908,6 +912,7 @@ typedef struct
   * @}
   */
 
+#if defined(USB_DRD_FS)
 /** @defgroup RCC_LL_EC_USB_CLKSOURCE  Peripheral USB clock source selection
   * @{
   */
@@ -920,6 +925,7 @@ typedef struct
 /**
   * @}
   */
+#endif /* USB_DRD_FS */
 
 /** @defgroup RCC_LL_EC_ADCDAC_CLKSOURCE  Peripheral ADCDAC clock source selection
   * @{
@@ -1120,6 +1126,7 @@ typedef struct
   * @}
   */
 
+#if defined(USB_DRD_FS)
 /** @defgroup RCC_LL_EC_USB  Peripheral USB get clock source
   * @{
   */
@@ -1127,6 +1134,7 @@ typedef struct
 /**
   * @}
   */
+#endif /* USB_DRD_FS */
 
 /** @defgroup RCC_LL_EC_ADCDAC  Peripheral ADCDAC get clock source
   * @{
@@ -2803,7 +2811,6 @@ __STATIC_INLINE void LL_RCC_SetI2CClockSource(uint32_t I2CxSource)
   * @rmtoll CCIPR4       I3C1SEL    LL_RCC_SetI3CClockSource\n
   *         CCIPR4       I3C2SEL    LL_RCC_SetI3CClockSource
   * @param  I3CxSource This parameter can be one of the following values:
-  *         @arg @ref LL_RCC_I3C1_CLKSOURCE_PCLK1
   *         @arg @ref LL_RCC_I3C1_CLKSOURCE_PLL3R (*)
   *         @arg @ref LL_RCC_I3C1_CLKSOURCE_PLL2R (**)
   *         @arg @ref LL_RCC_I3C1_CLKSOURCE_HSI
@@ -2999,6 +3006,7 @@ __STATIC_INLINE void LL_RCC_SetRNGClockSource(uint32_t RNGxSource)
   MODIFY_REG(RCC->CCIPR5, RCC_CCIPR5_RNGSEL, RNGxSource);
 }
 
+#if defined(USB_DRD_FS)
 /**
   * @brief  Configure USB clock source
   * @rmtoll CCIPR4       USBSEL      LL_RCC_SetUSBClockSource
@@ -3015,6 +3023,7 @@ __STATIC_INLINE void LL_RCC_SetUSBClockSource(uint32_t USBxSource)
 {
   MODIFY_REG(RCC->CCIPR4, RCC_CCIPR4_USBSEL, USBxSource);
 }
+#endif /* USB_DRD_FS */
 
 /**
   * @brief  Configure ADCx kernel clock source
@@ -3724,7 +3733,7 @@ __STATIC_INLINE uint32_t LL_RCC_GetSAIClockSource(uint32_t SAIx)
 /**
   * @brief  Get SDMMCx kernel clock source
   * @rmtoll CCIPR4         SDMMC1SEL        LL_RCC_GetSDMMCClockSource
-  *         CCIPR4         SDMMC2SEL        LL_RCC_GetSDMMCClockSource
+  * rmtoll  CCIPR4         SDMMC2SEL        LL_RCC_GetSDMMCClockSource
   * @param  SDMMCx This parameter can be one of the following values:
   *         @arg @ref LL_RCC_SDMMC1_CLKSOURCE
   *         @arg @ref LL_RCC_SDMMC2_CLKSOURCE (*)
@@ -3758,6 +3767,7 @@ __STATIC_INLINE uint32_t LL_RCC_GetRNGClockSource(uint32_t RNGx)
   return (uint32_t)(READ_BIT(RCC->CCIPR5, RNGx));
 }
 
+#if defined(USB_DRD_FS)
 /**
   * @brief  Get USB clock source
   * @rmtoll CCIPR4       USBSEL      LL_RCC_GetUSBClockSource
@@ -3775,6 +3785,7 @@ __STATIC_INLINE uint32_t LL_RCC_GetUSBClockSource(uint32_t USBx)
 {
   return (uint32_t)(READ_BIT(RCC->CCIPR4, USBx));
 }
+#endif /* USB_DRD_FS */
 
 /**
   * @brief  Get ADCDACx kernel clock source
@@ -6033,7 +6044,9 @@ uint32_t    LL_RCC_GetSAIClockFreq(uint32_t SAIxSource);
 uint32_t    LL_RCC_GetSDMMCClockFreq(uint32_t SDMMCxSource);
 #endif /* SDMMC1 */
 uint32_t    LL_RCC_GetRNGClockFreq(uint32_t RNGxSource);
+#if defined(USB_DRD_FS)
 uint32_t    LL_RCC_GetUSBClockFreq(uint32_t USBxSource);
+#endif /* USB_DRD_FS */
 uint32_t    LL_RCC_GetADCDACClockFreq(uint32_t ADCDACxSource);
 uint32_t    LL_RCC_GetDACLPClockFreq(uint32_t DACLPxSource);
 #if defined(OCTOSPI1)

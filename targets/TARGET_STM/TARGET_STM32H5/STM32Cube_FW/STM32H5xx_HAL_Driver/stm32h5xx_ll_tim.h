@@ -161,6 +161,8 @@ static const uint8_t SHIFT_TAB_OISx[] =
 @endcond
   */
 
+#define OCREF_CLEAR_SELECT_POS (28U)
+#define OCREF_CLEAR_SELECT_MSK (0x1U << OCREF_CLEAR_SELECT_POS)                /*!< 0x10000000 */
 /**
   * @}
   */
@@ -682,10 +684,10 @@ typedef struct
 /** @defgroup TIM_LL_EC_COUNTERMODE Counter Mode
   * @{
   */
-#define LL_TIM_COUNTERMODE_UP                  0x00000000U          /*!<Counter used as upcounter */
+#define LL_TIM_COUNTERMODE_UP                  0x00000000U          /*!< Counter used as upcounter */
 #define LL_TIM_COUNTERMODE_DOWN                TIM_CR1_DIR          /*!< Counter used as downcounter */
 #define LL_TIM_COUNTERMODE_CENTER_DOWN         TIM_CR1_CMS_0        /*!< The counter counts up and down alternatively. Output compare interrupt flags of output channels  are set only when the counter is counting down. */
-#define LL_TIM_COUNTERMODE_CENTER_UP           TIM_CR1_CMS_1        /*!<The counter counts up and down alternatively. Output compare interrupt flags of output channels  are set only when the counter is counting up */
+#define LL_TIM_COUNTERMODE_CENTER_UP           TIM_CR1_CMS_1        /*!< The counter counts up and down alternatively. Output compare interrupt flags of output channels  are set only when the counter is counting up */
 #define LL_TIM_COUNTERMODE_CENTER_UP_DOWN      TIM_CR1_CMS          /*!< The counter counts up and down alternatively. Output compare interrupt flags of output channels  are set only when the counter is counting up or down. */
 /**
   * @}
@@ -767,6 +769,15 @@ typedef struct
   */
 #endif /* USE_FULL_LL_DRIVER */
 
+/** Legacy definitions for compatibility purpose
+@cond 0
+  */
+#define LL_TIM_OCMODE_ASSYMETRIC_PWM1 LL_TIM_OCMODE_ASYMMETRIC_PWM1
+#define LL_TIM_OCMODE_ASSYMETRIC_PWM2 LL_TIM_OCMODE_ASYMMETRIC_PWM2
+/**
+@endcond
+  */
+
 /** @defgroup TIM_LL_EC_OCMODE Output Configuration Mode
   * @{
   */
@@ -782,8 +793,8 @@ typedef struct
 #define LL_TIM_OCMODE_RETRIG_OPM2              (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_0)                    /*!<Retrigerrable OPM mode 2*/
 #define LL_TIM_OCMODE_COMBINED_PWM1            (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2)                    /*!<Combined PWM mode 1*/
 #define LL_TIM_OCMODE_COMBINED_PWM2            (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_2) /*!<Combined PWM mode 2*/
-#define LL_TIM_OCMODE_ASSYMETRIC_PWM1          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2) /*!<Asymmetric PWM mode 1*/
-#define LL_TIM_OCMODE_ASSYMETRIC_PWM2          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M)                      /*!<Asymmetric PWM mode 2*/
+#define LL_TIM_OCMODE_ASYMMETRIC_PWM1          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2) /*!<Asymmetric PWM mode 1*/
+#define LL_TIM_OCMODE_ASYMMETRIC_PWM2          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M)                      /*!<Asymmetric PWM mode 2*/
 #define LL_TIM_OCMODE_PULSE_ON_COMPARE         (TIM_CCMR2_OC3M_3 | TIM_CCMR2_OC3M_1)                    /*!<Pulse on Compare mode */
 #define LL_TIM_OCMODE_DIRECTION_OUTPUT         (TIM_CCMR2_OC3M_3 | TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_0) /*!<Direction output mode */
 /**
@@ -1034,7 +1045,10 @@ typedef struct
 #define LL_TIM_TIM1_ETRSOURCE_GPIO        0x00000000U                                                 /*!< ETR input is connected to GPIO */
 #if defined(COMP1)
 #define LL_TIM_TIM1_ETRSOURCE_COMP1       TIM1_AF1_ETRSEL_0                                           /*!< ETR input is connected to COMP1_OUT */
-#endif /* COMP1*/
+#endif /* COMP1 */
+#if defined(COMP2)
+#define LL_TIM_TIM1_ETRSOURCE_COMP2       TIM1_AF1_ETRSEL_1                                           /*!< ETR input is connected to COMP2_OUT */
+#endif /* COMP2 */
 #define LL_TIM_TIM1_ETRSOURCE_ADC1_AWD1   (TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_0)                     /*!< ADC1 analog watchdog 1 */
 #define LL_TIM_TIM1_ETRSOURCE_ADC1_AWD2   TIM1_AF1_ETRSEL_2                                           /*!< ADC1 analog watchdog 2 */
 #define LL_TIM_TIM1_ETRSOURCE_ADC1_AWD3   (TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0)                     /*!< ADC1 analog watchdog 3 */
@@ -1048,22 +1062,34 @@ typedef struct
 #define LL_TIM_TIM2_ETRSOURCE_GPIO        0x00000000U                                                 /*!< ETR input is connected to GPIO */
 #if defined(COMP1)
 #define LL_TIM_TIM2_ETRSOURCE_COMP1       TIM1_AF1_ETRSEL_0                                           /*!< ETR input is connected to COMP1_OUT */
-#endif /* COMP1*/
-#define LL_TIM_TIM2_ETRSOURCE_LSE         (TIM1_AF1_ETRSEL_0 | TIM1_AF1_ETRSEL_1)                     /*!< ETR input is connected to LSE */
+#endif /* COMP1 */
+#if defined(COMP2)
+#define LL_TIM_TIM2_ETRSOURCE_COMP2       TIM1_AF1_ETRSEL_1                                           /*!< ETR input is connected to COMP2_OUT */
+#endif /* COMP2 */
+#define LL_TIM_TIM2_ETRSOURCE_LSE         (TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_0)                     /*!< ETR input is connected to LSE */
 #if defined(SAI1)
 #define LL_TIM_TIM2_ETRSOURCE_SAI1_FSA    TIM1_AF1_ETRSEL_2                                           /*!< ETR input is connected to SAI1_FSA */
-#define LL_TIM_TIM2_ETRSOURCE_SAI1_FSB    (TIM1_AF1_ETRSEL_0 | TIM1_AF1_ETRSEL_2)                     /*!< ETR input is connected to SAI1_FSB */
+#define LL_TIM_TIM2_ETRSOURCE_SAI1_FSB    (TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0)                     /*!< ETR input is connected to SAI1_FSB */
 #endif /* SAI1 */
-#define LL_TIM_TIM2_ETRSOURCE_TIM3_ETR    (TIM1_AF1_ETRSEL_0 | TIM1_AF1_ETRSEL_3)                     /*!< ETR input is connected to TIM3 ETR */
+#define LL_TIM_TIM2_ETRSOURCE_TIM3_ETR    (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_0)                     /*!< ETR input is connected to TIM3 ETR */
 #if defined(TIM4)
-#define LL_TIM_TIM2_ETRSOURCE_TIM4_ETR    (TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_3)                     /*!< ETR input is connected to TIM4 ETR */
+#define LL_TIM_TIM2_ETRSOURCE_TIM4_ETR    (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_1)                     /*!< ETR input is connected to TIM4 ETR */
 #endif /* TIM4 */
 #if defined(TIM5)
-#define LL_TIM_TIM2_ETRSOURCE_TIM5_ETR    (TIM1_AF1_ETRSEL_0 | TIM1_AF1_ETRSEL_1| TIM1_AF1_ETRSEL_3 ) /*!< ETR input is connected to TIM5 ETR */
+#define LL_TIM_TIM2_ETRSOURCE_TIM5_ETR    (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_0) /*!< ETR input is connected to TIM5 ETR */
 #endif /* TIM5 */
+#if defined(USB_DRD_FS)
+#define LL_TIM_TIM2_ETRSOURCE_USB_SOF     (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0) /*!< ETR input is connected to USB SOF */
+#elif defined(USB_OTG_HS)
+#define LL_TIM_TIM2_ETRSOURCE_USBHS_SOF   (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_2)                     /*!< ETR is connected to USBHS OTG SOF */
+#define LL_TIM_TIM2_ETRSOURCE_USBFS_SOF   (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0) /*!< ETR is connected to USBFS OTG SOF */
+#endif /* USB_DRD_FS */
 #if defined(ETH_NS)
-#define LL_TIM_TIM2_ETRSOURCE_ETH_PPS     (TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_3 ) /*!< ETR input is connected to ETH PPS */
+#define LL_TIM_TIM2_ETRSOURCE_ETH_PPS     (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_1) /*!< ETR input is connected to ETH PPS */
 #endif /* ETH_NS */
+#if defined(PLAY1)
+#define LL_TIM_TIM2_ETRSOURCE_PLAY1_OUT0  TIM1_AF1_ETRSEL_Msk                                         /*!< ETR input is connected to PLAY1 output 0 */
+#endif /* PLAY1 */
 /**
   * @}
   */
@@ -1074,7 +1100,15 @@ typedef struct
 #define LL_TIM_TIM3_ETRSOURCE_GPIO        0x00000000U                                                 /*!< ETR input is connected to GPIO */
 #if defined(COMP1)
 #define LL_TIM_TIM3_ETRSOURCE_COMP1       TIM1_AF1_ETRSEL_0                                           /*!< ETR input is connected to COMP1_OUT */
-#endif /* COMP1*/
+#endif /* COMP1 */
+#if defined(COMP2)
+#define LL_TIM_TIM3_ETRSOURCE_COMP2       TIM1_AF1_ETRSEL_1                                           /*!< ETR input is connected to COMP2_OUT */
+#endif /* COMP2 */
+#if defined(ADC2)
+#define LL_TIM_TIM3_ETRSOURCE_ADC2_AWD1   (TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_0)                     /*!< ADC2 analog watchdog 1 */
+#define LL_TIM_TIM3_ETRSOURCE_ADC2_AWD2   TIM1_AF1_ETRSEL_2                                           /*!< ADC2 analog watchdog 2 */
+#define LL_TIM_TIM3_ETRSOURCE_ADC2_AWD3   (TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0)                     /*!< ADC2 analog watchdog 3 */
+#endif /* ADC2 */
 #define LL_TIM_TIM3_ETRSOURCE_TIM2_ETR    TIM1_AF1_ETRSEL_3                                           /*!< ETR input is connected to TIM2 ETR */
 #if defined(TIM4)
 #define LL_TIM_TIM3_ETRSOURCE_TIM4_ETR    (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_1)                     /*!< ETR input is connected to TIM4 ETR */
@@ -1085,6 +1119,9 @@ typedef struct
 #if defined(ETH_NS)
 #define LL_TIM_TIM3_ETRSOURCE_ETH_PPS     (TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_3 ) /*!< ETR input is connected to ETH PPS */
 #endif /* ETH_NS */
+#if defined(PLAY1)
+#define LL_TIM_TIM3_ETRSOURCE_PLAY1_OUT0  TIM1_AF1_ETRSEL_Msk                                         /*!< ETR input is connected to PLAY1 output 0 */
+#endif /* PLAY1 */
 /**
   * @}
   */
@@ -1093,10 +1130,14 @@ typedef struct
 /** @defgroup TIM_LL_EC_TIM4_ETRSOURCE External Trigger Source TIM4
   * @{
   */
-#define LL_TIM_TIM4_ETRSOURCE_GPIO         0x00000000U                                                 /*!< ETR input is connected to GPIO */
-#define LL_TIM_TIM4_ETRSOURCE_TIM2_ETR     TIM1_AF1_ETRSEL_3                                           /*!< ETR input is connected to TIM3 ETR */
-#define LL_TIM_TIM4_ETRSOURCE_TIM3_ETR     (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_0)                     /*!< ETR input is connected to TIM4 ETR */
-#define LL_TIM_TIM4_ETRSOURCE_TIM5_ETR     (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_1| TIM1_AF1_ETRSEL_0)  /*!< ETR input is connected to TIM5 ETR */
+#define LL_TIM_TIM4_ETRSOURCE_GPIO        0x00000000U                                                 /*!< ETR input is connected to GPIO */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM4_ETRSOURCE_COMP1       TIM1_AF1_ETRSEL_0                                           /*!< ETR input is connected to COMP1_OUT */
+#define LL_TIM_TIM4_ETRSOURCE_COMP2       TIM1_AF1_ETRSEL_1                                           /*!< ETR input is connected to COMP2_OUT */
+#endif /* COMP1 && COMP2 */
+#define LL_TIM_TIM4_ETRSOURCE_TIM2_ETR    TIM1_AF1_ETRSEL_3                                           /*!< ETR input is connected to TIM3 ETR */
+#define LL_TIM_TIM4_ETRSOURCE_TIM3_ETR    (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_0)                     /*!< ETR input is connected to TIM4 ETR */
+#define LL_TIM_TIM4_ETRSOURCE_TIM5_ETR    (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_0) /*!< ETR input is connected to TIM5 ETR */
 /**
   * @}
   */
@@ -1109,9 +1150,19 @@ typedef struct
 #define LL_TIM_TIM5_ETRSOURCE_GPIO        0x00000000U                                                 /*!< ETR input is connected to GPIO */
 #define LL_TIM_TIM5_ETRSOURCE_SAI2_FSA    TIM1_AF1_ETRSEL_0                                           /*!< ETR input is connected to SAI2_FSA */
 #define LL_TIM_TIM5_ETRSOURCE_SAI2_FSB    TIM1_AF1_ETRSEL_1                                           /*!< ETR input is connected to SAI2_FSB */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM5_ETRSOURCE_COMP1       (TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0)                     /*!< ETR input is connected to COMP1_OUT */
+#define LL_TIM_TIM5_ETRSOURCE_COMP2       (TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_0) /*!< ETR input is connected to COMP2_OUT */
+#endif /* COMP1 && COMP2 */
 #define LL_TIM_TIM5_ETRSOURCE_TIM2_ETR    TIM1_AF1_ETRSEL_3                                           /*!< ETR input is connected to TIM2 ETR */
 #define LL_TIM_TIM5_ETRSOURCE_TIM3_ETR    (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_0)                     /*!< ETR input is connected to TIM3 ETR */
 #define LL_TIM_TIM5_ETRSOURCE_TIM4_ETR    (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_1)                     /*!< ETR input is connected to TIM4 ETR */
+#if defined(USB_DRD_FS)
+#define LL_TIM_TIM5_ETRSOURCE_USB_SOF     (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0) /*!< ETR input is connected to USB SOF */
+#elif defined(USB_OTG_HS)
+#define LL_TIM_TIM5_ETRSOURCE_USBHS_SOF   (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_2)                     /*!< ETR is connected to USBHS OTG SOF */
+#define LL_TIM_TIM5_ETRSOURCE_USBFS_SOF   (TIM1_AF1_ETRSEL_3 | TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0) /*!< ETR is connected to USBFS OTG SOF */
+#endif /* USB_DRD_FS */
 /**
   * @}
   */
@@ -1122,9 +1173,18 @@ typedef struct
   * @{
   */
 #define LL_TIM_TIM8_ETRSOURCE_GPIO        0x00000000U                                                 /*!< ETR input is connected to GPIO */
-#define LL_TIM_TIM8_ETRSOURCE_ADC2_AWD1   (TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_0)                     /*!< ADC4 analog watchdog 1 */
-#define LL_TIM_TIM8_ETRSOURCE_ADC2_AWD2   TIM1_AF1_ETRSEL_2                                           /*!< ADC4 analog watchdog 2 */
-#define LL_TIM_TIM8_ETRSOURCE_ADC2_AWD3   (TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0)                     /*!< ADC4 analog watchdog 3 */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM8_ETRSOURCE_COMP1       TIM1_AF1_ETRSEL_0                                           /*!< ETR input is connected to COMP1_OUT */
+#define LL_TIM_TIM8_ETRSOURCE_COMP2       TIM1_AF1_ETRSEL_1                                           /*!< ETR input is connected to COMP2_OUT */
+#endif /* COMP1 && COMP2 */
+#define LL_TIM_TIM8_ETRSOURCE_ADC2_AWD1   (TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_0)                     /*!< ADC2 analog watchdog 1 */
+#define LL_TIM_TIM8_ETRSOURCE_ADC2_AWD2   TIM1_AF1_ETRSEL_2                                           /*!< ADC2 analog watchdog 2 */
+#define LL_TIM_TIM8_ETRSOURCE_ADC2_AWD3   (TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_0)                     /*!< ADC2 analog watchdog 3 */
+#if defined(ADC3)
+#define LL_TIM_TIM8_ETRSOURCE_ADC3_AWD1   (TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_1)                     /*!< ADC3 analog watchdog 1 */
+#define LL_TIM_TIM8_ETRSOURCE_ADC3_AWD2   (TIM1_AF1_ETRSEL_2 | TIM1_AF1_ETRSEL_1 | TIM1_AF1_ETRSEL_0) /*!< ADC3 analog watchdog 2 */
+#define LL_TIM_TIM8_ETRSOURCE_ADC3_AWD3   TIM1_AF1_ETRSEL_3                                           /*!< ADC3 analog watchdog 3 */
+#endif /* ADC3 */
 /**
   * @}
   */
@@ -1228,6 +1288,15 @@ typedef struct
 #if defined(COMP1)
 #define LL_TIM_BKIN_SOURCE_BKCOMP1             TIM1_AF1_BKCMP1E    /*!< internal signal: COMP1 output */
 #endif /* COMP1 */
+#if defined(COMP2)
+#define LL_TIM_BKIN_SOURCE_BKCOMP2             TIM1_AF1_BKCMP2E    /*!< internal signal: COMP2 output */
+#endif /* COMP2 */
+#if defined(PLAY1)
+#define LL_TIM_BKIN_SOURCE_PLAY1               TIM1_AF1_BKCMP3E    /*!< internal signal: PLAY1 output */
+#endif /* PLAY1 */
+#if defined(MDF1)
+#define LL_TIM_BKIN_SOURCE_MDF1                TIM1_AF1_BKDF1BK0E  /*!< internal signal: Digital filter break output */
+#endif /* MDF1 */
 /**
   * @}
   */
@@ -1259,6 +1328,15 @@ typedef struct
   * @}
   */
 
+/** Legacy definitions for compatibility purpose
+@cond 0
+  */
+#define LL_TIM_ReArmBRK(_PARAM_)
+#define LL_TIM_ReArmBRK2(_PARAM_)
+/**
+@endcond
+  */
+
 /** @defgroup TIM_LL_EC_DMABURST_BASEADDR DMA Burst Base Address
   * @{
   */
@@ -1288,6 +1366,7 @@ typedef struct
 #define LL_TIM_DMABURST_BASEADDR_TISEL         (TIM_DCR_DBA_4 | TIM_DCR_DBA_2 | TIM_DCR_DBA_1 | TIM_DCR_DBA_0)  /*!< TIMx_TISEL register is the DMA base address for DMA burst */
 #define LL_TIM_DMABURST_BASEADDR_AF1           (TIM_DCR_DBA_4 | TIM_DCR_DBA_3)                                  /*!< TIMx_AF1 register is the DMA base address for DMA burst */
 #define LL_TIM_DMABURST_BASEADDR_AF2           (TIM_DCR_DBA_4 | TIM_DCR_DBA_3 | TIM_DCR_DBA_0)                  /*!< TIMx_AF2 register is the DMA base address for DMA burst */
+#define LL_TIM_DMABURST_BASEADDR_OR1           (TIM_DCR_DBA_4 | TIM_DCR_DBA_3 | TIM_DCR_DBA_1)                  /*!< TIMx_OR1 register is the DMA base address for DMA burst */
 /**
   * @}
   */
@@ -1341,10 +1420,13 @@ typedef struct
 /** @defgroup TIM_LL_EC_TIM1_TI1_RMP  TIM1 External Input Ch1 Remap
   * @{
   */
-#define LL_TIM_TIM1_TI1_RMP_GPIO   0x00000000UL
-#if defined(COMP1)
-#define LL_TIM_TIM1_TI1_RMP_COMP1    TIM_TISEL_TI1SEL_0
-#endif /* COMP1 */
+#define LL_TIM_TIM1_TI1_RMP_GPIO               0x00000000UL                                        /*!< TIM1_TI1 is connected to GPIO */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM1_TI1_RMP_COMP1              TIM_TISEL_TI1SEL_1                                  /*!< TIM1_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM1_TI1_RMP_COMP2              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM1_TI1 is connected to COMP2 output */
+#elif defined(COMP1)
+#define LL_TIM_TIM1_TI1_RMP_COMP1              TIM_TISEL_TI1SEL_0                                  /*!< TIM1_TI1 is connected to COMP1 output */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -1352,16 +1434,21 @@ typedef struct
 /** @defgroup TIM_LL_EC_TIM2_TI1_RMP  TIM2 External Input Ch1 Remap
   * @{
   */
-#define LL_TIM_TIM2_TI1_RMP_GPIO               0x00000000UL                                        /*!< TIM2_TI1 is connected to GPIO     */
+#define LL_TIM_TIM2_TI1_RMP_GPIO               0x00000000UL                                        /*!< TIM2_TI1 is connected to GPIO */
 #if defined(STM32H503xx)
-#define LL_TIM_TIM2_TI1_RMP_LSI                TIM_TISEL_TI1SEL_0                                  /*!< TIM2_TI1 is connected to LSI      */
-#define LL_TIM_TIM2_TI1_RMP_LSE                TIM_TISEL_TI1SEL_1                                  /*!< TIM2_TI1 is connected to LSE      */
-#define LL_TIM_TIM2_TI1_RMP_RTC                (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM2_TI1 is connected to RTC      */
+#define LL_TIM_TIM2_TI1_RMP_LSI                TIM_TISEL_TI1SEL_0                                  /*!< TIM2_TI1 is connected to LSI */
+#define LL_TIM_TIM2_TI1_RMP_LSE                TIM_TISEL_TI1SEL_1                                  /*!< TIM2_TI1 is connected to LSE */
+#define LL_TIM_TIM2_TI1_RMP_RTC                (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM2_TI1 is connected to RTC */
 #define LL_TIM_TIM2_TI1_RMP_TIM3_TI1           TIM_TISEL_TI1SEL_2                                  /*!< TIM2_TI1 is connected to TIM3 TI1 */
 #endif /* STM32H503xx */
 #if defined(ETH_NS)
-#define LL_TIM_TIM2_TI1_RMP_ETH_PPS          TIM_TISEL_TI1SEL_0                                    /*!< TIM2_TI1 is connected to ETH_ PPS */
+#define LL_TIM_TIM2_TI1_RMP_ETH_PPS            TIM_TISEL_TI1SEL_0                                  /*!< TIM2_TI1 is connected to ETH PPS */
 #endif /* ETH_NS */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM2_TI1_RMP_COMP1              TIM_TISEL_TI1SEL_1                                  /*!< TIM2_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM2_TI1_RMP_COMP2              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM2_TI1 is connected to COMP2 output */
+#define LL_TIM_TIM2_TI1_RMP_PLAY1_OUT3         TIM_TISEL_TI1SEL_2                                  /*!< TIM2_TI1 is connected to PLAY1 output 3 */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -1369,13 +1456,17 @@ typedef struct
 /** @defgroup TIM_LL_EC_TIM2_TI2_RMP  TIM2 External Input Ch2 Remap
   * @{
   */
-#define LL_TIM_TIM2_TI2_RMP_GPIO               0x00000000UL                                        /*!< TIM2_TI1 is connected to GPIO     */
+#define LL_TIM_TIM2_TI2_RMP_GPIO               0x00000000UL                                        /*!< TIM2_TI2 is connected to GPIO */
 #if defined(STM32H503xx)
 #define LL_TIM_TIM2_TI2_RMP_HSI_1024           TIM_TISEL_TI2SEL_0                                  /*!< TIM2_TI2 is connected to HSI_1024 */
-#define LL_TIM_TIM2_TI2_RMP_CSI_128            TIM_TISEL_TI2SEL_1                                  /*!< TIM2_TI2 is connected to CSI_128  */
-#define LL_TIM_TIM2_TI2_RMP_MCO2               (TIM_TISEL_TI2SEL_1 |TIM_TISEL_TI2SEL_0)            /*!< TIM2_TI2 is connected to MCO2     */
-#define LL_TIM_TIM2_TI2_RMP_MCO1               TIM_TISEL_TI2SEL_2                                  /*!< TIM2_TI2 is connected to MCO1     */
+#define LL_TIM_TIM2_TI2_RMP_CSI_128            TIM_TISEL_TI2SEL_1                                  /*!< TIM2_TI2 is connected to CSI_128 */
+#define LL_TIM_TIM2_TI2_RMP_MCO2               (TIM_TISEL_TI2SEL_1 |TIM_TISEL_TI2SEL_0)            /*!< TIM2_TI2 is connected to MCO2 */
+#define LL_TIM_TIM2_TI2_RMP_MCO1               TIM_TISEL_TI2SEL_2                                  /*!< TIM2_TI2 is connected to MCO1 */
 #endif /* STM32H503xx */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM2_TI2_RMP_COMP1              TIM_TISEL_TI2SEL_0                                  /*!< TIM2_TI2 is connected to COMP1 output */
+#define LL_TIM_TIM2_TI2_RMP_COMP2              TIM_TISEL_TI2SEL_1                                  /*!< TIM2_TI2 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -1384,9 +1475,9 @@ typedef struct
   * @{
   */
 #define LL_TIM_TIM2_TI4_RMP_GPIO               0x00000000UL                                        /*!< TIM2_TI4 is connected to GPIO */
-#if defined(COMP1)
-#define LL_TIM_TIM2_TI4_RMP_COMP1              TIM_TISEL_TI4SEL_0                                  /*!< TIM2_TI2 is connected to COMP1 */
-#endif /* COMP1 */
+#if defined(STM32H503xx)
+#define LL_TIM_TIM2_TI4_RMP_COMP1              TIM_TISEL_TI4SEL_0                                  /*!< TIM2_TI4 is connected to COMP1 output */
+#endif /* STM32H503xx */
 /**
   * @}
   */
@@ -1394,16 +1485,21 @@ typedef struct
 /** @defgroup TIM_LL_EC_TIM3_TI1_RMP  TIM3 External Input Ch1 Remap
   * @{
   */
-#define LL_TIM_TIM3_TI1_RMP_GPIO               0x00000000UL                                        /*!< TIM3_TI1 is connected to GPIO     */
+#define LL_TIM_TIM3_TI1_RMP_GPIO               0x00000000UL                                        /*!< TIM3_TI1 is connected to GPIO */
 #if defined(STM32H503xx)
-#define LL_TIM_TIM3_TI1_RMP_COMP1              TIM_TISEL_TI1SEL_0                                  /*!< TIM2_TI1 is connected to COMP1    */
-#define LL_TIM_TIM3_TI1_RMP_MCO1               TIM_TISEL_TI1SEL_1                                  /*!< TIM2_TI1 is connected to MCO1     */
-#define LL_TIM_TIM3_TI1_RMP_TIM2_TI1           (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM2_TI1 is connected to TIM2 TI1 */
-#define LL_TIM_TIM3_TI1_RMP_HSE_1MHZ           TIM_TISEL_TI1SEL_2                                  /*!< TIM2_TI1 is connected to HSE 1MHZ */
+#define LL_TIM_TIM3_TI1_RMP_COMP1              TIM_TISEL_TI1SEL_0                                  /*!< TIM3_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM3_TI1_RMP_MCO1               TIM_TISEL_TI1SEL_1                                  /*!< TIM3_TI1 is connected to MCO1 */
+#define LL_TIM_TIM3_TI1_RMP_TIM2_TI1           (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM3_TI1 is connected to TIM2 TI1 */
+#define LL_TIM_TIM3_TI1_RMP_HSE_1MHZ           TIM_TISEL_TI1SEL_2                                  /*!< TIM3_TI1 is connected to HSE 1MHZ */
 #endif /* STM32H503xx */
 #if defined(ETH_NS)
-#define LL_TIM_TIM3_TI1_RMP_ETH_PPS            TIM_TISEL_TI1SEL_0                                /*!< TIM2_TI1 is connected to ETH PPS */
+#define LL_TIM_TIM3_TI1_RMP_ETH_PPS            TIM_TISEL_TI1SEL_0                                  /*!< TIM3_TI1 is connected to ETH PPS */
 #endif /* ETH_NS */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM3_TI1_RMP_COMP1              TIM_TISEL_TI1SEL_1                                  /*!< TIM3_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM3_TI1_RMP_COMP2              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM3_TI1 is connected to COMP2 output */
+#define LL_TIM_TIM3_TI1_RMP_PLAY1_OUT3         TIM_TISEL_TI1SEL_2                                  /*!< TIM3_TI1 is connected to PLAY1 output 3 */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -1411,39 +1507,138 @@ typedef struct
 /** @defgroup TIM_LL_EC_TIM3_TI2_RMP  TIM3 External Input Ch2 Remap
   * @{
   */
-#define LL_TIM_TIM3_TI2_RMP_GPIO               0x00000000UL                                        /*!< TIM3_TI2 is connected to GPIO     */
+#define LL_TIM_TIM3_TI2_RMP_GPIO               0x00000000UL                                        /*!< TIM3_TI2 is connected to GPIO */
 #if defined(STM32H503xx)
-#define LL_TIM_TIM3_TI2_RMP_CSI_128            TIM_TISEL_TI2SEL_0                                  /*!< TIM3_TI2 is connected to CSI 128  */
-#define LL_TIM_TIM3_TI2_RMP_MCO2               TIM_TISEL_TI2SEL_1                                  /*!< TIM3_TI2 is connected to MCO2     */
+#define LL_TIM_TIM3_TI2_RMP_CSI_128            TIM_TISEL_TI2SEL_0                                  /*!< TIM3_TI2 is connected to CSI 128 */
+#define LL_TIM_TIM3_TI2_RMP_MCO2               TIM_TISEL_TI2SEL_1                                  /*!< TIM3_TI2 is connected to MCO2 */
 #define LL_TIM_TIM3_TI2_RMP_HSI_1024           (TIM_TISEL_TI2SEL_1 |TIM_TISEL_TI2SEL_0)            /*!< TIM3_TI2 is connected to HSI 1024 */
 #endif /* STM32H503xx */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM3_TI2_RMP_COMP1              TIM_TISEL_TI2SEL_0                                  /*!< TIM3_TI2 is connected to COMP1 output */
+#define LL_TIM_TIM3_TI2_RMP_COMP2              TIM_TISEL_TI2SEL_1                                  /*!< TIM3_TI2 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
+
+#if defined(TIM4)
+/** @defgroup TIM_LL_EC_TIM4_TI1_RMP  TIM4 External Input Ch1 Remap
+  * @{
+  */
+#define LL_TIM_TIM4_TI1_RMP_GPIO               0x00000000UL                                        /*!< TIM4_TI1 is connected to GPIO */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM4_TI1_RMP_COMP1              TIM_TISEL_TI1SEL_1                                  /*!< TIM4_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM4_TI1_RMP_COMP2              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM4_TI1 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
+/**
+  * @}
+  */
+#endif /* TIM4 */
+
+#if defined(TIM5)
+/** @defgroup TIM_LL_EC_TIM5_TI1_RMP  TIM5 External Input Ch1 Remap
+  * @{
+  */
+#define LL_TIM_TIM5_TI1_RMP_GPIO               0x00000000UL                                        /*!< TIM5_TI1 is connected to GPIO */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM5_TI1_RMP_COMP1              TIM_TISEL_TI1SEL_1                                  /*!< TIM5_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM5_TI1_RMP_COMP2              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM5_TI1 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
+/**
+  * @}
+  */
+#endif /* TIM5 */
+
+#if defined(TIM8)
+/** @defgroup TIM_LL_EC_TIM8_TI1_RMP  TIM8 External Input Ch1 Remap
+  * @{
+  */
+#define LL_TIM_TIM8_TI1_RMP_GPIO               0x00000000UL                                        /*!< TIM8_TI1 is connected to GPIO */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM8_TI1_RMP_COMP1              TIM_TISEL_TI1SEL_1                                  /*!< TIM8_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM8_TI1_RMP_COMP2              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM8_TI1 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
+/**
+  * @}
+  */
+#endif /* TIM8 */
 
 #if defined(TIM12)
 /** @defgroup TIM_LL_EC_TIM12_TI1_RMP  TIM12 External Input Ch1 Remap
   * @{
   */
-#define LL_TIM_TIM12_TI1_RMP_GPIO              0x00000000UL                                        /*!< TIM12_TI1 is connected to GPIO     */
+#define LL_TIM_TIM12_TI1_RMP_GPIO              0x00000000UL                                        /*!< TIM12_TI1 is connected to GPIO */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM12_TI1_RMP_COMP1             TIM_TISEL_TI1SEL_1                                  /*!< TIM12_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM12_TI1_RMP_COMP2             (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM12_TI1 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
 #define LL_TIM_TIM12_TI1_RMP_HSI_1024          TIM_TISEL_TI1SEL_2                                  /*!< TIM12_TI1 is connected to HSI 1024 */
-#define LL_TIM_TIM12_TI1_RMP_CSI_128           (TIM_TISEL_TI1SEL_2 |TIM_TISEL_TI1SEL_0)            /*!< TIM12_TI1 is connected to CSI 128  */
+#define LL_TIM_TIM12_TI1_RMP_CSI_128           (TIM_TISEL_TI1SEL_2 |TIM_TISEL_TI1SEL_0)            /*!< TIM12_TI1 is connected to CSI 128 */
+/**
+  * @}
+  */
+
+/** @defgroup TIM_LL_EC_TIM12_TI2_RMP  TIM12 External Input Ch2 Remap
+  * @{
+  */
+#define LL_TIM_TIM12_TI2_RMP_GPIO              0x00000000UL                                        /*!< TIM12_TI2 is connected to GPIO */
+#if defined(COMP2)
+#define LL_TIM_TIM12_TI2_RMP_COMP2             TIM_TISEL_TI2SEL_0                                  /*!< TIM12_TI2 is connected to COMP2 output */
+#endif /* COMP2 */
 /**
   * @}
   */
 #endif /* TIM12 */
 
+#if defined(TIM13)
+/** @defgroup TIM_LL_EC_TIM13_TI1_RMP  TIM13 External Input Ch1 Remap
+  * @{
+  */
+#define LL_TIM_TIM13_TI1_RMP_GPIO              0x00000000UL                                        /*!< TIM13_TI1 is connected to GPIO */
+#if defined(I3C1)
+#define LL_TIM_TIM13_TI1_RMP_I3C1_IBIACK       TIM_TISEL_TI1SEL_0                                  /*!< TIM13_TI1 is connected to I3C1 IBI ACK */
+#endif /* I3C1 */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM13_TI1_RMP_COMP1             TIM_TISEL_TI1SEL_1                                  /*!< TIM13_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM13_TI1_RMP_COMP2             (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM13_TI1 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
+/**
+  * @}
+  */
+#endif /* TIM13 */
+
+#if defined(TIM14)
+/** @defgroup TIM_LL_EC_TIM14_TI1_RMP  TIM14 External Input Ch1 Remap
+  * @{
+  */
+#define LL_TIM_TIM14_TI1_RMP_GPIO              0x00000000UL                                        /*!< TIM14_TI1 is connected to GPIO */
+#if defined(I3C2)
+#define LL_TIM_TIM14_TI1_RMP_I3C2_IBIACK       TIM_TISEL_TI1SEL_0                                  /*!< TIM14_TI1 is connected to I3C2 IBI ACK */
+#endif /* I3C1 */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM14_TI1_RMP_COMP1             TIM_TISEL_TI1SEL_1                                  /*!< TIM14_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM14_TI1_RMP_COMP2             (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM14_TI1 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
+/**
+  * @}
+  */
+#endif /* TIM14 */
+
 #if defined(TIM15)
 /** @defgroup TIM_LL_EC_TIM15_TI1_RMP  TIM15 External Input Ch1 Remap
   * @{
   */
-#define LL_TIM_TIM15_TI1_RMP_GPIO              0x00000000UL                                        /*!< TIM15_TI1 is connected to GPIO   */
-#define LL_TIM_TIM15_TI1_RMP_TIM2              TIM_TISEL_TI1SEL_0                                  /*!< TIM15_TI1 is connected to TIM2   */
-#define LL_TIM_TIM15_TI1_RMP_TIM3              TIM_TISEL_TI1SEL_1                                  /*!< TIM15_TI1 is connected to TIM3   */
-#define LL_TIM_TIM15_TI1_RMP_TIM4              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM15_TI1 is connected to TIM4   */
-#define LL_TIM_TIM15_TI1_RMP_LSE               TIM_TISEL_TI1SEL_2                                  /*!< TIM15_TI1 is connected to LSE    */
+#define LL_TIM_TIM15_TI1_RMP_GPIO              0x00000000UL                                        /*!< TIM15_TI1 is connected to GPIO */
+#define LL_TIM_TIM15_TI1_RMP_TIM2              TIM_TISEL_TI1SEL_0                                  /*!< TIM15_TI1 is connected to TIM2 */
+#define LL_TIM_TIM15_TI1_RMP_TIM3              TIM_TISEL_TI1SEL_1                                  /*!< TIM15_TI1 is connected to TIM3 */
+#define LL_TIM_TIM15_TI1_RMP_TIM4              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM15_TI1 is connected to TIM4 */
+#define LL_TIM_TIM15_TI1_RMP_LSE               TIM_TISEL_TI1SEL_2                                  /*!< TIM15_TI1 is connected to LSE */
 #define LL_TIM_TIM15_TI1_RMP_CSI_128           (TIM_TISEL_TI1SEL_2 |TIM_TISEL_TI1SEL_0)            /*!< TIM15_TI1 is connected to CSI 128*/
-#define LL_TIM_TIM15_TI1_RMP_MCO2              (TIM_TISEL_TI1SEL_2 |TIM_TISEL_TI1SEL_1)            /*!< TIM15_TI1 is connected to MCO2   */
+#define LL_TIM_TIM15_TI1_RMP_MCO2              (TIM_TISEL_TI1SEL_2 |TIM_TISEL_TI1SEL_1)            /*!< TIM15_TI1 is connected to MCO2 */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM15_TI1_RMP_COMP1             TIM_TISEL_TI1SEL_3                                  /*!< TIM15_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM15_TI1_RMP_COMP2             (TIM_TISEL_TI1SEL_3 | TIM_TISEL_TI1SEL_0)           /*!< TIM15_TI1 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -1451,10 +1646,14 @@ typedef struct
 /** @defgroup TIM_LL_EC_TIM15_TI2_RMP  TIM15 External Input Ch2 Remap
   * @{
   */
-#define LL_TIM_TIM15_TI2_RMP_GPIO              0x00000000UL                                        /*!< TIM15_TI1 is connected to GPIO   */
-#define LL_TIM_TIM15_TI2_RMP_TIM2              TIM_TISEL_TI2SEL_0                                  /*!< TIM15_TI2 is connected to TIM2   */
-#define LL_TIM_TIM15_TI2_RMP_TIM3              TIM_TISEL_TI2SEL_1                                  /*!< TIM15_TI2 is connected to TIM3   */
-#define LL_TIM_TIM15_TI2_RMP_TIM4              (TIM_TISEL_TI2SEL_1 | TIM_TISEL_TI2SEL_0)           /*!< TIM15_TI2 is connected to TIM4   */
+#define LL_TIM_TIM15_TI2_RMP_GPIO              0x00000000UL                                        /*!< TIM15_TI1 is connected to GPIO */
+#define LL_TIM_TIM15_TI2_RMP_TIM2              TIM_TISEL_TI2SEL_0                                  /*!< TIM15_TI2 is connected to TIM2 */
+#define LL_TIM_TIM15_TI2_RMP_TIM3              TIM_TISEL_TI2SEL_1                                  /*!< TIM15_TI2 is connected to TIM3 */
+#define LL_TIM_TIM15_TI2_RMP_TIM4              (TIM_TISEL_TI2SEL_1 | TIM_TISEL_TI2SEL_0)           /*!< TIM15_TI2 is connected to TIM4 */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM15_TI2_RMP_COMP1             TIM_TISEL_TI2SEL_2                                  /*!< TIM15_TI2 is connected to COMP1 output */
+#define LL_TIM_TIM15_TI2_RMP_COMP2             (TIM_TISEL_TI2SEL_2 | TIM_TISEL_TI2SEL_0)           /*!< TIM15_TI2 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -1465,9 +1664,13 @@ typedef struct
   * @{
   */
 #define LL_TIM_TIM16_TI1_RMP_GPIO              0x00000000UL                                        /*!< TIM16_TI1 is connected to GPIO */
-#define LL_TIM_TIM16_TI1_RMP_LSI               TIM_TISEL_TI1SEL_0                                  /*!< TIM16_TI1 is connected to LSI  */
-#define LL_TIM_TIM16_TI1_RMP_LSE               TIM_TISEL_TI1SEL_1                                  /*!< TIM16_TI1 is connected to LSE  */
-#define LL_TIM_TIM16_TI1_RMP_RTC_WKUP          (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM16_TI1 is connected to RTC  */
+#define LL_TIM_TIM16_TI1_RMP_LSI               TIM_TISEL_TI1SEL_0                                  /*!< TIM16_TI1 is connected to LSI */
+#define LL_TIM_TIM16_TI1_RMP_LSE               TIM_TISEL_TI1SEL_1                                  /*!< TIM16_TI1 is connected to LSE */
+#define LL_TIM_TIM16_TI1_RMP_RTC_WKUP          (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM16_TI1 is connected to RTC */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM16_TI1_RMP_COMP1             TIM_TISEL_TI1SEL_3                                  /*!< TIM16_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM16_TI1_RMP_COMP2             (TIM_TISEL_TI1SEL_3 | TIM_TISEL_TI1SEL_0)           /*!< TIM16_TI1 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -1477,9 +1680,13 @@ typedef struct
 /** @defgroup TIM_LL_EC_TIM17_TI1_RMP  TIM17 External Input Ch1 Remap
   * @{
   */
-#define LL_TIM_TIM17_TI1_RMP_GPIO              0x00000000UL                                        /*!< TIM17_TI1 is connected to GPIO     */
+#define LL_TIM_TIM17_TI1_RMP_GPIO              0x00000000UL                                        /*!< TIM17_TI1 is connected to GPIO */
 #define LL_TIM_TIM17_TI1_RMP_HSE_1MHZ          TIM_TISEL_TI1SEL_1                                  /*!< TIM17_TI1 is connected to HSE 1MHZ */
-#define LL_TIM_TIM17_TI1_RMP_MCO1              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM17_TI1 is connected to MCO1     */
+#define LL_TIM_TIM17_TI1_RMP_MCO1              (TIM_TISEL_TI1SEL_1 | TIM_TISEL_TI1SEL_0)           /*!< TIM17_TI1 is connected to MCO1 */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_TIM17_TI1_RMP_COMP1             TIM_TISEL_TI1SEL_2                                  /*!< TIM17_TI1 is connected to COMP1 output */
+#define LL_TIM_TIM17_TI1_RMP_COMP2             (TIM_TISEL_TI1SEL_2 | TIM_TISEL_TI1SEL_0)           /*!< TIM17_TI1 is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -1488,8 +1695,11 @@ typedef struct
 /** @defgroup TIM_LL_EC_OCREF_CLR_INT OCREF clear input selection
   * @{
   */
-#define LL_TIM_OCREF_CLR_INT_OCREF_CLR     0x00000000U         /*!< OCREF_CLR_INT is connected to the OCREF_CLR input */
-#define LL_TIM_OCREF_CLR_INT_ETR           TIM_SMCR_OCCS       /*!< OCREF_CLR_INT is connected to ETRF */
+#define LL_TIM_OCREF_CLR_INT_ETR         OCREF_CLEAR_SELECT_MSK                   /*!< OCREF_CLR_INT is connected to ETRF */
+#if defined(COMP1) && defined(COMP2)
+#define LL_TIM_OCREF_CLR_INT_COMP1       0x00000000U                              /*!< OCREF clear input is connected to COMP1_OUT */
+#define LL_TIM_OCREF_CLR_INT_COMP2       TIM1_AF2_OCRSEL_0                        /*!< OCREF clear input is connected to COMP2_OUT */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -2229,6 +2439,17 @@ __STATIC_INLINE void LL_TIM_CC_DisablePreload(TIM_TypeDef *TIMx)
 }
 
 /**
+  * @brief  Indicates whether the capture/compare control bits (CCxE, CCxNE and OCxM) preload is enabled.
+  * @rmtoll CR2          CCPC          LL_TIM_CC_IsEnabledPreload
+  * @param  TIMx Timer instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_TIM_CC_IsEnabledPreload(const TIM_TypeDef *TIMx)
+{
+  return ((READ_BIT(TIMx->CR2, TIM_CR2_CCPC) == (TIM_CR2_CCPC)) ? 1UL : 0UL);
+}
+
+/**
   * @brief  Set the updated source of the capture/compare control bits (CCxE, CCxNE and OCxM).
   * @note Macro IS_TIM_COMMUTATION_EVENT_INSTANCE(TIMx) can be used to check
   *       whether or not a timer instance is able to generate a commutation event.
@@ -2464,8 +2685,8 @@ __STATIC_INLINE void LL_TIM_OC_ConfigOutput(TIM_TypeDef *TIMx, uint32_t Channel,
   *         @arg @ref LL_TIM_OCMODE_RETRIG_OPM2
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM1
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM2
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM1
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM2
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM1
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM2
   *         @arg @ref LL_TIM_OCMODE_PULSE_ON_COMPARE   (for channel 3 or channel 4 only)
   *         @arg @ref LL_TIM_OCMODE_DIRECTION_OUTPUT   (for channel 3 or channel 4 only)
   * @retval None
@@ -2506,8 +2727,8 @@ __STATIC_INLINE void LL_TIM_OC_SetMode(TIM_TypeDef *TIMx, uint32_t Channel, uint
   *         @arg @ref LL_TIM_OCMODE_RETRIG_OPM2
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM1
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM2
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM1
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM2
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM1
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM2
   *         @arg @ref LL_TIM_OCMODE_PULSE_ON_COMPARE   (for channel 3 or channel 4 only)
   *         @arg @ref LL_TIM_OCMODE_DIRECTION_OUTPUT   (for channel 3 or channel 4 only)
   */
@@ -3897,6 +4118,7 @@ __STATIC_INLINE void LL_TIM_ConfigETR(TIM_TypeDef *TIMx, uint32_t ETRPolarity, u
   *
   *            @arg @ref LL_TIM_TIM1_ETRSOURCE_GPIO
   *            @arg @ref LL_TIM_TIM1_ETRSOURCE_COMP1      (*)
+  *            @arg @ref LL_TIM_TIM1_ETRSOURCE_COMP2      (*)
   *            @arg @ref LL_TIM_TIM1_ETRSOURCE_ADC1_AWD1
   *            @arg @ref LL_TIM_TIM1_ETRSOURCE_ADC1_AWD2
   *            @arg @ref LL_TIM_TIM1_ETRSOURCE_ADC1_AWD3
@@ -3905,27 +4127,38 @@ __STATIC_INLINE void LL_TIM_ConfigETR(TIM_TypeDef *TIMx, uint32_t ETRPolarity, u
   *
   *            @arg @ref LL_TIM_TIM2_ETRSOURCE_GPIO
   *            @arg @ref LL_TIM_TIM2_ETRSOURCE_COMP1      (*)
+  *            @arg @ref LL_TIM_TIM2_ETRSOURCE_COMP2      (*)
   *            @arg @ref LL_TIM_TIM2_ETRSOURCE_LSE
   *            @arg @ref LL_TIM_TIM2_ETRSOURCE_SAI1_FSA   (*)
   *            @arg @ref LL_TIM_TIM2_ETRSOURCE_SAI1_FSB   (*)
   *            @arg @ref LL_TIM_TIM2_ETRSOURCE_TIM3_ETR
   *            @arg @ref LL_TIM_TIM2_ETRSOURCE_TIM4_ETR   (*)
   *            @arg @ref LL_TIM_TIM2_ETRSOURCE_TIM5_ETR   (*)
+  *            @arg @ref LL_TIM_TIM2_ETRSOURCE_USB_SOF    (*)
+  *            @arg @ref LL_TIM_TIM2_ETRSOURCE_USBHS_SOF  (*)
+  *            @arg @ref LL_TIM_TIM2_ETRSOURCE_USBFS_SOF  (*)
   *            @arg @ref LL_TIM_TIM2_ETRSOURCE_ETH_PPS    (*)
-
+  *            @arg @ref LL_TIM_TIM2_ETRSOURCE_PLAY1_OUT0 (*)
   *
   *         TIM3: any combination of ETR_RMP where
   *
   *            @arg @ref LL_TIM_TIM3_ETRSOURCE_GPIO
   *            @arg @ref LL_TIM_TIM3_ETRSOURCE_COMP1      (*)
+  *            @arg @ref LL_TIM_TIM3_ETRSOURCE_COMP2      (*)
+  *            @arg @ref LL_TIM_TIM3_ETRSOURCE_ADC2_AWD1  (*)
+  *            @arg @ref LL_TIM_TIM3_ETRSOURCE_ADC2_AWD2  (*)
+  *            @arg @ref LL_TIM_TIM3_ETRSOURCE_ADC2_AWD3  (*)
   *            @arg @ref LL_TIM_TIM3_ETRSOURCE_TIM2_ETR
   *            @arg @ref LL_TIM_TIM3_ETRSOURCE_TIM4_ETR   (*)
   *            @arg @ref LL_TIM_TIM3_ETRSOURCE_TIM5_ETR   (*)
   *            @arg @ref LL_TIM_TIM3_ETRSOURCE_ETH_PPS    (*)
+  *            @arg @ref LL_TIM_TIM3_ETRSOURCE_PLAY1_OUT0 (*)
   *
   *         TIM4: any combination of ETR_RMP where     (**)
   *
   *            @arg @ref LL_TIM_TIM4_ETRSOURCE_GPIO
+  *            @arg @ref LL_TIM_TIM4_ETRSOURCE_COMP1      (*)
+  *            @arg @ref LL_TIM_TIM4_ETRSOURCE_COMP2      (*)
   *            @arg @ref LL_TIM_TIM4_ETRSOURCE_TIM2_ETR
   *            @arg @ref LL_TIM_TIM4_ETRSOURCE_TIM3_ETR
   *            @arg @ref LL_TIM_TIM4_ETRSOURCE_TIM5_ETR
@@ -3935,17 +4168,27 @@ __STATIC_INLINE void LL_TIM_ConfigETR(TIM_TypeDef *TIMx, uint32_t ETRPolarity, u
   *            @arg @ref LL_TIM_TIM5_ETRSOURCE_GPIO
   *            @arg @ref LL_TIM_TIM5_ETRSOURCE_SAI2_FSA
   *            @arg @ref LL_TIM_TIM5_ETRSOURCE_SAI2_FSB
+  *            @arg @ref LL_TIM_TIM5_ETRSOURCE_COMP1      (*)
+  *            @arg @ref LL_TIM_TIM5_ETRSOURCE_COMP2      (*)
   *            @arg @ref LL_TIM_TIM5_ETRSOURCE_TIM2_ETR
   *            @arg @ref LL_TIM_TIM5_ETRSOURCE_TIM3_ETR
   *            @arg @ref LL_TIM_TIM5_ETRSOURCE_TIM4_ETR
+  *            @arg @ref LL_TIM_TIM5_ETRSOURCE_USB_SOF    (*)
+  *            @arg @ref LL_TIM_TIM5_ETRSOURCE_USBHS_SOF  (*)
+  *            @arg @ref LL_TIM_TIM5_ETRSOURCE_USBFS_SOF  (*)
   *
   *         TIM8: any combination of ETR_RMP where  (**)
   *
   *            . . ETR_RMP can be one of the following values
   *            @arg @ref LL_TIM_TIM8_ETRSOURCE_GPIO
+  *            @arg @ref LL_TIM_TIM8_ETRSOURCE_COMP1      (*)
+  *            @arg @ref LL_TIM_TIM8_ETRSOURCE_COMP2      (*)
   *            @arg @ref LL_TIM_TIM8_ETRSOURCE_ADC2_AWD1
   *            @arg @ref LL_TIM_TIM8_ETRSOURCE_ADC2_AWD2
   *            @arg @ref LL_TIM_TIM8_ETRSOURCE_ADC2_AWD3
+  *            @arg @ref LL_TIM_TIM8_ETRSOURCE_ADC3_AWD1  (*)
+  *            @arg @ref LL_TIM_TIM8_ETRSOURCE_ADC3_AWD2  (*)
+  *            @arg @ref LL_TIM_TIM8_ETRSOURCE_ADC3_AWD3  (*)
   *
   *         (*)  Value not defined in all devices. \n
   *         (**) Timer instance not available on all devices. \n
@@ -4123,18 +4366,6 @@ __STATIC_INLINE void LL_TIM_DisarmBRK(TIM_TypeDef *TIMx)
 }
 
 /**
-  * @brief  Re-arm the break input (when it operates in bidirectional mode).
-  * @note  The Break input is automatically armed as soon as MOE bit is set.
-  * @rmtoll BDTR         BKDSRM        LL_TIM_ReArmBRK
-  * @param  TIMx Timer instance
-  * @retval None
-  */
-__STATIC_INLINE void LL_TIM_ReArmBRK(TIM_TypeDef *TIMx)
-{
-  CLEAR_BIT(TIMx->BDTR, TIM_BDTR_BKDSRM);
-}
-
-/**
   * @brief  Enable the break 2 function.
   * @note Macro IS_TIM_BKIN2_INSTANCE(TIMx) can be used to check whether or not
   *       a timer instance provides a second break input.
@@ -4221,18 +4452,6 @@ __STATIC_INLINE void LL_TIM_ConfigBRK2(TIM_TypeDef *TIMx, uint32_t Break2Polarit
 __STATIC_INLINE void LL_TIM_DisarmBRK2(TIM_TypeDef *TIMx)
 {
   SET_BIT(TIMx->BDTR, TIM_BDTR_BK2DSRM);
-}
-
-/**
-  * @brief  Re-arm the break 2 input (when it operates in bidirectional mode).
-  * @note  The Break 2 input is automatically armed as soon as MOE bit is set.
-  * @rmtoll BDTR         BK2DSRM       LL_TIM_ReArmBRK2
-  * @param  TIMx Timer instance
-  * @retval None
-  */
-__STATIC_INLINE void LL_TIM_ReArmBRK2(TIM_TypeDef *TIMx)
-{
-  CLEAR_BIT(TIMx->BDTR, TIM_BDTR_BK2DSRM);
 }
 
 /**
@@ -4343,15 +4562,24 @@ __STATIC_INLINE uint32_t LL_TIM_IsEnabledAllOutputs(const TIM_TypeDef *TIMx)
   *       or not a timer instance allows for break input selection.
   * @rmtoll AF1          BKINE         LL_TIM_EnableBreakInputSource\n
   *         AF1          BKCMP1E       LL_TIM_EnableBreakInputSource\n
+  *         AF1          BKCMP2E       LL_TIM_EnableBreakInputSource\n
+  *         AF1          BKCMP3E       LL_TIM_EnableBreakInputSource\n
+  *         AF1          BKDF1BK0E     LL_TIM_EnableBreakInputSource\n
   *         AF2          BK2INE        LL_TIM_EnableBreakInputSource\n
   *         AF2          BK2CMP1E      LL_TIM_EnableBreakInputSource\n
+  *         AF2          BK2CMP2E      LL_TIM_EnableBreakInputSource\n
+  *         AF2          BK2CMP3E      LL_TIM_EnableBreakInputSource\n
+  *         AF2          BK2DF1BK1E    LL_TIM_EnableBreakInputSource
   * @param  TIMx Timer instance
   * @param  BreakInput This parameter can be one of the following values:
   *         @arg @ref LL_TIM_BREAK_INPUT_BKIN
   *         @arg @ref LL_TIM_BREAK_INPUT_BKIN2
   * @param  Source This parameter can be one of the following values:
   *         @arg @ref LL_TIM_BKIN_SOURCE_BKIN
-  *         @arg @ref LL_TIM_BKIN_SOURCE_BKCOMP1 (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_BKCOMP1    (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_BKCOMP2    (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_PLAY1      (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_MDF1       (*)
   *
   *         (*)  Value not defined in all devices.
   * @retval None
@@ -4368,15 +4596,24 @@ __STATIC_INLINE void LL_TIM_EnableBreakInputSource(TIM_TypeDef *TIMx, uint32_t B
   *       or not a timer instance allows for break input selection.
   * @rmtoll AF1          BKINE         LL_TIM_DisableBreakInputSource\n
   *         AF1          BKCMP1E       LL_TIM_DisableBreakInputSource\n
+  *         AF1          BKCMP2E       LL_TIM_DisableBreakInputSource\n
+  *         AF1          BKCMP3E       LL_TIM_DisableBreakInputSource\n
+  *         AF1          BKDF1BK0E     LL_TIM_DisableBreakInputSource\n
   *         AF2          BK2INE        LL_TIM_DisableBreakInputSource\n
   *         AF2          BK2CMP1E      LL_TIM_DisableBreakInputSource\n
+  *         AF2          BK2CMP2E      LL_TIM_DisableBreakInputSource\n
+  *         AF2          BK2CMP3E      LL_TIM_DisableBreakInputSource\n
+  *         AF2          BK2DF1BK1E    LL_TIM_DisableBreakInputSource
   * @param  TIMx Timer instance
   * @param  BreakInput This parameter can be one of the following values:
   *         @arg @ref LL_TIM_BREAK_INPUT_BKIN
   *         @arg @ref LL_TIM_BREAK_INPUT_BKIN2
   * @param  Source This parameter can be one of the following values:
   *         @arg @ref LL_TIM_BKIN_SOURCE_BKIN
-  *         @arg @ref LL_TIM_BKIN_SOURCE_BKCOMP1 (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_BKCOMP1    (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_BKCOMP2    (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_PLAY1      (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_MDF1       (*)
   *
   *         (*)  Value not defined in all devices.
   * @retval None
@@ -4393,15 +4630,21 @@ __STATIC_INLINE void LL_TIM_DisableBreakInputSource(TIM_TypeDef *TIMx, uint32_t 
   *       or not a timer instance allows for break input selection.
   * @rmtoll AF1          BKINP         LL_TIM_SetBreakInputSourcePolarity\n
   *         AF1          BKCMP1P       LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF1          BKCMP2P       LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF1          BKCMP3P       LL_TIM_SetBreakInputSourcePolarity\n
   *         AF2          BK2INP        LL_TIM_SetBreakInputSourcePolarity\n
   *         AF2          BK2CMP1P      LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF2          BK2CMP2P      LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF2          BK2CMP3P      LL_TIM_SetBreakInputSourcePolarity
   * @param  TIMx Timer instance
   * @param  BreakInput This parameter can be one of the following values:
   *         @arg @ref LL_TIM_BREAK_INPUT_BKIN
   *         @arg @ref LL_TIM_BREAK_INPUT_BKIN2
   * @param  Source This parameter can be one of the following values:
   *         @arg @ref LL_TIM_BKIN_SOURCE_BKIN
-  *         @arg @ref LL_TIM_BKIN_SOURCE_BKCOMP1 (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_BKCOMP1    (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_BKCOMP2    (*)
+  *         @arg @ref LL_TIM_BKIN_SOURCE_PLAY1      (*)
   * @param  Polarity This parameter can be one of the following values:
   *         @arg @ref LL_TIM_BKIN_POLARITY_LOW
   *         @arg @ref LL_TIM_BKIN_POLARITY_HIGH
@@ -4568,6 +4811,7 @@ __STATIC_INLINE uint32_t LL_TIM_IsEnabledDeadTimePreload(const TIM_TypeDef *TIMx
   *         @arg @ref LL_TIM_DMABURST_BASEADDR_TISEL
   *         @arg @ref LL_TIM_DMABURST_BASEADDR_AF1
   *         @arg @ref LL_TIM_DMABURST_BASEADDR_AF2
+  *         @arg @ref LL_TIM_DMABURST_BASEADDR_OR1
   * @param  DMABurstLength This parameter can be one of the following values:
   *         @arg @ref LL_TIM_DMABURST_LENGTH_1TRANSFER
   *         @arg @ref LL_TIM_DMABURST_LENGTH_2TRANSFERS
@@ -4843,17 +5087,16 @@ __STATIC_INLINE void LL_TIM_ConfigIDX(TIM_TypeDef *TIMx, uint32_t Configuration)
   *         TIM3_TISEL    TI1SEL      LL_TIM_SetRemap\n
   *         TIM3_TISEL    TI2SEL      LL_TIM_SetRemap\n
   *         TIM4_TISEL    TI1SEL      LL_TIM_SetRemap\n
-  *         TIM4_TISEL    TI2SEL      LL_TIM_SetRemap\n
   *         TIM5_TISEL    TI1SEL      LL_TIM_SetRemap\n
-  *         TIM5_TISEL    TI2SEL      LL_TIM_SetRemap\n
   *         TIM8_TISEL    TI1SEL      LL_TIM_SetRemap\n
   *         TIM12_TISEL   TI1SEL      LL_TIM_SetRemap\n
+  *         TIM12_TISEL   TI2SEL      LL_TIM_SetRemap\n
   *         TIM13_TISEL   TI1SEL      LL_TIM_SetRemap\n
   *         TIM14_TISEL   TI1SEL      LL_TIM_SetRemap\n
   *         TIM15_TISEL   TI1SEL      LL_TIM_SetRemap\n
   *         TIM15_TISEL   TI2SEL      LL_TIM_SetRemap\n
   *         TIM16_TISEL   TI1SEL      LL_TIM_SetRemap\n
-  *         TIM17_TISEL   TI1SEL      LL_TIM_SetRemap\n
+  *         TIM17_TISEL   TI1SEL      LL_TIM_SetRemap
   *
   * @param  TIMx Timer instance
   * @param  Remap Remap param depends on the TIMx. Description available only
@@ -4864,69 +5107,78 @@ __STATIC_INLINE void LL_TIM_ConfigIDX(TIM_TypeDef *TIMx, uint32_t Configuration)
   *
   *         TIM1: one of the following values:
   *            @arg LL_TIM_TIM1_TI1_RMP_GPIO:                TIM1 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM1_TI1_RMP_COMP1:               TIM1 TI1 is connected to COMP1 output  (*)
-  *            @arg LL_TIM_TIM1_TI2_RMP_GPIO:                TIM1 TI2 is connected to GPIO
-  *            @arg LL_TIM_TIM1_TI3_RMP_GPIO:                TIM1 TI3 is connected to GPIO
-  *            @arg LL_TIM_TIM1_TI4_RMP_GPIO:                TIM1 TI4 is connected to GPIO
+  *            @arg LL_TIM_TIM1_TI1_RMP_COMP1:               TIM1 TI1 is connected to COMP1 output    (*)
+  *            @arg LL_TIM_TIM1_TI1_RMP_COMP2:               TIM1 TI1 is connected to COMP2 output    (*)
   *
   *         TIM2: one of the following values:
   *            @arg LL_TIM_TIM2_TI1_RMP_GPIO:                TIM2 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM2_TI1_RMP_LSI:                 TIM2 TI1 is connected to LSI           (*)
-  *            @arg LL_TIM_TIM2_TI1_RMP_LSE:                 TIM2 TI1 is connected to LSE           (*)
-  *            @arg LL_TIM_TIM2_TI1_RMP_RTC:                 TIM2 TI1 is connected to RTC           (*)
-  *            @arg LL_TIM_TIM2_TI1_RMP_TIM3_TI1:            TIM2 TI1 is connected to TIM3 TI1      (*)
-  *            @arg LL_TIM_TIM2_TI1_RMP_ETH_PPS:             TIM2 TI1 is connected to ETH PPS       (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_LSI:                 TIM2 TI1 is connected to LSI             (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_LSE:                 TIM2 TI1 is connected to LSE             (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_RTC:                 TIM2 TI1 is connected to RTC             (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_TIM3_TI1:            TIM2 TI1 is connected to TIM3 TI1        (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_ETH_PPS:             TIM2 TI1 is connected to ETH PPS         (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_COMP1:               TIM2 TI1 is connected to COMP1 output    (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_COMP2:               TIM2 TI1 is connected to COMP2 output    (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_PLAY1_OUT3:          TIM2 TI1 is connected to PLAY1 output 3  (*)
   *            @arg LL_TIM_TIM2_TI2_RMP_GPIO:                TIM2 TI2 is connected to GPIO
-  *            @arg LL_TIM_TIM2_TI2_RMP_HSI_1024:            TIM2 TI2 is connected to HSI 1024      (*)
-  *            @arg LL_TIM_TIM2_TI2_RMP_CSI_128:             TIM2 TI2 is connected to CSI 128       (*)
-  *            @arg LL_TIM_TIM2_TI2_RMP_MCO2:                TIM2 TI2 is connected to MCO2          (*)
-  *            @arg LL_TIM_TIM2_TI2_RMP_MCO1:                TIM2 TI2 is connected to MCO1          (*)
-  *            @arg LL_TIM_TIM2_TI3_RMP_GPIO:                TIM2 TI3 is connected to GPIO
+  *            @arg LL_TIM_TIM2_TI2_RMP_HSI_1024:            TIM2 TI2 is connected to HSI 1024        (*)
+  *            @arg LL_TIM_TIM2_TI2_RMP_CSI_128:             TIM2 TI2 is connected to CSI 128         (*)
+  *            @arg LL_TIM_TIM2_TI2_RMP_MCO2:                TIM2 TI2 is connected to MCO2            (*)
+  *            @arg LL_TIM_TIM2_TI2_RMP_MCO1:                TIM2 TI2 is connected to MCO1            (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_COMP1:               TIM2 TI2 is connected to COMP1 output    (*)
+  *            @arg LL_TIM_TIM2_TI1_RMP_COMP2:               TIM2 TI2 is connected to COMP2 output    (*)
   *            @arg LL_TIM_TIM2_TI4_RMP_GPIO:                TIM2 TI4 is connected to GPIO
-  *            @arg LL_TIM_TIM2_TI4_RMP_COMP1:               TIM2 TI4 is connected to COMP1         (*)
+  *            @arg LL_TIM_TIM2_TI4_RMP_COMP1:               TIM2 TI4 is connected to COMP1           (*)
   *
   *         TIM3: one of the following values:
   *            @arg LL_TIM_TIM3_TI1_RMP_GPIO:                TIM3 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM3_TI1_RMP_COMP1:               TIM3 TI1 is connected to COMP1 output  (*)
-  *            @arg LL_TIM_TIM3_TI1_RMP_MCO1:                TIM3 TI1 is connected to MCO1          (*)
-  *            @arg LL_TIM_TIM3_TI1_RMP_TIM2_TI1:            TIM3 TI1 is connected to TIM2 TI1      (*)
-  *            @arg LL_TIM_TIM3_TI1_RMP_HSE_1MHZ:            TIM3 TI1 is connected to HSE_1MHZ      (*)
-  *            @arg LL_TIM_TIM3_TI1_RMP_ETH_PPS:             TIM3 TI1 is connected to ETH PPS       (*)
+  *            @arg LL_TIM_TIM3_TI1_RMP_COMP1:               TIM3 TI1 is connected to COMP1 output    (*)
+  *            @arg LL_TIM_TIM3_TI1_RMP_COMP2:               TIM3 TI1 is connected to COMP2 output    (*)
+  *            @arg LL_TIM_TIM3_TI1_RMP_MCO1:                TIM3 TI1 is connected to MCO1            (*)
+  *            @arg LL_TIM_TIM3_TI1_RMP_TIM2_TI1:            TIM3 TI1 is connected to TIM2 TI1        (*)
+  *            @arg LL_TIM_TIM3_TI1_RMP_HSE_1MHZ:            TIM3 TI1 is connected to HSE_1MHZ        (*)
+  *            @arg LL_TIM_TIM3_TI1_RMP_ETH_PPS:             TIM3 TI1 is connected to ETH PPS         (*)
+  *            @arg LL_TIM_TIM3_TI1_RMP_PLAY1_OUT3:          TIM3 TI1 is connected to PLAY1 output 3  (*)
   *            @arg LL_TIM_TIM3_TI2_RMP_GPIO:                TIM3 TI2 is connected to GPIO
-  *            @arg LL_TIM_TIM3_TI2_RMP_CSI_128:             TIM3 TI2 is connected to CSI_128       (*)
-  *            @arg LL_TIM_TIM3_TI2_RMP_MCO2:                TIM3 TI2 is connected to MCO2          (*)
-  *            @arg LL_TIM_TIM3_TI2_RMP_HSI_1024:            TIM3 TI2 is connected to HSI_1024      (*)
-  *            @arg LL_TIM_TIM3_TI3_RMP_GPIO:                TIM3 TI3 is connected to GPIO
-  *            @arg LL_TIM_TIM3_TI4_RMP_GPIO:                TIM3 TI4 is connected to GPIO
+  *            @arg LL_TIM_TIM3_TI2_RMP_CSI_128:             TIM3 TI2 is connected to CSI_128         (*)
+  *            @arg LL_TIM_TIM3_TI2_RMP_MCO2:                TIM3 TI2 is connected to MCO2            (*)
+  *            @arg LL_TIM_TIM3_TI2_RMP_HSI_1024:            TIM3 TI2 is connected to HSI_1024        (*)
+  *            @arg LL_TIM_TIM3_TI2_RMP_COMP1:               TIM3 TI2 is connected to COMP1 output    (*)
+  *            @arg LL_TIM_TIM3_TI2_RMP_COMP2:               TIM3 TI2 is connected to COMP2 output    (*)
   *
   *         TIM4: one of the following values: (**)
   *            @arg LL_TIM_TIM4_TI1_RMP_GPIO:                TIM4 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM4_TI2_RMP_GPIO:                TIM4 TI2 is connected to GPIO
-  *            @arg LL_TIM_TIM4_TI3_RMP_GPIO:                TIM4 TI3 is connected to GPIO
-  *            @arg LL_TIM_TIM4_TI4_RMP_GPIO:                TIM4 TI4 is connected to GPIO
+  *            @arg LL_TIM_TIM4_TI1_RMP_COMP1:               TIM4 TI1 is connected to COMP1 output    (*)
+  *            @arg LL_TIM_TIM4_TI1_RMP_COMP2:               TIM4 TI1 is connected to COMP2 output    (*)
   *
   *         TIM5: one of the following values: (**)
   *            @arg LL_TIM_TIM5_TI1_RMP_GPIO:                TIM5 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM5_TI2_RMP_GPIO:                TIM5 TI2 is connected to GPIO
-  *            @arg LL_TIM_TIM5_TI3_RMP_GPIO:                TIM5 TI3 is connected to GPIO
-  *            @arg LL_TIM_TIM5_TI4_RMP_GPIO:                TIM5 TI4 is connected to GPIO
+  *            @arg LL_TIM_TIM5_TI1_RMP_COMP1:               TIM5 TI1 is connected to COMP1 output    (*)
+  *            @arg LL_TIM_TIM5_TI1_RMP_COMP2:               TIM5 TI1 is connected to COMP2 output    (*)
   *
   *         TIM8: one of the following values: (**)
   *            @arg LL_TIM_TIM8_TI1_RMP_GPIO:                TIM8 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM8_TI2_RMP_GPIO:                TIM8 TI2 is connected to GPIO
-  *            @arg LL_TIM_TIM8_TI3_RMP_GPIO:                TIM8 TI3 is connected to GPIO
-  *            @arg LL_TIM_TIM8_TI4_RMP_GPIO:                TIM8 TI4 is connected to GPIO
+  *            @arg LL_TIM_TIM8_TI1_RMP_COMP1:               TIM8 TI1 is connected to COMP1 output    (*)
+  *            @arg LL_TIM_TIM8_TI1_RMP_COMP2:               TIM8 TI1 is connected to COMP2 output    (*)
   *
   *         TIM12: one of the following values: (**)
   *            @arg LL_TIM_TIM12_TI1_RMP_GPIO:               TIM12 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM12_TI1_RMP_HSI_1024:           TIM12 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM12_TI1_RMP_CSI_128:            TIM12 TI1 is connected to GPIO
+  *            @arg LL_TIM_TIM12_TI1_RMP_COMP1:              TIM12 TI1 is connected to COMP1 output   (*)
+  *            @arg LL_TIM_TIM12_TI1_RMP_COMP2:              TIM12 TI1 is connected to COMP2 output   (*)
+  *            @arg LL_TIM_TIM12_TI1_RMP_HSI_1024:           TIM12 TI1 is connected to HSI 1024
+  *            @arg LL_TIM_TIM12_TI1_RMP_CSI_128:            TIM12 TI1 is connected to CSI 128
   *
   *         TIM13: one of the following values: (**)
   *            @arg LL_TIM_TIM13_TI1_RMP_GPIO:               TIM13 TI1 is connected to GPIO
+  *            @arg LL_TIM_TIM13_TI1_RMP_I3C1_IBIACK:        TIM13 TI1 is connected to I3C1 IBI ACK   (*)
+  *            @arg LL_TIM_TIM13_TI1_RMP_COMP1:              TIM13 TI1 is connected to COMP1 output   (*)
+  *            @arg LL_TIM_TIM13_TI1_RMP_COMP2:              TIM13 TI1 is connected to COMP2 output   (*)
   *
   *         TIM14: one of the following values: (**)
   *            @arg LL_TIM_TIM14_TI1_RMP_GPIO:               TIM14 TI1 is connected to GPIO
+  *            @arg LL_TIM_TIM14_TI1_RMP_I3C2_IBIACK:        TIM14 TI1 is connected to I3C2 IBI ACK   (*)
+  *            @arg LL_TIM_TIM14_TI1_RMP_COMP1:              TIM14 TI1 is connected to COMP1 output   (*)
+  *            @arg LL_TIM_TIM14_TI1_RMP_COMP2:              TIM14 TI1 is connected to COMP2 output   (*)
   *
   *         TIM15: one of the following values: (**)
   *            @arg LL_TIM_TIM15_TI1_RMP_GPIO:               TIM15 TI1 is connected to GPIO
@@ -4936,21 +5188,29 @@ __STATIC_INLINE void LL_TIM_ConfigIDX(TIM_TypeDef *TIMx, uint32_t Configuration)
   *            @arg LL_TIM_TIM15_TI1_RMP_LSE:                TIM15 TI1 is connected to LSE
   *            @arg LL_TIM_TIM15_TI1_RMP_CSI_128:            TIM15 TI1 is connected to CSI/128
   *            @arg LL_TIM_TIM15_TI1_RMP_MCO2:               TIM15 TI1 is connected to MCO2
+  *            @arg LL_TIM_TIM15_TI1_RMP_COMP1:              TIM15 TI1 is connected to COMP1 output   (*)
+  *            @arg LL_TIM_TIM15_TI1_RMP_COMP2:              TIM15 TI1 is connected to COMP2 output   (*)
   *            @arg LL_TIM_TIM15_TI2_RMP_GPIO:               TIM15 TI1 is connected to GPIO
   *            @arg LL_TIM_TIM15_TI2_RMP_TIM2:               TIM15 TI1 is connected to TIM2
   *            @arg LL_TIM_TIM15_TI2_RMP_TIM3:               TIM15 TI1 is connected to TIM3
   *            @arg LL_TIM_TIM15_TI2_RMP_TIM4:               TIM15 TI1 is connected to TIM4
+  *            @arg LL_TIM_TIM15_TI2_RMP_COMP1:              TIM15 TI2 is connected to COMP1 output   (*)
+  *            @arg LL_TIM_TIM15_TI2_RMP_COMP2:              TIM15 TI2 is connected to COMP2 output   (*)
   *
   *         TIM16: one of the following values: (**)
-  *            @arg LL_TIM_TIM16_TI1_RMP_GPIO:              TIM16 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM16_TI1_RMP_LSI:               TIM16 TI1 is connected to LSI
-  *            @arg LL_TIM_TIM16_TI1_RMP_LSE:               TIM16 TI1 is connected to LSE
-  *            @arg LL_TIM_TIM16_TI1_RMP_RTC_WKUP:          TIM16 TI1 is connected to RTC_WKUP
+  *            @arg LL_TIM_TIM16_TI1_RMP_GPIO:               TIM16 TI1 is connected to GPIO
+  *            @arg LL_TIM_TIM16_TI1_RMP_LSI:                TIM16 TI1 is connected to LSI
+  *            @arg LL_TIM_TIM16_TI1_RMP_LSE:                TIM16 TI1 is connected to LSE
+  *            @arg LL_TIM_TIM16_TI1_RMP_RTC_WKUP:           TIM16 TI1 is connected to RTC_WKUP
+  *            @arg LL_TIM_TIM16_TI1_RMP_COMP1:              TIM16 TI1 is connected to COMP1 output   (*)
+  *            @arg LL_TIM_TIM16_TI1_RMP_COMP2:              TIM16 TI1 is connected to COMP2 output   (*)
   *
   *         TIM17: one of the following values: (**)
-  *            @arg LL_TIM_TIM17_TI1_RMP_GPIO:              TIM17 TI1 is connected to GPIO
-  *            @arg LL_TIM_TIM17_TI1_RMP_HSE_1MHZ:          TIM17 TI1 is connected to HSE_1MHZ
-  *            @arg LL_TIM_TIM17_TI1_RMP_MCO1:              TIM17 TI1 is connected to MCO1
+  *            @arg LL_TIM_TIM17_TI1_RMP_GPIO:               TIM17 TI1 is connected to GPIO
+  *            @arg LL_TIM_TIM17_TI1_RMP_HSE_1MHZ:           TIM17 TI1 is connected to HSE_1MHZ
+  *            @arg LL_TIM_TIM17_TI1_RMP_MCO1:               TIM17 TI1 is connected to MCO1
+  *            @arg LL_TIM_TIM17_TI1_RMP_COMP1:              TIM17 TI1 is connected to COMP1 output   (*)
+  *            @arg LL_TIM_TIM17_TI1_RMP_COMP2:              TIM17 TI1 is connected to COMP2 output   (*)
   *
   *         (*)  Value not defined in all devices. \n
   *         (**) Timer instance not available on all devices. \n
@@ -4960,6 +5220,42 @@ __STATIC_INLINE void LL_TIM_ConfigIDX(TIM_TypeDef *TIMx, uint32_t Configuration)
 __STATIC_INLINE void LL_TIM_SetRemap(TIM_TypeDef *TIMx, uint32_t Remap)
 {
   MODIFY_REG(TIMx->TISEL, (TIM_TISEL_TI1SEL | TIM_TISEL_TI2SEL | TIM_TISEL_TI3SEL | TIM_TISEL_TI4SEL), Remap);
+}
+
+/**
+  * @brief  Enable request for HSE 1MHz clock used for TISEL remap.
+  * @note Only TIM17 support HSE 1MHz remap
+  * @rmtoll OR1         RTCPREEN           LL_TIM_EnableRTCPRE
+  * @param  TIMx Timer instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_TIM_EnableRTCPRE(TIM_TypeDef *TIMx)
+{
+  SET_BIT(TIMx->OR1, TIM_OR1_RTCPREEN);
+}
+
+/**
+  * @brief  Disable request for HSE 1MHz clock used for TISEL remap.
+  * @note Only TIM17 support HSE 1MHz remap
+  * @rmtoll OR1         RTCPREEN           LL_TIM_DisableRTCPRE
+  * @param  TIMx Timer instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_TIM_DisableRTCPRE(TIM_TypeDef *TIMx)
+{
+  CLEAR_BIT(TIMx->OR1, TIM_OR1_RTCPREEN);
+}
+
+/**
+  * @brief  Indicate whether request for HSE 1MHz clock is enabled.
+  * @note Only TIM17 support HSE 1MHz remap
+  * @rmtoll OR1         RTCPREEN           LL_TIM_IsEnabledRTCPRE
+  * @param  TIMx Timer instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_TIM_IsEnabledRTCPRE(const TIM_TypeDef *TIMx)
+{
+  return ((READ_BIT(TIMx->OR1, TIM_OR1_RTCPREEN) == (TIM_OR1_RTCPREEN)) ? 1UL : 0UL);
 }
 
 /**
@@ -4974,15 +5270,21 @@ __STATIC_INLINE void LL_TIM_SetRemap(TIM_TypeDef *TIMx, uint32_t Remap)
   * @note The OCxREF signal of a given channel can be cleared when a high level is applied on the OCREF_CLR_INPUT
   * @note This function can only be used in Output compare and PWM modes.
   * @rmtoll SMCR          OCCS                LL_TIM_SetOCRefClearInputSource
+  * @rmtoll AF2           OCRSEL              LL_TIM_SetOCRefClearInputSource
   * @param  TIMx Timer instance
   * @param  OCRefClearInputSource This parameter can be one of the following values:
-  *         @arg @ref LL_TIM_OCREF_CLR_INT_OCREF_CLR
   *         @arg @ref LL_TIM_OCREF_CLR_INT_ETR
+  *         @arg @ref LL_TIM_OCREF_CLR_INT_COMP1 (*)
+  *         @arg @ref LL_TIM_OCREF_CLR_INT_COMP2 (*)
+  *
+  *         (*)  Value not defined in all devices. \n
   * @retval None
   */
 __STATIC_INLINE void LL_TIM_SetOCRefClearInputSource(TIM_TypeDef *TIMx, uint32_t OCRefClearInputSource)
 {
-  MODIFY_REG(TIMx->SMCR, TIM_SMCR_OCCS, OCRefClearInputSource);
+  MODIFY_REG(TIMx->SMCR, TIM_SMCR_OCCS,
+             ((OCRefClearInputSource & OCREF_CLEAR_SELECT_MSK) >> OCREF_CLEAR_SELECT_POS) << TIM_SMCR_OCCS_Pos);
+  MODIFY_REG(TIMx->AF2, TIM1_AF2_OCRSEL, OCRefClearInputSource);
 }
 /**
   * @}

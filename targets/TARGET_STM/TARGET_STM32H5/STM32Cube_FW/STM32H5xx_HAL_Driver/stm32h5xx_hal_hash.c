@@ -2530,13 +2530,56 @@ static void HASH_WriteData(HASH_HandleTypeDef *hhash, const uint8_t *pInBuffer, 
 {
   uint32_t buffercounter;
   __IO uint32_t inputaddr = (uint32_t) pInBuffer;
+  uint8_t tmp1;
+  uint8_t tmp2;
+  uint8_t tmp3;
 
-
-  for (buffercounter = 0U; buffercounter < Size ; buffercounter += 4U)
+  for (buffercounter = 0U; buffercounter < (Size / 4U) ; buffercounter++)
   {
     /* Write input data 4 bytes at a time */
     hhash->Instance->DIN = *(uint32_t *)inputaddr;
     inputaddr += 4U;
+    hhash->HashInCount += 4U;
+  }
+
+  if ((Size % 4U) != 0U)
+  {
+    if (hhash->Init.DataType == HASH_HALFWORD_SWAP)
+    {
+      /* Write remaining input data */
+      if ((Size % 4U) <= 2U)
+      {
+        hhash->Instance->DIN = (uint32_t) * (uint16_t *)inputaddr;
+      }
+      if ((Size % 4U) == 3U)
+      {
+        hhash->Instance->DIN = *(uint32_t *)inputaddr;
+      }
+    }
+    else if ((hhash->Init.DataType == HASH_BYTE_SWAP)
+             || (hhash->Init.DataType == HASH_BIT_SWAP))  /* byte swap or bit swap or */
+    {
+      /* Write remaining input data */
+      if ((Size % 4U) == 1U)
+      {
+        hhash->Instance->DIN = (uint32_t) * (uint8_t *)inputaddr;
+      }
+      if ((Size % 4U) == 2U)
+      {
+        hhash->Instance->DIN = (uint32_t) * (uint16_t *)inputaddr;
+      }
+      if ((Size % 4U) == 3U)
+      {
+        tmp1 = *(uint8_t *)inputaddr;
+        tmp2 = *(((uint8_t *)inputaddr) + 1U);
+        tmp3 = *(((uint8_t *)inputaddr) + 2U);
+        hhash->Instance->DIN = ((uint32_t)tmp1) | ((uint32_t)tmp2 << 8U) | ((uint32_t)tmp3 << 16U);
+      }
+    }
+    else
+    {
+      hhash->Instance->DIN = *(uint32_t *)inputaddr;
+    }
     hhash->HashInCount += 4U;
   }
 }
@@ -3073,43 +3116,20 @@ static HAL_StatusTypeDef HASH_WaitOnFlagUntilTimeout(HASH_HandleTypeDef *hhash, 
 {
   uint32_t tickstart = HAL_GetTick();
 
-  /* Wait until flag is set */
-  if (Status == RESET)
+  while (__HAL_HASH_GET_FLAG(hhash, Flag) == Status)
   {
-    while (__HAL_HASH_GET_FLAG(hhash, Flag) == RESET)
+    /* Check for the Timeout */
+    if (Timeout != HAL_MAX_DELAY)
     {
-      /* Check for the Timeout */
-      if (Timeout != HAL_MAX_DELAY)
+      if (((HAL_GetTick() - tickstart) > Timeout) || (Timeout == 0U))
       {
-        if (((HAL_GetTick() - tickstart) > Timeout) || (Timeout == 0U))
-        {
-          /* Set State to Ready to be able to restart later on */
-          hhash->State  = HAL_HASH_STATE_READY;
-          hhash->ErrorCode |= HAL_HASH_ERROR_TIMEOUT;
-          /* Process Unlocked */
-          __HAL_UNLOCK(hhash);
-          return HAL_ERROR;
-        }
-      }
-    }
-  }
-  else
-  {
-    while (__HAL_HASH_GET_FLAG(hhash, Flag) != RESET)
-    {
-      /* Check for the Timeout */
-      if (Timeout != HAL_MAX_DELAY)
-      {
-        if (((HAL_GetTick() - tickstart) > Timeout) || (Timeout == 0U))
-        {
-          /* Set State to Ready to be able to restart later on */
-          hhash->State  = HAL_HASH_STATE_READY;
-          hhash->ErrorCode |= HAL_HASH_ERROR_TIMEOUT;
-          /* Process Unlocked */
-          __HAL_UNLOCK(hhash);
+        /* Set State to Ready to be able to restart later on */
+        hhash->State  = HAL_HASH_STATE_READY;
+        hhash->ErrorCode |= HAL_HASH_ERROR_TIMEOUT;
+        /* Process Unlocked */
+        __HAL_UNLOCK(hhash);
 
-          return HAL_ERROR;
-        }
+        return HAL_ERROR;
       }
     }
   }

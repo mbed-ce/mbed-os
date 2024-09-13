@@ -147,10 +147,10 @@ typedef struct
 /** @defgroup GTZC_MPCBB_SecureRWIllegalMode GTZC MPCBB SRWILADIS values
   * @{
   */
-
+#if defined(GTZC_MPCBB_CR_SRWILADIS_Pos)
 #define GTZC_MPCBB_SRWILADIS_ENABLE  (0U)
 #define GTZC_MPCBB_SRWILADIS_DISABLE (GTZC_MPCBB_CR_SRWILADIS_Msk)
-
+#endif /* GTZC_MPCBB_CR_SRWILADIS_Pos */
 /**
   * @}
   */
@@ -158,10 +158,10 @@ typedef struct
 /** @defgroup GTZC_MPCBB_InvertSecureState GTZC MPCBB INVSECSTATE values
   * @{
   */
-
+#if defined(GTZC_MPCBB_CR_INVSECSTATE_Pos)
 #define GTZC_MPCBB_INVSECSTATE_NOT_INVERTED  (0U)
 #define GTZC_MPCBB_INVSECSTATE_INVERTED      (GTZC_MPCBB_CR_INVSECSTATE_Msk)
-
+#endif /* GTZC_MPCBB_CR_INVSECSTATE_Pos */
 /**
   * @}
   */
@@ -693,4 +693,3 @@ void HAL_GTZC_TZIC_Callback(uint32_t PeriphId);
 #endif
 
 #endif /* STM32H5xx_HAL_GTZC_H */
-
