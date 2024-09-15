@@ -119,7 +119,7 @@ SECTIONS
 
     __etext = .;
     _sidata = .;
-    
+
     .crash_data_ram :
     {
         . = ALIGN(8);
