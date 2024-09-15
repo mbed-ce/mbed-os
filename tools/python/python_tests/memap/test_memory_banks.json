@@ -1,0 +1,38 @@
+{
+  "configured_memory_banks": {
+    "ROM": {
+      "IROM1": {
+        "access": {
+          "execute": true,
+          "non_secure": false,
+          "non_secure_callable": false,
+          "peripheral": false,
+          "read": true,
+          "secure": false,
+          "write": false
+        },
+        "default": true,
+        "size": 524288,
+        "start": 0,
+        "startup": true
+      }
+    },
+    "RAM": {
+      "IRAM1": {
+        "access": {
+          "execute": false,
+          "non_secure": false,
+          "non_secure_callable": false,
+          "peripheral": false,
+          "read": true,
+          "secure": false,
+          "write": true
+        },
+        "default": true,
+        "size": 32768,
+        "start": 536870912,
+        "startup": false
+      }
+    }
+  }
+}

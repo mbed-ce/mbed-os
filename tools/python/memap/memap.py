@@ -17,7 +17,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, annotations
+
+import copy
+
+"""
+ memap term glossary, for code reviewers and for developers working on this script
+ --------------------------------------------------------------------------------------------
+ 
+ - Symbol: Any entity declared in the program that has a global address.  Generally this means any global
+     variables and all functions.  Note that symbol names have to be alphanumeric, so C++ implemented
+     "mangling" to encode class and function names as valid symbol names.  This means that C++ symbols will look
+     like "_ZN4mbed8AnalogIn6_mutexE" to the linker.  You can use the "c++filt" tool to convert those back
+     into a human readable name like "mbed::AnalogIn::_mutex."
+ - Section: A logical region of an elf of object file.  Each section has a specific name and occupies contiguous memory. 
+     It's a vague term.
+ - Input section: The section in the object (.o/.obj) file that a symbol comes from.  It generally has a specific name,
+     e.g. a function could be from the .text.my_function input section.
+ - Output section: The section in the linked application file (.elf) that a symbol has been put into.  The output 
+     section *might* match the input section, but not always! A linker script can happily put stuff from 
+     any input section into any output section if so desired.
+ - VMA (Virtual Memory Address): The address that an output section will have when the application runs.
+     Note that this name is something of a misnomer as it is inherited from desktop Linux.  There is no virtual
+     memory on microcontrollers!
+ - LMA (Load Memory Address): The address that an output section is loaded from in flash when the program boots.
+ - .bss: Output section for global variables which have zero values at boot.  This region of RAM is zeroed at boot.
+ - .data: Output section for global variables with nonzero default values.  This region is copied, as a single block
+    of data, from the LMA to the VMA at boot.
+ - .text: Output section for code and constant data (e.g. the values of constant arrays).  This region
+    is mapped directly into flash and does not need to be copied at runtime.
+"""
 
 import dataclasses
 from typing import Tuple, Optional, Dict, TextIO, List
@@ -60,8 +89,14 @@ class MemoryBankInfo:
     # Total size of the memory bank in bytes
     total_size: int
 
-    # Size used in the memory bank in bytes
+    # Size used in the memory bank in bytes (sum of the sizes of all symbols)
     used_size: int = 0
+
+    def contains_addr(self, addr: int):
+        """
+        :return: True if the given address is contained inside this memory bank
+        """
+        return addr >= self.start_addr and addr < self.start_addr + self.total_size
 
 
 class _Parser(ABC):
@@ -80,7 +115,35 @@ class _Parser(ABC):
         # Memory bank info, by type (RAM/ROM)
         self.memory_banks: Dict[str, List[MemoryBankInfo]] = {"RAM": [], "ROM": []}
 
-    def add_symbol(self, symbol_name: str, object_name: str, start_addr: int, size: int, section: str):
+    def _add_symbol_to_memory_banks(self, symbol_name: str, start_addr: int, size: int) -> None:
+        """
+        Update the memory banks structure to add the space used by a symbol.
+        """
+
+        if len(self.memory_banks["RAM"]) == 0 and len(self.memory_banks["ROM"]) == 0:
+            # No memory banks loaded, skip
+            return
+
+        end_addr = start_addr + size
+        for bank_type, banks in self.memory_banks.items():
+            for bank_info in banks:
+                if bank_info.contains_addr(start_addr):
+                    if bank_info.contains_addr(end_addr):
+                        # Symbol fully inside this memory bank
+                        bank_info.used_size += size
+
+                        # Uncomment to show debug info about each symbol
+                        # print(f"Symbol {symbol_name} uses {size} bytes in {bank_info.name}")
+
+                        return
+                    else:
+                        print(f"Warning: Symbol {symbol_name} is only partially contained by memory bank {bank_info.name}")
+                        bank_info.used_size += (bank_info.start_addr + bank_info.total_size) - start_addr
+
+        print(f"Warning: Symbol {symbol_name} (at address 0x{start_addr:x}, size {size}) is not inside a defined memory "
+              f"bank for this target.")
+
+    def add_symbol(self, symbol_name: str, object_name: str, start_addr: int, size: int, section: str, vma_lma_offset: int):
         """ Adds information about a symbol (e.g. a function or global variable) to the data structures.
 
         Positional arguments:
@@ -88,10 +151,19 @@ class _Parser(ABC):
         object_name - name of the object file containing the symbol
         start addr - start address of symbol
         size - the size of the symbol being added
-        section - Name of the section, e.g. ".text".  Can also be "unknown".
+        section - Name of the output section, e.g. ".text".  Can also be "unknown".
+        vma_lma_offset - Offset from where the output section exists in memory to where it's loaded from.  If nonzero,
+           the initializer for this section will be considered too
         """
         if not object_name or not size:
             return
+
+        # Don't count the heap output section for memory bank size tracking, because the linker scripts (almost always?)
+        # configure that section to expand to fill the remaining amount of space
+        if section not in {".heap"}:
+            self._add_symbol_to_memory_banks(symbol_name, start_addr, size)
+            if vma_lma_offset != 0:
+                self._add_symbol_to_memory_banks(f"<initializer for {symbol_name}>", start_addr + vma_lma_offset, size)
 
         if object_name in self.symbols:
             self.symbols[object_name].setdefault(section, 0)
@@ -105,9 +177,9 @@ class _Parser(ABC):
                 contents[section] += size
                 return
 
-        new_module = defaultdict(int)
-        new_module[section] = size
-        self.symbols[object_name] = new_module
+        new_symbol = defaultdict(int)
+        new_symbol[section] = size
+        self.symbols[object_name] = new_symbol
 
     def load_memory_banks_info(self, memory_banks_json_file: TextIO) -> None:
         """
@@ -116,7 +188,7 @@ class _Parser(ABC):
         memory_banks_json = json.load(memory_banks_json_file)
         for bank_type, banks in memory_banks_json["configured_memory_banks"].items():
             for bank_name, bank_data in banks.items():
-                self.memory_banks["bank_type"].append(MemoryBankInfo(
+                self.memory_banks[bank_type].append(MemoryBankInfo(
                     name=bank_name,
                     start_addr=bank_data["start"],
                     total_size=bank_data["size"]
@@ -145,6 +217,22 @@ class _GccParser(_Parser):
     RE_TRANS_FILE = re.compile(r'^(.+\/|.+\.ltrans.o(bj)?)$')
     OBJECT_EXTENSIONS = (".o", ".obj")
 
+    # Parses a line beginning a new output section in the map file that has a load address
+    # Groups:
+    # 1 = section name, including dot
+    # 2 = in-memory address, hex, no 0x
+    # 3 = section size
+    # 4 = load address, i.e. where is the data for this section stored in flash
+    RE_OUTPUT_SECTION_WITH_LOAD_ADDRESS = re.compile(r'^(.\w+) +0x([0-9a-f]+) +0x([0-9a-f]+) +load address +0x([0-9a-f]+)')
+
+    # Parses a line beginning a new output section in the map file does not have a load address
+    # Groups:
+    # 1 = section name, including dot
+    # 2 = in-memory address, hex, no 0x
+    # 3 = section size
+    # 4 = load address, i.e. where is the data for this section stored in flash
+    RE_OUTPUT_SECTION_NO_LOAD_ADDRESS = re.compile(r'^(.\w+) +0x([0-9a-f]+) +0x([0-9a-f]+)')
+
     # Gets the input section name from the line, if it exists.
     # Input section names are always indented 1 space.
     RE_INPUT_SECTION_NAME = re.compile(r'^ (\.\w+\.?\w*\.?\w*)')  # Note: This allows up to 3 dots... hopefully that's enough...
@@ -156,22 +244,41 @@ class _GccParser(_Parser):
         + ('unknown', )
     )
 
-    def check_new_section(self, line):
-        """ Check whether a new section in a map file has been detected
+    def check_new_output_section(self, line) -> tuple[str, int] | None:
+        """ Check whether a new output section in a map file has been detected
 
         Positional arguments:
         line - the line to check for a new section
 
-        return value - A section name, if a new section was found, None
+        return value - Tuple of (name, vma to lma offset), if a new section was found, None
                        otherwise
+        The vma to lma offset is the offset to be added to a memory address to get the
+        address where it's loaded from.  If this is zero, the section is not loaded from flash to RAM at startup.
         """
-        for i in self.ALL_SECTIONS:
-            if line.startswith(i):
-                return i
-        if line.startswith('.'):
-            return 'unknown'
+
+        match = re.match(self.RE_OUTPUT_SECTION_WITH_LOAD_ADDRESS, line)
+        if match:
+            section_name = match.group(1)
+            memory_address = int(match.group(2), 16)
+            load_address = int(match.group(4), 16)
+            load_addr_offset = load_address - memory_address
         else:
-            return None
+            match = re.match(self.RE_OUTPUT_SECTION_NO_LOAD_ADDRESS, line)
+            if not match:
+                return None
+            section_name = match.group(1)
+            load_addr_offset = 0
+
+        # Ensure that this is a known section name, remove if not
+        if section_name not in self.ALL_SECTIONS:
+            section_name = "unknown"
+
+        # Strangely, GCC still generates load address info for sections that are not loaded, such as .bss.
+        # For now, suppress this for all sections other than .data.
+        if section_name != ".data":
+            load_addr_offset = 0
+
+        return section_name, load_addr_offset
 
     def check_input_section(self, line) -> Optional[str]:
         """ Check whether a new input section in a map file has been detected.
@@ -262,13 +369,8 @@ class _GccParser(_Parser):
         # GCC can put the section/symbol info on its own line or on the same line as the size and address.
         # So since this is a line oriented parser, we have to remember the most recently seen input & output
         # section name for later.
-        # Note: section (AKA output section) is the section in the output application that a symbol is going into.
-        # Examples: .text, .data, .bss
-        # input_section is the section in the object file that a symbol comes from.  It is generally more specific,
-        # e.g. a function could be from .text.my_function
-        # The output section *might* be a prefix to the input section, but not always: a linker script can happily
-        # put stuff from any input section into .text or .data if it wants to!
-        current_section = 'unknown'
+        current_output_section = 'unknown'
+        current_output_section_addr_offset = 0
         current_input_section = 'unknown'
 
         with file_desc as infile:
@@ -281,9 +383,9 @@ class _GccParser(_Parser):
                     # Done with memory map part of the map file
                     break
 
-                next_section = self.check_new_section(line)
+                next_section = self.check_new_output_section(line)
                 if next_section is not None:
-                    current_section = next_section
+                    current_output_section, current_output_section_addr_offset = next_section
 
                 next_input_section = self.check_input_section(line)
                 if next_input_section is not None:
@@ -294,7 +396,7 @@ class _GccParser(_Parser):
                 # With GCC at least, the closest we can get to a descriptive symbol name is the input section
                 # name.  Thanks to the -ffunction-sections and -fdata-sections options, the section names should
                 # be unique for each symbol.
-                self.add_symbol(current_input_section, symbol_name, symbol_start_addr, symbol_size, current_section)
+                self.add_symbol(current_input_section, symbol_name, symbol_start_addr, symbol_size, current_output_section, current_output_section_addr_offset)
 
         common_prefix = dirname(commonprefix([
             o for o in self.symbols.keys()
@@ -625,12 +727,22 @@ class MemapParser(object):
             self.mem_summary['total_flash_delta']
         )
 
+        output += '\n'
+        for bank_type, banks in self.memory_banks.items():
+            for bank_info in banks:
+                this_bank_deltas = self.memory_bank_summary[bank_type][bank_info.name]
+                output += (f"{bank_type} Bank {bank_info.name}: {bank_info.used_size}({this_bank_deltas['delta_bytes_used']:+})/"
+                           f"{bank_info.total_size} bytes used, "
+                           f"{this_bank_deltas['percent_used']:.01f}% ({this_bank_deltas['delta_percent_used']:+.01f}%) used\n")
+
         return output
 
     toolchains = ["ARM", "ARM_STD", "ARM_MICRO", "GCC_ARM", "IAR"]
 
     def compute_report(self):
-        """ Generates summary of memory usage for main areas
+        """
+        Generates summary of memory usage for main areas.  Result is put into the 'self.mem_report'
+        dict, which is processed by tests and also dumped as JSON for the JSON output format.
         """
         self.subtotal = defaultdict(int)
 
@@ -652,22 +764,49 @@ class MemapParser(object):
             self.subtotal['.text-delta'] + self.subtotal['.data-delta'],
         }
 
-        self.mem_report = []
+        self.mem_report = {}
+        modules = []
         if self.short_modules:
             for name, sizes in sorted(self.short_modules.items()):
-                self.mem_report.append({
+                modules.append({
                     "module": name,
                     "size": {
                         k: sizes.get(k, 0) for k in (self.print_sections +
                                                      self.delta_sections)
                     }
                 })
+        self.mem_report["modules"] = modules
 
-        self.mem_report.append({
-            'summary': self.mem_summary
-        })
+        self.mem_report["summary"] = self.mem_summary
 
-    def parse(self, mapfile, toolchain):
+        # Calculate the delta sizes for each memory bank in a couple different formats
+        self.memory_bank_summary: dict[str, dict[str, dict[str, float|int]]] = {}
+        for bank_type, banks in self.memory_banks.items():
+            self.memory_bank_summary[bank_type] = {}
+            for bank_info in banks:
+
+                this_bank_info = {}
+
+                # Find matching memory bank in old memory banks.  Compare by name as it would be possible
+                # for the indices to change between builds if someone edited the memory bank definition
+                old_bank_info = None
+                if self.old_memory_banks is not None and bank_type in self.old_memory_banks:
+                    for curr_old_bank_info in self.old_memory_banks[bank_type]:
+                        if curr_old_bank_info.name == bank_info.name:
+                            old_bank_info = curr_old_bank_info
+                            break
+
+                this_bank_info["bytes_used"] = bank_info.used_size
+                this_bank_info["total_size"] = bank_info.total_size
+                this_bank_info["delta_bytes_used"] = 0 if old_bank_info is None else bank_info.used_size - old_bank_info.used_size
+                this_bank_info["percent_used"] = 100 * bank_info.used_size/bank_info.total_size
+                this_bank_info["delta_percent_used"] = 100 * this_bank_info["delta_bytes_used"]/bank_info.total_size
+
+                self.memory_bank_summary[bank_type][bank_info.name] = this_bank_info
+
+        self.mem_report["memory_bank_usage"] = self.memory_bank_summary
+
+    def parse(self, mapfile: str, toolchain: str, memory_banks_json_path: str | None):
         """ Parse and decode map file depending on the toolchain
 
         Positional arguments:
@@ -676,17 +815,27 @@ class MemapParser(object):
         """
         self.tc_name = toolchain.title()
         if toolchain == "GCC_ARM":
-            parser = _GccParser
+            parser_class = _GccParser
         else:
             return False
+        parser = parser_class()
+        old_map_parser = parser_class()
+
+        if memory_banks_json_path is not None:
+            with open(memory_banks_json_path, 'r') as memory_banks_json_file:
+                parser.load_memory_banks_info(memory_banks_json_file)
+
         try:
             with open(mapfile, 'r') as file_input:
-                self.modules = parser().parse_mapfile(file_input)
+                self.modules = parser.parse_mapfile(file_input)
+                self.memory_banks = parser.memory_banks
             try:
                 with open("%s.old" % mapfile, 'r') as old_input:
-                    self.old_modules = parser().parse_mapfile(old_input)
+                    self.old_modules = old_map_parser.parse_mapfile(old_input)
+                    self.old_memory_banks = old_map_parser.memory_banks
             except IOError:
                 self.old_modules = None
+                self.old_memory_banks = None
             return True
 
         except IOError as error:
@@ -729,6 +878,11 @@ def main():
 
     parser.add_argument('-v', '--version', action='version', version=version)
 
+    parser.add_argument(
+        '-m', '--memory-banks-json',
+        type=argparse_filestring_type,
+        help='Path to memory bank JSON file.  If passed, memap will track the used space in each memory bank.')
+
     # Parse/run command
     if len(argv) <= 1:
         parser.print_help()
@@ -741,7 +895,7 @@ def main():
 
     # Parse and decode a map file
     if args.file and args.toolchain:
-        if memap.parse(args.file, args.toolchain) is False:
+        if memap.parse(args.file, args.toolchain, args.memory_banks_json) is False:
             exit(0)
 
     if args.depth is None:
