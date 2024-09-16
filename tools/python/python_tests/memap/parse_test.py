@@ -58,18 +58,18 @@ def test_parse_gcc():
 
 def test_add_symbol_missing_info():
     memap = _GccParser()
-    old_symbols = deepcopy(memap.symbols)
+    old_symbols = deepcopy(memap.modules)
     memap.add_symbol(".data.some_func", "", 8, 10, ".data", 1000)
-    assert(old_symbols == memap.symbols)
+    assert(old_symbols == memap.modules)
     memap.add_symbol(".data.some_func", "foo.o", 8, 0, ".data", 1000)
-    assert(old_symbols == memap.symbols)
+    assert(old_symbols == memap.modules)
 
 
 def test_add_full_module():
     memap = _GccParser()
-    old_modules = deepcopy(memap.symbols)
+    old_modules = deepcopy(memap.modules)
     memap.add_symbol(".data.foo", "main.o", 5, 8, ".data", 1000)
-    assert(old_modules != memap.symbols)
-    assert("main.o" in memap.symbols)
-    assert(".data" in memap.symbols["main.o"])
-    assert(memap.symbols["main.o"][".data"] == 8)
+    assert(old_modules != memap.modules)
+    assert("main.o" in memap.modules)
+    assert(".data" in memap.modules["main.o"])
+    assert(memap.modules["main.o"][".data"] == 8)

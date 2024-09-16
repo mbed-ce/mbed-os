@@ -17,14 +17,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from __future__ import absolute_import, annotations
-
-import copy
+from __future__ import annotations
 
 """
  memap term glossary, for code reviewers and for developers working on this script
  --------------------------------------------------------------------------------------------
  
+ - Module: In this script, a module refers to the code library (i.e. the .o file) where an object came from. 
  - Symbol: Any entity declared in the program that has a global address.  Generally this means any global
      variables and all functions.  Note that symbol names have to be alphanumeric, so C++ implemented
      "mangling" to encode class and function names as valid symbol names.  This means that C++ symbols will look
@@ -49,7 +48,7 @@ import copy
 """
 
 import dataclasses
-from typing import Tuple, Optional, Dict, TextIO, List
+from typing import Optional, TextIO
 from abc import abstractmethod, ABC
 from sys import stdout, exit, argv, path
 from os import sep
@@ -110,10 +109,10 @@ class _Parser(ABC):
 
     def __init__(self):
         # Dict of object name to {section name, size}
-        self.symbols: Dict[str, Dict[str, int]] = {}
+        self.modules: dict[str, dict[str, int]] = {}
 
         # Memory bank info, by type (RAM/ROM)
-        self.memory_banks: Dict[str, List[MemoryBankInfo]] = {"RAM": [], "ROM": []}
+        self.memory_banks: dict[str, list[MemoryBankInfo]] = {"RAM": [], "ROM": []}
 
     def _add_symbol_to_memory_banks(self, symbol_name: str, start_addr: int, size: int) -> None:
         """
@@ -165,13 +164,13 @@ class _Parser(ABC):
             if vma_lma_offset != 0:
                 self._add_symbol_to_memory_banks(f"<initializer for {symbol_name}>", start_addr + vma_lma_offset, size)
 
-        if object_name in self.symbols:
-            self.symbols[object_name].setdefault(section, 0)
-            self.symbols[object_name][section] += size
+        if object_name in self.modules:
+            self.modules[object_name].setdefault(section, 0)
+            self.modules[object_name][section] += size
             return
 
         obj_split = sep + basename(object_name)
-        for module_path, contents in self.symbols.items():
+        for module_path, contents in self.modules.items():
             if module_path.endswith(obj_split) or module_path == object_name:
                 contents.setdefault(section, 0)
                 contents[section] += size
@@ -179,7 +178,7 @@ class _Parser(ABC):
 
         new_symbol = defaultdict(int)
         new_symbol[section] = size
-        self.symbols[object_name] = new_symbol
+        self.modules[object_name] = new_symbol
 
     def load_memory_banks_info(self, memory_banks_json_file: TextIO) -> None:
         """
@@ -330,7 +329,7 @@ class _GccParser(_Parser):
                           % line)
                 return '[misc]'
 
-    def parse_section(self, line: str) -> Tuple[str, int, int]:
+    def parse_section(self, line: str) -> tuple[str, int, int]:
         """ Parse data from a section of gcc map file describing one symbol in the code.
 
         examples:
@@ -359,7 +358,7 @@ class _GccParser(_Parser):
 
         return "", 0, 0
 
-    def parse_mapfile(self, file_desc: TextIO) -> Dict[str, Dict[str, int]]:
+    def parse_mapfile(self, file_desc: TextIO) -> dict[str, dict[str, int]]:
         """ Main logic to decode gcc map files
 
         Positional arguments:
@@ -399,13 +398,13 @@ class _GccParser(_Parser):
                 self.add_symbol(current_input_section, symbol_name, symbol_start_addr, symbol_size, current_output_section, current_output_section_addr_offset)
 
         common_prefix = dirname(commonprefix([
-            o for o in self.symbols.keys()
+            o for o in self.modules.keys()
             if (
                     o.endswith(self.OBJECT_EXTENSIONS)
                     and not o.startswith("[lib]")
             )]))
         new_modules = {}
-        for name, stats in self.symbols.items():
+        for name, stats in self.modules.items():
             if name.startswith("[lib]"):
                 new_modules[name] = stats
             elif name.endswith(self.OBJECT_EXTENSIONS):
