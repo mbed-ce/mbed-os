@@ -422,12 +422,9 @@ in voltage and temperature.*/
 #include "stm32h5xx_hal_i2s.h"
 #endif /* HAL_I2S_MODULE_ENABLED */
 
-// Mbed patch to prevent circular include: ll_i3c.h includes this header, but hal_i3c.h needs ll_i3c.h to compile.
-// Boom.
-// So, don't include hal_i3c.h from this header.
-// #ifdef HAL_I3C_MODULE_ENABLED
-// #include "stm32h5xx_hal_i3c.h"
-// #endif /* HAL_I3C_MODULE_ENABLED */
+#ifdef HAL_I3C_MODULE_ENABLED
+#include "stm32h5xx_hal_i3c.h"
+#endif /* HAL_I3C_MODULE_ENABLED */
 
 #ifdef HAL_IWDG_MODULE_ENABLED
 #include "stm32h5xx_hal_iwdg.h"
