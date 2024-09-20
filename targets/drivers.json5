@@ -49,6 +49,10 @@
             "description": "Wifi 802.11b/g/n MCU running ESP8266-IDF-AT AT command firmware",
             "friendly_name": "Espressif ESP8366"
         },
+        "COMPONENT_ESPRESSIF_ESP32": {
+            "description": "Wifi 802.11b/g/n MCU running ESP32-IDF-AT AT command firmware",
+            "friendly_name": "Espressif ESP32"
+        },
 
 // Bluetooth only modules -----------------------------------------------------------
         "COMPONENT_BlueNRG_2": {
