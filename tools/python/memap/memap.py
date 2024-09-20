@@ -22,19 +22,19 @@ from __future__ import annotations
 """
  memap term glossary, for code reviewers and for developers working on this script
  --------------------------------------------------------------------------------------------
- 
- - Module: In this script, a module refers to the code library (i.e. the .o file) where an object came from. 
+
+ - Module: In this script, a module refers to the code library (i.e. the .o file) where an object came from.
  - Symbol: Any entity declared in the program that has a global address.  Generally this means any global
      variables and all functions.  Note that symbol names have to be alphanumeric, so C++ implemented
      "mangling" to encode class and function names as valid symbol names.  This means that C++ symbols will look
      like "_ZN4mbed8AnalogIn6_mutexE" to the linker.  You can use the "c++filt" tool to convert those back
      into a human readable name like "mbed::AnalogIn::_mutex."
- - Section: A logical region of an elf of object file.  Each section has a specific name and occupies contiguous memory. 
+ - Section: A logical region of an elf of object file.  Each section has a specific name and occupies contiguous memory.
      It's a vague term.
  - Input section: The section in the object (.o/.obj) file that a symbol comes from.  It generally has a specific name,
      e.g. a function could be from the .text.my_function input section.
- - Output section: The section in the linked application file (.elf) that a symbol has been put into.  The output 
-     section *might* match the input section, but not always! A linker script can happily put stuff from 
+ - Output section: The section in the linked application file (.elf) that a symbol has been put into.  The output
+     section *might* match the input section, but not always! A linker script can happily put stuff from
      any input section into any output section if so desired.
  - VMA (Virtual Memory Address): The address that an output section will have when the application runs.
      Note that this name is something of a misnomer as it is inherited from desktop Linux.  There is no virtual
