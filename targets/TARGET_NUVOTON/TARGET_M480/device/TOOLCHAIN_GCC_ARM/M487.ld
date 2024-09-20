@@ -23,7 +23,11 @@
 #include "../M480_mem.h"
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
-  #define MBED_CONF_TARGET_BOOT_STACK_SIZE      0x400
+#  if defined(MBED_BOOT_STACK_SIZE)
+#    define MBED_CONF_TARGET_BOOT_STACK_SIZE MBED_BOOT_STACK_SIZE
+#  else
+#    define MBED_CONF_TARGET_BOOT_STACK_SIZE 0x400
+#  endif
 #endif
 
 M_CRASH_DATA_RAM_SIZE = 0x100;
