@@ -59,5 +59,5 @@ set(UPLOAD_LAUNCH_COMMANDS
 "tbreak main"
 )
 set(UPLOAD_RESTART_COMMANDS
-"monitor reset"
+"monitor reset halt"
 )
