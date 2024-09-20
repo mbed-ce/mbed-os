@@ -91,7 +91,7 @@ class MemoryBankInfo:
     # Size used in the memory bank in bytes (sum of the sizes of all symbols)
     used_size: int = 0
 
-    def contains_addr(self, addr: int):
+    def contains_addr(self, addr: int) -> bool:
         """
         :return: True if the given address is contained inside this memory bank
         """
@@ -142,7 +142,7 @@ class _Parser(ABC):
         print(f"Warning: Symbol {symbol_name} (at address 0x{start_addr:x}, size {size}) is not inside a defined memory "
               f"bank for this target.")
 
-    def add_symbol(self, symbol_name: str, object_name: str, start_addr: int, size: int, section: str, vma_lma_offset: int):
+    def add_symbol(self, symbol_name: str, object_name: str, start_addr: int, size: int, section: str, vma_lma_offset: int) -> None:
         """ Adds information about a symbol (e.g. a function or global variable) to the data structures.
 
         Positional arguments:
@@ -243,7 +243,7 @@ class _GccParser(_Parser):
         + ('unknown', )
     )
 
-    def check_new_output_section(self, line) -> tuple[str, int] | None:
+    def check_new_output_section(self, line: str) -> tuple[str, int] | None:
         """ Check whether a new output section in a map file has been detected
 
         Positional arguments:
@@ -293,7 +293,7 @@ class _GccParser(_Parser):
 
         return match.group(1)
 
-    def parse_object_name(self, line) -> str:
+    def parse_object_name(self, line: str) -> str:
         """ Parse a path to object file
 
         Positional arguments:
@@ -805,7 +805,7 @@ class MemapParser(object):
 
         self.mem_report["memory_bank_usage"] = self.memory_bank_summary
 
-    def parse(self, mapfile: str, toolchain: str, memory_banks_json_path: str | None):
+    def parse(self, mapfile: str, toolchain: str, memory_banks_json_path: str | None) -> bool:
         """ Parse and decode map file depending on the toolchain
 
         Positional arguments:
