@@ -79,17 +79,17 @@ from .utils import (
 
 @dataclasses.dataclass
 class MemoryBankInfo:
-    # Name of the bank, from cmsis_mcu_descriptions.json
     name: str
+    """Name of the bank, from cmsis_mcu_descriptions.json"""
 
-    # Start address of memory bank
     start_addr: int
+    """Start address of memory bank"""
 
-    # Total size of the memory bank in bytes
     total_size: int
+    """Total size of the memory bank in bytes"""
 
-    # Size used in the memory bank in bytes (sum of the sizes of all symbols)
     used_size: int = 0
+    """Size used in the memory bank in bytes (sum of the sizes of all symbols)"""
 
     def contains_addr(self, addr: int) -> bool:
         """
@@ -108,11 +108,11 @@ class _Parser(ABC):
                       '.stabstr', '.ARM.exidx', '.ARM')
 
     def __init__(self):
-        # Dict of object name to {section name, size}
         self.modules: dict[str, dict[str, int]] = {}
+        """Dict of object name to {section name, size}"""
 
-        # Memory bank info, by type (RAM/ROM)
         self.memory_banks: dict[str, list[MemoryBankInfo]] = {"RAM": [], "ROM": []}
+        """Memory bank info, by type (RAM/ROM)"""
 
     def _add_symbol_to_memory_banks(self, symbol_name: str, start_addr: int, size: int) -> None:
         """
@@ -124,7 +124,7 @@ class _Parser(ABC):
             return
 
         end_addr = start_addr + size
-        for bank_type, banks in self.memory_banks.items():
+        for banks in self.memory_banks.values():
             for bank_info in banks:
                 if bank_info.contains_addr(start_addr):
                     if bank_info.contains_addr(end_addr):
