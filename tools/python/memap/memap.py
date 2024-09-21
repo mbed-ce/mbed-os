@@ -114,7 +114,7 @@ class _Parser(ABC):
         self.memory_banks: dict[str, list[MemoryBankInfo]] = {"RAM": [], "ROM": []}
         """Memory bank info, by type (RAM/ROM)"""
 
-    def _add_symbol_to_memory_banks(self, symbol_name: str, start_addr: int, size: int) -> None:
+    def _add_symbol_to_memory_banks(self, symbol_name: str, symbol_start_addr: int, size: int) -> None:
         """
         Update the memory banks structure to add the space used by a symbol.
         """
@@ -123,10 +123,10 @@ class _Parser(ABC):
             # No memory banks loaded, skip
             return
 
-        end_addr = start_addr + size
+        end_addr = symbol_start_addr + size
         for banks in self.memory_banks.values():
             for bank_info in banks:
-                if bank_info.contains_addr(start_addr):
+                if bank_info.contains_addr(symbol_start_addr):
                     if bank_info.contains_addr(end_addr):
                         # Symbol fully inside this memory bank
                         bank_info.used_size += size
@@ -136,10 +136,11 @@ class _Parser(ABC):
 
                         return
                     print(f"Warning: Symbol {symbol_name} is only partially contained by memory bank {bank_info.name}")
-                    bank_info.used_size += (bank_info.start_addr + bank_info.total_size) - start_addr
+                    first_addr_after_bank = bank_info.start_addr + bank_info.total_size
+                    bank_info.used_size += first_addr_after_bank - symbol_start_addr
 
-        print(f"Warning: Symbol {symbol_name} (at address 0x{start_addr:x}, size {size}) is not inside a defined memory "
-              f"bank for this target.")
+        print(f"Warning: Symbol {symbol_name} (at address 0x{symbol_start_addr:x}, size {size}) is not inside a "
+              f"defined memory bank for this target.")
 
     def add_symbol(self, symbol_name: str, object_name: str, start_addr: int, size: int, section: str, vma_lma_offset: int) -> None:
         """ Adds information about a symbol (e.g. a function or global variable) to the data structures.
@@ -193,7 +194,7 @@ class _Parser(ABC):
                 ))
 
     @abstractmethod
-    def parse_mapfile(self, file_desc: TextIO) -> Dict[str, Dict[str, int]]:
+    def parse_mapfile(self, file_desc: TextIO) -> dict[str, dict[str, int]]:
         """Parse a given file object pointing to a map file
 
         Positional arguments:
