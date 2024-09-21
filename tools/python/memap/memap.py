@@ -135,9 +135,8 @@ class _Parser(ABC):
                         # print(f"Symbol {symbol_name} uses {size} bytes in {bank_info.name}")
 
                         return
-                    else:
-                        print(f"Warning: Symbol {symbol_name} is only partially contained by memory bank {bank_info.name}")
-                        bank_info.used_size += (bank_info.start_addr + bank_info.total_size) - start_addr
+                    print(f"Warning: Symbol {symbol_name} is only partially contained by memory bank {bank_info.name}")
+                    bank_info.used_size += (bank_info.start_addr + bank_info.total_size) - start_addr
 
         print(f"Warning: Symbol {symbol_name} (at address 0x{start_addr:x}, size {size}) is not inside a defined memory "
               f"bank for this target.")
