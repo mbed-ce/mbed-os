@@ -28,6 +28,15 @@ MISSING_LICENSE_TEXT = "Missing license header"
 MISSING_PERMISSIVE_LICENSE_TEXT = "Non-permissive license"
 MISSING_SPDX_TEXT = "Missing SPDX license identifier"
 
+# If a path contains text matching one of these regexes, it will be ignored for license checking.
+IGNORE_PATH_REGEXES = [
+    # As of 2024, STMicro stopped putting license declaraions or SPDX identifiers
+    # in its HAL drivers.  Instead they reference a license file in the repo root.
+    # We don't want to have to modify all their code to add SPDX license IDs every time
+    # it gets updated, so we ignore everything under STM32Cube_FW
+    re.compile(r"TARGET_STM/.*STM32Cube_FW")
+]
+
 userlog = logging.getLogger("scancode_evaluate")
 
 # find the mbed-os root dir by going up three levels from this script
@@ -142,6 +151,15 @@ def license_check(scancode_output_path):
 
     for scancode_output_data_file in scancode_output_data['files']:
         if scancode_output_data_file['type'] != 'file':
+            continue
+
+        is_ignored = False
+        for regex in IGNORE_PATH_REGEXES:
+            if re.search(regex, scancode_output_data_file['path']) is not None:
+                userlog.info("Ignoring %s due to ignore rule." % (scancode_output_data_file['path'],))
+                is_ignored = True
+                break
+        if is_ignored:
             continue
 
         if not scancode_output_data_file['licenses']:

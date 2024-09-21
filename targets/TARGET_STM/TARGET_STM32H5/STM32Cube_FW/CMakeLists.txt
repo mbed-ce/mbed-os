@@ -118,9 +118,6 @@ target_sources(mbed-stm32h5cube-fw
         # HAL driver for i3c is enabled due to a circular include issue.
 )
 
-# Silence warning
-set_property(SOURCE STM32H5xx_HAL_Driver/stm32h5xx_hal_hcd.c PROPERTY COMPILE_OPTIONS -Wno-old-style-declaration)
-
 target_include_directories(mbed-stm32h5cube-fw
     INTERFACE
         .
