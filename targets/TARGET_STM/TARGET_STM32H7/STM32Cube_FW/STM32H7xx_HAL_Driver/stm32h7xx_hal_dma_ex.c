@@ -37,13 +37,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -290,18 +289,7 @@ HAL_StatusTypeDef HAL_DMAEx_MultiBufferStart_IT(DMA_HandleTypeDef *hdma, uint32_
     {
       /* Enable Common interrupts*/
       MODIFY_REG(((DMA_Stream_TypeDef   *)hdma->Instance)->CR, (DMA_IT_TC | DMA_IT_TE | DMA_IT_DME | DMA_IT_HT), (DMA_IT_TC | DMA_IT_TE | DMA_IT_DME));
-
-      /* Mbed CE mod: Only enable the FIFO Error interrupt if the FIFO is actually enabled.
-       * If it's not enabled, then this interrupt can trigger spuriously from memory bus
-       * stalls that the DMA engine encounters, and this creates random DMA failures.
-       * Reference forum thread here:
-       * https://community.st.com/t5/stm32-mcus-products/spi-dma-fifo-error-issue-feifx/td-p/537074
-       * also: https://community.st.com/t5/stm32-mcus-touch-gfx-and-gui/spi-dma-error-is-occurred-when-the-other-dma-memory-to-memory-is/td-p/191590
-       */
-      if(((DMA_Stream_TypeDef *)hdma->Instance)->FCR & DMA_SxFCR_DMDIS)
-      {
-        ((DMA_Stream_TypeDef *)hdma->Instance)->FCR |= DMA_IT_FE;
-      }
+      ((DMA_Stream_TypeDef   *)hdma->Instance)->FCR |= DMA_IT_FE;
 
       if((hdma->XferHalfCpltCallback != NULL) || (hdma->XferM1HalfCpltCallback != NULL))
       {
@@ -722,4 +710,3 @@ static void DMA_MultiBufferSetConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddres
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

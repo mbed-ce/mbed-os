@@ -75,14 +75,6 @@
 /* Consider 10ms as the default timeout for sending/receving 1 byte */
 #define TIMEOUT_1_BYTE 10
 
-#if defined(SPI_FLAG_FRLVL) // STM32F0 STM32F3 STM32F7 STM32L4
-#if defined(STM32U5) || defined(STM32H5)
-extern HAL_StatusTypeDef HAL_SPIEx_FlushRxFifo(const SPI_HandleTypeDef *hspi);
-#else
-extern HAL_StatusTypeDef HAL_SPIEx_FlushRxFifo(SPI_HandleTypeDef *hspi);
-#endif
-#endif
-
 #if defined(SPI_DATASIZE_17BIT) || defined(SPI_DATASIZE_18BIT) || defined(SPI_DATASIZE_19BIT) || defined(SPI_DATASIZE_20BIT) || \
     defined(SPI_DATASIZE_21BIT) || defined(SPI_DATASIZE_22BIT) || defined(SPI_DATASIZE_23BIT) || defined(SPI_DATASIZE_24BIT) || \
     defined(SPI_DATASIZE_25BIT) || defined(SPI_DATASIZE_26BIT) || defined(SPI_DATASIZE_27BIT) || defined(SPI_DATASIZE_28BIT) || \

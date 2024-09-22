@@ -1,10 +1,11 @@
 /**
   ******************************************************************************
-  * @file    system_stm32h7xx.c
+  * @file    system_stm32h7xx_dualcore_boot_cm4_cm7.c
   * @author  MCD Application Team
-  * @brief   CMSIS Cortex-M7 Device Peripheral Access Layer System Source File.
+  * @brief   CMSIS Cortex-Mx Device Peripheral Access Layer System Source File.
   *          This provides system initialization template function is case of
-  *          an application using a single core STM32H7 device
+  *          an application using a dual core STM32H7 device where
+  *          Cortex-M7 and Cortex-M4 boot are enabled at the FLASH option bytes
   *
   *   This file provides two functions and one global variable to be called from
   *   user application:
@@ -12,7 +13,7 @@
   *                      before branch to main program. This call is made inside
   *                      the "startup_stm32h7xx.s" file.
   *
-  *      - SystemCoreClock variable: Contains the core clock (HCLK), it can be used
+  *      - SystemCoreClock variable: Contains the core clock, it can be used
   *                                  by the user application to setup the SysTick
   *                                  timer or configure other parameters.
   *
@@ -24,13 +25,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -48,10 +48,6 @@
   */
 
 #include "stm32h7xx.h"
-
-
-#if !defined(DUAL_CORE)
-
 #include <math.h>
 
 #if !defined  (HSE_VALUE)
@@ -84,14 +80,48 @@
   */
 
 /************************* Miscellaneous Configuration ************************/
-/*!< Uncomment the following line if you need to use initialized data in D2 domain SRAM (AHB SRAM) */
-/* #define DATA_IN_D2_SRAM */
+/* Note: Following vector table addresses must be defined in line with linker
+         configuration. */
+/*!< Uncomment the following line if you need to relocate the vector table
+     anywhere in FLASH BANK1 or AXI SRAM, else the vector table is kept at the automatic
+     remap of boot address selected */
+/* #define USER_VECT_TAB_ADDRESS */
 
-/*!< Uncomment the following line if you need to relocate your vector Table in
-     Internal SRAM. */
+#if defined(USER_VECT_TAB_ADDRESS)
+#if defined(CORE_CM4)
+/*!< Uncomment the following line if you need to relocate your vector Table
+     in D2 AXI SRAM else user remap will be done in FLASH BANK2. */
 /* #define VECT_TAB_SRAM */
-#define VECT_TAB_OFFSET  0x00000000UL /*!< Vector Table base offset field.
-                                      This value must be a multiple of 0x200. */
+#if defined(VECT_TAB_SRAM)
+#define VECT_TAB_BASE_ADDRESS   D2_AXISRAM_BASE   /*!< Vector Table base address field.
+                                                       This value must be a multiple of 0x400. */
+#define VECT_TAB_OFFSET         0x00000000U       /*!< Vector Table base offset field.
+                                                       This value must be a multiple of 0x400. */
+#else
+#define VECT_TAB_BASE_ADDRESS   FLASH_BANK2_BASE  /*!< Vector Table base address field.
+                                                       This value must be a multiple of 0x400. */
+#define VECT_TAB_OFFSET         0x00000000U       /*!< Vector Table base offset field.
+                                                       This value must be a multiple of 0x400. */
+#endif /* VECT_TAB_SRAM */
+#elif defined(CORE_CM7)
+/*!< Uncomment the following line if you need to relocate your vector Table
+     in D1 AXI SRAM else user remap will be done in FLASH BANK1. */
+/* #define VECT_TAB_SRAM */
+#if defined(VECT_TAB_SRAM)
+#define VECT_TAB_BASE_ADDRESS   D1_AXISRAM_BASE   /*!< Vector Table base address field.
+                                                       This value must be a multiple of 0x400. */
+#define VECT_TAB_OFFSET         0x00000000U       /*!< Vector Table base offset field.
+                                                       This value must be a multiple of 0x400. */
+#else
+#define VECT_TAB_BASE_ADDRESS   FLASH_BANK1_BASE  /*!< Vector Table base address field.
+                                                       This value must be a multiple of 0x400. */
+#define VECT_TAB_OFFSET         0x00000000U       /*!< Vector Table base offset field.
+                                                       This value must be a multiple of 0x400. */
+#endif /* VECT_TAB_SRAM */
+#else
+#error Please #define CORE_CM4 or CORE_CM7
+#endif /* CORE_CM4 */
+#endif /* USER_VECT_TAB_ADDRESS */
 /******************************************************************************/
 
 /**
@@ -144,23 +174,24 @@
   * @param  None
   * @retval None
   */
-__weak void SystemInit (void)
+void SystemInit (void)
 {
-#if defined (DATA_IN_D2_SRAM)
- __IO uint32_t tmpreg;
-#endif /* DATA_IN_D2_SRAM */
-
   /* FPU settings ------------------------------------------------------------*/
   #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
     SCB->CPACR |= ((3UL << (10*2))|(3UL << (11*2)));  /* set CP10 and CP11 Full Access */
   #endif
-  /* Reset the RCC clock configuration to the default reset state ------------*/
 
+    /*SEVONPEND enabled so that an interrupt coming from the CPU(n) interrupt signal is
+     detectable by the CPU after a WFI/WFE instruction.*/
+ SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
+
+#if defined(CORE_CM7)
+  /* Reset the RCC clock configuration to the default reset state ------------*/
    /* Increasing the CPU frequency */
   if(FLASH_LATENCY_DEFAULT  > (READ_BIT((FLASH->ACR), FLASH_ACR_LATENCY)))
   {
     /* Program the new number of wait states to the LATENCY bits in the FLASH_ACR register */
-	MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, (uint32_t)(FLASH_LATENCY_DEFAULT));
+    MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, (uint32_t)(FLASH_LATENCY_DEFAULT));
   }
 
   /* Set HSION bit */
@@ -176,10 +207,9 @@ __weak void SystemInit (void)
   if(FLASH_LATENCY_DEFAULT  < (READ_BIT((FLASH->ACR), FLASH_ACR_LATENCY)))
   {
     /* Program the new number of wait states to the LATENCY bits in the FLASH_ACR register */
-	MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, (uint32_t)(FLASH_LATENCY_DEFAULT));
+    MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, (uint32_t)(FLASH_LATENCY_DEFAULT));
   }
 
-#if defined(D3_SRAM_BASE)
   /* Reset D1CFGR register */
   RCC->D1CFGR = 0x00000000;
 
@@ -188,16 +218,7 @@ __weak void SystemInit (void)
 
   /* Reset D3CFGR register */
   RCC->D3CFGR = 0x00000000;
-#else
-  /* Reset CDCFGR1 register */
-  RCC->CDCFGR1 = 0x00000000;
 
-  /* Reset CDCFGR2 register */
-  RCC->CDCFGR2 = 0x00000000;
-
-  /* Reset SRDCFGR register */
-  RCC->SRDCFGR = 0x00000000;
-#endif
   /* Reset PLLCKSELR register */
   RCC->PLLCKSELR = 0x02020200;
 
@@ -226,29 +247,29 @@ __weak void SystemInit (void)
   /* Disable all interrupts */
   RCC->CIER = 0x00000000;
 
-#if (STM32H7_DEV_ID == 0x450UL)
-  /* single core line */
+  /* Enable CortexM7 HSEM EXTI line (line 78)*/
+  EXTI_D2->EMR3 |= 0x4000UL;
+
   if((DBGMCU->IDCODE & 0xFFFF0000U) < 0x20000000U)
   {
     /* if stm32h7 revY*/
     /* Change  the switch matrix read issuing capability to 1 for the AXI SRAM target (Target 7) */
     *((__IO uint32_t*)0x51008108) = 0x000000001U;
   }
+
+#endif /* CORE_CM7*/
+
+#ifdef CORE_CM4
+
+  /* Configure the Vector Table location add offset address ------------------*/
+#ifdef VECT_TAB_SRAM
+  SCB->VTOR = D2_AXISRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
+#else
+#include "nvic_addr.h"                   // MBED
+  SCB->VTOR = NVIC_FLASH_VECTOR_ADDRESS; // MBED
 #endif
 
-#if defined (DATA_IN_D2_SRAM)
-  /* in case of initialized data in D2 SRAM (AHB SRAM), enable the D2 SRAM clock (AHB SRAM clock) */
-#if defined(RCC_AHB2ENR_D2SRAM3EN)
-  RCC->AHB2ENR |= (RCC_AHB2ENR_D2SRAM1EN | RCC_AHB2ENR_D2SRAM2EN | RCC_AHB2ENR_D2SRAM3EN);
-#elif defined(RCC_AHB2ENR_D2SRAM2EN)
-  RCC->AHB2ENR |= (RCC_AHB2ENR_D2SRAM1EN | RCC_AHB2ENR_D2SRAM2EN);
-#else
-  RCC->AHB2ENR |= (RCC_AHB2ENR_AHBSRAM1EN | RCC_AHB2ENR_AHBSRAM2EN);
-#endif /* RCC_AHB2ENR_D2SRAM3EN */
-  tmpreg = RCC->AHB2ENR;
-  (void) tmpreg;
-#endif /* DATA_IN_D2_SRAM */
-
+#elif defined(CORE_CM7)
   /*
    * Disable the FMC bank1 (enabled after reset).
    * This, prevents CPU speculation access on this bank which blocks the use of FMC during
@@ -258,13 +279,15 @@ __weak void SystemInit (void)
 
   /* Configure the Vector Table location add offset address ------------------*/
 #ifdef VECT_TAB_SRAM
-  SCB->VTOR = D1_AXISRAM_BASE  | VECT_TAB_OFFSET;       /* Vector Table Relocation in Internal AXI-RAM */
+  SCB->VTOR = D1_AXISRAM_BASE  | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal D1 AXI-RAM */
 #else
 #include "nvic_addr.h"                   // MBED
   SCB->VTOR = NVIC_FLASH_VECTOR_ADDRESS; // MBED
 #endif
 
-
+#else
+#error Please #define CORE_CM4 or CORE_CM7
+#endif /* CORE_CM4 */
 }
 
 /**
@@ -307,6 +330,7 @@ __weak void SystemInit (void)
 void SystemCoreClockUpdate (void)
 {
   uint32_t pllp, pllsource, pllm, pllfracen, hsivalue, tmp;
+  uint32_t common_system_clock;
   float_t fracn1, pllvco;
 
   /* Get SYSCLK source -------------------------------------------------------*/
@@ -314,16 +338,15 @@ void SystemCoreClockUpdate (void)
   switch (RCC->CFGR & RCC_CFGR_SWS)
   {
   case RCC_CFGR_SWS_HSI:  /* HSI used as system clock source */
-   SystemCoreClock = (uint32_t) (HSI_VALUE >> ((RCC->CR & RCC_CR_HSIDIV)>> 3));
-
+    common_system_clock = (uint32_t) (HSI_VALUE >> ((RCC->CR & RCC_CR_HSIDIV)>> 3));
     break;
 
   case RCC_CFGR_SWS_CSI:  /* CSI used as system clock  source */
-    SystemCoreClock = CSI_VALUE;
+    common_system_clock = CSI_VALUE;
     break;
 
   case RCC_CFGR_SWS_HSE:  /* HSE used as system clock  source */
-    SystemCoreClock = HSE_VALUE;
+    common_system_clock = HSE_VALUE;
     break;
 
   case RCC_CFGR_SWS_PLL1:  /* PLL1 used as system clock  source */
@@ -361,38 +384,35 @@ void SystemCoreClockUpdate (void)
         break;
       }
       pllp = (((RCC->PLL1DIVR & RCC_PLL1DIVR_P1) >>9) + 1U ) ;
-      SystemCoreClock =  (uint32_t)(float_t)(pllvco/(float_t)pllp);
+      common_system_clock =  (uint32_t)(float_t)(pllvco/(float_t)pllp);
     }
     else
     {
-      SystemCoreClock = 0U;
+      common_system_clock = 0U;
     }
     break;
 
   default:
-    SystemCoreClock = (uint32_t) (HSI_VALUE >> ((RCC->CR & RCC_CR_HSIDIV)>> 3));
+    common_system_clock = (uint32_t) (HSI_VALUE >> ((RCC->CR & RCC_CR_HSIDIV)>> 3));
     break;
   }
 
   /* Compute SystemClock frequency --------------------------------------------------*/
-#if defined (RCC_D1CFGR_D1CPRE)
   tmp = D1CorePrescTable[(RCC->D1CFGR & RCC_D1CFGR_D1CPRE)>> RCC_D1CFGR_D1CPRE_Pos];
 
-  /* SystemCoreClock frequency : CM7 CPU frequency  */
-  SystemCoreClock >>= tmp;
+  /* common_system_clock frequency : CM7 CPU frequency  */
+  common_system_clock >>= tmp;
 
-  /* SystemD2Clock frequency : AXI and AHBs Clock frequency  */
-  SystemD2Clock = (SystemCoreClock >> ((D1CorePrescTable[(RCC->D1CFGR & RCC_D1CFGR_HPRE)>> RCC_D1CFGR_HPRE_Pos]) & 0x1FU));
+  /* SystemD2Clock frequency : CM4 CPU, AXI and AHBs Clock frequency  */
+  SystemD2Clock = (common_system_clock >> ((D1CorePrescTable[(RCC->D1CFGR & RCC_D1CFGR_HPRE)>> RCC_D1CFGR_HPRE_Pos]) & 0x1FU));
+
+#if defined(CORE_CM4)
+  SystemCoreClock = SystemD2Clock;
 #else
-  tmp = D1CorePrescTable[(RCC->CDCFGR1 & RCC_CDCFGR1_CDCPRE)>> RCC_CDCFGR1_CDCPRE_Pos];
-
-  SystemCoreClock >>= tmp;
-  /* SystemD2Clock frequency : AXI and AHBs Clock frequency  */
-  SystemD2Clock = (SystemCoreClock >> ((D1CorePrescTable[(RCC->CDCFGR1 & RCC_CDCFGR1_HPRE)>> RCC_CDCFGR1_HPRE_Pos]) & 0x1FU));
-#endif
+  SystemCoreClock = common_system_clock;
+#endif /* CORE_CM4 */
 }
 
-#endif
 
 /**
   * @}
@@ -405,4 +425,3 @@ void SystemCoreClockUpdate (void)
 /**
   * @}
   */
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

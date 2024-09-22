@@ -3225,7 +3225,8 @@
         },
         "macros_add": [
             "EXTRA_IDLE_STACK_REQUIRED",
-            "MBED_TICKLESS"
+            "MBED_TICKLESS",
+            "DATA_IN_D2_SRAM" // Flag to HAL Layer to initialize clock for D2 SRAM on boot
         ],
         "overrides": {
             "lpticker_delay_ticks": 0,
