@@ -41,6 +41,12 @@
 #ifndef EM_DEVICE_H
 #define EM_DEVICE_H
 
+// MBED: The CMake scripts always define __FPU_PRESENT, but the MCU CMSIS headers below also define it.
+// So, undef it here to prevent multiple definition warning.
+#ifdef __FPU_PRESENT
+#undef __FPU_PRESENT
+#endif
+
 #if defined(EFM32GG11B110F2048GM64)
 #include "efm32gg11b110f2048gm64.h"
 

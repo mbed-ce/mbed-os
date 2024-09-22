@@ -1,11 +1,137 @@
-name: test building greentea tests with cmake
-
+name: Compile Check
 on: [pull_request]
 
 jobs:
-  build-greentea-cmake:
+  build-greentea:
     runs-on: ubuntu-latest
     container: ghcr.io/armmbed/mbed-os-env:master-latest
+
+    strategy:
+      matrix:
+        include:
+          ## For this matrix, we choose one target from each MCU target family that Mbed supports.
+          ## The target families can be seen here:
+          ## https://mbed-ce.github.io/mbed-ce-test-tools/targets/index.html
+          ## Generally we want to get the most feature-filled MCU of each type so that as much stuff
+          ## compiles as possible -- e.g. prefer a board with ethernet to one without so that we
+          ## can compile the netsocket tests.
+
+          # NXP MCUs
+          - target: LPC1768
+            profile: full
+          - target: LPC546XX
+            profile: full
+          - target: MIMXRT1060_EVK
+            profile: full
+          - target: MIMXRT1170_EVK
+            profile: full
+
+          # Freescale MCUs
+          - target: K64F
+            profile: full
+          - target: KL43Z
+            profile: full
+          - target: KW41Z
+            profile: full
+
+          # STM32 MCUs
+          - target: NUCLEO_F091RC
+            profile: full
+          - target: NUCLEO_F103RB
+            profile: baremetal
+          - target: NUCLEO_F207ZG
+            profile: full
+          - target: NUCLEO_F303RE
+            profile: full
+          - target: NUCLEO_F429ZI
+            profile: full
+          - target: NUCLEO_F767ZI
+            profile: full
+          - target: NUCLEO_G031K8
+            profile: baremetal
+          - target: NUCLEO_G431RB
+            profile: full
+          - target: NUCLEO_H563ZI
+            profile: full
+          - target: NUCLEO_H745ZI_Q_CM7
+            profile: full
+          - target: DISCO_L072CZ_LRWAN1
+            profile: baremetal
+          - target: XDOT_L151CC
+            profile: full
+          - target: DISCO_L4R9I
+            profile: full
+          - target: DISCO_L562QE
+            profile: full
+          - target: B_U585I_IOT02A
+            profile: full
+          - target: NUCLEO_WB55RG
+            profile: full
+          - target: NUCLEO_WL55JC
+            profile: full
+
+          # Maxim MCUs
+          - target: MAX32625MBED
+            profile: full
+          - target: XDOT_MAX32670
+            profile: full
+
+          # Nuvoton MCUs
+          - target: NUMAKER_PFM_NANO130
+            profile: baremetal
+          - target: NUMAKER_PFM_M487
+            profile: full
+          - target: NU_M2354
+            profile: full
+
+          # Samsung MCUs
+          - target: S1SBP6A
+            profile: full
+
+          # nRF MCUs
+          - target: NRF52840_DK
+            profile: full
+          - target: ARDUINO_NICLA_SENSE_ME
+            profile: full
+
+          # Toshiba MCUs
+          - target: TMPM4G9
+            profile: full
+
+          # Renesas MCUs
+          - target: GR_MANGO
+            profile: full
+          - target: RZ_A1H
+            profile: full
+
+          # Ambiq MCUs
+          - target: SFE_ARTEMIS_DK
+            profile: full
+
+          # Infineon/Cypress MCUs
+          - target: CY8CKIT_062S2_43012
+            profile: full
+          - target: CYTFM_064B0S2_4343W
+            profile: full
+
+          # Analog Devices MCUs
+          - target: EV_COG_AD4050LZ
+            profile: full
+
+          # GigaDevices MCUs
+          - target: GD32_F307VG
+            profile: full
+          - target: GD32_F450ZI
+            profile: full
+
+          # SiLabs MCUs
+          - target: EFM32GG11_STK3701
+            profile: full
+
+          # Raspberry Pi MCUs
+          - target: RASPBERRY_PI_PICO
+            profile: full
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -15,14 +141,17 @@ jobs:
           apt-get update
           apt-get install -y python3-venv
 
-      - name: Build NUCLEO_G031K8 with baremetal profile
+      - name: Build ${{ matrix.target }} with baremetal profile
+        if: ${{ matrix.profile == 'baremetal' }}
+        # Note: We have to set a wifi network name and password so that the test will compile on devices that use wifi
         run: |
             rm -rf __build
-            cmake -S . -B __build -GNinja -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_TEST_BAREMETAL=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=NUCLEO_G031K8 -DMBED_APP_JSON_PATH=TESTS/configs/baremetal.json
+            cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_TEST_BAREMETAL=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }} -DMBED_APP_JSON_PATH=TESTS/configs/baremetal.json
             cmake --build __build
 
-      - name: Build ARM_MUSCA_S1 with full profile
+      - name: Build ${{ matrix.target }} with full profile
+        if: ${{ matrix.profile == 'full' }}
         run: |
             rm -rf __build
-            cmake -S . -B __build -GNinja -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=ARM_MUSCA_S1
+            cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }}
             cmake --build __build

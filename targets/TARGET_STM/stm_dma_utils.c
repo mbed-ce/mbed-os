@@ -396,6 +396,15 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                 case 4:
                 case 5:
                     return DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX1_OVR_IRQn;
+#elif defined(TARGET_MCU_STM32F0)
+                // STM32F0 has a rather bespoke mapping
+                case 1:
+                case 2:
+                    return DMA1_Ch2_3_DMA2_Ch1_2_IRQn;
+                case 3:
+                case 4:
+                case 5:
+                    return DMA1_Ch4_7_DMA2_Ch3_5_IRQn;
 #else
 
 #ifdef DMA2_Channel1

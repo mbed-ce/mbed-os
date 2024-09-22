@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(TARGET_MAX32670EVKIT EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_XDOT_MAX32670 EXCLUDE_FROM_ALL)
 
 if(${MBED_TOOLCHAIN} STREQUAL "ARM")
     set(LINKER_FILE  device/TOOLCHAIN_ARM_STD/MAX32670.sct)
