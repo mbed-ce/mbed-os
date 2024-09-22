@@ -6,7 +6,6 @@ add_library(mbed-wio-h725ae INTERFACE)
 target_sources(mbed-wio-h725ae
     INTERFACE
         PeripheralPins.c
-        system_clock_override.c
 )
 
 target_include_directories(mbed-wio-h725ae
