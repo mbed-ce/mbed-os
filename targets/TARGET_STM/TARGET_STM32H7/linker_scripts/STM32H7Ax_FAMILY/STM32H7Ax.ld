@@ -15,16 +15,8 @@
  ******************************************************************************
 */
 
-#include "../cmsis_nvic.h"
-
-
-#if !defined(MBED_APP_START)
-  #define MBED_APP_START  MBED_ROM_START
-#endif
-
-#if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE  MBED_ROM_SIZE
-#endif
+#include "cmsis_nvic.h"
+#include "../stm32_eth_region_size_calcs.h"
 
 M_CRASH_DATA_RAM_SIZE = 0x100;
 
@@ -38,21 +30,19 @@ STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 
 /* Round up MBED_VECTTABLE_RAM_SIZE to 8 bytes */
 #define MBED_VECTTABLE_RAM_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
-#define MBED_RAM0_START  (MBED_RAM_START + MBED_VECTTABLE_RAM_SIZE)
-#define MBED_RAM0_SIZE   (MBED_RAM_SIZE - MBED_VECTTABLE_RAM_SIZE)
 
 MEMORY
 {
-    FLASH       (rx)  : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
-    SRAM_DTC   (xrw)  : ORIGIN = MBED_RAM0_START, LENGTH = MBED_RAM0_SIZE
-    SRAM       (xrw)  : ORIGIN = MBED_RAM1_START, LENGTH = MBED_RAM1_SIZE
-    SRAM_LOWER (xrw)  : ORIGIN = 0x30000000, LENGTH = 32K
-    SRAM_UPPER (xrw)  : ORIGIN = 0x38000000, LENGTH = 16K
-    SRAM_ITC   (xrw)  : ORIGIN = 0x00000000, LENGTH = 64K
+    FLASH       (rx)  : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START, LENGTH = MBED_CONFIGURED_ROM_BANK_IROM1_SIZE
+    SRAM_DTC   (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_DTC_START + MBED_VECTTABLE_RAM_SIZE, LENGTH = MBED_RAM_BANK_SRAM_DTC_SIZE - MBED_VECTTABLE_RAM_SIZE
+    SRAM       (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_AHB_START, LENGTH = MBED_RAM_BANK_SRAM_AHB_SIZE
+    SRAM_AXI   (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_AXI_START, LENGTH = MBED_RAM_BANK_SRAM_AXI_SIZE
+    SRAM_D3    (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_D3_START, LENGTH = MBED_RAM_BANK_SRAM_D3_SIZE
+    SRAM_ITC   (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_ITC_START, LENGTH = MBED_RAM_BANK_SRAM_ITC_SIZE
 }
 
 /* Linker script to place sections and symbol values. Should be used together
- * with other linker script that defines memory regions FLASH and RAM.
+ * with other linker script that defines memory regions FLASH and SRAM.
  * It references following symbols, which must be defined in code:
  *   Reset_Handler : Entry of reset handler
  *
@@ -123,48 +113,7 @@ SECTIONS
 
     __etext = .;
     _sidata = .;
-
-    .crash_data_ram :
-    {
-        . = ALIGN(8);
-        __CRASH_DATA_RAM__ = .;
-        __CRASH_DATA_RAM_START__ = .; /* Create a global symbol at data start */
-        KEEP(*(.keep.crash_data_ram))
-        *(.m_crash_data_ram)     /* This is a user defined section */
-        . += M_CRASH_DATA_RAM_SIZE;
-        . = ALIGN(8);
-        __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
-    } > SRAM_UPPER
-
-    /* .stack section doesn't contains any symbols. It is only
-     * used for linker to reserve space for the isr stack section
-     * WARNING: .stack should come immediately after the last secure memory
-     * section.  This provides stack overflow detection. */
-    .stack (NOLOAD):
-    {
-        __StackLimit = .;
-        *(.stack*);
-        . += STACK_SIZE - (. - __StackLimit);
-    } > SRAM_DTC
-
-    /* Set stack top to end of SRAM, and stack limit move down by
-     * size of stack_dummy section */
-    __StackTop = ADDR(.stack) + SIZEOF(.stack);
-    _estack = __StackTop;
-    __StackLimit = ADDR(.stack);
-    PROVIDE(__stack = __StackTop);
-
-    /* Place holder for additional heap */
-    .heap_0 (COPY):
-    {
-        __mbed_sbrk_start_0 = .;
-        . += (ORIGIN(SRAM_DTC) + LENGTH(SRAM_DTC) - .);
-        __mbed_krbs_start_0 = .;
-    } > SRAM_DTC
-
-    /* Check if heap exceeds SRAM_DTC */
-    ASSERT(__mbed_krbs_start_0 <= (ORIGIN(SRAM_DTC)+LENGTH(SRAM_DTC)), "Heap is too big for SRAM_DTC")
-
+    
     .data : AT (__etext)
     {
         __data_start__ = .;
@@ -200,9 +149,6 @@ SECTIONS
 
     } > SRAM
 
-    /* Check if data exceeds SRAM */
-    ASSERT(__data_end__ <= (ORIGIN(SRAM)+LENGTH(SRAM)), "data is too big for SRAM")
-
     /* Uninitialized data section
      * This region is not initialized by the C/C++ library and can be used to
      * store state across soft reboots. */
@@ -215,7 +161,7 @@ SECTIONS
         . = ALIGN(32);
         __uninitialized_end = .;
     } > SRAM
-
+    
     .bss :
     {
         . = ALIGN(8);
@@ -228,20 +174,66 @@ SECTIONS
         _ebss = .;
     } > SRAM
 
-    /* Check if bss exceeds SRAM */
-    ASSERT(__bss_end__ <= (ORIGIN(SRAM)+LENGTH(SRAM)), "bss is too big for SRAM")
-
     .heap (COPY):
     {
         __end__ = .;
-        end = __end__;
-        __mbed_sbrk_start = .;
+        PROVIDE(end = .);
+        PROVIDE(__mbed_sbrk_start = .);
         *(.heap*)
-        . += (ORIGIN(SRAM) + LENGTH(SRAM) - .);
-        __mbed_krbs_start = .;
+        . = ORIGIN(SRAM) + LENGTH(SRAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
+        PROVIDE(__mbed_krbs_start = .);
         __HeapLimit = .;
     } > SRAM
 
-    /* Check if data + heap exceeds SRAM limit */
-    ASSERT(__HeapLimit <= (ORIGIN(SRAM)+LENGTH(SRAM)), "Heap is too big for SRAM")
+    /* .stack_dummy section doesn't contains any symbols. It is only
+     * used for linker to calculate size of stack sections, and assign
+     * values to stack symbols later */
+    .stack_dummy (COPY):
+    {
+        *(.stack*)
+    } > SRAM
+
+    /* Set stack top to end of SRAM, and stack limit move down by
+     * size of stack_dummy section */
+    __StackTop = ORIGIN(SRAM) + LENGTH(SRAM);
+    _estack = __StackTop;
+    __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
+    PROVIDE(__stack = __StackTop);
+
+    /* Check if data + heap + stack exceeds SRAM limit */
+    ASSERT(__StackLimit >= __HeapLimit, "region SRAM overflowed with stack")
+
+    /* Put crash data in the otherwise unused D3 SRAM */
+    .crash_data_ram :
+    {
+        . = ALIGN(8);
+        __CRASH_DATA_RAM__ = .;
+        __CRASH_DATA_RAM_START__ = .; /* Create a global symbol at data start */
+        KEEP(*(.keep.crash_data_ram))
+        *(.m_crash_data_ram)     /* This is a user defined section */
+        . += M_CRASH_DATA_RAM_SIZE;
+        . = ALIGN(8);
+        __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
+    } > SRAM_D3
+
+    /* Ethernet DMA descriptors should be at the start of SRAM_AXI because they need an MPU region.*/
+    .eth_descriptors (NOLOAD) : {
+        ASSERT(. == ORIGIN(SRAM_AXI), "Eth Descriptors region must be at the start of SRAM_D2");
+        PROVIDE(__eth_descriptors_start = .);
+        *(.EthDescriptors)
+        . = __eth_descriptors_start + STM32_DMA_DESCRIP_REGION_SIZE;
+    } >SRAM_AXI
+
+    /* Ethernet buffers are recommended to be in SRAM_AXI but don't need any special MPU region. */
+    .eth_buffers (NOLOAD) : {
+        *(.EthBuffers)
+    } >SRAM_AXI 
+
+    /* Use the rest of DTCM as additional heap */
+    .heap_0 (COPY):
+    {
+        PROVIDE(__mbed_sbrk_start_0 = .);
+        . += (ORIGIN(SRAM_DTC) + LENGTH(SRAM_DTC) - .);
+        PROVIDE(__mbed_krbs_start_0 = .);
+    } > SRAM_DTC
 }

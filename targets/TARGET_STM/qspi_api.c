@@ -234,7 +234,7 @@ qspi_status_t qspi_prepare_command(const qspi_command_t *command, OSPI_RegularCm
 #else /* OCTOSPI */
 qspi_status_t qspi_prepare_command(const qspi_command_t *command, QSPI_CommandTypeDef *st_command)
 {
-    debug_if(qspi_api_c_debug, "qspi_prepare_command In: instruction.value %x dummy_count %x address.bus_width %x address.disabled %x address.value %x address.size %x\n",
+    debug_if(qspi_api_c_debug, "qspi_prepare_command In: instruction.value 0x%" PRIx8 " dummy_count 0x%" PRIx8 " address.bus_width 0x%x address.disabled %d address.value 0x%" PRIx32 " address.size %x\n",
              command->instruction.value, command->dummy_count, command->address.bus_width, command->address.disabled, command->address.value, command->address.size);
 
     // TODO: shift these around to get more dynamic mapping
@@ -372,7 +372,7 @@ qspi_status_t qspi_prepare_command(const qspi_command_t *command, QSPI_CommandTy
 
     st_command->NbData = 0;
 
-    debug_if(qspi_api_c_debug, "qspi_prepare_command Out: InstructionMode %x Instruction %x AddressMode %x AddressSize %x Address %x DataMode %x\n",
+    debug_if(qspi_api_c_debug, "qspi_prepare_command Out: InstructionMode 0x%" PRIx32 " Instruction 0x%" PRIx32 " AddressMode 0x%" PRIx32 " AddressSize 0x%" PRIx32 " Address 0x%" PRIx32 " DataMode %" PRIx32 "\n",
              st_command->InstructionMode, st_command->Instruction, st_command->AddressMode, st_command->AddressSize, st_command->Address, st_command->DataMode);
 
     return QSPI_STATUS_OK;

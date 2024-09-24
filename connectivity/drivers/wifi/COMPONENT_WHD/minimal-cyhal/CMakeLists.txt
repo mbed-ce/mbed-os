@@ -16,7 +16,7 @@ add_library(mbed-minimal-cyhal STATIC
 target_include_directories(mbed-minimal-cyhal PUBLIC .)
 target_link_libraries(mbed-minimal-cyhal PUBLIC
 	mbed-core-flags
-	mbed-cy-rtos-abstraction)
+	mbed-rtos-flags)
 
 # This is needed in order to make cybsp_wifi.h include cycfg.h
 target_compile_definitions(mbed-minimal-cyhal PUBLIC COMPONENT_CUSTOM_DESIGN_MODUS)

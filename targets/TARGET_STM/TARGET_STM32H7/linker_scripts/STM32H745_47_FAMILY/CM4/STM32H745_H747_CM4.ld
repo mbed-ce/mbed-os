@@ -16,6 +16,9 @@
 */
 
 #include "cmsis_nvic.h"
+#include "../../stm32_eth_region_size_calcs.h"
+
+M_CRASH_DATA_RAM_SIZE = 0x100;
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
     /* This value is normally defined by the tools
@@ -23,17 +26,17 @@
     #define MBED_CONF_TARGET_BOOT_STACK_SIZE  0x400
 #endif
 
-/* Round up VECTORS_SIZE to 8 bytes */
-#define VECTORS_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
+STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
+
+/* Round up MBED_VECTTABLE_RAM_SIZE to 8 bytes */
+#define MBED_VECTTABLE_RAM_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
 
 MEMORY
 {
-  FLASH (rx)     : ORIGIN = MBED_CONFIGURED_ROM_START, LENGTH = MBED_CONFIGURED_ROM_SIZE
-  DTCMRAM (rwx)  : ORIGIN = MBED_RAM_BANK_SRAM_DTC_START + VECTORS_SIZE, LENGTH = 128K - MBED_RAM_BANK_SRAM_DTC_SIZE
-  RAM (xrw)      : ORIGIN = MBED_RAM_BANK_SRAM_D1_START, LENGTH = MBED_RAM_BANK_SRAM_D1_SIZE
-  RAM_D2 (xrw)   : ORIGIN = MBED_RAM_BANK_SRAM_D2_START, LENGTH = MBED_RAM_BANK_SRAM_D2_SIZE
-  RAM_D3 (xrw)   : ORIGIN = MBED_RAM_BANK_SRAM_D3_START, LENGTH = MBED_RAM_BANK_SRAM_D3_SIZE
-  ITCMRAM (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_ITC_START, LENGTH = MBED_RAM_BANK_SRAM_ITC_SIZE
+    FLASH       (rx)  : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START, LENGTH = MBED_CONFIGURED_ROM_BANK_IROM1_SIZE
+    SRAM       (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_D1_START, LENGTH = MBED_RAM_BANK_SRAM_D1_SIZE
+    SRAM_D2    (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_D2_START, LENGTH = MBED_RAM_BANK_SRAM_D2_SIZE
+    SRAM_D3    (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_D3_START, LENGTH = MBED_RAM_BANK_SRAM_D3_SIZE
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -107,6 +110,16 @@ SECTIONS
     __exidx_end = .;
 
     __etext = .;
+
+    /* Ethernet DMA descriptors should be at the start of SRAM_D2 because they need an MPU region 
+       and because the CM4 and CM7 have to agree on their location.*/
+    .eth_descriptors (NOLOAD) : {
+        ASSERT(. == ORIGIN(SRAM_D2), "Eth Descriptors region must be at the start of SRAM_D2");
+        PROVIDE(__eth_descriptors_start = .);
+        *(.EthDescriptors)
+        . = __eth_descriptors_start + STM32_DMA_DESCRIP_REGION_SIZE;
+    } >SRAM_D2
+
     _sidata = .;
     
     .data : AT (__etext)
@@ -142,7 +155,7 @@ SECTIONS
         __data_end__ = .;
         _edata = .;
 
-    } > RAM_D2
+    } > SRAM_D2
 
     /* Uninitialized data section
      * This region is not initialized by the C/C++ library and can be used to
@@ -155,7 +168,7 @@ SECTIONS
         KEEP(*(.keep.uninitialized))
         . = ALIGN(32);
         __uninitialized_end = .;
-    } > RAM_D2
+    } > SRAM_D2
 
     .bss :
     {
@@ -167,24 +180,25 @@ SECTIONS
         . = ALIGN(8);
         __bss_end__ = .;
         _ebss = .;
-    } > RAM_D2
+    } > SRAM_D2
 
     .heap (COPY):
     {
         __end__ = .;
         PROVIDE(end = .);
+        PROVIDE(__mbed_sbrk_start = .);
         *(.heap*)
-        . = ORIGIN(RAM_D2) + LENGTH(RAM_D2) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
+        . = ORIGIN(SRAM_D2) + LENGTH(SRAM_D2) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
+        PROVIDE(__mbed_krbs_start = .);
         __HeapLimit = .;
-    } > RAM_D2
-
+    } > SRAM_D2
     /* .stack_dummy section doesn't contains any symbols. It is only
      * used for linker to calculate size of stack sections, and assign
      * values to stack symbols later */
     .stack_dummy (COPY):
     {
         *(.stack*)
-    } > RAM_D2
+    } > SRAM_D2
 
     /* Set stack top to end of RAM_D2, and stack limit move down by
      * size of stack_dummy section */
@@ -193,6 +207,26 @@ SECTIONS
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
     PROVIDE(__stack = __StackTop);
 
-    /* Check if data + heap + stack exceeds RAM limit */
-    ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+    /* Check if data + heap + stack exceeds SRAM_D2 limit */
+    ASSERT(__StackLimit >= __HeapLimit, "region SRAM_D2 overflowed with stack")
+
+    /* Put crash data in the otherwise unused D3 SRAM */
+    .crash_data_ram :
+    {
+        /* Advance forward by 1 crash data ram size so that we don't overwrite the CM7's crash data */
+        . += M_CRASH_DATA_RAM_SIZE;
+
+        __CRASH_DATA_RAM__ = .;
+        __CRASH_DATA_RAM_START__ = .; /* Create a global symbol at data start */
+        KEEP(*(.keep.crash_data_ram))
+        *(.m_crash_data_ram)     /* This is a user defined section */
+        . += M_CRASH_DATA_RAM_SIZE;
+        . = ALIGN(8);
+        __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
+    } > SRAM_D3
+
+    /* Ethernet buffers are recommended to be in SRAM_D2 but don't need any special MPU region. */
+    .eth_buffers (NOLOAD) : {
+        *(.EthBuffers)
+    } >SRAM_D2    
 }

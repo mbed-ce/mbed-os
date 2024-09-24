@@ -243,6 +243,9 @@
         "MTS_DRAGONFLY_L471QG": {
             "crash-capture-enabled": true,
             "fatal-error-auto-reboot-enabled": true
+        },
+        "MCU_STM32H7": {
+            "crash-capture-enabled": true
         }
     }
 }
