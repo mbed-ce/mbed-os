@@ -54,7 +54,6 @@ endmacro()
 # Sign a Cortex-M4 HEX with Cortex-M0 HEX.
 #
 macro(mbed_post_build_psoc6_sign_image
-    m0hex_filename
     cypress_psoc6_target
     policy_file_name
     boot_scheme
@@ -70,7 +69,7 @@ macro(mbed_post_build_psoc6_sign_image
                 ${Python3_EXECUTABLE} ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/PSOC6.py
                 sign
                 --build-dir ${CMAKE_BINARY_DIR}
-                --m0hex-filename ${m0hex_filename}
+                --m0hex-signed-intermediate $<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_BASE_NAME:${target}>.cm0-signed-image.hex
                 --target-name ${cypress_psoc6_target}
                 --policy-file-name ${policy_file_name}
                 --boot-scheme ${boot_scheme}
