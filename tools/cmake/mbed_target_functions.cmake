@@ -128,19 +128,14 @@ function(mbed_set_post_build target)
             get_target_property(POST_BUILD_TARGET_LINK_LIBRARIES ${target} LINK_LIBRARIES)
             if("mbed-os" IN_LIST POST_BUILD_TARGET_LINK_LIBRARIES)
                 get_target_property(LINKER_SCRIPT_PATH mbed-os LINKER_SCRIPT_PATH)
-                target_link_options(${target}
-                PRIVATE
-                    "-T" "${LINKER_SCRIPT_PATH}"
-            )
             elseif("mbed-baremetal" IN_LIST POST_BUILD_TARGET_LINK_LIBRARIES)
                 get_target_property(LINKER_SCRIPT_PATH mbed-baremetal LINKER_SCRIPT_PATH)
-                target_link_options(${target}
-                PRIVATE
-                    "-T" "${LINKER_SCRIPT_PATH}"
-            )
             else()
                 message(FATAL_ERROR "Target ${target} used with mbed_set_post_build() but does not link to mbed-os or mbed-baremetal!")
             endif()
+
+            target_link_options(${target} PRIVATE "-T" "${LINKER_SCRIPT_PATH}")
+            set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${LINKER_SCRIPT_PATH})
         else()
             message(STATUS "${target} uses custom linker script  ${ARGV1}")
             mbed_set_custom_linker_script(${target} ${ARGV1})

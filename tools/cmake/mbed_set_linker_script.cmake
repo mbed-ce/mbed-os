@@ -95,9 +95,10 @@ function(mbed_setup_linker_script mbed_os_target mbed_baremetal_target target_de
         #  add linker script only for tests
         if(MBED_IS_STANDALONE)
             target_link_options(${TARGET}
-            INTERFACE
-                "-T" "${LINKER_SCRIPT_PATH}"
-            )
+                INTERFACE
+                    "-T" "${LINKER_SCRIPT_PATH}"
+                )
+            set_property(TARGET ${TARGET} APPEND PROPERTY INTERFACE_LINK_DEPENDS ${LINKER_SCRIPT_PATH})
         endif()
     endforeach()
 
@@ -150,5 +151,6 @@ function(mbed_set_custom_linker_script target new_linker_script_path)
         PRIVATE
             "-T" "${CUSTOM_LINKER_SCRIPT_PATH}"
     )
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${CUSTOM_LINKER_SCRIPT_PATH})
 
 endfunction(mbed_set_custom_linker_script)

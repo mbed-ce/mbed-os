@@ -63,7 +63,6 @@ from collections import defaultdict
 from prettytable import PrettyTable, HEADER
 from jinja2 import FileSystemLoader, StrictUndefined
 from jinja2.environment import Environment
-from future.utils import with_metaclass
 
 
 # Be sure that the tools directory is in the search path
@@ -127,7 +126,7 @@ class _Parser(ABC):
         for banks in self.memory_banks.values():
             for bank_info in banks:
                 if bank_info.contains_addr(symbol_start_addr):
-                    if bank_info.contains_addr(end_addr):
+                    if bank_info.contains_addr(end_addr - 1): # end_addr is the first address past the end of the symbol so we subtract 1 here
                         # Symbol fully inside this memory bank
                         bank_info.used_size += size
 
@@ -234,7 +233,9 @@ class _GccParser(_Parser):
 
     # Gets the input section name from the line, if it exists.
     # Input section names are always indented 1 space.
-    RE_INPUT_SECTION_NAME = re.compile(r'^ (\.\w+\.?\w*\.?\w*)')  # Note: This allows up to 3 dots... hopefully that's enough...
+    # Note: This allows up to 3 dots... hopefully that's enough...
+    # It can also calture "*fill*" instead of something that looks like a section name.
+    RE_INPUT_SECTION_NAME = re.compile(r'^ ((?:\.\w+\.?\w*\.?\w*)|(?:\*fill\*))')
 
     ALL_SECTIONS = (
         _Parser.SECTIONS
@@ -844,7 +845,7 @@ class MemapParser(object):
 
 def main():
     """Entry Point"""
-    version = '0.4.0'
+    version = '1.0.0'
 
     # Parser handling
     parser = ArgumentParser(
