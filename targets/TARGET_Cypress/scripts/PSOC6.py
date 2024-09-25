@@ -173,7 +173,7 @@ def sign_image(toolchain, resourses, elf, binf, m0hex):
         toolchain.target.cm4_img_id,
         elf,
         binf,
-        m0hexf
+        m0hex
     )
 
 def sign_hex(
@@ -184,7 +184,7 @@ def sign_hex(
     Adds signature to a binary file being built,
     using cysecuretools python package.
     :param build_dir: The build directory
-    :param m0hex_filename: Path to store intermediate signed CM0 hex file at
+    :param m0hex_signed_intermediate: Path to store intermediate signed CM0 hex file at
     :param target_name: The name of the Mbed target
     :param policy: The path to the policy file
     :param notification: The object to output notification with
