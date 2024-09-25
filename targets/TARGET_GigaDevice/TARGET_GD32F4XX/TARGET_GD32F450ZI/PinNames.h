@@ -233,15 +233,12 @@ typedef enum {
     ARDUINO_UNO_D15 = PORTB_8,
 #endif
 
-    LED1        = PORTF_6,
-    LED2        = PORTC_13,
-    LED3        = PORTE_6,
+#define LED1 PORTF_6
+#define LED2 PORTC_13
+#define LED3 PORTE_6
 
-    KEY1        = PORTE_5,
-    KEY2        = PORTE_4,
-
-    BUTTON1     = KEY1,
-    BUTTON2     = KEY2,
+#define BUTTON1 PORTE_5
+#define BUTTON2 PORTE_4
 
     SERIAL_TX   = PORTC_12,
     SERIAL_RX   = PORTD_2,
