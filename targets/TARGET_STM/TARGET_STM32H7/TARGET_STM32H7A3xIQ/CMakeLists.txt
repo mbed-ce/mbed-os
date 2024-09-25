@@ -13,7 +13,6 @@ add_library(mbed-stm32h7a3xiq INTERFACE)
 
 target_sources(mbed-stm32h7a3xiq
     INTERFACE
-        system_clock.c
         ${STARTUP_FILE}
 )
 

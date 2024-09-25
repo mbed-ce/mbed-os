@@ -3718,11 +3718,11 @@
         "public": false,
         "core": "Cortex-M7FD",
         "extra_labels_add": [
-            "STM32H7A3xIQ"
+            "STM32H7A3xIQ",
+            "STM32H7_280MHZ"
         ],
         "macros_add": [
             "STM32H7A3xxQ",
-            "STM32H7_280MHZ",
             "MBED_SPLIT_HEAP"
         ],
         "device_name": "STM32H7A3ZITxQ"
