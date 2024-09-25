@@ -234,7 +234,7 @@ class _GccParser(_Parser):
     # Gets the input section name from the line, if it exists.
     # Input section names are always indented 1 space.
     # Note: This allows up to 3 dots... hopefully that's enough...
-    # It can also calture "*fill*" instead of something that looks like a section name.
+    # It can also capture "*fill*" instead of something that looks like a section name.
     RE_INPUT_SECTION_NAME = re.compile(r'^ ((?:\.\w+\.?\w*\.?\w*)|(?:\*fill\*))')
 
     ALL_SECTIONS = (
