@@ -2751,6 +2751,157 @@
         "sub_family": null,
         "vendor": "NXP:11"
     },
+    "MIMXRT1176DVMAA": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "devices/MIMXRT1176/arm/MIMXRT117x_QuadSPI_4KB_SEC.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 16777216,
+                "start": 805306368,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "devices/MIMXRT1176/arm/MIMXRT117x_QuadSPI_4KB_SEC_Alias.FLM",
+                "ram_size": 32768,
+                "ram_start": 536739840,
+                "size": 16777216,
+                "start": 134217728,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "devices/MIMXRT1176/arm/MIMXRT117x_64MB_QuadSPI_4KB_SEC.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 805306368,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "devices/MIMXRT1176/arm/MIMXRT117x_64MB_QuadSPI_4KB_SEC_Alias.FLM",
+                "ram_size": 32768,
+                "ram_start": 536739840,
+                "size": 67108864,
+                "start": 134217728,
+                "style": "Keil"
+            }
+        ],
+        "family": "MIMXRT1176",
+        "from_pack": {
+            "pack": "MIMXRT1176_DFP",
+            "url": "https://mcuxpresso.nxp.com/cmsis_pack/repo/",
+            "vendor": "NXP",
+            "version": "18.0.0"
+        },
+        "memories": {
+            // The datasheet is a bit confusing, but this device actually has *three* OCRAM banks.
+            // One of them is the conventional DTCM/ITCM/OCRAM split, and defaults to 256k DTCM & ITCM and no OCRAM.
+            // The other two are fixed to being OCRAM and form a contiguous region of memory, so we will treat them as such.
+            "SRAM_DTC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 0x40000,
+                "start": 0x20000000,
+                "startup": false
+            },
+            "SRAM_ITC": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 0x40000,
+                "start": 0,
+                "startup": false
+            },
+            // NOTE: If ECC was enabled, this would be only 1MiB, but with ECC disabled the space increases.
+            "SRAM_OC_1_2_COMBINED": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 0x120000,
+                "start": 0x20240000,
+                "startup": false
+            },
+
+            // Last but not least, we have the Cortex-M4 LMEM memory region, which is where the CM4 MCU executes out of.
+            // If the CM4 is not needed in an application, this space should be able to be used by the CM7 core as long
+            // as the CM4 core is powered up first.
+            "CM4_LMEM": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 0x40000,
+                "start": 0x20200000, // This is the CM7's address for this memory, the CM4 would use 0x1FFE0000
+                "startup": false
+            }
+        },
+        "name": "MIMXRT1176DVMAA",
+        "processors": [
+            {
+                "address": null,
+                "ap": 1,
+                "apid": null,
+                "core": "CortexM4",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "name": "cm4",
+                "svd": "devices/MIMXRT1176/MIMXRT1176_cm4.xml",
+            },
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM7",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "DoublePrecision",
+                "mpu": "Present",
+                "name": "cm7",
+                "svd": "devices/MIMXRT1176/MIMXRT1176_cm7.xml",
+                "unit": 0
+            }
+        ],
+        "sub_family": null,
+        "vendor": "NXP:11"
+    },
     "MK22FN512VLH12": {
         "algorithms": [
             {
