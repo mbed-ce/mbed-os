@@ -49,10 +49,10 @@ typedef enum {
     P11_0,P11_1,P11_2,P11_3,P11_4,P11_5,P11_6,P11_7,P11_8,P11_9,P11_10,P11_11,P11_12,P11_13,P11_14,P11_15, 
 
     // mbed Pin Names
-    LED1 = P6_13,
-    LED2 = P6_14,
-    LED3 = P6_15,
-    LED4 = P6_12,
+#define LED1 P6_13
+#define LED2 P6_14
+#define LED3 P6_15
+#define LED4 P6_12
 
     LED_RED  = LED1,
     LED_GREEN= LED2,
@@ -62,37 +62,32 @@ typedef enum {
     CONSOLE_TX = P6_3,
     CONSOLE_RX = P6_2,
 
-    // Arduiono Pin Names
-    D0 = P2_15,
-    D1 = P2_14,
-    D2 = P4_7,
-    D3 = P4_6,
-    D4 = P4_5,
-    D5 = P4_4,
-    D6 = P8_13,
-    D7 = P8_11,
-    D8 = P8_15,
-    D9 = P8_14,
-    D10 = P10_13,
-    D11 = P10_14,
-    D12 = P10_15,
-    D13 = P10_12,
-    D14 = P1_3,
-    D15 = P1_2,
+#ifdef TARGET_FF_ARDUINO_UNO
+    // Arduino Pin Names
+    ARDUINO_UNO_D0 = P2_15,
+    ARDUINO_UNO_D1 = P2_14,
+    ARDUINO_UNO_D2 = P4_7,
+    ARDUINO_UNO_D3 = P4_6,
+    ARDUINO_UNO_D4 = P4_5,
+    ARDUINO_UNO_D5 = P4_4,
+    ARDUINO_UNO_D6 = P8_13,
+    ARDUINO_UNO_D7 = P8_11,
+    ARDUINO_UNO_D8 = P8_15,
+    ARDUINO_UNO_D9 = P8_14,
+    ARDUINO_UNO_D10 = P10_13,
+    ARDUINO_UNO_D11 = P10_14,
+    ARDUINO_UNO_D12 = P10_15,
+    ARDUINO_UNO_D13 = P10_12,
+    ARDUINO_UNO_D14 = P1_3,
+    ARDUINO_UNO_D15 = P1_2,
 
-    A0 = P1_8,
-    A1 = P1_9,
-    A2 = P1_10,
-    A3 = P1_11,
-    A4 = P1_13,
-    A5 = P1_15,
-
-    I2C_SCL = D15,
-    I2C_SDA = D14,
-
-    USER_BUTTON0 = P6_0,
-    // Standardized button names
-    BUTTON1 = USER_BUTTON0,
+    ARDUINO_UNO_A0 = P1_8,
+    ARDUINO_UNO_A1 = P1_9,
+    ARDUINO_UNO_A2 = P1_10,
+    ARDUINO_UNO_A3 = P1_11,
+    ARDUINO_UNO_A4 = P1_13,
+    ARDUINO_UNO_A5 = P1_15,
+#endif
 
     // Not connected
     NC = (int)0xFFFFFFFF

@@ -85,28 +85,18 @@
 // LEDs
 #ifdef CYBSP_USER_LED1
 #define LED1 CYBSP_USER_LED1
-#else
-#define LED1 NC
 #endif
 #ifdef CYBSP_USER_LED2
 #define LED2 CYBSP_USER_LED2
-#else
-#define LED2 NC
 #endif
 #ifdef CYBSP_USER_LED3
 #define LED3 CYBSP_USER_LED3
-#else
-#define LED3 NC
 #endif
 #ifdef CYBSP_USER_LED4
 #define LED4 CYBSP_USER_LED4
-#else
-#define LED4 NC
 #endif
 #ifdef CYBSP_USER_LED5
 #define LED5 CYBSP_USER_LED5
-#else
-#define LED5 NC
 #endif
 
 #ifdef CYBSP_LED_RGB_RED
@@ -152,71 +142,29 @@
 #endif
 
 // Arduino Header
-#ifdef CYBSP_A0
-#define A0 CYBSP_A0
-#endif
-#ifdef CYBSP_A1
-#define A1 CYBSP_A1
-#endif
-#ifdef CYBSP_A2
-#define A2 CYBSP_A2
-#endif
-#ifdef CYBSP_A3
-#define A3 CYBSP_A3
-#endif
-#ifdef CYBSP_A4
-#define A4 CYBSP_A4
-#endif
-#ifdef CYBSP_A5
-#define A5 CYBSP_A5
-#endif
-#ifdef CYBSP_D0
-#define D0 CYBSP_D0
-#endif
-#ifdef CYBSP_D1
-#define D1 CYBSP_D1
-#endif
-#ifdef CYBSP_D2
-#define D2 CYBSP_D2
-#endif
-#ifdef CYBSP_D3
-#define D3 CYBSP_D3
-#endif
-#ifdef CYBSP_D4
-#define D4 CYBSP_D4
-#endif
-#ifdef CYBSP_D5
-#define D5 CYBSP_D5
-#endif
-#ifdef CYBSP_D6
-#define D6 CYBSP_D6
-#endif
-#ifdef CYBSP_D7
-#define D7 CYBSP_D7
-#endif
-#ifdef CYBSP_D8
-#define D8 CYBSP_D8
-#endif
-#ifdef CYBSP_D9
-#define D9 CYBSP_D9
-#endif
-#ifdef CYBSP_D10
-#define D10 CYBSP_D10
-#endif
-#ifdef CYBSP_D11
-#define D11 CYBSP_D11
-#endif
-#ifdef CYBSP_D12
-#define D12 CYBSP_D12
-#endif
-#ifdef CYBSP_D13
-#define D13 CYBSP_D13
-#endif
-#ifdef CYBSP_D14
-#define D14 CYBSP_D14
-#endif
-#ifdef CYBSP_D15
-#define D15 CYBSP_D15
+#ifdef TARGET_FF_ARDUINO_UNO
+#define ARDUINO_UNO_A0 CYBSP_A0
+#define ARDUINO_UNO_A1 CYBSP_A1
+#define ARDUINO_UNO_A2 CYBSP_A2
+#define ARDUINO_UNO_A3 CYBSP_A3
+#define ARDUINO_UNO_A4 CYBSP_A4
+#define ARDUINO_UNO_A5 CYBSP_A5
+#define ARDUINO_UNO_D0 CYBSP_D0
+#define ARDUINO_UNO_D1 CYBSP_D1
+#define ARDUINO_UNO_D2 CYBSP_D2
+#define ARDUINO_UNO_D3 CYBSP_D3
+#define ARDUINO_UNO_D4 CYBSP_D4
+#define ARDUINO_UNO_D5 CYBSP_D5
+#define ARDUINO_UNO_D6 CYBSP_D6
+#define ARDUINO_UNO_D7 CYBSP_D7
+#define ARDUINO_UNO_D8 CYBSP_D8
+#define ARDUINO_UNO_D9 CYBSP_D9
+#define ARDUINO_UNO_D10 CYBSP_D10
+#define ARDUINO_UNO_D11 CYBSP_D11
+#define ARDUINO_UNO_D12 CYBSP_D12
+#define ARDUINO_UNO_D13 CYBSP_D13
+#define ARDUINO_UNO_D14 CYBSP_D14
+#define ARDUINO_UNO_D15 CYBSP_D15
 #endif
 
 #endif // MBED_PINNAMES_H

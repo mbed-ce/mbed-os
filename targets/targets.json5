@@ -768,7 +768,7 @@
     },
     "KW41Z": {
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "core": "Cortex-M0+",
         "supported_toolchains": [
@@ -3314,8 +3314,7 @@
             "STM32H7_550MHZ"
         ],
         "macros_add": [
-            "STM32H735xx",
-            "MBED_SPLIT_HEAP"
+            "STM32H735xx"
         ],
         "overrides": {
             "system_power_supply": "PWR_LDO_SUPPLY"
@@ -3333,8 +3332,7 @@
             "STM32H7_480MHZ"
         ],
         "macros_add": [
-            "STM32H743xx",
-            "MBED_SPLIT_HEAP"
+            "STM32H743xx"
         ],
         "overrides": {
             "system_power_supply": "PWR_LDO_SUPPLY"
@@ -3419,6 +3417,11 @@
         "macros_add": [
             "STM32H745xx"
         ],
+        "overrides": {
+            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
+            // Cannot enable overdrive mode because the default power supply is SMPS
+            "enable-overdrive-mode": 0
+        },
         "device_name": "STM32H745ZITx"
     },
     "MCU_STM32H745xI_CM4": {
@@ -3458,15 +3461,17 @@
             }
         },
         "macros_add": [
-            "CORE_CM7",
-            "MBED_SPLIT_HEAP"
+            "CORE_CM7"
         ]
     },
-    "NUCLEO_H745ZI_Q": {
+    "NUCLEO_H745ZI_Q_CM7": {
+        "inherits": [
+            "MCU_STM32H745xI_CM7"
+        ],
+        "extra_labels_add": [ "NUCLEO_H745ZI_Q" ],
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "public": false,
         "config": {
             "d11_configuration": {
                 "help": "Value: PB_5 for the default board configuration, PA_7 in case of solder bridge update (SB33 on/ SB35 off)",
@@ -3476,24 +3481,47 @@
             "usb_speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_FS"
-            },
+            }
         },
         "device_has_add": [
             "USBDEVICE"
         ],
         "overrides": {
-            "network-default-interface-type": "ETHERNET",
-            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
-            // Cannot enable overdrive mode because the default power supply is SMPS
-            "enable-overdrive-mode": 0
+            "network-default-interface-type": "ETHERNET"
         },
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
-    "NUCLEO_H745ZI_Q_CM7": {
-        inherits: ["MCU_STM32H745xI_CM7", "NUCLEO_H745ZI_Q"]
-    },
     "NUCLEO_H745ZI_Q_CM4": {
-        inherits: ["MCU_STM32H745xI_CM4", "NUCLEO_H745ZI_Q"]
+        "inherits": [
+            "MCU_STM32H745xI_CM4"
+        ],
+        "extra_labels_add": [ "NUCLEO_H745ZI_Q" ],
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "config": {
+            "d11_configuration": {
+                "help": "Value: PB_5 for the default board configuration, PA_7 in case of solder bridge update (SB33 on/ SB35 off)",
+                "value": "PB_5",
+                "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
+            },
+            "usb_speed": {
+                "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
+                "value": "USE_USB_OTG_FS"
+            }
+        },
+        "device_has_add": [
+            "USBDEVICE"
+        ],
+        "overrides": {
+            "network-default-interface-type": "ETHERNET"
+        },
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
+    },
+    "NUCLEO_H745ZI_Q" : {
+        "inherits" : [
+            "NUCLEO_H745ZI_Q_CM7"
+        ]
     },
     "MCU_STM32H747xI": {
         "inherits": [
@@ -3506,7 +3534,12 @@
         ],
         "macros_add": [
             "STM32H747xx"
-        ]
+        ],
+        "overrides": {
+            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
+            // Cannot enable overdrive mode because the default power supply is SMPS
+            "enable-overdrive-mode": 0
+        }
     },
     "MCU_STM32H747xI_CM7": {
         "inherits": [
@@ -3525,48 +3558,12 @@
             }
         },
         "macros_add": [
-            "CORE_CM7",
-            "MBED_SPLIT_HEAP"
+            "CORE_CM7"
         ]
-    },
-    "MCU_STM32H747xI_CM4": {
-        "inherits": [
-            "MCU_STM32H747xI"
-        ],
-        "public": false,
-        "extra_labels_add": [
-            "STM32H747xI_CM4"
-        ],
-        "core": "Cortex-M4F",
-        "memory_bank_config": {
-            // Select flash bank 2
-            "IROM1": {
-                "start": 0x08100000,
-                "size": 0x100000
-            }
-        },
-        "macros_add": [
-            "CORE_CM4",
-            "MBED_MPU_CUSTOM"
-        ],
-        "device_has_remove": [
-            "MPU"
-        ],
-        "OUTPUT_EXT": "hex"
-    },
-    "DISCO_H747I": {
-        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/310/MFG_STM32H747I-DISCO.jpg",
-        "public": false,
-        "overrides": {
-            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
-            // Cannot enable overdrive mode because the default power supply is SMPS
-            "enable-overdrive-mode": 0
-        }
     },
     "DISCO_H747I_CM7": {
         "inherits": [
-            "MCU_STM32H747xI_CM7",
-            "DISCO_H747"
+            "MCU_STM32H747xI_CM7"
         ],
         "supported_form_factors": [
             "ARDUINO_UNO",
@@ -3586,12 +3583,39 @@
         "detect_code": [
             "0814"
         ],
-        "device_name": "STM32H747XIHx"
+        "device_name": "STM32H747XIHx",
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/310/MFG_STM32H747I-DISCO.jpg"
+    },
+    "DISCO_H747I": {
+        "inherits": [
+            "DISCO_H747I_CM7"
+        ],
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/310/MFG_STM32H747I-DISCO.jpg"
+    },
+    "MCU_STM32H747xI_CM4": {
+        "inherits": [
+            "MCU_STM32H747xI"
+        ],
+        "public": false,
+        "extra_labels_add": [
+            "STM32H747xI_CM4"
+        ],
+        "core": "Cortex-M4F",
+        "memory_bank_config": {
+            // Select flash bank 2
+            "IROM1": {
+                "start": 0x08100000,
+                "size": 0x100000
+            }
+        },
+        "macros_add": [
+            "CORE_CM4"
+        ],
+        "OUTPUT_EXT": "hex"
     },
     "DISCO_H747I_CM4": {
         "inherits": [
-            "MCU_STM32H747xI_CM4",
-            "DISCO_H747"
+            "MCU_STM32H747xI_CM4"
         ],
         "extra_labels_add": [
             "DISCO_H747I",
@@ -3608,7 +3632,8 @@
             "STMOD",
             "PMOD"
         ],
-        "device_name": "STM32H747XIHx"
+        "device_name": "STM32H747XIHx",
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/310/MFG_STM32H747I-DISCO.jpg"
     },
     // Umbrella target for all Arduino boards that use an H747 chip
     "STM32H747_ARDUINO": {
@@ -3669,10 +3694,42 @@
         "image_url": "https://store.arduino.cc/cdn/shop/products/ABX00042_00.iso_1200x900.jpg?v=1675840144"
     },
     "ARDUINO_PORTENTA_H7_M7": {
-        "inherits": ["ARDUINO_PORTENTA_H7", "MCU_STM32H747xI_CM7"],
+        "inherits": ["ARDUINO_PORTENTA_H7"],
+        "core": "Cortex-M7FD",
+        "memory_bank_config": {
+            // Select flash bank 1
+            "IROM1": {
+                "start": 0x08000000,
+                "size": 0x100000
+            }
+        },
+        "extra_labels_add": [
+            "STM32H747xI_CM7"
+        ],
+        "macros_add": [
+            "CORE_CM7"
+        ]
     },
     "ARDUINO_PORTENTA_H7_M4": {
-        "inherits": ["ARDUINO_PORTENTA_H7", "MCU_STM32H747xI_CM4"],
+        "inherits": ["ARDUINO_PORTENTA_H7"],
+        "core": "Cortex-M4F",
+        "memory_bank_config": {
+            // Select flash bank 2
+            "IROM1": {
+                "start": 0x08100000,
+                "size": 0x100000
+            }
+        },
+        "extra_labels_add": [
+            "STM32H747xI_CM4"
+        ],
+        "macros_add": [
+            "CORE_CM4",
+            "MBED_MPU_CUSTOM"
+        ],
+        "device_has_remove": [
+            "MPU"
+        ]
     },
     "MCU_STM32H750xB": {
         "inherits": [
@@ -3685,8 +3742,7 @@
             "STM32H7_480MHZ"
         ],
         "macros_add": [
-            "STM32H750xx",
-            "MBED_SPLIT_HEAP"
+            "STM32H750xx"
         ],
         "overrides": {
             "system_power_supply": "PWR_LDO_SUPPLY"
@@ -3704,8 +3760,7 @@
             "STM32H7_480MHZ"
         ],
         "macros_add": [
-            "STM32H753xx",
-            "MBED_SPLIT_HEAP"
+            "STM32H753xx"
         ],
         "overrides": {
             "system_power_supply": "PWR_LDO_SUPPLY"
@@ -3722,10 +3777,14 @@
         ],
         "macros_add": [
             "STM32H7A3xxQ",
-            "STM32H7_280MHZ",
-            "MBED_SPLIT_HEAP"
+            "STM32H7_280MHZ"
         ],
-        "device_name": "STM32H7A3ZITxQ"
+        "device_name": "STM32H7A3ZITxQ",
+        "overrides": {
+            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
+            // Cannot enable overdrive mode because the default power supply is SMPS
+            "enable-overdrive-mode": 0
+        }
     },
     "NUCLEO_H7A3ZI_Q": {
         "inherits": [
@@ -3737,11 +3796,6 @@
         "detect_code": [
             "0860"
         ],
-        "overrides": {
-            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
-            // Cannot enable overdrive mode because the default power supply is SMPS
-            "enable-overdrive-mode": 0
-        },
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267690.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     "MCU_STM32H7B3xIQ": {
@@ -3755,8 +3809,7 @@
             "STM32H7_280MHZ"
         ],
         "macros_add": [
-            "STM32H7B3xxQ",
-            "MBED_SPLIT_HEAP"
+            "STM32H7B3xxQ"
         ],
         "device_name": "STM32H7B3ZITxQ",
         "overrides": {
@@ -5456,6 +5509,7 @@
                 "small"
             ]
         },
+        "device_name": "MIMXRT1176DVMAA",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/MIMXRT1170-EVKB-TOP-IMG.jpg"
     },
 
@@ -6103,7 +6157,7 @@
             "RZ_A1XX"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "extra_labels_add": [
             "RZA1H",
@@ -6695,7 +6749,7 @@
     },
     "MCU_EFM32_GECKO": { // Family target for EFM32 Gecko MCUs
         "inherits": [
-            "Target"
+            "EFM32"
         ],
         "device_has": [
             "ANALOGIN",
@@ -8814,7 +8868,7 @@
             "CYW43XXX"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "device_has_remove": [
             "ANALOGOUT"
@@ -8902,7 +8956,7 @@
             "CYW43XXX",
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "extra_labels_add": [
             "PSOC6_01",
@@ -8949,7 +9003,7 @@
             "USBDEVICE"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "extra_labels_add": [
             "PSOC6_01",
@@ -8988,7 +9042,7 @@
             "BLE"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "components_add": [
             "WHD",
@@ -9042,7 +9096,7 @@
             "BLE"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "components_add": [
             "WHD",
@@ -9086,7 +9140,7 @@
             "MCU_PSOC6_M4"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "features": [
             "BLE"
@@ -9140,7 +9194,7 @@
             "MCU_PSOC6_M4"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "features_add": [
             "BLE",
@@ -9251,7 +9305,7 @@
             "GD32_Target"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "core": "Cortex-M4F",
         "extra_labels_add": [
@@ -9286,6 +9340,7 @@
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
+        "device_name": "GD32F307VG",
         "image_url": "https://os.mbed.com/media/uploads/Ray_Chen/307-1.png"
     },
     "GD32_F450ZI": {
@@ -9293,7 +9348,7 @@
             "GD32_Target"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "core": "Cortex-M4F",
         "extra_labels_add": [

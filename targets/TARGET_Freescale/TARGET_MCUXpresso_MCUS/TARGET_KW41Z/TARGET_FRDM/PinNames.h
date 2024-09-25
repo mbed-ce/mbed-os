@@ -64,55 +64,49 @@ typedef enum {
     LED_GREEN = PTA19,
     LED_BLUE  = PTA18,
 
-    // mbed original LED naming
-    LED1 = LED_RED,
-    LED2 = LED_GREEN,
-    LED3 = LED_BLUE,
-    LED4 = LED_RED,
+    // LEDs and buttons
+#define LED1 PTC1
+#define LED2 PTA19
+#define LED3 PTA18
 
-    //Push buttons
-    SW3 = PTC4,
-    SW4 = PTC5,
-    // Standardized button names
-    BUTTON1 = SW3,
-    BUTTON2 = SW4,
+#define BUTTON1 PTC4
+#define BUTTON2 PTC5
 
     // USB Pins
     CONSOLE_TX = PTC7,
     CONSOLE_RX = PTC6,
 
-    // Arduino Headers
-    D0 = PTC6,
-    D1 = PTC7,
-    D2 = PTC19,
-    D3 = PTC16,
-    D4 = PTC4,
-    D5 = PTC17,
-    D6 = PTC18,
-    D7 = PTA1,
-    D8 = PTA0,
-    D9 = PTC1,
-    D10 = PTA19,
-    D11 = PTA16,
-    D12 = PTA17,
-    D13 = PTA18,
-    D14 = PTC3,
-    D15 = PTC2,
-
-    I2C_SCL = D15,
-    I2C_SDA = D14,
-
-    DAC0_OUT = PTB18,
-
-    A0 = (int)0xFFFFFFFF,
-    A1 = DAC0_OUT,
-    A2 = PTB2,
-    A3 = PTB3,
-    A4 = PTB1,
-    A5 = PTB0,
-
     // Not connected
-    NC = (int)0xFFFFFFFF
+    NC = (int)0xFFFFFFFF,
+
+#ifdef TARGET_FF_ARDUINO_UNO
+    // Arduino Headers
+    ARDUINO_UNO_D0 = PTC6,
+    ARDUINO_UNO_D1 = PTC7,
+    ARDUINO_UNO_D2 = PTC19,
+    ARDUINO_UNO_D3 = PTC16,
+    ARDUINO_UNO_D4 = PTC4,
+    ARDUINO_UNO_D5 = PTC17,
+    ARDUINO_UNO_D6 = PTC18,
+    ARDUINO_UNO_D7 = PTA1,
+    ARDUINO_UNO_D8 = PTA0,
+    ARDUINO_UNO_D9 = PTC1,
+    ARDUINO_UNO_D10 = PTA19,
+    ARDUINO_UNO_D11 = PTA16,
+    ARDUINO_UNO_D12 = PTA17,
+    ARDUINO_UNO_D13 = PTA18,
+    ARDUINO_UNO_D14 = PTC3,
+    ARDUINO_UNO_D15 = PTC2,
+
+    ARDUINO_UNO_A0 = NC,
+    ARDUINO_UNO_A1 = PTB18,
+    ARDUINO_UNO_A2 = PTB2,
+    ARDUINO_UNO_A3 = PTB3,
+    ARDUINO_UNO_A4 = PTB1,
+    ARDUINO_UNO_A5 = PTB0,
+#endif
+
+    DAC0_OUT = PTB18
 } PinName;
 
 
