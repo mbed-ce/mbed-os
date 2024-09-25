@@ -145,7 +145,7 @@ class _Parser(ABC):
         """ Adds information about a symbol (e.g. a function or global variable) to the data structures.
 
         Positional arguments:
-        symbol_name - Descriptive name of the symbol, e.g. ".text.some_function"
+        symbol_name - Descriptive name of the symbol, e.g. ".text.some_function" or "*fill*"
         object_name - name of the object file containing the symbol
         start addr - start address of symbol
         size - the size of the symbol being added
