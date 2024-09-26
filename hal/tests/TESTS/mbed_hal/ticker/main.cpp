@@ -2251,7 +2251,7 @@ static void test_match_interval_passed_table()
         {0xfffffffe, 0xffffffff, 0xffffffff, true},
         {0x00000000, 0xffffffff, 0xffffffff, true},
     };
-    for (int i = 0; i < MBED_ARRAY_SIZE(test_values); i++) {
+    for (size_t i = 0; i < MBED_ARRAY_SIZE(test_values); i++) {
         const uint32_t prev = test_values[i].prev;
         const uint32_t cur = test_values[i].cur;
         const uint32_t match = test_values[i].match;

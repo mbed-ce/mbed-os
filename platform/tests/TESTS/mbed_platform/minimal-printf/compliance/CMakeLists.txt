@@ -12,3 +12,8 @@ mbed_greentea_add_test(
         main.cpp
         mbed_printf.c
 )
+
+# Disable "snprintf into buffer of size x" warnings
+target_compile_options(test-mbed-platform-minimal-printf-compliance
+	PRIVATE
+	-Wno-format-truncation)

@@ -755,11 +755,6 @@ static int construct_count;
 static int destruct_count;
 static int copy_count;
 
-static int live_count()
-{
-    return construct_count - destruct_count;
-}
-
 struct FunctionObject {
     FunctionObject(int n) : val(n)
     {
@@ -824,6 +819,11 @@ void test_trivial()
 }
 
 #if MBED_CONF_PLATFORM_CALLBACK_NONTRIVIAL
+static int live_count()
+{
+    return construct_count - destruct_count;
+}
+
 void test_nontrivial()
 {
     {

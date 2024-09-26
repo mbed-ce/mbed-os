@@ -402,7 +402,7 @@ void USBDevice::_complete_set_configuration()
     if ((_abort_control || !success) && !configured()) {
         // The set configuration request was aborted or failed so
         // reset any endpoints which may have been added.
-        memset(_endpoint_info, 0, sizeof(_endpoint_info));
+        _clear_endpoints();
         _device.configuration = 0;
         _endpoint_add_remove_allowed = false;
     }
@@ -1348,7 +1348,7 @@ USBDevice::USBDevice(USBPhy *phy, uint16_t vendor_id, uint16_t product_id, uint1
     this->product_id = product_id;
     this->product_release = product_release;
 
-    memset(_endpoint_info, 0, sizeof(_endpoint_info));
+    _clear_endpoints();
     memset(&_transfer, 0, sizeof(_transfer));
     _transfer.user_callback = None;
 
@@ -1754,7 +1754,7 @@ void USBDevice::_change_state(DeviceState new_state)
     bool leaving_default_state = (old_state >= Default) && (new_state < Default);
 
     if (leaving_configured_state) {
-        memset(_endpoint_info, 0, sizeof(_endpoint_info));
+        _clear_endpoints();
         _device.configuration = 0;
         _endpoint_add_remove_allowed = false;
     }
@@ -1770,4 +1770,11 @@ void USBDevice::_change_state(DeviceState new_state)
 void USBDevice::_run_later(void (USBDevice::*function)())
 {
     _post_process = function;
+}
+
+void USBDevice::_clear_endpoints()
+{
+    for (auto &info : _endpoint_info) {
+        info = endpoint_info_t{};
+    }
 }

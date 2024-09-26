@@ -34,6 +34,7 @@ list(APPEND common_options
     "-Wextra"
     "-Wno-unused-parameter"
     "-Wno-missing-field-initializers"
+    "-Wno-psabi" # Disable "parameter passing changed in GCC 7.1" warning
     "-fmessage-length=0"
     "-fno-exceptions"
     "-ffunction-sections"

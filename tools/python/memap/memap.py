@@ -158,7 +158,7 @@ class _Parser(ABC):
 
         # Don't count the heap output section for memory bank size tracking, because the linker scripts (almost always?)
         # configure that section to expand to fill the remaining amount of space
-        if section not in {".heap"}:
+        if section not in {".heap", ".heap_0"}:
             self._add_symbol_to_memory_banks(symbol_name, start_addr, size)
             if vma_lma_offset != 0:
                 self._add_symbol_to_memory_banks(f"<initializer for {symbol_name}>", start_addr + vma_lma_offset, size)

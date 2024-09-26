@@ -115,7 +115,7 @@ static void _ospi_write_read_test(Ospi &ospi, ospi_bus_width_t write_inst_width,
     ospi_status_t ret = OSPI_STATUS_OK;
 
     Timer timer;
-    int erase_time = 0, write_time = 0, read_time = 0;
+    std::chrono::microseconds erase_time{}, write_time{}, read_time{};
     size_t buf_len = data_size;
 
     for (uint32_t tc = 0; tc < test_count; tc++) {
@@ -136,7 +136,7 @@ static void _ospi_write_read_test(Ospi &ospi, ospi_bus_width_t write_inst_width,
         WAIT_FOR(SECTOR_ERASE_MAX_TIME, ospi);
 
         timer.stop();
-        erase_time = timer.read_us();
+        erase_time = timer.elapsed_time();
 
         // switching to extended-SPI/DPI/QPI mode here for write operation
         // for DPI/QPI ospi.cmd is automatically switched to 2_2_2/4_4_4 mode
@@ -167,7 +167,7 @@ static void _ospi_write_read_test(Ospi &ospi, ospi_bus_width_t write_inst_width,
             WAIT_FOR(PAGE_PROG_MAX_TIME, ospi);
 
             timer.stop();
-            write_time = timer.read_us();
+            write_time = timer.elapsed_time();
         }
 
         // switching back to single channel SPI
@@ -193,7 +193,7 @@ static void _ospi_write_read_test(Ospi &ospi, ospi_bus_width_t write_inst_width,
             TEST_ASSERT_EQUAL(read_size, buf_len);
 
             timer.stop();
-            read_time = timer.read_us();
+            read_time = timer.elapsed_time();
         }
         ospi.cmd.set_dummy_cycles(0);
 
@@ -211,13 +211,13 @@ static void _ospi_write_read_test(Ospi &ospi, ospi_bus_width_t write_inst_width,
             if (tx_buf[i] != rx_buf[i]) {
                 log_data("tx data", tx_buf, data_size);
                 log_data("rx data", rx_buf, data_size);
-                utest_printf("erase/write/read time: %d/%d/%d [us]\r\n", erase_time, write_time, read_time);
+                utest_printf("erase/write/read time: %" PRIi64 "/%" PRIi64 "/%" PRIi64 " [us]\r\n", erase_time.count(), write_time.count(), read_time.count());
                 TEST_ASSERT_EQUAL(tx_buf[i], rx_buf[i]);
             }
         }
 
 #ifdef OSPI_TEST_LOG_FLASH_TIME
-        utest_printf("erase/write/read time: %d/%d/%d [us]\r\n", erase_time, write_time, read_time);
+        utest_printf("erase/write/read time: %" PRIi64 "/%" PRIi64 "/%" PRIi64 " [us]\r\n", erase_time.count(), write_time.count(), read_time.count());
 #endif
 
 #ifdef OSPI_TEST_LOG_DATA

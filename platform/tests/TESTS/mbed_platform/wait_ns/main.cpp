@@ -77,7 +77,8 @@ void test_wait_ns_time_measurement()
     timer.stop();
 
     /* Check results - wait_val_us us have elapsed. */
-    TEST_ASSERT_FLOAT_WITHIN(DELTA * wait_val_s, MIDPOINT * wait_val_s, timer.read());
+    TEST_ASSERT_FLOAT_WITHIN(DELTA * wait_val_s, MIDPOINT * wait_val_s,
+                             std::chrono::duration<float>(timer.elapsed_time()).count());
 }
 
 utest::v1::status_t test_setup(const size_t number_of_cases)

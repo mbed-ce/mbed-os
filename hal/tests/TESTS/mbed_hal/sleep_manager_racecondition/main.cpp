@@ -32,7 +32,7 @@ void sleep_manager_locking_thread_test()
 {
     for (uint32_t i = 0; i < 100; i++) {
         sleep_manager_lock_deep_sleep();
-        ThisThread::sleep_for(25);
+        ThisThread::sleep_for(25ms);
         sleep_manager_unlock_deep_sleep();
     }
 }
@@ -45,7 +45,7 @@ void sleep_manager_multithread_test()
         Thread t2(osPriorityNormal, TEST_STACK_SIZE);
 
         t1.start(callback(cb));
-        ThisThread::sleep_for(25);
+        ThisThread::sleep_for(25ms);
         t2.start(callback(cb));
 
         // Wait for the threads to finish
@@ -70,13 +70,13 @@ void sleep_manager_irq_test()
         Ticker ticker1;
         Timer timer;
 
-        ticker1.attach_us(&sleep_manager_locking_irq_test, 1000);
+        ticker1.attach(&sleep_manager_locking_irq_test, 1ms);
 
         // run this for 10 seconds
         timer.start();
-        int start = timer.read();
-        int end = start + 10;
-        while (timer.read() < end) {
+        const auto start = timer.elapsed_time();
+        const auto end = start + 10s;
+        while (timer.elapsed_time() < end) {
             sleep_manager_locking_irq_test();
         }
         timer.stop();

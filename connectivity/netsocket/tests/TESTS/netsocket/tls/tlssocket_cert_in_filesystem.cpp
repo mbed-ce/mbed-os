@@ -36,7 +36,8 @@ void TLSSOCKET_CERT_IN_FILESYSTEM()
     TEST_ASSERT_EQUAL(0, fs.mount(&bd));
 
     FILE *fp = fopen("/fs/certs.pem", "wb");
-    int ret = fwrite(tls_global::cert, strlen(tls_global::cert), 1, fp);
+    size_t ret = fwrite(tls_global::cert, strlen(tls_global::cert), 1, fp);
+    TEST_ASSERT_EQUAL(1, ret);
     fclose(fp);
 
     TLSSocket sock;

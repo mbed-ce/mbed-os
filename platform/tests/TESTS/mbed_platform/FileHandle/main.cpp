@@ -101,7 +101,7 @@ void test_fwrite_fread()
     std::clearerr(file);
 
     // ARMCC/IAR returns 0 here instead of number of elements successfully written !!!
-    TEST_ASSERT_TRUE(write_ret >= 0 && write_ret <= (str2_size - 1));
+    TEST_ASSERT_TRUE(write_ret <= (str2_size - 1));
 
     // write 3; expected written 0
     TestFile<FS>::resetFunctionCallHistory();

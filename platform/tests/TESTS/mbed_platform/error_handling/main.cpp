@@ -267,7 +267,7 @@ void test_error_hook()
     }
 
     MBED_WARNING1(MBED_ERROR_INVALID_ARGUMENT, "Test for error hook", 1234);
-    bool acquired = callback_sem.try_acquire_for(5000);
+    bool acquired = callback_sem.try_acquire_for(5s);
 
     TEST_ASSERT(acquired);
 }

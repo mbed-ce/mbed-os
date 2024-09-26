@@ -260,7 +260,7 @@ void test_heap_allocation_free(void)
     check_and_free_heap(head, max_allocation_size);
 
     // Force a task switch so a stack check is performed
-    ThisThread::sleep_for(10);
+    ThisThread::sleep_for(10s);
 
     printf("Total size dynamically allocated: %luB\n", max_allocation_size);
 }

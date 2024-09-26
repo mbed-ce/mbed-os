@@ -488,6 +488,7 @@ struct GattClient::DiscoveryControlBlock final : public ProcedureControlBlock {
     bool done;
 };
 
+#undef TRACE_CLASS
 #define TRACE_CLASS "ReadControlBlock"
 struct GattClient::ReadControlBlock final : public ProcedureControlBlock {
     using ProcedureControlBlock::connection_handle;
@@ -701,6 +702,7 @@ struct GattClient::ReadControlBlock final : public ProcedureControlBlock {
 /*
  * Control block for the write process
  */
+#undef TRACE_CLASS
 #define TRACE_CLASS "WriteControlBlock"
 struct GattClient::WriteControlBlock final : public ProcedureControlBlock {
     using ProcedureControlBlock::connection_handle;
@@ -926,6 +928,7 @@ struct GattClient::WriteControlBlock final : public ProcedureControlBlock {
 /*
  * Control block for the descriptor discovery process
  */
+#undef TRACE_CLASS
 #define TRACE_CLASS "DescriptorDiscoveryControlBlock"
 struct GattClient::DescriptorDiscoveryControlBlock final : public ProcedureControlBlock {
     using ProcedureControlBlock::connection_handle;

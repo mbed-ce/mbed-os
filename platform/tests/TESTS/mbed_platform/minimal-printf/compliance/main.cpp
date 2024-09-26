@@ -126,7 +126,7 @@ static int make_test_string(
 )
 {
     char *exp_str = &expected_string[0];
-    int str_length = 0;
+    size_t str_length = 0;
     memset(exp_str, 0, MAX_STRING_SIZE);
     if (prefix) {
         str_length = strlen(prefix);

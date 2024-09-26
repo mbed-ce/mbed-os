@@ -58,7 +58,6 @@ volatile bool mutex_defect = false;
 bool manipulate_protected_zone(const Kernel::Clock::duration thread_delay)
 {
     bool result = true;
-    osStatus stat;
 
     stdio_mutex.lock();
 
@@ -128,7 +127,6 @@ void test_multiple_threads(void)
 
 void test_dual_thread_nolock_lock_thread(Mutex *mutex)
 {
-    osStatus stat;
     mutex->lock();
 
     mutex->unlock();
@@ -184,7 +182,6 @@ void test_dual_thread_lock_unlock_thread(Mutex *mutex)
 void test_dual_thread_lock_unlock(void)
 {
     Mutex mutex;
-    osStatus stat;
     Thread thread(osPriorityNormal, TEST_STACK_SIZE);
 
     mutex.lock();
@@ -230,7 +227,6 @@ template <void (*F)(Mutex *)>
 void test_dual_thread_lock(void)
 {
     Mutex mutex;
-    osStatus stat;
     Thread thread(osPriorityNormal, TEST_STACK_SIZE);
 
     mutex.lock();
@@ -251,7 +247,6 @@ void test_dual_thread_lock(void)
 void test_single_thread_lock_recursive(void)
 {
     Mutex mutex;
-    osStatus stat;
 
     mutex.lock();
 
@@ -287,7 +282,6 @@ void test_single_thread_trylock(void)
 void test_single_thread_lock(void)
 {
     Mutex mutex;
-    osStatus stat;
 
     mutex.lock();
 
