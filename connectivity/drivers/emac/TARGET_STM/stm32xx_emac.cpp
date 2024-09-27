@@ -306,13 +306,13 @@ bool STM32_EMAC::low_level_init_successful()
     tr_info("PHY ID %#X", PHY_ID);
 
     /* Initialize Tx Descriptors list: Chain Mode */
-    if (HAL_ETH_DMATxDescListInit(&EthHandle, DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB) != HAL_OK) {
+    if (HAL_ETH_DMATxDescListInit(&EthHandle, DMATxDscrTab, reinterpret_cast<uint8_t *>(&Tx_Buff[0][0]), ETH_TXBUFNB) != HAL_OK) {
         tr_error("HAL_ETH_DMATxDescListInit issue");
         return false;
     }
 
     /* Initialize Rx Descriptors list: Chain Mode  */
-    if (HAL_ETH_DMARxDescListInit(&EthHandle, DMARxDscrTab, Rx_Buff[0].data(), ETH_RXBUFNB) != HAL_OK) {
+    if (HAL_ETH_DMARxDescListInit(&EthHandle, DMARxDscrTab, reinterpret_cast<uint8_t *>(Rx_Buff[0].data()), ETH_RXBUFNB) != HAL_OK) {
         tr_error("HAL_ETH_DMARxDescListInit issue");
         return false;
     }
