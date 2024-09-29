@@ -3421,10 +3421,10 @@
         ],
         "device_name": "STM32H745ZITx"
     },
+	
+	// These targets contain the extra bits to add to the MCU_STM32H745xI target to set it for the
+	// CM4 or CM7 core.
     "MCU_STM32H745xI_CM4": {
-        "inherits": [
-            "MCU_STM32H745xI"
-        ],
         "public": false,
         "extra_labels_add": [
             "STM32H745xI_CM4"
@@ -3442,9 +3442,6 @@
         ]
     },
     "MCU_STM32H745xI_CM7": {
-        "inherits": [
-            "MCU_STM32H745xI"
-        ],
         "public": false,
         "extra_labels_add": [
             "STM32H745xI_CM7"
@@ -3463,6 +3460,7 @@
         ]
     },
     "NUCLEO_H745ZI_Q": {
+		"inherits": ["MCU_STM32H745xI"],
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
@@ -3508,10 +3506,9 @@
             "STM32H747xx"
         ]
     },
+	// These targets contain the extra bits to add to the MCU_STM32H747xI target to set it for the
+	// CM4 or CM7 core.
     "MCU_STM32H747xI_CM7": {
-        "inherits": [
-            "MCU_STM32H747xI"
-        ],
         "public": false,
         "extra_labels_add": [
             "STM32H747xI_CM7"
@@ -3530,9 +3527,6 @@
         ]
     },
     "MCU_STM32H747xI_CM4": {
-        "inherits": [
-            "MCU_STM32H747xI"
-        ],
         "public": false,
         "extra_labels_add": [
             "STM32H747xI_CM4"
@@ -3557,6 +3551,7 @@
     "DISCO_H747I": {
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/310/MFG_STM32H747I-DISCO.jpg",
         "public": false,
+		"inherits": ["MCU_STM32H747xI"],
         "overrides": {
             "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
@@ -3564,9 +3559,11 @@
         }
     },
     "DISCO_H747I_CM7": {
+		// NOTE: inherit from MCU_STM32H747xI_CM7 first so that target's attributes get priority over
+		// DISCO_H747I's attributes.
         "inherits": [
-            "MCU_STM32H747xI_CM7",
-            "DISCO_H747"
+		    "MCU_STM32H747xI_CM7",
+		    "DISCO_H747I"
         ],
         "supported_form_factors": [
             "ARDUINO_UNO",
@@ -3590,8 +3587,8 @@
     },
     "DISCO_H747I_CM4": {
         "inherits": [
-            "MCU_STM32H747xI_CM4",
-            "DISCO_H747"
+			"MCU_STM32H747xI_CM4",
+            "DISCO_H747I"
         ],
         "extra_labels_add": [
             "DISCO_H747I",
@@ -3669,10 +3666,10 @@
         "image_url": "https://store.arduino.cc/cdn/shop/products/ABX00042_00.iso_1200x900.jpg?v=1675840144"
     },
     "ARDUINO_PORTENTA_H7_M7": {
-        "inherits": ["ARDUINO_PORTENTA_H7", "MCU_STM32H747xI_CM7"],
+        "inherits": ["MCU_STM32H747xI_CM7", "ARDUINO_PORTENTA_H7"]
     },
     "ARDUINO_PORTENTA_H7_M4": {
-        "inherits": ["ARDUINO_PORTENTA_H7", "MCU_STM32H747xI_CM4"],
+        "inherits": ["MCU_STM32H747xI_CM4", "ARDUINO_PORTENTA_H7"]
     },
     "MCU_STM32H750xB": {
         "inherits": [
