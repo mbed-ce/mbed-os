@@ -30,7 +30,7 @@
 #include "securestore/SecureStore.h"
 #define TRACE_GROUP "KVCFG"
 
-#if DEVICE_FLASH
+#if COMPONENT_FLASHIAP
 #include "FlashIAPBlockDevice.h"
 #endif
 
@@ -284,7 +284,7 @@ FileSystem *_get_filesystem_default(const char *mount)
 
 BlockDevice *_get_blockdevice_FLASHIAP(bd_addr_t start_address, bd_size_t size)
 {
-#if DEVICE_FLASH
+#if COMPONENT_FLASHIAP
     int ret = kv_get_flash_bounds_from_config(&start_address, &size);
     if (ret != 0) {
         tr_error("KV Config: Determination of internal block device bounds failed. The configured start address/size is likely invalid.");
@@ -677,7 +677,7 @@ int _create_internal_tdb(BlockDevice **internal_bd, KVStore **internal_tdb, bd_s
 
 int _storage_config_TDB_INTERNAL()
 {
-#if DEVICE_FLASH
+#if COMPONENT_FLASHIAP
     bd_size_t internal_size = MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE;
     bd_addr_t internal_start_address = MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_BASE_ADDRESS;
 
@@ -999,7 +999,7 @@ MBED_WEAK int kv_init_storage_config()
     int ret = MBED_SUCCESS;
 
     // We currently have no supported configuration without internal storage
-#ifndef DEVICE_FLASH
+#ifndef COMPONENT_FLASHIAP
     return MBED_ERROR_UNSUPPORTED;
 #endif
 
@@ -1026,7 +1026,7 @@ int kv_get_default_flash_addresses(bd_addr_t *start_address, bd_size_t *size)
 {
     int ret = MBED_SUCCESS;
 
-#if DEVICE_FLASH
+#if COMPONENT_FLASHIAP
     FlashIAP flash;
     if (flash.init() != 0) {
         return MBED_ERROR_INITIALIZATION_FAILED;
@@ -1072,7 +1072,7 @@ int kv_get_default_flash_addresses(bd_addr_t *start_address, bd_size_t *size)
 
 int kv_get_flash_bounds_from_config(bd_addr_t *start_address, bd_size_t *size)
 {
-#if DEVICE_FLASH
+#if COMPONENT_FLASHIAP
 
     bd_addr_t flash_end_address;
     bd_addr_t flash_start_address;

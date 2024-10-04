@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-#ifndef DEVICE_FLASH
+#ifndef COMPONENT_FLASHIAP
 #error [NOT_SUPPORTED] Target must have internal FlashIAP for this test
 #else
 
@@ -323,4 +323,4 @@ int main()
     return !Harness::run(specification);
 }
 
-#endif // DEVICE_FLASH
+#endif // COMPONENT_FLASHIAP

@@ -1,8 +1,10 @@
 # Copyright (c) 2020-2021 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-if(NOT "MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED=1" IN_LIST MBED_CONFIG_DEFINITIONS)
-	set(TEST_SKIPPED "CRC is not supported for this target")
+include(mbed_greentea)
+
+if(NOT DEFINED MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED)
+    set(TEST_SKIPPED "crash_reporting test not supported.")
 endif()
 
 mbed_greentea_add_test(

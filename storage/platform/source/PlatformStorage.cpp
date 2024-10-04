@@ -44,7 +44,7 @@ const spi_pinmap_t static_spi_pinmap = get_spi_pinmap(MBED_CONF_SD_SPI_MOSI, MBE
 #endif
 #endif
 
-#if DEVICE_FLASH
+#if COMPONENT_FLASHIAP
 #include "FlashIAPBlockDevice.h"
 #endif
 
@@ -104,7 +104,7 @@ MBED_WEAK BlockDevice *BlockDevice::get_default_instance()
 
     return &default_bd;
 
-#elif DEVICE_FLASH
+#elif COMPONENT_FLASHIAP
 
 #if (MBED_CONF_FLASHIAP_BLOCK_DEVICE_SIZE == 0) && (MBED_CONF_FLASHIAP_BLOCK_DEVICE_BASE_ADDRESS == 0xFFFFFFFF)
 
@@ -164,7 +164,7 @@ MBED_WEAK FileSystem *FileSystem::get_default_instance()
 
     return &sdcard;
 
-#elif DEVICE_FLASH
+#elif COMPONENT_FLASHIAP
 
 // To avoid alignment issues, initialize a filesystem if all sectors have the same size
 // OR the user has specified an address range
