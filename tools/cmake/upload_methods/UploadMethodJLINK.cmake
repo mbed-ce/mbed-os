@@ -7,7 +7,6 @@
 # JLINK_CLOCK_SPEED - Speed to run the J-Link at, in KHz.
 # JLINK_CPU_NAME - Name of CPU to pass to J-Link
 #   This method has the following options:
-# JLINK_USB_SERIAL_NUMBER - Use a J-Link connected over USB with the specified serial number.
 # JLINK_NETWORK_ADDRESS - Use a J-Link connected over the network with the given <ip addr>[:port]
 # JLINK_NO_GUI - If set to true, suppress GUI dialog boxes from the J-Link software.
 #
@@ -19,14 +18,13 @@ find_package(JLINK)
 set(UPLOAD_JLINK_FOUND ${JLINK_FOUND})
 
 ### Setup options
-set(JLINK_USB_SERIAL_NUMBER "" CACHE STRING "Use a J-Link connected over USB with the specified serial number.")
 set(JLINK_NETWORK_ADDRESS "" CACHE STRING "Use a J-Link connected over the network with the given <ip addr>[:port]")
 
 # Figure out -select option.  See here: https://wiki.segger.com/J-Link_GDB_Server#-select
-if((NOT "${JLINK_USB_SERIAL_NUMBER}" STREQUAL "") AND (NOT "${JLINK_NETWORK_ADDRESS}" STREQUAL ""))
-	message(FATAL_ERROR "Cannot use both JLINK_USB_SERIAL_NUMBER and JLINK_NETWORK_ADDRESS at the same time!")
-elseif(NOT "${JLINK_USB_SERIAL_NUMBER}" STREQUAL "")
-	set(JLINK_SELECT_ARG -Select usb=${JLINK_USB_SERIAL_NUMBER} CACHE INTERNAL "" FORCE)
+if((NOT "${MBED_UPLOAD_SERIAL_NUMBER}" STREQUAL "") AND (NOT "${JLINK_NETWORK_ADDRESS}" STREQUAL ""))
+	message(FATAL_ERROR "Cannot use both MBED_UPLOAD_SERIAL_NUMBER and JLINK_NETWORK_ADDRESS at the same time!")
+elseif(NOT "${MBED_UPLOAD_SERIAL_NUMBER}" STREQUAL "")
+	set(JLINK_SELECT_ARG -Select usb=${MBED_UPLOAD_SERIAL_NUMBER} CACHE INTERNAL "" FORCE)
 elseif(NOT "${JLINK_NETWORK_ADDRESS}" STREQUAL "")
 	set(JLINK_SELECT_ARG -Select ip=${JLINK_NETWORK_ADDRESS} CACHE INTERNAL "" FORCE)
 else()
@@ -51,8 +49,11 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 
 	# create command file for j-link
 	set(COMMAND_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/flash-${TARGET_NAME}.jlink)
+
+	# Note: loadfile currently only honors the base address for .bin files.  For hex files it uses the offset read
+	# from the hex file.  Unsure if that will be an issue or not...
 	file(GENERATE OUTPUT ${COMMAND_FILE_PATH} CONTENT
-"loadfile ${BINARY_FILE}
+"loadfile ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR}
 r
 go
 exit

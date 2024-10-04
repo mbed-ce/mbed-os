@@ -15,8 +15,8 @@ if(stlink_FOUND AND (stlink_VERSION VERSION_LESS 1.7.0))
 endif()
 
 ### Figure out --serial argument
-if(DEFINED STLINK_PROBE_SN AND NOT "${STLINK_PROBE_SN}" STREQUAL "")
-	set(STLINK_SERIAL_ARGUMENT --serial ${STLINK_PROBE_SN} CACHE INTERNAL "" FORCE)
+if(DEFINED MBED_UPLOAD_SERIAL_NUMBER AND NOT "${MBED_UPLOAD_SERIAL_NUMBER}" STREQUAL "")
+	set(STLINK_SERIAL_ARGUMENT --serial ${MBED_UPLOAD_SERIAL_NUMBER} CACHE INTERNAL "" FORCE)
 else()
 	set(STLINK_SERIAL_ARGUMENT "" CACHE INTERNAL "" FORCE)
 endif()
@@ -30,7 +30,7 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		--reset # Reset chip after flashing
 		${STLINK_SERIAL_ARGUMENT}
 		${STLINK_ARGS}
-		write ${BINARY_FILE} ${STLINK_LOAD_ADDRESS})
+		write ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR})
 
 	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
 endfunction(gen_upload_target)

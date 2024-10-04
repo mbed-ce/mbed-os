@@ -5,10 +5,6 @@
 # This method needs the following parameters:
 # STM32CUBE_CONNECT_COMMAND - "Connect" (-c) command to pass to the programmer
 # STM32CUBE_GDBSERVER_ARGS - Arguments to pass to the ST-Link gdbserver.
-# This method creates the following options:
-# STM32CUBE_PROBE_SN - Serial number of the ST-Link probe to connect to.  If blank, will connect to any probe.
-
-set(STM32CUBE_PROBE_SN "" CACHE STRING "Serial number of the ST-Link probe to connect to.  If blank, will connect to any probe.")
 
 ### Check if upload method can be enabled on this machine
 find_package(STLINKTools COMPONENTS STM32CubeProg OPTIONAL_COMPONENTS STLINK_gdbserver)
@@ -25,9 +21,9 @@ endif()
 set(STM32CUBE_UPLOAD_PROBE_ARGS "" CACHE INTERNAL "" FORCE)
 set(STM32CUBE_GDB_PROBE_ARGS "" CACHE INTERNAL "" FORCE)
 
-if(NOT "${STM32CUBE_PROBE_SN}" STREQUAL "")
-	set(STM32CUBE_UPLOAD_PROBE_ARGS sn=${STM32CUBE_PROBE_SN} CACHE INTERNAL "" FORCE)
-	set(STM32CUBE_GDB_PROBE_ARGS --serial-number ${STM32CUBE_PROBE_SN} CACHE INTERNAL "" FORCE)
+if(NOT "${MBED_UPLOAD_SERIAL_NUMBER}" STREQUAL "")
+	set(STM32CUBE_UPLOAD_PROBE_ARGS sn=${MBED_UPLOAD_SERIAL_NUMBER} CACHE INTERNAL "" FORCE)
+	set(STM32CUBE_GDB_PROBE_ARGS --serial-number ${MBED_UPLOAD_SERIAL_NUMBER} CACHE INTERNAL "" FORCE)
 endif()
 
 function(gen_upload_target TARGET_NAME BINARY_FILE)
@@ -37,7 +33,7 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		COMMAND ${STM32CubeProg_COMMAND}
 		${STM32CUBE_CONNECT_COMMAND}
 		${STM32CUBE_UPLOAD_PROBE_ARGS} # probe arg must be immediately after -c command as it gets appended to -c
-		-w "$<TARGET_FILE:${TARGET_NAME}>"
+		-w ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR}
 		-rst)
 
 	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})

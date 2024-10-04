@@ -5,8 +5,6 @@
 # This method needs the following parameters:
 # PYOCD_TARGET_NAME - Name of your processor as passed to the -t option of pyOCD. This is usually the full or partial model number.
 # PYOCD_CLOCK_SPEED - Clock speed of the JTAG or SWD connection. Default is in Hz, but can use k and M suffixes for MHz and GHz
-# This method creates the following options:
-# PYOCD_PROBE_UID - Probe UID to pass to pyOCD commands. You can get the UIDs from `python -m pyocd list`.  Set to empty to detect any probe.
 
 set(UPLOAD_SUPPORTS_DEBUG TRUE)
 
@@ -15,13 +13,10 @@ include(CheckPythonPackage)
 check_python_package(pyocd HAVE_PYOCD)
 set(UPLOAD_PYOCD_FOUND ${HAVE_PYOCD})
 
-### Setup options
-set(PYOCD_PROBE_UID "" CACHE STRING "Probe UID to pass to pyOCD commands. You can get the UIDs from `python -m pyocd list`.  Set to empty to detect any probe.")
-
 ### Function to generate upload target
 set(PYOCD_PROBE_ARGS "" CACHE INTERNAL "" FORCE)
-if(NOT "${PYOCD_PROBE_UID}" STREQUAL "")
-	set(PYOCD_PROBE_ARGS --probe ${PYOCD_PROBE_UID} CACHE INTERNAL "" FORCE)
+if(NOT "${MBED_UPLOAD_SERIAL_NUMBER}" STREQUAL "")
+	set(PYOCD_PROBE_ARGS --probe ${MBED_UPLOAD_SERIAL_NUMBER} CACHE INTERNAL "" FORCE)
 endif()
 
 function(gen_upload_target TARGET_NAME BINARY_FILE)
@@ -36,6 +31,7 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		-f ${PYOCD_CLOCK_SPEED}
 		-t ${PYOCD_TARGET_NAME}
 		${PYOCD_PROBE_ARGS}
+		--base-address ${MBED_UPLOAD_BASE_ADDR}
 		${BINARY_FILE})
 
 	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
