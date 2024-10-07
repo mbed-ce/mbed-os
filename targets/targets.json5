@@ -8203,6 +8203,34 @@
             "usb-uart-tx": "PA_7",
             "usb-uart-rx": "PA_6"
         },
+        "memory_banks": {
+            "NS_CODE": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": false,
+                "size": 0x8D000,
+                "start": 0x10071000,
+                "startup": false
+            },
+            "NS_DATA": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x28000,
+                "start": 0x30018000,
+                "startup": false
+            }
+        },
         "OUTPUT_EXT": "bin",
         "components_add": [
             "TFM_S_FW"

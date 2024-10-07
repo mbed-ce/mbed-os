@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Nuvoton Technology Corporation
+ * Copyright (c) 2022, Nuvoton Technology Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-#ifndef __M251_MEM_H__
-#define __M251_MEM_H__
+#ifndef __NUC472_MEM_H__
+#define __NUC472_MEM_H__
 
 /* Default memory specification
  *
- * Flash size:  256KiB
- * SRAM size:   32KiB
+ * Flash size:  512KiB
+ * SRAM size:   64KiB
  */
 
 /* Physical IROM1 start/size */
@@ -30,7 +30,7 @@
 #define MBED_ROM_BANK_IROM1_START 0x0
 #endif
 #if !defined(MBED_ROM_BANK_IROM1_SIZE)
-#define MBED_ROM_BANK_IROM1_SIZE 0x40000
+#define MBED_ROM_BANK_IROM1_SIZE 0x80000
 #endif 
 
 /* Physical IRAM1 start/size */
@@ -38,7 +38,7 @@
 #define MBED_RAM_BANK_IRAM1_START 0x20000000
 #endif
 #if !defined(MBED_RAM_BANK_IRAM1_SIZE)
-#define MBED_RAM_BANK_IRAM1_SIZE 0x8000
+#define MBED_RAM_BANK_IRAM1_SIZE 0x10000
 #endif
 
 /* Configured IROM1 start/size */
@@ -57,4 +57,20 @@
 #define MBED_CONFIGURED_RAM_BANK_IRAM1_SIZE MBED_RAM_BANK_IRAM1_SIZE
 #endif
 
-#endif  /* __M251_MEM_H__ */
+/* Physical XRAM1 start/size */
+#if !defined(MBED_RAM_BANK_XRAM1_START)
+#define MBED_RAM_BANK_XRAM1_START 0x60000000
+#endif
+#if !defined(MBED_RAM_BANK_XRAM1_SIZE)
+#define MBED_RAM_BANK_XRAM1_SIZE 0x100000
+#endif
+
+/* Configured XRAM1 start/size */
+#if !defined(MBED_CONFIGURED_RAM_BANK_XRAM1_START)
+#define MBED_CONFIGURED_RAM_BANK_XRAM1_START MBED_RAM_BANK_XRAM1_START
+#endif
+#if !defined(MBED_CONFIGURED_RAM_BANK_XRAM1_SIZE)
+#define MBED_CONFIGURED_RAM_BANK_XRAM1_SIZE MBED_RAM_BANK_XRAM1_SIZE
+#endif
+
+#endif  /* __NUC472_MEM_H__ */

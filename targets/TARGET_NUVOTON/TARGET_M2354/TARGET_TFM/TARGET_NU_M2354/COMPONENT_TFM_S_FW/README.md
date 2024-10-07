@@ -152,6 +152,23 @@ Below summarize the copy paths from TF-M into Mbed:
 **NOTE**: `trusted-firmware-m/cmake_build/install/image_signing/keys/root-RSA-3072.pem` can be missing due to TF-M build tool issue.
 Try to get it from `trusted-firmware-m/bl2/ext/mcuboot/root-RSA-3072.pem` instead if it is just the original source.
 
+Open `targets.json5` (for built-in target) or `custom_targets.json5` (for custom target),
+, locate the `memory_banks` section for this mbed target,
+and update the below symbols per above TF-M exported `region_defs.h`.
+
+```json5
+"memory_banks": {
+    "NS_CODE": {
+        "size": /*<NS_CODE_SIZE>*/,
+        "start": /*<NS_CODE_START>*/,
+    },
+    "NS_DATA": {
+        "size": /*<NS_DATA_SIZE>*/,
+        "start": /*<NS_DATA_START>*/,
+    },
+},
+```
+
 ## PSA Firmware Update
 
 ### Requirement
