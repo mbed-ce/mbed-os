@@ -49,10 +49,6 @@ if(NOT DEFINED MBED_UPLOAD_BASE_ADDR OR "${MBED_UPLOAD_BASE_ADDR}" STREQUAL "")
 	endif()
 endif()
 
-
-set(MBED_UPLOAD_SERIAL_NUMBER "" CACHE STRING "Serial number of the Mbed board or the programming tool, for upload methods that select by serial number.")
-
-
 # ----------------------------------------------
 # Load the upload method.
 # Upload methods are expected to refer to the following variables:
