@@ -46,7 +46,7 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	${LinkServer_PATH}
 	gdbserver
 	${LINKSERVER_PROBE_ARGS}
-	--gdb-port ${GDB_PORT}
+	--gdb-port ${MBED_GDB_PORT}
 	${LINKSERVER_DEVICE}
 )
 

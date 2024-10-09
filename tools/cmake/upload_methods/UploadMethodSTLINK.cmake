@@ -41,7 +41,7 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	${st-util_PATH}
 	${STLINK_SERIAL_ARGUMENT}
 	${STLINK_ARGS}
-	--listen_port=${GDB_PORT}
+	--listen_port=${MBED_GDB_PORT}
 	--multi)
 
 # Reference: https://github.com/Marus/cortex-debug/blob/056c03f01e008828e6527c571ef5c9adaf64083f/src/stutil.ts#L39

@@ -62,7 +62,7 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	# Shut down OpenOCD when GDB disconnects.
 	# see https://github.com/Marus/cortex-debug/issues/371#issuecomment-999727626
 	-c "[target current] configure -event gdb-detach {shutdown}"
-	-c "gdb_port ${GDB_PORT}")
+	-c "gdb_port ${MBED_GDB_PORT}")
 
 # request extended-remote GDB sessions
 set(UPLOAD_WANTS_EXTENDED_REMOTE TRUE)

@@ -90,7 +90,7 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	-JTAGConf -1,-1
 	-LocalhostOnly
 	-noIR
-	-port ${GDB_PORT}
+	-port ${MBED_GDB_PORT}
 	-singlerun # Terminate GDB server after GDB disconnects
 	)
 

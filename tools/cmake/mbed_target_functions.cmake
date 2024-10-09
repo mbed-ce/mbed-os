@@ -50,6 +50,10 @@ function(mbed_generate_map_file target)
 
     # Config process saves the JSON file here
     set(MEMORY_BANKS_JSON_PATH ${CMAKE_BINARY_DIR}/memory_banks.json)
+    set(MEMORY_BANKS_ARG "")
+    if(EXISTS ${MEMORY_BANKS_JSON_PATH})
+        set(MEMORY_BANKS_ARG --memory-banks-json ${MEMORY_BANKS_JSON_PATH})
+    endif()
 
     # generate table for screen
     add_custom_command(
@@ -58,7 +62,8 @@ function(mbed_generate_map_file target)
         POST_BUILD
         COMMAND ${Python3_EXECUTABLE} -m memap.memap
             -t ${MBED_TOOLCHAIN} ${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map 
-            --depth ${MBED_MEMAP_DEPTH} --memory-banks-json ${MEMORY_BANKS_JSON_PATH}
+            --depth ${MBED_MEMAP_DEPTH}
+            ${MEMORY_BANKS_ARG}
         WORKING_DIRECTORY
 			${mbed-os_SOURCE_DIR}/tools/python
     )
@@ -74,7 +79,7 @@ function(mbed_generate_map_file target)
             --depth ${MBED_MEMAP_DEPTH} 
             -e json
             -o ${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.memmap.json
-            --memory-banks-json ${MEMORY_BANKS_JSON_PATH}
+            ${MEMORY_BANKS_ARG}
             WORKING_DIRECTORY
 			    ${mbed-os_SOURCE_DIR}/tools/python
     )
@@ -91,7 +96,7 @@ function(mbed_generate_map_file target)
             --depth ${MBED_MEMAP_DEPTH} 
             -e html
             -o ${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.memmap.html
-            --memory-banks-json ${MEMORY_BANKS_JSON_PATH}
+            ${MEMORY_BANKS_ARG}
             WORKING_DIRECTORY
 			    ${mbed-os_SOURCE_DIR}/tools/python
     )
