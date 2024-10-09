@@ -74,6 +74,12 @@ if("MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE=MESH" IN_LIST MBED_CONFIG_DE
     target_link_libraries(mbed-netsocket-api PUBLIC mbed-nanostack-mbed_mesh_api)
 endif()
 
+# Similarly if wifi networking is used bring in that library
+if("MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE=WIFI" IN_LIST MBED_CONFIG_DEFINITIONS)
+    if(TARGET mbed-wifi)
+        target_link_libraries(mbed-netsocket-api PUBLIC mbed-wifi)
+    endif()
+endif()
 
 if("DEVICE_EMAC=1" IN_LIST MBED_TARGET_DEFINITIONS)
     target_link_libraries(mbed-netsocket-api
