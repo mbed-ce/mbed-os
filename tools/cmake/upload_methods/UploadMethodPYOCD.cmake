@@ -53,6 +53,10 @@ set(UPLOAD_LAUNCH_COMMANDS
 "monitor reset halt"
 "load"
 "tbreak main"
+
+# It appears the device under debug must be halted after UPLOAD_LAUNCH_COMMANDS,
+# or debugger will become abnormal.
+"monitor reset halt"
 )
 set(UPLOAD_RESTART_COMMANDS
 "monitor reset halt"

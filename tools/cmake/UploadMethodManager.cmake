@@ -1,6 +1,44 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+# Change GDB load command to flash post-build processed image in debug launch.
+# With this adjustment, GDB load command changes to "load <app>.hex" from
+# just "load":
+# 1. "Load" will load <app>.elf and is inappropriate for targets like
+#    bootloader or TF-M enabled which need to post-build process images.
+# 2. "load <app>.bin" is not considered because GDB load command
+#    doesn't support binary format.
+#
+# NOTE: Place at the very start so that it can override by the below loaded
+#       upload method if need be.
+function(mbed_adjust_upload_debug_commands target)
+    # MBED_UPLOAD_LAUNCH_COMMANDS defined?
+    if(NOT DEFINED MBED_UPLOAD_LAUNCH_COMMANDS)
+        return()
+    endif()
+
+    # GDB load command in MBED_UPLOAD_LAUNCH_COMMANDS?
+    list(FIND MBED_UPLOAD_LAUNCH_COMMANDS "load" LOAD_INDEX)
+    if(${LOAD_INDEX} LESS "0")
+        return()
+    endif()
+
+    # <app>.hex for debug launch load
+    set(HEX_FILE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.hex)
+
+    # "load" -> "load <app>.hex"
+    #
+    # GDB load command doesn't support binary format. Ignore OUTPUT_EXT
+    # and fix to Intel Hex format.
+    #
+    # NOTE: The <app>.hex file name needs to be quoted (\\\") to pass along
+    #       to gdb correctly.
+    list(TRANSFORM MBED_UPLOAD_LAUNCH_COMMANDS APPEND " \\\"${HEX_FILE}\\\"" AT ${LOAD_INDEX})
+
+    # Update MBED_UPLOAD_LAUNCH_COMMANDS in cache
+    set(MBED_UPLOAD_LAUNCH_COMMANDS ${MBED_UPLOAD_LAUNCH_COMMANDS} CACHE INTERNAL "" FORCE)
+endfunction()
+
 # ----------------------------------------------
 # Common upload method options
 
