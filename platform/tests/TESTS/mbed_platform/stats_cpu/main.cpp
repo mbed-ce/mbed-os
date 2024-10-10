@@ -39,8 +39,8 @@ DigitalOut led1(LED1);
 #define MAX_THREAD_STACK        384
 #endif
 
-#define SAMPLE_TIME             1000    // msec
-#define LOOP_TIME               2000    // msec
+#define SAMPLE_TIME             1s
+#define LOOP_TIME               2s
 
 static int32_t wait_time = 5000;
 
@@ -76,7 +76,7 @@ void test_cpu_info(void)
     mbed_stats_cpu_t stats;
     // Additional read to make sure timer is initialized
     mbed_stats_cpu_get(&stats);
-    ThisThread::sleep_for(3);
+    ThisThread::sleep_for(3ms);
     mbed_stats_cpu_get(&stats);
     TEST_ASSERT_NOT_EQUAL(0, stats.uptime);
     TEST_ASSERT_NOT_EQUAL(0, stats.idle_time);

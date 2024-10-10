@@ -33,13 +33,22 @@ void test_sys_info()
     mbed_stats_sys_t stats;
     mbed_stats_sys_get(&stats);
 
+    // Print a summary of the stats, just for debug purposes
+    printf("Dump of Mbed System Stats: -------------------------------------\n");
+    printf("- OS Version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 "\n",
+        stats.os_version / 10000,
+        (stats.os_version % 10000) / 100,
+        ((stats.os_version % 10000) % 100));
+    printf("- CPUID Register: 0x%" PRIx32 "\n", stats.cpu_id);
+    printf("- Compiler Version: %" PRIu32 "\n", stats.compiler_version);
+
     TEST_ASSERT_NOT_EQUAL(0, stats.os_version);
 #if defined(__CORTEX_M)
     TEST_ASSERT_NOT_EQUAL(0, stats.cpu_id);
 #endif
 
 #if defined(__IAR_SYSTEMS_ICC__)
-    TEST_ASSERT_EQUAL(IAR, stats.compiler_id);
+    TEST_ASSERT_EQUAL(IAR, stats.compiler_id); 
 #elif defined(__ARMCC_VERSION)
     TEST_ASSERT_EQUAL(ARM, stats.compiler_id);
 #elif defined(__GNUC__)
