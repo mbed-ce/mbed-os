@@ -1,0 +1,5 @@
+{
+    "overrides": {
+        "platform.all-stats-enabled": 1
+    }
+}

@@ -3,9 +3,10 @@
 
 include(mbed_greentea)
 
-if(NOT DEFINED MBED_HEAP_STATS_ENABLED)
-    set(TEST_SKIPPED "Stats heap test not supported.")
+if((NOT "MBED_HEAP_STATS_ENABLED=1" IN_LIST MBED_CONFIG_DEFINITIONS) AND (NOT "MBED_ALL_STATS_ENABLED=1" IN_LIST MBED_CONFIG_DEFINITIONS))
+	set(TEST_SKIPPED "heap stats not enabled")
 endif()
+
 
 mbed_greentea_add_test(
     TEST_NAME

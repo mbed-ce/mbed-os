@@ -3,8 +3,8 @@
 
 include(mbed_greentea)
 
-if(NOT DEFINED MBED_SYS_STATS_ENABLED)
-    set(TEST_SKIPPED "System stats test not supported.")
+if((NOT "MBED_SYS_STATS_ENABLED=1" IN_LIST MBED_CONFIG_DEFINITIONS) AND (NOT "MBED_ALL_STATS_ENABLED=1" IN_LIST MBED_CONFIG_DEFINITIONS))
+	set(TEST_SKIPPED "System stats not enabled")
 endif()
 
 mbed_greentea_add_test(
