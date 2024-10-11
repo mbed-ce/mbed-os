@@ -153,5 +153,5 @@ jobs:
         if: ${{ matrix.profile == 'full' }}
         run: |
             rm -rf __build
-            cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }}
+            cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }} -DMBED_APP_JSON_PATH=TESTS/configs/greentea_full.json
             cmake --build __build
