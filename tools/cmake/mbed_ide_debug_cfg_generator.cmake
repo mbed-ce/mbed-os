@@ -241,20 +241,6 @@ elseif(MBED_UPLOAD_SUPPORTS_DEBUG)
 
 	function(mbed_generate_ide_debug_configuration CMAKE_TARGET)
 
-			# add debug target
-			if(MBED_UPLOAD_SUPPORTS_DEBUG AND MBED_GDB_FOUND)
-			add_custom_target(debug-${target}
-				COMMENT "Starting GDB to debug ${target}..."
-				COMMAND ${MBED_GDB}
-				--command=${CMAKE_BINARY_DIR}/mbed-cmake.gdbinit
-				$<TARGET_FILE:${target}>
-				USES_TERMINAL)
-			endif()
-
-	endfunction(mbed_generate_ide_debug_configuration)
-
-	function(mbed_finalize_ide_debug_configurations)
-
 		# create init file for GDB client
 		if(MBED_UPLOAD_WANTS_EXTENDED_REMOTE)
 			set(UPLOAD_GDB_REMOTE_KEYWORD "extended-remote")
@@ -264,12 +250,26 @@ elseif(MBED_UPLOAD_SUPPORTS_DEBUG)
 
 		list(JOIN MBED_UPLOAD_LAUNCH_COMMANDS "\n" MBED_UPLOAD_LAUNCH_COMMANDS_FOR_GDBINIT)
 
-		file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}/mbed-cmake.gdbinit CONTENT
+		file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${CMAKE_TARGET}>.gdbinit CONTENT
 "# connect to GDB server
 target ${UPLOAD_GDB_REMOTE_KEYWORD} 127.0.0.1:${GDB_PORT}
 ${MBED_UPLOAD_LAUNCH_COMMANDS_FOR_GDBINIT}
 c"
 )
+
+			# add debug target
+			if(MBED_UPLOAD_SUPPORTS_DEBUG AND MBED_GDB_FOUND)
+			add_custom_target(debug-${target}
+				COMMENT "Starting GDB to debug ${target}..."
+				COMMAND ${MBED_GDB}
+				--command=${CMAKE_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${CMAKE_TARGET}>.gdbinit
+				$<TARGET_FILE:${target}>
+				USES_TERMINAL)
+			endif()
+
+	endfunction(mbed_generate_ide_debug_configuration)
+
+	function(mbed_finalize_ide_debug_configurations)
 
 		# Create target to start the GDB server
 		add_custom_target(gdbserver
