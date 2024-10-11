@@ -22,6 +22,8 @@
 
 #include "mbed.h"
 
+#include <cinttypes>
+
 #if !defined(MBED_SYS_STATS_ENABLED)
 #error [NOT_SUPPORTED] test not supported
 #else
