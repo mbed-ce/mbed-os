@@ -64,7 +64,7 @@ void get_cpu_usage()
     while (1) {
         mbed_stats_cpu_get(&stats);
         uint64_t diff = (stats.idle_time - prev_idle_time);
-        uint8_t usage = 100 - ((diff * 100) / (SAMPLE_TIME * 1000));
+        uint8_t usage = 100 - ((diff * 100) / std::chrono::duration_cast<std::chrono::milliseconds>(SAMPLE_TIME).count());
         prev_idle_time = stats.idle_time;
         TEST_ASSERT_NOT_EQUAL(0, usage);
         ThisThread::sleep_for(SAMPLE_TIME);
