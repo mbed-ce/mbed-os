@@ -18,8 +18,12 @@
 #ifndef ESP32_STACK_H
 #define ESP32_STACK_H
 
-#include "mbed.h"
+
 #include "ESP32.h"
+#include "netsocket/NetworkInterface.h"
+#include "netsocket/NetworkStack.h"
+#include "netsocket/nsapi_types.h"
+#include "netsocket/WiFiInterface.h"
 
 /** ESP32Stack class
  *  Implementation of the NetworkStack for the ESP32

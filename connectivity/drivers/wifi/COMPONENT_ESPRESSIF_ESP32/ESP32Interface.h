@@ -17,7 +17,6 @@
 #ifndef ESP32_INTERFACE_H
 #define ESP32_INTERFACE_H
 
-#include "mbed.h"
 #include "ESP32Stack.h"
 
 /** ESP32Interface class

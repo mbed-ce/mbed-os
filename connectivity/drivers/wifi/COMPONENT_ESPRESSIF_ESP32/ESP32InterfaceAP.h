@@ -17,7 +17,6 @@
 #ifndef ESP32_INTERFACE_AP_H
 #define ESP32_INTERFACE_AP_H
 
-#include "mbed.h"
 #include "ESP32Stack.h"
 
 
@@ -253,7 +252,7 @@ private:
     SocketAddress _netmask;
     SocketAddress _gateway;
     nsapi_connection_status_t _connection_status;
-    Callback<void(nsapi_event_t, intptr_t)> _connection_status_cb;
+    mbed::Callback<void(nsapi_event_t, intptr_t)> _connection_status_cb;
 };
 
 #endif

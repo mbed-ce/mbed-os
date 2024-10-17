@@ -17,6 +17,8 @@
 #include <string.h>
 #include "ESP32Interface.h"
 
+using namespace std::chrono_literals;
+
 // ESP32Interface implementation
 ESP32Interface::ESP32Interface() :
     ESP32Stack(MBED_CONF_ESP32_WIFI_EN, MBED_CONF_ESP32_WIFI_IO0, MBED_CONF_ESP32_WIFI_TX, MBED_CONF_ESP32_WIFI_RX, MBED_CONF_ESP32_WIFI_DEBUG,
@@ -34,7 +36,7 @@ ESP32Interface::ESP32Interface() :
     _connection_status_cb(NULL)
 {
     memset(_ap_ssid, 0, sizeof(_ap_ssid));
-    _esp->attach_wifi_status(callback(this, &ESP32Interface::wifi_status_cb));
+    _esp->attach_wifi_status(mbed::callback(this, &ESP32Interface::wifi_status_cb));
 }
 
 ESP32Interface::ESP32Interface(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
@@ -53,7 +55,7 @@ ESP32Interface::ESP32Interface(PinName en, PinName io0, PinName tx, PinName rx, 
     _connection_status_cb(NULL)
 {
     memset(_ap_ssid, 0, sizeof(_ap_ssid));
-    _esp->attach_wifi_status(callback(this, &ESP32Interface::wifi_status_cb));
+    _esp->attach_wifi_status(mbed::callback(this, &ESP32Interface::wifi_status_cb));
 }
 
 ESP32Interface::ESP32Interface(PinName tx, PinName rx, bool debug) :
@@ -71,7 +73,7 @@ ESP32Interface::ESP32Interface(PinName tx, PinName rx, bool debug) :
     _connection_status_cb(NULL)
 {
     memset(_ap_ssid, 0, sizeof(_ap_ssid));
-    _esp->attach_wifi_status(callback(this, &ESP32Interface::wifi_status_cb));
+    _esp->attach_wifi_status(mbed::callback(this, &ESP32Interface::wifi_status_cb));
 }
 
 nsapi_error_t ESP32Interface::set_network(const SocketAddress &ip_address, const SocketAddress &netmask, const SocketAddress &gateway)

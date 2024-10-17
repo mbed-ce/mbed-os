@@ -19,26 +19,13 @@
 #define ESP32_H
 
 #if DEVICE_SERIAL && defined(MBED_CONF_EVENTS_PRESENT) && defined(MBED_CONF_NSAPI_PRESENT) && defined(MBED_CONF_RTOS_PRESENT)
-#include <vector>
-#include <stdint.h>
-#include <stdlib.h>
+
 #include "drivers/DigitalOut.h"
-#include "drivers/SerialBase.h"
 #include "netsocket/nsapi_types.h"
 #include "netsocket/WiFiAccessPoint.h"
-#include "PinNames.h"
 #include "platform/ATCmdParser.h"
-#include "platform/Callback.h"
-#include "platform/mbed_error.h"
-#include "platform/mbed_version.h"
-#include "rtos/Mutex.h"
 #include "rtos/ThisThread.h"
-
-#if (MBED_MAJOR_VERSION < 6)
-#include "drivers/UARTSerial.h"
-#else
 #include "drivers/BufferedSerial.h"
-#endif
 
 #ifndef ESP32_CONNECT_TIMEOUT
 #define ESP32_CONNECT_TIMEOUT 15000
@@ -275,11 +262,7 @@ private:
     mbed::DigitalOut * _p_wifi_io0;
     bool _init_end_common;
     bool _init_end_wifi;
-#if (MBED_MAJOR_VERSION < 6)
-    mbed::UARTSerial _serial;
-#else
     mbed::BufferedSerial _serial;
-#endif
     mbed::ATCmdParser _parser;
     struct packet {
         struct packet *next;
