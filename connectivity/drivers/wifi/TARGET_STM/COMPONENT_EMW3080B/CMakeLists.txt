@@ -21,3 +21,10 @@ target_sources(mbed-wifi
         mx_wifi/core/mx_wifi_ipc.c
         mx_wifi/core/mx_wifi_slip.c
 )
+
+# Add sources which contain override symbols
+if("MBED_CONF_EMW3080B_PROVIDE_DEFAULT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
+    mbed_wifi_add_override_sources(
+        EMW3080BInterface.cpp
+    )
+endif()

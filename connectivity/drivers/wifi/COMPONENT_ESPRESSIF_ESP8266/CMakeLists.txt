@@ -12,3 +12,10 @@ target_include_directories(mbed-wifi
         .
         ./ESP8266
 )
+
+# Add sources which contain override symbols
+if("MBED_CONF_ESP8266_PROVIDE_DEFAULT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
+    mbed_wifi_add_override_sources(
+        ESP8266Interface.cpp
+    )
+endif()
