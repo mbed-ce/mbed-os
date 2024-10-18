@@ -100,6 +100,12 @@ $ cmake -S . \
 -G"Unix Makefiles"
 ```
 
+**NOTE**: To build for NuMaker-IoT-M2354 board, add below lines to above:
+```
+-DNU_TGT_NUMAKER_M2354=OFF \
+-DNU_TGT_NUMAKER_IOT_M2354=ON \
+```
+
 Then:
 
 ```

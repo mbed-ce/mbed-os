@@ -1,11 +1,14 @@
 # Nuvoton M2354 RSA keypair
 
-A default RSA key pair is given to the Nuvoton M2354 target.
+Two default RSA key pairs are given to the Nuvoton M2354 target.
 
-Public key was pre-compiled to `targets/TARGET_NUVOTON/TARGET_M2354/TARGET_TFM/TARGET_NU_M2354/COMPONENT_TFM_S_FW/bl2.bin` and private key is in `nuvoton_m2354-root-rsa-3072.pem` for Secure image and `nuvoton_m2354-root-rsa-3072_1.pem` for Non-Secure image.
+Public keys were pre-compiled to `bl2.bin` and private keys are in
+`nuvoton_m2354-root-rsa-3072.pem` and `nuvoton_m2354-root-rsa-3072_1.pem`
+for Secure image and Non-Secure image separately.
 
 DO NOT use them in production code, they are exclusively for testing!
 
-Private key must be stored in a safe place outside of the repository.
+Private keys must be stored in a safe place outside of the repository.
 
-`tools/psa/tfm/bin_utils/imgtool.py` can be used to generate new key pairs.
+[Image tool](https://github.com/mcu-tools/mcuboot/blob/main/docs/imgtool.md)
+can be used to generate new key pairs.
