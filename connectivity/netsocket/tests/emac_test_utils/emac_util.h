@@ -18,6 +18,9 @@
 #ifndef EMAC_UTIL_H
 #define EMAC_UTIL_H
 
+#include <cstdint>
+#include <chrono>
+
 #define SECOND_TO_US            1000000
 #define SECOND_TO_MS            1000
 #define MS_TO_US                1000
@@ -102,7 +105,7 @@ char emac_if_get_trace_level();
 
 void emac_if_trace_to_ascii_hex_dump(const char *prefix, int len, char *data);
 
-unsigned char *emac_if_get_own_addr(void);
+unsigned char const *emac_if_get_own_addr(void);
 
 int emac_if_get_mtu_size();
 void emac_if_set_mtu_size(int mtu_size);
@@ -118,8 +121,10 @@ void emac_if_set_input_memory(bool memory);
 void emac_if_check_memory(bool output);
 void emac_if_set_memory(bool memory);
 
+void emac_if_set_ctp_server_enabled(bool enabled);
+
 void worker_loop_init(void);
-void worker_loop_start(void (*test_step_cb_fnc)(int opt), int timeout);
+void worker_loop_start(void (*test_step_cb_fnc)(int opt), std::chrono::milliseconds poll_rate, bool loop_forever=false);
 void worker_loop_end(void);
 void worker_loop_link_up_wait(void);
 

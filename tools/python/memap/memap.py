@@ -99,7 +99,7 @@ class MemoryBankInfo:
 
 class _Parser(ABC):
     """Internal interface for parsing"""
-    SECTIONS = ('.text', '.data', '.bss', '.heap', '.stack')
+    SECTIONS = ('.text', '.data', '.bss', '.heap', '.heap_0', '.stack')
     MISC_FLASH_SECTIONS = ('.interrupts', '.flash_config')
     OTHER_SECTIONS = ('.interrupts_ram', '.init', '.ARM.extab',
                       '.ARM.exidx', '.ARM.attributes', '.eh_frame',

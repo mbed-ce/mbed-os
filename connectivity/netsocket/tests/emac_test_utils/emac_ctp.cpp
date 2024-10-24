@@ -14,25 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#if defined(MBED_CONF_RTOS_PRESENT)
-#include "greentea-client/test_env.h"
-#include "unity/unity.h"
-#include "utest.h"
-
 #include "mbed.h"
 
 #include "EMAC.h"
 #include "EMACMemoryManager.h"
-#include "emac_TestMemoryManager.h"
+#include "EmacTestMemoryManager.h"
+#include "EmacTestNetworkStack.h"
 
 #include "emac_tests.h"
 #include "emac_ctp.h"
 
-#include "emac_initialize.h"
 #include "emac_util.h"
 #include "emac_membuf.h"
-
-using namespace utest::v1;
 
 // Unique identifier for message
 static int receipt_number = 0;
@@ -64,7 +57,7 @@ static int emac_if_ctp_header_build(unsigned char *eth_frame, const unsigned cha
     return receipt_number;
 }
 
-ctp_function emac_if_ctp_header_handle(unsigned char *eth_input_frame, unsigned char *eth_output_frame, unsigned char *origin_addr, int *receipt_number)
+ctp_function emac_if_ctp_header_handle(unsigned char *eth_input_frame, unsigned char *eth_output_frame, unsigned char const *origin_addr, int *receipt_number)
 {
     if (eth_input_frame[12] != 0x90 || eth_input_frame[13] != 0x00) {
         return CTP_NONE;
@@ -123,10 +116,10 @@ void emac_if_ctp_msg_build(int eth_frame_len, const unsigned char *dest_addr, co
 
     emac_mem_buf_t *buf;
     if (options & CTP_OPT_HEAP) {
-        buf = emac_m_mngr_get()->alloc_heap(eth_frame_len, align, alloc_opt);
+        buf = EmacTestMemoryManager::get_instance().alloc_heap(eth_frame_len, align, alloc_opt);
     } else {
         // Default allocation is from pool
-        buf = emac_m_mngr_get()->alloc_pool(eth_frame_len, align, alloc_opt);
+        buf = EmacTestMemoryManager::get_instance().alloc_pool(eth_frame_len, align, alloc_opt);
     }
 
     if (!buf) {
@@ -146,7 +139,6 @@ void emac_if_ctp_msg_build(int eth_frame_len, const unsigned char *dest_addr, co
     emac_if_memory_buffer_write(buf, eth_output_frame_data, true);
 
     emac_if_check_memory(true);
-    emac_if_get()->link_out(buf);
+    EmacTestNetworkStack::get_instance().get_emac()->link_out(buf);
     emac_if_check_memory(false);
 }
-#endif // defined(MBED_CONF_RTOS_PRESENT)
