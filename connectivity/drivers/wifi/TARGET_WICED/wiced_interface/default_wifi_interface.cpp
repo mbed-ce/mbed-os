@@ -25,4 +25,18 @@ WiFiInterface *WiFiInterface::get_target_default_instance()
     return &wifi;
 }
 
+/*
+ * With e.g. GCC linker option "--undefined=<LINK_FOO>", pull in this
+ * object file anyway for being able to override weak symbol successfully
+ * even though from static library. See:
+ * https://stackoverflow.com/questions/42588983/what-does-the-gnu-ld-undefined-option-do
+ *
+ * NOTE: For C++ name mangling, 'extern "C"' is necessary to match the
+ *       <LINK_FOO> symbol correctly.
+ */
+extern "C"
+void LINK_DEFAULT_WIFI_INTERFACE_CPP(void)
+{
+}
+
 #endif
