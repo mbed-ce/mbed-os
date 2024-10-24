@@ -14,10 +14,6 @@ list(
     APPEND
         TEST_SOURCE_LIST
             main.cpp
-            emac_TestMemoryManager.cpp
-            emac_TestNetworkStack.cpp
-            emac_ctp.cpp
-            emac_membuf.cpp
             emac_test_broadcast.cpp
             emac_test_initialize.cpp
             emac_test_memory.cpp
@@ -26,7 +22,6 @@ list(
             emac_test_unicast_burst.cpp
             emac_test_unicast_frame_len.cpp
             emac_test_unicast_long.cpp
-            emac_util.cpp
 )
 
 mbed_greentea_add_test(

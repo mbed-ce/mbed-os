@@ -14,29 +14,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#if defined(MBED_CONF_RTOS_PRESENT)
-
-#include "unity.h"
-
 #include "EMACMemoryManager.h"
-#include "emac_TestNetworkStack.h"
-#include "emac_initialize.h"
+#include "EmacTestNetworkStack.h"
+
+#include "mbed_interface.h"
+
+bool EmacTestNetworkStack::emac_if_init(EMAC *emac) {
+    emac->set_link_input_cb(emac_if_link_input_cb);
+    emac->set_link_state_cb(emac_if_link_state_change_cb);
+
+    if (!emac->power_up()) {
+        printf("emac power up failed!");
+        return false;
+    }
+
+    int hwaddr_len = emac->get_hwaddr_size();
+    printf("emac hwaddr length %i\r\n\r\n", hwaddr_len);
+
+    if(hwaddr_len != 6)
+    {
+        printf("invalid emac hwaddr length %d!\n", hwaddr_len);
+        return false;
+    }
+
+    // If driver updates this, write it back, otherwise write default from mbed_mac_address
+    mbed_mac_address(reinterpret_cast<char *>(&eth_mac_addr[0]));
+    emac->get_hwaddr(eth_mac_addr);
+    emac->set_hwaddr(eth_mac_addr);
+    printf("emac hwaddr %x:%x:%x:%x:%x:%x\r\n\r\n", eth_mac_addr[0], eth_mac_addr[1], eth_mac_addr[2], eth_mac_addr[3], eth_mac_addr[4], eth_mac_addr[5]);
+
+    int mtu_size = emac->get_mtu_size();
+    printf("emac mtu %i\r\n\r\n", mtu_size);
+    emac_if_set_mtu_size(mtu_size);
+
+    char hw_name[11];
+    emac->get_ifname(hw_name, 10);
+    printf("emac if name %s\r\n\r\n", hw_name);
+
+    return true;
+}
 
 EmacTestNetworkStack::EmacTestNetworkStack()
-    : m_interface(NULL)
+    : m_interface(*this)
 {
 
 }
 
-nsapi_error_t EmacTestNetworkStack::gethostbyname(const char *host, SocketAddress *address, nsapi_version_t version)
-{
-    return NSAPI_ERROR_OK;
-}
-
-nsapi_error_t EmacTestNetworkStack::add_dns_server(const SocketAddress &address)
-{
-    return NSAPI_ERROR_OK;
-}
 
 nsapi_error_t EmacTestNetworkStack::call_in(int delay, mbed::Callback<void()> func)
 {
@@ -117,24 +140,33 @@ void EmacTestNetworkStack::socket_attach(nsapi_socket_t handle, void (*callback)
 
 nsapi_error_t EmacTestNetworkStack::add_ethernet_interface(EMAC &emac, bool default_if, OnboardNetworkStack::Interface **interface_out, NetworkInterface *user_network_interface)
 {
-    // Test network stack supports only one interface
-    TEST_ASSERT_MESSAGE(!m_interface, "Only one interface supported!");
+    // Only one interface is supported
+    if(m_interface.m_emac != nullptr)
+    {
+        return NSAPI_ERROR_UNSUPPORTED;
+    }
 
-    m_interface = &EmacTestNetworkStack::Interface::get_instance();
-    TEST_ASSERT_MESSAGE(m_interface, "Invalid interface!");
-
-    m_interface->m_emac = &emac;
+    m_interface.m_emac = &emac;
 
     EmacTestMemoryManager *memory_manager = &EmacTestMemoryManager::get_instance();
     emac.set_memory_manager(*memory_manager);
 
-    *interface_out = m_interface;
+    *interface_out = &m_interface;
 
     return NSAPI_ERROR_OK;
 }
 
-EmacTestNetworkStack::Interface::Interface()
-    : m_emac(NULL)
+EMAC *EmacTestNetworkStack::get_emac() {
+    return m_interface.m_emac;
+}
+
+unsigned char const *EmacTestNetworkStack::get_mac_addr() const {
+    return eth_mac_addr;
+}
+
+EmacTestNetworkStack::Interface::Interface(EmacTestNetworkStack & netStack):
+m_netStack(netStack),
+m_emac(nullptr)
 {
 
 }
@@ -152,7 +184,7 @@ nsapi_connection_status_t EmacTestNetworkStack::Interface::get_connection_status
 
 char *EmacTestNetworkStack::Interface::get_mac_address(char *buf, nsapi_size_t buflen)
 {
-    return NULL;
+    return nullptr;
 }
 
 nsapi_error_t EmacTestNetworkStack::Interface::set_mac_address(uint8_t *buf, nsapi_size_t buflen)
@@ -165,19 +197,9 @@ nsapi_error_t EmacTestNetworkStack::Interface::get_ip_address(SocketAddress *add
     return NSAPI_ERROR_OK;
 }
 
-char *EmacTestNetworkStack::Interface::get_ip_address(char *buf, nsapi_size_t buflen)
-{
-    return NULL;
-}
-
 nsapi_error_t EmacTestNetworkStack::Interface::get_netmask(SocketAddress *address)
 {
     return NSAPI_ERROR_OK;
-}
-
-char *EmacTestNetworkStack::Interface::get_netmask(char *buf, nsapi_size_t buflen)
-{
-    return NULL;
 }
 
 nsapi_error_t EmacTestNetworkStack::Interface::get_gateway(SocketAddress *address)
@@ -185,15 +207,10 @@ nsapi_error_t EmacTestNetworkStack::Interface::get_gateway(SocketAddress *addres
     return NSAPI_ERROR_OK;
 }
 
-char *EmacTestNetworkStack::Interface::get_gateway(char *buf, nsapi_size_t buflen)
-{
-    return NULL;
-}
-
 nsapi_error_t EmacTestNetworkStack::Interface::bringup(bool dhcp, const char *ip, const char *netmask, const char *gw, const nsapi_ip_stack_t stack, bool blocking)
 {
-    if (!emac_if_init(m_emac)) {
-        TEST_ASSERT_MESSAGE(0, "emac initialization failed!");
+    if (!m_netStack.emac_if_init(m_emac)) {
+        return NSAPI_ERROR_DEVICE_ERROR;
     }
 
     return NSAPI_ERROR_OK;
@@ -204,24 +221,8 @@ nsapi_error_t EmacTestNetworkStack::Interface::bringdown()
     return NSAPI_ERROR_OK;
 }
 
-EmacTestNetworkStack::Interface &EmacTestNetworkStack::Interface::get_instance()
-{
-    static EmacTestNetworkStack::Interface test_interface;
-    return test_interface;
-}
-
 EmacTestNetworkStack &EmacTestNetworkStack::get_instance()
 {
     static EmacTestNetworkStack test_stack;
     return test_stack;
 }
-
-#define TEST 0x33254234
-#if MBED_CONF_NSAPI_DEFAULT_STACK == TEST
-#undef TEST
-OnboardNetworkStack &OnboardNetworkStack::get_default_instance()
-{
-    return EmacTestNetworkStack::get_instance();
-}
-#endif // defined(MBED_CONF_RTOS_PRESENT)
-#endif

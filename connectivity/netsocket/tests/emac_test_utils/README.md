@@ -1,0 +1,2 @@
+# EMAC Test Utils library
+This folder contains a testing implementation of a network stack and a memory manager, as well as code for sending and receiving Connection Test Protocol (CTP) packets.  It is used in the EMAC test and in the CTP echo server.

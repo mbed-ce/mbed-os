@@ -14,38 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#if defined(MBED_CONF_RTOS_PRESENT)
-
-#include "mbed.h"
-#include "greentea-client/test_env.h"
-#include "unity.h"
-#include "utest.h"
 
 #include "mbed.h"
 
 #include "EMAC.h"
 #include "EMACMemoryManager.h"
-#include "emac_TestMemoryManager.h"
+#include "EmacTestMemoryManager.h"
+#include "EmacTestNetworkStack.h"
 
 #include "emac_tests.h"
-#include "emac_initialize.h"
 #include "emac_util.h"
 #include "emac_membuf.h"
 #include "emac_ctp.h"
-
-using namespace utest::v1;
 
 /* For LPC boards define the memory bank ourselves to give us section placement
    control */
 #ifndef ETHMEM_SECTION
 #if defined(TARGET_LPC1768)
-#  if defined (__ICCARM__)
-#     define ETHMEM_SECTION
-#  elif defined(TOOLCHAIN_GCC_CR)
-#     define ETHMEM_SECTION __attribute__((section(".data.$RamPeriph32")))
-#  else
-#     define ETHMEM_SECTION __attribute__((section("AHBSRAM1"),aligned))
-#  endif
+#define ETHMEM_SECTION __attribute__((section("AHBSRAM1"),aligned))
 #endif
 #endif
 
@@ -107,6 +93,8 @@ static unsigned int trace_level = 0;
 static unsigned int error_flags = 0;
 static unsigned int no_response_cnt = 0;
 static bool link_up = false;
+
+static bool ctp_server_mode = false;
 
 int emac_if_find_outgoing_msg(int receipt_number)
 {
@@ -376,12 +364,12 @@ void emac_if_trace_to_ascii_hex_dump(const char *prefix, int len, unsigned char 
 
 void emac_if_set_all_multicast(bool all)
 {
-    emac_if_get()->set_all_multicast(all);
+    EmacTestNetworkStack::get_instance().get_emac()->set_all_multicast(all);
 }
 
 void emac_if_add_multicast_group(uint8_t *address)
 {
-    emac_if_get()->add_multicast_group(address);
+    EmacTestNetworkStack::get_instance().get_emac()->add_multicast_group(address);
 }
 
 void emac_if_set_output_memory(bool memory)
@@ -410,8 +398,7 @@ void emac_if_set_memory(bool memory)
     static bool memory_value = true;
     if (memory_value != memory) {
         memory_value = memory;
-        EmacTestMemoryManager *mem_mngr = emac_m_mngr_get();
-        mem_mngr->set_memory_available(memory);
+        EmacTestMemoryManager::get_instance().set_memory_available(memory);
     }
 }
 
@@ -428,18 +415,18 @@ void emac_if_link_input_cb(void *buf)
 {
     if (link_input_event.post(buf) == 0) {
         if (buf) {
-            emac_m_mngr_get()->free(buf);
+            EmacTestMemoryManager::get_instance().free(buf);
         }
     }
 }
 
 static void link_input_event_cb(void *buf)
 {
-    int length = emac_m_mngr_get()->get_total_len(buf);
+    int length = EmacTestMemoryManager::get_instance().get_total_len(buf);
 
     if (length >= ETH_FRAME_HEADER_LEN) {
         // Ethernet input frame
-        unsigned char eth_input_frame_data[ETH_FRAME_HEADER_LEN];
+        static unsigned char eth_input_frame_data[ETH_FRAME_HEADER_LEN];
         memset(eth_input_frame_data, 0, ETH_FRAME_HEADER_LEN);
 
         int invalid_data_index = emac_if_memory_buffer_read(buf, eth_input_frame_data);
@@ -448,7 +435,7 @@ static void link_input_event_cb(void *buf)
             unsigned char eth_output_frame_data[ETH_FRAME_HEADER_LEN];
             int receipt_number;
 
-            ctp_function function = emac_if_ctp_header_handle(eth_input_frame_data, eth_output_frame_data, emac_if_get_hw_addr(), &receipt_number);
+            ctp_function function = emac_if_ctp_header_handle(eth_input_frame_data, eth_output_frame_data, EmacTestNetworkStack::get_instance().get_mac_addr(), &receipt_number);
 
             if (function == CTP_REPLY) {
                 // If reply has valid receipt number
@@ -462,13 +449,12 @@ static void link_input_event_cb(void *buf)
                     // Calls test loop
                     worker_loop_event_queue.call(current_test_step_cb_fnc, INPUT);
                 }
-#if MBED_CONF_APP_ECHO_SERVER
-                // Echoes only if configured as echo server
-            } else if (function == CTP_FORWARD) {
+            }
+            // Echoes only if configured as echo server
+            else if (function == CTP_FORWARD && ctp_server_mode) {
                 emac_if_memory_buffer_write(buf, eth_output_frame_data, false);
-                emac_if_get()->link_out(buf);
-                buf = 0;
-#endif
+                EmacTestNetworkStack::get_instance().get_emac()->link_out(buf);
+                buf = nullptr;
             }
 
             emac_if_add_echo_server_addr(&eth_input_frame_data[6]);
@@ -482,7 +468,7 @@ static void link_input_event_cb(void *buf)
     }
 
     if (buf) {
-        emac_m_mngr_get()->free(buf);
+        EmacTestMemoryManager::get_instance().free(buf);
     }
 }
 
@@ -508,24 +494,27 @@ void worker_loop_init(void)
     }
 }
 
-void worker_loop_start(void (*test_step_cb_fnc)(int opt), int timeout)
+void worker_loop_start(void (*test_step_cb_fnc)(int opt), std::chrono::milliseconds poll_rate, bool loop_forever)
 {
     current_test_step_cb_fnc = test_step_cb_fnc;
 
-    int test_step_cb_timer = worker_loop_event_queue.call_every(timeout, test_step_cb_fnc, TIMEOUT);
-    int timeout_outgoing_msg_timer = worker_loop_event_queue.call_every(1000, emac_if_timeout_outgoing_msg);
+    int test_step_cb_timer = worker_loop_event_queue.call_every(poll_rate, test_step_cb_fnc, TIMEOUT);
+    int timeout_outgoing_msg_timer = worker_loop_event_queue.call_every(1000ms, emac_if_timeout_outgoing_msg);
 
     int validate_outgoing_msg_timer = 0;
-    if (timeout > 500) {
+    if (poll_rate > 500ms) {
         // For long test step callback timeouts validates messages also between callback timeouts
-        validate_outgoing_msg_timer = worker_loop_event_queue.call_every(200, emac_if_validate_outgoing_msg);
+        validate_outgoing_msg_timer = worker_loop_event_queue.call_every(200ms, emac_if_validate_outgoing_msg);
     }
 
-#if MBED_CONF_APP_ECHO_SERVER
-    worker_loop_semaphore.acquire();
-#else
-    worker_loop_semaphore.try_acquire_for(600 * SECOND_TO_MS);
-#endif
+    if(loop_forever)
+    {
+        worker_loop_semaphore.acquire();
+    }
+    else
+    {
+        worker_loop_semaphore.try_acquire_for(600s);
+    }
 
     worker_loop_event_queue.cancel(test_step_cb_timer);
     worker_loop_event_queue.cancel(timeout_outgoing_msg_timer);
@@ -565,9 +554,9 @@ void worker_loop(void)
     worker_loop_event_queue.dispatch_forever();
 }
 
-unsigned char *emac_if_get_own_addr(void)
+unsigned char const *emac_if_get_own_addr(void)
 {
-    return (emac_if_get_hw_addr());
+    return EmacTestNetworkStack::get_instance().get_mac_addr();
 }
 
 int emac_if_get_mtu_size()
@@ -579,4 +568,8 @@ void emac_if_set_mtu_size(int mtu_size)
 {
     eth_mtu_size = mtu_size;
 }
-#endif // defined(MBED_CONF_RTOS_PRESENT)
+
+void emac_if_set_ctp_server_enabled(bool enabled)
+{
+    ctp_server_mode = enabled;
+}

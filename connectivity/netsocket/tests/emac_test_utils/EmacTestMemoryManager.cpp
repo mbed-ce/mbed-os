@@ -21,17 +21,12 @@
 #include <list>
 #include <stdlib.h>
 
-#include "unity.h"
-
 #include "rtos/Mutex.h"
 
-extern "C" {
-#include "arm_hal_interrupt_private.h"
-}
 #include "nsdynmemLIB.h"
 
 #include "EMACMemoryManager.h"
-#include "emac_TestMemoryManager.h"
+#include "EmacTestMemoryManager.h"
 
 #define BUF_HEAD        "headheadheadhead"
 #define BUF_HEAD_SIZE   16
@@ -480,9 +475,9 @@ template <typename TYPE> void EmacTestMemoryManager::check_value(TYPE value, con
     if (!value) {
         va_list ap;
         va_start(ap, fmt);
-        snprintf(s_trace_buffer + sizeof(MEM_MNGR_TRACE) - 1, sizeof(s_trace_buffer) - sizeof(MEM_MNGR_TRACE) - 1, fmt, ap);
+        vfprintf(stderr, fmt, ap);
+        assert(false);
         va_end(ap);
-        TEST_ASSERT_MESSAGE(0, s_trace_buffer);
     }
 }
 

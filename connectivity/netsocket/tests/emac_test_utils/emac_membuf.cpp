@@ -17,17 +17,13 @@
 #if defined(MBED_CONF_RTOS_PRESENT)
 
 #include "mbed.h"
-#include "greentea-client/test_env.h"
-#include "unity.h"
-#include "utest.h"
 
 #include "mbed.h"
 
 #include "EMAC.h"
 #include "EMACMemoryManager.h"
-#include "emac_TestMemoryManager.h"
+#include "EmacTestMemoryManager.h"
 
-#include "emac_initialize.h"
 #include "emac_membuf.h"
 #include "emac_util.h"
 
@@ -36,9 +32,9 @@ int emac_if_memory_buffer_read(void *buf, unsigned char *eth_frame)
     int eth_frame_index = 0;
     int invalid_data_index = 0;
 
-    for (emac_mem_buf_t *mem_buf = buf; mem_buf != NULL; mem_buf = emac_m_mngr_get()->get_next(mem_buf)) {
-        unsigned char *buf_payload = (unsigned char *) emac_m_mngr_get()->get_ptr(mem_buf);
-        int buf_payload_len = emac_m_mngr_get()->get_len(mem_buf);
+    for (emac_mem_buf_t *mem_buf = buf; mem_buf != NULL; mem_buf = EmacTestMemoryManager::get_instance().get_next(mem_buf)) {
+        unsigned char *buf_payload = (unsigned char *) EmacTestMemoryManager::get_instance().get_ptr(mem_buf);
+        int buf_payload_len = EmacTestMemoryManager::get_instance().get_len(mem_buf);
 
         for (int index = 0; index < buf_payload_len; index++) {
             if (eth_frame_index < ETH_FRAME_HEADER_LEN) {
@@ -60,9 +56,9 @@ void emac_if_memory_buffer_write(void *buf, unsigned char *eth_frame, bool write
 {
     int eth_frame_index = 0;
 
-    for (emac_mem_buf_t *mem_buf = buf; mem_buf != NULL; mem_buf = emac_m_mngr_get()->get_next(mem_buf)) {
-        unsigned char *buf_payload = (unsigned char *) emac_m_mngr_get()->get_ptr(mem_buf);
-        int buf_payload_len = emac_m_mngr_get()->get_len(mem_buf);
+    for (emac_mem_buf_t *mem_buf = buf; mem_buf != NULL; mem_buf = EmacTestMemoryManager::get_instance().get_next(mem_buf)) {
+        unsigned char *buf_payload = (unsigned char *) EmacTestMemoryManager::get_instance().get_ptr(mem_buf);
+        int buf_payload_len = EmacTestMemoryManager::get_instance().get_len(mem_buf);
 
         for (int index = 0; index < buf_payload_len; index++) {
             if (eth_frame_index < ETH_FRAME_HEADER_LEN) {

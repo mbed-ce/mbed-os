@@ -34,7 +34,7 @@ enum ctp_function {
 #define CTP_MSG_SEND(length, send_to_address, own_address, forward_to_address, mem_mngr_options) \
     emac_if_ctp_msg_build(length, send_to_address, own_address, forward_to_address, mem_mngr_options)
 
-ctp_function emac_if_ctp_header_handle(unsigned char *eth_input_frame, unsigned char *eth_output_frame, unsigned char *origin_addr, int *receipt_number);
+ctp_function emac_if_ctp_header_handle(unsigned char *eth_input_frame, unsigned char *eth_output_frame, unsigned char const *origin_addr, int *receipt_number);
 void emac_if_ctp_msg_build(int eth_frame_len, const unsigned char *dest_addr, const unsigned char *origin_addr, const unsigned char *forward_addr, int options);
 void emac_if_ctp_reply_handle(int lenght, int invalid_data_index);
 
