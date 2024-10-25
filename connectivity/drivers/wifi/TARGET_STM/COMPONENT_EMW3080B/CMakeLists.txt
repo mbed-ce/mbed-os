@@ -21,3 +21,13 @@ target_sources(mbed-wifi
         mx_wifi/core/mx_wifi_ipc.c
         mx_wifi/core/mx_wifi_slip.c
 )
+
+# Link override object file from static library
+if("MBED_CONF_EMW3080B_PROVIDE_DEFAULT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
+    if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
+        target_link_options(mbed-wifi
+            INTERFACE
+                LINKER:--undefined=LINK_EMW3080BINTERFACE_CPP
+        )
+    endif()
+endif()
