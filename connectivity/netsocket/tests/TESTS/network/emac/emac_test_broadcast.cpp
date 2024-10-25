@@ -93,7 +93,7 @@ void test_emac_broadcast(void)
     RESET_ALL_ERROR_FLAGS;
     SET_TRACE_LEVEL(TRACE_SEND | TRACE_ETH_FRAMES | TRACE_SUCCESS | TRACE_FAILURE);
 
-    START_TEST_LOOP(test_emac_broadcast_cb, 1 * SECOND_TO_MS);
+    START_TEST_LOOP(test_emac_broadcast_cb, 1s);
 
     PRINT_ERROR_FLAGS;
     TEST_ASSERT_FALSE(ERROR_FLAGS);

@@ -13,8 +13,9 @@ Arm Mbed OS is an open source embedded operating system designed specifically fo
 Mbed OS provides a platform that includes:
 
 - Security foundations.
-- Cloud management services.
-- Drivers for sensors, I/O devices and connectivity.
+- Embedded networking libraries, e.g Wi-Fi and Ethernet drivers and network libraries using them
+- Drivers for microcontroller hardware features, including digital and analog I/O, PWM, and communications busses
+- Storage features, including file system and block device abstractions and low-level drivers
 
 This is Mbed OS Community Edition (CE), a fork focused on improving the build system and tooling, fixing bugs, and keeping maintenance going after ARM's step back from the Mbed project.
 

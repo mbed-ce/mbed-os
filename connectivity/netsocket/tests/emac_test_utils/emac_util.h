@@ -21,10 +21,6 @@
 #include <cstdint>
 #include <chrono>
 
-#define SECOND_TO_US            1000000
-#define SECOND_TO_MS            1000
-#define MS_TO_US                1000
-
 extern const unsigned char eth_mac_broadcast_addr[];
 
 // Trace flags

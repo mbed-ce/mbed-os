@@ -18,6 +18,14 @@
 #ifndef ARM_HAL_INTERRUPT_PRIVATE_H_
 #define ARM_HAL_INTERRUPT_PRIVATE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void platform_critical_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

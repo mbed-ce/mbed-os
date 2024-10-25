@@ -18,20 +18,8 @@
 #error [NOT_SUPPORTED] EMAC test cases require a RTOS to run
 #else
 
-#if !defined(MBED_CONF_APP_ECHO_SERVER)       || \
-    !defined(MBED_CONF_APP_ECHO_SERVER_TRACE) || \
-    !defined(MBED_CONF_APP_WIFI_SCAN)
-#error [NOT_SUPPORTED] Requires parameters from mbed_app.json
-#else
-
 #define ETHERNET 1
 #define WIFI 2
-
-#if MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE != ETHERNET && \
-    MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE != WIFI
-#error [NOT_SUPPORTED] Either wifi or ethernet testing need to be enabled
-#else
-
 
 #include "greentea-client/test_env.h"
 #include "unity.h"
@@ -39,19 +27,19 @@
 
 #include "emac_tests.h"
 #include "emac_util.h"
+#include "OnboardNetworkStack.h"
+#include "EmacTestNetworkStack.h"
 
 using namespace utest::v1;
 
 // Test setup
 utest::v1::status_t test_setup(const size_t number_of_cases)
 {
-#if !MBED_CONF_APP_ECHO_SERVER
 #ifdef MBED_GREENTEA_TEST_EMAC_TIMEOUT_S
     GREENTEA_SETUP(MBED_GREENTEA_TEST_EMAC_TIMEOUT_S, "default_auto");
 #else
     GREENTEA_SETUP(1400, "default_auto");
 #endif // #ifdef MBED_GREENTEA_TEST_EMAC_TIMEOUT_S
-#endif // #if !MBED_CONF_APP_ECHO_SERVER
 
     return verbose_test_setup_handler(number_of_cases);
 }
@@ -77,6 +65,10 @@ int main()
     return !Harness::run(specification);
 }
 
-#endif // (MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE != ETHERNET && MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE != WIFI)
-#endif // !defined(MBED_CONF_APP_ECHO_SERVER) || !defined(MBED_CONF_APP_ECHO_SERVER_TRACE) || !defined(MBED_CONF_APP_WIFI_SCAN)
+// Override network stack selection to return the EmacTest network stack
+OnboardNetworkStack &OnboardNetworkStack::get_default_instance()
+{
+    return EmacTestNetworkStack::get_instance();
+}
+
 #endif // !defined(MBED_CONF_RTOS_PRESENT)

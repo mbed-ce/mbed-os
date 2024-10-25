@@ -22,6 +22,8 @@ target_sources(mbed-nanostack-libservice
         source/nvmHelper/ns_nvm_helper.c
 )
 
+target_link_libraries(mbed-nanostack-libservice PUBLIC mbed-nanostack-hal_mbed_cmsis_rtos)
+
 # The definition, source files and include directories below
 # are needed by mbed-trace which is part of the mbed-core CMake target
 target_compile_definitions(mbed-core-flags

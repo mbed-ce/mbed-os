@@ -24,6 +24,7 @@
 #include "rtos/Mutex.h"
 
 #include "nsdynmemLIB.h"
+#include "arm_hal_interrupt_private.h"
 
 #include "EMACMemoryManager.h"
 #include "EmacTestMemoryManager.h"

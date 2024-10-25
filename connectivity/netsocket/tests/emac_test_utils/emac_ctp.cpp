@@ -21,7 +21,6 @@
 #include "EmacTestMemoryManager.h"
 #include "EmacTestNetworkStack.h"
 
-#include "emac_tests.h"
 #include "emac_ctp.h"
 
 #include "emac_util.h"

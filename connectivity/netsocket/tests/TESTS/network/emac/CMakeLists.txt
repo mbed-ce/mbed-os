@@ -1,14 +1,10 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.19.0 FATAL_ERROR)
-
-set(MBED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../.. CACHE INTERNAL "")
-set(TEST_TARGET mbed-connectivity-netsocket-network-emac)
-
-include(${MBED_PATH}/tools/cmake/mbed_greentea.cmake)
-
-project(${TEST_TARGET})
+if(NOT "MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE=WIFI" IN_LIST MBED_CONFIG_DEFINITIONS AND
+	NOT "MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE=ETHERNET" IN_LIST MBED_CONFIG_DEFINITIONS)
+	set(TEST_SKIPPED "Requires wi-fi or ethernet to be the default network interface")
+endif()
 
 list(
     APPEND
@@ -26,9 +22,12 @@ list(
 
 mbed_greentea_add_test(
     TEST_NAME
-        ${TEST_TARGET}
+        mbed-connectivity-network-emac
     TEST_SOURCES
         ${TEST_SOURCE_LIST}
     TEST_REQUIRED_LIBS
-        mbed-emac
+		mbed-netsocket
+        mbed-emac-test-utils
+    TEST_SKIPPED
+        ${TEST_SKIPPED}
 )

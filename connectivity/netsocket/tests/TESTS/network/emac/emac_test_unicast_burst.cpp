@@ -78,7 +78,7 @@ void test_emac_unicast_burst()
     SET_TRACE_LEVEL(TRACE_SEND | TRACE_SUCCESS | TRACE_FAILURE);
 
     if (ECHO_SERVER_ADDRESS_KNOWN) {
-        START_TEST_LOOP(test_emac_unicast_burst_cb, 100);
+        START_TEST_LOOP(test_emac_unicast_burst_cb, 100ms);
     }
 
     PRINT_ERROR_FLAGS;
