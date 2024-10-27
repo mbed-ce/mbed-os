@@ -66,11 +66,12 @@ set(MBED_GDB_PORT 23331 CACHE STRING "Port that the GDB server will be started o
 set(MBED_UPLOAD_SERIAL_NUMBER "" CACHE STRING "Serial number of the Mbed board or the programming tool, for upload methods that select by serial number.")
 
 # Handle legacy per-upload-method aliases for the upload serial number
-foreach(LEGACY_VAR_NAME JLINK_USB_SERIAL_NUMBER LINKSERVER_PROBE_SN MBED_TARGET_UID OPENOCD_ADAPTER_SERIAL PYOCD_PROBE_UID STLINK_SERIAL_ARGUMENT STM32CUBE_PROBE_SN)
+foreach(LEGACY_VAR_NAME JLINK_USB_SERIAL_NUMBER LINKSERVER_PROBE_SN MBED_TARGET_UID OPENOCD_ADAPTER_SERIAL PYOCD_PROBE_UID STLINK_PROBE_SN STM32CUBE_PROBE_SN)
     if(DEFINED ${LEGACY_VAR_NAME})
 		if(NOT "${${LEGACY_VAR_NAME}}" STREQUAL "")
 			message(WARNING "${LEGACY_VAR_NAME} is deprecated, set the MBED_UPLOAD_SERIAL_NUMBER variable instead. MBED_UPLOAD_SERIAL_NUMBER will be set to the value of ${LEGACY_VAR_NAME}.")
 			set(MBED_UPLOAD_SERIAL_NUMBER ${${LEGACY_VAR_NAME}} CACHE STRING "" FORCE)
+			unset(STLINK_PROBE_SN CACHE)
 		endif()
 	endif()
 endforeach()
