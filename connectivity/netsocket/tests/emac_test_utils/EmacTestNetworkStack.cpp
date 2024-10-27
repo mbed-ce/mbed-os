@@ -19,7 +19,8 @@
 
 #include "mbed_interface.h"
 
-bool EmacTestNetworkStack::emac_if_init(EMAC *emac) {
+bool EmacTestNetworkStack::emac_if_init(EMAC *emac)
+{
     emac->set_link_input_cb(emac_if_link_input_cb);
     emac->set_link_state_cb(emac_if_link_state_change_cb);
 
@@ -31,8 +32,7 @@ bool EmacTestNetworkStack::emac_if_init(EMAC *emac) {
     int hwaddr_len = emac->get_hwaddr_size();
     printf("emac hwaddr length %i\r\n\r\n", hwaddr_len);
 
-    if(hwaddr_len != 6)
-    {
+    if (hwaddr_len != 6) {
         printf("invalid emac hwaddr length %d!\n", hwaddr_len);
         return false;
     }
@@ -141,8 +141,7 @@ void EmacTestNetworkStack::socket_attach(nsapi_socket_t handle, void (*callback)
 nsapi_error_t EmacTestNetworkStack::add_ethernet_interface(EMAC &emac, bool default_if, OnboardNetworkStack::Interface **interface_out, NetworkInterface *user_network_interface)
 {
     // Only one interface is supported
-    if(m_interface.m_emac != nullptr)
-    {
+    if (m_interface.m_emac != nullptr) {
         return NSAPI_ERROR_UNSUPPORTED;
     }
 
@@ -156,17 +155,19 @@ nsapi_error_t EmacTestNetworkStack::add_ethernet_interface(EMAC &emac, bool defa
     return NSAPI_ERROR_OK;
 }
 
-EMAC *EmacTestNetworkStack::get_emac() {
+EMAC *EmacTestNetworkStack::get_emac()
+{
     return m_interface.m_emac;
 }
 
-unsigned char const *EmacTestNetworkStack::get_mac_addr() const {
+unsigned char const *EmacTestNetworkStack::get_mac_addr() const
+{
     return eth_mac_addr;
 }
 
-EmacTestNetworkStack::Interface::Interface(EmacTestNetworkStack & netStack):
-m_netStack(netStack),
-m_emac(nullptr)
+EmacTestNetworkStack::Interface::Interface(EmacTestNetworkStack &netStack):
+    m_netStack(netStack),
+    m_emac(nullptr)
 {
 
 }

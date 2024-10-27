@@ -120,7 +120,7 @@ void emac_if_set_memory(bool memory);
 void emac_if_set_ctp_server_enabled(bool enabled);
 
 void worker_loop_init(void);
-void worker_loop_start(void (*test_step_cb_fnc)(int opt), std::chrono::milliseconds poll_rate, bool loop_forever=false);
+void worker_loop_start(void (*test_step_cb_fnc)(int opt), std::chrono::milliseconds poll_rate, bool loop_forever = false);
 void worker_loop_end(void);
 void worker_loop_link_up_wait(void);
 

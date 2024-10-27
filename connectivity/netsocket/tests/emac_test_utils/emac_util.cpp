@@ -506,12 +506,9 @@ void worker_loop_start(void (*test_step_cb_fnc)(int opt), std::chrono::milliseco
         validate_outgoing_msg_timer = worker_loop_event_queue.call_every(200ms, emac_if_validate_outgoing_msg);
     }
 
-    if(loop_forever)
-    {
+    if (loop_forever) {
         worker_loop_semaphore.acquire();
-    }
-    else
-    {
+    } else {
         worker_loop_semaphore.try_acquire_for(600s);
     }
 

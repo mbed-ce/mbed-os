@@ -52,10 +52,10 @@ public:
         nsapi_error_t set_mac_address(uint8_t *mac_addr, nsapi_size_t addr_len);
 
         nsapi_error_t bringup(bool dhcp, const char *ip,
-                                      const char *netmask, const char *gw,
-                                      nsapi_ip_stack_t stack,
-                                      bool blocking
-                                     ) override;
+                              const char *netmask, const char *gw,
+                              nsapi_ip_stack_t stack,
+                              bool blocking
+                             ) override;
 
         nsapi_error_t bringdown() override;
 
@@ -73,19 +73,19 @@ public:
     private:
         friend EmacTestNetworkStack;
 
-        explicit Interface(EmacTestNetworkStack & netStack);
+        explicit Interface(EmacTestNetworkStack &netStack);
 
-        EmacTestNetworkStack & m_netStack;
+        EmacTestNetworkStack &m_netStack;
         EMAC *m_emac;
     };
 
     nsapi_error_t add_ethernet_interface(EMAC &emac, bool default_if, OnboardNetworkStack::Interface **interface_out, NetworkInterface *user_network_interface) override;
 
     /// Get a pointer to the EMAC driver.  Will return nullptr if no interface has been added yet.
-    EMAC * get_emac();
+    EMAC *get_emac();
 
     /// Get the MAC address being used for the ethernet port
-    unsigned char const * get_mac_addr() const;
+    unsigned char const *get_mac_addr() const;
 
 protected:
 
@@ -100,27 +100,27 @@ protected:
     nsapi_error_t socket_connect(nsapi_socket_t handle, const SocketAddress &address) override;
 
     nsapi_error_t socket_accept(nsapi_socket_t server,
-                                        nsapi_socket_t *handle, SocketAddress *address = 0) override;
+                                nsapi_socket_t *handle, SocketAddress *address = 0) override;
 
     nsapi_size_or_error_t socket_send(nsapi_socket_t handle,
-                                              const void *data, nsapi_size_t size) override;
+                                      const void *data, nsapi_size_t size) override;
 
     nsapi_size_or_error_t socket_recv(nsapi_socket_t handle,
-                                              void *data, nsapi_size_t size) override;
+                                      void *data, nsapi_size_t size) override;
 
     nsapi_size_or_error_t socket_sendto(nsapi_socket_t handle, const SocketAddress &address,
-                                                const void *data, nsapi_size_t size) override;
+                                        const void *data, nsapi_size_t size) override;
 
     nsapi_size_or_error_t socket_recvfrom(nsapi_socket_t handle, SocketAddress *address,
-                                                  void *buffer, nsapi_size_t size) override;
+                                          void *buffer, nsapi_size_t size) override;
 
     void socket_attach(nsapi_socket_t handle, void (*callback)(void *), void *data) override;
 
     nsapi_error_t setsockopt(nsapi_socket_t handle, int level,
-                                     int optname, const void *optval, unsigned optlen) override;
+                             int optname, const void *optval, unsigned optlen) override;
 
     nsapi_error_t getsockopt(nsapi_socket_t handle, int level,
-                                     int optname, void *optval, unsigned *optlen) override;
+                             int optname, void *optval, unsigned *optlen) override;
 
 private:
     call_in_callback_cb_t get_call_in_callback() override;
