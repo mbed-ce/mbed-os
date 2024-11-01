@@ -207,6 +207,10 @@
         },
         "MTS_DRAGONFLY_F411RE": {
             "tcpip-thread-stacksize": 1600
+        },
+        "STM32H7": {
+            // On STM32H7, we have lots of RAM, so we can make the pool size relatively large
+            "pbuf-pool-size": 16,
         }
     }
 }
