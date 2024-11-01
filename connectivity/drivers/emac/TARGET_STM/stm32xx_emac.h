@@ -20,6 +20,11 @@
 
 #include "EMAC.h"
 #include "rtos/Mutex.h"
+#include "rtos/Thread.h"
+
+#include "STM32EthIPv2DMARings.h"
+
+#include <optional>
 
 class STM32_EMAC : public EMAC {
 public:
@@ -150,17 +155,19 @@ public:
 
     // Called from driver functions
     ETH_HandleTypeDef EthHandle;
-    osThreadId_t thread; /**< Processing thread */
+
 
 private:
+
     bool low_level_init_successful();
     void packet_rx();
     int low_level_input(emac_mem_buf_t **buf);
-    static void thread_function(void *pvParameters);
+    void thread_function();
     static void rmii_watchdog_thread_function(void *pvParameters);
     void phy_task();
     void enable_interrupts();
     void disable_interrupts();
+    static void irqHandler();
 
     // Populate multicast filter registers with the contents of mcastMacs.
     // Uses the perfect filter registers first, then the hash filter.
@@ -176,10 +183,11 @@ private:
     osThreadId_t rmii_watchdog_thread; /**< Watchdog processing thread */
 #endif
     rtos::Mutex TXLockMutex;/**< TX critical section mutex */
-    rtos::Mutex RXLockMutex;/**< RX critical section mutex */
-    emac_link_input_cb_t emac_link_input_cb; /**< Callback for incoming data */
     emac_link_state_change_cb_t emac_link_state_cb; /**< Link state change callback */
+    emac_link_input_cb_t emac_link_input_cb; /**< Callback for incoming packets */
     EMACMemoryManager *memory_manager; /**< Memory manager */
+
+    std::optional<mbed::STM32EthIPv2DMARings> dmaRings;
 
     uint32_t phy_status;
     int phy_task_handle; /**< Handle for phy task event */

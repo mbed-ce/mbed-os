@@ -65,11 +65,6 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef *heth)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
     if (heth->Instance == ETH) {
-        /* Disable DCache for STM32H7 family */
-        core_util_critical_section_enter();
-        SCB_DisableDCache();
-        core_util_critical_section_exit();
-
         /* GPIO Ports Clock Enable */
         __HAL_RCC_GPIOH_CLK_ENABLE();
         __HAL_RCC_GPIOC_CLK_ENABLE();

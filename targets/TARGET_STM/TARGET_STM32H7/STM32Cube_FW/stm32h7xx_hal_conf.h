@@ -50,10 +50,7 @@
 #define HAL_DTS_MODULE_ENABLED
 #define HAL_DSI_MODULE_ENABLED
 
-// Temporary: using legacy Ethernet driver for now
-// #define HAL_ETH_MODULE_ENABLED
-#define HAL_ETH_LEGACY_MODULE_ENABLED
-
+#define HAL_ETH_MODULE_ENABLED
 #define HAL_EXTI_MODULE_ENABLED
 #define HAL_FDCAN_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED

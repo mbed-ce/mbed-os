@@ -65,6 +65,8 @@ void test_emac_unicast_frame_len_cb(int opt)
         retries = 0;
         send_request = true;
     }
+
+    printf("Regs: ETH_RX_UNICAST_PACKETS_GOOD=%lu, ETH_DMACCARXDR=%p\n", ETH->MMCRUPGR, (void*)ETH->DMACCARDR);
 }
 
 void test_emac_unicast_frame_len()

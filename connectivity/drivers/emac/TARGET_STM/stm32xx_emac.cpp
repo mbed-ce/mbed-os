@@ -63,13 +63,11 @@
 #include "lan8742/lan8742.h"
 #include "lwip/memp.h"
 #include "lwip/api.h"
-#include "linker_scripts/stm32_eth_region_size_calcs.h"
 #endif
 
 using namespace std::chrono;
 
-/* \brief Flags for worker thread */
-#define FLAG_RX                 1
+
 
 /** \brief  Driver thread priority */
 #define THREAD_PRIORITY         (osPriorityHigh)
@@ -79,18 +77,6 @@ using namespace std::chrono;
 #define STM_HWADDR_SIZE         (6)
 #define STM_ETH_MTU_SIZE        1500
 #define STM_ETH_IF_NAME         "st"
-
-#define ETH_RX_DESC_CNT MBED_CONF_STM32_EMAC_ETH_RXBUFNB
-#define ETH_TX_DESC_CNT MBED_CONF_STM32_EMAC_ETH_TXBUFNB
-
-ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".EthDescriptors"))); /* Ethernet Rx DMA Descriptors */
-ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".EthDescriptors")));  /* Ethernet Tx DMA Descriptors */
-
-// Rx buffer addresses need to be aligned 4 bytes and to cache lines because we cache invalidate the buffers after receiving them.
-mbed::StaticCacheAlignedBuffer<uint32_t, ETH_MAX_PACKET_SIZE / sizeof(uint32_t)> Rx_Buff[ETH_RX_DESC_CNT] __attribute__((section(".EthBuffers"))); /* Ethernet Receive Buffers */
-
-// Tx buffers just need to be aligned to the nearest 4 bytes.
-uint32_t Tx_Buff[ETH_TX_DESC_CNT][ETH_MAX_PACKET_SIZE / sizeof(uint32_t)] __attribute__((section(".EthBuffers")));
 
 #if defined(ETH_IP_VERSION_V2)
 
@@ -110,9 +96,12 @@ static lan8742_IOCtx_t LAN8742_IOCtx = {
     ETH_PHY_IO_GetTick
 };
 
-static ETH_TxPacketConfig TxConfig;
+#else
 
-#endif // ETH_IP_VERSION_V2
+// For IP v1, we do not do zero copy Rx, so we have to allocate all the Tx buffers ahead of time.
+// Rx buffer addresses need to be aligned 4 bytes and to cache lines because we cache invalidate the buffers after receiving them.
+mbed::StaticCacheAlignedBuffer<uint32_t, ETH_MAX_PACKET_SIZE / sizeof(uint32_t)> Rx_Buff[ETH_RX_DESC_CNT] __attribute__((section(".EthBuffers"))); /* Ethernet Receive Buffers */
+#endif
 
 MBED_WEAK uint8_t mbed_otp_mac_address(char *mac);
 void mbed_default_mac_address(char *mac);
@@ -127,12 +116,6 @@ void ETH_IRQHandler(void);
 // We need to give the linker a reason to pull in the stmxx_eth_init.c files, since they only contain
 // weak symbol overrides and would otherwise be ignored.
 void stm32_eth_init_weak_symbol_helper();
-
-#ifdef USE_USER_DEFINED_HAL_ETH_IRQ_CALLBACK
-MBED_WEAK void STM_HAL_ETH_Handler();
-#else
-void STM_HAL_ETH_Handler();
-#endif
 
 #ifdef __cplusplus
 }
@@ -184,61 +167,11 @@ bool _phy_is_up(int32_t phy_state)
     return phy_state > LAN8742_STATUS_LINK_DOWN;
 }
 
-// Integer log2 of an integer.
-// from https://stackoverflow.com/questions/994593/how-to-do-an-integer-log2-in-c
-static inline uint32_t log2i(uint32_t x) {
-    return sizeof(uint32_t) * 8 - __builtin_clz(x) - 1;
-}
-
-static void MPU_Config(void)
-{
-    MPU_Region_InitTypeDef MPU_InitStruct;
-
-    /* Disable the MPU */
-    HAL_MPU_Disable();
-
-    /* Configure the MPU attributes as Device not cacheable
-       for ETH DMA descriptors.  The linker script puts these into their own
-       cordoned off, power-of-2 sized region. */
-    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
-    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-    MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
-    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
-    MPU_InitStruct.Number = 4; // Mbed OS MPU config can use regions 0 through 3
-    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-    MPU_InitStruct.SubRegionDisable = 0x00;
-    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-
-    extern uint8_t __eth_descriptors_start[0]; // <-- defined in linker script
-    MPU_InitStruct.BaseAddress = reinterpret_cast<uint32_t>(__eth_descriptors_start);
-
-    // Use a logarithm to calculate the region size
-    MPU_InitStruct.Size = log2i(STM32_DMA_DESCRIP_REGION_SIZE) - 1;
-
-    HAL_MPU_ConfigRegion(&MPU_InitStruct);
-
-    /* Enable the MPU */
-    HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
-}
-
 #endif
 
-/**
- * Ethernet IRQ Handler
- *
- * @param  None
- * @retval None
- */
-void ETH_IRQHandler(void)
-{
-    STM_HAL_ETH_Handler();
-}
-
-STM32_EMAC::STM32_EMAC()
-    : thread(0)
+STM32_EMAC::STM32_EMAC():
 #ifdef ETH_IP_VERSION_V2
-    , phy_status(0)
+phy_status(0)
 #endif
 {
 }
@@ -336,12 +269,8 @@ bool STM32_EMAC::low_level_init_successful()
 }
 #else // ETH_IP_VERSION_V2
 {
-    uint32_t idx;
-
     // Generate a reference to this empty function so the linker pulls it in.
     stm32_eth_init_weak_symbol_helper();
-
-    MPU_Config();
 
     /* Init ETH */
     uint8_t MACAddr[6];
@@ -358,12 +287,8 @@ bool STM32_EMAC::low_level_init_successful()
 #endif
     EthHandle.Init.MACAddr = &MACAddr[0];
     EthHandle.Init.MediaInterface = HAL_ETH_RMII_MODE;
-    EthHandle.Init.RxDesc = DMARxDscrTab;
-    EthHandle.Init.TxDesc = DMATxDscrTab;
-    EthHandle.Init.RxBuffLen = 1524;
 
     tr_debug("MAC Addr %02x:%02x:%02x:%02x:%02x:%02x", MACAddr[0], MACAddr[1], MACAddr[2], MACAddr[3], MACAddr[4], MACAddr[5]);
-    tr_info("ETH buffers : %u Rx %u Tx", ETH_RX_DESC_CNT, ETH_TX_DESC_CNT);
 
     if (HAL_ETH_Init(&EthHandle) != HAL_OK) {
         return false;
@@ -375,14 +300,25 @@ bool STM32_EMAC::low_level_init_successful()
     // Enable multicast hash and perfect filter
     EthHandle.Instance->MACPFR = ETH_MACPFR_HMC | ETH_MACPFR_HPF;
 
-    memset(&TxConfig, 0, sizeof(ETH_TxPacketConfig));
-    TxConfig.Attributes = ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
-    TxConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
-    TxConfig.CRCPadCtrl = ETH_CRC_PAD_INSERT;
+    // Enable Tx, Rx, and fatal bus error interrupts.
+    // However, don't enable receive buffer unavailable interrupt, because that can
+    // trigger if we run out of Rx descriptors, and we don't want to fatal error
+    // in that case.
+    EthHandle.Instance->DMACIER = (ETH_DMACIER_NIE | ETH_DMACIER_RIE | ETH_DMACIER_TIE  |
+                                   ETH_DMACIER_FBEE | ETH_DMACIER_AIE);
 
-    for (idx = 0; idx < ETH_RX_DESC_CNT; idx++) {
-        HAL_ETH_DescAssignMemory(&EthHandle, idx, reinterpret_cast<uint8_t *>(Rx_Buff[idx].data()), NULL);
+    // Disable checksum offload, this is enabled by HAL_ETH_Init
+    EthHandle.Instance->MACCR &= ~ETH_MACCR_IPC;
+
+    // Init the DMA rings
+    dmaRings.emplace(*memory_manager, EthHandle, emac_link_input_cb);
+    if (dmaRings->startDMA() != HAL_OK) {
+        return false;
     }
+
+    // Enable the MAC transmission & reception
+    // TODO should only do this once the link goes up
+    EthHandle.Instance->MACCR |= ETH_MACCR_TE | ETH_MACCR_RE;
 
     tr_info("low_level_init_successful");
     return _phy_init();
@@ -484,63 +420,10 @@ error:
 }
 #else // ETH_IP_VERSION_V2
 {
-    bool success = false;
-    uint32_t i = 0;
-    uint32_t frameLength = 0;
-    struct pbuf *q;
-    ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT];
-    HAL_StatusTypeDef status;
-    struct pbuf *p = NULL;
-    p = (struct pbuf *)buf;
     /* Get exclusive access */
     TXLockMutex.lock();
 
-    memset(Txbuffer, 0, ETH_TX_DESC_CNT * sizeof(ETH_BufferTypeDef));
-
-    /* copy frame from pbufs to driver buffers */
-    for (q = p; q != NULL; q = q->next) {
-        if (i >= ETH_TX_DESC_CNT) {
-            tr_error("Error : ETH_TX_DESC_CNT not sufficient");
-            goto error;
-        }
-
-        Txbuffer[i].buffer = (uint8_t *)q->payload;
-        Txbuffer[i].len = q->len;
-        frameLength += q->len;
-
-        if (i > 0) {
-            Txbuffer[i - 1].next = &Txbuffer[i];
-        }
-
-        if (q->next == NULL) {
-            Txbuffer[i].next = NULL;
-        }
-
-#if defined(__DCACHE_PRESENT)
-        // For chips with a cache, we need to evict the Tx data from cache to main memory.
-        // This ensures that the DMA controller can see the most up-to-date copy of the data.
-        SCB_CleanDCache_by_Addr(Txbuffer[i].buffer, Txbuffer[i].len);
-#endif
-
-        i++;
-    }
-
-    TxConfig.Length = frameLength;
-    TxConfig.TxBuffer = Txbuffer;
-
-    status = HAL_ETH_Transmit(&EthHandle, &TxConfig, 50);
-    if (status == HAL_OK) {
-        success = 1;
-    } else {
-        tr_error("Error returned by HAL_ETH_Transmit (%d)", status);
-        success = 0;
-    }
-
-error:
-
-    if (p->ref > 1) {
-        pbuf_free(p);
-    }
+    bool success = dmaRings->txPacket(buf) == HAL_OK;
 
     /* Restore access */
     TXLockMutex.unlock();
@@ -549,6 +432,7 @@ error:
 }
 #endif // ETH_IP_VERSION_V2
 
+#ifndef ETH_IP_VERSION_V2
 /**
  * Should allocate a contiguous memory buffer and transfer the bytes of the incoming
  * packet to the buffer.
@@ -559,7 +443,6 @@ error:
  *         zero when frame is received
  */
 int STM32_EMAC::low_level_input(emac_mem_buf_t **buf)
-#ifndef ETH_IP_VERSION_V2
 {
     uint32_t len = 0;
     uint8_t *buffer;
@@ -636,74 +519,7 @@ int STM32_EMAC::low_level_input(emac_mem_buf_t **buf)
     return 0;
 }
 #else // ETH_IP_VERSION_V2
-{
-    ETH_BufferTypeDef RxBuff;
-    uint32_t frameLength = 0;
-
-    if (HAL_ETH_GetRxDataBuffer(&EthHandle, &RxBuff) == HAL_OK) {
-        if (HAL_ETH_GetRxDataLength(&EthHandle, &frameLength) != HAL_OK) {
-            tr_error("Error: returned by HAL_ETH_GetRxDataLength");
-            return -1;
-        }
-
-        /* Build Rx descriptor to be ready for next data reception */
-        HAL_ETH_BuildRxDescriptors(&EthHandle);
-
-#if defined(__DCACHE_PRESENT)
-        /* Invalidate data cache for ETH Rx Buffers */
-        SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff.buffer, frameLength);
-#endif
-
-        *buf = pbuf_alloc(PBUF_RAW, frameLength, PBUF_POOL);
-        if (*buf) {
-            pbuf_take((struct pbuf *)*buf, RxBuff.buffer, frameLength);
-        }
-    } else {
-        return -1;
-    }
-
-    return 0;
-}
 #endif // ETH_IP_VERSION_V2
-
-/** \brief  Attempt to read a packet from the EMAC interface.
- *
- */
-void STM32_EMAC::packet_rx()
-{
-    /* move received packet into a new buf */
-    while (1) {
-        emac_mem_buf_t *p = NULL;
-        RXLockMutex.lock();
-        if (low_level_input(&p) < 0) {
-            RXLockMutex.unlock();
-            break;
-        }
-        if (p) {
-            emac_link_input_cb(p);
-        }
-        RXLockMutex.unlock();
-    }
-}
-
-/** \brief  Worker thread.
- *
- * Woken by thread flags to receive packets or clean up transmit
- *
- *  \param[in] pvParameters pointer to the interface data
- */
-void STM32_EMAC::thread_function(void *pvParameters)
-{
-    static struct STM32_EMAC *stm32_enet = static_cast<STM32_EMAC *>(pvParameters);
-
-    for (;;) {
-        uint32_t flags = osThreadFlagsWait(FLAG_RX, osFlagsWaitAny, osWaitForever);
-
-        if (flags & FLAG_RX) {
-            stm32_enet->packet_rx();
-        }
-    }
-}
 
 /**
  * This task checks phy link status and updates net status
@@ -879,13 +695,8 @@ bool STM32_EMAC::power_up()
         return false;
     }
 
-    /* Worker thread */
-#if MBED_CONF_MBED_TRACE_ENABLE
-    thread = create_new_thread("stm32_emac_thread", &STM32_EMAC::thread_function, this, MBED_CONF_STM32_EMAC_THREAD_STACKSIZE * 2, THREAD_PRIORITY, &thread_cb);
-#else
-    thread = create_new_thread("stm32_emac_thread", &STM32_EMAC::thread_function, this, MBED_CONF_STM32_EMAC_THREAD_STACKSIZE, THREAD_PRIORITY, &thread_cb);
-#endif
-
+    /* Allow the PHY task to detect the initial link state and set up the proper flags */
+    phy_task();
 
     phy_task_handle = mbed::mbed_event_queue()->call_every(PHY_TASK_PERIOD, mbed::callback(this, &STM32_EMAC::phy_task));
 
@@ -894,10 +705,16 @@ bool STM32_EMAC::power_up()
     rmii_watchdog_thread = create_new_thread("stm32_rmii_watchdog", &STM32_EMAC::rmii_watchdog_thread_function, this, 128, THREAD_PRIORITY, &rmii_watchdog_thread_cb);
 #endif
 
-    /* Allow the PHY task to detect the initial link state and set up the proper flags */
-    osDelay(10);
-
+    // Set up interrupt handler
+    NVIC_SetVector(ETH_IRQn, reinterpret_cast<uint32_t>(&STM32_EMAC::irqHandler));
     enable_interrupts();
+
+    /* Enable ETH DMA interrupts:
+    - Tx complete interrupt
+    - Rx complete interrupt
+    - Fatal bus interrupt
+    */
+    ETH->DMACIER = ETH_DMACIER_NIE | ETH_DMACIER_RIE | ETH_DMACIER_TIE | ETH_DMACIER_FBEE | ETH_DMACIER_AIE;
 
     return true;
 }
@@ -1028,6 +845,36 @@ STM32_EMAC &STM32_EMAC::get_instance()
     return emac;
 }
 
+void STM32_EMAC::irqHandler()
+{
+    uint32_t dma_flag = ETH->DMACSR;
+
+    /* Packet received */
+    if ((dma_flag & ETH_DMACSR_RI) != 0U)
+    {
+        /* Clear the Eth DMA Rx IT pending bits */
+        ETH->DMACSR = ETH_DMACSR_RI | ETH_DMACSR_NIS;
+
+        get_instance().dmaRings->rxISR();
+    }
+
+    /* Packet transmitted */
+    if ((dma_flag & ETH_DMACSR_TI) != 0U)
+    {
+        /* Clear the Eth DMA Tx IT pending bits */
+        ETH->DMACSR = ETH_DMACSR_TI | ETH_DMACSR_NIS;
+
+        get_instance().dmaRings->txISR();
+    }
+
+    /* ETH DMA Error */
+    if(dma_flag & ETH_DMACSR_FBE)
+    {
+        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ETHERNET, EIO), \
+               "STM32 EMAC: Hardware reports fatal DMA Error\n");
+    }
+}
+
 void STM32_EMAC::populateMcastFilterRegs() {
     const size_t NUM_PERFECT_FILTER_REGS = 3;
 
@@ -1120,9 +967,7 @@ void STM32_EMAC::writeMACAddress(const uint8_t *MAC, volatile uint32_t *addrHigh
     /* Set MAC addr bits 0 to 31 */
     *addrLowReg = (static_cast<uint32_t>(MAC[3]) << 24) | (static_cast<uint32_t>(MAC[2]) << 16) |
                   (static_cast<uint32_t>(MAC[1]) << 8) | static_cast<uint32_t>(MAC[0]);
-}
-
-// Weak so a module can override
+}// Weak so a module can override
 MBED_WEAK EMAC &EMAC::get_default_instance()
 {
     return STM32_EMAC::get_instance();
@@ -1222,47 +1067,5 @@ void HAL_ETH_MACErrorCallback(ETH_HandleTypeDef *heth)
                "Error from ethernet HAL (HAL_ETH_MACErrorCallback)\n");
 }
 #endif // ETH_IP_VERSION_V2
-
-#ifndef USE_USER_DEFINED_HAL_ETH_IRQ_CALLBACK
-
-#define FLAG_RX                 1
-
-/**
- * Override Ethernet Rx Transfer completed callback
- * @param  heth: ETH handle
- * @retval None
- */
-void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
-{
-    STM32_EMAC &emac = STM32_EMAC::get_instance();
-    if (emac.thread) {
-        osThreadFlagsSet(emac.thread, FLAG_RX);
-    }
-}
-
-/**
- * Override the IRQ Handler
- * @param  None
- * @retval None
- */
-void STM_HAL_ETH_Handler()
-{
-   STM32_EMAC &emac = STM32_EMAC::get_instance();
-   HAL_ETH_IRQHandler(&emac.EthHandle);
-}
-
-#else /* USE_USER_DEFINED_HAL_ETH_IRQ_CALLBACK */
-
-/**
- * IRQ Handler
- *
- * @param  heth: ETH handle
- * @retval None
- */
-MBED_WEAK void STM_HAL_ETH_Handler()
-{
-}
-
-#endif /* USE_USER_DEFINED_HAL_ETH_IRQ_CALLBACK */
 
 #endif /* DEVICE_EMAC */

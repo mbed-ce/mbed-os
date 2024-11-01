@@ -16,7 +16,6 @@
 */
 
 #include "cmsis_nvic.h"
-#include "../stm32_eth_region_size_calcs.h"
 
 M_CRASH_DATA_RAM_SIZE = 0x100;
 
@@ -211,20 +210,6 @@ SECTIONS
     _estack = __StackTop;
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
     PROVIDE(__stack = __StackTop);
-
-    /* Ethernet DMA descriptors should be at the start of SRAM_D2 because they need an MPU region 
-       and because the CM4 and CM7 have to agree on their location.*/
-    .eth_descriptors (NOLOAD) : {
-        ASSERT(. == ORIGIN(SRAM_D2), "Eth Descriptors region must be at the start of SRAM_D2");
-        PROVIDE(__eth_descriptors_start = .);
-        *(.EthDescriptors)
-        . = __eth_descriptors_start + STM32_DMA_DESCRIP_REGION_SIZE;
-    } >SRAM_D2
-
-    /* Ethernet buffers are recommended to be in SRAM_D2 but don't need any special MPU region. */
-    .eth_buffers (NOLOAD) : {
-        *(.EthBuffers)
-    } >SRAM_D2 
 
     /* Use SRAM_D2 as additional heap */
     .heap (NOLOAD):
