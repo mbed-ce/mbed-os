@@ -57,6 +57,8 @@ public:
      */
     uint32_t get_pool_alloc_unit(uint32_t align) const override;
 
+    uint32_t get_pool_size() const override;
+
     /**
      * Free memory buffer chain
      *

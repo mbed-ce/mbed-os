@@ -66,8 +66,7 @@
 
 using namespace std::chrono;
 
-/* \brief Flags for worker thread */
-#define FLAG_RX                 1
+
 
 /** \brief  Driver thread priority */
 #define THREAD_PRIORITY         (osPriorityHigh)
@@ -83,9 +82,6 @@ using namespace std::chrono;
 
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".EthDescriptors"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".EthDescriptors")));  /* Ethernet Tx DMA Descriptors */
-
-// Rx buffer addresses need to be aligned 4 bytes and to cache lines because we cache invalidate the buffers after receiving them.
-mbed::StaticCacheAlignedBuffer<uint32_t, ETH_MAX_PACKET_SIZE / sizeof(uint32_t)> Rx_Buff[ETH_RX_DESC_CNT] __attribute__((section(".EthBuffers"))); /* Ethernet Receive Buffers */
 
 // Tx buffers just need to be aligned to the nearest 4 bytes.
 uint32_t Tx_Buff[ETH_TX_DESC_CNT][ETH_MAX_PACKET_SIZE / sizeof(uint32_t)] __attribute__((section(".EthBuffers")));
@@ -108,9 +104,12 @@ static lan8742_IOCtx_t LAN8742_IOCtx = {
     ETH_PHY_IO_GetTick
 };
 
-static ETH_TxPacketConfig TxConfig;
+#else
 
-#endif // ETH_IP_VERSION_V2
+// For IP v1, we do not do zero copy Rx, so we have to allocate all the Tx buffers ahead of time.
+// Rx buffer addresses need to be aligned 4 bytes and to cache lines because we cache invalidate the buffers after receiving them.
+mbed::StaticCacheAlignedBuffer<uint32_t, ETH_MAX_PACKET_SIZE / sizeof(uint32_t)> Rx_Buff[ETH_RX_DESC_CNT] __attribute__((section(".EthBuffers"))); /* Ethernet Receive Buffers */
+#endif
 
 MBED_WEAK uint8_t mbed_otp_mac_address(char *mac);
 void mbed_default_mac_address(char *mac);
@@ -233,10 +232,14 @@ void ETH_IRQHandler(void)
     STM_HAL_ETH_Handler();
 }
 
-STM32_EMAC::STM32_EMAC()
-    : thread(0)
+STM32_EMAC::STM32_EMAC():
+#if MBED_CONF_MBED_TRACE_ENABLE
+thread(THREAD_PRIORITY, MBED_CONF_STM32_EMAC_THREAD_STACKSIZE*2, nullptr, "stm32_emac_thread")
+#else
+thread(THREAD_PRIORITY, MBED_CONF_STM32_EMAC_THREAD_STACKSIZE, nullptr, "stm32_emac_thread")
+#endif
 #ifdef ETH_IP_VERSION_V2
-    , phy_status(0)
+, phy_status(0)
 #endif
 {
 }
@@ -355,7 +358,7 @@ bool STM32_EMAC::low_level_init_successful()
     EthHandle.Init.MediaInterface = HAL_ETH_RMII_MODE;
     EthHandle.Init.RxDesc = DMARxDscrTab;
     EthHandle.Init.TxDesc = DMATxDscrTab;
-    EthHandle.Init.RxBuffLen = 1524;
+    EthHandle.Init.RxBuffLen = memory_manager->get_pool_alloc_unit(mbed::STM32EthIPv2DMARings::RX_BUFFER_ALIGN);
 
     tr_debug("MAC Addr %02x:%02x:%02x:%02x:%02x:%02x", MACAddr[0], MACAddr[1], MACAddr[2], MACAddr[3], MACAddr[4], MACAddr[5]);
     tr_info("ETH buffers : %u Rx %u Tx", ETH_RX_DESC_CNT, ETH_TX_DESC_CNT);
@@ -364,14 +367,13 @@ bool STM32_EMAC::low_level_init_successful()
         return false;
     }
 
-    memset(&TxConfig, 0, sizeof(ETH_TxPacketConfig));
-    TxConfig.Attributes = ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
-    TxConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
-    TxConfig.CRCPadCtrl = ETH_CRC_PAD_INSERT;
-
-    for (idx = 0; idx < ETH_RX_DESC_CNT; idx++) {
-        HAL_ETH_DescAssignMemory(&EthHandle, idx, reinterpret_cast<uint8_t *>(Rx_Buff[idx].data()), NULL);
+    if (HAL_ETH_Start(&EthHandle) != HAL_OK) {
+        return false;
     }
+
+    // Enable the MAC transmission & reception
+    // TODO should only do this once the link goes up
+    heth.Instance->MACCR |= ETH_MACCR_TE | ETH_MACCR_RE;
 
     tr_info("low_level_init_successful");
     return _phy_init();
@@ -473,63 +475,63 @@ error:
 }
 #else // ETH_IP_VERSION_V2
 {
+    uint8_t * txBuffer;
     bool success = false;
-    uint32_t i = 0;
-    uint32_t frameLength = 0;
-    struct pbuf *q;
-    ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT];
-    HAL_StatusTypeDef status;
-    struct pbuf *p = NULL;
-    p = (struct pbuf *)buf;
+
     /* Get exclusive access */
     TXLockMutex.lock();
 
-    memset(Txbuffer, 0, ETH_TX_DESC_CNT * sizeof(ETH_BufferTypeDef));
+    // Check length
+    const size_t txLen = memory_manager->get_total_len(buf);
+    if(txLen > ETH_MAX_PACKET_SIZE)
+    {
+        goto free_and_return;
+    }
 
-    /* copy frame from pbufs to driver buffers */
-    for (q = p; q != NULL; q = q->next) {
-        if (i >= ETH_TX_DESC_CNT) {
-            tr_error("Error : ETH_TX_DESC_CNT not sufficient");
-            goto error;
-        }
+    // Find free Tx buffer
+    if(DMATxDscrTab[EthHandle.TxDescList.CurTxDesc].DESC3 & ETH_DMATXNDESCWBF_OWN)
+    {
+        // No free Tx DMA descriptors left
+        tr_error("Error : ETH_TX_DESC_CNT not sufficient");
+        goto free_and_return;
+    }
+    txBuffer = reinterpret_cast<uint8_t *>(Tx_Buff[EthHandle.TxDescList.CurTxDesc]);
 
-        Txbuffer[i].buffer = (uint8_t *)q->payload;
-        Txbuffer[i].len = q->len;
-        frameLength += q->len;
-
-        if (i > 0) {
-            Txbuffer[i - 1].next = &Txbuffer[i];
-        }
-
-        if (q->next == NULL) {
-            Txbuffer[i].next = NULL;
-        }
+    // Copy data into Tx buffer
+    memory_manager->copy_from_buf(txBuffer, txLen, buf);
 
 #if defined(__DCACHE_PRESENT)
-        // For chips with a cache, we need to evict the Tx data from cache to main memory.
-        // This ensures that the DMA controller can see the most up-to-date copy of the data.
-        SCB_CleanDCache_by_Addr(Txbuffer[i].buffer, Txbuffer[i].len);
+    // For chips with a cache, we need to evict the Tx data from cache to main memory.
+    // This ensures that the DMA controller can see the most up-to-date copy of the data.
+    SCB_CleanDCache_by_Addr(txBuffer, txLen);
 #endif
 
-        i++;
+    // Transmit the data in the buffer
+    {
+        ETH_BufferTypeDef txBufferDescriptor{
+                .buffer = txBuffer,
+                .len = txLen,
+                .next = nullptr
+        };
+        ETH_TxPacketConfig txConfig = {};
+        txConfig.Attributes = ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
+        txConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
+        txConfig.CRCPadCtrl = ETH_CRC_PAD_INSERT;
+        txConfig.TxBuffer = &txBufferDescriptor;
+        int status = HAL_ETH_Transmit_IT(&EthHandle, &txConfig);
+        if (status == HAL_OK)
+        {
+            success = true;
+        }
+        else
+        {
+            tr_error("Error returned by HAL_ETH_Transmit (%d)", status);
+        }
     }
 
-    TxConfig.Length = frameLength;
-    TxConfig.TxBuffer = Txbuffer;
+free_and_return:
 
-    status = HAL_ETH_Transmit(&EthHandle, &TxConfig, 50);
-    if (status == HAL_OK) {
-        success = 1;
-    } else {
-        tr_error("Error returned by HAL_ETH_Transmit (%d)", status);
-        success = 0;
-    }
-
-error:
-
-    if (p->ref > 1) {
-        pbuf_free(p);
-    }
+    memory_manager->free(buf);
 
     /* Restore access */
     TXLockMutex.unlock();
@@ -626,34 +628,48 @@ int STM32_EMAC::low_level_input(emac_mem_buf_t **buf)
 }
 #else // ETH_IP_VERSION_V2
 {
-    ETH_BufferTypeDef RxBuff;
-    uint32_t frameLength = 0;
+    for(size_t numDescs = 0; ; numDescs++)
+    {
+       auto * currRxDesc = (ETH_DMADescTypeDef *)EthHandle.RxDescList.RxDesc[EthHandle.RxDescList.RxDescIdx];
 
-    if (HAL_ETH_GetRxDataBuffer(&EthHandle, &RxBuff) == HAL_OK) {
-        if (HAL_ETH_GetRxDataLength(&EthHandle, &frameLength) != HAL_OK) {
-            tr_error("Error: returned by HAL_ETH_GetRxDataLength");
-            return -1;
-        }
+       if(numDescs == ETH_RX_DESC_CNT - EthHandle.RxDescList.RxBuildDescCnt)
+       {
+           // We have now processed every available descriptor
+           break;
+       }
 
-        /* Build Rx descriptor to be ready for next data reception */
-        HAL_ETH_BuildRxDescriptors(&EthHandle);
-
-#if defined(__DCACHE_PRESENT)
-        /* Invalidate data cache for ETH Rx Buffers */
-        SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff.buffer, frameLength);
-#endif
-
-        *buf = pbuf_alloc(PBUF_RAW, frameLength, PBUF_POOL);
-        if (*buf) {
-            pbuf_take((struct pbuf *)*buf, RxBuff.buffer, frameLength);
-        }
-    } else {
-        return -1;
+       if(currRxDesc->DESC3 & ETH_DMARXNDESCWBF_OWN)
+       {
+           // Next descriptor owned by DMA
+           break;
+       }
     }
 
-    return 0;
+    if(RxAllocStatus == RX_ALLOC_OK)
+    {
+        if(HAL_ETH_ReadData(&EthHandle, buf) == HAL_OK)
+        {
+            return 0;
+        }
+        else
+        {
+            return -1; // No more frames
+        }
+    }
+    else
+    {
+        return -1; // No memory.
+    }
 }
 #endif // ETH_IP_VERSION_V2
+
+#ifdef ETH_IP_VERSION_V2
+// Callback from STM32Cube HAL: Allocate a new buffer of size
+extern "C" void HAL_ETH_RxAllocateCallback(uint8_t **buf)
+{
+}
+
+#endif
 
 /** \brief  Attempt to read a packet from the EMAC interface.
  *
@@ -681,15 +697,13 @@ void STM32_EMAC::packet_rx()
  *
  *  \param[in] pvParameters pointer to the interface data
  */
-void STM32_EMAC::thread_function(void *pvParameters)
+void STM32_EMAC::thread_function()
 {
-    static struct STM32_EMAC *stm32_enet = static_cast<STM32_EMAC *>(pvParameters);
-
     for (;;) {
         uint32_t flags = osThreadFlagsWait(FLAG_RX, osFlagsWaitAny, osWaitForever);
 
         if (flags & FLAG_RX) {
-            stm32_enet->packet_rx();
+            packet_rx();
         }
     }
 }
@@ -869,12 +883,7 @@ bool STM32_EMAC::power_up()
     }
 
     /* Worker thread */
-#if MBED_CONF_MBED_TRACE_ENABLE
-    thread = create_new_thread("stm32_emac_thread", &STM32_EMAC::thread_function, this, MBED_CONF_STM32_EMAC_THREAD_STACKSIZE * 2, THREAD_PRIORITY, &thread_cb);
-#else
-    thread = create_new_thread("stm32_emac_thread", &STM32_EMAC::thread_function, this, MBED_CONF_STM32_EMAC_THREAD_STACKSIZE, THREAD_PRIORITY, &thread_cb);
-#endif
-
+    thread.start(mbed::callback(this, &STM32_EMAC::thread_function));
 
     phy_task_handle = mbed::mbed_event_queue()->call_every(PHY_TASK_PERIOD, mbed::callback(this, &STM32_EMAC::phy_task));
 

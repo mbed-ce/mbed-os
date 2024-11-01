@@ -80,6 +80,16 @@ public:
     virtual uint32_t get_pool_alloc_unit(uint32_t align) const = 0;
 
     /**
+     * Get memory buffer pool size.
+     *
+     * Returns the maximum size of contiguous memory that can be allocated from a pool.
+     *
+     * @param align    Memory alignment requirement in bytes
+     * @return         Contiguous memory size
+     */
+    virtual uint32_t get_pool_size() const = 0;
+
+    /**
      * Free memory buffer chain
      *
      * Frees all buffers from the chained list.
@@ -157,6 +167,23 @@ public:
     virtual net_stack_mem_buf_t *get_next(const net_stack_mem_buf_t *buf) const = 0;
 
     /**
+     * @brief Count the number of buffers in a buffer chain
+     *
+     * @param buf      Memory buffer
+     * @return         The number of buffers in the chain
+     */
+    size_t count_buffers(const net_stack_mem_buf_t *buf)
+    {
+        size_t count = 0;
+        while(buf != nullptr)
+        {
+            count += 1;
+            buf = get_next(buf);
+        }
+        return count;
+    }
+
+    /**
      * Return pointer to the payload of the buffer
      *
      * @param buf      Memory buffer
@@ -165,7 +192,7 @@ public:
     virtual void *get_ptr(const net_stack_mem_buf_t *buf) const = 0;
 
     /**
-     * Return payload size of the buffer
+     * Return payload size of this individual buffer (NOT including any chained buffers)
      *
      * @param buf      Memory buffer
      * @return         Size in bytes

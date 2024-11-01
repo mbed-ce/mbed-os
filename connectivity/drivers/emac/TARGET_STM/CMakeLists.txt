@@ -19,4 +19,5 @@ target_include_directories(mbed-emac
 target_sources(mbed-emac
     PRIVATE
         stm32xx_emac.cpp
+        STM32EthIPv2DMARings.cpp
 )

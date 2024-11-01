@@ -1,0 +1,371 @@
+/* Copyright (c) 2024 Jamie Smith
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "STM32EthIPv2DMARings.h"
+
+namespace mbed
+{
+
+// Event flag constants
+static uint32_t TX_BUF_AVAILABLE_EVENT = 1;
+
+void STM32EthIPv2DMARings::buildRxDescriptors()
+{
+    while(rxDescsOwnedByApplication > 0)
+    {
+        auto & currRxDesc = rxDescs[rxBuildIndex][0];
+
+        // Allocate new buffer
+        auto * const buffer = memory_manager.alloc_pool(rxPoolPayloadSize, RX_BUFFER_ALIGN);
+        if(buffer == nullptr)
+        {
+            // No memory, cannot return any more descriptors.
+            return;
+        }
+
+        // Store buffer address
+        rxDescBuffers[rxBuildIndex] = buffer;
+        currRxDesc.DESC0 = reinterpret_cast<uint32_t>(memory_manager.get_ptr(buffer));
+
+        // Configure descriptor
+        currRxDesc.DESC3 = ETH_DMARXNDESCRF_OWN // Transfer ownership to DMA
+                | ETH_DMARXNDESCRF_BUF1V // Buffer 1 address supplied in RDES0
+                | ETH_DMARXNDESCRF_IOC; // Send interrupt when DMA closes the descriptor
+
+        // Flush to main memory
+        SCB_CleanDCache_by_Addr(&currRxDesc, sizeof(ETH_DMADescTypeDef));
+
+        // Move to next descriptor
+        --rxDescsOwnedByApplication;
+        rxBuildIndex = (rxBuildIndex + 1) % rxPoolSize;
+    }
+}
+
+
+STM32EthIPv2DMARings::STM32EthIPv2DMARings(rtos::Thread &rxThread, EMACMemoryManager &memory_manager, ETH_HandleTypeDef & heth):
+rxThread(rxThread),
+memory_manager(memory_manager),
+heth(heth),
+rxPoolSize(memory_manager.get_pool_size() - RX_POOL_EXTRA_BUFFERS),
+rxPoolPayloadSize(memory_manager.get_pool_alloc_unit(RX_BUFFER_ALIGN))
+{
+    // Make sure we have enough space in the pool for RX_POOL_EXTRA_BUFFERS
+    MBED_ASSERT(memory_manager.get_pool_size() > RX_POOL_EXTRA_BUFFERS);
+
+    // Allocate memory for Rx descriptors
+    rxDescs = new StaticCacheAlignedBuffer<ETH_DMADescTypeDef, 1>[rxPoolSize];
+    rxDescBuffers = new net_stack_mem_buf_t*[rxPoolSize];
+}
+
+STM32EthIPv2DMARings::~STM32EthIPv2DMARings()
+{
+    delete[] rxDescs;
+    delete[] rxDescBuffers;
+}
+
+
+HAL_StatusTypeDef STM32EthIPv2DMARings::startDMA()
+{
+    if (heth.gState == HAL_ETH_STATE_READY)
+    {
+        heth.gState = HAL_ETH_STATE_BUSY;
+
+        // At the start, we own all the descriptors
+        rxDescsOwnedByApplication = rxPoolSize;
+        txDescsOwnedByApplication = MBED_CONF_STM32_EMAC_ETH_TXBUFNB;
+
+        // Build all descriptors
+        buildRxDescriptors();
+
+        // Flush Tx queue
+        heth.Instance->MTLTQOMR |= ETH_MTLTQOMR_FTQ;
+
+        // Configure spacing between descriptors.  This will be different depending on
+        // cache line sizes.
+        const size_t rxSpacing = rxDescs[1].data() - rxDescs[0].data();
+        const size_t txSpacing = txDescs[1].data() - txDescs[0].data();
+        MBED_ASSERT(rxSpacing == txSpacing);
+        MBED_ASSERT(rxSpacing % sizeof(uint32_t) == 0);
+
+        // The spacing bitfield is configured as the number of 32-bit words to skip between descriptors.
+        // The descriptors have a default size of 16 bytes.
+        const size_t wordsToSkip = (rxSpacing - 16) / sizeof(uint32_t);
+        MBED_ASSERT(wordsToSkip <= 7);
+        heth.Instance->DMACCR &= ~ETH_DMACCR_DSL_Msk;
+        heth.Instance->DMACCR |= wordsToSkip << ETH_DMACCR_DSL_Pos;
+
+        // Configure Rx descriptor ring
+        heth.Instance->DMACRDRLR = rxPoolSize; // Ring size
+        heth.Instance->DMACRDLAR = reinterpret_cast<uint32_t>(rxDescs[0].data()); // Head pointer
+        heth.Instance->DMACRDTPR = reinterpret_cast<uint32_t>(rxDescs[0].data()); // Next descriptor (tail) pointer
+
+        // Configure Tx descriptor ring
+        heth.Instance->DMACTDRLR = MBED_CONF_STM32_EMAC_ETH_TXBUFNB - 1; // Ring size
+        heth.Instance->DMACTDLAR = reinterpret_cast<uint32_t>(txDescs[0].data()); // Head pointer
+        heth.Instance->DMACTDTPR = reinterpret_cast<uint32_t>(txDescs[0].data()); // Next descriptor (tail) pointer
+
+        // Enable Rx and Tx DMA.  NOTE: Typo in C++ headers, these should be called
+        // "DMACTXCR" and "DMACRXCR"
+        heth.Instance->DMACTCR |= ETH_DMACTCR_ST;
+        heth.Instance->DMACRCR |= ETH_DMACRCR_SR;
+
+        // Clear Tx and Rx process stopped flags
+        heth.Instance->DMACSR = (ETH_DMACSR_TPS | ETH_DMACSR_RPS);
+
+        heth.gState = HAL_ETH_STATE_STARTED;
+
+        return HAL_OK;
+    }
+    else
+    {
+        return HAL_ERROR;
+    }
+}
+
+void STM32EthIPv2DMARings::txISR()
+{
+
+}
+
+
+// TODO monitor for Rx buffer exhaustion conditions.  This happens when we have too few
+// built Rx buffers and won't be able to receive another packet.  Example: if the size of
+// one buffer is 512 bytes, then we need at least 3 built buffers to be able to receive
+// the next packet if it's 1 MTU.
+// If we are in a potential buffer exhaustion situation, we need to poll at a reasonably
+// high rate (10ms) until the application has freed up at least some of the pool buffers.
+// NOTE: In LwIP, the failed allocation of a buffer from the pool will trigger a cleanup
+// of the TCP reassembly buffer, potentially freeing some memory in the near future.
+
+net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket()
+{
+    // Indices of the first and last descriptors for the packet will be saved here
+    size_t firstDescIdx = rxPoolSize;
+    size_t lastDescIdx = rxPoolSize;
+
+    // Prevent looping around into descriptors waiting for rebuild by limiting how many
+    // we can process.
+    const size_t maxDescsToProcess = rxPoolSize - rxDescsOwnedByApplication;
+
+    for(size_t descCount = 0; descCount < maxDescsToProcess; descCount++)
+    {
+        size_t descIdx = (rxNextIndex + descCount) % rxPoolSize;
+        auto & descriptor = rxDescs[rxNextIndex][0];
+
+#if __DCACHE_PRESENT
+        SCB_InvalidateDCache_by_Addr(&descriptor, sizeof(EthTxDescriptor));
+#endif
+
+        if(descriptor.DESC3 & ETH_DMARXNDESCWBF_OWN)
+        {
+            // Descriptor owned by DMA.  We are out of descriptors to process.
+            break;
+        }
+
+        if(descriptor.DESC3 & ETH_DMARXNDESCWBF_CTXT || descriptor.DESC3 & ETH_DMARXNDESCWBF_ES)
+        {
+            // Context or error descriptor.  Ignore, free associated memory, and schedule for rebuild.
+            memory_manager.free(rxDescBuffers[descIdx]);
+            ++rxDescsOwnedByApplication;
+
+            // We should only get one of these descriptors before the start of the packet, not
+            // during it.
+            MBED_ASSERT(firstDescIdx == rxPoolSize);
+        }
+        else if(descriptor.DESC3 & ETH_DMARXNDESCWBF_FD)
+        {
+            // We should see first descriptor only once and before last descriptor
+            MBED_ASSERT(firstDescIdx == rxPoolSize);
+            MBED_ASSERT(lastDescIdx == rxPoolSize);
+
+            firstDescIdx = descIdx;
+        }
+        else if(descriptor.DESC3 & ETH_DMARXNDESCWBF_LD)
+        {
+            // We should see last descriptor only once and after first descriptor
+            MBED_ASSERT(firstDescIdx != rxPoolSize);
+            MBED_ASSERT(lastDescIdx == rxPoolSize);
+
+            lastDescIdx = descIdx;
+        }
+    }
+
+    if(firstDescIdx == rxPoolSize || lastDescIdx == rxPoolSize)
+    {
+        // No complete packet identified.
+        // Take the chance to rebuild any available descriptors, then return.
+        buildRxDescriptors();
+        return nullptr;
+    }
+
+    // Link together the found packets and mark them as owned.
+    // Note that this also transfers ownership of subsequent buffers to the first buffer,
+    // so if the first buffer is deleted, the others will be as well.
+    net_stack_mem_buf_t * const headBuffer = rxDescBuffers[firstDescIdx];
+    ++rxDescsOwnedByApplication; // for first buffer
+    rxDescBuffers[firstDescIdx] = nullptr;
+    for(size_t descIdx = (firstDescIdx + 1) % rxPoolSize;
+        descIdx != (lastDescIdx + 1) % rxPoolSize;
+        descIdx = (descIdx + 1) % rxPoolSize)
+    {
+        memory_manager.cat(headBuffer, rxDescBuffers[descIdx]);
+        rxDescBuffers[descIdx] = nullptr;
+        ++rxDescsOwnedByApplication;
+    }
+
+    // Length is given in the last descriptor
+    memory_manager.set_len(headBuffer, rxDescs[lastDescIdx][0].DESC3 & ETH_DMARXNDESCWBF_PL);
+
+    // Rebuild descriptors if possible
+    buildRxDescriptors();
+
+    return headBuffer;
+}
+
+HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
+{
+    // NOTE: It would be tempting to im
+
+    // Step 1: Figure out if we can send this zero-copy, or if we need to copy it.
+    // Also note that each descriptor can store 2 buffers, so we need half as many descriptors
+    // as we have buffers, rounding up.
+    size_t neededDescs = (memory_manager.count_buffers(buf) + 1) / 2;
+    bool needToCopy = false;
+    if(neededDescs > MBED_CONF_STM32_EMAC_ETH_TXBUFNB)
+    {
+        // Packet uses too many buffers, we have to copy it into a continuous buffer.
+        needToCopy = true;
+    }
+
+    // On STM32H7, the Ethernet DMA cannot access data in DTCM.  So, if someone sends
+    // a packet with a data pointer in DTCM (e.g. a stack allocated payload), everything
+    // will break if we don't copy it first.
+#ifdef MBED_RAM_BANK_SRAM_DTC_START
+    if(!needToCopy)
+    {
+        net_stack_mem_buf_t * currBuf = buf;
+        while(currBuf != nullptr)
+        {
+            if(reinterpret_cast<ptrdiff_t>(memory_manager.get_ptr(currBuf)) >= MBED_RAM_BANK_SRAM_DTC_START &&
+                reinterpret_cast<ptrdiff_t>(memory_manager.get_ptr(currBuf)) <= MBED_RAM_BANK_SRAM_DTC_START + MBED_RAM_BANK_SRAM_DTC_SIZE)
+            {
+                needToCopy = true;
+            }
+            currBuf = memory_manager.get_next(buf);
+        }
+    }
+#endif
+
+    // Step 2: Copy packet if needed
+    if(needToCopy)
+    {
+        auto * newBuf = memory_manager.alloc_heap(memory_manager.get_total_len(buf), 0);
+        if(newBuf == nullptr)
+        {
+            // No free memory, drop packet
+            memory_manager.free(newBuf);
+            return HAL_ERROR;
+        }
+
+        // We should have gotten just one contiguous buffer
+        MBED_ASSERT(memory_manager.get_next(newBuf) == nullptr);
+        neededDescs = 1;
+
+        // Copy data over
+        memory_manager.copy_from_buf(memory_manager.get_ptr(newBuf), memory_manager.get_len(newBuf), buf);
+        memory_manager.free(buf);
+        buf = newBuf;
+    }
+
+    // Step 3: Wait for needed amount of buffers to be available.
+    // Note that, in my experience, it's better to block here, as dropping the packet
+    // due to having enough buffers can create weird effects when the application sends
+    // lots of packets at once.
+    while(txDescsOwnedByApplication < neededDescs)
+    {
+        eventFlags.wait_any_for(TX_BUF_AVAILABLE_EVENT, rtos::Kernel::wait_for_u32_forever);
+    }
+
+    // Step 4: Load buffer into descriptors and send
+    net_stack_mem_buf_t * currBuf = buf;
+    for(size_t descCount = 0; descCount < neededDescs; descCount++)
+    {
+        auto & currDesc = txDescs[txSendIndex][0];
+
+        // Set buffer 1
+        currDesc.buffer1 = currBuf;
+        currDesc.buffer1Addr = static_cast<uint8_t *>(memory_manager.get_ptr(currBuf));
+        currDesc.buffer1Len = memory_manager.get_len(currBuf);
+
+        // Set buffer 2
+        currBuf = memory_manager.get_next(currBuf);
+        if(currBuf != nullptr)
+        {
+            currDesc.buffer2 = currBuf;
+            currDesc.buffer2Addr = memory_manager.get_ptr(currBuf);
+            currDesc.buffer2Len = memory_manager.get_len(currBuf);
+        }
+        else
+        {
+            currDesc.buffer2 = nullptr;
+            currDesc.buffer2Addr = nullptr;
+            currDesc.buffer2Len = 0;
+        }
+
+        // Move to next buffer
+        currBuf = memory_manager.get_next(currBuf);
+
+        // Enter a critical section, because we could run into weird corner cases if the
+        // interrupt executes while we are half done configuring this descriptor and updating
+        // the counters.
+        core_util_critical_section_enter();
+
+        // Configure settings.  Note that we have to configure these every time as
+        // they get wiped away when the DMA gives back the descriptor
+        currDesc._reserved = 0;
+        currDesc.checksumInsertionCtrl = 0; // Mbed does not do checksum offload for now
+        currDesc.tcpSegmentationEnable = 0; // No TCP offload
+        currDesc.tcpUDPHeaderLen = 0; // No TCP offload
+        currDesc.srcMACInsertionCtrl = 0; // No MAC insertion
+        currDesc.crcPadCtrl = 0; // Insert CRC and padding
+        currDesc.lastDescriptor = currBuf == nullptr;
+        currDesc.firstDescriptor = descCount == 0;
+        currDesc.isContext = false;
+        currDesc.vlanTagCtrl = 0; // No VLAN tag
+        currDesc.intrOnCompletion = true;
+        currDesc.timestampEnable = false;
+        currDesc.dmaOwn = true;
+
+#if __DCACHE_PRESENT
+        // Write descriptor back to main memory
+        SCB_CleanDCache_by_Addr(&currDesc, sizeof(EthTxDescriptor));
+#endif
+
+        // Update descriptor count and index
+        txDescsOwnedByApplication--;
+        txSendIndex = (txSendIndex + 1) % MBED_CONF_STM32_EMAC_ETH_TXBUFNB;
+
+        core_util_critical_section_exit();
+
+        // Move tail pointer register to point to the descriptor after this descriptor.
+        // This tells the MAC to transmit until it reaches the given descriptor, then stop.
+        heth.Instance->DMACTDTPR = reinterpret_cast<uint32_t>(txDescs[txSendIndex].data());
+    }
+
+    return HAL_OK;
+}
+
+}

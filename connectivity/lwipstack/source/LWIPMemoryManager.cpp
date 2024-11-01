@@ -49,6 +49,11 @@ uint32_t LWIPMemoryManager::get_pool_alloc_unit(uint32_t align) const
     return alloc_unit;
 }
 
+uint32_t LWIPMemoryManager::get_pool_size() const
+{
+    return 0;
+}
+
 void LWIPMemoryManager::free(net_stack_mem_buf_t *buf)
 {
     pbuf_free(static_cast<struct pbuf *>(buf));

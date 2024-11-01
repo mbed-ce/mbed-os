@@ -20,6 +20,9 @@
 
 #include "EMAC.h"
 #include "rtos/Mutex.h"
+#include "rtos/Thread.h"
+
+#include "STM32EthIPv2DMARings.h"
 
 class STM32_EMAC : public EMAC {
 public:
@@ -150,13 +153,13 @@ public:
 
     // Called from driver functions
     ETH_HandleTypeDef EthHandle;
-    osThreadId_t thread; /**< Processing thread */
+    rtos::Thread thread;
 
 private:
     bool low_level_init_successful();
     void packet_rx();
     int low_level_input(emac_mem_buf_t **buf);
-    static void thread_function(void *pvParameters);
+    void thread_function();
     static void rmii_watchdog_thread_function(void *pvParameters);
     void phy_task();
     void enable_interrupts();

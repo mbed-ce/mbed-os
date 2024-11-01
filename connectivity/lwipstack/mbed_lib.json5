@@ -230,6 +230,13 @@
         },
         "MTS_DRAGONFLY_F411RE": {
             "tcpip-thread-stacksize": 1600
+        },
+        "STM32H7": {
+            // On STM32H7, we use a large pool of relatively small Rx buffers.
+            // This allows memory to be used more optimally for the case of lots of small
+            // Rx packets.
+            "pbuf-pool-size": 16,
+            "pbuf-pool-bufsize": 256
         }
     }
 }
