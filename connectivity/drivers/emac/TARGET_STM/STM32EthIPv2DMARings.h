@@ -19,6 +19,7 @@
 #define MBED_OS_STM32ETHIPV2DMARINGS_H
 
 #include "EMACMemoryManager.h"
+#include "EMAC.h"
 #include "CacheAlignedBuffer.h"
 
 #include "stm32xx_emac_config.h"
@@ -75,12 +76,16 @@ struct __attribute__((packed)) alignas(uint32_t) EthTxDescriptor
  */
 class STM32EthIPv2DMARings
 {
-    rtos::Thread & rxThread; ///< Thread to signal when a packet is received
     EMACMemoryManager & memory_manager; /**< Memory manager */
     ETH_HandleTypeDef & heth; ///< Handle to Ethernet peripheral
 
+    EMAC::emac_link_input_cb_t emac_link_input_cb; /**< Callback for incoming packets */
+
     // Event flags used to signal application threads from ISRs
     rtos::EventFlags eventFlags;
+
+    // Thread which runs the receive loop
+    rtos::Thread rxThread;
 
     const size_t rxPoolSize; ///< Number of entries in the Rx buffer pool
 
@@ -88,9 +93,10 @@ class STM32EthIPv2DMARings
     // NOTE: when working with these indices, it's important to consider the case where e.g. the send and reclaim indexes are
     // equal.  This could mean *either* that the Tx ring is completely full of data, or that the Tx ring is empty.
     // To resolve this ambiguity, we maintain separate count variables that track how many entries are in the ring at present.
-    size_t rxBuildIndex; ///< Index of the next Rx descriptor that needs to be built.  Updated by application only.
+    size_t rxBuildIndex; ///< Index of the next Rx descriptor that needs to be built.  Updated by application and used by ISR.
     size_t rxDescsOwnedByApplication; ///< Number of Rx descriptors owned by the application and needing buffers allocated.
-    size_t rxNextIndex; ///< Index of the next frame that the DMA shall populate.
+    mstd::atomic<size_t> rxNextIndex; ///< Index of the next frame that the DMA shall populate.  Updated by application but used by ISR.
+
     size_t txSendIndex; ///< Index of the next Tx descriptor that can be filled with data
     mstd::atomic<size_t> txDescsOwnedByApplication; ///< Number of Tx descriptors owned by the application.  Incremented by the ISR and decremented by the application.
     size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the ISR.
@@ -111,6 +117,13 @@ class STM32EthIPv2DMARings
     // The first descriptor returned will be the one at RxBuildDescIdx
     void buildRxDescriptors();
 
+    /// Receive the next packet.  Call from the Rx thread when signal is delivered.
+    /// Returns nullptr if nothing was received.
+    net_stack_mem_buf_t * rxNextPacket();
+
+    /// Receive main loop
+    void rxLoop();
+
 public:
     // Alignment required for Rx memory buffers.  Normally they don't need alignment but
     // if we are doing cache operations they need to be cache aligned.
@@ -129,7 +142,7 @@ public:
     /// of the pool minus any overhead needed for alignment.
     const size_t rxPoolPayloadSize;
 
-    STM32EthIPv2DMARings(rtos::Thread & rxThread, EMACMemoryManager & memory_manager, ETH_HandleTypeDef & heth);
+    STM32EthIPv2DMARings(EMACMemoryManager & memory_manager, ETH_HandleTypeDef & heth);
 
     ~STM32EthIPv2DMARings();
 
@@ -145,15 +158,22 @@ public:
     /// Call when EMAC generates transmit interrupt
     void txISR();
 
-    /// Receive the next packet.  Call from the Rx thread when signal is delivered.
-    /// Returns nullptr if nothing was received.
-    net_stack_mem_buf_t * rxNextPacket();
-
     /// Transmit a packet out of the Tx DMA ring.  Note that this function
     /// *takes ownership of* the passed packet and will free it either now or after
     /// it's been transmitted.
     /// Will block until there is space to transmit the packet.
     HAL_StatusTypeDef txPacket(net_stack_mem_buf_t * buf);
+
+    /**
+     * Sets a callback that needs to be called for packets received for that interface
+     *
+     * @param input_cb Function to be register as a callback
+     */
+    void set_link_input_cb(EMAC::emac_link_input_cb_t input_cb)
+    {
+        emac_link_input_cb = input_cb;
+    }
+
 };
 
 }

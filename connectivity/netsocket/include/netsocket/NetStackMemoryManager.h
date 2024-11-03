@@ -210,6 +210,21 @@ public:
      */
     virtual void set_len(net_stack_mem_buf_t *buf, uint32_t len) = 0;
 
+    enum class Lifetime
+    {
+        POOL_ALLOCATED, ///< Allocated from the memory manager's pool
+        HEAP_ALLOCATED, ///< Allocated from the memory manager's heap
+        CONSTANT, ///< Buffer points to constant data that will live forever
+        VOLATILE ///< Buffer points to data from the application that will not live past the current network stack call.
+    };
+
+    /**
+     * Gets the lifetime of the buffer
+     *
+     * @param buf      Memory buffer
+     */
+    virtual Lifetime get_lifetime(net_stack_mem_buf_t const * buf) const = 0;
+
 protected:
     ~NetStackMemoryManager() = default;
 };

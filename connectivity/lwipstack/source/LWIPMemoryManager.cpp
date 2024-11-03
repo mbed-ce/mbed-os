@@ -110,6 +110,30 @@ void LWIPMemoryManager::set_len(net_stack_mem_buf_t *buf, uint32_t len)
     set_total_len(pbuf);
 }
 
+NetStackMemoryManager::Lifetime LWIPMemoryManager::get_lifetime(const net_stack_mem_buf_t *buf) const
+{
+    auto const * p = static_cast<const struct pbuf *>(buf);
+
+    uint8_t allocSrc = pbuf_get_allocsrc(p);
+
+    if(allocSrc == PBUF_TYPE_ALLOC_SRC_MASK_STD_MEMP_PBUF && PBUF_NEEDS_COPY(p))
+    {
+        return Lifetime::VOLATILE;
+    }
+    else if(allocSrc == PBUF_TYPE_ALLOC_SRC_MASK_STD_MEMP_PBUF)
+    {
+        return Lifetime::CONSTANT;
+    }
+    else if(allocSrc == PBUF_TYPE_ALLOC_SRC_MASK_STD_MEMP_PBUF_POOL)
+    {
+        return Lifetime::POOL_ALLOCATED;
+    }
+    else
+    {
+        return Lifetime::HEAP_ALLOCATED;
+    }
+}
+
 uint32_t LWIPMemoryManager::count_total_align(uint32_t size, uint32_t align)
 {
     uint32_t buffers = size / get_pool_alloc_unit(align);

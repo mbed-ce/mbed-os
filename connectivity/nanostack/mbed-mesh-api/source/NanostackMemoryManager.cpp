@@ -141,3 +141,10 @@ void NanostackMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
 
     mem->len = len;
 }
+
+NetStackMemoryManager::Lifetime NanostackMemoryManager::get_lifetime(const net_stack_mem_buf_t *buf) const
+{
+    // For Nanostack, all buffers are heap allocated and can be kept around as long as
+    // is needed by the EMAC driver.
+    return Lifetime::HEAP_ALLOCATED;
+}

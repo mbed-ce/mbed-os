@@ -77,12 +77,6 @@ using namespace std::chrono;
 #define STM_ETH_MTU_SIZE        1500
 #define STM_ETH_IF_NAME         "st"
 
-#define ETH_RX_DESC_CNT MBED_CONF_STM32_EMAC_ETH_RXBUFNB
-#define ETH_TX_DESC_CNT MBED_CONF_STM32_EMAC_ETH_TXBUFNB
-
-ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".EthDescriptors"))); /* Ethernet Rx DMA Descriptors */
-ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".EthDescriptors")));  /* Ethernet Tx DMA Descriptors */
-
 // Tx buffers just need to be aligned to the nearest 4 bytes.
 uint32_t Tx_Buff[ETH_TX_DESC_CNT][ETH_MAX_PACKET_SIZE / sizeof(uint32_t)] __attribute__((section(".EthBuffers")));
 
@@ -181,44 +175,6 @@ bool _phy_is_up(int32_t phy_state)
     return phy_state > LAN8742_STATUS_LINK_DOWN;
 }
 
-// Integer log2 of an integer.
-// from https://stackoverflow.com/questions/994593/how-to-do-an-integer-log2-in-c
-static inline uint32_t log2i(uint32_t x) {
-    return sizeof(uint32_t) * 8 - __builtin_clz(x) - 1;
-}
-
-static void MPU_Config(void)
-{
-    MPU_Region_InitTypeDef MPU_InitStruct;
-
-    /* Disable the MPU */
-    HAL_MPU_Disable();
-
-    /* Configure the MPU attributes as Device not cacheable
-       for ETH DMA descriptors.  The linker script puts these into their own
-       cordoned off, power-of-2 sized region. */
-    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
-    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-    MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
-    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
-    MPU_InitStruct.Number = 4; // Mbed OS MPU config can use regions 0 through 3
-    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-    MPU_InitStruct.SubRegionDisable = 0x00;
-    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-
-    extern uint8_t __eth_descriptors_start[0]; // <-- defined in linker script
-    MPU_InitStruct.BaseAddress = reinterpret_cast<uint32_t>(__eth_descriptors_start);
-
-    // Use a logarithm to calculate the region size
-    MPU_InitStruct.Size = log2i(STM32_DMA_DESCRIP_REGION_SIZE) - 1;
-
-    HAL_MPU_ConfigRegion(&MPU_InitStruct);
-
-    /* Enable the MPU */
-    HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
-}
-
 #endif
 
 /**
@@ -233,13 +189,8 @@ void ETH_IRQHandler(void)
 }
 
 STM32_EMAC::STM32_EMAC():
-#if MBED_CONF_MBED_TRACE_ENABLE
-thread(THREAD_PRIORITY, MBED_CONF_STM32_EMAC_THREAD_STACKSIZE*2, nullptr, "stm32_emac_thread")
-#else
-thread(THREAD_PRIORITY, MBED_CONF_STM32_EMAC_THREAD_STACKSIZE, nullptr, "stm32_emac_thread")
-#endif
 #ifdef ETH_IP_VERSION_V2
-, phy_status(0)
+phy_status(0)
 #endif
 {
 }
@@ -339,8 +290,6 @@ bool STM32_EMAC::low_level_init_successful()
     // Generate a reference to this empty function so the linker pulls it in.
     stm32_eth_init_weak_symbol_helper();
 
-    MPU_Config();
-
     /* Init ETH */
     uint8_t MACAddr[6];
     EthHandle.Instance = ETH;
@@ -361,7 +310,6 @@ bool STM32_EMAC::low_level_init_successful()
     EthHandle.Init.RxBuffLen = memory_manager->get_pool_alloc_unit(mbed::STM32EthIPv2DMARings::RX_BUFFER_ALIGN);
 
     tr_debug("MAC Addr %02x:%02x:%02x:%02x:%02x:%02x", MACAddr[0], MACAddr[1], MACAddr[2], MACAddr[3], MACAddr[4], MACAddr[5]);
-    tr_info("ETH buffers : %u Rx %u Tx", ETH_RX_DESC_CNT, ETH_TX_DESC_CNT);
 
     if (HAL_ETH_Init(&EthHandle) != HAL_OK) {
         return false;
@@ -688,23 +636,6 @@ void STM32_EMAC::packet_rx()
             emac_link_input_cb(p);
         }
         RXLockMutex.unlock();
-    }
-}
-
-/** \brief  Worker thread.
- *
- * Woken by thread flags to receive packets or clean up transmit
- *
- *  \param[in] pvParameters pointer to the interface data
- */
-void STM32_EMAC::thread_function()
-{
-    for (;;) {
-        uint32_t flags = osThreadFlagsWait(FLAG_RX, osFlagsWaitAny, osWaitForever);
-
-        if (flags & FLAG_RX) {
-            packet_rx();
-        }
     }
 }
 

@@ -137,6 +137,8 @@ public:
      * @param len      Payload size, must be less or equal allocated size
      */
     void set_len(emac_mem_buf_t *buf, uint32_t len) override;
+
+    Lifetime get_lifetime(const net_stack_mem_buf_t *buf) const override;
 };
 
 #endif /* NANOSTACK_MEMORY_MANAGER_H */

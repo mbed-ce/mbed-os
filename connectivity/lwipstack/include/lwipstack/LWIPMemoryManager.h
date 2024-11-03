@@ -164,6 +164,8 @@ public:
      */
     void set_len(net_stack_mem_buf_t *buf, uint32_t len) override;
 
+    Lifetime get_lifetime(const net_stack_mem_buf_t *buf) const override;
+
 private:
 
     /**
