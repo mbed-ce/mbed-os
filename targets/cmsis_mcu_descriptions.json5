@@ -8472,6 +8472,268 @@
         "sub_family": "STM32H743",
         "vendor": "STMicroelectronics:13"
     },
+    "STM32H743XIHx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 2097152,
+                "start": 134217728,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H7B3I_EVAL_FMC-NOR.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 1610612736,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H747I-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MTFC4GACAJCN_STM32H750B-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 536870912,
+                "start": 2684354560,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H7xx_MT25TL01G.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H750B-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H745I-DISCO.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H743I-eval_FMC.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 16777216,
+                "start": 1610612736,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B3I-EVAL.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B3I-Disco.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B0-EVAL.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H7B0-Disco.FLM",
+                "ram_size": 655360,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MX25LM51245G_STM32H735-Disco.FLM",
+                "ram_size": 65524,
+                "ram_start": 603979776,
+                "size": 67108864,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/MT25TL01G_STM32H747I-EVAL.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            },
+            {
+                "default": false,
+                "file_name": "CMSIS/Flash/STM32H7xx_MT25TL01G_DUAL.FLM",
+                "ram_size": 65524,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 2415919104,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32H7 Series",
+        "from_pack": {
+            "pack": "STM32H7xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "4.0.0"
+        },
+        "memories": {
+            "SRAM_DTC": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "p_name": null,
+                "size": 131072,
+                "start": 536870912,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 1048576,
+                "start": 134217728,
+                "startup": true
+            },
+            "IROM2": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 1048576,
+                "start": 135266304,
+                "startup": true
+            },
+            "SRAM_D1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 524288,
+                "start": 603979776,
+                "startup": false
+            },
+            "SRAM_D2": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 294912,
+                "start": 805306368,
+                "startup": false
+            },
+            "SRAM_D3": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 65536,
+                "start": 939524096,
+                "startup": false
+            }
+        },
+        "name": "STM32H743XIHx",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM7",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "DoublePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32H743.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32H743",
+        "vendor": "STMicroelectronics:13"
+    },
     "STM32H745ZITx": {
         "algorithms": [
             {
