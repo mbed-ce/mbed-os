@@ -35,11 +35,9 @@
 namespace mbed
 {
 
-/// Structure representing one Tx descriptor.
-/// Only the first 4 words are processed by the hardware; we are free to add our own
-/// stuff in after that.
-/// Note that per the datasheet, Tx descriptors must be word aligned.
-struct __attribute__((packed)) alignas(uint32_t) EthTxDescriptor
+// Descriptor format written by the application to queue a packet for transmission.
+// Note: Datasheet calls this the "read format" which is just nuts...
+struct __attribute__((packed)) EthTxDescriptorTxFmt
 {
     void const * buffer1Addr;
     void const * buffer2Addr;
@@ -60,6 +58,47 @@ struct __attribute__((packed)) alignas(uint32_t) EthTxDescriptor
     bool firstDescriptor: 1;
     bool isContext : 1;
     bool dmaOwn : 1;
+};
+
+// Write-back descriptor (DMA updates the desc with this format when complete)
+struct __attribute__((packed)) EthTxDescriptorWBFmt
+{
+    uint32_t timestampLow;
+    uint32_t timestampHigh;
+    uint32_t _reserved;
+    // TDES3 fields
+    bool ipHeaderError : 1;
+    bool deferred : 1;
+    bool underflowError : 1;
+    bool excessiveDeferral : 1;
+    uint8_t collisionCount : 4;
+    bool excessiveCollisions : 1;
+    bool lateCollision : 1;
+    bool noCarrier : 1;
+    bool lossOfCarrier : 1;
+    bool payloadChecksumError : 1;
+    bool packetFlushed : 1;
+    bool jabberTimeout : 1;
+    bool errorSummary: 1;
+    uint8_t _reserved0: 1;
+    bool txTimestampCaptured : 1;
+    uint16_t _reserved1 : 10;
+    bool lastDescriptor: 1;
+    bool firstDescriptor : 1;
+    bool context : 1;
+    bool dmaOwn : 1;
+};
+
+/// Structure representing one Tx descriptor.
+/// Only the first 4 words are processed by the hardware; we are free to add our own
+/// stuff in after that.
+/// Note that per the datasheet, Tx descriptors must be word aligned.
+struct __attribute__((packed)) alignas(uint32_t) EthTxDescriptor
+{
+    union {
+        EthTxDescriptorTxFmt txDesc;
+        EthTxDescriptorWBFmt wbDesc;
+    };
 
     // Memory buffers filled in to this descriptor.
     // These must be freed when the descriptor is done transmitting.

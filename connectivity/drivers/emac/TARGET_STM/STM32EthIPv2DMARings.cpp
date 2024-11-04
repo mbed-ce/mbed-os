@@ -24,6 +24,7 @@ namespace mbed
 // Thread/evet flag constants
 static uint32_t TX_BUF_AVAILABLE_FLAG = 1;
 static uint32_t RX_DESC_AVAILABLE_FLAG = 2;
+static uint32_t RX_THREAD_SHUTDOWN_FLAG = 4;
 
 void STM32EthIPv2DMARings::buildRxDescriptors()
 {
@@ -177,7 +178,11 @@ void STM32EthIPv2DMARings::rxLoop()
         }
 
         // Wait until the next packet is received
-        rtos::ThisThread::flags_wait_any(RX_DESC_AVAILABLE_FLAG);
+        uint32_t flags = rtos::ThisThread::flags_wait_any(RX_DESC_AVAILABLE_FLAG | RX_THREAD_SHUTDOWN_FLAG);
+        if(flags & RX_THREAD_SHUTDOWN_FLAG)
+        {
+            return;
+        }
     }
 }
 
@@ -199,6 +204,12 @@ rxPoolPayloadSize(memory_manager.get_pool_alloc_unit(RX_BUFFER_ALIGN))
 
 STM32EthIPv2DMARings::~STM32EthIPv2DMARings()
 {
+    if(rxThread.get_state() != rtos::Thread::Deleted)
+    {
+        rxThread.flags_set(RX_THREAD_SHUTDOWN_FLAG);
+        rxThread.join();
+    }
+    
     delete[] rxDescs;
     delete[] rxDescBuffers;
 }
@@ -282,7 +293,7 @@ void STM32EthIPv2DMARings::rxISR()
         auto &descriptor = rxDescs[rxNextIndex][0];
 
 #if __DCACHE_PRESENT
-        SCB_InvalidateDCache_by_Addr(&descriptor, sizeof(EthTxDescriptor));
+        SCB_InvalidateDCache_by_Addr(&descriptor, sizeof(ETH_DMADescTypeDef));
 #endif
 
         if (descriptor.DESC3 & ETH_DMARXNDESCWBF_OWN)
@@ -306,6 +317,47 @@ void STM32EthIPv2DMARings::rxISR()
 
 void STM32EthIPv2DMARings::txISR()
 {
+    bool returnedAnyBuffers = false;
+
+    while(true)
+    {
+        if(txReclaimIndex == txSendIndex && txDescsOwnedByApplication > 0)
+        {
+            // If we have reached the Tx send index, we want to stop iterating as this is
+            // the next descriptor that has not been populated by the application yet.
+            // The only exception is if the Tx ring is completely full, in which case we want
+            // to process the entire ring.  In the case where the Tx ring is full,
+            // txDescsOwnedByApplication will be 0.
+            // Note that txSendIndex and txDescsOwnedByApplication are updated in a critical
+            // section so their values will always be in sync with each other.
+            break;
+        }
+
+        auto &currDesc = txDescs[txReclaimIndex][0];
+
+#if __DCACHE_PRESENT
+        SCB_InvalidateDCache_by_Addr(&currDesc, sizeof(EthTxDescriptor));
+#endif
+
+        if(currDesc.wbDesc.dmaOwn)
+        {
+            // This desc is owned by the DMA, so we have reached the part of the ring buffer
+            // that is still being transmitted.
+            // Done for now!
+            break;
+        }
+
+        // Free any buffers associated with the descriptor
+        if(currDesc.buffer1 != nullptr)
+        {
+            memory_manager.free(currDesc.buffer1);
+        }
+    }
+
+    if(returnedAnyBuffers)
+    {
+        eventFlags.set(TX_BUF_AVAILABLE_FLAG);
+    }
 
 }
 
@@ -387,22 +439,22 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
 
         // Set buffer 1
         currDesc.buffer1 = currBuf;
-        currDesc.buffer1Addr = static_cast<uint8_t *>(memory_manager.get_ptr(currBuf));
-        currDesc.buffer1Len = memory_manager.get_len(currBuf);
+        currDesc.txDesc.buffer1Addr = static_cast<uint8_t *>(memory_manager.get_ptr(currBuf));
+        currDesc.txDesc.buffer1Len = memory_manager.get_len(currBuf);
 
         // Set buffer 2
         currBuf = memory_manager.get_next(currBuf);
         if(currBuf != nullptr)
         {
             currDesc.buffer2 = currBuf;
-            currDesc.buffer2Addr = memory_manager.get_ptr(currBuf);
-            currDesc.buffer2Len = memory_manager.get_len(currBuf);
+            currDesc.txDesc.buffer2Addr = memory_manager.get_ptr(currBuf);
+            currDesc.txDesc.buffer2Len = memory_manager.get_len(currBuf);
         }
         else
         {
             currDesc.buffer2 = nullptr;
-            currDesc.buffer2Addr = nullptr;
-            currDesc.buffer2Len = 0;
+            currDesc.txDesc.buffer2Addr = nullptr;
+            currDesc.txDesc.buffer2Len = 0;
         }
 
         // Move to next buffer
@@ -415,19 +467,19 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
 
         // Configure settings.  Note that we have to configure these every time as
         // they get wiped away when the DMA gives back the descriptor
-        currDesc._reserved = 0;
-        currDesc.checksumInsertionCtrl = 0; // Mbed does not do checksum offload for now
-        currDesc.tcpSegmentationEnable = 0; // No TCP offload
-        currDesc.tcpUDPHeaderLen = 0; // No TCP offload
-        currDesc.srcMACInsertionCtrl = 0; // No MAC insertion
-        currDesc.crcPadCtrl = 0; // Insert CRC and padding
-        currDesc.lastDescriptor = currBuf == nullptr;
-        currDesc.firstDescriptor = descCount == 0;
-        currDesc.isContext = false;
-        currDesc.vlanTagCtrl = 0; // No VLAN tag
-        currDesc.intrOnCompletion = true;
-        currDesc.timestampEnable = false;
-        currDesc.dmaOwn = true;
+        currDesc.txDesc._reserved = 0;
+        currDesc.txDesc.checksumInsertionCtrl = 0; // Mbed does not do checksum offload for now
+        currDesc.txDesc.tcpSegmentationEnable = 0; // No TCP offload
+        currDesc.txDesc.tcpUDPHeaderLen = 0; // No TCP offload
+        currDesc.txDesc.srcMACInsertionCtrl = 0; // No MAC insertion
+        currDesc.txDesc.crcPadCtrl = 0; // Insert CRC and padding
+        currDesc.txDesc.lastDescriptor = currBuf == nullptr;
+        currDesc.txDesc.firstDescriptor = descCount == 0;
+        currDesc.txDesc.isContext = false;
+        currDesc.txDesc.vlanTagCtrl = 0; // No VLAN tag
+        currDesc.txDesc.intrOnCompletion = true;
+        currDesc.txDesc.timestampEnable = false;
+        currDesc.txDesc.dmaOwn = true;
 
 #if __DCACHE_PRESENT
         // Write descriptor back to main memory
