@@ -8697,6 +8697,36 @@
                 "size": 65536,
                 "start": 939524096,
                 "startup": false
+            },
+            "SRAM_ITC": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x10000,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x1000,
+                "start": 0x38800000,
+                "startup": false
             }
         },
         "name": "STM32H743XIHx",
