@@ -8650,22 +8650,6 @@
                 "start": 134217728,
                 "startup": true
             },
-            "IROM2": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": false
-                },
-                "default": true,
-                "p_name": null,
-                "size": 1048576,
-                "start": 135266304,
-                "startup": true
-            },
             "SRAM_D1": {
                 "access": {
                     "execute": true,
@@ -8730,6 +8714,32 @@
                 "svd": "CMSIS/SVD/STM32H743.svd",
                 "unit": 0
             }
+        ],
+        "sectors": [
+            [
+                134217728,
+                131072
+            ],
+            [
+                1610612736,
+                131072
+            ],
+            [
+                2415919104,
+                65536
+            ],
+            [
+                2415919104,
+                65536
+            ],
+            [
+                2415919104,
+                131072
+            ],
+            [
+                2415919104,
+                131072
+            ]
         ],
         "sub_family": "STM32H743",
         "vendor": "STMicroelectronics:13"
