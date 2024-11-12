@@ -21,3 +21,5 @@ target_sources(mbed-emac
         stm32xx_emac.cpp
         STM32EthIPv2DMARings.cpp
 )
+
+target_compile_options(mbed-emac PRIVATE -Wno-packed-bitfield-compat)

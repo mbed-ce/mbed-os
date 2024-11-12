@@ -123,6 +123,7 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_heap(uint32_t size, uint32_t align,
     buf->orig_len = size;
     buf->len = size;
     buf->first = true;
+    buf->lifetime = Lifetime::HEAP_ALLOCATED;
 
     if (opt & MEM_NO_ALIGN) {
         if (reinterpret_cast<uint32_t>(buf->ptr) % sizeof(uint16_t) == 0) {
@@ -169,9 +170,22 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_pool(uint32_t size, uint32_t align,
         return NULL;
     }
 
+    // Lock memory mutex
+    rtos::ScopedMutexLock lock(m_mem_mutex);
+
     // Contiguous allocation
     if (size + align <= m_alloc_unit) {
-        return alloc_heap(size, align, opt);
+        if(m_pool_bufs_used > m_pool_size)
+        {
+            return nullptr;
+        }
+
+        auto * buf = alloc_heap(size, align, opt);
+
+        static_cast<emac_memory_t *>(buf)->lifetime = Lifetime::POOL_ALLOCATED;
+        ++m_pool_bufs_used;
+
+        return buf;
     }
 
     unsigned int pool_buffer_max_size = m_alloc_unit - align;
@@ -195,7 +209,20 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_pool(uint32_t size, uint32_t align,
             size_left = 0;
         }
 
+        if(m_pool_bufs_used > m_pool_size)
+        {
+            // No simulated pool space left, free and return nullptr
+            if(first_buf != nullptr)
+            {
+                free(first_buf);
+            }
+            return nullptr;
+        }
+
         emac_memory_t *new_buf = static_cast<emac_memory_t *>(alloc_heap(alloc_size, align, opt));
+
+        static_cast<emac_memory_t *>(new_buf)->lifetime = Lifetime::POOL_ALLOCATED;
+        ++m_pool_bufs_used;
 
         if (prev_buf) {
             new_buf->first = false;
@@ -253,6 +280,12 @@ void EmacTestMemoryManager::free(emac_mem_buf_t *buf)
         char *buffer_tail = static_cast<char *>(mem_buf->ptr) + mem_buf->orig_len;
         if (memcmp(buffer_tail, BUF_TAIL, BUF_TAIL_SIZE) != 0) {
             CHECK_ASSERT(0, "free(): %p tail overwrite", mem_buf);
+        }
+
+        // Update pool size
+        if(mem_buf->lifetime == Lifetime::POOL_ALLOCATED)
+        {
+            --m_pool_bufs_used;
         }
 
         emac_memory_t *next = mem_buf->next;
@@ -437,11 +470,24 @@ void EmacTestMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
     mem_buf->len = len;
 }
 
+uint32_t EmacTestMemoryManager::get_pool_size() const {
+    return m_pool_size;
+}
+
+NetStackMemoryManager::Lifetime EmacTestMemoryManager::get_lifetime(const net_stack_mem_buf_t *buf) const {
+    return static_cast<emac_memory_t const *>(buf)->lifetime;
+}
+
 void EmacTestMemoryManager::set_alloc_unit(uint32_t alloc_unit)
 {
     validate_list();
 
     m_alloc_unit = alloc_unit;
+}
+
+void EmacTestMemoryManager::set_pool_size(size_t size)
+{
+    m_pool_size = size;
 }
 
 void EmacTestMemoryManager::set_memory_available(bool memory)
@@ -541,5 +587,6 @@ EmacTestMemoryManager &EmacTestMemoryManager::get_instance()
     static EmacTestMemoryManager test_memory_manager;
     return test_memory_manager;
 }
+
 
 #endif // defined(MBED_CONF_RTOS_PRESENT)

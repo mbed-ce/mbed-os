@@ -275,7 +275,8 @@ public:
  *
  * Use a DynamicCacheAlignedBuffer when you want to create a cache-aligned buffer with a size
  * known only at runtime.  When constructed, %DynamicCacheAlignedBuffers allocate backing memory off the
- * heap for the provided number of elements.  The memory will be released when the buffer object is destroyed.
+ * heap for the provided number of elements, plus a little extra for alignment.  The memory will be deleted when
+ * the buffer object is destroyed.
  *
  * @tparam DataT Type of the data to store in the buffer.  Note: %CacheAlignedBuffer is not designed for
  *    using class types as DataT, and will not call constructors.

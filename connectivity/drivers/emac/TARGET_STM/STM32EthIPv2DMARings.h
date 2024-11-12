@@ -23,6 +23,7 @@
 #include "CacheAlignedBuffer.h"
 
 #include "stm32xx_emac_config.h"
+#include "STM32IPv2EthDescriptors.h"
 
 #include "rtos/Thread.h"
 #include "rtos/EventFlags.h"
@@ -35,76 +36,45 @@
 namespace mbed
 {
 
-// Descriptor format written by the application to queue a packet for transmission.
-// Note: Datasheet calls this the "read format" which is just nuts...
-struct __attribute__((packed)) EthTxDescriptorTxFmt
+struct WrappedEthTxDescriptor
 {
-    void const * buffer1Addr;
-    void const * buffer2Addr;
-    // TDES2 fields
-    uint16_t buffer1Len : 14;
-    uint8_t vlanTagCtrl : 2;
-    uint16_t buffer2Len : 14;
-    bool timestampEnable : 1;
-    bool intrOnCompletion : 1;
-    // TDES3 fields (not dealing with TCP offload for now)
-    uint16_t _reserved : 16;
-    uint8_t checksumInsertionCtrl : 2;
-    bool tcpSegmentationEnable : 1;
-    uint8_t tcpUDPHeaderLen : 4;
-    uint8_t srcMACInsertionCtrl : 3;
-    uint8_t crcPadCtrl : 2;
-    bool lastDescriptor : 1;
-    bool firstDescriptor: 1;
-    bool isContext : 1;
-    bool dmaOwn : 1;
-};
-
-// Write-back descriptor (DMA updates the desc with this format when complete)
-struct __attribute__((packed)) EthTxDescriptorWBFmt
-{
-    uint32_t timestampLow;
-    uint32_t timestampHigh;
-    uint32_t _reserved;
-    // TDES3 fields
-    bool ipHeaderError : 1;
-    bool deferred : 1;
-    bool underflowError : 1;
-    bool excessiveDeferral : 1;
-    uint8_t collisionCount : 4;
-    bool excessiveCollisions : 1;
-    bool lateCollision : 1;
-    bool noCarrier : 1;
-    bool lossOfCarrier : 1;
-    bool payloadChecksumError : 1;
-    bool packetFlushed : 1;
-    bool jabberTimeout : 1;
-    bool errorSummary: 1;
-    uint8_t _reserved0: 1;
-    bool txTimestampCaptured : 1;
-    uint16_t _reserved1 : 10;
-    bool lastDescriptor: 1;
-    bool firstDescriptor : 1;
-    bool context : 1;
-    bool dmaOwn : 1;
-};
-
-/// Structure representing one Tx descriptor.
-/// Only the first 4 words are processed by the hardware; we are free to add our own
-/// stuff in after that.
-/// Note that per the datasheet, Tx descriptors must be word aligned.
-struct __attribute__((packed)) alignas(uint32_t) EthTxDescriptor
-{
-    union {
-        EthTxDescriptorTxFmt txDesc;
-        EthTxDescriptorWBFmt wbDesc;
-    };
+    EthTxDescriptor txDesc;
 
     // Memory buffers filled in to this descriptor.
     // These must be freed when the descriptor is done transmitting.
     net_stack_mem_buf_t * buffer1;
     net_stack_mem_buf_t * buffer2;
+
+    // If we have a data cache, we need each descriptor to be in its own cache line.  So,
+    // pad up to 32 byte cache line size
+#if __DCACHE_PRESENT
+    uint8_t _padding[__SCB_DCACHE_LINE_SIZE - sizeof(EthTxDescriptor) - 2*sizeof(net_stack_mem_buf_t *)];
+#endif
 };
+
+#if __DCACHE_PRESENT
+static_assert(sizeof(WrappedEthTxDescriptor) == __SCB_DCACHE_LINE_SIZE, "Tx descriptor size must equal cache line size");
+#endif
+
+struct WrappedEthRxDescriptor
+{
+    EthRxDescriptor rxDesc;
+
+    // Memory buffers filled in to this descriptor.
+    // These will be passed to the application if the reception was successful.
+    net_stack_mem_buf_t * buffer;
+
+    // If we have a data cache, we need each descriptor to be in its own cache line.  So,
+    // pad up to 32 byte cache line size
+#if __DCACHE_PRESENT
+    uint8_t _padding[__SCB_DCACHE_LINE_SIZE - sizeof(EthRxDescriptor) - sizeof(net_stack_mem_buf_t *)];
+#endif
+};
+
+#if __DCACHE_PRESENT
+static_assert(sizeof(WrappedEthRxDescriptor) == __SCB_DCACHE_LINE_SIZE, "Rx descriptor size must equal cache line size");
+#endif
+
 
 /**
  * @brief Implementation of Ethernet DMA rings for STM32 Ethernet IP v2.
@@ -117,14 +87,13 @@ class STM32EthIPv2DMARings
 {
     EMACMemoryManager & memory_manager; /**< Memory manager */
     ETH_HandleTypeDef & heth; ///< Handle to Ethernet peripheral
-
     EMAC::emac_link_input_cb_t emac_link_input_cb; /**< Callback for incoming packets */
 
     // Event flags used to signal application threads from ISRs
     rtos::EventFlags eventFlags;
 
-    // Thread which runs the receive loop
-    rtos::Thread rxThread;
+    // Thread which runs the receive loop and the transmit buffer reclamation process
+    rtos::Thread thread;
 
     const size_t rxPoolSize; ///< Number of entries in the Rx buffer pool
 
@@ -137,19 +106,15 @@ class STM32EthIPv2DMARings
     mstd::atomic<size_t> rxNextIndex; ///< Index of the next frame that the DMA shall populate.  Updated by application but used by ISR.
 
     size_t txSendIndex; ///< Index of the next Tx descriptor that can be filled with data
-    mstd::atomic<size_t> txDescsOwnedByApplication; ///< Number of Tx descriptors owned by the application.  Incremented by the ISR and decremented by the application.
-    size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the ISR.
+    mstd::atomic<size_t> txDescsOwnedByApplication; ///< Number of Tx descriptors owned by the application.  Incremented by the mac thread and decremented by the application thread.
+    size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the mac thread.
 
     // Descriptors
-    StaticCacheAlignedBuffer<ETH_DMADescTypeDef, 1> * rxDescs;
-    StaticCacheAlignedBuffer<EthTxDescriptor, 1> txDescs[MBED_CONF_STM32_EMAC_ETH_TXBUFNB];
+    DynamicCacheAlignedBuffer<WrappedEthRxDescriptor> rxDescs;
+    StaticCacheAlignedBuffer<WrappedEthTxDescriptor, MBED_CONF_STM32_EMAC_ETH_TXBUFNB> txDescs;
 
     // Tx buffers just need to be aligned to the nearest 4 bytes.
     uint32_t txBuffers[MBED_CONF_STM32_EMAC_ETH_TXBUFNB][ETH_MAX_PACKET_SIZE / sizeof(uint32_t)];
-
-    // Buffers associated with each Rx descriptor.  These will be passed to the application
-    // when data is received into them.
-    net_stack_mem_buf_t ** rxDescBuffers;
 
     // Return Rx descriptors to the Ethernet MAC.
     // Descriptors can only be returned if there are free buffers in the pool to allocate to them.
@@ -160,8 +125,12 @@ class STM32EthIPv2DMARings
     /// Returns nullptr if nothing was received.
     net_stack_mem_buf_t * rxNextPacket();
 
-    /// Receive main loop
-    void rxLoop();
+    /// Reclaims Tx buffers and frees their memory after packet transmission.
+    /// Invoked by the MAC thread when it sees a Tx interrupt.
+    void reclaimTxDescs();
+
+    /// MAC thread loop
+    void macThread();
 
 public:
     // Alignment required for Rx memory buffers.  Normally they don't need alignment but
@@ -181,7 +150,7 @@ public:
     /// of the pool minus any overhead needed for alignment.
     const size_t rxPoolPayloadSize;
 
-    STM32EthIPv2DMARings(EMACMemoryManager & memory_manager, ETH_HandleTypeDef & heth);
+    STM32EthIPv2DMARings(EMACMemoryManager & memory_manager, ETH_HandleTypeDef & heth, EMAC::emac_link_input_cb_t emac_link_input_cb);
 
     ~STM32EthIPv2DMARings();
 
@@ -202,17 +171,6 @@ public:
     /// it's been transmitted.
     /// Will block until there is space to transmit the packet.
     HAL_StatusTypeDef txPacket(net_stack_mem_buf_t * buf);
-
-    /**
-     * Sets a callback that needs to be called for packets received for that interface
-     *
-     * @param input_cb Function to be register as a callback
-     */
-    void set_link_input_cb(EMAC::emac_link_input_cb_t input_cb)
-    {
-        emac_link_input_cb = input_cb;
-    }
-
 };
 
 }

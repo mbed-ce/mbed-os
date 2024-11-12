@@ -34,6 +34,10 @@ void test_emac_initialize()
 {
     worker_loop_init();
 
+    // Set memory manager parameters
+    EmacTestMemoryManager::get_instance().set_alloc_unit(256); // Use a relatively small allocation unit size so packets have to be split up into a lot of buffers
+    EmacTestMemoryManager::get_instance().set_pool_size(8); // Start with 8 buffers in the Rx pool
+
     static NetworkInterface *network_interface = get_network_interface();
 
     // Power up the interface and emac driver

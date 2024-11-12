@@ -24,6 +24,8 @@
 
 #include "STM32EthIPv2DMARings.h"
 
+#include <optional>
+
 class STM32_EMAC : public EMAC {
 public:
     STM32_EMAC();
@@ -156,6 +158,7 @@ public:
 
 
 private:
+
     bool low_level_init_successful();
     void packet_rx();
     int low_level_input(emac_mem_buf_t **buf);
@@ -164,6 +167,7 @@ private:
     void phy_task();
     void enable_interrupts();
     void disable_interrupts();
+    static void irqHandler();
 
     mbed_rtos_storage_thread_t thread_cb;
 #if defined (STM32F767xx) || defined (STM32F769xx) || defined (STM32F777xx)\
@@ -173,7 +177,10 @@ private:
 #endif
     rtos::Mutex TXLockMutex;/**< TX critical section mutex */
     emac_link_state_change_cb_t emac_link_state_cb; /**< Link state change callback */
+    emac_link_input_cb_t emac_link_input_cb; /**< Callback for incoming packets */
     EMACMemoryManager *memory_manager; /**< Memory manager */
+
+    std::optional<mbed::STM32EthIPv2DMARings> dmaRings;
 
     uint32_t phy_status;
     int phy_task_handle; /**< Handle for phy task event */
