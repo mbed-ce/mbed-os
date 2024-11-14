@@ -1033,7 +1033,7 @@ int can_read(can_t *obj, CAN_Message *msg, int handle)
 
     msg->type = (CANType)(((uint8_t)0x02 & can->sFIFOMailBox[rxfifo_default].RIR) >> 1);
     /* Get the DLC */
-    msg->len = ((can->sFIFOMailBox[rxfifo_default].RDTR & CAN_RDT0R_DLC) < 8) ? ((uint8_t)0x0F & can->sFIFOMailBox[rxfifo_default].RDTR) : ((uint8_t) 8);
+    msg->len = ((can->sFIFOMailBox[rxfifo_default].RDTR & CAN_RDT0R_DLC) < 8) ? (CAN_RDT0R_DLC & can->sFIFOMailBox[rxfifo_default].RDTR) : ((uint8_t) 8);
     /* Get the FMI */
     // msg->FMI = (uint8_t)0xFF & (can->sFIFOMailBox[rxfifo_default].RDTR >> 8);
     /* Get the data field */
