@@ -239,7 +239,15 @@ void hciTrSerialRxIncoming(uint8_t *pBuf, uint8_t len)
         }
         else
         {
+          /**
+           * As above, simply employing WSF_ASSERT is not reasonable.
+           * Instead, it is advisable to discard this data packet,
+           * exit the packet processing function,
+           * and adjust the stateRx back to HCI_RX_STATE_IDLE.
+          */
+          stateRx = HCI_RX_STATE_IDLE;
           WSF_ASSERT(0); /* allocate falied */
+          return;
         }
 
       }
