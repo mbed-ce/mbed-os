@@ -1331,6 +1331,11 @@ static void hciEvtProcessLeExtAdvReport(uint8_t *p, uint8_t len)
   while (i-- > 0)
   {
     ptr += HCI_EXT_ADV_RPT_DATA_LEN_OFFSET;
+    // discard event if it doesn't contain enough data
+    if (ptr >= p + len)
+    {
+        return;
+    }
     BSTREAM_TO_UINT8(dataLen, ptr);
     ptr += dataLen;
 
@@ -1340,6 +1345,12 @@ static void hciEvtProcessLeExtAdvReport(uint8_t *p, uint8_t len)
       /* update max len */
       maxLen = dataLen;
     }
+  }
+
+  // finally check that the last report is fully contained within the event
+  if (ptr > p + len)
+  {
+      return;
   }
 
   /* allocate temp buffer that can hold max length ext adv/scan rsp data */
