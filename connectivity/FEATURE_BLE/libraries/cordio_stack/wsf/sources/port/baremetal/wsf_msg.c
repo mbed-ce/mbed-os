@@ -53,6 +53,10 @@ typedef struct wsfMsg_tag
 /*************************************************************************************************/
 void *WsfMsgDataAlloc(uint16_t len, uint8_t tailroom)
 {
+  /* check for overflow */
+  if (len > UINT16_MAX - tailroom) {
+    return NULL;
+  }
   return WsfMsgAlloc(len + tailroom);
 }
 
@@ -68,6 +72,11 @@ void *WsfMsgDataAlloc(uint16_t len, uint8_t tailroom)
 void *WsfMsgAlloc(uint16_t len)
 {
   wsfMsg_t  *pMsg;
+
+  /* check for overflow */
+  if (len > UINT16_MAX - sizeof(wsfMsg_t)) {
+    return NULL;
+  }
 
   pMsg = WsfBufAlloc(len + sizeof(wsfMsg_t));
 

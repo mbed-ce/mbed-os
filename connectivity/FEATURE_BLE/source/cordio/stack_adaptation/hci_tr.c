@@ -204,6 +204,12 @@ void hciTrSerialRxIncoming(uint8_t *pBuf, uint8_t len)
         }
 
         /* allocate data buffer to hold entire packet */
+        /* check that the length doesn't overflow */
+        if (hdrLen > UINT16_MAX - dataLen)
+        {
+          stateRx = HCI_RX_STATE_IDLE;
+          return;
+        }
         if (pktIndRx == HCI_ACL_TYPE)
         {
           pPktRx = (uint8_t*)WsfMsgDataAlloc(hdrLen + dataLen, 0);
