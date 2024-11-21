@@ -9792,6 +9792,21 @@
             // (so the ADC can never read 100%).
             "default-adc-vref": 3.3
         },
+        "memory_banks": {
+            "QSPI_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "startup": true,
+                "size": 0x200000, // 2MiB
+                "start": 0x10000000
+            }
+        },
         "image_url": "https://cdn11.bigcommerce.com/s-2fbyfnm8ev/images/stencil/1280x1280/products/1212/4275/Pico3__75642.1611086462.jpg?c=2"
     },
     "RASPBERRY_PI_PICO_SWD": {
