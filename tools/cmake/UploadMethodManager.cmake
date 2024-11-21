@@ -12,8 +12,14 @@
 # NOTE: Place at the very start so that it can override by the below loaded
 #       upload method if need be.
 function(mbed_adjust_upload_debug_commands target)
-    # MBED_UPLOAD_LAUNCH_COMMANDS defined?
-    if(NOT DEFINED MBED_UPLOAD_LAUNCH_COMMANDS)
+    # MBED_UPLOAD_LAUNCH_COMMANDS_BAK = first version of MBED_UPLOAD_LAUNCH_COMMANDS
+    if(DEFINED MBED_UPLOAD_LAUNCH_COMMANDS_BAK)
+        # Need first version for fresh adjust
+        set(MBED_UPLOAD_LAUNCH_COMMANDS ${MBED_UPLOAD_LAUNCH_COMMANDS_BAK})
+    elseif(DEFINED MBED_UPLOAD_LAUNCH_COMMANDS)
+        # No FORCE for saving first version only
+        set(MBED_UPLOAD_LAUNCH_COMMANDS_BAK ${MBED_UPLOAD_LAUNCH_COMMANDS} CACHE INTERNAL "")
+    else()
         return()
     endif()
 
