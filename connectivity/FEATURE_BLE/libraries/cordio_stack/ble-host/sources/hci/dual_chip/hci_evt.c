@@ -2471,7 +2471,7 @@ void hciEvtProcessCmdCmpl(uint8_t *p, uint8_t len)
   uint8_t       cbackEvt = 0;
   hciEvtCback_t cback = hciCb.evtCback;
 
-  if (len > 3)
+  if (len < 3)
   {
     return;
   }
