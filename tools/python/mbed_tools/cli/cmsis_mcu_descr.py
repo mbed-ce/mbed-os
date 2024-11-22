@@ -35,6 +35,8 @@ MBED_OS_DIR = THIS_SCRIPT_DIR.parent.parent.parent.parent
 TARGETS_JSON5_PATH = MBED_OS_DIR / "targets" / "targets.json5"
 CMSIS_MCU_DESCRIPTIONS_JSON_PATH = MBED_OS_DIR / "targets" / "cmsis_mcu_descriptions.json5"
 
+CUSTOM_DIR = THIS_SCRIPT_DIR.parent.parent.parent.parent.parent
+CUSTOM_TARGETS_JSON5_PATH = CUSTOM_DIR / "custom_targets" / "custom_targets.json5"
 
 # Top-level command
 @click.group(
@@ -69,12 +71,16 @@ def open_cmsis_cache(*, must_exist: bool = True) -> cmsis_pack_manager.Cache:
 
 def get_mcu_names_used_by_targets_json5() -> Set[str]:
     """
-    Accumulate set of all `device_name` properties used by all targets defined in targets.json5
+    Accumulate set of all `device_name` properties used by all targets defined in targets.json5 and custom_targets.json5
     """
-    LOGGER.info("Scanning targets.json5 for used MCU names...")
     used_mcu_names = set()
-    targets_json5_contents = decode_json_file(TARGETS_JSON5_PATH)
-    for target_details in targets_json5_contents.values():
+    LOGGER.info("Scanning targets.json5 for used MCU names...")
+    json5_contents = decode_json_file(TARGETS_JSON5_PATH)
+    if os.path.exists(CUSTOM_TARGETS_JSON5_PATH):
+        LOGGER.info("Scanning custom_targets.json5 for used MCU names...")
+        json5_contents.update(decode_json_file(CUSTOM_TARGETS_JSON5_PATH))
+
+    for target_details in json5_contents.values():
         if "device_name" in target_details:
             used_mcu_names.add(target_details["device_name"])
     return used_mcu_names
@@ -153,12 +159,12 @@ def check_missing():
 
 @cmsis_mcu_descr.command(
     name="fetch-missing",
-    short_help="Fetch any missing MCU descriptions used by targets.json5."
+    short_help="Fetch any missing MCU descriptions used by targets.json5 or custom_targets.json5."
 )
 def fetch_missing():
     """
-    Scans through cmsis_mcu_descriptions.json for any missing MCU descriptions that are referenced by
-    targets.json5.  If any are found, they are imported from the CMSIS cache.
+    Scans through cmsis_mcu_descriptions.json for any missing MCU descriptions that are referenced by 
+    targets.json5 or custom_targets.json5. If any are found, they are imported from the CMSIS cache.
 
     Note that downloaded descriptions should be checked for accuracy before they are committed.
     """
@@ -186,8 +192,11 @@ def fetch_missing():
                                f"wrong part number, or this MCU simply doesn't exist in the CMSIS index and has "
                                f"to be added manually?")
         missing_mcus_dict[mcu] = cmsis_cache.index[mcu]
+        
+    if os.path.exists(CUSTOM_TARGETS_JSON5_PATH):
+        print(f"Remove 'device_name' and add the 'memories' section as 'memory_banks' section\nfrom following entries to {CUSTOM_TARGETS_JSON5_PATH}:")
+    else:
+        print(f"Add the following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:")
 
-    print(f"Add the following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:")
     print(json.dumps(missing_mcus_dict, indent=4, sort_keys=True))
-
-    sys.exit(1)
+    sys.exit(1) 
