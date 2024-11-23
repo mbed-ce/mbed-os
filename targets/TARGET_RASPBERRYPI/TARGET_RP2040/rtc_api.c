@@ -1,3 +1,20 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2024, Arm Limited and affiliates.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #if DEVICE_RTC
 
 #include "mbed_critical.h"
@@ -81,6 +98,8 @@ void rtc_write(time_t t)
     // won't produce the expected result.  I wasn't able to find any errata or anything documenting
     // this behavior, but it's very consistent, and the RTC tests fail if the below block is removed.
     // To fix the error, we just decrease the time by 1 second before writing it to the registers.
+    // Update 2024: This is now a known, if not officially acknowledged, errata:
+    // https://forums.raspberrypi.com/viewtopic.php?t=377876
     if (t >= 1) {
         t -= 1;
     }
