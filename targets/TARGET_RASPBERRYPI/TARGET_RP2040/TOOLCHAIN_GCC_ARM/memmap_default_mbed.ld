@@ -22,8 +22,6 @@
     __stack (== StackTop)
 */
 
-#include "../cmsis_nvic.h"
-
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
     /* This value is normally defined by the tools
        to 0x1000 for bare metal and 0x400 for RTOS */
@@ -32,15 +30,15 @@
 
 MEMORY
 {
-    FLASH(rx) : ORIGIN = MBED_ROM_START, LENGTH = MBED_ROM_SIZE
-    RAM(rwx) : ORIGIN =  MBED_RAM_START, LENGTH = MBED_RAM_SIZE
+    FLASH(rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_QSPI_FLASH_START, LENGTH = MBED_CONFIGURED_ROM_BANK_QSPI_FLASH_SIZE
+    RAM(rwx) : ORIGIN =  MBED_CONFIGURED_RAM_BANK_IRAM1_START, LENGTH = MBED_CONFIGURED_RAM_BANK_IRAM1_SIZE
 
     /*
      * Scratch banks are commonly used for critical data and functions accessed only by one core (when only
      * one core is accessing the RAM bank, there is no opportunity for stalls).
      */
-    SCRATCH_X(rwx) : ORIGIN = 0x20040000, LENGTH = 4k
-    SCRATCH_Y(rwx) : ORIGIN = 0x20041000, LENGTH = 4k
+    SCRATCH_X(rwx) : ORIGIN = MBED_CONFIGURED_RAM_BANK_SCRATCH_X_START, LENGTH = MBED_CONFIGURED_RAM_BANK_SCRATCH_X_SIZE
+    SCRATCH_Y(rwx) : ORIGIN = MBED_CONFIGURED_RAM_BANK_SCRATCH_Y_START, LENGTH = MBED_CONFIGURED_RAM_BANK_SCRATCH_Y_SIZE
 }
 
 ENTRY(_entry_point)
@@ -218,16 +216,19 @@ SECTIONS
         __end__ = .;
         PROVIDE(end = .);
         *(.heap*)
-        . = ORIGIN(RAM) + LENGTH(RAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
+        . = ORIGIN(RAM) + LENGTH(RAM);
         __HeapLimit = .;
     } > RAM
+
+    /* Check if data + heap exceeds RAM limit */
+    ASSERT(__HeapLimit >= ORIGIN(RAM) + LENGTH(RAM), "region RAM overflowed")
 
     .flash_end : {
         PROVIDE(__flash_binary_end = .);
     } > FLASH
 
     /* stack limit is poorly named, but historically is maximum heap ptr */
-    __StackTop = ORIGIN(SCRATCH_Y) + LENGTH(SCRATCH_Y);
+    __StackTop = ORIGIN(SCRATCH) + LENGTH(SCRATCH_Y);
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
     __StackBottom = __StackLimit;
     PROVIDE(__stack = __StackTop);
