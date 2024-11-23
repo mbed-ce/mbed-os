@@ -88,7 +88,7 @@ uint32_t flash_get_size(const flash_t *obj)
 {
     (void)(obj);
 
-    return PICO_FLASH_SIZE_BYTES;
+    return MBED_ROM_BANK_QSPI_FLASH_SIZE;
 }
 
 uint32_t flash_get_sector_size(const flash_t *obj, uint32_t address)
