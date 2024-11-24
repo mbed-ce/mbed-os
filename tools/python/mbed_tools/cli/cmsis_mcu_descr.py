@@ -33,12 +33,10 @@ LOGGER = logging.getLogger(__name__)
 
 # Calculate path to Mbed OS JSON files
 THIS_SCRIPT_DIR = pathlib.Path(os.path.dirname(__file__))
+PROJECT_ROOT = THIS_SCRIPT_DIR.parent.parent.parent.parent.parent
 MBED_OS_DIR = THIS_SCRIPT_DIR.parent.parent.parent.parent
 TARGETS_JSON5_PATH = MBED_OS_DIR / "targets" / "targets.json5"
 CMSIS_MCU_DESCRIPTIONS_JSON_PATH = MBED_OS_DIR / "targets" / "cmsis_mcu_descriptions.json5"
-
-PROJECT_ROOT = THIS_SCRIPT_DIR.parent.parent.parent.parent.parent
-CUSTOM_TARGETS_JSON_PATH = None
 
 # Top-level command
 @click.group(
@@ -69,6 +67,7 @@ def open_cmsis_cache(*, must_exist: bool = True) -> cmsis_pack_manager.Cache:
         LOGGER.info("CMSIS MCU description cache was last updated: %s", index_age)
 
     return cmsis_cache
+
 
 def find_json_files(root_dir, exclude_dirs=[], file_pattern=r".*\.(json|json5)"):
     """
@@ -107,11 +106,11 @@ def get_mcu_names_used_by_targets_json5() -> Set[str]:
     file_pattern = r"custom_targets\.(json|json5)"  
     custom_targets_file = find_json_files(PROJECT_ROOT, exclude_dirs, file_pattern)
 
+    custom_targets_json_path = {}
     for file in custom_targets_file:
         if os.path.exists(file):
-            global CUSTOM_TARGETS_JSON_PATH 
-            CUSTOM_TARGETS_JSON_PATH = file
-            print(f"File exist {CUSTOM_TARGETS_JSON_PATH}")
+            custom_targets_json_path = file
+            LOGGER.info(f"Custom_targets file detected - {custom_targets_json_path}")
 
 
     used_mcu_names = set()
@@ -119,7 +118,7 @@ def get_mcu_names_used_by_targets_json5() -> Set[str]:
     json_contents = decode_json_file(TARGETS_JSON5_PATH)
     if custom_targets_file:
         LOGGER.info("Scanning custom_targets.json/json5. for used MCU names...")
-        json_contents.update(decode_json_file(CUSTOM_TARGETS_JSON_PATH))
+        json_contents.update(decode_json_file(custom_targets_json_path))
 
     for target_details in json_contents.values():
         if "device_name" in target_details:
@@ -235,10 +234,8 @@ def fetch_missing():
                                f"to be added manually?")
         missing_mcus_dict[mcu] = cmsis_cache.index[mcu]
         
-    if os.path.exists(CUSTOM_TARGETS_JSON_PATH):
-        LOGGER.info(f"Remove 'device_name' and add the 'memories' section as 'memory_banks' section\nfrom following entries to {CUSTOM_TARGETS_JSON_PATH}:")
-    else:
-       LOGGER.info(f"Add the following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:")
-
+    LOGGER.info(f"In case of Custom target remove 'device_name' from your custom_targets.json5 file and add\n" +
+                    "just the 'memories' section as 'memory_banks' section from content below.\n" +
+                    "Otherwise add the whole following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:")
     print(json.dumps(missing_mcus_dict, indent=4, sort_keys=True))
     sys.exit(1) 
