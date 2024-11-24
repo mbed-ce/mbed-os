@@ -25,6 +25,8 @@ import datetime
 import logging
 import json
 import sys
+import re
+import argparse
 from typing import Set, Dict, Any
 
 LOGGER = logging.getLogger(__name__)
@@ -35,8 +37,8 @@ MBED_OS_DIR = THIS_SCRIPT_DIR.parent.parent.parent.parent
 TARGETS_JSON5_PATH = MBED_OS_DIR / "targets" / "targets.json5"
 CMSIS_MCU_DESCRIPTIONS_JSON_PATH = MBED_OS_DIR / "targets" / "cmsis_mcu_descriptions.json5"
 
-CUSTOM_DIR = THIS_SCRIPT_DIR.parent.parent.parent.parent.parent
-CUSTOM_TARGETS_JSON5_PATH = CUSTOM_DIR / "custom_targets" / "custom_targets.json5"
+PROJECT_ROOT = THIS_SCRIPT_DIR.parent.parent.parent.parent.parent
+CUSTOM_TARGETS_JSON_PATH = None
 
 # Top-level command
 @click.group(
@@ -68,19 +70,58 @@ def open_cmsis_cache(*, must_exist: bool = True) -> cmsis_pack_manager.Cache:
 
     return cmsis_cache
 
+def find_json_files(root_dir, exclude_dirs=[], file_pattern=r".*\.(json|json5)"):
+    """
+    Recursively searches for files matching the specified pattern in a given directory, excluding specified directories.
+
+    Args:
+        root_dir (str): The root directory to search.
+        exclude_dirs (list): A list of directory names to exclude.
+        file_pattern (str): A regular expression pattern to match file names.
+
+    Returns:
+        A list of paths to found files.
+    """
+    json_files = []
+
+    for root, dirs, files in os.walk(root_dir):
+        # Exclude specified directories
+        for exclude_dir in exclude_dirs:
+            if exclude_dir in dirs:
+                dirs.remove(exclude_dir)
+
+        for file in files:
+            if re.match(file_pattern, file):
+                json_files.append(pathlib.Path(os.path.join(root, file)))
+
+    return json_files
+
 
 def get_mcu_names_used_by_targets_json5() -> Set[str]:
     """
-    Accumulate set of all `device_name` properties used by all targets defined in targets.json5 and custom_targets.json5
+    Accumulate set of all `device_name` properties used by all targets defined in targets.json5 and custom_targets.json/json5.
     """
+
+    # Search for files starting with "custom_targets" of type .json or .json5. Also exclude some folders like build and mbed-os
+    exclude_dirs = ["build", "mbed-os", ".git"]
+    file_pattern = r"custom_targets\.(json|json5)"  
+    custom_targets_file = find_json_files(PROJECT_ROOT, exclude_dirs, file_pattern)
+
+    for file in custom_targets_file:
+        if os.path.exists(file):
+            global CUSTOM_TARGETS_JSON_PATH 
+            CUSTOM_TARGETS_JSON_PATH = file
+            print(f"File exist {CUSTOM_TARGETS_JSON_PATH}")
+
+
     used_mcu_names = set()
     LOGGER.info("Scanning targets.json5 for used MCU names...")
-    json5_contents = decode_json_file(TARGETS_JSON5_PATH)
-    if os.path.exists(CUSTOM_TARGETS_JSON5_PATH):
-        LOGGER.info("Scanning custom_targets.json5 for used MCU names...")
-        json5_contents.update(decode_json_file(CUSTOM_TARGETS_JSON5_PATH))
+    json_contents = decode_json_file(TARGETS_JSON5_PATH)
+    if custom_targets_file:
+        LOGGER.info("Scanning custom_targets.json/json5. for used MCU names...")
+        json_contents.update(decode_json_file(CUSTOM_TARGETS_JSON_PATH))
 
-    for target_details in json5_contents.values():
+    for target_details in json_contents.values():
         if "device_name" in target_details:
             used_mcu_names.add(target_details["device_name"])
     return used_mcu_names
@@ -159,26 +200,27 @@ def check_missing():
 
 @cmsis_mcu_descr.command(
     name="fetch-missing",
-    short_help="Fetch any missing MCU descriptions used by targets.json5 or custom_targets.json5."
+    short_help="Fetch any missing MCU descriptions used by targets.json5 or custom_targets.json/json5.."
 )
 def fetch_missing():
     """
-    Scans through cmsis_mcu_descriptions.json for any missing MCU descriptions that are referenced by 
-    targets.json5 or custom_targets.json5. If any are found, they are imported from the CMSIS cache.
+    Scans through cmsis_mcu_descriptions.json5 for any missing MCU descriptions that are referenced by 
+    targets.json5 or custom_targets.json/json5. If any are found, they are imported from the CMSIS cache.
 
     Note that downloaded descriptions should be checked for accuracy before they are committed.
     """
+
     used_mcu_names = get_mcu_names_used_by_targets_json5()
 
     # Accumulate set of all keys in cmsis_mcu_descriptions.json
-    LOGGER.info("Scanning cmsis_mcu_descriptions.json for missing MCUs...")
+    LOGGER.info("Scanning cmsis_mcu_descriptions.json5 file for missing MCUs...")
     cmsis_mcu_descriptions_json_contents: Dict[str, Any] = decode_json_file(CMSIS_MCU_DESCRIPTIONS_JSON_PATH)
     available_mcu_names = cmsis_mcu_descriptions_json_contents.keys()
 
     # Are there any missing?
     missing_mcu_names = used_mcu_names - available_mcu_names
     if len(missing_mcu_names) == 0:
-        print("No missing MCUs, no work to do.")
+        LOGGER.info("No missing MCUs, no work to do.")
         return
 
     # Load CMSIS cache to access new MCUs
@@ -193,10 +235,10 @@ def fetch_missing():
                                f"to be added manually?")
         missing_mcus_dict[mcu] = cmsis_cache.index[mcu]
         
-    if os.path.exists(CUSTOM_TARGETS_JSON5_PATH):
-        print(f"Remove 'device_name' and add the 'memories' section as 'memory_banks' section\nfrom following entries to {CUSTOM_TARGETS_JSON5_PATH}:")
+    if os.path.exists(CUSTOM_TARGETS_JSON_PATH):
+        LOGGER.info(f"Remove 'device_name' and add the 'memories' section as 'memory_banks' section\nfrom following entries to {CUSTOM_TARGETS_JSON_PATH}:")
     else:
-        print(f"Add the following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:")
+       LOGGER.info(f"Add the following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:")
 
     print(json.dumps(missing_mcus_dict, indent=4, sort_keys=True))
     sys.exit(1) 
