@@ -234,8 +234,8 @@ def fetch_missing():
                                f"to be added manually?")
         missing_mcus_dict[mcu] = cmsis_cache.index[mcu]
         
-    LOGGER.info(f"In case of Custom target remove 'device_name' from your custom_targets.json5 file and add\n" +
+    LOGGER.info("In case of Custom target remove 'device_name' from your custom_targets.json5 file and add\n" +
                     "just the 'memories' section as 'memory_banks' section from content below.\n" +
-                    "Otherwise add the whole following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:")
+                    f"Otherwise add the whole following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:")
     print(json.dumps(missing_mcus_dict, indent=4, sort_keys=True))
     sys.exit(1) 
