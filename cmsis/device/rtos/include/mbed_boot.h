@@ -58,6 +58,11 @@ extern "C" {
 extern unsigned char *mbed_heap_start;
 extern uint32_t mbed_heap_size;
 
+#if defined(MBED_SPLIT_HEAP)
+extern unsigned char *mbed_heap_start_0;
+extern uint32_t mbed_heap_size_0;
+#endif
+
 /* Stack limits */
 extern unsigned char *mbed_stack_isr_start;
 extern uint32_t mbed_stack_isr_size;

@@ -46,7 +46,7 @@
  * - Value INITIAL_SP is ignored
  *
  * GCC Memory layout :
- * - Heap explicitly placed in linker script (*.ld file) and heap start (__end___) and heap end (__HeapLimit) should be defined in linker script
+ * - Heap explicitly placed in linker script (*.ld file) and heap start (__end___) and heap end (__HeapLimit) should be defined in linker script (or __mbed_sbrk_start/__mbed_sbrk_start_0 and __mbed_krbs_start/__mbed_krbs_start_0 for split heap targets)
  * - Interrupt stack placed in linker script **.ld file) and stack start (__StackTop) and stack end (__StackLimit) should be defined in linker script
  *
  * ARM Memory layout :

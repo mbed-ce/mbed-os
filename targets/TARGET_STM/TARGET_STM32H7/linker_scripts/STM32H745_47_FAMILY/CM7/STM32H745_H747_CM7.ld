@@ -174,14 +174,14 @@ SECTIONS
         _ebss = .;
     } > SRAM
 
+    /* Check if data + stack will exceed SRAM limit */
+    ASSERT(_ebss < ORIGIN(SRAM) + LENGTH(SRAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE, "region SRAM does not have enough space for boot stack size")
+
     .heap (COPY):
     {
         __end__ = .;
         PROVIDE(end = .);
-        PROVIDE(__mbed_sbrk_start = .);
-        *(.heap*)
         . = ORIGIN(SRAM) + LENGTH(SRAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
-        PROVIDE(__mbed_krbs_start = .);
         __HeapLimit = .;
     } > SRAM
 
@@ -230,12 +230,4 @@ SECTIONS
         . = ALIGN(8);
         __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
     } > SRAM_D3
-    
-    /* Use the rest of DTCM as additional heap */
-    .heap_0 (COPY):
-    {
-        PROVIDE(__mbed_sbrk_start_0 = .);
-        . += (ORIGIN(SRAM_DTC) + LENGTH(SRAM_DTC) - .);
-        PROVIDE(__mbed_krbs_start_0 = .);
-    } > SRAM_DTC
 }

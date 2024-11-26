@@ -3455,8 +3455,7 @@
             }
         },
         "macros_add": [
-            "CORE_CM7",
-            "MBED_SPLIT_HEAP"
+            "CORE_CM7"
         ]
     },
     "NUCLEO_H745ZI_Q": {
@@ -3522,8 +3521,7 @@
             }
         },
         "macros_add": [
-            "CORE_CM7",
-            "MBED_SPLIT_HEAP"
+            "CORE_CM7"
         ]
     },
     "MCU_STM32H747xI_CM4": {

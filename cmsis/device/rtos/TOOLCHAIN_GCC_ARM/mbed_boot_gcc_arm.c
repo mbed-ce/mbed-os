@@ -29,10 +29,20 @@ static osMutexId_t               env_mutex_id;
 static mbed_rtos_storage_mutex_t env_mutex_obj;
 static osMutexAttr_t             env_mutex_attr;
 
+// Stack symbols from linker script
 extern uint32_t             __StackLimit;
 extern uint32_t             __StackTop;
+
+// Heap symbols from linker script
+#if defined(MBED_SPLIT_HEAP)
+extern uint32_t __mbed_sbrk_start;
+extern uint32_t __mbed_krbs_start;
+extern uint32_t __mbed_sbrk_start_0;
+extern uint32_t __mbed_krbs_start_0;
+#else
 extern uint32_t             __end__;
 extern uint32_t             __HeapLimit;
+#endif
 
 extern void __libc_init_array(void);
 
@@ -45,8 +55,15 @@ void software_init_hook(void)
 {
     mbed_stack_isr_start = (unsigned char *) &__StackLimit;
     mbed_stack_isr_size = (uint32_t) &__StackTop - (uint32_t) &__StackLimit;
+#if defined(MBED_SPLIT_HEAP)
+    mbed_heap_start = (unsigned char *) &__mbed_sbrk_start;
+    mbed_heap_size = (uint32_t) &__mbed_krbs_start - (uint32_t) &__mbed_sbrk_start;
+    mbed_heap_start_0 = (unsigned char *) &__mbed_sbrk_start_0;
+    mbed_heap_size_0 = (uint32_t) &__mbed_krbs_start_0 - (uint32_t) &__mbed_sbrk_start_0;
+#else
     mbed_heap_start = (unsigned char *) &__end__;
     mbed_heap_size = (uint32_t) &__HeapLimit - (uint32_t) &__end__;
+#endif
 
     mbed_init();
     mbed_rtos_start();

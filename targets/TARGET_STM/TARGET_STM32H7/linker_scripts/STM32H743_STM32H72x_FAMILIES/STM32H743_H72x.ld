@@ -187,15 +187,14 @@ SECTIONS
         _ebss = .;
     } > SRAM
 
-    .heap (COPY):
+    /* Check if data + stack will exceed SRAM limit */
+    ASSERT(_ebss < ORIGIN(SRAM) + LENGTH(SRAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE, "region SRAM does not have enough space for boot stack size")
+
+    .heap_0 (NOLOAD):
     {
-        __end__ = .;
-        PROVIDE(end = .);
-        PROVIDE(__mbed_sbrk_start = .);
-        *(.heap*)
+        PROVIDE(__mbed_sbrk_start_0 = .);
         . = ORIGIN(SRAM) + LENGTH(SRAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
-        PROVIDE(__mbed_krbs_start = .);
-        __HeapLimit = .;
+        PROVIDE(__mbed_krbs_start_0 = .);
     } > SRAM
 
     /* .stack_dummy section doesn't contains any symbols. It is only
@@ -213,9 +212,6 @@ SECTIONS
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
     PROVIDE(__stack = __StackTop);
 
-    /* Check if data + heap + stack exceeds SRAM limit */
-    ASSERT(__StackLimit >= __HeapLimit, "region SRAM overflowed with stack")
-
     /* Ethernet DMA descriptors should be at the start of SRAM_D2 because they need an MPU region 
        and because the CM4 and CM7 have to agree on their location.*/
     .eth_descriptors (NOLOAD) : {
@@ -230,11 +226,11 @@ SECTIONS
         *(.EthBuffers)
     } >SRAM_D2 
 
-    /* Use the rest of DTCM as additional heap */
-    .heap_0 (COPY):
+    /* Use SRAM_D2 as additional heap */
+    .heap (NOLOAD):
     {
-        PROVIDE(__mbed_sbrk_start_0 = .);
-        . += (ORIGIN(SRAM_DTC) + LENGTH(SRAM_DTC) - .);
-        PROVIDE(__mbed_krbs_start_0 = .);
-    } > SRAM_DTC
+        PROVIDE(__mbed_sbrk_start = .);
+        . += (ORIGIN(SRAM_D2) + LENGTH(SRAM_D2) - .);
+        PROVIDE(__mbed_krbs_start = .);
+    } > SRAM_D2
 }

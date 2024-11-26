@@ -17,6 +17,7 @@
 
 #include "mbed_error.h"
 #include "mbed_toolchain.h"
+#include "mbed_boot.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include "cmsis.h"
@@ -27,10 +28,6 @@
  * Note: The start-up code for mbed OS is in cmsis/device/rtos/TOOLCHAIN_<TOOLCHAIN>/mbed_boot_<TOOLCHAIN>.c code file.
  */
 #if !defined(MBED_CONF_RTOS_PRESENT)
-
-/* Heap limits - only used if set */
-extern unsigned char *mbed_heap_start;
-extern uint32_t mbed_heap_size;
 
 /* Stack limits */
 unsigned char *mbed_stack_isr_start = 0;
@@ -154,8 +151,16 @@ const uint32_t os_cb_sections[] __attribute__((section(".rodata"))) = {};
 
 extern uint32_t             __StackLimit;
 extern uint32_t             __StackTop;
+
+#if defined(MBED_SPLIT_HEAP)
+extern uint32_t __mbed_sbrk_start;
+extern uint32_t __mbed_krbs_start;
+extern uint32_t __mbed_sbrk_start_0;
+extern uint32_t __mbed_krbs_start_0;
+#else
 extern uint32_t             __end__;
 extern uint32_t             __HeapLimit;
+#endif
 
 extern int __real_main(void);
 
@@ -163,8 +168,16 @@ void software_init_hook(void)
 {
     mbed_stack_isr_start = (unsigned char *) &__StackLimit;
     mbed_stack_isr_size = (uint32_t) &__StackTop - (uint32_t) &__StackLimit;
+
+#if defined(MBED_SPLIT_HEAP)
+    mbed_heap_start = (unsigned char *) &__mbed_sbrk_start;
+    mbed_heap_size = (uint32_t) &__mbed_krbs_start - (uint32_t) &__mbed_sbrk_start;
+    mbed_heap_start_0 = (unsigned char *) &__mbed_sbrk_start_0;
+    mbed_heap_size_0 = (uint32_t) &__mbed_krbs_start_0 - (uint32_t) &__mbed_sbrk_start_0;
+#else
     mbed_heap_start = (unsigned char *) &__end__;
     mbed_heap_size = (uint32_t) &__HeapLimit - (uint32_t) &__end__;
+#endif
 
     mbed_init();
     software_init_hook_rtos();
