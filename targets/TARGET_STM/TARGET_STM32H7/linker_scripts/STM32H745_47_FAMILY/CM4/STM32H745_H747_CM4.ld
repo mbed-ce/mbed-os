@@ -182,14 +182,15 @@ SECTIONS
         _ebss = .;
     } > SRAM_D2
 
+    /* Check if data + stack will exceed SRAM limit */
+    ASSERT(_ebss < ORIGIN(SRAM_D2) + LENGTH(SRAM_D2) - MBED_CONF_TARGET_BOOT_STACK_SIZE, "region SRAM does not have enough space for boot stack size")
+
     .heap (COPY):
     {
         __end__ = .;
         PROVIDE(end = .);
-        PROVIDE(__mbed_sbrk_start = .);
         *(.heap*)
         . = ORIGIN(SRAM_D2) + LENGTH(SRAM_D2) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
-        PROVIDE(__mbed_krbs_start = .);
         __HeapLimit = .;
     } > SRAM_D2
     /* .stack_dummy section doesn't contains any symbols. It is only
@@ -206,9 +207,6 @@ SECTIONS
     _estack = __StackTop;
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
     PROVIDE(__stack = __StackTop);
-
-    /* Check if data + heap + stack exceeds SRAM_D2 limit */
-    ASSERT(__StackLimit >= __HeapLimit, "region SRAM_D2 overflowed with stack")
 
     /* Put crash data in the otherwise unused D3 SRAM */
     .crash_data_ram :
