@@ -289,6 +289,9 @@ bool STM32_EMAC::low_level_init_successful()
         return false;
     }
 
+    // Disable checksum offload, this is enabled by HAL_ETH_Init
+    EthHandle.Instance->MACCR &= ~ETH_MACCR_IPC;
+
     // Init the DMA rings
     dmaRings.emplace(*memory_manager, EthHandle, emac_link_input_cb);
     if (dmaRings->startDMA() != HAL_OK) {

@@ -479,6 +479,30 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
             currDesc.txDesc.toDMAFmt.buffer2Len = 0;
         }
 
+//        printf("Tx Ethernet buffer:");
+//        for(size_t byteIdx = 0; byteIdx < currDesc.txDesc.toDMAFmt.buffer1Len; ++byteIdx)
+//        {
+//            printf(" %02" PRIx8, reinterpret_cast<uint8_t const *>(currDesc.txDesc.toDMAFmt.buffer1Addr)[byteIdx]);
+//        }
+//        printf("\n");
+//
+//        printf("Tx Ethernet buffer2:");
+//        for(size_t byteIdx = 0; byteIdx < currDesc.txDesc.toDMAFmt.buffer2Len; ++byteIdx)
+//        {
+//            printf(" %02" PRIx8, reinterpret_cast<uint8_t const *>(currDesc.txDesc.toDMAFmt.buffer2Addr)[byteIdx]);
+//        }
+//        printf("\n");
+
+#if __DCACHE_PRESENT
+        // Write buffers back to main memory
+        SCB_CleanDCache_by_Addr(const_cast<void*>(currDesc.txDesc.toDMAFmt.buffer1Addr), currDesc.txDesc.toDMAFmt.buffer1Len);
+        if(currDesc.buffer2 != nullptr)
+        {
+            SCB_CleanDCache_by_Addr(const_cast<void*>(currDesc.txDesc.toDMAFmt.buffer2Addr), currDesc.txDesc.toDMAFmt.buffer2Len);
+        }
+#endif
+
+
         // Enter a critical section, because we could run into weird corner cases if the
         // interrupt executes while we are half done configuring this descriptor and updating
         // the counters.
