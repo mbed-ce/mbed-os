@@ -43,6 +43,13 @@ MBED_WEAK MeshInterface *MeshInterface::get_default_instance()
     return get_target_default_instance();
 }
 
+#if MBED_CONF_CELLULAR_PRESENT
+MBED_WEAK CellularInterface *CellularInterface::get_default_instance()
+{
+    return get_target_default_instance();
+}
+#endif // MBED_CONF_CELLULAR_PRESENT
+
 /* For other types, we can provide a reasonable get_target_default_instance
  * in some cases. This is done in EthernetInterface.cpp, mbed-mesh-api and
  * OnboardCellularInterface.cpp. We have no implementation for WiFi, so a
