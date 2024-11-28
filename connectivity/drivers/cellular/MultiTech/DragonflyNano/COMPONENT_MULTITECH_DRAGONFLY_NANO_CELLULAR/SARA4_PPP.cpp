@@ -185,4 +185,18 @@ CellularDevice *CellularDevice::get_default_instance()
     static SARA4_PPP device(&serial);
     return &device;
 }
+
+/*
+ * With e.g. GCC linker option "--undefined=<LINK_FOO>", pull in this
+ * object file anyway for being able to override weak symbol successfully
+ * even though from static library. See:
+ * https://stackoverflow.com/questions/42588983/what-does-the-gnu-ld-undefined-option-do
+ *
+ * NOTE: For C++ name mangling, 'extern "C"' is necessary to match the
+ *       <LINK_FOO> symbol correctly.
+ */
+extern "C"
+void LINK_SARA4_PPP_CPP(void)
+{
+}
 #endif
