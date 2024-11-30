@@ -131,10 +131,11 @@ struct __attribute__((packed)) EthRxDescriptorFromDMAFmt
     uint16_t _reserved0: 10;
     bool arpNotGenerated: 1;
     uint8_t _reserved1: 4;
+    bool vlanFiltPassed : 1;
     bool sourceAddrFail: 1;
     bool destAddrFail: 1;
     bool hashFilterStatus: 1;
-    uint8_t hashValOrMatchIdx;
+    uint8_t hashValOrMatchIdx: 8;
     bool l3FiltMatch: 1;
     bool l4FiltMatch: 1;
     uint8_t filterMatchNo: 3;

@@ -3333,7 +3333,8 @@
             "STM32H7_480MHZ"
         ],
         "macros_add": [
-            "STM32H743xx"
+            "STM32H743xx",
+            "MBED_SPLIT_HEAP"
         ],
         "overrides": {
             "system_power_supply": "PWR_LDO_SUPPLY"

@@ -29,7 +29,11 @@ static uint32_t THREAD_FLAG_SHUTDOWN = 4;
 static uint32_t EVENT_FLAG_TX_DESC_AVAILABLE = 1;
 
 void STM32EthIPv2DMARings::buildRxDescriptors() {
-    while (rxDescsOwnedByApplication > 0) {
+
+    // Note: With this Ethernet peripheral, you can never give back every single descriptor to
+    // the hardware, because then it thinks there are 0 descriptors left.
+    // TODO double check this ^
+    while (rxDescsOwnedByApplication > 1) {
         auto &currRxDesc = rxDescs[rxBuildIndex];
 
         // Allocate new buffer
@@ -57,13 +61,14 @@ void STM32EthIPv2DMARings::buildRxDescriptors() {
         SCB_CleanDCache_by_Addr(&currRxDesc, __SCB_DCACHE_LINE_SIZE);
 #endif
 
-        // Update tail ptr to issue "rx poll demand" and mark this descriptor for receive.
-        // Per the DMACRDTPR register description, it should be set to point to the last valid descriptor.
-        heth.Instance->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[rxBuildIndex]);
-
         // Move to next descriptor
         --rxDescsOwnedByApplication;
         rxBuildIndex = (rxBuildIndex + 1) % rxPoolSize;
+
+        // Update tail ptr to issue "rx poll demand" and mark this descriptor for receive.
+        // Rx stops when the current and tail pointers are equal, so we want to set the tail pointer
+        // to one location after the last DMA-owned descriptor in the FIFO.
+        heth.Instance->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[rxBuildIndex]);
     }
 }
 
@@ -109,18 +114,28 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
             // We should only get one of these descriptors before the start of the packet, not
             // during it.
             MBED_ASSERT(firstDescIdx == rxPoolSize);
-        } else if (descriptor.rxDesc.fromDMAFmt.firstDescriptor) {
+
+            continue;
+        }
+
+        if (descriptor.rxDesc.fromDMAFmt.firstDescriptor) {
             // We should see first descriptor only once and before last descriptor
             MBED_ASSERT(firstDescIdx == rxPoolSize);
             MBED_ASSERT(lastDescIdx == rxPoolSize);
 
             firstDescIdx = descIdx;
-        } else if (descriptor.rxDesc.fromDMAFmt.lastDescriptor) {
+
+            printf("Start of Rx packet found in descriptor %zu\n", firstDescIdx);
+        }
+
+        if (descriptor.rxDesc.fromDMAFmt.lastDescriptor) {
             // We should see last descriptor only once and after first descriptor
             MBED_ASSERT(firstDescIdx != rxPoolSize);
             MBED_ASSERT(lastDescIdx == rxPoolSize);
 
             lastDescIdx = descIdx;
+
+            printf("End of Rx packet found in descriptor %zu\n", firstDescIdx);
         }
     }
 
@@ -250,7 +265,7 @@ STM32EthIPv2DMARings::STM32EthIPv2DMARings(EMACMemoryManager &memory_manager, ET
         heth(heth),
         emac_link_input_cb(emac_link_input_cb),
         thread(osPriorityHigh, MBED_CONF_STM32_EMAC_THREAD_STACKSIZE, nullptr, "stm32_emac_rx_thread"),
-        rxPoolSize(memory_manager.get_pool_size() - RX_POOL_EXTRA_BUFFERS),
+        rxPoolSize(memory_manager.get_pool_size() - RX_POOL_EXTRA_BUFFERS + 1), // + 1 because we have to always keep one descriptor owned by the application
         rxDescs(rxPoolSize),
         rxPoolPayloadSize(memory_manager.get_pool_alloc_unit(RX_BUFFER_ALIGN))
 {
@@ -277,9 +292,6 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::startDMA()
         // At the start, we own all the descriptors
         rxDescsOwnedByApplication = rxPoolSize;
         txDescsOwnedByApplication = MBED_CONF_STM32_EMAC_ETH_TXBUFNB;
-
-        // Build all descriptors
-        buildRxDescriptors();
 
         // Flush Tx queue
         heth.Instance->MTLTQOMR |= ETH_MTLTQOMR_FTQ;
@@ -312,12 +324,14 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::startDMA()
 
         // Configure Rx descriptor ring
         heth.Instance->DMACRDRLR = rxPoolSize; // Ring size
-        heth.Instance->DMACRDLAR = reinterpret_cast<uint32_t>(&rxDescs[0]); // Head pointer
+        heth.Instance->DMACRDLAR = reinterpret_cast<uint32_t>(&rxDescs[0]); // Ring base address
         heth.Instance->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[0]); // Next descriptor (tail) pointer
+
+        buildRxDescriptors();
 
         // Configure Tx descriptor ring
         heth.Instance->DMACTDRLR = MBED_CONF_STM32_EMAC_ETH_TXBUFNB - 1; // Ring size
-        heth.Instance->DMACTDLAR = reinterpret_cast<uint32_t>(&txDescs[0]); // Head pointer
+        heth.Instance->DMACTDLAR = reinterpret_cast<uint32_t>(&txDescs[0]); // Ring base address
         heth.Instance->DMACTDTPR = reinterpret_cast<uint32_t>(&txDescs[0]); // Next descriptor (tail) pointer
 
         // Enable Rx and Tx DMA.  NOTE: Typo in C++ headers, these should be called
@@ -419,6 +433,8 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
             currBuf = memory_manager.get_next(buf);
         }
     }
+
+    printf("Transmitting packet of length %lu\n", memory_manager.get_total_len(buf));
 
     // Step 2: Copy packet if needed
     if(needToCopy)
