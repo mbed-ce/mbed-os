@@ -137,6 +137,7 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
     if (lastDescIdx == rxPoolSize) {
         // No complete packet identified.
         // Take the chance to rebuild any available descriptors, then return.
+        printf("No complete packets in Rx descs\n");
         buildRxDescriptors();
         return nullptr;
     }
@@ -145,22 +146,29 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
     // Update this now to tell the ISR to search for descriptors after lastDescIdx only.
     rxNextIndex = (lastDescIdx + 1) % rxPoolSize;
 
+    // Set length of first buffer
+    net_stack_mem_buf_t *const headBuffer = rxDescs[firstDescIdx].buffer;
+    size_t lenRemaining = rxDescs[lastDescIdx].rxDesc.fromDMAFmt.pktLength;
+    memory_manager.set_len(headBuffer, std::min(lenRemaining, rxPoolPayloadSize));
+    lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
+
     // Iterate through the subsequent descriptors in this packet and link the buffers
     // Note that this also transfers ownership of subsequent buffers to the first buffer,
     // so if the first buffer is deleted, the others will be as well.
-    net_stack_mem_buf_t *const headBuffer = rxDescs[firstDescIdx].buffer;
     ++rxDescsOwnedByApplication; // for first buffer
     rxDescs[firstDescIdx].buffer = nullptr;
     for (size_t descIdx = (firstDescIdx + 1) % rxPoolSize;
          descIdx != (lastDescIdx + 1) % rxPoolSize;
          descIdx = (descIdx + 1) % rxPoolSize) {
+
+        // We have to set the buffer length first before concatenating it to the chain
+        memory_manager.set_len(rxDescs[descIdx].buffer, std::min(lenRemaining, rxPoolPayloadSize));
+        lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
+
         memory_manager.cat(headBuffer, rxDescs[descIdx].buffer);
         rxDescs[descIdx].buffer = nullptr;
         ++rxDescsOwnedByApplication;
     }
-
-    // Length is given in the last descriptor
-    memory_manager.set_len(headBuffer, rxDescs[lastDescIdx].rxDesc.fromDMAFmt.pktLength);
 
     // Invalidate cache for all data buffers, as these were written by the DMA to main memory
 #if __DCACHE_PRESENT
@@ -239,8 +247,9 @@ void STM32EthIPv2DMARings::macThread()
         {
             return;
         }
-        if(flags & THREAD_FLAG_RX_DESC_AVAILABLE)
+        if(flags & (THREAD_FLAG_RX_DESC_AVAILABLE | THREAD_FLAG_TX_DESC_AVAILABLE)) // TODO temp
         {
+            printf("Reclaimable descriptor!\n");
             // Receive any available packets.
             // Note that if the ISR was delayed, we might get multiple packets per ISR, so we need to loop.
             while(true)
@@ -443,11 +452,12 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
             }
 #endif
 
-            currBuf = memory_manager.get_next(buf);
+            currBuf = memory_manager.get_next(currBuf);
         }
     }
 
-    printf("Transmitting packet of length %lu\n", memory_manager.get_total_len(buf));
+    printf("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+           memory_manager.get_total_len(buf), neededDescs, neededDescs);
 
     // Step 2: Copy packet if needed
     if(needToCopy)

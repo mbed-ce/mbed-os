@@ -205,6 +205,14 @@ public:
      * The allocated payload size will not change. It is not permitted
      * to change the length of a buffer that is not the first (or only) in a chain.
      *
+     * *Note as of Dec 2024: Different implementations (nanostack vs LwIP) disagree about
+     * how to implement this operation.  Specifically, if called on the head of a buffer
+     * chain, the LwIP implementation allows changing the length of the chain as a whole.
+     * However, the Nanostack implementation does not and only can change the length of the head buffer.
+     * For fear of breaking existing code, I do not want to change this behavior.
+     * So, if constructing a buffer chain, it is safest to set the buffer lengths first before
+     * building the chain.
+     *
      * @param buf      Memory buffer
      * @param len      Payload size, must be less or equal to the allocated size
      */

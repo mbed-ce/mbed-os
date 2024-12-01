@@ -196,7 +196,7 @@ private:
      * Sets total lengths of a memory buffer chain
      *
      * Sets total length fields for a memory buffer chain based on buffer
-     * length fields. All total lengths are calculated again.
+     * \c len fields. All total lengths are calculated again.
      *
      * @param pbuf     Memory buffer
      */
