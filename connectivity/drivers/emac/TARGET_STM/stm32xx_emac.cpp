@@ -289,6 +289,13 @@ bool STM32_EMAC::low_level_init_successful()
         return false;
     }
 
+    // Enable Tx, Rx, and fatal bus error interrupts.
+    // However, don't enable receive buffer unavailable interrupt, because that can
+    // trigger if we run out of Rx descriptors, and we don't want to fatal error
+    // in that case.
+    EthHandle.Instance->DMACIER = (ETH_DMACIER_NIE | ETH_DMACIER_RIE | ETH_DMACIER_TIE  |
+                                   ETH_DMACIER_FBEE | ETH_DMACIER_AIE);
+
     // Disable checksum offload, this is enabled by HAL_ETH_Init
     EthHandle.Instance->MACCR &= ~ETH_MACCR_IPC;
 
@@ -799,7 +806,7 @@ void STM32_EMAC::irqHandler()
     }
 
     /* ETH DMA Error */
-    if ((dma_flag & ETH_DMACSR_AIS) != 0U)
+    if(dma_flag & ETH_DMACSR_FBE)
     {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ETHERNET, EIO), \
                "STM32 EMAC: Hardware reports fatal DMA Error\n");

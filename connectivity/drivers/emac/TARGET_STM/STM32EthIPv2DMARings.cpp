@@ -32,7 +32,6 @@ void STM32EthIPv2DMARings::buildRxDescriptors() {
 
     // Note: With this Ethernet peripheral, you can never give back every single descriptor to
     // the hardware, because then it thinks there are 0 descriptors left.
-    // TODO double check this ^
     while (rxDescsOwnedByApplication > 1) {
         auto &currRxDesc = rxDescs[rxBuildIndex];
 
@@ -124,8 +123,6 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
             MBED_ASSERT(lastDescIdx == rxPoolSize);
 
             firstDescIdx = descIdx;
-
-            printf("Start of Rx packet found in descriptor %zu\n", firstDescIdx);
         }
 
         if (descriptor.rxDesc.fromDMAFmt.lastDescriptor) {
@@ -134,8 +131,6 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
             MBED_ASSERT(lastDescIdx == rxPoolSize);
 
             lastDescIdx = descIdx;
-
-            printf("End of Rx packet found in descriptor %zu\n", firstDescIdx);
         }
     }
 
@@ -150,7 +145,7 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
     // Update this now to tell the ISR to search for descriptors after lastDescIdx only.
     rxNextIndex = (lastDescIdx + 1) % rxPoolSize;
 
-    // Link together the found packets and mark them as owned.
+    // Iterate through the subsequent descriptors in this packet and link the buffers
     // Note that this also transfers ownership of subsequent buffers to the first buffer,
     // so if the first buffer is deleted, the others will be as well.
     net_stack_mem_buf_t *const headBuffer = rxDescs[firstDescIdx].buffer;
@@ -166,6 +161,19 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
 
     // Length is given in the last descriptor
     memory_manager.set_len(headBuffer, rxDescs[lastDescIdx].rxDesc.fromDMAFmt.pktLength);
+
+    // Invalidate cache for all data buffers, as these were written by the DMA to main memory
+#if __DCACHE_PRESENT
+    auto * bufToInvalidate = headBuffer;
+    while(bufToInvalidate != nullptr)
+    {
+        SCB_InvalidateDCache_by_Addr(memory_manager.get_ptr(bufToInvalidate), rxPoolPayloadSize);
+        bufToInvalidate = memory_manager.get_next(bufToInvalidate);
+    }
+#endif
+
+    printf("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu\n",
+           memory_manager.get_total_len(headBuffer), memory_manager.get_ptr(headBuffer), firstDescIdx, lastDescIdx);
 
     // Rebuild descriptors if possible
     buildRxDescriptors();
@@ -323,7 +331,7 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::startDMA()
         heth.Instance->DMACCR |= wordsToSkip << ETH_DMACCR_DSL_Pos;
 
         // Configure Rx descriptor ring
-        heth.Instance->DMACRDRLR = rxPoolSize; // Ring size
+        heth.Instance->DMACRDRLR = rxPoolSize - 1; // Ring size
         heth.Instance->DMACRDLAR = reinterpret_cast<uint32_t>(&rxDescs[0]); // Ring base address
         heth.Instance->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[0]); // Next descriptor (tail) pointer
 
@@ -396,6 +404,11 @@ void STM32EthIPv2DMARings::txISR()
 
 HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
 {
+    if(memory_manager.get_total_len(buf) >= 250)
+    {
+        printf("slightly big one!\n");
+    }
+
     // Step 1: Figure out if we can send this zero-copy, or if we need to copy it.
     // Also note that each descriptor can store 2 buffers, so we need half as many descriptors
     // as we have buffers, rounding up.

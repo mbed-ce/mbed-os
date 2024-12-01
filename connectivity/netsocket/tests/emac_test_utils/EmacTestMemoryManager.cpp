@@ -146,6 +146,13 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_heap(uint32_t size, uint32_t align,
     char *buffer_tail = static_cast<char *>(buf->ptr) + buf->len;
     memcpy(buffer_tail, BUF_TAIL, BUF_TAIL_SIZE);
 
+    // Scribble over the buffer contents with 'y' so it's totally obvious if someone uses it uninitialized.
+    // Do this in both the cache and the main memory.
+    memset(buf->ptr, 'y', buf->orig_len);
+#if __DCACHE_PRESENT
+    SCB_CleanDCache_by_Addr(buf->ptr, buf->orig_len);
+#endif
+
     m_mem_buffers.push_front(buf);
 
     m_mem_mutex.unlock();
@@ -281,6 +288,13 @@ void EmacTestMemoryManager::free(emac_mem_buf_t *buf)
         if (memcmp(buffer_tail, BUF_TAIL, BUF_TAIL_SIZE) != 0) {
             CHECK_ASSERT(0, "free(): %p tail overwrite", mem_buf);
         }
+
+        // Scribble over the buffer contents with 'z' so it's totally obvious if someone reuses it later.
+        // Do this in both the cache and the main memory.
+        memset(mem_buf->ptr, 'z', mem_buf->orig_len);
+#if __DCACHE_PRESENT
+        SCB_CleanDCache_by_Addr(mem_buf->ptr, mem_buf->orig_len);
+#endif
 
         // Update pool size
         if(mem_buf->lifetime == Lifetime::POOL_ALLOCATED)
