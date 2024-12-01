@@ -64,6 +64,8 @@ set(EXPECTED_MBED_UPLOAD_CFG_FILE_PATH ${MBED_SOURCE_DIR}/targets/upload_method_
 
 # check if a custom upload config path is defined in top lvl cmake
 if((DEFINED CUSTOM_UPLOAD_CFG_PATH))
+	# Make path absolute, as required by EXISTS
+	get_filename_component(CUSTOM_UPLOAD_CFG_PATH "${CUSTOM_UPLOAD_CFG_PATH}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
     if(EXISTS ${CUSTOM_UPLOAD_CFG_PATH})
         include(${CUSTOM_UPLOAD_CFG_PATH})
         message(STATUS "Mbed: Custom upload config included from ${CUSTOM_UPLOAD_CFG_PATH}")

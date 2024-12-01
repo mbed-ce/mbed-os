@@ -28,8 +28,9 @@ WEAK MBED_NORETURN void mbed_die(void)
 #if !defined(TARGET_EFM32)
     core_util_critical_section_enter();
 #endif
-    gpio_t led_err;
+
 #ifdef LED1
+    gpio_t led_err;
     gpio_init_out(&led_err, LED1);
 #endif
 

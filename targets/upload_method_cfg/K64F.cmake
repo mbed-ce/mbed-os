@@ -3,11 +3,10 @@
 # include app.cmake and where you add mbed os as a subdirectory.
 #
 # Notes:
-# 1. PyOCD did not actually work in my testing as of Apr 2024, though this device is supposed to be supported
-# 2. Be sure to update the DAPLink firmware on the board via these instructions: https://os.mbed.com/blog/entry/DAPLink-bootloader-update/
-# 3. OpenOCD 0.12 flashes this device perfectly and can enter a debug session, but cannot hit breakpoints
-# 4. LinkServer can both flash and debug, so it's the recommended upload method for this device.
-# 5. LinkServer does appear to have a bug where it doesn't map the peripheral registers as valid memory, so you can't
+# 1. Be sure to update the DAPLink firmware on the board via these instructions: https://os.mbed.com/blog/entry/DAPLink-bootloader-update/
+# 2. OpenOCD 0.12 flashes this device perfectly and can enter a debug session, but cannot hit breakpoints
+# 3. LinkServer can both flash and debug, so it's the recommended upload method for this device.
+# 4. LinkServer does appear to have a bug where it doesn't map the peripheral registers as valid memory, so you can't
 #    inspect them.  I was able to work around this by inserting a block like this into <LinkServer install dir>/devices/FRDM-K64F.json:
 #
 #         "name": "MK64FN1M0xxx12",

@@ -1014,7 +1014,7 @@ int can_write(can_t *obj, CAN_Message msg, int cc)
 int can_read(can_t *obj, CAN_Message *msg, int handle)
 {
     //FIFO selection cannot be controlled by software for STM32, default FIFO is 0, hence handle is not used
-    int rxfifo_default = DEFAULT_RXFIFO; 
+    const int rxfifo_default = DEFAULT_RXFIFO;
     CAN_TypeDef *can = obj->CanHandle.Instance;
 
     // check FPM0 which holds the pending message count in FIFO 0
@@ -1033,7 +1033,7 @@ int can_read(can_t *obj, CAN_Message *msg, int handle)
 
     msg->type = (CANType)(((uint8_t)0x02 & can->sFIFOMailBox[rxfifo_default].RIR) >> 1);
     /* Get the DLC */
-    msg->len = ((uint8_t)0x0F & can->sFIFOMailBox[rxfifo_default].RDTR < 8) ? ((uint8_t)0x0F & can->sFIFOMailBox[rxfifo_default].RDTR) : ((uint8_t) 8);
+    msg->len = ((can->sFIFOMailBox[rxfifo_default].RDTR & CAN_RDT0R_DLC) < 8) ? (CAN_RDT0R_DLC & can->sFIFOMailBox[rxfifo_default].RDTR) : ((uint8_t) 8);
     /* Get the FMI */
     // msg->FMI = (uint8_t)0xFF & (can->sFIFOMailBox[rxfifo_default].RDTR >> 8);
     /* Get the data field */

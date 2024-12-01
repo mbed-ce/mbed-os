@@ -28,6 +28,7 @@
 #include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"
+#include "mbed_boot.h"
 
 using utest::v1::Case;
 
@@ -39,17 +40,8 @@ static const int test_timeout = 30;
 // Malloc fill pattern
 #define MALLOC_FILL                 0x55
 
-extern unsigned char *mbed_heap_start;
-extern uint32_t mbed_heap_size;
 extern unsigned char *mbed_stack_isr_start;
 extern uint32_t mbed_stack_isr_size;
-
-#if defined(TOOLCHAIN_GCC_ARM) && defined(MBED_SPLIT_HEAP)
-extern uint32_t __mbed_sbrk_start_0;
-extern uint32_t __mbed_krbs_start_0;
-unsigned char *mbed_heap_start_0 = (unsigned char *) &__mbed_sbrk_start_0;;
-uint32_t mbed_heap_size_0 = (uint32_t) &__mbed_krbs_start_0 - (uint32_t) &__mbed_sbrk_start_0;
-#endif
 
 struct linked_list {
     linked_list *next;
@@ -260,7 +252,7 @@ void test_heap_allocation_free(void)
     check_and_free_heap(head, max_allocation_size);
 
     // Force a task switch so a stack check is performed
-    ThisThread::sleep_for(10);
+    ThisThread::sleep_for(10s);
 
     printf("Total size dynamically allocated: %luB\n", max_allocation_size);
 }

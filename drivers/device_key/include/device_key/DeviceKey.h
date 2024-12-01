@@ -25,7 +25,7 @@
 
 // Whole class is not supported if entropy is not enabled
 // Flash device is required as Device Key is currently depending on it
-#if !DEVICE_FLASH || !defined(COMPONENT_FLASHIAP)
+#if !DEVICE_FLASH
 #undef DEVICEKEY_ENABLED
 #define DEVICEKEY_ENABLED 0
 #endif

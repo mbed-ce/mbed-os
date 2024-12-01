@@ -24,3 +24,15 @@ target_sources(mbed-wiced
 )
 
 target_link_libraries(mbed-wifi PUBLIC mbed-wiced)
+
+# Link override object file coming from static library anyway
+#
+# NOTE: This linker option is to pretend undefined symbol and won't cause
+#       undefined symbol error even though the override object file actually
+#       doesn't provide such symbol definition.
+if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
+    target_link_options(mbed-wifi
+        INTERFACE
+            LINKER:--undefined=LINK_DEFAULT_WIFI_INTERFACE_CPP
+    )
+endif()

@@ -159,7 +159,7 @@ SECTIONS
      * values to stack symbols later */
     .stack_dummy (NOLOAD):
     {
-        *(.stack)
+        . += STACK_SIZE;
     } > RAM
 
     /* Set stack top to end of RAM, and stack limit move down by

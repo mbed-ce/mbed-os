@@ -97,7 +97,6 @@ target_sources(mbed-stm32h5cube-fw
         STM32H5xx_HAL_Driver/stm32h5xx_ll_fmc.c
         STM32H5xx_HAL_Driver/stm32h5xx_ll_gpio.c
         STM32H5xx_HAL_Driver/stm32h5xx_ll_i2c.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_i3c.c
         STM32H5xx_HAL_Driver/stm32h5xx_ll_icache.c
         STM32H5xx_HAL_Driver/stm32h5xx_ll_lptim.c
         STM32H5xx_HAL_Driver/stm32h5xx_ll_lpuart.c
@@ -114,6 +113,9 @@ target_sources(mbed-stm32h5cube-fw
         STM32H5xx_HAL_Driver/stm32h5xx_ll_usb.c
         STM32H5xx_HAL_Driver/stm32h5xx_ll_utils.c
         STM32H5xx_HAL_Driver/stm32h5xx_util_i3c.c
+
+        # NOTE: Don't compile stm32h5xx_ll_i3c.c, it does not build if the
+        # HAL driver for i3c is enabled due to a circular include issue.
 )
 
 target_include_directories(mbed-stm32h5cube-fw

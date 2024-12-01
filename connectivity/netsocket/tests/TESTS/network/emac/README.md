@@ -4,7 +4,7 @@ This document describes how to run EMAC tests. The EMAC test cases are made usin
 
 ## Configuring the CTP echo server
 
-To configure a device to be a CTP echo server, you need to enable the `echo-server` setting in the `json` file of the test environment application. When you configure a device to be a CTP echo server, it starts to forward CTP messages automatically when it is on and continues to do so until you switch it off.
+To configure a device to be a CTP echo server, you need to flash it with the [mbed-ethernet-ctp-server](https://github.com/mbed-ce/mbed-ethernet-ctp-server) application. When you configure a device to be a CTP echo server, it starts to forward CTP messages automatically when it is on and continues to do so until you switch it off.
 
 ## Other configuration options
 
@@ -55,28 +55,6 @@ Please refer to the following table for priorities of test cases. Priorities are
 | 8   | EMAC memory                             | MUST     |
 
 ## Example commands
-
-### CTP echo server
-
-You can use the following command to a build CTP echo server:
-
-`mbed test --compile -m TARGET -t GCC_ARM -v -n tests-network-emac --app-config TESTS/network/emac/template_mbed_app_echo_server.txt`
-
-Replace TARGET with the target device. After building, flash the binary to the CTP echo server device.
-
-You can verify that the CTP echo server has started properly by making a terminal connection to the device, resetting it and verifying that `echo server started successfully` prints on the terminal. You can run host tests when the CTP echo server is running on the Ethernet segment.
-
-For Wi-Fi tests, the CTP echo server can also run on the ethernet side as long as the network configuration is such that Ethernet frames are routed between Wi-Fi and Ethernet.
-
-The CTP echo server sends a 100-byte long broadcast CTP Ethernet frame every 60 seconds to inform the network of its presence.
-
-### Running tests
-
-You can use the following command to run tests:
-
-`mbed test --compile --run -m TARGET -t GCC_ARM -v -n tests-network-emac --app-config TESTS/network/emac/template_mbed_app.txt`
-
-Replace TARGET with the target device.
 
 ## Traces
 

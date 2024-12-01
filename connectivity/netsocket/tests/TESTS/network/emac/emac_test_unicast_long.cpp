@@ -75,7 +75,7 @@ void test_emac_unicast_long()
     SET_TRACE_LEVEL(TRACE_FAILURE);
 
     if (ECHO_SERVER_ADDRESS_KNOWN) {
-        START_TEST_LOOP(test_emac_unicast_long_cb, 1);
+        START_TEST_LOOP(test_emac_unicast_long_cb, 1ms);
     }
 
     PRINT_ERROR_FLAGS;

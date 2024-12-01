@@ -29,6 +29,11 @@ function(mbed_setup_linker_script mbed_os_target mbed_baremetal_target target_de
 
     # Find the path to the desired linker script
     # (the property should be set on both the OS and baremetal targets in a sane world)
+    get_property(RAW_LINKER_SCRIPT_PATHS_SET TARGET ${mbed_baremetal_target} PROPERTY INTERFACE_MBED_LINKER_SCRIPT SET)
+    if(NOT RAW_LINKER_SCRIPT_PATHS_SET)
+        message(FATAL_ERROR "No linker script has been set for the Mbed target. Ensure that code is calling mbed_set_linker_script() for the mbed-<your-board-name> target or one of its parents")
+    endif()
+
     get_property(RAW_LINKER_SCRIPT_PATHS TARGET ${mbed_baremetal_target} PROPERTY INTERFACE_MBED_LINKER_SCRIPT)
 
     # Check if two (or more) different linker scripts got used
@@ -90,9 +95,10 @@ function(mbed_setup_linker_script mbed_os_target mbed_baremetal_target target_de
         #  add linker script only for tests
         if(MBED_IS_STANDALONE)
             target_link_options(${TARGET}
-            INTERFACE
-                "-T" "${LINKER_SCRIPT_PATH}"
-            )
+                INTERFACE
+                    "-T" "${LINKER_SCRIPT_PATH}"
+                )
+            set_property(TARGET ${TARGET} APPEND PROPERTY INTERFACE_LINK_DEPENDS ${LINKER_SCRIPT_PATH})
         endif()
     endforeach()
 
@@ -145,5 +151,6 @@ function(mbed_set_custom_linker_script target new_linker_script_path)
         PRIVATE
             "-T" "${CUSTOM_LINKER_SCRIPT_PATH}"
     )
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${CUSTOM_LINKER_SCRIPT_PATH})
 
 endfunction(mbed_set_custom_linker_script)

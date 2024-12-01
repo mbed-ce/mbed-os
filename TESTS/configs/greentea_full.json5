@@ -1,0 +1,9 @@
+{
+    "overrides": {
+        // Enable Mbed Stats tests
+        "platform.all-stats-enabled": 1,
+
+        // Enable auto reboot on error, required for crash reporting test
+        "platform.fatal-error-auto-reboot-enabled": true
+    }
+}

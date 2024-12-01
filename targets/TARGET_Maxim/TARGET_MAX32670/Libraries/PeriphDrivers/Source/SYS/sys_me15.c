@@ -44,7 +44,6 @@
 #include "mxc_assert.h"
 #include "mxc_sys.h"
 #include "mxc_delay.h"
-#include "aes.h"
 #include "flc.h"
 #include "gcr_regs.h"
 #include "fcr_regs.h"

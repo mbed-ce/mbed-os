@@ -69,7 +69,7 @@ void test_emac_unicast()
     SET_TRACE_LEVEL(TRACE_SEND | TRACE_ETH_FRAMES | TRACE_SUCCESS | TRACE_FAILURE);
 
     if (ECHO_SERVER_ADDRESS_KNOWN) {
-        START_TEST_LOOP(test_emac_unicast_cb, 1 * SECOND_TO_MS);
+        START_TEST_LOOP(test_emac_unicast_cb, 1ms);
     }
 
     PRINT_ERROR_FLAGS;

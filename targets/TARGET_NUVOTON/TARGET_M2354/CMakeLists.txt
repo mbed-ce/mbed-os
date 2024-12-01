@@ -14,6 +14,7 @@ target_sources(mbed-m2354
         analogin_api.c
         analogout_api.c
 
+        device/partition_M2354_mem.c
         device/startup_M2354.c
         device/system_M2354.c
         device/StdDriver/src/m2354_acmp.c

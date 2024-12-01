@@ -50,36 +50,14 @@ FLASH_CM0P_SIZE = 0x10000;
 /* The size of the MCU boot header area at the start of FLASH */
 BOOT_HEADER_SIZE = 0x400;
 
-#if !defined(MBED_ROM_START)
-  #define MBED_ROM_START    0x10000000
-#endif
-
-/* MBED_APP_START is being used by the bootloader build script and
-* will be calculate by the system. In case if MBED_APP_START address is
-* customized by the bootloader config, the application image should not
-* include CM0p prebuilt image.
-*/
+/*
+ * Figure out start address and size of application, unless overridden by definitions
+ */
 #if !defined(MBED_APP_START)
-  #define MBED_APP_START (MBED_ROM_START + FLASH_CM0P_SIZE)
+  #define MBED_APP_START (MBED_CONFIGURED_ROM_BANK_IROM1_START + FLASH_CM0P_SIZE)
 #endif
-
-#if !defined(MBED_ROM_SIZE)
-  #define MBED_ROM_SIZE     0x000E8000
-#endif
-
-/* MBED_APP_SIZE is being  used by the bootloader build script and
-* will be calculate by the system.
-*/
 #if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE (MBED_ROM_SIZE - FLASH_CM0P_SIZE)
-#endif
-
-#if !defined(MBED_RAM_START)
-  #define MBED_RAM_START    0x08001800
-#endif
-
-#if !defined(MBED_RAM_SIZE)
-  #define MBED_RAM_SIZE     0x000DE800
+  #define MBED_APP_SIZE (MBED_CONFIGURED_ROM_BANK_IROM1_SIZE - FLASH_CM0P_SIZE)
 #endif
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
@@ -108,8 +86,8 @@ MEMORY
      * Your changes must be aligned with the corresponding memory regions for CM0+ core in 'xx_cm0plus.ld',
      * where 'xx' is the device group; for example, 'cyb06xxa_cm0plus.ld'.
      */
-    ram               (rwx)   : ORIGIN = MBED_RAM_START, LENGTH = MBED_RAM_SIZE
-    cm0p_image        (rx)    : ORIGIN = (MBED_ROM_START + BOOT_HEADER_SIZE), LENGTH = FLASH_CM0P_SIZE
+    ram               (rwx)   : ORIGIN = MBED_CONFIGURED_RAM_BANK_IRAM1_START, LENGTH = MBED_CONFIGURED_RAM_BANK_IRAM1_SIZE
+    cm0p_image        (rx)    : ORIGIN = MBED_ROM_BANK_IROM1_START + BOOT_HEADER_SIZE, LENGTH = FLASH_CM0P_SIZE
     flash             (rx)    : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
 
     /* This is a 32K flash region used for EEPROM emulation. This region can also be used as the general purpose flash.
@@ -443,8 +421,8 @@ SECTIONS
 
 /* The following symbols used by the cymcuelftool. */
 /* Flash */
-__cy_memory_0_start    = 0x10000000;
-__cy_memory_0_length   = 0x001D0000;
+__cy_memory_0_start    = MBED_ROM_BANK_IROM1_START;
+__cy_memory_0_length   = MBED_ROM_BANK_IROM1_SIZE;
 __cy_memory_0_row_size = 0x200;
 
 /* Emulated EEPROM Flash area */

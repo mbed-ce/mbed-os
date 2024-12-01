@@ -68,6 +68,17 @@ TEST_F(TestNetworkInterface, constructor)
 }
 
 // get_default_instance is tested along with the implementations of NetworkInterface.
+TEST_F(TestNetworkInterface, get_hostname)
+{
+    char *n = 0;
+    EXPECT_EQ(iface->get_hostname(), n);
+}
+
+TEST_F(TestNetworkInterface, set_hostname)
+{
+    char *hostname;
+    EXPECT_EQ(iface->set_hostname(hostname), NSAPI_ERROR_UNSUPPORTED);
+}
 
 TEST_F(TestNetworkInterface, get_mac_address)
 {

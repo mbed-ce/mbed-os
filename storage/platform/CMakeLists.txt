@@ -14,27 +14,27 @@ list(APPEND mbed-storage-libs
     mbed-storage-littlefs-v2
 )
 
-if("DATAFLASH" IN_LIST MBED_TARGET_LABELS)
+if("COMPONENT_DATAFLASH=1" IN_LIST MBED_TARGET_DEFINITIONS)
     list(APPEND mbed-storage-libs mbed-storage-dataflash)
 endif()
 
-if("FLASHIAP" IN_LIST MBED_TARGET_LABELS)
+if("DEVICE_FLASH=1" IN_LIST MBED_TARGET_DEFINITIONS)
     list(APPEND mbed-storage-libs mbed-storage-flashiap)
 endif()
 
-if("QSPIF" IN_LIST MBED_TARGET_LABELS)
+if("COMPONENT_QSPIF=1" IN_LIST MBED_TARGET_DEFINITIONS)
     list(APPEND mbed-storage-libs mbed-storage-qspif)
 endif()
 
-if("OSPIF" IN_LIST MBED_TARGET_LABELS)
+if("COMPONENT_OSPIF=1" IN_LIST MBED_TARGET_DEFINITIONS)
     list(APPEND mbed-storage-libs mbed-storage-ospif)
 endif()
 
-if("SD" IN_LIST MBED_TARGET_LABELS)
+if("COMPONENT_SD=1" IN_LIST MBED_TARGET_DEFINITIONS)
     list(APPEND mbed-storage-libs mbed-storage-sd)
 endif()
 
-if("SPIF" IN_LIST MBED_TARGET_LABELS)
+if("COMPONENT_SPIF=1" IN_LIST MBED_TARGET_DEFINITIONS)
     list(APPEND mbed-storage-libs mbed-storage-spif)
 endif()
 

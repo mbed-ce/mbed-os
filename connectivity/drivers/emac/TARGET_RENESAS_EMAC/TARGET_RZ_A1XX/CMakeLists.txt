@@ -9,5 +9,5 @@ target_include_directories(mbed-emac
 target_sources(mbed-emac
     PRIVATE
         rza1_emac.cpp
-        rza1_eth.cpp
+        rza1_eth.c
 )

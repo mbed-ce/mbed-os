@@ -6,16 +6,19 @@
 import pathlib
 
 from typing import Any, Tuple
+import json
 
 from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.project import MbedProgram
 from mbed_tools.targets import get_target_by_name
 from mbed_tools.build._internal.cmake_file import render_mbed_config_cmake_template
 from mbed_tools.build._internal.config.assemble_build_config import Config, assemble_config
+from mbed_tools.build._internal.memory_banks import incorporate_memory_bank_data_from_cmsis, process_memory_banks
 from mbed_tools.build._internal.write_files import write_file
 from mbed_tools.build.exceptions import MbedBuildError
 
 CMAKE_CONFIG_FILE = "mbed_config.cmake"
+MEMORY_BANKS_JSON_FILE = "memory_banks.json"
 MBEDIGNORE_FILE = ".mbedignore"
 
 
@@ -33,9 +36,16 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> T
     """
     targets_data = _load_raw_targets_data(program)
     target_build_attributes = get_target_by_name(target_name, targets_data)
+    incorporate_memory_bank_data_from_cmsis(target_build_attributes, program)
     config = assemble_config(
         target_build_attributes, [program.root, program.mbed_os.root], program.files.app_config_file
     )
+
+    # Process memory banks and save JSON data for other tools (e.g. memap) to use
+    memory_banks_json_content = process_memory_banks(config)
+    program.files.cmake_build_dir.mkdir(parents=True, exist_ok=True)
+    (program.files.cmake_build_dir / MEMORY_BANKS_JSON_FILE).write_text(json.dumps(memory_banks_json_content, indent=4))
+
     cmake_file_contents = render_mbed_config_cmake_template(
         target_name=target_name, config=config, toolchain_name=toolchain,
     )

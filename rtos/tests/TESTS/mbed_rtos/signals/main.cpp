@@ -35,7 +35,7 @@ using utest::v1::Case;
 template <int32_t signals, uint32_t timeout, uint32_t test_val>
 void run_signal_wait(void)
 {
-    uint32_t ret = ThisThread::flags_wait_all_for(signals, timeout);
+    uint32_t ret = ThisThread::flags_wait_all_for(signals, std::chrono::milliseconds(timeout));
     TEST_ASSERT_EQUAL(test_val, ret);
 }
 
@@ -64,7 +64,7 @@ void test_clear_no_signals_with_ticker(void)
 {
     Ticker t;
     osThreadFlagsSet(ThisThread::get_id(), ALL_SIGNALS);
-    t.attach_us([&] { run_multiple_wait_clear(NO_SIGNALS, NO_SIGNALS, ALL_SIGNALS, ALL_SIGNALS); }, 3000);
+    t.attach([&] { run_multiple_wait_clear(NO_SIGNALS, NO_SIGNALS, ALL_SIGNALS, ALL_SIGNALS); }, 3ms);
 }
 
 /** Validate all flags_clr clears the signal in one shot
@@ -77,7 +77,7 @@ void test_clear_all_with_ticker(void)
 {
     Ticker t;
     osThreadFlagsSet(ThisThread::get_id(), ALL_SIGNALS);
-    t.attach_us([&] { run_multiple_wait_clear(ALL_SIGNALS, NO_SIGNALS, ALL_SIGNALS, NO_SIGNALS); }, 3000);
+    t.attach([&] { run_multiple_wait_clear(ALL_SIGNALS, NO_SIGNALS, ALL_SIGNALS, NO_SIGNALS); }, 3ms);
 }
 
 /** Validate if any signals are set on ticker callback
@@ -89,7 +89,7 @@ void test_clear_all_with_ticker(void)
 void test_init_state_with_ticker(void)
 {
     Ticker t;
-    t.attach_us(callback(run_clear<NO_SIGNALS, NO_SIGNALS>), 3000);
+    t.attach(callback(run_clear<NO_SIGNALS, NO_SIGNALS>), 3ms);
 }
 
 /** Validate signal_wait return status if timeout specified
@@ -102,7 +102,7 @@ template <int32_t signals, uint32_t timeout, uint32_t status>
 void test_wait_timeout_with_ticker(void)
 {
     Ticker t;
-    t.attach_us(callback(run_signal_wait<signals, timeout, status>), 3000);
+    t.attach(callback(run_signal_wait<signals, timeout, status>), 3ms);
 }
 
 void run_release_wait_signal_wait_callback()
@@ -121,21 +121,20 @@ void run_release_wait_signal_wait_callback()
 void test_wait_all_already_set_with_ticker(void)
 {
     Ticker t;
-    t.attach_us([&] { run_release_wait_signal_wait_callback(); }, 3000);
-    uint32_t ret = ThisThread::flags_wait_all_for(ALL_SIGNALS, osWaitForever);
+    t.attach([&] { run_release_wait_signal_wait_callback(); }, 3ms);
+    uint32_t ret = ThisThread::flags_wait_all_for(ALL_SIGNALS, Kernel::wait_for_u32_forever);
     TEST_ASSERT_EQUAL(ALL_SIGNALS, ret);
 }
 
 void run_release_wait_signal_set_callback(int32_t signal, osThreadId_t id)
 {
-    int32_t ret;
     if (signal == 0) {
         for (int i = 0; i < 16; i++) {
             int32_t signal = 1 << i;
-            ret = osThreadFlagsSet(id, signal);
+            osThreadFlagsSet(id, signal);
         }
     } else {
-        ret = osThreadFlagsSet(id, signal);
+        osThreadFlagsSet(id, signal);
     }
 }
 
@@ -153,8 +152,8 @@ void test_wait_all_loop_with_ticker(void)
     Semaphore sem(0, 1);
     Ticker t;
     osThreadId_t id = ThisThread::get_id();
-    t.attach_us([&] { run_release_wait_signal_set_callback(0, id); }, 4000);
-    ret = ThisThread::flags_wait_all_for((ALL_SIGNALS & 0xFFFF), osWaitForever, true);
+    t.attach([&] { run_release_wait_signal_set_callback(0, id); }, 4ms);
+    ret = ThisThread::flags_wait_all_for((ALL_SIGNALS & 0xFFFF), Kernel::wait_for_u32_forever, true);
     TEST_ASSERT_EQUAL((ALL_SIGNALS & 0xFFFF), ret);
 }
 
@@ -172,10 +171,10 @@ void test_set_double_with_ticker(void)
     int32_t ret;
     Ticker t1, t2;
     osThreadId_t id = ThisThread::get_id();
-    t1.attach_us([&] { run_release_wait_signal_set_callback(SIGNAL2, id); }, 3000);
-    t2.attach_us([&] { run_release_wait_signal_set_callback(SIGNAL1 | SIGNAL2 | SIGNAL3, id); }, 4000);
+    t1.attach([&] { run_release_wait_signal_set_callback(SIGNAL2, id); }, 3ms);
+    t2.attach([&] { run_release_wait_signal_set_callback(SIGNAL1 | SIGNAL2 | SIGNAL3, id); }, 4ms);
 
-    ret = ThisThread::flags_wait_all_for((SIGNAL1 | SIGNAL2 | SIGNAL3), osWaitForever, true);
+    ret = ThisThread::flags_wait_all_for((SIGNAL1 | SIGNAL2 | SIGNAL3), Kernel::wait_for_u32_forever, true);
     TEST_ASSERT_EQUAL(SIGNAL1 | SIGNAL2 | SIGNAL3, ret);
 }
 
@@ -197,7 +196,7 @@ template <int32_t signals, uint32_t timeout, uint32_t test_val>
 void run_release_signal_wait(Semaphore *sem)
 {
     sem->release();
-    uint32_t ret = ThisThread::flags_wait_all_for(signals, timeout);
+    uint32_t ret = ThisThread::flags_wait_all_for(signals, std::chrono::milliseconds(timeout));
     TEST_ASSERT_EQUAL(test_val, ret);
 }
 
@@ -206,7 +205,7 @@ void run_release_wait_signal_wait(Sync *sync)
 {
     sync->sem_parent.release();
     sync->sem_child.acquire();
-    uint32_t ret = ThisThread::flags_wait_all_for(signals, timeout);
+    uint32_t ret = ThisThread::flags_wait_all_for(signals, std::chrono::milliseconds(timeout));
     TEST_ASSERT_EQUAL(test_val, ret);
 }
 
@@ -314,7 +313,6 @@ void test_set_all(void)
  */
 void test_set_prohibited(void)
 {
-    int32_t ret;
     Semaphore sem_parent(0, 1);
     Semaphore sem_child(0, 1);
     Sync sync(sem_parent, sem_child);
@@ -326,7 +324,7 @@ void test_set_prohibited(void)
     t.flags_set(ALL_SIGNALS);
 
 #if !MBED_TRAP_ERRORS_ENABLED
-    ret = t.flags_set(PROHIBITED_SIGNAL);
+    int32_t ret = t.flags_set(PROHIBITED_SIGNAL);
     TEST_ASSERT_EQUAL(osErrorParameter, ret);
 #endif
 

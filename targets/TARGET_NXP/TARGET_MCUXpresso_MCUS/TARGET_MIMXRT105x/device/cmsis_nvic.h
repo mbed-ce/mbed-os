@@ -42,10 +42,4 @@ extern uint32_t __VECTOR_RAM[];
 #define NVIC_NUM_VECTORS        (16 + 160)        // CORE + MCU Peripherals
 #define NVIC_RAM_VECTOR_ADDRESS (__VECTOR_RAM)    // Vectors positioned at start of RAM
 
-#ifdef MIMXRT105X_BOARD_HAS_EXTERNAL_RAM
-#define MBED_RAM_SIZE MIMXRT105X_EXTERNAL_RAM_SIZE
-#else
-#define MBED_RAM_SIZE 0x00040000
-#endif
-
 #endif

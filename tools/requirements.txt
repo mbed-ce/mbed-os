@@ -20,7 +20,7 @@ junit-xml>=1.0,<2.0
 lockfile
 six>=1.0,<2.0
 colorama>=0.3,<0.5
-json5
+pyjson5~=1.6
 humanize~=4.9.0
 
 # Install pyocd so that it's available in the venv if the user chooses to use it
@@ -33,6 +33,7 @@ lxml; sys_platform == 'darwin'
 # needed for signing secure images
 cryptography
 cbor
+cysecuretools~=6.0
 
 # Needed for downloading CMSIS MCU descriptions
 cmsis-pack-manager~=0.5.0

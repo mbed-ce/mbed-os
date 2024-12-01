@@ -207,52 +207,45 @@ typedef enum {
     ADC_VREF = 0xF1,
     ADC_VBAT = 0xF2,
 
+#ifdef TARGET_FF_ARDUINO_UNO
     /* Arduino connector pin definitions */
-    A0          = PORTC_0,
-    A1          = PORTA_5,
-    A2          = PORTC_2,
-    A3          = PORTC_3,
-    A4          = PORTA_0,      /* PORTB_11 */
-    A5          = PORTC_5,      /* PORTB_10 */
-    D0          = PORTC_11,
-    D1          = PORTC_10,
-    D2          = PORTA_15,
-    D3          = PORTD_12,
-    D4          = PORTC_8,
-    D5          = PORTC_7,
-    D6          = PORTB_0,
-    D7          = PORTC_12,
-    D8          = PORTD_13,
-    D9          = PORTA_8,
-    D10         = PORTA_1,
-    D11         = PORTB_15,
-    D12         = PORTB_14,
-    D13         = PORTB_13,
-    D14         = PORTB_9,
-    D15         = PORTB_8,
+    ARDUINO_UNO_A0  = PORTC_0,
+    ARDUINO_UNO_A1  = PORTA_5,
+    ARDUINO_UNO_A2  = PORTC_2,
+    ARDUINO_UNO_A3  = PORTC_3,
+    ARDUINO_UNO_A4  = PORTA_0,      /* PORTB_11 */
+    ARDUINO_UNO_A5  = PORTC_5,      /* PORTB_10 */
+    ARDUINO_UNO_D0  = PORTC_11,
+    ARDUINO_UNO_D1  = PORTC_10,
+    ARDUINO_UNO_D2  = PORTA_15,
+    ARDUINO_UNO_D3  = PORTD_12,
+    ARDUINO_UNO_D4  = PORTC_8,
+    ARDUINO_UNO_D5  = PORTC_7,
+    ARDUINO_UNO_D6  = PORTB_0,
+    ARDUINO_UNO_D7  = PORTC_12,
+    ARDUINO_UNO_D8  = PORTD_13,
+    ARDUINO_UNO_D9  = PORTA_8,
+    ARDUINO_UNO_D10 = PORTA_1,
+    ARDUINO_UNO_D11 = PORTB_15,
+    ARDUINO_UNO_D12 = PORTB_14,
+    ARDUINO_UNO_D13 = PORTB_13,
+    ARDUINO_UNO_D14 = PORTB_9,
+    ARDUINO_UNO_D15 = PORTB_8,
+#endif
 
-    LED1        = PORTF_6,
-    LED2        = PORTC_13,
-    LED3        = PORTE_6,
+#define LED1 PORTF_6
+#define LED2 PORTC_13
+#define LED3 PORTE_6
 
-    KEY1        = PORTE_5,
-    KEY2        = PORTE_4,
-
-    BUTTON1     = KEY1,
-    BUTTON2     = KEY2,
+#define BUTTON1 PORTE_5
+#define BUTTON2 PORTE_4
 
     SERIAL_TX   = PORTC_12,
     SERIAL_RX   = PORTD_2,
     CONSOLE_TX       = SERIAL_TX,
     CONSOLE_RX       = SERIAL_RX,
 
-    I2C_SCL     = PORTB_6,
-    I2C_SDA     = PORTB_7,
-    SPI_MOSI    = PORTB_5,
-    SPI_MISO    = PORTB_4,
-    SPI_SCK     = PORTB_3,
-    SPI_CS      = PORTE_2,
-    PWM_OUT     = D9,
+    PWM_OUT     = PORTA_8,
 
     USBFS_VBUS  = PORTA_9,
     USBFS_DM    = PORTA_11,

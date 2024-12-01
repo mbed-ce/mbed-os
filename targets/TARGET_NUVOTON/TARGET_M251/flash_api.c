@@ -94,7 +94,7 @@ static const flash_algo_t flash_algo_config = {
 
 /* Secure flash */
 static const sector_info_t sectors_info[] = {
-    {MBED_ROM_START, 0x200},                                // (start, sector size)
+    {MBED_ROM_BANK_IROM1_START, 0x200},                                // (start, sector size)
 };
 
 /* Secure flash */
@@ -102,8 +102,8 @@ static const flash_target_config_t flash_target_config = {
     .page_size  = 4,                                        // 4 bytes
                                                             // Here page_size is program unit, which is different
                                                             // than FMC definition.
-    .flash_start = MBED_ROM_START,
-    .flash_size = MBED_ROM_SIZE,
+    .flash_start = MBED_ROM_BANK_IROM1_START,
+    .flash_size = MBED_ROM_BANK_IROM1_SIZE,
     .sectors = sectors_info,
     .sector_info_count = sizeof(sectors_info) / sizeof(sector_info_t)
 };

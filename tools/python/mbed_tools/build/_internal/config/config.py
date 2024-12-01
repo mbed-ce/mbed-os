@@ -41,6 +41,11 @@ class Config(UserDict):
                 _apply_override(self.data, override)
                 continue
 
+            # Support override of memory_bank_config in mbed_app.json
+            if override.namespace == "target" and override.name == "memory_bank_config":
+                _apply_override(self.data, override)
+                continue
+
             setting = next(
                 filter(
                     lambda x: x.name == override.name and x.namespace == override.namespace,

@@ -73,7 +73,7 @@ static void _ifup()
 #if MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == MESH
     tr_info("Waiting for GLOBAL_UP\n");
     while (net->get_connection_status() != NSAPI_STATUS_GLOBAL_UP) {
-        ThisThread::sleep_for(500);
+        ThisThread::sleep_for(500ms);
     }
 #endif
     tr_info("MBED: UDPClient IP address is '%s'\n", address ? address.get_ip_address() : "null");

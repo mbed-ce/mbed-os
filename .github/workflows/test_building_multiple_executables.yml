@@ -8,10 +8,12 @@ jobs:
     container: ghcr.io/armmbed/mbed-os-env:master-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Python packages
+        # Note: pip>=20.3 is needed to install dependencies of cysecuretools
         run: |
+          python3 -m pip install --upgrade pip
           python3 -m pip install -r tools/requirements.txt
 
       # Note: For this CI job we use MBED_CREATE_PYTHON_VENV=FALSE so that we can make sure

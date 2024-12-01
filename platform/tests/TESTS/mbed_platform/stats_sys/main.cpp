@@ -22,6 +22,8 @@
 
 #include "mbed.h"
 
+#include <cinttypes>
+
 #if !defined(MBED_SYS_STATS_ENABLED)
 #error [NOT_SUPPORTED] test not supported
 #else
@@ -32,6 +34,15 @@ void test_sys_info()
 {
     mbed_stats_sys_t stats;
     mbed_stats_sys_get(&stats);
+
+    // Print a summary of the stats, just for debug purposes
+    printf("Dump of Mbed System Stats: -------------------------------------\n");
+    printf("- OS Version: %" PRIu32 ".%" PRIu32 ".%" PRIu32 "\n",
+           stats.os_version / 10000,
+           (stats.os_version % 10000) / 100,
+           ((stats.os_version % 10000) % 100));
+    printf("- CPUID Register: 0x%" PRIx32 "\n", stats.cpu_id);
+    printf("- Compiler Version: %" PRIu32 "\n", stats.compiler_version);
 
     TEST_ASSERT_NOT_EQUAL(0, stats.os_version);
 #if defined(__CORTEX_M)

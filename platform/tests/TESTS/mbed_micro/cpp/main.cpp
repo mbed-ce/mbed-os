@@ -30,7 +30,7 @@ class Test {
 
 private:
     const char *name;
-    const int pattern;
+    const uint32_t pattern;
 
 public:
     Test(const char *_name, bool print_message = true) : name(_name), pattern(PATTERN_CHECK_VALUE)

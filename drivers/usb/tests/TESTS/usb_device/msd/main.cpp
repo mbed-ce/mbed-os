@@ -217,7 +217,7 @@ void msd_process(USBMSD *msd)
     Semaphore proc;
     msd->attach(callback(run_processing, &proc));
     while (!msd_process_done) {
-        proc.try_acquire_for(100);
+        proc.try_acquire_for(100ms);
         msd->process();
         if (msd->media_removed()) {
             media_remove_event.release();
@@ -233,7 +233,7 @@ void msd_process(USBMSD *msd)
     for (int x = 0; x < 15; x++) { \
         prev_read_counter = usb.get_read_counter();\
         prev_program_counter = usb.get_program_counter();\
-        ThisThread::sleep_for(1000);\
+        ThisThread::sleep_for(1000ms);\
         if ((usb.get_read_counter() == prev_read_counter) && \
             (usb.get_program_counter() == prev_program_counter)) {\
             break;\
@@ -241,18 +241,19 @@ void msd_process(USBMSD *msd)
     }
 
 
-#define TEST_ASSERT_EQUAL_STRING_LOOP(expected, actual, loop_index)                             \
-        if (strcmp(expected, actual) != 0) {                                                    \
-            char str[128];                                                                      \
-            sprintf(str, "expected %s was %s (loop index: %lu)", expected, actual, loop_index); \
-            TEST_ASSERT_MESSAGE(false, str);                                                    \
+char testMessageBuffer[300];
+
+
+#define TEST_ASSERT_EQUAL_STRING_LOOP(expected, actual, loop_index)                                           \
+        if (strcmp(expected, actual) != 0) {                                                                  \
+            sprintf(testMessageBuffer, "expected %s was %s (loop index: %lu)", expected, actual, loop_index); \
+            TEST_ASSERT_MESSAGE(false, testMessageBuffer);                                                    \
         }
 
-#define TEST_ASSERT_EQUAL_LOOP(expected, actual, loop_index)                                    \
-        if (expected != actual) {                                                               \
-            char str[128];                                                                      \
-            sprintf(str, "expected %d was %d (loop index: %lu)", expected, actual, loop_index); \
-            TEST_ASSERT_MESSAGE(false, str);                                                    \
+#define TEST_ASSERT_EQUAL_LOOP(expected, actual, loop_index)                                                  \
+        if (expected != actual) {                                                                             \
+            sprintf(testMessageBuffer, "expected %d was %d (loop index: %lu)", expected, actual, loop_index); \
+            TEST_ASSERT_MESSAGE(false, testMessageBuffer);                                                    \
         }
 
 
@@ -341,7 +342,7 @@ void mount_unmount_test(BlockDevice *bd, FileSystem *fs)
             TEST_ASSERT_EQUAL_STRING_LOOP("passed", _key, i);
 
             // wait for unmount event (set 10s timeout)
-            media_remove_event.try_acquire_for(10000);
+            media_remove_event.try_acquire_for(10s);
             if (!usb.media_removed()) {
                 TEST_ASSERT_EQUAL_LOOP(true, usb.media_removed(), i);
             }
@@ -436,7 +437,7 @@ void mount_unmount_and_data_test(BlockDevice *bd, FileSystem *fs)
     TEST_ASSERT_EQUAL_STRING("passed", _key);
 
     do {
-        ThisThread::sleep_for(1);
+        ThisThread::sleep_for(1ms);
     } while (test_files_exist(fs_root));
     TEST_ASSERT_EQUAL(false, test_files_exist(fs_root));
 

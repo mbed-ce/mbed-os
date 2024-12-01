@@ -320,6 +320,13 @@ WEAK MBED_NORETURN mbed_error_status_t mbed_error(mbed_error_status_t error_stat
     //Protect report_error_ctx while we update it
     core_util_critical_section_enter();
     report_error_ctx = last_error_ctx;
+
+    // If the MCU has a data cache, ensure that the fault data is flushed to main memory
+    // before reboot
+#if __DCACHE_PRESENT
+    SCB_CleanDCache_by_Addr(&report_error_ctx, sizeof(mbed_crash_data_t));
+#endif
+
     core_util_critical_section_exit();
     //We need not call delete_mbed_crc(crc_obj) here as we are going to reset the system anyway, and calling delete while handling a fatal error may cause nested exception
 #if MBED_CONF_PLATFORM_FATAL_ERROR_AUTO_REBOOT_ENABLED && (MBED_CONF_PLATFORM_ERROR_REBOOT_MAX > 0)

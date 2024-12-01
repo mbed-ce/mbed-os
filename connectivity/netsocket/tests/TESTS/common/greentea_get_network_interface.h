@@ -28,6 +28,7 @@
 #error [NOT_SUPPORTED] No network configuration found for this target.
 #endif
 
+#if MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI
 /*
  * Read the MBED_GREENTEA_WIFI_SECURE_PROTOCOL define from CMake and get the type of wifi
  * security in use
@@ -58,6 +59,7 @@ inline WiFiInterface *get_wifi_interface()
 
     return wifi_interface;
 }
+#endif
 
 /*
  * Get the default network interface for this board.

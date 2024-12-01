@@ -1331,6 +1331,11 @@ static void hciEvtProcessLeExtAdvReport(uint8_t *p, uint8_t len)
   while (i-- > 0)
   {
     ptr += HCI_EXT_ADV_RPT_DATA_LEN_OFFSET;
+    // discard event if it doesn't contain enough data
+    if (ptr >= p + len)
+    {
+        return;
+    }
     BSTREAM_TO_UINT8(dataLen, ptr);
     ptr += dataLen;
 
@@ -1340,6 +1345,12 @@ static void hciEvtProcessLeExtAdvReport(uint8_t *p, uint8_t len)
       /* update max len */
       maxLen = dataLen;
     }
+  }
+
+  // finally check that the last report is fully contained within the event
+  if (ptr > p + len)
+  {
+      return;
   }
 
   /* allocate temp buffer that can hold max length ext adv/scan rsp data */
@@ -2471,6 +2482,11 @@ void hciEvtProcessCmdCmpl(uint8_t *p, uint8_t len)
   uint8_t       cbackEvt = 0;
   hciEvtCback_t cback = hciCb.evtCback;
 
+  if (len < 3)
+  {
+    return;
+  }
+
   BSTREAM_TO_UINT8(numPkts, p);
   BSTREAM_TO_UINT16(opcode, p);
 
@@ -2684,7 +2700,7 @@ void hciEvtProcessCmdCmpl(uint8_t *p, uint8_t len)
     if (cbackEvt == HCI_UNHANDLED_CMD_CMPL_CBACK_EVT) {
       const uint8_t structSize = sizeof(hciUnhandledCmdCmplEvt_t) - 1 /* removing the fake 1-byte array */;
       const uint8_t remainingLen = len - 3 /* we already read opcode and numPkts */;
-      const uint8_t msgSize = structSize + remainingLen;
+      const uint16_t msgSize = structSize + remainingLen;
 
       pMsg = WsfBufAlloc(msgSize);
       if (pMsg != NULL) {
@@ -2738,6 +2754,7 @@ void hciEvtProcessMsg(uint8_t *pEvt)
   uint8_t   evt;
   uint8_t   subEvt;
   uint8_t   len;
+  uint8_t   extraMsgLen = 0;
   uint8_t   cbackEvt = 0;
   hciEvt_t  *pMsg;
   uint16_t  handle;
@@ -2997,6 +3014,7 @@ void hciEvtProcessMsg(uint8_t *pEvt)
 #endif
       hciEvtStats.numVendorSpecEvt++;
       cbackEvt = HCI_VENDOR_SPEC_CBACK_EVT;
+      extraMsgLen = len;
 
 #ifdef WSF_DETOKEN_TRACE
       if (WsfDetokenProcessHciEvent(len, pEvt))
@@ -3014,7 +3032,7 @@ void hciEvtProcessMsg(uint8_t *pEvt)
   if (cbackEvt != 0)
   {
     /* allocate temp buffer */
-    if ((pMsg = WsfBufAlloc(hciEvtCbackLen[cbackEvt])) != NULL)
+    if ((pMsg = WsfBufAlloc(hciEvtCbackLen[cbackEvt] + extraMsgLen)) != NULL)
     {
       /* initialize message header */
       pMsg->hdr.param = 0;

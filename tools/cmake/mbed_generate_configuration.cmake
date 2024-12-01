@@ -97,7 +97,7 @@ if(MBED_NEED_TO_RECONFIGURE)
     file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake)
 
     set(MBEDTOOLS_CONFIGURE_COMMAND ${Python3_EXECUTABLE}
-        -c "import mbed_tools.cli.main\; exit(mbed_tools.cli.main.cli())" # This is used instead of invoking mbed_tools as a script, because it might not be on the user's PATH.
+        -m mbed_tools.cli.main
         -v # without -v, warnings (e.g. "you have tried to override a nonexistent parameter") do not get printed
         configure
         -t GCC_ARM # GCC_ARM is currently the only supported toolchain
@@ -120,7 +120,7 @@ if(MBED_NEED_TO_RECONFIGURE)
 
     if((NOT MBEDTOOLS_CONFIGURE_RESULT EQUAL 0) OR (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake))
         string(JOIN " " MBEDTOOLS_COMMAND_SPC_SEP ${MBEDTOOLS_CONFIGURE_COMMAND})
-        message(FATAL_ERROR "mbedtools configure failed!  Cannot build this project.  Command was ${MBEDTOOLS_COMMAND_SPC_SEP}")
+        message(FATAL_ERROR "mbedtools configure failed!  Cannot build this project.  Command was cd ${CMAKE_CURRENT_LIST_DIR}/../python && ${MBEDTOOLS_COMMAND_SPC_SEP}")
     endif()
 
 endif()

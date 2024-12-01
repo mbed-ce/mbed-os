@@ -9,7 +9,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -495,7 +495,7 @@ HAL_StatusTypeDef HAL_NAND_Reset(NAND_HandleTypeDef *hnand)
   * @param  pDeviceConfig  pointer to NAND_DeviceConfigTypeDef structure
   * @retval HAL status
   */
-HAL_StatusTypeDef  HAL_NAND_ConfigDevice(NAND_HandleTypeDef *hnand, NAND_DeviceConfigTypeDef *pDeviceConfig)
+HAL_StatusTypeDef  HAL_NAND_ConfigDevice(NAND_HandleTypeDef *hnand, const NAND_DeviceConfigTypeDef *pDeviceConfig)
 {
   hnand->Config.PageSize           = pDeviceConfig->PageSize;
   hnand->Config.SpareAreaSize      = pDeviceConfig->SpareAreaSize;

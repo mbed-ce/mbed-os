@@ -22,7 +22,7 @@ import json
 import pytest
 
 from memap import memap
-from memap.memap import MemapParser
+from memap.memap import MemapParser, MemoryBankInfo
 from copy import deepcopy
 
 """
@@ -38,7 +38,7 @@ def memap_parser():
     """
     memap_parser = MemapParser()
 
-    memap_parser.modules = {
+    memap_parser.symbols = {
         "mbed-os/targets/TARGET/TARGET_MCUS/api/pinmap.o": {
             ".text": 1,
             ".data": 2,
@@ -136,6 +136,24 @@ def memap_parser():
             "OUTPUT":0,
         },
     }
+
+    memap_parser.memory_banks = {
+        "RAM": [
+            MemoryBankInfo(name="IRAM1", start_addr=0x20000000, total_size=32768, used_size=2000)
+        ],
+        "ROM": [
+            MemoryBankInfo(name="IROM1", start_addr=0x20000000, total_size=65536, used_size=10000)
+        ]
+    }
+    memap_parser.old_memory_banks = {
+        "RAM": [
+            MemoryBankInfo(name="IRAM1", start_addr=0x20000000, total_size=32768, used_size=2014)
+        ],
+        "ROM": [
+            MemoryBankInfo(name="IROM1", start_addr=0x20000000, total_size=65536, used_size=9000)
+        ]
+    }
+
     return memap_parser
 
 
@@ -217,3 +235,21 @@ def test_generate_output_csv_ci(memap_parser, tmpdir, depth, sep):
     file_name = str(tmpdir.join('output.csv').realpath())
     generate_test_helper(memap_parser, 'csv-ci', depth, sep, file_name)
     assert isfile(file_name), "Failed to create csv-ci file"
+
+
+def test_memory_bank_summary(memap_parser: MemapParser):
+    """
+    Test that the memory bank summary has the expected information in it.
+    """
+
+    memap_parser.generate_output('table', 1, "/")
+
+    assert memap_parser.memory_bank_summary["RAM"].keys() == {"IRAM1"}
+    assert memap_parser.memory_bank_summary["ROM"].keys() == {"IROM1"}
+
+    # Check details of the ROM bank more closely
+    assert memap_parser.memory_bank_summary["ROM"]["IROM1"]["bytes_used"] == 10000
+    assert memap_parser.memory_bank_summary["ROM"]["IROM1"]["total_size"] == 65536
+    assert memap_parser.memory_bank_summary["ROM"]["IROM1"]["delta_bytes_used"] == 1000
+    assert memap_parser.memory_bank_summary["ROM"]["IROM1"]["percent_used"] == pytest.approx(15.3, abs=0.1)
+    assert memap_parser.memory_bank_summary["ROM"]["IROM1"]["delta_percent_used"] == pytest.approx(1.5, abs=0.1)

@@ -547,6 +547,8 @@ private:
     void _complete_set_configuration();
     void _complete_set_interface();
 
+    void _clear_endpoints();
+
     struct endpoint_info_t {
         mbed::Callback<void()> callback;
         uint16_t max_packet_size;

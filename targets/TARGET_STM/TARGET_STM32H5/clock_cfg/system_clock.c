@@ -123,7 +123,10 @@ else // Divisible by 5MHz
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLL1_SOURCE_HSE;
 
     RCC_OscInitStruct.PLL.PLLP = 2;
-    RCC_OscInitStruct.PLL.PLLQ = 2;
+    // Most of the SPI busses are clocked off of PLL1Q, and the max usable frequency for SPI is about
+    // ~50MHz.  Plus, SPI has only limited, power-of-2 prescaler options so a high input clock really hurts
+    // its clock resolution.  So, give it a much lower input clock.
+    RCC_OscInitStruct.PLL.PLLQ = 10; // output freq = 50MHz
     RCC_OscInitStruct.PLL.PLLR = 2;
     RCC_OscInitStruct.PLL.PLLFRACN = 0;
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1_VCORANGE_WIDE;
@@ -189,7 +192,10 @@ uint8_t SetSysClock_PLL_HSI(void)
     RCC_OscInitStruct.PLL.PLLM = 4;
     RCC_OscInitStruct.PLL.PLLN = 31;
     RCC_OscInitStruct.PLL.PLLP = 2;
-    RCC_OscInitStruct.PLL.PLLQ = 2;
+    // Most of the SPI busses are clocked off of PLL1Q, and the max usable frequency for SPI is about
+    // ~50MHz.  Plus, SPI has only limited, power-of-2 prescaler options so a high input clock really hurts
+    // its clock resolution.  So, give it a much lower input clock.
+    RCC_OscInitStruct.PLL.PLLQ = 10; // output freq = 50MHz
     RCC_OscInitStruct.PLL.PLLR = 2;
     RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1_VCIRANGE_3;
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1_VCORANGE_WIDE;

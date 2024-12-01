@@ -8,4 +8,4 @@ target_include_directories(mbed-sdt32625b
         .
 )
 
-target_link_libraries(mbed-sdt32625b INTERFACE mbed-max32625-no-boot)
+target_link_libraries(mbed-sdt32625b INTERFACE mbed-max32625)

@@ -151,53 +151,45 @@ typedef enum {
     ADC_TEMP = 0xF0,
     ADC_VREF = 0xF1,
 
-
+#ifdef TARGET_FF_ARDUINO_UNO
     /* Arduino connector namings */
-    A0          = PORTC_0,
-    A1          = PORTC_1,
-    A2          = PORTC_2,
-    A3          = PORTC_3,
-    A4          = PORTA_0,
-    A5          = PORTB_1,
-    D0          = PORTA_3,
-    D1          = PORTA_2,
-    D2          = PORTE_4,
-    D3          = PORTD_12,
-    D4          = PORTB_3,
-    D5          = PORTC_7,
-    D6          = PORTB_0,
-    D7          = PORTB_4,
-    D8          = PORTD_11,
-    D9          = PORTE_5,
-    D10         = PORTA_8,
-    D11         = PORTB_15,
-    D12         = PORTB_14,
-    D13         = PORTB_13,
-    D14         = PORTB_9,
-    D15         = PORTB_8,
+    ARDUINO_UNO_A0  = PORTC_0,
+    ARDUINO_UNO_A1  = PORTC_1,
+    ARDUINO_UNO_A2  = PORTC_2,
+    ARDUINO_UNO_A3  = PORTC_3,
+    ARDUINO_UNO_A4  = PORTA_0,
+    ARDUINO_UNO_A5  = PORTB_1,
+    ARDUINO_UNO_D0  = PORTA_3,
+    ARDUINO_UNO_D1  = PORTA_2,
+    ARDUINO_UNO_D2  = PORTE_4,
+    ARDUINO_UNO_D3  = PORTD_12,
+    ARDUINO_UNO_D4  = PORTB_3,
+    ARDUINO_UNO_D5  = PORTC_7,
+    ARDUINO_UNO_D6  = PORTB_0,
+    ARDUINO_UNO_D7  = PORTB_4,
+    ARDUINO_UNO_D8  = PORTD_11,
+    ARDUINO_UNO_D9  = PORTE_5,
+    ARDUINO_UNO_D10 = PORTA_8,
+    ARDUINO_UNO_D11 = PORTB_15,
+    ARDUINO_UNO_D12 = PORTB_14,
+    ARDUINO_UNO_D13 = PORTB_13,
+    ARDUINO_UNO_D14 = PORTB_9,
+    ARDUINO_UNO_D15 = PORTB_8,
+#endif
 
-    LED1        = PORTE_0,
-    LED2        = PORTE_1,
-    LED3        = PORTE_6,
+#define LED1 PORTE_0
+#define LED2 PORTE_1
+#define LED3 PORTE_6
 
-    KEY1        = PORTE_2,
-    KEY2        = PORTE_7,
-
-    BUTTON1     = KEY1,
-    BUTTON2     = KEY2,
+#define BUTTON1 PORTE_2
+#define BUTTON2 PORTE_7
 
     SERIAL_TX   = PORTC_10,
     SERIAL_RX   = PORTC_11,
     CONSOLE_TX       = SERIAL_TX,
     CONSOLE_RX       = SERIAL_RX,
 
-    I2C_SCL     = D15,
-    I2C_SDA     = D14,
-    SPI_MOSI    = D11,
-    SPI_MISO    = D12,
-    SPI_SCK     = D13,
-    SPI_CS      = D10,
-    PWM_OUT     = D9,
+    PWM_OUT     = PORTE_5,
 
     USBFS_VBUS  = PORTA_9,
     USBFS_DM    = PORTA_11,

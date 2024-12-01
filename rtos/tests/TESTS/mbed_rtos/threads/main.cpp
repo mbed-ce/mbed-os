@@ -370,7 +370,7 @@ void test_thread_flags_set()
     Thread::State state = t_wait.get_state();
     TEST_ASSERT_EQUAL(Thread::WaitingThreadFlag, state);
 
-    int32_t res = t_wait.flags_set(S);
+    t_wait.flags_set(S);
 
     t_wait.join();
 }
@@ -741,7 +741,7 @@ void test_msg_put()
 /** Utility function that places some date on the stack */
 void use_some_stack()
 {
-    volatile uint32_t stack_filler[10] = {0xDEADBEEF};
+    [[maybe_unused]] volatile uint32_t stack_filler[10] = {0xDEADBEEF};
 }
 
 /** Testing thread with external stack memory

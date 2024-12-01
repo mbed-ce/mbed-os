@@ -23,7 +23,7 @@
 #endif
 
 #if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE  MBED_ROM_SIZE
+  #define MBED_APP_SIZE  MBED_CONFIGURED_ROM_SIZE
 #endif
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)

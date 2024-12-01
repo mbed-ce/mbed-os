@@ -17,23 +17,7 @@
 #ifndef MBED_CMSIS_NVIC_H
 #define MBED_CMSIS_NVIC_H
 
-#if !defined(MBED_ROM_START)
-#define MBED_ROM_START  0x8000000
-#endif
-
-#if !defined(MBED_ROM_SIZE)
-#define MBED_ROM_SIZE  0x200000  // 2.0 MB
-#endif
-
-#if !defined(MBED_RAM_START)
-#define MBED_RAM_START  0x24000000
-#endif
-
-#if !defined(MBED_RAM_SIZE)
-#define MBED_RAM_SIZE  0x100000  // 1.0 MB
-#endif
-
 #define NVIC_NUM_VECTORS        172
-#define NVIC_RAM_VECTOR_ADDRESS 0x20000000
+#define NVIC_RAM_VECTOR_ADDRESS MBED_RAM_BANK_SRAM_DTC_START
 
 #endif

@@ -13,4 +13,4 @@ target_sources(mbed-max32625pico
         low_level_init.c
 )
 
-target_link_libraries(mbed-max32625pico INTERFACE mbed-max32625 mbed-max32625-boot)
+target_link_libraries(mbed-max32625pico INTERFACE mbed-max32625)

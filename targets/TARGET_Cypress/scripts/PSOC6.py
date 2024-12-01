@@ -173,18 +173,18 @@ def sign_image(toolchain, resourses, elf, binf, m0hex):
         toolchain.target.cm4_img_id,
         elf,
         binf,
-        m0hexf
+        m0hex
     )
 
 def sign_hex(
-    build_dir, m0hex_filename, target_name, policy, notification, boot_scheme,
+    build_dir, m0hex_signed_intermediate, target_name, policy, notification, boot_scheme,
     cm0_img_id, cm4_img_id, elf, m4hex, m0hex
 ):
     """
     Adds signature to a binary file being built,
     using cysecuretools python package.
     :param build_dir: The build directory
-    :param m0hex_filename: The file name of the Cortex-M0 hex
+    :param m0hex_signed_intermediate: Path to store intermediate signed CM0 hex file at
     :param target_name: The name of the Mbed target
     :param policy: The path to the policy file
     :param notification: The object to output notification with
@@ -199,9 +199,8 @@ def sign_hex(
     # that need to be signed
 
     if m0hex != '':
-        m0hex_build = os.path.join(build_dir, m0hex_filename)
-        copy2(m0hex, m0hex_build)
-        m0hex = m0hex_build
+        copy2(m0hex, m0hex_signed_intermediate)
+        m0hex = m0hex_signed_intermediate
 
     # Mapping from mbed target to cysecuretools target
     TARGET_MAPPING = {
@@ -327,7 +326,7 @@ def sign_action(args):
     """Entry point for the "sign" CLI command."""
     sign_hex(
         args.build_dir,
-        args.m0hex_filename,
+        args.m0hex_signed_intermediate,
         args.target_name,
         args.policy_file_name,
         logging.getLogger(__name__),
@@ -369,7 +368,7 @@ def parse_args():
         "--build-dir", required=True, help="the build directory."
     )
     sign_subcommand.add_argument(
-        "--m0hex-filename", required=True, help="the name of the HEX file."
+        "--m0hex-signed-intermediate", required=True, help="Path to store intermediate signed CM0 hex file at."
     )
     sign_subcommand.add_argument(
         "--target-name", help="the Mbed target name."

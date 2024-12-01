@@ -416,29 +416,28 @@ typedef struct
   */
 typedef enum
 {
-  HAL_TIM_BASE_MSPINIT_CB_ID              = 0x00U   /*!< TIM Base MspInit Callback ID                              */
-  , HAL_TIM_BASE_MSPDEINIT_CB_ID          = 0x01U   /*!< TIM Base MspDeInit Callback ID                            */
-  , HAL_TIM_IC_MSPINIT_CB_ID              = 0x02U   /*!< TIM IC MspInit Callback ID                                */
-  , HAL_TIM_IC_MSPDEINIT_CB_ID            = 0x03U   /*!< TIM IC MspDeInit Callback ID                              */
-  , HAL_TIM_OC_MSPINIT_CB_ID              = 0x04U   /*!< TIM OC MspInit Callback ID                                */
-  , HAL_TIM_OC_MSPDEINIT_CB_ID            = 0x05U   /*!< TIM OC MspDeInit Callback ID                              */
-  , HAL_TIM_PWM_MSPINIT_CB_ID             = 0x06U   /*!< TIM PWM MspInit Callback ID                               */
-  , HAL_TIM_PWM_MSPDEINIT_CB_ID           = 0x07U   /*!< TIM PWM MspDeInit Callback ID                             */
-  , HAL_TIM_ONE_PULSE_MSPINIT_CB_ID       = 0x08U   /*!< TIM One Pulse MspInit Callback ID                         */
-  , HAL_TIM_ONE_PULSE_MSPDEINIT_CB_ID     = 0x09U   /*!< TIM One Pulse MspDeInit Callback ID                       */
-  , HAL_TIM_ENCODER_MSPINIT_CB_ID         = 0x0AU   /*!< TIM Encoder MspInit Callback ID                           */
-  , HAL_TIM_ENCODER_MSPDEINIT_CB_ID       = 0x0BU   /*!< TIM Encoder MspDeInit Callback ID                         */
-  , HAL_TIM_HALL_SENSOR_MSPINIT_CB_ID     = 0x0CU   /*!< TIM Hall Sensor MspDeInit Callback ID                     */
-  , HAL_TIM_HALL_SENSOR_MSPDEINIT_CB_ID   = 0x0DU   /*!< TIM Hall Sensor MspDeInit Callback ID                     */
+  HAL_TIM_BASE_MSPINIT_CB_ID              = 0x00U   /*!< TIM Base MspInit Callback ID                               */
+  , HAL_TIM_BASE_MSPDEINIT_CB_ID          = 0x01U   /*!< TIM Base MspDeInit Callback ID                             */
+  , HAL_TIM_IC_MSPINIT_CB_ID              = 0x02U   /*!< TIM IC MspInit Callback ID                                 */
+  , HAL_TIM_IC_MSPDEINIT_CB_ID            = 0x03U   /*!< TIM IC MspDeInit Callback ID                               */
+  , HAL_TIM_OC_MSPINIT_CB_ID              = 0x04U   /*!< TIM OC MspInit Callback ID                                 */
+  , HAL_TIM_OC_MSPDEINIT_CB_ID            = 0x05U   /*!< TIM OC MspDeInit Callback ID                               */
+  , HAL_TIM_PWM_MSPINIT_CB_ID             = 0x06U   /*!< TIM PWM MspInit Callback ID                                */
+  , HAL_TIM_PWM_MSPDEINIT_CB_ID           = 0x07U   /*!< TIM PWM MspDeInit Callback ID                              */
+  , HAL_TIM_ONE_PULSE_MSPINIT_CB_ID       = 0x08U   /*!< TIM One Pulse MspInit Callback ID                          */
+  , HAL_TIM_ONE_PULSE_MSPDEINIT_CB_ID     = 0x09U   /*!< TIM One Pulse MspDeInit Callback ID                        */
+  , HAL_TIM_ENCODER_MSPINIT_CB_ID         = 0x0AU   /*!< TIM Encoder MspInit Callback ID                            */
+  , HAL_TIM_ENCODER_MSPDEINIT_CB_ID       = 0x0BU   /*!< TIM Encoder MspDeInit Callback ID                          */
+  , HAL_TIM_HALL_SENSOR_MSPINIT_CB_ID     = 0x0CU   /*!< TIM Hall Sensor MspDeInit Callback ID                      */
+  , HAL_TIM_HALL_SENSOR_MSPDEINIT_CB_ID   = 0x0DU   /*!< TIM Hall Sensor MspDeInit Callback ID                      */
   , HAL_TIM_PERIOD_ELAPSED_CB_ID          = 0x0EU   /*!< TIM Period Elapsed Callback ID                             */
   , HAL_TIM_PERIOD_ELAPSED_HALF_CB_ID     = 0x0FU   /*!< TIM Period Elapsed half complete Callback ID               */
   , HAL_TIM_TRIGGER_CB_ID                 = 0x10U   /*!< TIM Trigger Callback ID                                    */
   , HAL_TIM_TRIGGER_HALF_CB_ID            = 0x11U   /*!< TIM Trigger half complete Callback ID                      */
-
   , HAL_TIM_IC_CAPTURE_CB_ID              = 0x12U   /*!< TIM Input Capture Callback ID                              */
   , HAL_TIM_IC_CAPTURE_HALF_CB_ID         = 0x13U   /*!< TIM Input Capture half complete Callback ID                */
   , HAL_TIM_OC_DELAY_ELAPSED_CB_ID        = 0x14U   /*!< TIM Output Compare Delay Elapsed Callback ID               */
-  , HAL_TIM_PWM_PULSE_FINISHED_CB_ID      = 0x15U   /*!< TIM PWM Pulse Finished Callback ID           */
+  , HAL_TIM_PWM_PULSE_FINISHED_CB_ID      = 0x15U   /*!< TIM PWM Pulse Finished Callback ID                         */
   , HAL_TIM_PWM_PULSE_FINISHED_HALF_CB_ID = 0x16U   /*!< TIM PWM Pulse Finished half complete Callback ID           */
   , HAL_TIM_ERROR_CB_ID                   = 0x17U   /*!< TIM Error Callback ID                                      */
   , HAL_TIM_COMMUTATION_CB_ID             = 0x18U   /*!< TIM Commutation Callback ID                                */
@@ -471,9 +470,12 @@ typedef  void (*pTIM_CallbackTypeDef)(TIM_HandleTypeDef *htim);  /*!< pointer to
 /** @defgroup TIM_ClearInput_Source TIM Clear Input Source
   * @{
   */
-#define TIM_CLEARINPUTSOURCE_NONE           0x00000000U   /*!< OCREF_CLR is disabled */
-#define TIM_CLEARINPUTSOURCE_ETR            0x00000001U   /*!< OCREF_CLR is connected to ETRF input */
-#define TIM_CLEARINPUTSOURCE_OCREFCLR       0x00000002U   /*!< OCREF_CLR is connected to OCREF_CLR_INT */
+#define TIM_CLEARINPUTSOURCE_NONE     0xFFFFFFFFU                               /*!< OCREF_CLR is disabled */
+#define TIM_CLEARINPUTSOURCE_ETR      0x00000001U                               /*!< OCREF_CLR is connected to ETRF input */
+#if defined(COMP1) && defined(COMP2)
+#define TIM_CLEARINPUTSOURCE_COMP1    0x00000000U                               /*!< OCREF_CLR_INT is connected to COMP1 output */
+#define TIM_CLEARINPUTSOURCE_COMP2    TIM1_AF2_OCRSEL_0                         /*!< OCREF_CLR_INT is connected to COMP2 output */
+#endif /* COMP1 && COMP2 */
 /**
   * @}
   */
@@ -507,6 +509,7 @@ typedef  void (*pTIM_CallbackTypeDef)(TIM_HandleTypeDef *htim);  /*!< pointer to
 #define TIM_DMABASE_TISEL                  0x00000017U
 #define TIM_DMABASE_AF1                    0x00000018U
 #define TIM_DMABASE_AF2                    0x00000019U
+#define TIM_DMABASE_OR1                    0x0000001AU
 /**
   * @}
   */
@@ -1066,8 +1069,8 @@ typedef  void (*pTIM_CallbackTypeDef)(TIM_HandleTypeDef *htim);  /*!< pointer to
 #define TIM_OCMODE_RETRIGERRABLE_OPM2      (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_0)                     /*!< Retrigerrable OPM mode 2               */
 #define TIM_OCMODE_COMBINED_PWM1           (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2)                     /*!< Combined PWM mode 1                    */
 #define TIM_OCMODE_COMBINED_PWM2           (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_2)  /*!< Combined PWM mode 2                    */
-#define TIM_OCMODE_ASSYMETRIC_PWM1         (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2)  /*!< Asymmetric PWM mode 1                  */
-#define TIM_OCMODE_ASSYMETRIC_PWM2         TIM_CCMR1_OC1M                                            /*!< Asymmetric PWM mode 2                  */
+#define TIM_OCMODE_ASYMMETRIC_PWM1         (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2)  /*!< Asymmetric PWM mode 1                  */
+#define TIM_OCMODE_ASYMMETRIC_PWM2         TIM_CCMR1_OC1M                                            /*!< Asymmetric PWM mode 2                  */
 #define TIM_OCMODE_PULSE_ON_COMPARE        (TIM_CCMR2_OC3M_3 | TIM_CCMR2_OC3M_1)                     /*!< Pulse on compare (CH3&CH4 only)        */
 #define TIM_OCMODE_DIRECTION_OUTPUT        (TIM_CCMR2_OC3M_3 | TIM_CCMR2_OC3M_1 | TIM_CCMR2_OC3M_0)  /*!< Direction output (CH3&CH4 only)        */
 /**
@@ -1848,9 +1851,15 @@ mode.
 /** @defgroup TIM_Private_Macros TIM Private Macros
   * @{
   */
-#define IS_TIM_CLEARINPUT_SOURCE(__MODE__)  (((__MODE__) == TIM_CLEARINPUTSOURCE_NONE)      || \
-                                             ((__MODE__) == TIM_CLEARINPUTSOURCE_ETR)       || \
-                                             ((__MODE__) == TIM_CLEARINPUTSOURCE_OCREFCLR))
+#if defined(COMP1) && defined(COMP2)
+#define IS_TIM_CLEARINPUT_SOURCE(__MODE__)  (((__MODE__) == TIM_CLEARINPUTSOURCE_ETR)      || \
+                                             ((__MODE__) == TIM_CLEARINPUTSOURCE_COMP1)    || \
+                                             ((__MODE__) == TIM_CLEARINPUTSOURCE_COMP2)    || \
+                                             ((__MODE__) == TIM_CLEARINPUTSOURCE_NONE))
+#else
+#define IS_TIM_CLEARINPUT_SOURCE(__MODE__)  (((__MODE__) == TIM_CLEARINPUTSOURCE_ETR)      || \
+                                             ((__MODE__) == TIM_CLEARINPUTSOURCE_NONE))
+#endif /* COMP1 && COMP2 */
 
 #define IS_TIM_DMA_BASE(__BASE__) (((__BASE__) == TIM_DMABASE_CR1)   || \
                                    ((__BASE__) == TIM_DMABASE_CR2)   || \
@@ -1958,8 +1967,9 @@ mode.
 #define IS_TIM_OPM_CHANNELS(__CHANNEL__)   (((__CHANNEL__) == TIM_CHANNEL_1) || \
                                             ((__CHANNEL__) == TIM_CHANNEL_2))
 
-#define IS_TIM_PERIOD(__HANDLE__, __PERIOD__) \
-  ((IS_TIM_32B_COUNTER_INSTANCE(((__HANDLE__)->Instance)) == 0U) ? (((__PERIOD__) > 0U) && ((__PERIOD__) <= 0x0000FFFFU)) : ((__PERIOD__) > 0U))
+#define IS_TIM_PERIOD(__HANDLE__, __PERIOD__) ((IS_TIM_32B_COUNTER_INSTANCE(((__HANDLE__)->Instance)) == 0U) ? \
+                                               (((__PERIOD__) > 0U) && ((__PERIOD__) <= 0x0000FFFFU)) :        \
+                                               ((__PERIOD__) > 0U))
 
 #define IS_TIM_COMPLEMENTARY_CHANNELS(__CHANNEL__) (((__CHANNEL__) == TIM_CHANNEL_1) || \
                                                     ((__CHANNEL__) == TIM_CHANNEL_2) || \
@@ -2021,7 +2031,6 @@ mode.
                                             ((__LEVEL__) == TIM_LOCKLEVEL_3))
 
 #define IS_TIM_BREAK_FILTER(__BRKFILTER__) ((__BRKFILTER__) <= 0xFUL)
-
 
 #define IS_TIM_BREAK_STATE(__STATE__)      (((__STATE__) == TIM_BREAK_ENABLE) || \
                                             ((__STATE__) == TIM_BREAK_DISABLE))
@@ -2091,8 +2100,8 @@ mode.
                                    ((__MODE__) == TIM_OCMODE_PWM2)               || \
                                    ((__MODE__) == TIM_OCMODE_COMBINED_PWM1)      || \
                                    ((__MODE__) == TIM_OCMODE_COMBINED_PWM2)      || \
-                                   ((__MODE__) == TIM_OCMODE_ASSYMETRIC_PWM1)    || \
-                                   ((__MODE__) == TIM_OCMODE_ASSYMETRIC_PWM2))
+                                   ((__MODE__) == TIM_OCMODE_ASYMMETRIC_PWM1)    || \
+                                   ((__MODE__) == TIM_OCMODE_ASYMMETRIC_PWM2))
 
 #define IS_TIM_OC_MODE(__MODE__)  (((__MODE__) == TIM_OCMODE_TIMING)             || \
                                    ((__MODE__) == TIM_OCMODE_ACTIVE)             || \
@@ -2416,7 +2425,8 @@ HAL_StatusTypeDef HAL_TIM_ConfigTI1Input(TIM_HandleTypeDef *htim, uint32_t TI1_S
 HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro(TIM_HandleTypeDef *htim, const TIM_SlaveConfigTypeDef *sSlaveConfig);
 HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro_IT(TIM_HandleTypeDef *htim, const TIM_SlaveConfigTypeDef *sSlaveConfig);
 HAL_StatusTypeDef HAL_TIM_DMABurst_WriteStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress,
-                                              uint32_t BurstRequestSrc, const uint32_t  *BurstBuffer, uint32_t  BurstLength);
+                                              uint32_t BurstRequestSrc, const uint32_t  *BurstBuffer,
+                                              uint32_t  BurstLength);
 HAL_StatusTypeDef HAL_TIM_DMABurst_MultiWriteStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress,
                                                    uint32_t BurstRequestSrc, const uint32_t *BurstBuffer,
                                                    uint32_t BurstLength,  uint32_t DataLength);

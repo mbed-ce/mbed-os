@@ -9,7 +9,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -1162,6 +1162,7 @@ HAL_SRAM_StateTypeDef HAL_SRAM_GetState(const SRAM_HandleTypeDef *hsram)
   */
 static void SRAM_DMACplt(DMA_HandleTypeDef *hdma)
 {
+  /* Derogation MISRAC2012-Rule-11.5 */
   SRAM_HandleTypeDef *hsram = (SRAM_HandleTypeDef *)(hdma->Parent);
 
   /* Disable the DMA channel */
@@ -1184,6 +1185,7 @@ static void SRAM_DMACplt(DMA_HandleTypeDef *hdma)
   */
 static void SRAM_DMACpltProt(DMA_HandleTypeDef *hdma)
 {
+  /* Derogation MISRAC2012-Rule-11.5 */
   SRAM_HandleTypeDef *hsram = (SRAM_HandleTypeDef *)(hdma->Parent);
 
   /* Disable the DMA channel */
@@ -1206,6 +1208,7 @@ static void SRAM_DMACpltProt(DMA_HandleTypeDef *hdma)
   */
 static void SRAM_DMAError(DMA_HandleTypeDef *hdma)
 {
+  /* Derogation MISRAC2012-Rule-11.5 */
   SRAM_HandleTypeDef *hsram = (SRAM_HandleTypeDef *)(hdma->Parent);
 
   /* Disable the DMA channel */

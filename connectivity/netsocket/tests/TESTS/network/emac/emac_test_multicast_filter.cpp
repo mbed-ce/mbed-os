@@ -45,7 +45,7 @@ void test_emac_multicast_filter_cb(int opt)
             case 0:
                 printf("STEP 0: check unicast message functionality\r\n\r\n");
                 {
-                    unsigned char *own_addr = emac_if_get_own_addr();
+                    unsigned char const *own_addr = emac_if_get_own_addr();
                     memcpy(forward_addr, own_addr, 6);
                 }
                 receive = true;
@@ -165,7 +165,7 @@ void test_emac_multicast_filter()
     SET_TRACE_LEVEL(TRACE_SEND | TRACE_ETH_FRAMES | TRACE_SUCCESS | TRACE_FAILURE);
 
     if (ECHO_SERVER_ADDRESS_KNOWN) {
-        START_TEST_LOOP(test_emac_multicast_filter_cb, 1 * SECOND_TO_MS);
+        START_TEST_LOOP(test_emac_multicast_filter_cb, 1s);
     }
 
     PRINT_ERROR_FLAGS;

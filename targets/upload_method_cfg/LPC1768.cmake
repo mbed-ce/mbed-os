@@ -37,6 +37,10 @@ set(OPENOCD_UPLOAD_ENABLED TRUE)
 set(OPENOCD_CHIP_CONFIG_COMMANDS
     -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/lpc1768.cfg)
 
+# For some reason, as of summer 2024, git version of OpenOCD does not work with LPC1768.  So, it seems like
+# the last compatible version will be the current release 0.12.
+set(OPENOCD_VERSION_RANGE 0.10...<0.13)
+
 # Config options for LINKSERVER
 # -------------------------------------------------------------
 set(LINKSERVER_UPLOAD_ENABLED TRUE)
