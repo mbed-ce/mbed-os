@@ -18,11 +18,63 @@
 #ifndef EMAC_CTP_H
 #define EMAC_CTP_H
 
-enum ctp_function {
-    CTP_NONE,
-    CTP_FORWARD,
-    CTP_REPLY
+// CTP types --------------------------------------------------------------------
+
+enum class ctp_function : uint16_t {
+
+    INVALID = 0,
+
+    // Note: Values swapped as network data should be big endian
+    FORWARD = 0x02,
+    REPLY = 0x01
 };
+
+const uint16_t CTP_ETHERTYPE = 0x9000;
+
+// CTP structures ---------------------------------------------------------------
+
+/**
+ * @brief Structure for a CTP reply message.
+ */
+struct __attribute__((packed)) CTPReplyCommand {
+    ctp_function function; ///< Function. Should be set to REPLY
+    uint16_t receiptNumber; ///< Receipt number.  Set arbitrarily by the originating station
+    uint8_t payload[0]; ///< Payload.  Arbitrary, set by the originating station.
+};
+
+/**
+ * @brief Structure for a CTP forward message.
+ */
+struct CTPForwardCommand;
+struct __attribute__((packed)) CTPForwardCommand {
+    ctp_function function; ///< Function. Should be set to FORWARD.
+    uint8_t forwardMAC[6]; ///< MAC to forward this message to.
+
+    /// Contained command, as a generic pointer
+    uint8_t nextCommand[0];
+};
+
+/**
+ * @brief Packed structure representing an Ethernet frame with a CTP packet
+ */
+struct __attribute__((packed)) EthernetCTPFrame {
+
+    // Ethernet II header
+    uint8_t destMAC[6];
+    uint8_t srcMAC[6];
+    uint16_t etherType;
+
+    /// CTP skip count.
+    /// Indicates the offset where the receiving station should find its command in this packet.
+    /// THis will be 0 when a packet is sent from the originating station.  When a station processes
+    /// a CTP REPLY command, it updates this field in the reply packet to point to the next command.
+    uint16_t skipCount;
+
+    /// Contained command, as a generic pointer
+    uint8_t nextCommand[0];
+};
+
+// CTP functions ---------------------------------------------------------------
 
 // Test memory manager options
 #define CTP_OPT_HEAP           0x01   // Allocate link_out() frame from heap
@@ -34,7 +86,18 @@ enum ctp_function {
 #define CTP_MSG_SEND(length, send_to_address, own_address, forward_to_address, mem_mngr_options) \
     emac_if_ctp_msg_build(length, send_to_address, own_address, forward_to_address, mem_mngr_options)
 
-ctp_function emac_if_ctp_header_handle(unsigned char *eth_input_frame, unsigned char *eth_output_frame, unsigned char const *origin_addr, int *receipt_number);
+/**
+ * @brief Handle an incoming Ethernet frame.
+ *
+ * If the frame is a CTP forward command, a response frame is written to \c eth_output_frame and
+ * FORWARD is returned.
+ *
+ * If the frame is a CTP reply (meaning, this packet reached its final destination at this station),
+ * REPLY is returned and the receipt number is saved to \c receipt_number .
+ *
+ * Otherwise (invalid or non CTP packet), INVALID is returned.
+ */
+ctp_function emac_if_ctp_header_handle(unsigned char const *eth_input_frame, unsigned char *eth_output_frame, unsigned char const *origin_addr, int *receipt_number);
 void emac_if_ctp_msg_build(int eth_frame_len, const unsigned char *dest_addr, const unsigned char *origin_addr, const unsigned char *forward_addr, int options);
 void emac_if_ctp_reply_handle(int lenght, int invalid_data_index);
 
