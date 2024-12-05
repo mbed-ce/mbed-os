@@ -117,6 +117,12 @@ target_compile_definitions(mbed-mbedtls
 
 target_link_libraries(mbed-mbedtls PUBLIC mbed-core-flags)
 
+# Link Mbed's PSA implementation on enabled
+if(("FEATURE_EXPERIMENTAL_API=1" IN_LIST MBED_TARGET_DEFINITIONS) AND
+    ("FEATURE_PSA=1" IN_LIST MBED_TARGET_DEFINITIONS))
+    target_link_libraries(mbed-mbedtls PUBLIC mbed-psa)
+endif()
+
 # Workaround for https://github.com/ARMmbed/mbedtls/issues/1077
 # which affects cores without __thumb2__ set by the compiler
 # due to the lack of full Thumb-2 support
