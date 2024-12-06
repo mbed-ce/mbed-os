@@ -53,15 +53,7 @@ ENTRY(Reset_Handler)
 
 __ram_vector_table__ = 1;
 
-#if !defined(MBED_APP_START)
-  #define MBED_APP_START 0
-#elif MBED_APP_START > 0 && MBED_APP_START < 0x410
-    #error MBED_APP_START too small and will overwrite interrupts and flash config
-#endif
 
-#if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE 0x100000
-#endif
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
     #define MBED_CONF_TARGET_BOOT_STACK_SIZE 0x400
@@ -72,19 +64,32 @@ __stack_size__ = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0400;
 M_VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x0400 : 0x0;
 M_CRASH_DATA_RAM_SIZE = 0x100;
+FLASH_VTOR_TABLE_SIZE = 0x400;
+FLASH_CONFIG_FIELD_SIZE = 0x10;
+
+/* If we are not configured to execute out of the start of ROM, then a bootloader is
+ * present.  This tells us whether we need to add the Flash Configuration Field at the start of flash. */
+#if MBED_CONFIGURED_ROM_BANK_IROM1_START == 0
+#define IS_BOOTLOADER_PRESENT 0
+#else
+#define IS_BOOTLOADER_PRESENT 1
+#endif
+
+#if IS_BOOTLOADER_PRESENT && MBED_CONFIGURED_ROM_BANK_IROM1_START < 0x410
+#error MBED_CONFIGURED_ROM_BANK_IROM1_START too small and will overwrite interrupts and flash config
+#endif
 
 /* Specify the memory areas */
 MEMORY
 {
-#if MBED_APP_START == 0
-  m_interrupts          (RX)  : ORIGIN = MBED_APP_START, LENGTH = 0x400
-  m_flash_config        (RX)  : ORIGIN = MBED_APP_START + 0x400, LENGTH = 0x10
-  m_text                (RX)  : ORIGIN = MBED_APP_START + 0x410, LENGTH = MBED_APP_SIZE - 0x410
-#else
-  m_text                (RX)  : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
-#endif
-  m_data                (RW)  : ORIGIN = 0x1FFF0000, LENGTH = 0x00010000
-  m_data_2              (RW)  : ORIGIN = 0x20000000, LENGTH = 0x00030000
+  m_text   (RX)  : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START, LENGTH = MBED_CONFIGURED_ROM_BANK_IROM1_SIZE
+
+  /*
+   * Note: while these two SRAMs occupy a contiguous address space, we have to keep them as
+   * separate memory banks because the MCU doesn't support accesses that bridge the two banks.
+   */
+  m_sram_l (RW)  : ORIGIN = MBED_RAM_BANK_SRAM_L_START, LENGTH = MBED_RAM_BANK_SRAM_L_SIZE
+  m_sram_u (RW)  : ORIGIN = MBED_RAM_BANK_SRAM_U_START, LENGTH = MBED_RAM_BANK_SRAM_U_SIZE
 }
 
 /* Define output sections */
@@ -97,18 +102,20 @@ SECTIONS
     . = ALIGN(8);
     KEEP(*(.isr_vector))     /* Startup code */
     . = ALIGN(8);
-#if MBED_APP_START == 0
-  } > m_interrupts
+  } > m_text AT> m_text
 
-  .flash_config :
+  /* FCF to absolute address of 0x400, but only if bootloader is not present. */
+#if !IS_BOOTLOADER_PRESENT
+  .flash_config VTOR_TABLE_SIZE :
   {
-    . = ALIGN(8);
     KEEP(*(.FlashConfig))    /* Flash Configuration Field (FCF) */
-    . = ALIGN(8);
-  } > m_flash_config
+  } > m_text AT> m_text
 #else
-  } > m_text
+  /DISCARD/ : {
+    *(.FlashConfig)
+  }
 #endif
+
   .text :
   {
 
@@ -204,11 +211,12 @@ SECTIONS
     . += M_VECTOR_RAM_SIZE;
     . = ALIGN(8);
     __interrupts_ram_end__ = .; /* Define a global symbol at data end */
-  } > m_data
+  } > m_sram_u
 
-  .crash_data_ram :
+#if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
+  /* Stick the crash data ram at the start of sram_l */
+  .crash_data_ram : ALIGN(8)
   {
-    . = ALIGN(8);
     __CRASH_DATA_RAM__ = .;
     __CRASH_DATA_RAM_START__ = .; /* Create a global symbol at data start */
     KEEP(*(.keep.crash_data_ram))
@@ -216,24 +224,24 @@ SECTIONS
     . += M_CRASH_DATA_RAM_SIZE;
     . = ALIGN(8);
     __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
-  } > m_data
+  } > m_sram_u
+#endif
 
-  .heap_0 :
+  /* Fill the entire sram_l with the heap 0 section. */
+  .heap_0 (NOLOAD): ALIGN(8)
   {
-    . = ALIGN(8);
     __mbed_sbrk_start_0 = .;
-    . += (ORIGIN(m_data) + LENGTH(m_data) - .);
+    . += (ORIGIN(m_sram_l) + LENGTH(m_sram_l) - .);
     __mbed_krbs_start_0 = .;
-  } > m_data
+  } > m_sram_l
 
   __VECTOR_RAM = DEFINED(__ram_vector_table__) ? __VECTOR_RAM__ : ORIGIN(m_interrupts);
   __RAM_VECTOR_TABLE_SIZE_BYTES = DEFINED(__ram_vector_table__) ? (__interrupts_ram_end__ - __interrupts_ram_start__) : 0x0;
 
-  .data :
+  .data : ALIGN(8)
   {
     PROVIDE(__etext = LOADADDR(.data));    /* Define a global symbol at end of code, */
     PROVIDE(__DATA_ROM = LOADADDR(.data)); /* Symbol is used by startup for data initialization. */
-    . = ALIGN(8);
     __DATA_RAM = .;
     __data_start__ = .;      /* create a global symbol at data start */
     *(.data)                 /* .data sections */
@@ -241,7 +249,7 @@ SECTIONS
     KEEP(*(.jcr*))
     . = ALIGN(8);
     __data_end__ = .;        /* define a global symbol at data end */
-  } > m_data_2 AT > m_text
+  } > m_sram_u AT > m_text
 
   __DATA_END = __DATA_ROM + (__data_end__ - __data_start__);
   text_end = ORIGIN(m_text) + LENGTH(m_text);
@@ -259,15 +267,14 @@ SECTIONS
     KEEP(*(.keep.uninitialized))
     . = ALIGN(32);
     __uninitialized_end = .;
-  } > m_data_2
+  } > m_sram_u
 
   USB_RAM_GAP = DEFINED(__usb_ram_size__) ? __usb_ram_size__ : 0x800;
 
   /* Uninitialized data section */
-  .bss :
+  .bss : ALIGN(8)
   {
     /* This is used by the startup in order to initialize the .bss section */
-    . = ALIGN(8);
     __START_BSS = .;
     __bss_start__ = .;
     *(.bss)
@@ -279,39 +286,41 @@ SECTIONS
     . = ALIGN(8);
     __bss_end__ = .;
     __END_BSS = .;
-  } > m_data_2
+  } > m_sram_u
 
-  .heap :
+  .heap : ALIGN(8)
   {
-    . = ALIGN(8);
     __end__ = .;
     PROVIDE(end = .);
+
+    ASSERT((__end__ - ORIGIN(m_sram_u)) + STACK_SIZE <= LENGTH(m_sram_u), "SRAM_U is not large enough to contain globals and boot stack!");
+
     __mbed_sbrk_start = .;
     __HeapBase = .;
-    . = ORIGIN(m_data_2) + LENGTH(m_data_2) - STACK_SIZE;
+    . = ORIGIN(m_sram_u) + LENGTH(m_sram_u) - STACK_SIZE;
     __mbed_krbs_start = .;
     __HeapLimit = .;
     __heap_limit = .; /* Add for _sbrk */
-  } > m_data_2
+  } > m_sram_u
 
-  m_usb_bdt USB_RAM_START (NOLOAD) :
+  /* USB RAM sections.  These live inside a "gap" created in .bss. */
+  m_usb_bdt USB_RAM_START (OVERLAY) :
   {
     *(m_usb_bdt)
     USB_RAM_BDT_END = .;
   }
 
-  m_usb_global USB_RAM_BDT_END (NOLOAD) :
+  m_usb_global USB_RAM_BDT_END (OVERLAY) :
   {
     *(m_usb_global)
   }
 
   /* Initializes stack on the end of block */
-  __StackTop = ORIGIN(m_data_2) + LENGTH(m_data_2);
+  __StackTop = ORIGIN(m_sram_u) + LENGTH(m_sram_u);
   __StackLimit = __StackTop - STACK_SIZE;
   PROVIDE(__stack = __StackTop);
 
-  .ARM.attributes 0 : { *(.ARM.attributes) }
-
-  ASSERT(__StackLimit >= __HeapLimit, "Region m_data_2 overflowed with stack and heap")
-
+  /DISCARD/ : {
+    *(.ARM.attributes)
+  }
 }

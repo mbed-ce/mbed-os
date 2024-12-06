@@ -3088,7 +3088,7 @@
             "version": "1.5.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM_U": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3099,11 +3099,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 196608,
-                "start": 536870912,
+                "size": 0x30000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IRAM2": {
+            "SRAM_L": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3114,8 +3114,8 @@
                     "write": true
                 },
                 "default": false,
-                "size": 65536,
-                "start": 536805376,
+                "size": 0x10000,
+                "start": 0x1FFF0000,
                 "startup": false
             },
             "IROM1": {

@@ -157,16 +157,17 @@ function(mbed_set_post_build target)
     # diagnostic output file for some toolchains.
 
     # copy mapfile .map to .map.old for ram/rom statistics diff in memap.py
-    if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map)
-        add_custom_command(
-            TARGET
-                ${target}
-            PRE_BUILD
-            COMMAND
-                ${CMAKE_COMMAND} -E rename "${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map" "${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map.old"
-        )
-    endif()
-    
+    add_custom_command(
+        TARGET
+            ${target}
+        PRE_BUILD
+        # So that the rename command does not fail on the first build, touch the map file first to create it if it does not exist.
+        COMMAND
+            ${CMAKE_COMMAND} -E touch "${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map"
+        COMMAND
+            ${CMAKE_COMMAND} -E rename "${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map" "${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map.old"
+    )
+
     mbed_configure_memory_map(${target} "${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map")
     mbed_validate_application_profile(${target})
     mbed_generate_bin_hex(${target})
