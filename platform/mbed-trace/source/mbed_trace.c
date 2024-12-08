@@ -282,7 +282,7 @@ const char *mbed_trace_include_filters_get(void)
 {
     return m_trace.filters_include;
 }
-void mbed_trace_include_filters_set(char *filters)
+void mbed_trace_include_filters_set(char const *filters)
 {
     if (filters) {
         (void)strncpy(m_trace.filters_include, filters, m_trace.filters_length);

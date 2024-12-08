@@ -79,6 +79,16 @@ FLASH_CONFIG_FIELD_SIZE = 0x10;
 #error MBED_CONFIGURED_ROM_BANK_IROM1_START too small and will overwrite interrupts and flash config
 #endif
 
+/* Specify the ELF segments (program headers) */
+PHDRS
+{
+    text PT_LOAD FLAGS(5); /* read + execute */
+    ram_vector_table PT_LOAD FLAGS(6); /* read + write */
+	ram_noinit PT_LOAD FLAGS(6); /* read + write */
+	ram_init PT_LOAD FLAGS(6); /* read + write */
+	sram_l PT_LOAD FLAGS(6); /* read + write */
+}
+
 /* Specify the memory areas */
 MEMORY
 {
@@ -102,14 +112,14 @@ SECTIONS
     . = ALIGN(8);
     KEEP(*(.isr_vector))     /* Startup code */
     . = ALIGN(8);
-  } > m_text AT> m_text
+  } > m_text AT> m_text :text
 
   /* FCF to absolute address of 0x400, but only if bootloader is not present. */
 #if !IS_BOOTLOADER_PRESENT
   .flash_config VTOR_TABLE_SIZE :
   {
     KEEP(*(.FlashConfig))    /* Flash Configuration Field (FCF) */
-  } > m_text AT> m_text
+  } > m_text AT> m_text :text
 #else
   /DISCARD/ : {
     *(.FlashConfig)
@@ -130,19 +140,19 @@ SECTIONS
     KEEP (*(.init))
     KEEP (*(.fini))
     . = ALIGN(8);
-  } > m_text
+  } > m_text AT> m_text :text
 
   .ARM.extab :
   {
     *(.ARM.extab* .gnu.linkonce.armextab.*)
-  } > m_text
+  } > m_text AT> m_text :text
 
   .ARM :
   {
     __exidx_start = .;
     *(.ARM.exidx*)
     __exidx_end = .;
-  } > m_text
+  } > m_text AT> m_text :text
 
  .ctors :
   {
@@ -166,7 +176,7 @@ SECTIONS
     KEEP (*(SORT(.ctors.*)))
     KEEP (*(.ctors))
     __CTOR_END__ = .;
-  } > m_text
+  } > m_text AT> m_text :text
 
   .dtors :
   {
@@ -177,14 +187,14 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
     __DTOR_END__ = .;
-  } > m_text
+  } > m_text AT> m_text :text
 
   .preinit_array :
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
-  } > m_text
+  } > m_text AT> m_text :text
 
   .init_array :
   {
@@ -192,7 +202,7 @@ SECTIONS
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } > m_text
+  } > m_text AT> m_text :text
 
   .fini_array :
   {
@@ -200,18 +210,7 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } > m_text
-
-  .interrupts_ram :
-  {
-    . = ALIGN(8);
-    __VECTOR_RAM__ = .;
-    __interrupts_ram_start__ = .; /* Create a global symbol at data start */
-    *(.m_interrupts_ram)     /* This is a user defined section */
-    . += M_VECTOR_RAM_SIZE;
-    . = ALIGN(8);
-    __interrupts_ram_end__ = .; /* Define a global symbol at data end */
-  } > m_sram_u
+  } > m_text AT> m_text :text
 
 #if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
   /* Stick the crash data ram at the start of sram_l */
@@ -224,7 +223,7 @@ SECTIONS
     . += M_CRASH_DATA_RAM_SIZE;
     . = ALIGN(8);
     __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
-  } > m_sram_u
+  } > m_sram_l :sram_l
 #endif
 
   /* Fill the entire sram_l with the heap 0 section. */
@@ -233,10 +232,21 @@ SECTIONS
     __mbed_sbrk_start_0 = .;
     . += (ORIGIN(m_sram_l) + LENGTH(m_sram_l) - .);
     __mbed_krbs_start_0 = .;
-  } > m_sram_l
+  } > m_sram_l :sram_l
 
   __VECTOR_RAM = DEFINED(__ram_vector_table__) ? __VECTOR_RAM__ : ORIGIN(m_interrupts);
   __RAM_VECTOR_TABLE_SIZE_BYTES = DEFINED(__ram_vector_table__) ? (__interrupts_ram_end__ - __interrupts_ram_start__) : 0x0;
+
+  .interrupts_ram :
+  {
+    . = ALIGN(8);
+    __VECTOR_RAM__ = .;
+    __interrupts_ram_start__ = .; /* Create a global symbol at data start */
+    *(.m_interrupts_ram)     /* This is a user defined section */
+    . += M_VECTOR_RAM_SIZE;
+    . = ALIGN(8);
+    __interrupts_ram_end__ = .; /* Define a global symbol at data end */
+  } > m_sram_u :ram_vector_table
 
   .data : ALIGN(8)
   {
@@ -249,7 +259,7 @@ SECTIONS
     KEEP(*(.jcr*))
     . = ALIGN(8);
     __data_end__ = .;        /* define a global symbol at data end */
-  } > m_sram_u AT > m_text
+  } > m_sram_u AT > m_text :ram_init
 
   __DATA_END = __DATA_ROM + (__data_end__ - __data_start__);
   text_end = ORIGIN(m_text) + LENGTH(m_text);
@@ -267,7 +277,7 @@ SECTIONS
     KEEP(*(.keep.uninitialized))
     . = ALIGN(32);
     __uninitialized_end = .;
-  } > m_sram_u
+  } > m_sram_u AT> m_sram_u :ram_noinit
 
   USB_RAM_GAP = DEFINED(__usb_ram_size__) ? __usb_ram_size__ : 0x800;
 
@@ -286,7 +296,7 @@ SECTIONS
     . = ALIGN(8);
     __bss_end__ = .;
     __END_BSS = .;
-  } > m_sram_u
+  } > m_sram_u AT> m_sram_u :ram_noinit
 
   .heap : ALIGN(8)
   {
@@ -301,19 +311,19 @@ SECTIONS
     __mbed_krbs_start = .;
     __HeapLimit = .;
     __heap_limit = .; /* Add for _sbrk */
-  } > m_sram_u
+  } > m_sram_u AT> m_sram_u :ram_noinit
 
   /* USB RAM sections.  These live inside a "gap" created in .bss. */
   m_usb_bdt USB_RAM_START (OVERLAY) :
   {
     *(m_usb_bdt)
     USB_RAM_BDT_END = .;
-  }
+  } :ram_noinit
 
   m_usb_global USB_RAM_BDT_END (OVERLAY) :
   {
     *(m_usb_global)
-  }
+  } :ram_noinit
 
   /* Initializes stack on the end of block */
   __StackTop = ORIGIN(m_sram_u) + LENGTH(m_sram_u);

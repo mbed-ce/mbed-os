@@ -278,7 +278,7 @@ const char *mbed_trace_exclude_filters_get(void);
  *  mbed_tracef(TRACE_ACTIVE_LEVEL_DEBUG, "mygr", "Hi There");
  *  mbed_tracef(TRACE_ACTIVE_LEVEL_DEBUG, "grp2", "This is not printed");
  */
-void mbed_trace_include_filters_set(char *filters);
+void mbed_trace_include_filters_set(char const *filters);
 /** get trace include filters
  */
 const char *mbed_trace_include_filters_get(void);
