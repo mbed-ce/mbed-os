@@ -26,8 +26,15 @@ namespace mbed {
 /** \addtogroup storage-blockdevice */
 /** @{*/
 
-/** Block device for allowing minimal read and program sizes (of 1) for the underlying BD,
- *  using a buffer on the heap.
+/**
+ * Block device which allows minimal read and program sizes (of 1) for the underlying BD
+ * using a buffer on the heap.  This essentially "simulates" a byte-programmable device
+ * like a NOR flash or an EEPROM, using a non-byte-programmable device like an SD card or
+ * NAND flash.
+ *
+ * @note While the read and write size of the buffered block device will always be 1,
+ *     the erase size is the same as the underlying block device.  In other words, you
+ *     still must erase in the hardware erase sector size.
  */
 class BufferedBlockDevice : public BlockDevice {
 public:
