@@ -409,7 +409,7 @@ bool Kinetis_EMAC::link_out(emac_mem_buf_t *buf)
     }
 
     /* Check if a descriptor is available for the transfer (wait 10ms before dropping the buffer) */
-    if (!xTXDCountSem.try_acquire_for(10)) {
+    if (!xTXDCountSem.try_acquire_for(10ms)) {
         memory_manager->free(buf);
         return false;
     }

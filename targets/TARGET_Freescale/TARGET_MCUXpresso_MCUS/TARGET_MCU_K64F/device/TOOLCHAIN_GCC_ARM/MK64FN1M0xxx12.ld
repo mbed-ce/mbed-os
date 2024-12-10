@@ -82,11 +82,11 @@ FLASH_CONFIG_FIELD_SIZE = 0x10;
 /* Specify the ELF segments (program headers) */
 PHDRS
 {
-    text PT_LOAD FLAGS(5); /* read + execute */
-    ram_vector_table PT_LOAD FLAGS(6); /* read + write */
-	ram_noinit PT_LOAD FLAGS(6); /* read + write */
-	ram_init PT_LOAD FLAGS(6); /* read + write */
-	sram_l PT_LOAD FLAGS(6); /* read + write */
+  text PT_LOAD FLAGS(5); /* read + execute */
+  ram_vector_table PT_LOAD FLAGS(6); /* read + write */
+  ram_noinit PT_LOAD FLAGS(6); /* read + write */
+  ram_init PT_LOAD FLAGS(6); /* read + write */
+  sram_l PT_LOAD FLAGS(6); /* read + write */
 }
 
 /* Specify the memory areas */
@@ -116,7 +116,7 @@ SECTIONS
 
   /* FCF to absolute address of 0x400, but only if bootloader is not present. */
 #if !IS_BOOTLOADER_PRESENT
-  .flash_config VTOR_TABLE_SIZE :
+  .flash_config FLASH_VTOR_TABLE_SIZE :
   {
     KEEP(*(.FlashConfig))    /* Flash Configuration Field (FCF) */
   } > m_text AT> m_text :text

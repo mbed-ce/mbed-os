@@ -77,7 +77,7 @@ foreach(LEGACY_VAR_NAME JLINK_USB_SERIAL_NUMBER LINKSERVER_PROBE_SN MBED_TARGET_
 		if(NOT "${${LEGACY_VAR_NAME}}" STREQUAL "")
 			message(WARNING "${LEGACY_VAR_NAME} is deprecated, set the MBED_UPLOAD_SERIAL_NUMBER variable instead. MBED_UPLOAD_SERIAL_NUMBER will be set to the value of ${LEGACY_VAR_NAME}.")
 			set(MBED_UPLOAD_SERIAL_NUMBER ${${LEGACY_VAR_NAME}} CACHE STRING "" FORCE)
-			unset(STLINK_PROBE_SN CACHE)
+			unset(${LEGACY_VAR_NAME} CACHE)
 		endif()
 	endif()
 endforeach()
