@@ -17,15 +17,6 @@
 
 #include "../cmsis_nvic.h"
 
-
-#if !defined(MBED_APP_START)
-  #define MBED_APP_START  MBED_ROM_START
-#endif
-
-#if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE  MBED_ROM_SIZE
-#endif
-
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
     /* This value is normally defined by the tools
        to 0x1000 for bare metal and 0x400 for RTOS */
@@ -33,12 +24,12 @@
 #endif
 
 /* Round up VECTORS_SIZE to 8 bytes */
-#define VECTORS_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
+#define MBED_VECTTABLE_RAM_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
 
 MEMORY
 {
-    FLASH (rx)   : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
-    RAM (rwx)    : ORIGIN = MBED_RAM_START + VECTORS_SIZE, LENGTH = MBED_RAM_SIZE - VECTORS_SIZE
+    FLASH (rx)   : ORIGIN = MBED_CONFIGURED_ROM_BANK_FLASH_START, LENGTH = MBED_CONFIGURED_ROM_BANK_FLASH_SIZE
+    RAM (rwx)    : ORIGIN = MBED_RAM_BANK_SRAM1_2_START + MBED_VECTTABLE_RAM_SIZE, LENGTH = (MBED_RAM_BANK_SRAM1_2_SIZE + MBED_RAM_BANK_SRAM3_SIZE) - MBED_VECTTABLE_RAM_SIZE
 }
 
 /* Linker script to place sections and symbol values. Should be used together
