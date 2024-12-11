@@ -33,7 +33,7 @@ namespace mbed {
  * NAND flash.
  *
  * @note While the read and write size of the buffered block device will always be 1,
- *     the erase size is the same as the underlying block device.  In other words, you
+ *     the erase size is the same as the underlying block device. In other words, you
  *     still must erase in the hardware erase sector size.
  */
 class BufferedBlockDevice : public BlockDevice {
