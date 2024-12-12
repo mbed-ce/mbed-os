@@ -4834,7 +4834,16 @@
         ],
         "macros_add": [
             "STM32U575xx"
-        ]
+        ],
+        "device_has_add": [
+            "USBDEVICE"
+        ],
+        "config": {
+            "usb_speed": {
+                "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS or USE_USB_NO_OTG",
+                "value": "USE_USB_OTG_FS"
+            }
+        }        
     },
     "MCU_STM32U585xI": {
         "inherits": [
