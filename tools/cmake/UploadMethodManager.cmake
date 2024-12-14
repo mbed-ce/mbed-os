@@ -146,4 +146,10 @@ function(mbed_generate_upload_target target)
 	else()
 		gen_upload_target(${target} ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.hex)
 	endif()
+
+	# Make sure building the upload target causes the target to be built first
+	if(TARGET flash-${target})
+		add_dependencies(flash-${target} ${target})
+	endif()
+
 endfunction()

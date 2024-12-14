@@ -28,6 +28,4 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		--write ${BINARY_FILE}
 		--reset)
 
-	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
-
 endfunction(gen_upload_target)

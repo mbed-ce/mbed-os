@@ -29,12 +29,16 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		list(APPEND PICOTOOL_TARGET_ARGS --address ${PICOTOOL_TARGET_ADDRESS})
 	endif()
 
+	if("${MBED_OUTPUT_EXT}" STREQUAL "hex")
+        message(FATAL_ERROR "Bin file output must be enabled to use picotool.  Set MBED_OUTPUT_EXT to empty string or to 'bin' in your top level CMakeLists.txt!")
+    endif()
+
 	add_custom_target(flash-${TARGET_NAME}
 		COMMAND ${Picotool}
 			load
+			--verify
 		    --execute
-			$<TARGET_FILE:${TARGET_NAME}>)
-
-	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
+			--offset ${MBED_UPLOAD_BASE_ADDR}
+			${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${TARGET_NAME}>.bin)
 
 endfunction(gen_upload_target)

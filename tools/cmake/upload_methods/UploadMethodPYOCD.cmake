@@ -34,7 +34,6 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		--base-address ${MBED_UPLOAD_BASE_ADDR}
 		${BINARY_FILE})
 
-	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
 endfunction(gen_upload_target)
 
 ### Commands to run the debug server.

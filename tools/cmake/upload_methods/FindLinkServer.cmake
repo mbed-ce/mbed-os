@@ -7,6 +7,7 @@
 # This module defines:
 # LinkServer - Whether the reqested tools were found.
 # LinkServer_PATH - full path to the LinkServer command line tool.
+# LinkServer_VERSION - version number of LinkServer
 
 # Check for LinkServer install folders on Windows
 if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
@@ -26,6 +27,16 @@ find_program(LinkServer_PATH
     HINTS ${LINKSERVER_HINTS}
 )
 
-find_package_handle_standard_args(LinkServer REQUIRED_VARS LinkServer_PATH)
+if(EXISTS "${LinkServer_PATH}")
+	# Detect version
+	execute_process(COMMAND ${LinkServer_PATH} --version
+			OUTPUT_VARIABLE LinkServer_VERSION_OUTPUT)
+
+	# The output looks like "LinkServer v1.2.45 [Build 45] [2023-07-25 09:54:50]", so use a regex to grab the version
+	string(REGEX REPLACE "LinkServer v([0-9]+\\.[0-9]+\\.[0-9]+).*" "\\1" LinkServer_VERSION ${LinkServer_VERSION_OUTPUT})
+endif()
+
+
+find_package_handle_standard_args(LinkServer REQUIRED_VARS LinkServer_PATH VERSION_VAR LinkServer_VERSION)
 
 

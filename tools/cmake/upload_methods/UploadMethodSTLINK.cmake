@@ -32,7 +32,6 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		${STLINK_ARGS}
 		write ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR})
 
-	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
 endfunction(gen_upload_target)
 
 ### Commands to run the debug server.

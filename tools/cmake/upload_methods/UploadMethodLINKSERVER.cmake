@@ -23,6 +23,12 @@ endif()
 find_package(LinkServer)
 set(UPLOAD_LINKSERVER_FOUND ${LinkServer_FOUND})
 
+if(LinkServer_FOUND)
+	if(${LinkServer_VERSION} VERSION_LESS 1.5.30 AND "${MBED_OUTPUT_EXT}" STREQUAL "hex")
+		message(FATAL_ERROR "LinkServer <1.5.30 does not support flashing hex files! Please upgrade LinkServer and then clean and rebuild the project.")
+	endif()
+endif()
+
 ### Function to generate upload target
 
 function(gen_upload_target TARGET_NAME BINARY_FILE)
@@ -36,8 +42,6 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 			load
 			--addr ${MBED_UPLOAD_BASE_ADDR}
 			${BINARY_FILE})
-
-	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
 
 endfunction(gen_upload_target)
 

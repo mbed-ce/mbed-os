@@ -41,7 +41,6 @@ endif()
 
 function(gen_upload_target TARGET_NAME BINARY_FILE)
 
-	# unlike other upload methods, OpenOCD uses the elf file
 	add_custom_target(flash-${TARGET_NAME}
 		COMMENT "Flashing ${TARGET_NAME} with OpenOCD..."
 		COMMAND ${OpenOCD}
@@ -51,7 +50,6 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		-c "program ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR} reset exit"
 		VERBATIM)
 
-	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
 endfunction(gen_upload_target)
 
 ### Commands to run the debug server.

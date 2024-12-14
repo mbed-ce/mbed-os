@@ -71,9 +71,6 @@ exit
 		-ExitOnError
 		-CommandFile ${COMMAND_FILE_PATH})
 
-
-	add_dependencies(flash-${TARGET_NAME} ${TARGET_NAME})
-
 endfunction(gen_upload_target)
 
 ### Commands to run the debug server.
