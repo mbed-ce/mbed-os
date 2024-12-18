@@ -362,6 +362,8 @@ bool ESP32::accept(int * p_id)
 
 bool ESP32::reset(void)
 {
+    setTimeout(2000);//could take 2s
+
     for (int i = 0; i < 2; i++) {
         if (_parser.send("AT+RST")
             && _parser.recv("OK")) {
@@ -369,7 +371,9 @@ bool ESP32::reset(void)
 #if DEVICE_SERIAL_FC
             _serial.set_flow_control(SerialBase::Disabled);
 #endif
+            setTimeout(2000);//could take 2s
             _parser.recv("ready");
+            setTimeout(last_timeout_ms);
             _clear_socket_packets(ESP32_ALL_SOCKET_IDS);
 
             if (_parser.send("AT+UART_CUR=%d,8,1,0,%d", _baudrate, _flow_control)
