@@ -115,7 +115,7 @@ endfunction(mbed_setup_linker_script)
 function(mbed_set_custom_linker_script target new_linker_script_path)
 
     set(RAW_LINKER_SCRIPT_PATHS  ${CMAKE_CURRENT_SOURCE_DIR}/${new_linker_script_path})
-    set(CUSTOM_LINKER_SCRIPT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${target}.link_spript.ld)
+    set(CUSTOM_LINKER_SCRIPT_PATH ${CMAKE_CURRENT_BINARY_DIR}/${target}.link_script.ld)
 
     # To avoid path limits on Windows, we create a "response file" and set the path to it as a
     # global property. We need this solely to pass the compile definitions to GCC's preprocessor,
@@ -151,6 +151,5 @@ function(mbed_set_custom_linker_script target new_linker_script_path)
         PRIVATE
             "-T" "${CUSTOM_LINKER_SCRIPT_PATH}"
     )
-    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${CUSTOM_LINKER_SCRIPT_PATH})
 
 endfunction(mbed_set_custom_linker_script)
