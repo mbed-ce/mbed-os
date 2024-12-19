@@ -60,8 +60,7 @@ function(mbed_setup_linker_script mbed_os_target mbed_baremetal_target target_de
     add_custom_command(
         OUTPUT
             ${LINKER_SCRIPT_PATH}
-        PRE_LINK
-        COMMAND 
+        COMMAND
             ${CMAKE_COMMAND} -E echo "Preprocess linker script: ${RAW_LINKER_SCRIPT_NAME} -> ${LINKER_SCRIPT_NAME}"
         COMMAND
             ${CMAKE_C_COMPILER} @${linker_defs_response_file}
@@ -130,7 +129,7 @@ function(mbed_set_custom_linker_script target new_linker_script_path)
             ${target}
         PRE_LINK
         COMMAND 
-            ${CMAKE_COMMAND} -E echo "Preprocess custom linker script: ${RAW_LINKER_SCRIPT_NAME} -> ${LINKER_SCRIPT_NAME}"
+            ${CMAKE_COMMAND} -E echo "Preprocess custom linker script ${RAW_LINKER_SCRIPT_NAME} to ${LINKER_SCRIPT_NAME}"
         COMMAND
             ${CMAKE_C_COMPILER} @${linker_defs_response_file}
             -E -x assembler-with-cpp
@@ -151,5 +150,6 @@ function(mbed_set_custom_linker_script target new_linker_script_path)
         PRIVATE
             "-T" "${CUSTOM_LINKER_SCRIPT_PATH}"
     )
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS ${RAW_LINKER_SCRIPT_PATHS})
 
 endfunction(mbed_set_custom_linker_script)
