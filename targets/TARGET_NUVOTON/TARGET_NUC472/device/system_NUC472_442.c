@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include "NUC472_442.h"
+#include "NUC472_mem.h"
 //#include "rtc.h"
 
 /*----------------------------------------------------------------------------
@@ -20,7 +21,7 @@ uint32_t SystemCoreClock = __HSI;               /*!< System Clock Frequency (Cor
 uint32_t CyclesPerUs      = (__HSI / 1000000);  /*!< Cycles per micro second            */
 uint32_t gau32ClkSrcTbl[] = {__HXT, __LXT, 0, __LIRC, 0, 0, 0, __HIRC}; /*!< System clock source table */
 
-#if defined TARGET_NU_XRAM_SUPPORTED
+#if MBED_CONF_TARGET_EBI_ENABLE
 static void nu_ebi_init(void);
 #endif
 
@@ -114,13 +115,13 @@ void SystemInit (void)
     /*------------------------------------------------------------------------*/
 #endif
 
-#if defined TARGET_NU_XRAM_SUPPORTED
+#if MBED_CONF_TARGET_EBI_ENABLE
     // NOTE: C-runtime not initialized yet. Ensure no static memory (global variable) are accessed in this function.
     nu_ebi_init();
 #endif
 }
 
-#if defined TARGET_NU_XRAM_SUPPORTED
+#if MBED_CONF_TARGET_EBI_ENABLE
 void nu_ebi_init(void)
 {
     /* Enable IP clock */

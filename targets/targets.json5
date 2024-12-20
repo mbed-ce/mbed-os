@@ -7412,7 +7412,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels": [
             "NUVOTON",
             "NUC472",
-            "NU_XRAM_SUPPORTED",
             "FLASH_CMSIS_ALGO",
             "NUVOTON_EMAC"
         ],
@@ -7449,7 +7448,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             },
             "eadc-extsmpt-list": {
                 "help": "For EADC, comma separated {pin, value} list to extend sampling time in EADC clocks on per-pin basis. Value must be in the range [0, 255]."
-            }
+            },
+            "ebi-enable": {
+                "help": "Enable EBI for EBI RAM",
+                "options": [false, true]
+            },
         },
         "inherits": [
             "Target"
@@ -7501,7 +7504,25 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "lxt-present": true,
             "network-default-interface-type": "ETHERNET",
             "deep-sleep-latency": 1,
-            "tickless-from-us-ticker": true
+            "tickless-from-us-ticker": true,
+            "ebi-enable": true
+        },
+        "memory_banks": {
+            "EBIRAM1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x100000,
+                "start": 0x60000000,
+                "startup": false
+            }
         },
         "detect_code": [
             "1302"

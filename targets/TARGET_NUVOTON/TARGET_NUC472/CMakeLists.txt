@@ -2,26 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
-    if("NU_XRAM_SUPPORTED" IN_LIST MBED_TARGET_LABELS)
-        set(LINKER_FILE_NU_XRAM_SUPPORTED device/TOOLCHAIN_GCC_ARM/TARGET_NU_XRAM_SUPPORTED/NUC472.ld)
-    elseif("NU_XRAM_UNSUPPORTED" IN_LIST MBED_TARGET_LABELS)
-        set(LINKER_FILE_NU_XRAM_UNSUPPORTED device/TOOLCHAIN_GCC_ARM/TARGET_NU_XRAM_UNSUPPORTED/NUC472.ld)
-    endif()
-elseif(${MBED_TOOLCHAIN} STREQUAL "ARM")
-    if("NU_XRAM_SUPPORTED" IN_LIST MBED_TARGET_LABELS)
-        set(LINKER_FILE_NU_XRAM_SUPPORTED device/TOOLCHAIN_ARM_STD/TARGET_NU_XRAM_SUPPORTED/NUC472.sct)
-    elseif("NU_XRAM_UNSUPPORTED" IN_LIST MBED_TARGET_LABELS)
-        set(LINKER_FILE_NU_XRAM_UNSUPPORTED device/TOOLCHAIN_ARM_STD/TARGET_NU_XRAM_UNSUPPORTED/NUC472.sct)
-    endif()
+    set(LINKER_FILE device/TOOLCHAIN_GCC_ARM/NUC472.ld)
 endif()
-
-add_library(mbed-nu-xram-supported INTERFACE)
-mbed_set_linker_script(mbed-nu-xram-supported ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE_NU_XRAM_SUPPORTED})
-
-add_library(mbed-nu-xram-unsupported INTERFACE)
-mbed_set_linker_script(mbed-nu-xram-unsupported ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE_NU_XRAM_UNSUPPORTED})
-
-
 
 add_library(mbed-nuc472 INTERFACE)
 
@@ -90,22 +72,10 @@ target_include_directories(mbed-nuc472
         device/StdDriver
 )
 
-target_link_libraries(mbed-nuc472 INTERFACE mbed-nuvoton)
+target_link_libraries(mbed-nuc472 INTERFACE mbed-nuvoton mbed-flash-cmsis-algo)
+
+mbed_set_linker_script(mbed-nuc472 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
 
 add_library(mbed-numaker-pfm-nuc472 INTERFACE)
 
-if("NU_XRAM_SUPPORTED" IN_LIST MBED_TARGET_LABELS)
-    target_link_libraries(mbed-numaker-pfm-nuc472
-        INTERFACE
-            mbed-nuc472
-            mbed-nu-xram-supported
-            mbed-flash-cmsis-algo
-    )
-elseif("NU_XRAM_UNSUPPORTED" IN_LIST MBED_TARGET_LABELS)
-    target_link_libraries(mbed-numaker-pfm-nuc472
-        INTERFACE
-            mbed-nuc472
-            mbed-nu-xram-unsupported
-            mbed-flash-cmsis-algo
-    )
-endif()
+target_link_libraries(mbed-numaker-pfm-nuc472 INTERFACE mbed-nuc472)

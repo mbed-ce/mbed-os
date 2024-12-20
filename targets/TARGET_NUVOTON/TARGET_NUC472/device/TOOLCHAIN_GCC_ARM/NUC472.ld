@@ -2,7 +2,7 @@
  * Nuvoton NUC472 GCC linker script file
  */
 
-#include "../../NUC472_mem.h"
+#include "../NUC472_mem.h"
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
 #  if defined(MBED_BOOT_STACK_SIZE)
@@ -21,7 +21,9 @@ MEMORY
   VECTORS (rx)          : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START, LENGTH = 0x00000400
   FLASH (rx)            : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START + 0x400, LENGTH = MBED_CONFIGURED_ROM_BANK_IROM1_SIZE - 0x00000400
   RAM_INTERN (rwx)      : ORIGIN = MBED_CONFIGURED_RAM_BANK_IRAM1_START, LENGTH = MBED_CONFIGURED_RAM_BANK_IRAM1_SIZE
-  RAM_EXTERN (rwx)      : ORIGIN = MBED_CONFIGURED_RAM_BANK_XRAM1_START, LENGTH = MBED_CONFIGURED_RAM_BANK_XRAM1_SIZE
+#if NU_ENABLE_EBIRAM1
+  RAM_EXTERN (rwx)      : ORIGIN = MBED_CONFIGURED_RAM_BANK_EBIRAM1_START, LENGTH = MBED_CONFIGURED_RAM_BANK_EBIRAM1_SIZE
+#endif
 }
 
 /**
@@ -200,8 +202,12 @@ SECTIONS
         *lwip_*.o(COMMON)
         *mesh_system.o(.bss*)
        __bss_extern_end__ = .;
+#if NU_ENABLE_EBIRAM1
     } > RAM_EXTERN
-    
+#else
+    } > RAM_INTERN
+#endif
+
     .bss (NOLOAD):
     {
         __bss_start__ = .;
@@ -210,6 +216,7 @@ SECTIONS
         __bss_end__ = .;
     } > RAM_INTERN
 
+#if NU_ENABLE_EBIRAM1
     .heap (NOLOAD):
     {
         __end__ = .;
@@ -218,6 +225,16 @@ SECTIONS
         . += (ORIGIN(RAM_EXTERN) + LENGTH(RAM_EXTERN) - .);
         __HeapLimit = .;
     } > RAM_EXTERN
+#else
+    .heap (NOLOAD):
+    {
+        __end__ = .;
+        end = __end__;
+        *(.heap*);
+        . += (ORIGIN(RAM_INTERN) + LENGTH(RAM_INTERN) - .);
+        __HeapLimit = .;
+    } > RAM_INTERN
+#endif
     PROVIDE(__heap_size = SIZEOF(.heap));
     PROVIDE(__mbed_sbrk_start = ADDR(.heap));
     PROVIDE(__mbed_krbs_start = ADDR(.heap) + SIZEOF(.heap));
