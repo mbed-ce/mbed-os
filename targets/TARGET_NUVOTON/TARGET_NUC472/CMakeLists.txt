@@ -94,4 +94,18 @@ target_link_libraries(mbed-nuc472 INTERFACE mbed-nuvoton)
 
 add_library(mbed-numaker-pfm-nuc472 INTERFACE)
 
-target_link_libraries(mbed-numaker-pfm-nuc472 INTERFACE mbed-nuc472 mbed-nu-xram-supported mbed-flash-cmsis-algo)
+if("NU_XRAM_SUPPORTED" IN_LIST MBED_TARGET_LABELS)
+    target_link_libraries(mbed-numaker-pfm-nuc472
+        INTERFACE
+            mbed-nuc472
+            mbed-nu-xram-supported
+            mbed-flash-cmsis-algo
+    )
+elseif("NU_XRAM_UNSUPPORTED" IN_LIST MBED_TARGET_LABELS)
+    target_link_libraries(mbed-numaker-pfm-nuc472
+        INTERFACE
+            mbed-nuc472
+            mbed-nu-xram-unsupported
+            mbed-flash-cmsis-algo
+    )
+endif()
