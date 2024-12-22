@@ -40,15 +40,15 @@ struct WrappedEthTxDescriptor
 {
     EthTxDescriptor txDesc;
 
-    // Memory buffers filled in to this descriptor.
-    // These must be freed when the descriptor is done transmitting.
-    net_stack_mem_buf_t * buffer1;
-    net_stack_mem_buf_t * buffer2;
+    // Pointer to first memory buffer in the chain associated with this descriptor.
+    // This shall only be filled in on the *last* packet, so that the entire chain is freed
+    // when the last descriptor is returned.
+    net_stack_mem_buf_t * packetFirstBuf;
 
     // If we have a data cache, we need each descriptor to be in its own cache line.  So,
     // pad up to 32 byte cache line size
 #if __DCACHE_PRESENT
-    uint8_t _padding[__SCB_DCACHE_LINE_SIZE - sizeof(EthTxDescriptor) - 2*sizeof(net_stack_mem_buf_t *)];
+    uint8_t _padding[__SCB_DCACHE_LINE_SIZE - sizeof(EthTxDescriptor) - sizeof(net_stack_mem_buf_t *)];
 #endif
 };
 

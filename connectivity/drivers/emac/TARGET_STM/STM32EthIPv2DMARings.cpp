@@ -180,8 +180,9 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
     }
 #endif
 
-    printf("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu\n",
-           memory_manager.get_total_len(headBuffer), memory_manager.get_ptr(headBuffer), firstDescIdx, lastDescIdx);
+    printf("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
+           memory_manager.get_total_len(headBuffer), memory_manager.get_ptr(headBuffer), firstDescIdx, lastDescIdx,
+           &rxDescs[firstDescIdx], &rxDescs[lastDescIdx]);
 
     // Rebuild descriptors if possible
     buildRxDescriptors();
@@ -218,11 +219,8 @@ void STM32EthIPv2DMARings::reclaimTxDescs() {
         }
 
         // Free any buffers associated with the descriptor
-        if (currDesc.buffer1 != nullptr) {
-            memory_manager.free(currDesc.buffer1);
-        }
-        if (currDesc.buffer2 != nullptr) {
-            memory_manager.free(currDesc.buffer2);
+        if (currDesc.packetFirstBuf != nullptr) {
+            memory_manager.free(currDesc.packetFirstBuf);
         }
 
         // Update counters
@@ -413,7 +411,7 @@ void STM32EthIPv2DMARings::txISR()
 
 HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
 {
-    if(memory_manager.get_total_len(buf) >= 250)
+    if(memory_manager.get_total_len(buf) >= 700)
     {
         printf("slightly big one!\n");
     }
@@ -456,8 +454,8 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
         }
     }
 
-    printf("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
-           memory_manager.get_total_len(buf), neededDescs, neededDescs);
+    printf("Transmitting packet of length %lu in %zu buffers and %zu descs (%zu rx descs currently free)\n",
+           memory_manager.get_total_len(buf), memory_manager.count_buffers(buf), neededDescs, rxPoolSize - rxDescsOwnedByApplication);
 
     // Step 2: Copy packet if needed
     if(needToCopy)
@@ -496,7 +494,6 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
         auto & currDesc = txDescs[txSendIndex];
 
         // Set buffer 1
-        currDesc.buffer1 = currBuf;
         currDesc.txDesc.toDMAFmt.buffer1Addr = static_cast<uint8_t *>(memory_manager.get_ptr(currBuf));
         currDesc.txDesc.toDMAFmt.buffer1Len = memory_manager.get_len(currBuf);
 
@@ -504,7 +501,6 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
         currBuf = memory_manager.get_next(currBuf);
         if(currBuf != nullptr)
         {
-            currDesc.buffer2 = currBuf;
             currDesc.txDesc.toDMAFmt.buffer2Addr = memory_manager.get_ptr(currBuf);
             currDesc.txDesc.toDMAFmt.buffer2Len = memory_manager.get_len(currBuf);
 
@@ -513,9 +509,18 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
         }
         else
         {
-            currDesc.buffer2 = nullptr;
             currDesc.txDesc.toDMAFmt.buffer2Addr = nullptr;
             currDesc.txDesc.toDMAFmt.buffer2Len = 0;
+        }
+
+        if(currBuf == nullptr)
+        {
+            // Last descriptor, store buffer address for freeing
+            currDesc.packetFirstBuf = buf;
+        }
+        else
+        {
+            currDesc.packetFirstBuf = nullptr;
         }
 
 //        printf("Tx Ethernet buffer:");
@@ -535,12 +540,11 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
 #if __DCACHE_PRESENT
         // Write buffers back to main memory
         SCB_CleanDCache_by_Addr(const_cast<void*>(currDesc.txDesc.toDMAFmt.buffer1Addr), currDesc.txDesc.toDMAFmt.buffer1Len);
-        if(currDesc.buffer2 != nullptr)
+        if(currDesc.txDesc.toDMAFmt.buffer2Addr != nullptr)
         {
             SCB_CleanDCache_by_Addr(const_cast<void*>(currDesc.txDesc.toDMAFmt.buffer2Addr), currDesc.txDesc.toDMAFmt.buffer2Len);
         }
 #endif
-
 
         // Enter a critical section, because we could run into weird corner cases if the
         // interrupt executes while we are half done configuring this descriptor and updating
