@@ -8,7 +8,7 @@
  *****************************************************************************/
 
 #include "NuMicro.h"
-
+#include "M460_mem.h"
 
 /*----------------------------------------------------------------------------
   DEFINES
@@ -93,7 +93,7 @@ void SystemInit (void)
     /* Lock protected registers */
     SYS_LockReg();
 
-#if defined(MBED_CONF_TARGET_HBI_ENABLE) && MBED_CONF_TARGET_HBI_ENABLE
+#if MBED_CONF_TARGET_HBI_ENABLE
     /* Initialize HBI for HyperRAM */
     void nu_hbi_init(void);
     nu_hbi_init();
@@ -138,7 +138,7 @@ int32_t nu_hyperram_used(void)
     return NU_HYPERRAM_USED;
 }
 
-#if defined(MBED_CONF_TARGET_HBI_ENABLE) && MBED_CONF_TARGET_HBI_ENABLE
+#if MBED_CONF_TARGET_HBI_ENABLE
 
 /* Simple array size macro without type check */
 #define _NU_ARRAY_SIZE(arr)     (sizeof(arr)/sizeof(arr[0]))
@@ -187,4 +187,4 @@ void nu_hbi_init(void)
     SYS_LockReg();
 }
 
-#endif  /* #if defined(MBED_CONF_TARGET_HBI_ENABLE) && MBED_CONF_TARGET_HBI_ENABLE */
+#endif  /* #if MBED_CONF_TARGET_HBI_ENABLE */
