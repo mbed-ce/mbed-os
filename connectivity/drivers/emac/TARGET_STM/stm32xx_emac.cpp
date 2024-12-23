@@ -289,6 +289,12 @@ bool STM32_EMAC::low_level_init_successful()
         return false;
     }
 
+    // Set MAC address
+    writeMACAddress(MACAddr, &EthHandle.Instance->MACA0HR, &EthHandle.Instance->MACA0LR);
+
+    // Enable multicast hash and perfect filter
+    EthHandle.Instance->MACPFR = ETH_MACPFR_HMC | ETH_MACPFR_HPF;
+
     // Enable Tx, Rx, and fatal bus error interrupts.
     // However, don't enable receive buffer unavailable interrupt, because that can
     // trigger if we run out of Rx descriptors, and we don't want to fatal error
@@ -811,6 +817,45 @@ void STM32_EMAC::irqHandler()
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ETHERNET, EIO), \
                "STM32 EMAC: Hardware reports fatal DMA Error\n");
     }
+}
+
+void STM32_EMAC::populateMcastFilterRegs() {
+    const size_t NUM_PERFECT_FILTER_REGS = 3;
+
+    const size_t numPerfectFilterMacs = std::min(NUM_PERFECT_FILTER_REGS, numSubscribedMcastMacs);
+    const size_t numHashFilterMacs = numSubscribedMcastMacs - numPerfectFilterMacs;
+
+    for(size_t perfFiltIdx = 0; perfFiltIdx < numPerfectFilterMacs; ++perfFiltIdx)
+    {
+        // Find MAC addr registers (they aren't in an array :/)
+        uint32_t volatile * highReg;
+        uint32_t volatile * lowReg;
+        if(perfFiltIdx == 0)
+        {
+            highReg = &EthHandle.Instance->MACA1HR;
+            lowReg = &EthHandle.Instance->MACA1LR;
+        }
+        else if(perfFiltIdx == 1)
+        {
+            highReg = &EthHandle.Instance->MACA2HR;
+            lowReg = &EthHandle.Instance->MACA2LR;
+        }
+        else
+        {
+            highReg = &EthHandle.Instance->MACA3HR;
+            lowReg = &EthHandle.Instance->MACA3LR;
+        }
+
+        writeMACAddress(mcastMacs[perfFiltIdx], highReg, lowReg);
+    }
+}
+
+void STM32_EMAC::writeMACAddress(const uint8_t *MAC, volatile uint32_t *addrHighReg, volatile uint32_t *addrLowReg) {
+    /* Set MAC addr bits 32 to 47 */
+    *addrHighReg = (static_cast<uint32_t>(MAC[5]) << 8) | static_cast<uint32_t>(MAC[4]) | ETH_MACA0HR_AE_Msk;
+    /* Set MAC addr bits 0 to 31 */
+    *addrLowReg = (static_cast<uint32_t>(MAC[3]) << 24) | (static_cast<uint32_t>(MAC[2]) << 16) |
+                               (static_cast<uint32_t>(MAC[1]) << 8) | static_cast<uint32_t>(MAC[0]);
 }
 
 // Weak so a module can override
