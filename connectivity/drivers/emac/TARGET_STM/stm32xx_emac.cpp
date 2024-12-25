@@ -18,6 +18,7 @@
 #if DEVICE_EMAC
 
 #include <stdlib.h>
+#include <algorithm>
 
 #include "cmsis_os.h"
 
@@ -757,17 +758,57 @@ void STM32_EMAC::set_link_state_cb(emac_link_state_change_cb_t state_cb)
 
 void STM32_EMAC::add_multicast_group(const uint8_t *addr)
 {
-    /* No-op at this stage */
+    if(numSubscribedMcastMacs >= MBED_CONF_STM32_EMAC_MAX_MCAST_SUBSCRIBES)
+    {
+        tr_error("Out of multicast group entries (currently have %d). Increase the 'stm32-emac.max-mcast-subscribes' JSON option!", MBED_CONF_STM32_EMAC_MAX_MCAST_SUBSCRIBES);
+        return;
+    }
+
+    memcpy(mcastMacs[numSubscribedMcastMacs++].data(), addr, 6);
+    populateMcastFilterRegs();
 }
 
 void STM32_EMAC::remove_multicast_group(const uint8_t *addr)
 {
-    /* No-op at this stage */
+    // Find MAC address in the subscription list
+    auto macsEndIter = std::begin(mcastMacs) + numSubscribedMcastMacs;
+    auto toRemoveIter = std::find_if(std::begin(mcastMacs), macsEndIter, [&](auto element) {
+        return memcmp(element.data(), addr, 6) == 0;
+    });
+
+    if(toRemoveIter == macsEndIter)
+    {
+        tr_warning("Tried to remove mcast group that was not added");
+        return;
+    }
+
+    // Swap the MAC addr to be removed to the end of the list, if it is not there already
+    auto lastElementIter = macsEndIter - 1;
+    if(toRemoveIter != std::begin(mcastMacs) && toRemoveIter != lastElementIter)
+    {
+        std::swap(*toRemoveIter, *lastElementIter);
+    }
+
+    // 'remove' the last element by changing the length
+    numSubscribedMcastMacs--;
+
+    // Rebuild the MAC registers with that MAC removed.
+    // Technically it would be more performance efficient to remove just this MAC address, but that gets complex
+    // once you throw the hash filter into the mix.  Unless you are subscribed to insane numbers of mcast addrs,
+    // it's easier to just rebuild it all.
+    populateMcastFilterRegs();
 }
 
 void STM32_EMAC::set_all_multicast(bool all)
 {
-    /* No-op at this stage */
+    if(all)
+    {
+        EthHandle.Instance->MACPFR |= ETH_MACPFR_PM;
+    }
+    else
+    {
+        EthHandle.Instance->MACPFR &= ~ETH_MACPFR_PM;
+    }
 }
 
 void STM32_EMAC::power_down()
@@ -825,7 +866,7 @@ void STM32_EMAC::populateMcastFilterRegs() {
     const size_t numPerfectFilterMacs = std::min(NUM_PERFECT_FILTER_REGS, numSubscribedMcastMacs);
     const size_t numHashFilterMacs = numSubscribedMcastMacs - numPerfectFilterMacs;
 
-    for(size_t perfFiltIdx = 0; perfFiltIdx < numPerfectFilterMacs; ++perfFiltIdx)
+    for(size_t perfFiltIdx = 0; perfFiltIdx < NUM_PERFECT_FILTER_REGS; ++perfFiltIdx)
     {
         // Find MAC addr registers (they aren't in an array :/)
         uint32_t volatile * highReg;
@@ -846,7 +887,19 @@ void STM32_EMAC::populateMcastFilterRegs() {
             lowReg = &EthHandle.Instance->MACA3LR;
         }
 
-        writeMACAddress(mcastMacs[perfFiltIdx], highReg, lowReg);
+        if(perfFiltIdx < numPerfectFilterMacs)
+        {
+            printf("Using perfect filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 "\n",
+                     mcastMacs[perfFiltIdx][0], mcastMacs[perfFiltIdx][1], mcastMacs[perfFiltIdx][2],
+                     mcastMacs[perfFiltIdx][3], mcastMacs[perfFiltIdx][4], mcastMacs[perfFiltIdx][5]);
+            writeMACAddress(mcastMacs[perfFiltIdx].data(), highReg, lowReg);
+        }
+        else
+        {
+            // Write zeroes to disable this mac addr entry
+            *highReg = 0;
+            *lowReg = 0;
+        }
     }
 }
 

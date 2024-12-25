@@ -193,7 +193,7 @@ private:
     int phy_task_handle; /**< Handle for phy task event */
 
     // Multicast subscribe information
-    uint8_t mcastMacs[MBED_CONF_STM32_EMAC_MAX_MCAST_SUBSCRIBES][6];
+    std::array<uint8_t, 6> mcastMacs[MBED_CONF_STM32_EMAC_MAX_MCAST_SUBSCRIBES];
     size_t numSubscribedMcastMacs;
 };
 

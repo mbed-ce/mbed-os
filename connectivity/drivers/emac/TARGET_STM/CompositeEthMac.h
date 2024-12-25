@@ -51,7 +51,35 @@ namespace mbed
  */
 class CompositeEMAC : public EMAC
 {
+    enum class ErrCode
+    {
+        SUCCESS = 0,
+        TIMEOUT = 1,
+        HW_ERROR = 2,
+        PHY_NOT_RESPONDING = 3,
+        OUT_OF_MEMORY = 4,
+        INVALID_ARGUMENT = 5,
+        INVALID_USAGE = 6
+    };
 
+    class MACDriver
+    {
+        /**
+         * @brief Initialize the MAC and prepare it to send and receive packets.
+         *    It should not be enabled yet.
+         */
+        virtual ErrCode init() = 0;
+
+        /**
+         * @brief Enable the MAC to send
+         * @return
+         */
+        virtual ErrCode enable() = 0;
+    };
+
+    class PhyDriver
+    {
+    };
 };
 
 }
