@@ -29,6 +29,7 @@
 #include "platform/mbed_power_mgmt.h"
 #include "platform/mbed_error.h"
 #include "CacheAlignedBuffer.h"
+#include "MbedCRC.h"
 
 #include "stm32xx_emac_config.h"
 #include "stm32xx_emac.h"
@@ -889,7 +890,7 @@ void STM32_EMAC::populateMcastFilterRegs() {
 
         if(perfFiltIdx < numPerfectFilterMacs)
         {
-            printf("Using perfect filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 "\n",
+            tr_debug("Using perfect filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8,
                      mcastMacs[perfFiltIdx][0], mcastMacs[perfFiltIdx][1], mcastMacs[perfFiltIdx][2],
                      mcastMacs[perfFiltIdx][3], mcastMacs[perfFiltIdx][4], mcastMacs[perfFiltIdx][5]);
             writeMACAddress(mcastMacs[perfFiltIdx].data(), highReg, lowReg);
@@ -899,6 +900,37 @@ void STM32_EMAC::populateMcastFilterRegs() {
             // Write zeroes to disable this mac addr entry
             *highReg = 0;
             *lowReg = 0;
+        }
+    }
+
+    // Reset hash filter regs
+    EthHandle.Instance->MACHT1R = 0;
+    EthHandle.Instance->MACHT0R = 0;
+
+    // Note: as always, the datasheet description of how to do this CRC was vague and slightly wrong.
+    // This forum thread figured it out: https://community.st.com/t5/stm32-mcus-security/calculating-ethernet-multicast-filter-hash-value/td-p/416984
+    // What the datasheet SHOULD say is:
+    // Compute the Ethernet CRC-32 of the MAC address, with initial value of 1s, final XOR of ones, and input reflection on but output reflection off
+    // Then, take the upper 6 bits and use that to index the hash table.
+
+    mbed::MbedCRC<POLY_32BIT_ANSI> crcCalc(0xFFFFFFFF, 0xFFFFFFFF, true, false);
+    for(size_t hashFiltIdx = 0; hashFiltIdx < numHashFilterMacs; ++hashFiltIdx)
+    {
+        auto & currMacAddr = mcastMacs[hashFiltIdx + numPerfectFilterMacs];
+
+        // Compute Ethernet CRC-32 of the MAC address
+        uint32_t crc;
+        crcCalc.compute(currMacAddr.data(), currMacAddr.size(), &crc);
+
+        // Take upper 6 bits
+        uint32_t hashVal = crc >> 26;
+
+        // Set correct bit in hash filter
+        if(hashVal & 0b100000) {
+            EthHandle.Instance->MACHT1R |= (1 << (hashVal & 0x1F));
+        }
+        else {
+            EthHandle.Instance->MACHT0R |= (1 << (hashVal & 0x1F));
         }
     }
 }
