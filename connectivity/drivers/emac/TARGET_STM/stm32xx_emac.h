@@ -162,6 +162,13 @@ private:
     void enable_interrupts();
     void disable_interrupts();
 
+    // Populate multicast filter registers with the contents of mcastMacs.
+    // Uses the perfect filter registers first, then the hash filter.
+    void populateMcastFilterRegs();
+
+    // Write a MAC address into a high and low register pair on the MAC.
+    static void writeMACAddress(uint8_t const * MAC, uint32_t volatile * addrHighReg, uint32_t volatile * addrLowReg);
+
     mbed_rtos_storage_thread_t thread_cb;
 #if defined (STM32F767xx) || defined (STM32F769xx) || defined (STM32F777xx)\
     || defined (STM32F779xx)
@@ -176,6 +183,10 @@ private:
 
     uint32_t phy_status;
     int phy_task_handle; /**< Handle for phy task event */
+
+    // Multicast subscribe information
+    std::array<uint8_t, 6> mcastMacs[MBED_CONF_STM32_EMAC_MAX_MCAST_SUBSCRIBES];
+    size_t numSubscribedMcastMacs;
 };
 
 #endif /* STM32_EMAC_H_ */

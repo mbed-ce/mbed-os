@@ -42,6 +42,10 @@
         "eth-phy-duplex-status": {
             "help" : "Duplex mask information in eth-phy-status-register",
             "value" : "0x0010"
+        },
+        "max-mcast-subscribes": {
+            "help" : "Maximum supported number of multicast addresses that the application can subscribe to",
+            "value" : "8"
         }
     },
     "target_overrides": {

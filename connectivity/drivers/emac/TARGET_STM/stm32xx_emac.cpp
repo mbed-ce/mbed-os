@@ -28,6 +28,7 @@
 #include "platform/mbed_power_mgmt.h"
 #include "platform/mbed_error.h"
 #include "CacheAlignedBuffer.h"
+#include "MbedCRC.h"
 
 #include "stm32xx_emac_config.h"
 #include "stm32xx_emac.h"
@@ -294,6 +295,12 @@ bool STM32_EMAC::low_level_init_successful()
         /* HAL_ETH_Init returns TIMEOUT when Ethernet cable is not plugged */;
     }
 
+    // Set MAC address
+    writeMACAddress(MACAddr, &EthHandle.Instance->MACA0HR, &EthHandle.Instance->MACA0LR);
+
+    // Enable multicast hash and perfect filter
+    EthHandle.Instance->MACFFR = ETH_MACFFR_HM | ETH_MACFFR_HPF;
+
     uint32_t TempRegisterValue;
     if (HAL_ETH_ReadPHYRegister(&EthHandle, 2, &TempRegisterValue) != HAL_OK) {
         tr_error("HAL_ETH_ReadPHYRegister 2 issue");
@@ -363,6 +370,12 @@ bool STM32_EMAC::low_level_init_successful()
     if (HAL_ETH_Init(&EthHandle) != HAL_OK) {
         return false;
     }
+
+    // Set MAC address
+    writeMACAddress(MACAddr, &EthHandle.Instance->MACA0HR, &EthHandle.Instance->MACA0LR);
+
+    // Enable multicast hash and perfect filter
+    EthHandle.Instance->MACPFR = ETH_MACPFR_HMC | ETH_MACPFR_HPF;
 
     memset(&TxConfig, 0, sizeof(ETH_TxPacketConfig));
     TxConfig.Attributes = ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
@@ -934,17 +947,68 @@ void STM32_EMAC::set_link_state_cb(emac_link_state_change_cb_t state_cb)
 
 void STM32_EMAC::add_multicast_group(const uint8_t *addr)
 {
-    /* No-op at this stage */
+    if(numSubscribedMcastMacs >= MBED_CONF_STM32_EMAC_MAX_MCAST_SUBSCRIBES)
+    {
+        tr_error("Out of multicast group entries (currently have %d). Increase the 'stm32-emac.max-mcast-subscribes' JSON option!", MBED_CONF_STM32_EMAC_MAX_MCAST_SUBSCRIBES);
+        return;
+    }
+
+    memcpy(mcastMacs[numSubscribedMcastMacs++].data(), addr, 6);
+    populateMcastFilterRegs();
 }
 
 void STM32_EMAC::remove_multicast_group(const uint8_t *addr)
 {
-    /* No-op at this stage */
+    // Find MAC address in the subscription list
+    auto macsEndIter = std::begin(mcastMacs) + numSubscribedMcastMacs;
+    auto toRemoveIter = std::find_if(std::begin(mcastMacs), macsEndIter, [&](auto element) {
+        return memcmp(element.data(), addr, 6) == 0;
+    });
+
+    if(toRemoveIter == macsEndIter)
+    {
+        tr_warning("Tried to remove mcast group that was not added");
+        return;
+    }
+
+    // Swap the MAC addr to be removed to the end of the list, if it is not there already
+    auto lastElementIter = macsEndIter - 1;
+    if(toRemoveIter != std::begin(mcastMacs) && toRemoveIter != lastElementIter)
+    {
+        std::swap(*toRemoveIter, *lastElementIter);
+    }
+
+    // 'remove' the last element by changing the length
+    numSubscribedMcastMacs--;
+
+    // Rebuild the MAC registers with that MAC removed.
+    // Technically it would be more performance efficient to remove just this MAC address, but that gets complex
+    // once you throw the hash filter into the mix.  Unless you are subscribed to insane numbers of mcast addrs,
+    // it's easier to just rebuild it all.
+    populateMcastFilterRegs();
 }
 
 void STM32_EMAC::set_all_multicast(bool all)
 {
-    /* No-op at this stage */
+#if defined(ETH_IP_VERSION_V2)
+    if(all)
+    {
+        EthHandle.Instance->MACPFR |= ETH_MACPFR_PM;
+    }
+    else
+    {
+        EthHandle.Instance->MACPFR &= ~ETH_MACPFR_PM;
+    }
+#else
+    if(all)
+    {
+        EthHandle.Instance->MACFFR |= ETH_MACFFR_PM;
+    }
+    else
+    {
+        EthHandle.Instance->MACFFR &= ~ETH_MACFFR_PM;
+    }
+#endif
 }
 
 void STM32_EMAC::power_down()
@@ -964,6 +1028,100 @@ STM32_EMAC &STM32_EMAC::get_instance()
 {
     static STM32_EMAC emac;
     return emac;
+}
+
+void STM32_EMAC::populateMcastFilterRegs() {
+    const size_t NUM_PERFECT_FILTER_REGS = 3;
+
+    const size_t numPerfectFilterMacs = std::min(NUM_PERFECT_FILTER_REGS, numSubscribedMcastMacs);
+    const size_t numHashFilterMacs = numSubscribedMcastMacs - numPerfectFilterMacs;
+
+    for(size_t perfFiltIdx = 0; perfFiltIdx < NUM_PERFECT_FILTER_REGS; ++perfFiltIdx)
+    {
+        // Find MAC addr registers (they aren't in an array :/)
+        uint32_t volatile * highReg;
+        uint32_t volatile * lowReg;
+
+        if(perfFiltIdx == 0)
+        {
+            highReg = &EthHandle.Instance->MACA1HR;
+            lowReg = &EthHandle.Instance->MACA1LR;
+        }
+        else if(perfFiltIdx == 1)
+        {
+            highReg = &EthHandle.Instance->MACA2HR;
+            lowReg = &EthHandle.Instance->MACA2LR;
+        }
+        else
+        {
+            highReg = &EthHandle.Instance->MACA3HR;
+            lowReg = &EthHandle.Instance->MACA3LR;
+        }
+
+        if(perfFiltIdx < numPerfectFilterMacs)
+        {
+            tr_debug("Using perfect filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8,
+                     mcastMacs[perfFiltIdx][0], mcastMacs[perfFiltIdx][1], mcastMacs[perfFiltIdx][2],
+                     mcastMacs[perfFiltIdx][3], mcastMacs[perfFiltIdx][4], mcastMacs[perfFiltIdx][5]);
+            writeMACAddress(mcastMacs[perfFiltIdx].data(), highReg, lowReg);
+        }
+        else
+        {
+            // Write zeroes to disable this mac addr entry
+            *highReg = 0;
+            *lowReg = 0;
+        }
+    }
+
+#if defined(ETH_IP_VERSION_V2)
+    uint32_t volatile * hashRegs[] = {
+        &EthHandle.Instance->MACHT1R,
+        &EthHandle.Instance->MACHT0R
+    };
+#else
+    uint32_t volatile * hashRegs[] = {
+        &EthHandle.Instance->MACHTHR,
+        &EthHandle.Instance->MACHTLR
+    };
+#endif
+
+    // Reset hash filter regs
+    *hashRegs[0] = 0;
+    *hashRegs[1] = 0;
+
+    // Note: as always, the datasheet description of how to do this CRC was vague and slightly wrong.
+    // This forum thread figured it out: https://community.st.com/t5/stm32-mcus-security/calculating-ethernet-multicast-filter-hash-value/td-p/416984
+    // What the datasheet SHOULD say is:
+    // Compute the Ethernet CRC-32 of the MAC address, with initial value of 1s, final XOR of ones, and input reflection on but output reflection off
+    // Then, take the upper 6 bits and use that to index the hash table.
+
+    mbed::MbedCRC<POLY_32BIT_ANSI> crcCalc(0xFFFFFFFF, 0xFFFFFFFF, true, false);
+    for(size_t hashFiltIdx = 0; hashFiltIdx < numHashFilterMacs; ++hashFiltIdx)
+    {
+        auto & currMacAddr = mcastMacs[hashFiltIdx + numPerfectFilterMacs];
+
+        tr_debug("Using hash filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8,
+                 currMacAddr[0], currMacAddr[1], currMacAddr[2],
+                 currMacAddr[3], currMacAddr[4], currMacAddr[5]);
+
+        // Compute Ethernet CRC-32 of the MAC address
+        uint32_t crc;
+        crcCalc.compute(currMacAddr.data(), currMacAddr.size(), &crc);
+
+        // Take upper 6 bits
+        uint32_t hashVal = crc >> 26;
+
+        // Set correct bit in hash filter
+        *hashRegs[hashVal >> 5] |= (1 << (hashVal & 0x1F));
+    }
+}
+
+void STM32_EMAC::writeMACAddress(const uint8_t *MAC, volatile uint32_t *addrHighReg, volatile uint32_t *addrLowReg) {
+    /* Set MAC addr bits 32 to 47 */
+    *addrHighReg = (static_cast<uint32_t>(MAC[5]) << 8) | static_cast<uint32_t>(MAC[4]) | ETH_MACA1HR_AE_Msk;
+    /* Set MAC addr bits 0 to 31 */
+    *addrLowReg = (static_cast<uint32_t>(MAC[3]) << 24) | (static_cast<uint32_t>(MAC[2]) << 16) |
+                  (static_cast<uint32_t>(MAC[1]) << 8) | static_cast<uint32_t>(MAC[0]);
 }
 
 // Weak so a module can override
