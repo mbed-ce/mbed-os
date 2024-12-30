@@ -100,6 +100,14 @@
             "semihosting-enabled": {
                 "help": "Enable ARM Semihosting protocol.  This uses a magic breakpoint instruction to enable the MCU to print data to and access files on a host machine.  However, it can interfere with debuggers that are not semihost aware.",
                 "value": false
+            },
+            "application-profile": {
+                "help": "Select application profile. Options: auto, full, bare-metal. 'auto' mode will check other build options and resolve to\
+                'full' mode by default or 'bare-metal' mode, for example, MBED_GREENTEA_TEST_BAREMETAL being ON for Greentea test. 'full' mode\
+                enables the real-time OS and enables all features of Mbed to be used. 'bare-metal' mode disables the real-time OS, preventing you\
+                from using threads and libraries that depend on them. 'bare-metal' mode is recommended for target MCUs with small amounts of flash\
+                and RAM.",
+                "value": "auto"
             }
         }
     },

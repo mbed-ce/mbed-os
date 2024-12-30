@@ -118,8 +118,40 @@ endif()
 # by libraries that depend on them.
 add_library(mbed-rtos-flags INTERFACE) # Collects flags that are in mbed-os but not mbed-baremetal
 add_library(mbed-rtos-sources INTERFACE) # Collects source files that are in mbed-os but not mbed-baremetal
-add_library(mbed-core-flags INTERFACE) # Collects flags common to mbed-baremetal and mbed-os
-add_library(mbed-core-sources INTERFACE) # Collects source files common to mbed-baremetal and mbed-os
+add_library(mbed-core-flags INTERFACE) # Collects flags that are in mbed-os or mbed-baremetal
+                                       # depending on target.application-profile setting
+add_library(mbed-core-sources INTERFACE) # Collects source files that are in mbed-os or mbed-baremetal
+                                         # depending on target.application-profile setting
+
+if("MBED_CONF_TARGET_APPLICATION_PROFILE=full" IN_LIST MBED_CONFIG_DEFINITIONS)
+    set(APPLICATION_PROFILE_CONFIG_FULL TRUE)
+endif()
+if("MBED_CONF_TARGET_APPLICATION_PROFILE=bare-metal" IN_LIST MBED_CONFIG_DEFINITIONS)
+    set(APPLICATION_PROFILE_CONFIG_BAREMETAL TRUE)
+endif()
+if(NOT APPLICATION_PROFILE_CONFIG_FULL AND NOT APPLICATION_PROFILE_CONFIG_BAREMETAL)
+    set(APPLICATION_PROFILE_CONFIG_AUTO TRUE)
+endif()
+
+# mbed-core-flags/mbed-core-sources link mbed-rtos-flags/mbed-rtos-sources or not
+if((APPLICATION_PROFILE_CONFIG_AUTO OR APPLICATION_PROFILE_CONFIG_FULL) AND
+    (NOT MBED_ENABLE_OS_INTERNAL_TESTS OR NOT MBED_BUILD_GREENTEA_TESTS OR NOT MBED_GREENTEA_TEST_BAREMETAL))
+    target_link_libraries(mbed-core-flags INTERFACE mbed-rtos-flags)
+    target_link_libraries(mbed-core-sources INTERFACE mbed-rtos-sources)
+endif()
+
+# Check if target.application-profile matches MBED_GREENTEA_TEST_BAREMETAL
+if(MBED_ENABLE_OS_INTERNAL_TESTS AND MBED_BUILD_GREENTEA_TESTS)
+    if(APPLICATION_PROFILE_CONFIG_FULL AND MBED_GREENTEA_TEST_BAREMETAL)
+        message(FATAL_ERROR
+            "target.application-profile (full) doesn't match MBED_GREENTEA_TEST_BAREMETAL (TRUE)"
+        )
+    elseif(APPLICATION_PROFILE_CONFIG_BAREMETAL AND NOT MBED_GREENTEA_TEST_BAREMETAL)
+        message(FATAL_ERROR
+            "target.application-profile (bare-metal) doesn't match MBED_GREENTEA_TEST_BAREMETAL (FALSE)"
+        )
+    endif()
+endif()
 
 # Validate selected C library type
 # The C library type selected has to match the library that the target can support
