@@ -43,13 +43,15 @@ if(NOT MBED_NEED_TO_RECONFIGURE)
     file(TIMESTAMP ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake MBED_CONFIG_CMAKE_TIMESTAMP "%s" UTC)
 
     foreach(CONFIG_JSON ${MBED_CONFIG_JSON_SOURCE_FILES})
-        if(NOT EXISTS ${CMAKE_SOURCE_DIR}/${CONFIG_JSON})
+        get_filename_component(CONFIG_JSON_ABSPATH ${CONFIG_JSON} ABSOLUTE)
+
+        if(NOT EXISTS ${CONFIG_JSON_ABSPATH})
             message(STATUS "Mbed: ${CONFIG_JSON} deleted or renamed, regenerating configs...")
             set(MBED_NEED_TO_RECONFIGURE TRUE)
             break()
         endif()
 
-        file(TIMESTAMP ${CMAKE_SOURCE_DIR}/${CONFIG_JSON} CONFIG_JSON_TIMESTAMP "%s" UTC)
+        file(TIMESTAMP ${CONFIG_JSON_ABSPATH} CONFIG_JSON_TIMESTAMP "%s" UTC)
         if(${CONFIG_JSON_TIMESTAMP} GREATER ${MBED_CONFIG_CMAKE_TIMESTAMP})
             message(STATUS "Mbed: ${CONFIG_JSON} modified, regenerating configs...")
             set(MBED_NEED_TO_RECONFIGURE TRUE)

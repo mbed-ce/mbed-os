@@ -24,7 +24,7 @@ class Config(UserDict):
 
     # List of JSON files used to create this config.  Dumped to CMake at the end of configuration
     # so that it can regenerate configuration if the JSONs change.
-    # All paths will be relative to the Mbed program root directory.
+    # All paths will be relative to the Mbed program root directory, or absolute if outside said directory.
     json_sources: List[pathlib.Path] = []
 
     def __setitem__(self, key: Hashable, item: Any) -> None:
