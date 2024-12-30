@@ -136,9 +136,20 @@ function(mbed_set_post_build target)
     if (NOT MBED_IS_STANDALONE)
         if("${ARGN}" STREQUAL "")
             get_target_property(POST_BUILD_TARGET_LINK_LIBRARIES ${target} LINK_LIBRARIES)
+            get_target_property(MBED_CORE_FLAGS_TARGET_LINK_LIBRARIES mbed-core-flags INTERFACE_LINK_LIBRARIES)
             if("mbed-os" IN_LIST POST_BUILD_TARGET_LINK_LIBRARIES)
+                if(NOT "mbed-rtos-flags" IN_LIST MBED_CORE_FLAGS_TARGET_LINK_LIBRARIES)
+                    message(FATAL_ERROR
+                        "Target ${target} links to mbed-os, but Mbed is configured for a baremetal build. Please set \"target.application-profile\": \"full\" in JSON to enable the mbed-os target, or link your application to mbed-baremetal instead of mbed-os."
+                    )
+                endif()
                 get_target_property(LINKER_SCRIPT_PATH mbed-os LINKER_SCRIPT_PATH)
             elseif("mbed-baremetal" IN_LIST POST_BUILD_TARGET_LINK_LIBRARIES)
+                if("mbed-rtos-flags" IN_LIST MBED_CORE_FLAGS_TARGET_LINK_LIBRARIES)
+                    message(FATAL_ERROR
+                        "Target ${target} links to mbed-baremetal, but Mbed is configured for a full build. Please set \"target.application-profile\": \"bare-metal\" in JSON to enable the mbed-baremetal target, or link your application to mbed-os instead of mbed-baremetal."
+                    )
+                endif()
                 get_target_property(LINKER_SCRIPT_PATH mbed-baremetal LINKER_SCRIPT_PATH)
             else()
                 message(FATAL_ERROR "Target ${target} used with mbed_set_post_build() but does not link to mbed-os or mbed-baremetal!")
