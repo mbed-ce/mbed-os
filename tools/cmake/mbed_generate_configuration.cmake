@@ -34,7 +34,7 @@ if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake)
         set(MBED_NEED_TO_RECONFIGURE TRUE)
     endif()
 else()
-    # Include the old version of mbed_config.cmake to get the CONFIG_JSON_SOURCE_FILES variable used below
+    # Include the old version of mbed_config.cmake to get the MBED_CONFIG_JSON_SOURCE_FILES variable used below
     include(${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake)
 endif()
 
@@ -42,7 +42,7 @@ endif()
 if(NOT MBED_NEED_TO_RECONFIGURE)
     file(TIMESTAMP ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake MBED_CONFIG_CMAKE_TIMESTAMP "%s" UTC)
 
-    foreach(CONFIG_JSON ${CONFIG_JSON_SOURCE_FILES})
+    foreach(CONFIG_JSON ${MBED_CONFIG_JSON_SOURCE_FILES})
         if(NOT EXISTS ${CMAKE_SOURCE_DIR}/${CONFIG_JSON})
             message(STATUS "Mbed: ${CONFIG_JSON} deleted or renamed, regenerating configs...")
             set(MBED_NEED_TO_RECONFIGURE TRUE)
@@ -113,4 +113,4 @@ endif()
 include(${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake)
 
 # Make it so that if any config JSON files are modified, CMake is rerun.
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CONFIG_JSON_SOURCE_FILES})
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${MBED_CONFIG_JSON_SOURCE_FILES})
