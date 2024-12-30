@@ -89,7 +89,6 @@ if(MBED_NEED_TO_RECONFIGURE)
         --mbed-os-path ${CMAKE_CURRENT_LIST_DIR}/../..
         --output-dir ${CMAKE_CURRENT_BINARY_DIR}
         --program-path ${CMAKE_SOURCE_DIR}
-        --cmake-build-dir ${CMAKE_BINARY_DIR}
         ${APP_CONFIG_ARGUMENT}
         ${CUSTOM_TARGET_ARGUMENT})
 

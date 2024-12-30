@@ -99,12 +99,12 @@ class MbedProgramFiles:
         )
 
     @classmethod
-    def from_existing(cls, root_path: Path, build_subdir: Path) -> "MbedProgramFiles":
+    def from_existing(cls, root_path: Path, build_dir: Path) -> "MbedProgramFiles":
         """Create MbedProgramFiles from a directory containing an existing program.
 
         Args:
             root_path: The path containing the MbedProgramFiles.
-            build_subdir: The subdirectory of BUILD_DIR to use for CMake build.
+            build_dir: The directory to use for CMake build.
         """
         app_config: Optional[Path] = None
         if (root_path / APP_CONFIG_FILE_NAME_JSON5).exists():
@@ -126,13 +126,12 @@ class MbedProgramFiles:
         cmakelists_file = root_path / CMAKELISTS_FILE_NAME
         if not cmakelists_file.exists():
             logger.warning("No CMakeLists.txt found in the program root.")
-        cmake_build_dir = root_path / BUILD_DIR / build_subdir
 
         return cls(
             app_config_file=app_config,
             mbed_os_ref=mbed_os_file,
             cmakelists_file=cmakelists_file,
-            cmake_build_dir=cmake_build_dir,
+            cmake_build_dir=build_dir,
             custom_targets_json=custom_targets_json,
         )
 

@@ -15,7 +15,7 @@ set(MBED_GREENTEA_TEST_RESET_TIMEOUT "{{forced_reset_timeout}}")
 
 # JSON files used to generate this config.  If any of these change, the Python config generation
 # scripts must be rerun.
-set(CONFIG_JSON_SOURCE_FILES {% for json_source in json_sources %}
+set(CONFIG_JSON_SOURCE_FILES {% for json_source in json_sources | sort %}
     "{{json_source.as_posix()}}"
 {%- endfor %}
 )
