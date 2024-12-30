@@ -5365,6 +5365,30 @@
             "console-usb": true,
             "console-uart": false
         },
+
+        // 2MB QSPI flash
+        "memory_banks": {
+            "EXT_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x200000,
+                "start": 0x60000000,
+                "startup": true
+            }
+        },
+
+        // The end of flash is used by the Teensy bootloader
+        "memory_bank_config": {
+            "EXT_FLASH": {
+                "size": 0x1F0000, // 1984k
+            }
+        },
         "device_has_remove": [
             "EMAC"
         ],
@@ -5385,6 +5409,31 @@
             "console-uart": false,
             "network-default-interface-type": "ETHERNET"
         },
+
+        // 8MB QSPI flash
+        "memory_banks": {
+            "EXT_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x800000,
+                "start": 0x60000000,
+                "startup": true
+            }
+        },
+
+        // The end of flash is used by the Teensy bootloader
+        "memory_bank_config": {
+            "EXT_FLASH": {
+                "size": 0x7C0000, // 7936k
+            }
+        },
+
         "device_name": "MIMXRT1062DVL6B",
         "image_url": "https://www.pjrc.com/store/teensy41_4.jpg"
     },

@@ -25,9 +25,6 @@
 ** ###################################################################
 */
 
-/* Pick up memory info for this specific device */
-#include <mimxrt_memory_info.h>
-
 /* Entry Point */
 ENTRY(Reset_Handler)
 
@@ -42,21 +39,42 @@ __stack_size__ = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0400;
 M_VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x0400 : 0x0;
 
+M_CRASH_DATA_RAM_SIZE = 0x100;
+
+/* If we are not configured to execute out of the start of ROM, then a bootloader is
+ * present.  This tells us whether we need to add the Flash Configuration Field at the start of flash. */
+#if MBED_CONFIGURED_ROM_BANK_EXT_FLASH_START == MBED_ROM_BANK_EXT_FLASH_START
+#define IS_BOOTLOADER_PRESENT 0
+#else
+#define IS_BOOTLOADER_PRESENT 1
+#endif
+
+/* Specify the ELF segments (program headers) */
+PHDRS
+{
+  text PT_LOAD FLAGS(5); /* read + execute */
+  ram_functions PT_LOAD FLAGS(5); /* read + execute */
+  ram_vector_table PT_LOAD FLAGS(6); /* read + write */
+  ram_noinit PT_LOAD FLAGS(6); /* read + write */
+  ram_init PT_LOAD FLAGS(6); /* read + write */
+  dtcm_stack PT_LOAD FLAGS(6); /* read + write */
+  ram_ncache_noinit PT_LOAD FLAGS(6); /* read + write */
+  ram_ncache_init PT_LOAD FLAGS(6); /* read + write */
+  crash_data_ram PT_LOAD FLAGS(6); /* read + write */
+}
+
 /* Specify the memory areas */
 MEMORY
 {
-  m_flash_config        (RX)  : ORIGIN = MBED_APP_START, LENGTH = 0x00001000
-  m_ivt                 (RX)  : ORIGIN = MBED_APP_START + 0x1000, LENGTH = 0x00001000
-  m_interrupts          (RX)  : ORIGIN = MBED_APP_START + 0x2000, LENGTH = 0x00000400
-  m_text                (RX)  : ORIGIN = MBED_APP_START + 0x2400, LENGTH = MBED_APP_SIZE - 0x2400
+  m_text                (RX)  : ORIGIN = MBED_CONFIGURED_ROM_BANK_EXT_FLASH_START, LENGTH = MBED_CONFIGURED_ROM_BANK_EXT_FLASH_SIZE
 
 /* DTCM memory.
      Startup code configures size to 256k (stealing space from OCRAM). */
-  m_dtcm                (RW)  : ORIGIN = 0x20000000, LENGTH = 0x00040000
+  m_dtcm                (RW)  : ORIGIN = MBED_RAM_BANK_SRAM_DTC_START, LENGTH = MBED_RAM_BANK_SRAM_DTC_SIZE
 
-#if MIMXRT105X_BOARD_HAS_EXTERNAL_RAM
+#ifdef MBED_RAM_BANK_SDRAM_SIZE
   /* Use the external RAM as main memory */
-  m_data                (RW)  : ORIGIN = 0x80000000, LENGTH = MIMXRT105X_EXTERNAL_RAM_SIZE
+  m_data                (RW)  : ORIGIN = MBED_RAM_BANK_SDRAM_START, LENGTH = MBED_RAM_BANK_SDRAM_SIZE
 #else
   /* No external data memory, store data in DTCM (significantly faster than OCRAM)*/
 #define m_data m_dtcm
@@ -65,54 +83,64 @@ MEMORY
   /* ITCM bank -- used for functions that need to execute from RAM
      (which is faster than having to load them from flash).
      Startup code configures size to 128k. */
-  m_itcm               (RX)  : ORIGIN = 0x00000000, LENGTH = 0x00020000
+  m_itcm               (RX)  : ORIGIN = MBED_RAM_BANK_SRAM_ITC_START, LENGTH = MBED_RAM_BANK_SRAM_ITC_SIZE
 
   /* OCRAM bank -- extra RAM, available for misc storage but slower to access.
      Startup code configures size to 128k.
      Note that address is different on the 105x and the 106x. */
-#if MBED_TARGET_MIMXRT1050
-  m_ocram              (RW)  : ORIGIN = 0x20200000, LENGTH = 0x00020000
-#else /* MIMXRT1060 */
-  m_ocram              (RW)  : ORIGIN = 0x20280000, LENGTH = 0x00020000
-#endif
+  m_ocram              (RW)  : ORIGIN = MBED_RAM_BANK_SRAM_OC_START, LENGTH = MBED_RAM_BANK_SRAM_OC_SIZE
 
 #if MBED_TARGET_MIMXRT1060
   /* OCRAM2 bank -- extra RAM, available on MIMXRT106x only. */
-  m_ocram2             (RW)  : ORIGIN = 0x20200000, LENGTH = 0x00080000
+  m_ocram2             (RW)  : ORIGIN = MBED_RAM_BANK_SRAM_OC2_START, LENGTH = MBED_RAM_BANK_SRAM_OC2_SIZE
 #endif
 }
 
 /* Define output sections */
 SECTIONS
 {
-#if !defined(MBED_APP_COMPILE)
+#if !IS_BOOTLOADER_PRESENT
+  /* Flash config goes first, at the start of flash */
   .flash_config :
   {
-    . = ALIGN(8);
     __FLASH_BASE = .;
     KEEP(* (.boot_hdr.conf))     /* flash config section */
-    . = ALIGN(8);
-  } > m_flash_config
+  } > m_text :text
 
-  ivt_begin = ORIGIN(m_flash_config) + LENGTH(m_flash_config);
-
-  .ivt :
+  /* Then IVT at offset 0x1000 */
+  .ivt MBED_ROM_BANK_EXT_FLASH_START + 0x1000 :
   {
-    . = ALIGN(8);
     KEEP(* (.boot_hdr.ivt))           /* ivt section */
     KEEP(* (.boot_hdr.boot_data))     /* boot section */
     KEEP(* (.boot_hdr.dcd_data))      /* dcd section */
-    . = ALIGN(8);
-  } > m_ivt
+  } > m_text :text
+  /* Note that we do not want to use AT> above, because that would result in this section being
+   * placed in flash immediately after .flash_config.  Instead we don't use AT> to set the LMA equal
+   * to the VMA. */
+
+  /* Interrupts go after that */
+  #define INTERRUPT_TABLE_ADDR MBED_ROM_BANK_EXT_FLASH_START + 0x2000
+#else
+  /* We have a bootloader so we don't need the flash config or IVT */
+  /DISCARD/ : {
+    *(.boot_hdr.conf)
+    *(.boot_hdr.ivt)
+    *(.boot_hdr.boot_data)
+    *(.boot_hdr.dcd_data)
+  }
+
+  /* Interrupts go at the start of flash */
+  #define INTERRUPT_TABLE_ADDR MBED_ROM_BANK_EXT_FLASH_START
 #endif
-  /* The startup code goes first into internal RAM */
-  .interrupts :
+
+  /* Now we have the ISR vector */
+  .interrupts INTERRUPT_TABLE_ADDR :
   {
     __VECTOR_TABLE = .;
     . = ALIGN(8);
     KEEP(*(.isr_vector))     /* Startup code */
     . = ALIGN(8);
-  } > m_interrupts
+  } > m_text :text
 
   /* The program code and other data goes into internal RAM */
   .text :
@@ -128,19 +156,19 @@ SECTIONS
     KEEP (*(.init))
     KEEP (*(.fini))
     . = ALIGN(8);
-  } > m_text
+  } > m_text :text
 
   .ARM.extab :
   {
     *(.ARM.extab* .gnu.linkonce.armextab.*)
-  } > m_text
+  } > m_text :text
 
   .ARM :
   {
     __exidx_start = .;
     *(.ARM.exidx*)
     __exidx_end = .;
-  } > m_text
+  } > m_text :text
 
  .ctors :
   {
@@ -164,7 +192,7 @@ SECTIONS
     KEEP (*(SORT(.ctors.*)))
     KEEP (*(.ctors))
     __CTOR_END__ = .;
-  } > m_text
+  } > m_text :text
 
   .dtors :
   {
@@ -175,14 +203,14 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
     __DTOR_END__ = .;
-  } > m_text
+  } > m_text :text
 
   .preinit_array :
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
-  } > m_text
+  } > m_text :text
 
   .init_array :
   {
@@ -190,7 +218,7 @@ SECTIONS
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } > m_text
+  } > m_text :text
 
   .fini_array :
   {
@@ -198,7 +226,7 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } > m_text
+  } > m_text :text
 
   __etext = .;    /* define a global symbol at end of code */
   __DATA_ROM = .; /* Symbol is used by startup for data initialization */
@@ -212,7 +240,7 @@ SECTIONS
     . += M_VECTOR_RAM_SIZE;
     . = ALIGN(8);
     __interrupts_ram_end__ = .; /* Define a global symbol at data end */
-  } > m_dtcm
+  } > m_dtcm :ram_vector_table
 
   __VECTOR_RAM = DEFINED(__ram_vector_table__) ? __VECTOR_RAM__ : ORIGIN(m_interrupts);
   __RAM_VECTOR_TABLE_SIZE_BYTES = DEFINED(__ram_vector_table__) ? (__interrupts_ram_end__ - __interrupts_ram_start__) : 0x0;
@@ -228,7 +256,7 @@ SECTIONS
     KEEP(*(.jcr*))
     . = ALIGN(8);
     __data_end__ = .;        /* define a global symbol at data end */
-  } > m_data AT> m_text
+  } > m_data AT> m_text :ram_init
   __ram_function_flash_start = __DATA_ROM + (__data_end__ - __data_start__); /* Symbol is used by startup for TCM data initialization */
 
   .ram_function :
@@ -238,28 +266,42 @@ SECTIONS
     *(CodeQuickAccess)
     . = ALIGN(128);
     __ram_function_end__ = .;
-  } > m_itcm AT> m_text
+  } > m_itcm AT> m_text :ram_functions
 
   __ram_function_size = SIZEOF(.ram_function);
 
   __NDATA_ROM = __ram_function_flash_start + SIZEOF(.ram_function);
 
+  /* Store crash data RAM at the end of OCRAM (which is otherwise unused).
+     Note that the ROM bootloader clobbers the first part of OCRAM, so we have to put this at the end. */
+  __CRASH_DATA_RAM_START__ = ORIGIN(m_ocram) + LENGTH(m_ocram) - M_CRASH_DATA_RAM_SIZE; /* Create a global symbol at data start */
+  .crash_data_ram __CRASH_DATA_RAM_START__ :
+  {
+    . = ALIGN(8);
+    __CRASH_DATA_RAM__ = .;
+    KEEP(*(.keep.crash_data_ram))
+    *(.m_crash_data_ram)     /* This is a user defined section */
+    . += M_CRASH_DATA_RAM_SIZE;
+    . = ALIGN(8);
+    __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
+  } > m_ocram :crash_data_ram
+
   /* Always store noncacheable data (e.g. DMA descriptors) in DTCM, since this memory
-     does not use a cache. */
+     is always cache coherent. */
   .ncache.init :
   {
     __noncachedata_start__ = .;   /* create a global symbol at ncache data start */
     *(NonCacheable.init)
     . = ALIGN(8);
     __noncachedata_init_end__ = .;   /* create a global symbol at initialized ncache data end */
-  } > m_dtcm AT> m_text
+  } > m_dtcm AT> m_text :ram_ncache_init
   . = __noncachedata_init_end__;
   .ncache :
   {
     *(NonCacheable)
     . = ALIGN(8);
     __noncachedata_end__ = .;     /* define a global symbol at ncache data end */
-  } > m_dtcm
+  } > m_dtcm :ram_ncache_noinit
 
   __TEXT_CSF_ROM = __NDATA_ROM + (__noncachedata_init_end__ - __noncachedata_start__);
 
@@ -269,7 +311,7 @@ SECTIONS
     . = ALIGN(1024);
     KEEP(*(.csf))
     __text_csf_end = .;
-  } > m_text
+  } > m_text :text
 
 
   /* __USED_FLASH_END gives the end of all data written to the flash memory, including code and data
@@ -284,7 +326,7 @@ SECTIONS
   ASSERT(__USED_FLASH_END <= text_end, "Code and data initializers exceed flash size!")
 
   /* Uninitialized data section */
-  .bss :
+  .bss (NOLOAD):
   {
     /* This is used by the startup in order to initialize the .bss section */
     . = ALIGN(8);
@@ -297,9 +339,9 @@ SECTIONS
     . = ALIGN(8);
     __bss_end__ = .;
     __END_BSS = .;
-  } > m_data
+  } > m_data :ram_noinit
 
-  .heap :
+  .heap (NOLOAD):
   {
     . = ALIGN(8);
     __end__ = .;
@@ -308,15 +350,15 @@ SECTIONS
     . =  ORIGIN(m_data) + LENGTH(m_data) - STACK_SIZE;
     __HeapLimit = .;
     __heap_limit = .; /* Add for _sbrk */
-  } > m_data
+  } > m_data :ram_noinit
 
   /* Reserve space for stack (even though stack is always at the end of DTCM regardless
      of where this section is located) */
-  .stack :
+  .stack (NOLOAD):
   {
     . = ALIGN(8);
     . += STACK_SIZE;
-  } > m_dtcm
+  } > m_dtcm :dtcm_stack
 
   /* Initializes stack on the end of block */
   __StackTop   = ORIGIN(m_dtcm) + LENGTH(m_dtcm);

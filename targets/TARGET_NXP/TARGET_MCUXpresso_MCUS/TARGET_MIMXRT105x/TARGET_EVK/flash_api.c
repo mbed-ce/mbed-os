@@ -655,8 +655,8 @@ int32_t flash_free(flash_t *obj)
 uint32_t flash_get_sector_size(const flash_t *obj, uint32_t address)
 {
     uint32_t sectorsize = MBED_FLASH_INVALID_SIZE;
-    uint32_t devicesize = BOARD_FLASH_SIZE;
-    uint32_t startaddr = BOARD_FLASH_START_ADDR;
+    uint32_t devicesize = MBED_ROM_BANK_EXT_FLASH_SIZE;
+    uint32_t startaddr = MBED_ROM_BANK_EXT_FLASH_START;
 
     if ((address >= startaddr) && (address < (startaddr + devicesize))) {
         sectorsize = BOARD_FLASH_SECTOR_SIZE;
@@ -672,12 +672,12 @@ uint32_t flash_get_page_size(const flash_t *obj)
 
 uint32_t flash_get_start_address(const flash_t *obj)
 {
-    return BOARD_FLASH_START_ADDR;
+    return MBED_ROM_BANK_EXT_FLASH_START;
 }
 
 uint32_t flash_get_size(const flash_t *obj)
 {
-    return BOARD_FLASH_SIZE;
+    return MBED_ROM_BANK_EXT_FLASH_SIZE;
 }
 
 uint8_t flash_get_erase_value(const flash_t *obj)

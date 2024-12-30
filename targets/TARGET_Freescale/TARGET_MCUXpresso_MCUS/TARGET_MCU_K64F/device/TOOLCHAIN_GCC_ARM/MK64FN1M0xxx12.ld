@@ -112,14 +112,14 @@ SECTIONS
     . = ALIGN(8);
     KEEP(*(.isr_vector))     /* Startup code */
     . = ALIGN(8);
-  } > m_text AT> m_text :text
+  } > m_text :text
 
   /* FCF to absolute address of 0x400, but only if bootloader is not present. */
 #if !IS_BOOTLOADER_PRESENT
   .flash_config FLASH_VTOR_TABLE_SIZE :
   {
     KEEP(*(.FlashConfig))    /* Flash Configuration Field (FCF) */
-  } > m_text AT> m_text :text
+  } > m_text :text
 #else
   /DISCARD/ : {
     *(.FlashConfig)
@@ -140,19 +140,19 @@ SECTIONS
     KEEP (*(.init))
     KEEP (*(.fini))
     . = ALIGN(8);
-  } > m_text AT> m_text :text
+  } > m_text :text
 
   .ARM.extab :
   {
     *(.ARM.extab* .gnu.linkonce.armextab.*)
-  } > m_text AT> m_text :text
+  } > m_text :text
 
   .ARM :
   {
     __exidx_start = .;
     *(.ARM.exidx*)
     __exidx_end = .;
-  } > m_text AT> m_text :text
+  } > m_text :text
 
  .ctors :
   {
@@ -176,7 +176,7 @@ SECTIONS
     KEEP (*(SORT(.ctors.*)))
     KEEP (*(.ctors))
     __CTOR_END__ = .;
-  } > m_text AT> m_text :text
+  } > m_text :text
 
   .dtors :
   {
@@ -187,14 +187,14 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
     __DTOR_END__ = .;
-  } > m_text AT> m_text :text
+  } > m_text :text
 
   .preinit_array :
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
-  } > m_text AT> m_text :text
+  } > m_text :text
 
   .init_array :
   {
@@ -202,7 +202,7 @@ SECTIONS
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } > m_text AT> m_text :text
+  } > m_text :text
 
   .fini_array :
   {
@@ -210,7 +210,7 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } > m_text AT> m_text :text
+  } > m_text :text
 
 #if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
   /* Stick the crash data ram at the start of sram_l */

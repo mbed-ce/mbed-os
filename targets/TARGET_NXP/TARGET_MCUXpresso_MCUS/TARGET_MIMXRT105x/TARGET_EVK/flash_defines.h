@@ -274,7 +274,7 @@ static uint32_t customLUT[CUSTOM_LUT_LENGTH] = {
 
 flexspi_device_config_t deviceconfig = {
     .flexspiRootClk       = 120000000,
-    .flashSize            = (BOARD_FLASH_SIZE/1024),
+    .flashSize            = (MBED_ROM_BANK_EXT_FLASH_SIZE/1024),
     .CSIntervalUnit       = kFLEXSPI_CsIntervalUnit1SckCycle,
     .CSInterval           = 0,
     .CSHoldTime           = 3,

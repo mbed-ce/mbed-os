@@ -19,20 +19,7 @@
 #define MBED_OS_MIMXRT_MEMORY_INFO_H
 
 /* 8MB QSPI Flash */
-#define BOARD_FLASH_SIZE             (0x7C0000) // 7936k
-#define BOARD_FLASH_START_ADDR       (0x60000000)
 #define BOARD_FLASH_PAGE_SIZE        (256)
 #define BOARD_FLASH_SECTOR_SIZE      (4096)
-
-// Unless the user overrides it, define the app to use the entire flash space.
-#ifndef MBED_APP_START
-#define MBED_APP_START BOARD_FLASH_START_ADDR
-#endif
-
-#ifndef MBED_APP_SIZE
-#define MBED_APP_SIZE BOARD_FLASH_SIZE
-#endif
-
-#define MIMXRT105X_BOARD_HAS_EXTERNAL_RAM 0
 
 #endif //MBED_OS_MIMXRT_MEMORY_INFO_H

@@ -20,28 +20,12 @@
 
 #ifdef HYPERFLASH_BOOT
 /* 64MB HyperFlash */
-#define BOARD_FLASH_SIZE             (0x4000000)
-#define BOARD_FLASH_START_ADDR       (0x60000000)
 #define BOARD_FLASH_PAGE_SIZE        (512)
 #define BOARD_FLASH_SECTOR_SIZE      (262144)
 #else
 /* 8MB QSPI Flash */
-#define BOARD_FLASH_SIZE             (0x800000)
-#define BOARD_FLASH_START_ADDR       (0x60000000)
 #define BOARD_FLASH_PAGE_SIZE        (256)
 #define BOARD_FLASH_SECTOR_SIZE      (4096)
 #endif
-
-// Unless the user overrides it, define the app to use the entire flash space.
-#ifndef MBED_APP_START
-#define MBED_APP_START BOARD_FLASH_START_ADDR
-#endif
-
-#ifndef MBED_APP_SIZE
-#define MBED_APP_SIZE BOARD_FLASH_SIZE
-#endif
-
-#define MIMXRT105X_BOARD_HAS_EXTERNAL_RAM 1
-#define MIMXRT105X_EXTERNAL_RAM_SIZE 0x02000000
 
 #endif //MBED_OS_MIMXRT_MEMORY_INFO_H
