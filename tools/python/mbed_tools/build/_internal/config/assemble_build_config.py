@@ -42,7 +42,7 @@ def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
 
     config = _assemble_config_from_sources(target_attributes, list(mbed_lib_files), program.files.app_config_file)
 
-    # Set up the config source path list using the resolved version of the path to every JSON
+    # Set up the config source path list using the path to every JSON
     config.json_sources.extend(mbed_lib_files)
     if program.files.app_config_file is not None:
         config.json_sources.append(program.files.app_config_file)
