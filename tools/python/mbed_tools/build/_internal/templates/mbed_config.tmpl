@@ -6,13 +6,19 @@
 
 include_guard(GLOBAL)
 
-set(MBED_TOOLCHAIN "{{toolchain_name}}" CACHE STRING "")
-set(MBED_TARGET "{{target_name}}" CACHE STRING "")
-set(MBED_CPU_CORE "{{core}}" CACHE STRING "")
-set(MBED_C_LIB "{{c_lib}}" CACHE STRING "")
-set(MBED_PRINTF_LIB "{{printf_lib}}" CACHE STRING "")
-set(MBED_OUTPUT_EXT "{{OUTPUT_EXT}}" CACHE STRING "")
-set(MBED_GREENTEA_TEST_RESET_TIMEOUT "{{forced_reset_timeout}}" CACHE STRING "")
+set(MBED_TOOLCHAIN "{{toolchain_name}}")
+set(MBED_CPU_CORE "{{core}}")
+set(MBED_C_LIB "{{c_lib}}")
+set(MBED_PRINTF_LIB "{{printf_lib}}")
+set(MBED_OUTPUT_EXT "{{OUTPUT_EXT}}")
+set(MBED_GREENTEA_TEST_RESET_TIMEOUT "{{forced_reset_timeout}}")
+
+# JSON files used to generate this config.  If any of these change, the Python config generation
+# scripts must be rerun.
+set(CONFIG_JSON_SOURCE_FILES {% for json_source in json_sources %}
+    "{{json_source.as_posix()}}"
+{%- endfor %}
+)
 
 list(APPEND MBED_TARGET_SUPPORTED_C_LIBS {% for supported_c_lib in supported_c_libs %}
     {{supported_c_lib}}

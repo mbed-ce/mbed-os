@@ -9,12 +9,15 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional, Set
 
+from setuptools.build_meta import build_editable
+
+from mbed_tools.project import MbedProgram
 from mbed_tools.build._internal.config.config import Config
 from mbed_tools.build._internal.config import source
 from mbed_tools.build._internal.find_files import LabelFilter, RequiresFilter, filter_files, find_files
 
 
-def assemble_config(target_attributes: dict, search_paths: Iterable[Path], mbed_app_file: Optional[Path]) -> Config:
+def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
     """Assemble config for given target and program directory.
 
     Mbed library and application specific config parameters are parsed from mbed_lib.json and mbed_app.json files
@@ -29,16 +32,29 @@ def assemble_config(target_attributes: dict, search_paths: Iterable[Path], mbed_
 
     Args:
         target_attributes: Mapping of target specific config parameters.
-        search_paths: Iterable of paths to search for mbed_lib.json files.
-        mbed_app_file: The path to mbed_app.json. This can be None.
+        program: MbedProgram to build the config for
     """
     mbed_lib_files: Set[Path] = set()
 
-    for path in search_paths:
+    for path in [program.root, program.mbed_os.root]:
         mbed_lib_files.update(find_files("mbed_lib.json", path.absolute().resolve()))
         mbed_lib_files.update(find_files("mbed_lib.json5", path.absolute().resolve()))
 
-    return _assemble_config_from_sources(target_attributes, list(mbed_lib_files), mbed_app_file)
+    config = _assemble_config_from_sources(target_attributes, list(mbed_lib_files), program.files.app_config_file)
+
+    # Set up the config source path list using the resolved version of the path to every JSON
+    config.json_sources.extend(mbed_lib_files)
+    if program.files.app_config_file is not None:
+        config.json_sources.append(program.files.app_config_file)
+    config.json_sources.append(program.mbed_os.targets_json_file)
+    config.json_sources.append(program.mbed_os.cmsis_mcu_descriptions_json_file)
+    if program.files.custom_targets_json.exists():
+        config.json_sources.append(program.files.custom_targets_json)
+
+    # Make all JSON sources relative paths to the program root
+    config.json_sources = [json_source.relative_to(program.root) for json_source in config.json_sources]
+
+    return config
 
 
 def _assemble_config_from_sources(

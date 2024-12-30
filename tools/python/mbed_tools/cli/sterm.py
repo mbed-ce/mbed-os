@@ -3,14 +3,22 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Command to launch a serial terminal to a connected Mbed device."""
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 import click
 
-from mbed_tools.cli.build import _get_target_id
 from mbed_tools.devices import find_connected_device, get_connected_devices
 from mbed_tools.devices.exceptions import MbedDevicesError
 from mbed_tools.sterm import terminal
+
+
+def _get_target_id(target: str) -> Tuple[str, Optional[int]]:
+    if "[" in target:
+        target_name, target_id = target.replace("]", "").split("[", maxsplit=1)
+        if target_id.isdigit() and int(target_id) >= 0:
+            return (target_name, int(target_id))
+        raise click.ClickException("When using the format mbed-target[ID], ID must be a positive integer or 0.")
+    return (target, None)
 
 
 @click.command(

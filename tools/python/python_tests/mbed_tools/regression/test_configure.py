@@ -53,8 +53,9 @@ class TestConfigureRegression(TestCase):
             pathlib.Path(tmpDirPath / "mbed-os" / "targets").mkdir()
             pathlib.Path(tmpDirPath / "mbed-os" / "targets" / "targets.json5").write_text(target_json)
             pathlib.Path(tmpDirPath / "mbed-os" / "targets" / "cmsis_mcu_descriptions.json5").write_text("{}")
+            pathlib.Path(tmpDirPath / "cmake-build-debug").mkdir()
 
             result = CliRunner().invoke(
-                configure, ["-m", "Target", "-t", "gcc_arm", "-p", tmpDir], catch_exceptions=False
+                configure, ["-m", "Target", "-t", "gcc_arm", "-p", tmpDir, "--cmake-build-dir", str(tmpDirPath / "cmake-build-debug")], catch_exceptions=False
             )
             self.assertIn("mbed_config.cmake has been generated and written to", result.output)

@@ -4,6 +4,7 @@
 #
 """Mbed Program abstraction layer."""
 import logging
+import pathlib
 
 from pathlib import Path
 from typing import Dict
@@ -29,7 +30,7 @@ class MbedProgram:
         * A collection of references to external libraries, defined in .lib files located in the program source tree
     """
 
-    def __init__(self, program_files: MbedProgramFiles, mbed_os: MbedOS) -> None:
+    def __init__(self, program_files: MbedProgramFiles, mbed_os: MbedOS, root_path: pathlib.Path) -> None:
         """Initialise the program attributes.
 
         Args:
@@ -37,7 +38,7 @@ class MbedProgram:
             mbed_os: An instance of `MbedOS` holding paths to locations in the local copy of the Mbed OS source.
         """
         self.files = program_files
-        self.root = self.files.mbed_os_ref.parent
+        self.root = root_path
         self.mbed_os = mbed_os
 
     @classmethod
@@ -63,7 +64,7 @@ class MbedProgram:
         program_files = MbedProgramFiles.from_new(dir_path)
         logger.info(f"Creating git repository for the Mbed program '{dir_path}'")
         mbed_os = MbedOS.from_new(dir_path / MBED_OS_DIR_NAME)
-        return cls(program_files, mbed_os)
+        return cls(program_files, mbed_os, dir_path)
 
     @classmethod
     def from_existing(
@@ -98,7 +99,7 @@ class MbedProgram:
                 "\nYou may need to resolve the mbed-os.lib reference. You can do this by performing a `deploy`."
             )
 
-        return cls(program, mbed_os)
+        return cls(program, mbed_os, program_root)
 
 
 def parse_url(name_or_url: str) -> Dict[str, str]:

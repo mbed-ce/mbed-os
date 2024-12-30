@@ -27,57 +27,41 @@ else()
 endif()
 set(MBED_INTERNAL_LAST_MBED_TARGET "${MBED_TARGET}" CACHE INTERNAL "Previous mbed target this dir was configured with" FORCE)
 
-# Convert all relative paths to absolute paths, rooted at CMAKE_SOURCE_DIR.
-# This makes sure that they are interpreted the same way everywhere.
-get_filename_component(MBED_APP_JSON_PATH "${MBED_APP_JSON_PATH}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
-get_filename_component(CUSTOM_TARGETS_JSON_PATH "${CUSTOM_TARGETS_JSON_PATH}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
-
-# Make it so that if mbed_app.json or custom_targets.json are modified, CMake is rerun.
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${MBED_APP_JSON_PATH})
-if(EXISTS "${CUSTOM_TARGETS_JSON_PATH}" AND (NOT IS_DIRECTORY "${CUSTOM_TARGETS_JSON_PATH}"))
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CUSTOM_TARGETS_JSON_PATH})
-endif()
-
-# Check if mbed_app.json was modified
-# Note: if the path is an empty string, get_filename_component(ABSOLUTE) will convert it to a directory,
-# so we have to verify that the path we have is a file, not a dir.
-if(EXISTS "${MBED_APP_JSON_PATH}" AND (NOT IS_DIRECTORY "${MBED_APP_JSON_PATH}"))
-    file(TIMESTAMP "${MBED_APP_JSON_PATH}" MBED_APP_JSON_TIMESTAMP "%s" UTC)
-else()
-    set(MBED_APP_JSON_TIMESTAMP "<none>")
-endif()
-
-if(NOT MBED_NEED_TO_RECONFIGURE)
-    if(NOT "${MBED_INTERNAL_LAST_MBED_APP_JSON_TIMESTAMP}" STREQUAL "${MBED_APP_JSON_TIMESTAMP}")
-        message(STATUS "Mbed: mbed_app.json modified, regenerating configs...")
-        set(MBED_NEED_TO_RECONFIGURE TRUE)
-    endif()
-endif()
-set(MBED_INTERNAL_LAST_MBED_APP_JSON_TIMESTAMP "${MBED_APP_JSON_TIMESTAMP}" CACHE INTERNAL "Previous UTC modification timestamp for mbed_app.json" FORCE)
-
-# Check if custom_targets.json was modified
-if(EXISTS "${CUSTOM_TARGETS_JSON_PATH}" AND (NOT IS_DIRECTORY "${CUSTOM_TARGETS_JSON_PATH}"))
-    file(TIMESTAMP "${CUSTOM_TARGETS_JSON_PATH}" CUSTOM_TARGETS_JSON_TIMESTAMP "%s" UTC)
-else()
-    set(CUSTOM_TARGETS_JSON_TIMESTAMP "<none>")
-endif()
-
-if(NOT MBED_NEED_TO_RECONFIGURE)
-    if(NOT "${MBED_INTERNAL_LAST_CUSTOM_TARGETS_JSON_TIMESTAMP}" STREQUAL "${CUSTOM_TARGETS_JSON_TIMESTAMP}")
-        message(STATUS "Mbed: custom_targets.json modified, regenerating configs...")
-        set(MBED_NEED_TO_RECONFIGURE TRUE)
-    endif()
-endif()
-
-set(MBED_INTERNAL_LAST_CUSTOM_TARGETS_JSON_TIMESTAMP "${CUSTOM_TARGETS_JSON_TIMESTAMP}" CACHE INTERNAL "Previous UTC modification timestamp for custom_targets.json" FORCE)
-
 # Check if the include file is missing (e.g. because a previous attempt to generate it failed)
 if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake)
     if(NOT MBED_NEED_TO_RECONFIGURE)
         message(STATUS "Mbed: mbed_config.cmake not found, regenerating configs...")
         set(MBED_NEED_TO_RECONFIGURE TRUE)
     endif()
+else()
+    # Include the old version of mbed_config.cmake to get the CONFIG_JSON_SOURCE_FILES variable used below
+    include(${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake)
 endif()
+
+# Check timestamps on all JSON files used to generate the Mbed configuration
+if(NOT MBED_NEED_TO_RECONFIGURE)
+    file(TIMESTAMP ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake MBED_CONFIG_CMAKE_TIMESTAMP "%s" UTC)
+
+    foreach(CONFIG_JSON ${CONFIG_JSON_SOURCE_FILES})
+        if(NOT EXISTS ${CMAKE_SOURCE_DIR}/${CONFIG_JSON})
+            message(STATUS "Mbed: ${CONFIG_JSON} deleted or renamed, regenerating configs...")
+            set(MBED_NEED_TO_RECONFIGURE TRUE)
+            break()
+        endif()
+
+        file(TIMESTAMP ${CMAKE_SOURCE_DIR}/${CONFIG_JSON} CONFIG_JSON_TIMESTAMP "%s" UTC)
+        if(${CONFIG_JSON_TIMESTAMP} GREATER ${MBED_CONFIG_CMAKE_TIMESTAMP})
+            message(STATUS "Mbed: ${CONFIG_JSON} modified, regenerating configs...")
+            set(MBED_NEED_TO_RECONFIGURE TRUE)
+            break()
+        endif()
+    endforeach()
+endif()
+
+# Convert all relative paths to absolute paths, rooted at CMAKE_SOURCE_DIR.
+# This makes sure that they are interpreted the same way everywhere.
+get_filename_component(MBED_APP_JSON_PATH "${MBED_APP_JSON_PATH}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
+get_filename_component(CUSTOM_TARGETS_JSON_PATH "${CUSTOM_TARGETS_JSON_PATH}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
 
 if(MBED_NEED_TO_RECONFIGURE)
     # Generate mbed_config.cmake for this target
@@ -98,13 +82,14 @@ if(MBED_NEED_TO_RECONFIGURE)
 
     set(MBEDTOOLS_CONFIGURE_COMMAND ${Python3_EXECUTABLE}
         -m mbed_tools.cli.main
-        -v # without -v, warnings (e.g. "you have tried to override a nonexistent parameter") do not get printed
+        -v -v # without at least -v, warnings (e.g. "you have tried to override a nonexistent parameter") do not get printed
         configure
         -t GCC_ARM # GCC_ARM is currently the only supported toolchain
         -m "${MBED_TARGET}"
         --mbed-os-path ${CMAKE_CURRENT_LIST_DIR}/../..
         --output-dir ${CMAKE_CURRENT_BINARY_DIR}
         --program-path ${CMAKE_SOURCE_DIR}
+        --cmake-build-dir ${CMAKE_BINARY_DIR}
         ${APP_CONFIG_ARGUMENT}
         ${CUSTOM_TARGET_ARGUMENT})
 
@@ -127,3 +112,6 @@ endif()
 
 # Include the generated config file
 include(${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake)
+
+# Make it so that if any config JSON files are modified, CMake is rerun.
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CONFIG_JSON_SOURCE_FILES})

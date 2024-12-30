@@ -38,7 +38,7 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> T
     target_build_attributes = get_target_by_name(target_name, targets_data)
     incorporate_memory_bank_data_from_cmsis(target_build_attributes, program)
     config = assemble_config(
-        target_build_attributes, [program.root, program.mbed_os.root], program.files.app_config_file
+        target_build_attributes, program
     )
 
     # Process memory banks and save JSON data for other tools (e.g. memap) to use

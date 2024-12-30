@@ -25,7 +25,6 @@ from mbed_tools.build import generate_config
     help="The toolchain you are using to build your app.",
 )
 @click.option("-m", "--mbed-target", required=True, help="A build target for an Mbed-enabled device, eg. K64F")
-@click.option("-b", "--profile", default="develop", help="The build type (release, develop or debug).")
 @click.option("-o", "--output-dir", type=click.Path(), default=None, help="Path to output directory.")
 @click.option(
     "-p",
@@ -40,15 +39,18 @@ from mbed_tools.build import generate_config
 @click.option(
     "--app-config", type=click.Path(), default=None, help="Path to application configuration file.",
 )
+@click.option(
+    "--cmake-build-dir", type=click.Path(path_type=pathlib.Path), help="Path to CMake build dir", required=True
+)
 def configure(
     toolchain: str,
     mbed_target: str,
-    profile: str,
     program_path: str,
     mbed_os_path: str,
     output_dir: str,
     custom_targets_json: str,
-    app_config: str
+    app_config: str,
+    cmake_build_dir: pathlib.Path
 ) -> None:
     """Exports a mbed_config.cmake file to build directory in the program root.
 
@@ -63,17 +65,16 @@ def configure(
         custom_targets_json: the path to custom_targets.json
         toolchain: the toolchain you are using (eg. GCC_ARM, ARM)
         mbed_target: the target you are building for (eg. K64F)
-        profile: The Mbed build profile (debug, develop or release).
         program_path: the path to the local Mbed program
         mbed_os_path: the path to the local Mbed OS directory
         output_dir: the path to the output directory
         app_config: the path to the application configuration file
+        cmake_build_dir: Path to CMake build dir
     """
-    cmake_build_subdir = pathlib.Path(mbed_target.upper(), profile.lower(), toolchain.upper())
     if mbed_os_path is None:
-        program = MbedProgram.from_existing(pathlib.Path(program_path), cmake_build_subdir)
+        program = MbedProgram.from_existing(pathlib.Path(program_path), cmake_build_dir)
     else:
-        program = MbedProgram.from_existing(pathlib.Path(program_path), cmake_build_subdir, pathlib.Path(mbed_os_path))
+        program = MbedProgram.from_existing(pathlib.Path(program_path), cmake_build_dir, pathlib.Path(mbed_os_path).resolve())
     if custom_targets_json is not None:
         program.files.custom_targets_json = pathlib.Path(custom_targets_json)
     if output_dir is not None:
