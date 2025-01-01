@@ -112,7 +112,7 @@ static bool valid_fill(uint8_t *data, uint32_t size, uint8_t fill)
     for (uint32_t i = 0; i < size; i++) {
         if (data[i] != fill) {
             printf("Address 0x%" PRIx32 ": expected value 0x%" PRIx8 ", got 0x%" PRIx8,
-                reinterpret_cast<uint32_t>(&data[i]), fill, data[i]);
+                   reinterpret_cast<uint32_t>(&data[i]), fill, data[i]);
             valid = false;
             wait_us(1000);
         }
