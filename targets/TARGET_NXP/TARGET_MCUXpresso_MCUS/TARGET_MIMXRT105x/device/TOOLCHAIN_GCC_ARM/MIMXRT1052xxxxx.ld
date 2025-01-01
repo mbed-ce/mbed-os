@@ -74,10 +74,7 @@ MEMORY
 
 #ifdef MBED_RAM_BANK_SDRAM_SIZE
   /* Use the external RAM as main memory */
-  m_data                (RW)  : ORIGIN = MBED_RAM_BANK_SDRAM_START, LENGTH = MBED_RAM_BANK_SDRAM_SIZE
-#else
-  /* No external data memory, store data in DTCM (significantly faster than OCRAM)*/
-#define m_data m_dtcm
+  m_sdram               (RW)  : ORIGIN = MBED_RAM_BANK_SDRAM_START, LENGTH = MBED_RAM_BANK_SDRAM_SIZE
 #endif
 
   /* ITCM bank -- used for functions that need to execute from RAM
@@ -256,7 +253,7 @@ SECTIONS
     KEEP(*(.jcr*))
     . = ALIGN(8);
     __data_end__ = .;        /* define a global symbol at data end */
-  } > m_data AT> m_text :ram_init
+  } > m_dtcm AT> m_text :ram_init
   __ram_function_flash_start = __DATA_ROM + (__data_end__ - __data_start__); /* Symbol is used by startup for TCM data initialization */
 
   .ram_function :
@@ -339,18 +336,19 @@ SECTIONS
     . = ALIGN(8);
     __bss_end__ = .;
     __END_BSS = .;
-  } > m_data :ram_noinit
+  } > m_dtcm :ram_noinit
+
+  . = ALIGN(8);
+  __end__ = .;
+  PROVIDE(end = .);
 
   .heap (NOLOAD):
   {
-    . = ALIGN(8);
-    __end__ = .;
-    PROVIDE(end = .);
     __HeapBase = .;
-    . =  ORIGIN(m_data) + LENGTH(m_data) - STACK_SIZE;
+    . =  ORIGIN(m_dtcm) + LENGTH(m_dtcm) - STACK_SIZE;
     __HeapLimit = .;
     __heap_limit = .; /* Add for _sbrk */
-  } > m_data :ram_noinit
+  } > m_dtcm :ram_noinit
 
   /* Reserve space for stack (even though stack is always at the end of DTCM regardless
      of where this section is located) */
