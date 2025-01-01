@@ -165,9 +165,11 @@ bool Harness::run(const Specification& specification)
 void Harness::raise_failure(const failure_reason_t reason)
 {
     UTEST_LOG_FUNCTION();
-    // ignore a failure, if the Harness has not been initialized.
-    // this allows using unity assertion macros without setting up utest.
-    if (test_cases == NULL) return;
+
+    // If not currently in a test case and code does a unity assertion that fails, it will end up
+    // at this assert.  This will stop execution of the program.
+    // This allows using unity assertion macros without setting up utest.
+    assert(test_cases != nullptr);
 
     utest::v1::status_t fail_status = STATUS_ABORT;
     if (handlers->test_failure) handlers->test_failure(failure_t(reason, location));

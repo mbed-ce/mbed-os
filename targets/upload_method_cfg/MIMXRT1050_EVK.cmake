@@ -2,6 +2,9 @@
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
+# 1. Most debuggers cannot connect to this CPU after it does an NVIC system reset.  See Mbed CE bug #83.
+#      However, a workaround has been implemented for PyOCD.
+
 # General config parameters
 # -------------------------------------------------------------
 set(UPLOAD_METHOD_DEFAULT MBED)
@@ -16,6 +19,7 @@ set(MBED_RESET_BAUDRATE 115200)
 set(PYOCD_UPLOAD_ENABLED TRUE)
 set(PYOCD_TARGET_NAME mimxrt1050_hyperflash) # Note: change to "mimxrt1050_quadspi" if onboard QSPI flash is used
 set(PYOCD_CLOCK_SPEED 4000k)
+set(PYOCD_EXTRA_OPTIONS -Oconnect_mode=pre-reset)
 
 # Config options for LINKSERVER
 # -------------------------------------------------------------

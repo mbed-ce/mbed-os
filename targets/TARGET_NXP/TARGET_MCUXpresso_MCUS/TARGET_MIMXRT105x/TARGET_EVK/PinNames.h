@@ -206,9 +206,8 @@ typedef enum {
     NC = (int)0xFFFFFFFF
 } PinName;
 
-// Standardized LED and button names
-#define LED1 		GPIO_AD_B0_09		// USER LED (green)
-#define USER_LED	LED1
+// MIMXRT EVKs do not have a usable LED, because the LED shares important pins with the
+// debugging interface, so trying to use the LED can interrupt flashing and debugging code!
 
 typedef enum {
     PullNone = 0,

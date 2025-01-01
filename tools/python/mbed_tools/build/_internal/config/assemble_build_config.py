@@ -59,7 +59,7 @@ def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
         except ValueError:
             return path
 
-    config.json_sources = [make_relative_if_possible(program.root) for json_source in config.json_sources]
+    config.json_sources = [make_relative_if_possible(json_source) for json_source in config.json_sources]
 
     return config
 

@@ -5,6 +5,7 @@
 # This method needs the following parameters:
 # PYOCD_TARGET_NAME - Name of your processor as passed to the -t option of pyOCD. This is usually the full or partial model number.
 # PYOCD_CLOCK_SPEED - Clock speed of the JTAG or SWD connection. Default is in Hz, but can use k and M suffixes for MHz and GHz
+# PYOCD_EXTRA_OPTIONS - Extra options to pass to the pyocd 'flash' and 'gdbserver' commands.
 
 set(UPLOAD_SUPPORTS_DEBUG TRUE)
 
@@ -32,6 +33,7 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		-t ${PYOCD_TARGET_NAME}
 		${PYOCD_PROBE_ARGS}
 		--base-address ${MBED_UPLOAD_BASE_ADDR}
+		${PYOCD_EXTRA_OPTIONS}
 		${BINARY_FILE})
 
 endfunction(gen_upload_target)
@@ -41,11 +43,13 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	${Python3_EXECUTABLE}
 	-m pyocd
 	gdbserver
+	-Oconnect_mode=pre-reset
 	--no-wait
 	-t ${PYOCD_TARGET_NAME}
 	${PYOCD_PROBE_ARGS}
 	-f ${PYOCD_CLOCK_SPEED}
-	-p ${MBED_GDB_PORT})
+	-p ${MBED_GDB_PORT}
+	${PYOCD_EXTRA_OPTIONS})
 
 # Reference: https://github.com/Marus/cortex-debug/blob/056c03f01e008828e6527c571ef5c9adaf64083f/src/pyocd.ts#L40
 set(UPLOAD_LAUNCH_COMMANDS

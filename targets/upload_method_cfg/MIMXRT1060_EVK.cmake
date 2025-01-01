@@ -7,8 +7,9 @@
 #      connecting an external J-Link probe.  See here for conversion instructions: https://www.segger.com/products/debug-probes/j-link/models/other-j-links/lpc-link-2/
 #      Also, a relatively new version of the J-Link software is needed (7.82 confirmed working), so try updating
 #      it if you get any errors.
-# 2. pyocd seems glitchy for this device.  Sometimes it works great, sometimes you get 'no ACK received.'
-#      Might be related to pyOCD#861?
+# 2. Most debuggers cannot connect to this CPU after it does an NVIC system reset.  See Mbed CE bug #83.
+#      However, a workaround has been implemented for PyOCD.
+#
 
 # General config parameters
 # -------------------------------------------------------------
@@ -26,6 +27,7 @@ set(JLINK_CLOCK_SPEED 4000)
 set(PYOCD_UPLOAD_ENABLED TRUE)
 set(PYOCD_TARGET_NAME mimxrt1060) # Note: This seems to use QSPI.  There does not seem to be a pyocd equivalent for hyperflash.
 set(PYOCD_CLOCK_SPEED 4000k)
+set(PYOCD_EXTRA_OPTIONS -Oconnect_mode=pre-reset)
 
 # Config options for LINKSERVER
 # -------------------------------------------------------------

@@ -60,9 +60,9 @@ Configure the firewall to allow this traffic to access the test server.
 
 These services are available on many operating systems, and installing them is out of scope of this document. Below is an example of how to install these services into a Debian/Ubuntu based Linux distribution using standard Inet Daemon:
 
-```.sh
+```shell
 $ sudo apt install inetutils-inetd
-$ nano /etc/inetd.conf
+$ sudo nano /etc/inetd.conf
 ```
 
 Enable following services from /etc/inetd.conf:
@@ -77,6 +77,13 @@ chargen     stream  tcp6    nowait  root    internal
 chargen     dgram   udp6    wait    root    internal
 daytime     stream  tcp6    nowait  root    internal
 time        stream  tcp6    nowait  root    internal
+```
+
+Then run:
+
+```shell
+$ sudo systemctl enable inetutils-inetd.service
+$ sudo systemctl start inetutils-inetd.service
 ```
 
 Below is an example of how to install these services in TLS version into a Debian/Ubuntu based Linux distribution using Stunnel4 Daemon:

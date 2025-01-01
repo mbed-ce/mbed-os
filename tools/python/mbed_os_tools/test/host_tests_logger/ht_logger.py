@@ -22,7 +22,7 @@ from functools import partial
 class HtrunLogger(object):
     """! Yet another logger flavour """
     def __init__(self, name):
-        logging.basicConfig(stream=sys.stdout,format='[%(created).2f][%(name)s]%(message)s', level=logging.DEBUG)
+        logging.basicConfig(stream=sys.stdout,format='[+%(relativeCreated)dms][%(name)s]%(message)s', level=logging.DEBUG)
         self.logger = logging.getLogger(name)
         self.format_str = '[%(logger_level)s] %(message)s'
 
