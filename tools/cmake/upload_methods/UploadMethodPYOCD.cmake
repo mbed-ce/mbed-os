@@ -43,7 +43,6 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	${Python3_EXECUTABLE}
 	-m pyocd
 	gdbserver
-	-Oconnect_mode=pre-reset
 	--no-wait
 	-t ${PYOCD_TARGET_NAME}
 	${PYOCD_PROBE_ARGS}
