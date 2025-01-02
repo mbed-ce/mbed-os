@@ -5202,7 +5202,8 @@
             "__STARTUP_INITIALIZE_NONCACHEDATA",
             "MBED_MPU_CUSTOM",
             "MBED_TICKLESS",
-            "DATA_SECTION_IS_CACHEABLE=1"
+            "DATA_SECTION_IS_CACHEABLE=1",
+            "MBED_SPLIT_HEAP"
         ],
         "inherits": [
             "Target"

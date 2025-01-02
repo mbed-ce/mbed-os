@@ -87,7 +87,7 @@ MEMORY
      Note that address is different on the 105x and the 106x. */
   m_ocram              (RW)  : ORIGIN = MBED_RAM_BANK_SRAM_OC_START, LENGTH = MBED_RAM_BANK_SRAM_OC_SIZE
 
-#if MBED_TARGET_MIMXRT1060
+#ifdef MBED_RAM_BANK_SRAM_OC2_START
   /* OCRAM2 bank -- extra RAM, available on MIMXRT106x only. */
   m_ocram2             (RW)  : ORIGIN = MBED_RAM_BANK_SRAM_OC2_START, LENGTH = MBED_RAM_BANK_SRAM_OC2_SIZE
 #endif
@@ -269,20 +269,6 @@ SECTIONS
 
   __NDATA_ROM = __ram_function_flash_start + SIZEOF(.ram_function);
 
-  /* Store crash data RAM at the end of OCRAM (which is otherwise unused).
-     Note that the ROM bootloader clobbers the first part of OCRAM, so we have to put this at the end. */
-  __CRASH_DATA_RAM_START__ = ORIGIN(m_ocram) + LENGTH(m_ocram) - M_CRASH_DATA_RAM_SIZE; /* Create a global symbol at data start */
-  .crash_data_ram __CRASH_DATA_RAM_START__ :
-  {
-    . = ALIGN(8);
-    __CRASH_DATA_RAM__ = .;
-    KEEP(*(.keep.crash_data_ram))
-    *(.m_crash_data_ram)     /* This is a user defined section */
-    . += M_CRASH_DATA_RAM_SIZE;
-    . = ALIGN(8);
-    __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
-  } > m_ocram :crash_data_ram
-
   /* Always store noncacheable data (e.g. DMA descriptors) in DTCM, since this memory
      is always cache coherent. */
   .ncache.init :
@@ -342,13 +328,12 @@ SECTIONS
   __end__ = .;
   PROVIDE(end = .);
 
-  .heap (NOLOAD):
+  .heap_0 (NOLOAD):
   {
-    __HeapBase = .;
-    . =  ORIGIN(m_dtcm) + LENGTH(m_dtcm) - STACK_SIZE;
-    __HeapLimit = .;
-    __heap_limit = .; /* Add for _sbrk */
-  } > m_dtcm :ram_noinit
+      PROVIDE(__mbed_sbrk_start_0 = .);
+      . =  ORIGIN(m_dtcm) + LENGTH(m_dtcm) - STACK_SIZE;
+      PROVIDE(__mbed_krbs_start_0 = .);
+  } > m_dtcm
 
   /* Reserve space for stack (even though stack is always at the end of DTCM regardless
      of where this section is located) */
@@ -362,6 +347,39 @@ SECTIONS
   __StackTop   = ORIGIN(m_dtcm) + LENGTH(m_dtcm);
   __StackLimit = __StackTop - STACK_SIZE;
   PROVIDE(__stack = __StackTop);
+
+  /* Store crash data RAM at the end of OCRAM (which is otherwise unused).
+     Note that the ROM bootloader clobbers the first part of OCRAM, so we have to put this at the end. */
+  __CRASH_DATA_RAM_START__ = ORIGIN(m_ocram) + LENGTH(m_ocram) - M_CRASH_DATA_RAM_SIZE; /* Create a global symbol at data start */
+
+  /* Second heap region. Use OCRAM2 if available, otherwise use OCRAM.
+   * TODO https://github.com/mbed-ce/mbed-os/issues/413 Use SDRAM once this bug is fixed. */
+#ifdef MBED_RAM_BANK_SRAM_OC2_START
+  .heap (NOLOAD):
+  {
+      PROVIDE(__mbed_sbrk_start = .);
+      . += (ORIGIN(m_ocram2) + LENGTH(m_ocram2));
+      PROVIDE(__mbed_krbs_start = .);
+  } > m_ocram2
+#else
+  .heap (NOLOAD):
+  {
+      PROVIDE(__mbed_sbrk_start = .);
+      . = __CRASH_DATA_RAM_START__;
+      PROVIDE(__mbed_krbs_start = .);
+  } > m_ocram2
+#endif
+
+  .crash_data_ram __CRASH_DATA_RAM_START__ :
+  {
+    . = ALIGN(8);
+    __CRASH_DATA_RAM__ = .;
+    KEEP(*(.keep.crash_data_ram))
+    *(.m_crash_data_ram)     /* This is a user defined section */
+    . += M_CRASH_DATA_RAM_SIZE;
+    . = ALIGN(8);
+    __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
+  } > m_ocram :crash_data_ram
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 
