@@ -4,8 +4,6 @@
 # Automatically generated configuration file.
 # DO NOT EDIT. Content may be overwritten.
 
-include_guard(GLOBAL)
-
 set(MBED_TOOLCHAIN "{{toolchain_name}}")
 set(MBED_CPU_CORE "{{core}}")
 set(MBED_C_LIB "{{c_lib}}")
@@ -69,7 +67,6 @@ set(MBED_TARGET_DEFINITIONS{% for component in components %}
 
 # config
 set(MBED_CONFIG_DEFINITIONS
-
     # Config settings
 {% for setting in config %}
     {%- if setting.macro_name -%}
