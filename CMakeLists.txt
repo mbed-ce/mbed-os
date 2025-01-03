@@ -314,7 +314,7 @@ if(NOT MBED_IS_NATIVE_BUILD)
     # Note that many different source files will compile differently depending on if the RTOS is in use.
     # So, it's needed to compile the core sources twice, once for RTOS and once for non-RTOS.
     mbed_create_distro(mbed-baremetal ${MBED_TARGET_CMAKE_NAME} mbed-core-flags mbed-core-sources)
-    mbed_create_distro(mbed-os ${MBED_TARGET_CMAKE_NAME} mbed-core-flags mbed-core-sources mbed-rtos-flags mbed-rtos-sources)
+    mbed_create_distro(mbed-os ${MBED_TARGET_CMAKE_NAME} mbed-core-flags mbed-core-sources)
 
     # Set up the linker script and hook it up to the top-level OS targets
     mbed_setup_linker_script(mbed-os mbed-baremetal ${CMAKE_CURRENT_BINARY_DIR}/generated-headers/mbed-target-config.h)
