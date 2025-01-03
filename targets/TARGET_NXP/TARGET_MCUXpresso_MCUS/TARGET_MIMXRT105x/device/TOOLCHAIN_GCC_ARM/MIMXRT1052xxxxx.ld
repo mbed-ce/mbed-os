@@ -126,8 +126,8 @@ SECTIONS
     *(.boot_hdr.dcd_data)
   }
 
-  /* Interrupts go at the start of flash */
-  #define INTERRUPT_TABLE_ADDR MBED_ROM_BANK_EXT_FLASH_START
+  /* Interrupts go at the start of configured flash area */
+  #define INTERRUPT_TABLE_ADDR MBED_CONFIGURED_ROM_BANK_EXT_FLASH_START
 #endif
 
   /* Now we have the ISR vector */

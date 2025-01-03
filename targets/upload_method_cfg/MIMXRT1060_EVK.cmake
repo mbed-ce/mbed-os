@@ -13,7 +13,7 @@
 
 # General config parameters
 # -------------------------------------------------------------
-set(UPLOAD_METHOD_DEFAULT JLINK)
+set(UPLOAD_METHOD_DEFAULT PYOCD)
 
 # Config options for JLINK
 # -------------------------------------------------------------

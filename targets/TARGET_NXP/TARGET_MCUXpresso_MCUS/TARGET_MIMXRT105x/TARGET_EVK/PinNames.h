@@ -209,6 +209,9 @@ typedef enum {
 // MIMXRT EVKs do not have a usable LED, because the LED shares important pins with the
 // debugging interface, so trying to use the LED can interrupt flashing and debugging code!
 
+// User button is connected to the WAKEUP pin
+#define BUTTON1 WAKEUP
+
 typedef enum {
     PullNone = 0,
     PullDown = 1,
