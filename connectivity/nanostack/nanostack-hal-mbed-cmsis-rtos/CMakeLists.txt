@@ -29,6 +29,4 @@ target_link_libraries(mbed-nanostack-hal_mbed_cmsis_rtos
         mbed-nanostack-sal_stack-event_loop
         mbed-nanostack-libservice
         mbed-nanostack-sal_stack
-    PRIVATE
-        mbed-rtos-flags
 )

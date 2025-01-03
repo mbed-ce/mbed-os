@@ -8,7 +8,6 @@ target_sources(mbed-emac-test-utils PRIVATE
 target_include_directories(mbed-emac-test-utils PUBLIC .)
 target_link_libraries(mbed-emac-test-utils PUBLIC
     mbed-core-flags
-    mbed-rtos-flags
     mbed-netsocket-api
 	mbed-nanostack-libservice
 	mbed-nanostack-hal_mbed_cmsis_rtos)

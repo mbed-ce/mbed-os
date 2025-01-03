@@ -15,7 +15,7 @@ target_sources(mbed-wifi
 target_link_libraries(mbed-wifi
     PUBLIC
         mbed-lwipstack
-		mbed-rtos-flags
+		mbed-core-flags
 )
 
 if("DEVICE_EMAC=1" IN_LIST MBED_TARGET_DEFINITIONS)

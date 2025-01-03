@@ -7,7 +7,7 @@ macro(create_mbed_802_15_4_target)
 		add_library(mbed-802.15.4-rf STATIC EXCLUDE_FROM_ALL)
 
 		# Nanostack drivers always require Mbed RTOS
-		target_link_libraries(mbed-802.15.4-rf PUBLIC mbed-core-flags mbed-rtos-flags)
+		target_link_libraries(mbed-802.15.4-rf PUBLIC mbed-core-flags)
 
 		# For NanostackRfPhy.h
 		target_link_libraries(mbed-802.15.4-rf PUBLIC mbed-nanostack)

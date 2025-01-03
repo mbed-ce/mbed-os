@@ -8,7 +8,7 @@ macro(create_mbed_wifi_target)
 
 		target_link_libraries(mbed-wifi
 		    PUBLIC
-		        mbed-rtos-flags
+		        mbed-core-flags
 		        mbed-netsocket-api
 		)
 	endif()

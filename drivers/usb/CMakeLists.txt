@@ -56,5 +56,5 @@ if("DEVICE_USBDEVICE=1" IN_LIST MBED_TARGET_DEFINITIONS)
             include/usb/cdc_ecm
     )
 
-    target_link_libraries(mbed-usb-cdc-ecm PUBLIC mbed-usb mbed-rtos-flags)
+    target_link_libraries(mbed-usb-cdc-ecm PUBLIC mbed-usb mbed-core-flags)
 endif()

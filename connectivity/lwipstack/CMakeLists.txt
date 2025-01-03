@@ -100,6 +100,6 @@ target_link_libraries(mbed-lwipstack
         mbed-ppp
         mbed-randlib
     PRIVATE
-        mbed-rtos-flags
+        mbed-core-flags
 )
 

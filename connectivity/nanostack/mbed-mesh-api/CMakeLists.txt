@@ -37,8 +37,6 @@ target_link_libraries(mbed-nanostack-mbed_mesh_api
 		mbed-nanostack
         mbed-netsocket-api
         mbed-core-flags
-    PRIVATE
-        mbed-rtos-flags
 )
 
 # Since there are a lot of circular references between this library and mbed-netsocket-api,

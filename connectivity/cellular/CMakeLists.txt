@@ -39,6 +39,5 @@ target_link_libraries(mbed-cellular
     PUBLIC
         mbed-netsocket-api
         mbed-core-flags
-        mbed-rtos-flags
         mbed-randlib
 )

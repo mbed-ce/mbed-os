@@ -8,8 +8,7 @@ target_link_libraries(mbed-bluenrg2
     PUBLIC
         mbed-core-flags
         mbed-ble
-    PRIVATE
-        mbed-rtos-flags)
+)
 
 # circular dependency between mbed-ble and the BlueNRG driver, because of the ble_cordio_get_hci_driver() implementation
 target_link_libraries(mbed-ble PUBLIC mbed-bluenrg2)

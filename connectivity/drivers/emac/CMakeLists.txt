@@ -33,5 +33,5 @@ target_link_libraries(mbed-emac
     PUBLIC
         mbed-netsocket-api
     PRIVATE
-        mbed-rtos-flags
+        mbed-core-flags
 )
