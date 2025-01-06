@@ -134,23 +134,9 @@ if(NOT APPLICATION_PROFILE_CONFIG_FULL AND NOT APPLICATION_PROFILE_CONFIG_BAREME
 endif()
 
 # mbed-core-flags/mbed-core-sources link mbed-rtos-flags/mbed-rtos-sources or not
-if((APPLICATION_PROFILE_CONFIG_AUTO OR APPLICATION_PROFILE_CONFIG_FULL) AND
-    (NOT MBED_ENABLE_OS_INTERNAL_TESTS OR NOT MBED_BUILD_GREENTEA_TESTS OR NOT MBED_GREENTEA_TEST_BAREMETAL))
+if(APPLICATION_PROFILE_CONFIG_AUTO OR APPLICATION_PROFILE_CONFIG_FULL)
     target_link_libraries(mbed-core-flags INTERFACE mbed-rtos-flags)
     target_link_libraries(mbed-core-sources INTERFACE mbed-rtos-sources)
-endif()
-
-# Check if target.application-profile matches MBED_GREENTEA_TEST_BAREMETAL
-if(MBED_ENABLE_OS_INTERNAL_TESTS AND MBED_BUILD_GREENTEA_TESTS)
-    if(APPLICATION_PROFILE_CONFIG_FULL AND MBED_GREENTEA_TEST_BAREMETAL)
-        message(FATAL_ERROR
-            "target.application-profile (full) doesn't match MBED_GREENTEA_TEST_BAREMETAL (TRUE)"
-        )
-    elseif(APPLICATION_PROFILE_CONFIG_BAREMETAL AND NOT MBED_GREENTEA_TEST_BAREMETAL)
-        message(FATAL_ERROR
-            "target.application-profile (bare-metal) doesn't match MBED_GREENTEA_TEST_BAREMETAL (FALSE)"
-        )
-    endif()
 endif()
 
 # Validate selected C library type
