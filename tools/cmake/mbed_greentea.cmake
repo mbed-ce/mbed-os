@@ -92,7 +92,9 @@ function(mbed_greentea_add_test)
             ${MBED_GREENTEA_TEST_SOURCES}
     )
 
-    if(MBED_GREENTEA_TEST_BAREMETAL)
+    # Resolve link library based on target.application-profile setting
+    get_target_property(MBED_CORE_FLAGS_TARGET_LINK_LIBRARIES mbed-core-flags INTERFACE_LINK_LIBRARIES)
+    if(NOT "mbed-rtos-flags" IN_LIST MBED_CORE_FLAGS_TARGET_LINK_LIBRARIES)
         list(APPEND MBED_GREENTEA_TEST_REQUIRED_LIBS mbed-baremetal)
     else()
         list(APPEND MBED_GREENTEA_TEST_REQUIRED_LIBS mbed-os)
