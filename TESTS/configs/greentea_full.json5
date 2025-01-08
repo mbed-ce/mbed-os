@@ -9,6 +9,12 @@
         // Allow lots of reboots so that we don't get in a situation where the MCU refuses to boot
         // after crashing and being reflashed (since some MCUs/flash tools don't reset the
         // crash data RAM)
-        "platform.error-reboot-max": 99999
+        "platform.error-reboot-max": 99999,
+
+        // Enable mbed trace prints for tests that use it
+        "mbed-trace.enable": true,
+
+        // Disable colored traces in tests, as the test runner does not like the terminal control chars
+        "mbed-trace.default-config": "TRACE_ACTIVE_LEVEL_INFO | TRACE_CARRIAGE_RETURN"
     }
 }

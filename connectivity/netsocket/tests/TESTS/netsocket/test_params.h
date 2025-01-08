@@ -19,7 +19,7 @@
 #define TEST_PARAMS_H
 
 #ifndef MBED_CONF_APP_ECHO_SERVER_ADDR
-#define ECHO_SERVER_ADDR "echo.mbedcloudtesting.com"
+#define ECHO_SERVER_ADDR "mbed-ce.dev"
 #else
 #define ECHO_SERVER_ADDR MBED_CONF_APP_ECHO_SERVER_ADDR
 #endif

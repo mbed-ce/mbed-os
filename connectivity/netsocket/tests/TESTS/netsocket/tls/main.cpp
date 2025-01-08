@@ -161,6 +161,9 @@ int fetch_stats()
 // Test setup
 utest::v1::status_t greentea_setup(const size_t number_of_cases)
 {
+    // Enable logging
+    mbed_trace_init();
+
     GREENTEA_SETUP(tls_global::TESTS_TIMEOUT.count(), "default_auto");
     _ifup();
 
