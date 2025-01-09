@@ -40,20 +40,26 @@
  * For the 'lock kernel scheduler' approach to work thoroughly, we must also
  * address some side issues:
  *
- * - Prohibit NS secure call from ISR except SVC, so non-preemptive doesn't break.
- * - Allow NS secure call in SVC context because it is synchronous. Here, we lock
- *   interrupt instead of kernel scheduler because svcRtxKernelLock()/svcRtxKernelRestoreLock(...)
- *   are inaccessible outside rtx_kernel.c. Currently, this is rare case and would cause
- *   little trouble (see known paths below).
- * - Call into secure world straight in interrupt-disabled context. When in
- *   interrupt-disabled context, NS secure call is guaranteed to be non-preemptive
- *   naturally.
- * - Call into secure world straight at pre-rtos stage. When at pre-rtos stage,
+ * - NOT SUPPORT NS secure call from ISR except SVC (rtos/baremetal)
+ * - Support NS secure call in SVC context conditionally (rtos/baremetal)
+ *   - For rtos profile, lock interrupt instead of kernel scheduler because
+ *     svcRtxKernelLock()/svcRtxKernelRestoreLock(...) are inaccessible
+ *     outside rtx_kernel.c. Currently, this is rare case and would cause
+ *     little trouble (see known paths below).
+ *   - For baremetal profile, NS secure call is guaranteed to be non-preemptive
+ *     naturally.
+ *   NOTE: However, per test, TF-M doesn't allow call in SVC context anymore.
+ *   It will trap this as error and possibly reboot the system, except for 
+ *   secure context calls like TZ_InitContextSystem_S and firends.
+ * - Call into secure world straight in interrupt-disabled context (rtos/baremetal)
  *   NS secure call is guaranteed to be non-preemptive naturally.
- * - osKernelLock() will error when kernel state is 'osKernelSuspended'. Address
- *   it separately. Known path of NS secure call when kernel state is 'osKernelSuspended':
- *   - default idle thread > osKernelSuspend() > lp_ticker_init > SYS_ResetModule_S/
- *     CLK_SetModuleClock_S/CLK_EnableModuleClock_S
+ * - Call into secure world straight at pre-rtos stage (rtos)
+ *   NS secure call is guaranteed to be non-preemptive naturally.
+ * - osKernelLock() will error when kernel state is 'osKernelSuspended' (rtos).
+ *   Address it separately. Known path of NS secure call when kernel state is
+ *   'osKernelSuspended':
+ *   default idle thread > osKernelSuspend() > lp_ticker_init > SYS_ResetModule_S/
+ *   CLK_SetModuleClock_S/CLK_EnableModuleClock_S
  *
  * Known paths of NS secure call in interrupt-disabled context:
  * - mbed-os/platform/mbed_sleep_manager.c > sleep_manager_sleep_auto >
@@ -65,9 +71,10 @@
  *   CLK_IsRTCClockEnabled_S
  *
  * Known paths of NS secure call in SVC context:
- * - In tickless mode, osKernelStart > svcRtxKernelStart > OS_Tick_Enable >
+ * - In MBED_TICKLESS mode, osKernelStart > svcRtxKernelStart > OS_Tick_Enable >
  *   us_ticker_init/lp_ticker_init > SYS_ResetModule_S/CLK_SetModuleClock_S/
  *   CLK_EnableModuleClock_S
+ *   NOTE: Per above SVC test, this means MBED_TICKLESS mode is not supported.
  */
 
 struct ns_interface_state
@@ -87,34 +94,51 @@ int32_t tfm_ns_interface_dispatch(veneer_fn fn,
     /* Prohibit NS secure call from ISR except SVC, so non-preemptive doesn't break */
     uint32_t ipsr = __get_IPSR();
     if (ipsr == 11U) {
-        /* Allow NS secure call in SVC context because it is synchronous. Here,
-         * we lock interrupt instead of kernel scheduler because svcRtxKernelLock()/
-         * svcRtxKernelRestoreLock(...) are inaccessible outside rtx_kernel.c. */
+        /* Support NS secure call in SVC context */
+#if MBED_CONF_RTOS_PRESENT
+        /*
+         * Lock interrupt instead of kernel scheduler because svcRtxKernelLock()/
+         * svcRtxKernelRestoreLock(...) are inaccessible outside rtx_kernel.c
+         */
         core_util_critical_section_enter();
         int32_t result = fn(arg0, arg1, arg2, arg3);
         core_util_critical_section_exit();
 
         return result;
+#else
+        /*
+         * Call into secure world straight for baremetal because NS secure
+         * call is non-preemptive naturally
+         */
+        return fn(arg0, arg1, arg2, arg3);
+#endif
     } else if (ipsr) {
         MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_KERNEL, MBED_ERROR_CODE_PROHIBITED_IN_ISR_CONTEXT), "Prohibited in ISR context", (uintptr_t) fn);
     }
 
-    /* Call into secure world straight in interrupt-disabled context because
-     * NS secure call is non-preemptive naturally */
+    /*
+     * Call into secure world straight in interrupt-disabled context because
+     * NS secure call is non-preemptive naturally
+     */
     if (!core_util_are_interrupts_enabled()) {
         return fn(arg0, arg1, arg2, arg3);
     }
 
+#if MBED_CONF_RTOS_PRESENT
     osKernelState_t kernel_state = osKernelGetState();
 
-    /* Call into secure world straight at pre-rtos stage because NS secure
-     * call is non-preemptive naturally */
+    /*
+     * Call into secure world straight at pre-rtos stage because NS secure
+     * call is non-preemptive naturally
+     */
     if (kernel_state == osKernelInactive || kernel_state == osKernelReady) {
         return fn(arg0, arg1, arg2, arg3);
     }
 
-    /* osKernelLock() will error when kernel state is 'osKernelSuspended'. Address
-     * it separately. */
+    /*
+     * osKernelLock() will error when kernel state is 'osKernelSuspended'. Address
+     * it separately.
+     */
     if (kernel_state == osKernelSuspended) {
         return fn(arg0, arg1, arg2, arg3);
     } else if (kernel_state == osKernelError) {
@@ -139,6 +163,13 @@ int32_t tfm_ns_interface_dispatch(veneer_fn fn,
     MBED_ASSERT(lock_state >= 0);
 
     return result;
+#else
+    /*
+     * Call into secure world straight for baremetal because NS secure
+     * call is non-preemptive naturally
+     */
+    return fn(arg0, arg1, arg2, arg3);
+#endif
 }
 
 /* Override tfm_ns_lock_init()
