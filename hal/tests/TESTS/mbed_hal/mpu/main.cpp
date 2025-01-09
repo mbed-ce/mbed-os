@@ -134,7 +134,7 @@ void mpu_fault_test_bss()
 
 void mpu_fault_test_stack()
 {
-    uint16_t stack_function;
+    volatile uint16_t stack_function;
 
     stack_function = ASM_BX_LR;
     clear_caches();
@@ -143,14 +143,14 @@ void mpu_fault_test_stack()
 
 void mpu_fault_test_heap()
 {
-    uint16_t *heap_function = (uint16_t *)malloc(2);
+    uint16_t volatile *heap_function = (uint16_t *)malloc(2);
 
     TEST_ASSERT_NOT_EQUAL(NULL, heap_function);
     *heap_function = ASM_BX_LR;
     clear_caches();
     mpu_fault_test(heap_function);
 
-    free(heap_function);
+    free(const_cast<uint16_t *>(heap_function));
 }
 
 utest::v1::status_t fault_override_setup(const Case *const source, const size_t index_of_case)

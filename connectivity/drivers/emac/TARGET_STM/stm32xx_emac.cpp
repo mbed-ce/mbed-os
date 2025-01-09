@@ -18,6 +18,7 @@
 #if DEVICE_EMAC
 
 #include <stdlib.h>
+#include <algorithm>
 
 #include "cmsis_os.h"
 
