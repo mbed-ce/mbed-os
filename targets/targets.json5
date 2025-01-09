@@ -8232,6 +8232,9 @@
         ],
         "bootloader_supported": true,
         "forced_reset_timeout": 5,
+        "supported_application_profiles": [
+            "full", "bare-metal"
+        ],
         "is_mcu_family_target": true
     },
     "NU_M2354": { // AKA NUMAKER-M2354
