@@ -1,4 +1,8 @@
-prettytable>=3.12.0 # 3.12.0 both added HRuleStyle and deprecated the old constants in one single release :/
+
+# 3.12.0 both added HRuleStyle and deprecated the old constants in one single release :/
+prettytable>=2.0,<3.12.0; python_version < '3.9'
+prettytable>=3.12.0; python_version >= '3.9'
+
 future>=0.18.0,<1.0
 jinja2>=2.11.3
 intelhex>=2.3.0,<3.0.0
