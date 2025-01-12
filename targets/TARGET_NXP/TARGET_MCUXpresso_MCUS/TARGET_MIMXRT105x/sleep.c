@@ -33,6 +33,7 @@ void hal_sleep(void)
     __ISB();
 }
 
+#if DEVICE_LPTICKER
 void hal_deepsleep(void)
 {
     /* Check if any of the UART's is transmitting data */
@@ -48,4 +49,9 @@ void hal_deepsleep(void)
 
     vPortPOST_SLEEP_PROCESSING(kCLOCK_ModeStop);
 }
-
+#else
+void hal_deepsleep(void)
+{
+    hal_sleep();
+}
+#endif

@@ -5226,8 +5226,7 @@
             "SPISLAVE",
             "TRNG",
             "WATCHDOG",
-            "USBDEVICE",
-            "LPTICKER"
+            "USBDEVICE"
         ],
         "overrides": {
             "deep-sleep-latency": 10

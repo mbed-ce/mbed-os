@@ -206,7 +206,9 @@ void mbed_sdk_init()
     BOARD_Init_PMIC_STBY_REQ();
 #endif
 
+#if DEVICE_LPTICKER
     LPM_Init();
+#endif
 }
 
 void spi_setup_clock()

@@ -31,8 +31,6 @@ target_sources(mbed-mimxrt105x
         clock_config.c
         PeripheralPins.c
         pinmap.c
-        mimxrt_clock_adjustment.c
-        lpm.c
         mbed_overrides.c
 
         device/system_MIMXRT1052.c
@@ -105,6 +103,14 @@ target_sources(mbed-mimxrt105x
 
         ${STARTUP_FILE}
 )
+
+# Add extra sources used for deep sleep mode
+if("DEVICE_LPTICKER=1" IN_LIST MBED_TARGET_DEFINITIONS)
+    target_sources(mbed-mimxrt105x
+        INTERFACE
+            mimxrt_clock_adjustment.c
+            lpm.c)
+endif()
 
 target_link_libraries(mbed-mimxrt105x
     INTERFACE
