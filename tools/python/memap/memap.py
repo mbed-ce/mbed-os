@@ -698,7 +698,7 @@ class MemapParser(object):
         columns = ['Module']
         columns.extend(self.print_sections)
 
-        table = PrettyTable(columns, junction_char="|", hrules=HRuleStyle.HEADER)
+        table = PrettyTable(columns, junction_char="|", hrules=HEADER)
         table.align["Module"] = "l"
         for col in self.print_sections:
             table.align[col] = 'r'
