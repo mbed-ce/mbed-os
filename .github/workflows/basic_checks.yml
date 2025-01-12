@@ -231,13 +231,7 @@ jobs:
             | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vvvfp "${file}"; done
           git diff --exit-code --diff-filter=d --color
 
-  cmake-checks:
-    env: 
-      NAME: mbed-test-mode-check 
-      ROOT: tools/cmake/tests/mbed_test_mode/ 
-      TOOLCHAIN: GCC_ARM 
-      TARGET_NAME: K64F 
-      PROFILE: develop
+  cmake-native-unit-tests:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/armmbed/mbed-os-env:master-latest
@@ -252,14 +246,7 @@ jobs:
           apt-get install -y python3-venv
 
       -
-        name: cmake build
-        run: |
-          set -x
-          cmake -S ${{env.ROOT}} -B ${{ env.ROOT }}/cmake_build/${{env.TARGET_NAME}}/${{ env.PROFILE }}/${{ env.TOOLCHAIN }}/ -GNinja -DCMAKE_BUILD_TYPE=${{ env.PROFILE }} -DMBED_TARGET=${{ env.TARGET_NAME }}
-          cmake --build ${{ env.ROOT }}/cmake_build/${{ env.TARGET_NAME }}/${{ env.PROFILE }}/${{ env.TOOLCHAIN }}/
-
-      -
-        name: cmake unittest
+        name: Build and run unit tests
         run: |
           set -x     
           ctest --build-and-test . build --build-generator Ninja --build-options -DMBED_ENABLE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON --test-command ctest        
