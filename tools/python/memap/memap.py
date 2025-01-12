@@ -61,7 +61,7 @@ import json
 from argparse import ArgumentParser
 from copy import deepcopy
 from collections import defaultdict
-from prettytable import PrettyTable, HRuleStyle
+from prettytable import PrettyTable
 
 # prettytable moved this constant into an enum in the Python 3.9 release.
 if sys.version_info >= (3, 9):
