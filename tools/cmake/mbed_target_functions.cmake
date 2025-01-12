@@ -195,8 +195,22 @@ endfunction()
 # writing out debug configurations.
 #
 function(mbed_finalize_build)
+    # Issue a warning if this is called multiple times (calling it manually used to be required).
+    get_property(FINALIZE_BUILD_CALLED GLOBAL PROPERTY MBED_FINALIZE_BUILD_CALLED SET)
+    if("${FINALIZE_BUILD_CALLED}")
+        message(WARNING "Mbed: Deprecated: mbed_finalize_build() is now automatically called, so you don't need to call it in CMakeLists.txt")
+    endif()
+
     mbed_finalize_ide_debug_configurations()
+
+    set_property(GLOBAL PROPERTY MBED_FINALIZE_BUILD_CALLED TRUE)
 endfunction(mbed_finalize_build)
+
+# Defer a call to mbed_finalize_build() when execution of the top level CMakeLists.txt ends.
+cmake_language(DEFER
+    DIRECTORY ${CMAKE_SOURCE_DIR}
+    ID mbed_finalize_build
+    CALL mbed_finalize_build)
 
 # Lists that mbed_disable_mcu_target_file stores data in
 set(MBED_DISABLE_MCU_TARGET_FILE_TARGETS "" CACHE INTERNAL "" FORCE)

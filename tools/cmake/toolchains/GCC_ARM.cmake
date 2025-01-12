@@ -1,12 +1,38 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# specify the cross compiler.  Use cache variables so that VS Code can detect the compiler from the cache.
-set(CMAKE_C_COMPILER arm-none-eabi-gcc CACHE FILEPATH "C Compiler")
-set(CMAKE_CXX_COMPILER arm-none-eabi-g++ CACHE FILEPATH "CXX Compiler")
-set(CMAKE_ASM_COMPILER arm-none-eabi-gcc CACHE FILEPATH "ASM Compiler")
-set(GCC_ELF2BIN "arm-none-eabi-objcopy")
-set_property(GLOBAL PROPERTY ELF2BIN ${GCC_ELF2BIN})
+# Find the cross compiler.  Use cache variables so that VS Code can detect the compiler from the cache.
+if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
+    file(GLOB ARM_NONE_EABI_TOOLCHAIN_HINTS "C:/Program Files*/Arm GNU Toolchain arm-none-eabi/*/bin")
+else()
+    set(ARM_NONE_EABI_TOOLCHAIN_HINTS "")
+endif()
+
+find_program(CMAKE_C_COMPILER NAMES arm-none-eabi-gcc
+    DOC "C Compiler"
+    HINTS ${ARM_NONE_EABI_TOOLCHAIN_HINTS}
+    REQUIRED)
+
+# Now that we have the C compiler location, also use it to find the ASM compiler and objcopy
+get_filename_component(ARM_NONE_EABI_TOOLCHAIN_HINTS ${CMAKE_C_COMPILER} DIRECTORY)
+find_program(CMAKE_CXX_COMPILER NAMES arm-none-eabi-g++
+        DOC "CXX Compiler"
+        HINTS ${ARM_NONE_EABI_TOOLCHAIN_HINTS}
+        REQUIRED)
+find_program(CMAKE_ASM_COMPILER NAMES arm-none-eabi-gcc
+        DOC "ASM Compiler"
+        HINTS ${ARM_NONE_EABI_TOOLCHAIN_HINTS}
+        REQUIRED)
+find_program(CMAKE_OBJCOPY NAMES arm-none-eabi-objcopy
+        DOC "Elf to bin/hex conversion program"
+        HINTS ${ARM_NONE_EABI_TOOLCHAIN_HINTS}
+        REQUIRED)
+find_program(MBED_GDB
+        NAMES arm-none-eabi-gdb gdb-multiarch
+        HINTS ${ARM_NONE_EABI_TOOLCHAIN_HINTS}
+        DOC "Path to the GDB client program to use when debugging.")
+
+set_property(GLOBAL PROPERTY ELF2BIN ${CMAKE_OBJCOPY})
 
 # build toolchain flags that get passed to everything (including CMake compiler checks)
 list(APPEND link_options

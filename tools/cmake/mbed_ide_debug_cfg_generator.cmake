@@ -29,6 +29,23 @@ elseif(MBED_UPLOAD_SUPPORTS_DEBUG)
 	message(STATUS "Mbed: No IDE detected, will generate configurations for command-line debugging (e.g. ninja gdbserver, then ninja debug-SomeProgram)")
 endif()
 
+# Default no-op function declarations (to be overridden below)
+# -------------------------------------------------------------
+
+function(mbed_generate_ide_debug_configuration CMAKE_TARGET)
+endfunction()
+
+function(mbed_finalize_ide_debug_configurations)
+endfunction()
+
+# Make sure we have the path to GDB
+# -------------------------------------------------------------
+if(NOT EXISTS "${MBED_GDB}")
+	message(STATUS "Mbed: Could not find arm-none-eabi-gdb or gdb-multiarch.  Debugging will be unavailable.  Set the MBED_GDB variable to specify its path.")
+	return()
+endif()
+
+
 # CLion generator
 # -------------------------------------------------------------
 
@@ -239,6 +256,7 @@ elseif(MBED_GENERATE_VS_CODE_DEBUG_CFGS)
 # -------------------------------------------------------------
 elseif(MBED_UPLOAD_SUPPORTS_DEBUG)
 
+
 	function(mbed_generate_ide_debug_configuration CMAKE_TARGET)
 
 		# create init file for GDB client
@@ -258,7 +276,7 @@ c"
 )
 
 			# add debug target
-			if(MBED_UPLOAD_SUPPORTS_DEBUG AND MBED_GDB_FOUND)
+			if(MBED_UPLOAD_SUPPORTS_DEBUG)
 			add_custom_target(debug-${target}
 				COMMENT "Starting GDB to debug ${target}..."
 				COMMAND ${MBED_GDB}
@@ -278,14 +296,4 @@ c"
 			USES_TERMINAL
 			VERBATIM)
 	endfunction(mbed_finalize_ide_debug_configurations)
-
-else()
-
-	# No-ops
-	function(mbed_generate_ide_debug_configuration CMAKE_TARGET)
-	endfunction()
-
-	function(mbed_finalize_ide_debug_configurations)
-	endfunction()
-
 endif()

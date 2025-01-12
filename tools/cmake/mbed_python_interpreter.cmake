@@ -15,6 +15,9 @@ if(MBED_CREATE_PYTHON_VENV)
     set(VENV_STAMP_FILE ${MBED_VENV_LOCATION}/mbed-venv.stamp)
     set(MBED_REQUIREMENTS_TXT_LOCATION "${CMAKE_CURRENT_LIST_DIR}/../requirements.txt")
 
+    # Make it so modifying requirements.txt will trigger a reconfigure
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${MBED_REQUIREMENTS_TXT_LOCATION})
+
     # Find Python3, using the venv if it already exists
     set (ENV{VIRTUAL_ENV} ${MBED_VENV_LOCATION})
     set (Python3_FIND_VIRTUALENV FIRST)

@@ -4,7 +4,7 @@
 # This is the boilerplate for Mbed OS
 
 cmake_minimum_required(VERSION 3.19.0 FATAL_ERROR)
-cmake_policy(VERSION 3.16...3.22)
+cmake_policy(VERSION 3.19...3.22)
 
 # Setup build type (target type, tests/unit tests/real build) ----------------------------------------------------------------------------------
 # This block sets up the following variables for all subdirs to use:
