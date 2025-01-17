@@ -60,7 +60,7 @@ void mx_buf_set_size(mx_buf_t *p, int32_t n)
 
     mx_buf_t   *mx_buf_alloc(uint32_t len)
     {
-        emac_mem_buf_t *p = emac3080b_global_memory_manager->alloc_pool(len, 0);
+        emac_mem_buf_t *p = emac3080b_global_memory_manager->alloc_heap(len, 0);
         return (mx_buf_t *) p;
     }
 

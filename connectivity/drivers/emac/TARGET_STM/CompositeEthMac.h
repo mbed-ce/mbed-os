@@ -62,23 +62,131 @@ class CompositeEMAC : public EMAC
         INVALID_USAGE = 6
     };
 
+    enum class LinkSpeed
+    {
+        LINK_10MBIT,
+        LINK_100MBIT,
+        LINK_1GBIT
+    };
+
+    enum class Duplex
+    {
+        HALF,
+        FULL
+    };
+
+    typedef std::array<uint8_t, 6> MACAddress;
+
     class MACDriver
     {
         /**
-         * @brief Initialize the MAC and prepare it to send and receive packets.
+         * @brief Initialize the MAC, map pins, and prepare it to send and receive packets.
          *    It should not be enabled yet.
+         *
+         * @param ownAddress MAC address that this device should use
+         *
+         * @return Error code or SUCCESS
          */
-        virtual ErrCode init() = 0;
+        virtual ErrCode init(MACAddress const & ownAddress) = 0;
 
         /**
-         * @brief Enable the MAC to send
-         * @return
+         * @brief Deinit the MAC so that it's not using any clock/power. Should prepare for init() to be called
+         *    again.
+         *
+         * @return Error code or SUCCESS
          */
-        virtual ErrCode enable() = 0;
+        virtual ErrCode deinit() = 0;
+
+        /**
+         * @brief Enable the MAC so that it can send and receive packets
+         *
+         * @param speed Speed of the link
+         * @param duplex Duplex of the link
+         *
+         * @return Error code or SUCCESS
+         */
+        virtual ErrCode enable(LinkSpeed speed, Duplex duplex) = 0;
+
+        /**
+         * @brief Disable the MAC so that it will not send or receive packets
+         *
+         * @return Error code or SUCCESS
+         */
+        virtual ErrCode disable() = 0;
+
+        /**
+         * @brief Read a register from the PHY over the MDIO bus.
+         *
+         * @param devAddr PHY device address to read. This will usually be set via the phy strapping pins.
+         * @param regAddr Register address from 0-31 to read.
+         * @param result Result is returned here. Note that because MDIO is an open drain bus, a result of
+         *     0xFFFF usually means the phy didn't respond at all.
+         *
+         * @return Error code or success.
+         */
+        virtual ErrCode mdioRead(uint16_t devAddr, uint8_t regAddr, uint16_t & result) = 0;
+
+        /**
+         * @brief Write a register to the PHY over the MDIO bus.
+         *
+         * @param devAddr PHY device address to write. This will usually be set via the phy strapping pins.
+         * @param regAddr Register address from 0-31 to write.
+         * @param data Data to write
+         *
+         * @return Error code or success.
+         */
+        virtual ErrCode mdioWrite(uint16_t devAddr, uint8_t regAddr, uint16_t data) = 0;
+
+        /**
+         * @brief Get the reset pin for the Ethernet PHY.
+         *
+         * @return Reset pin, or NC if the reset pin is not mapped
+         */
+        virtual PinName getPhyResetPin() = 0;
+
+        /**
+         * @brief Add a multicast MAC address that should be accepted by the MAC.
+         *
+         * @param mac MAC address to accept
+         *
+         * @return Error code or success
+         */
+        virtual ErrCode addMcastMAC(MACAddress mac) = 0;
+
+        /**
+         * @brief Clear the MAC multicast filter, removing all multicast subscriptions
+         *
+         * @return Error code or success
+         */
+        virtual ErrCode clearMcastFilter() = 0;
+
+        /**
+         * @brief Set whether the MAC passes all multicast traffic up to the application.
+         *
+         * @param pass True to pass all mcasts, false otherwise
+         *
+         * @return Error code or success
+         */
+        virtual ErrCode setPassAllMcast(bool pass);
+
+        /**
+         * @brief Set promiscuous mode (where the Eth MAC passes all traffic up to the application, regardless
+         *   of its destination address).
+         *
+         * @param enable True to pass all traffic, false otherwise
+         *
+         * @return Error code or success
+         */
+        virtual ErrCode setPromiscuous(bool enable);
     };
 
     class PhyDriver
     {
+        /**
+         * @brief Get the expected
+         * @return
+         */
+        virtual std::pair<uint8_t, uint8_t> getOUIAndModel() = 0;
     };
 };
 

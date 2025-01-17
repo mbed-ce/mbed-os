@@ -114,13 +114,7 @@ void emac_if_ctp_msg_build(int eth_frame_len, const unsigned char *dest_addr, co
         align = 1;                 // Reserve memory overhead to align to odd address
     }
 
-    emac_mem_buf_t *buf;
-    if (options & CTP_OPT_HEAP) {
-        buf = EmacTestMemoryManager::get_instance().alloc_heap(eth_frame_len, align, alloc_opt);
-    } else {
-        // Default allocation is from pool
-        buf = EmacTestMemoryManager::get_instance().alloc_pool(eth_frame_len, align, alloc_opt);
-    }
+    emac_mem_buf_t *buf = EmacTestMemoryManager::get_instance().alloc_heap(eth_frame_len, align, alloc_opt);
 
     if (!buf) {
         SET_ERROR_FLAGS(NO_FREE_MEM_BUF);

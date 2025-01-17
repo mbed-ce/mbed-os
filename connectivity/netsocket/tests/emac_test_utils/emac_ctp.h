@@ -77,7 +77,6 @@ struct __attribute__((packed)) EthernetCTPFrame {
 // CTP functions ---------------------------------------------------------------
 
 // Test memory manager options
-#define CTP_OPT_HEAP           0x01   // Allocate link_out() frame from heap
 #define CTP_OPT_NON_ALIGNED    0x02   // Force memory buffers to be non-aligned
 
 /* Builds and sends CTP message. Forward to address is the address where echo server sends the reply.

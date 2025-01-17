@@ -80,8 +80,8 @@ static Event<void(void *)> link_input_event(&worker_loop_event_queue, link_input
 static unsigned char eth_mac_echo_server_addr[ECHO_SERVER_COUNT][ETH_MAC_ADDR_LEN];
 static int etc_mac_echo_server_free_index = 0;
 
-static bool output_memory = true;
-static bool input_memory = true;
+static bool allow_output_memory_allocs = true;
+static bool allow_input_memory_allocs = true;
 
 static void (*current_test_step_cb_fnc)(int opt);
 
@@ -373,12 +373,12 @@ void emac_if_add_multicast_group(uint8_t *address)
 
 void emac_if_set_output_memory(bool memory)
 {
-    output_memory = memory;
+    allow_output_memory_allocs = memory;
 }
 
 void emac_if_set_input_memory(bool memory)
 {
-    input_memory = memory;
+    allow_input_memory_allocs = memory;
 
     emac_if_set_memory(memory);
 }
@@ -386,9 +386,9 @@ void emac_if_set_input_memory(bool memory)
 void emac_if_check_memory(bool output)
 {
     if (output) {
-        emac_if_set_memory(output_memory);
+        emac_if_set_memory(allow_output_memory_allocs);
     } else {
-        emac_if_set_memory(input_memory);
+        emac_if_set_memory(allow_input_memory_allocs);
     }
 }
 

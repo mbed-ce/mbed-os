@@ -55,6 +55,7 @@ emac_mem_buf_t *NanostackMemoryManager::alloc_heap(uint32_t size, uint32_t align
 
 emac_mem_buf_t *NanostackMemoryManager::alloc_pool(uint32_t size, uint32_t align)
 {
+    // Unlike LwIP, Nanostack does not treat pool buffers any differently from heap ones.
     return alloc_heap(size, align);
 }
 

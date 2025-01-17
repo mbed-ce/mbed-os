@@ -21,17 +21,23 @@
 /**
  * Network Stack interface memory manager
  *
+ * \par
  * This interface provides abstraction for memory modules used in different IP stacks (often to accommodate zero
  * copy). NetStack interface is required to accept output packets and provide received data using this stack-
  * independent API. This header should be implemented for each IP stack, so that we keep EMAC module independent.
  *
+ * \par
  * NetStack memory interface uses memory buffer chains to store data. Data passed in either direction
- * may be either contiguous (a single-buffer chain), or may consist of multiple buffers.
+ * may either be contiguous (a single-buffer chain), or may consist of multiple buffers.
  * Chaining of the buffers is made using singly-linked list. The NetStack data-passing APIs do not specify
  * alignment or structure of the chain in either direction.
  *
+ * \par
  * Memory buffers can be allocated either from heap or from memory pools. Heap buffers are always contiguous.
- * Memory pool buffers may be either contiguous or chained depending on allocation size.
+ * Memory pool buffers may be either contiguous or chained depending on allocation size. By LwIP convention,
+ * the pool should only be used for Rx packets -- the EMAC may opt to keep buffers pre-allocated from the pool
+ * for receiving packets into. This is done because LwIP will do special stuff when the pool runs out of space,
+ * e.g. flushing TCP out-of-sequence segment buffers to free up memory.
  *
  * On NetStack interface buffer chain ownership is transferred. EMAC must free buffer chain that it is given for
  * link output and the stack must free the buffer chain that it is given for link input.

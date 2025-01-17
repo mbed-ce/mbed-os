@@ -17,6 +17,9 @@
 #include "STM32EthIPv2DMARings.h"
 
 #include "ThisThread.h"
+#include "mbed_trace.h"
+
+#define TRACE_GROUP  "CEMAC"
 
 namespace mbed {
 
@@ -91,7 +94,7 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
 
     const size_t startIdx = rxNextIndex;
 
-    for (size_t descCount = 0; descCount < maxDescsToProcess; descCount++) {
+    for (size_t descCount = 0; descCount < maxDescsToProcess && lastDescIdx == rxPoolSize; descCount++) {
         size_t descIdx = (startIdx + descCount) % rxPoolSize;
         auto &descriptor = rxDescs[descIdx];
 
@@ -118,8 +121,17 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
         }
 
         if (descriptor.rxDesc.fromDMAFmt.firstDescriptor) {
-            // We should see first descriptor only once and before last descriptor
-            MBED_ASSERT(firstDescIdx == rxPoolSize);
+            // We should see first descriptor only once and before last descriptor. If this rule is violated, it's
+            // because we ran out of descriptors during receive earlier and the MAC tossed out the rest of the packet.
+            if(firstDescIdx != rxPoolSize) {
+                // Clean up the old first descriptor
+                auto & oldFirstDesc = rxDescs[firstDescIdx];
+                memory_manager.free(oldFirstDesc.buffer);
+                ++rxDescsOwnedByApplication;
+                ++rxNextIndex;
+            }
+
+            // We should not have seen any last descriptors yet
             MBED_ASSERT(lastDescIdx == rxPoolSize);
 
             firstDescIdx = descIdx;
@@ -137,7 +149,7 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
     if (lastDescIdx == rxPoolSize) {
         // No complete packet identified.
         // Take the chance to rebuild any available descriptors, then return.
-        printf("No complete packets in Rx descs\n");
+        tr_debug("No complete packets in Rx descs\n");
         buildRxDescriptors();
         return nullptr;
     }
@@ -180,7 +192,7 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
     }
 #endif
 
-    printf("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
+    tr_info("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
            memory_manager.get_total_len(headBuffer), memory_manager.get_ptr(headBuffer), firstDescIdx, lastDescIdx,
            &rxDescs[firstDescIdx], &rxDescs[lastDescIdx]);
 
@@ -247,7 +259,6 @@ void STM32EthIPv2DMARings::macThread()
         }
         if(flags & (THREAD_FLAG_RX_DESC_AVAILABLE | THREAD_FLAG_TX_DESC_AVAILABLE)) // TODO temp
         {
-            printf("Reclaimable descriptor!\n");
             // Receive any available packets.
             // Note that if the ISR was delayed, we might get multiple packets per ISR, so we need to loop.
             while(true)
@@ -411,11 +422,6 @@ void STM32EthIPv2DMARings::txISR()
 
 HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
 {
-    if(memory_manager.get_total_len(buf) >= 700)
-    {
-        printf("slightly big one!\n");
-    }
-
     // Step 1: Figure out if we can send this zero-copy, or if we need to copy it.
     // Also note that each descriptor can store 2 buffers, so we need half as many descriptors
     // as we have buffers, rounding up.
@@ -454,8 +460,8 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
         }
     }
 
-    printf("Transmitting packet of length %lu in %zu buffers and %zu descs (%zu rx descs currently free)\n",
-           memory_manager.get_total_len(buf), memory_manager.count_buffers(buf), neededDescs, rxPoolSize - rxDescsOwnedByApplication);
+    printf("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+           memory_manager.get_total_len(buf), memory_manager.count_buffers(buf), neededDescs);
 
     // Step 2: Copy packet if needed
     if(needToCopy)
@@ -480,7 +486,7 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
 
     // Step 3: Wait for needed amount of buffers to be available.
     // Note that, in my experience, it's better to block here, as dropping the packet
-    // due to having enough buffers can create weird effects when the application sends
+    // due to not having enough buffers can create weird effects when the application sends
     // lots of packets at once.
     while(txDescsOwnedByApplication < neededDescs)
     {

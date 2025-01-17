@@ -250,7 +250,7 @@ int8_t PPPPhy::tx(uint8_t *data_ptr, uint16_t data_len, uint8_t tx_handle, data_
         return -1;
     }
 
-    net_stack_mem_buf_t *mem = memory_manager.alloc_pool(data_len, 0);
+    net_stack_mem_buf_t *mem = memory_manager.alloc_heap(data_len, 0);
     if (!mem) {
         return -1;
     }
