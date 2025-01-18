@@ -106,6 +106,8 @@ extern "C" void *__wrap__malloc_r(struct _reent *r, size_t size)
     return malloc_wrapper(r, size, MBED_CALLER_ADDR());
 }
 
+void* lastCaller;
+
 extern "C" void *malloc_wrapper(struct _reent *r, size_t size, void *caller)
 {
     void *ptr = NULL;
@@ -114,21 +116,23 @@ extern "C" void *malloc_wrapper(struct _reent *r, size_t size, void *caller)
 #endif
 #if MBED_HEAP_STATS_ENABLED
     malloc_stats_mutex->lock();
+    lastCaller = caller;
     alloc_info_t *alloc_info = NULL;
     if (size <= SIZE_MAX - sizeof(alloc_info_t)) {
-        alloc_info = (alloc_info_t *)__real__malloc_r(r, size + sizeof(alloc_info_t));
+        ptr = (alloc_info_t *)__real__malloc_r(r, size + sizeof(alloc_info_t));     // malloc the size + the size of the alloc_info_t struct
     }
-    if (alloc_info != NULL) {
-        alloc_info->size = size;
-        alloc_info->signature = MBED_HEAP_STATS_SIGNATURE;
-        ptr = (void *)(alloc_info + 1);
-        heap_stats.current_size += size;
+    if (ptr != NULL) {                                              // if malloc was successful
+        size_t alloc_size = get_malloc_block_total_size(ptr);       // get the total size of the malloc block, stored before malloc ptr
+        alloc_info = (alloc_info_t*)((char*)ptr + size);            // set the alloc_info to the end of the malloc block
+        alloc_info->size = size;                                    // set the size of the malloc block
+        alloc_info->signature = MBED_HEAP_STATS_SIGNATURE;          // set the signature
+        heap_stats.current_size += size;                            // calculate the heap statistics
         heap_stats.total_size += size;
         heap_stats.alloc_cnt += 1;
-        if (heap_stats.current_size > heap_stats.max_size) {
+        if (heap_stats.current_size > heap_stats.max_size) {        // update the max ever used heap size
             heap_stats.max_size = heap_stats.current_size;
         }
-        heap_stats.overhead_size += get_malloc_block_total_size((void *)alloc_info) - size;
+        heap_stats.overhead_size += alloc_size - size;
     } else {
         heap_stats.alloc_fail_cnt += 1;
     }
@@ -198,20 +202,26 @@ extern "C" void free_wrapper(struct _reent *r, void *ptr, void *caller)
 #endif
 #if MBED_HEAP_STATS_ENABLED
     malloc_stats_mutex->lock();
+    lastCaller = caller;                                    // debug helper, to be removed
     alloc_info_t *alloc_info = NULL;
+    size_t alloc_size = get_malloc_block_total_size(ptr);   // get the total size of the malloc block, stored before malloc ptr
     if (ptr != NULL) {
-        alloc_info = ((alloc_info_t *)ptr) - 1;
-        if (MBED_HEAP_STATS_SIGNATURE == alloc_info->signature) {
+        alloc_info = ((alloc_info_t *)((char*)ptr + alloc_size - sizeof(alloc_info_t) - 8));    // magic number 8 is the size of the padding area
+        if (MBED_HEAP_STATS_SIGNATURE == alloc_info->signature) {   // check the signature
             size_t user_size = alloc_info->size;
-            size_t alloc_size = get_malloc_block_total_size((void *)alloc_info);
-            alloc_info->signature = 0x0;
-            heap_stats.current_size -= user_size;
-            heap_stats.alloc_cnt -= 1;
-            heap_stats.overhead_size -= (alloc_size - user_size);
-            __real__free_r(r, (void *)alloc_info);
+
+            if (alloc_info->size > alloc_size) {            // catch memalign, which is frees parts of the heap chunk
+                alloc_info->size -= alloc_size;             // correct the size of the memalign chunk
+                heap_stats.current_size -= alloc_size;      // correct the current heap size
+                memcpy((char*)ptr - sizeof(alloc_info_t) - 8, (char*)alloc_info, sizeof(alloc_info_t)); // copy the user data to the new end of the chunk
         } else {
-            __real__free_r(r, ptr);
+                alloc_info->signature = 0x0;                // remove the signature
+                heap_stats.current_size -= user_size;       // subtract the user size from the current heap size
+                heap_stats.overhead_size -= (alloc_size - user_size);   // subtract the overhead size from the overhead
+                heap_stats.alloc_cnt -= 1;                  // decrement the allocation count
+            }
         }
+        __real__free_r(r, ptr);
     }
 
     malloc_stats_mutex->unlock();
