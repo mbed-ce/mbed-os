@@ -68,10 +68,10 @@ protected:
     void socket_attach(void *handle, void (*callback)(void *), void *data) override;
 
     nsapi_error_t setsockopt(nsapi_socket_t handle, int level,
-                                     int optname, const void *optval, unsigned optlen) override;
+                             int optname, const void *optval, unsigned optlen) override;
 
     nsapi_error_t getsockopt(nsapi_socket_t handle, int level,
-                                     int optname, void *optval, unsigned *optlen) override;
+                             int optname, void *optval, unsigned *optlen) override;
 
 protected:
     ESP32 *_esp;

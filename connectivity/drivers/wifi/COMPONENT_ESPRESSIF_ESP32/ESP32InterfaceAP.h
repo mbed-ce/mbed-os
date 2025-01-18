@@ -49,7 +49,7 @@ public:
      * @param debug     Enable debugging
      */
     ESP32InterfaceAP(PinName tx, PinName rx, bool debug = false);
-    
+
     nsapi_error_t set_network(
         const SocketAddress &ip_address, const SocketAddress &netmask,
         const SocketAddress &gateway) override;
@@ -59,7 +59,7 @@ public:
     int connect() override;
 
     int connect(const char *ssid, const char *pass, nsapi_security_t security = NSAPI_SECURITY_NONE,
-                        uint8_t channel = 0) override;
+                uint8_t channel = 0) override;
 
     int set_credentials(const char *ssid, const char *pass, nsapi_security_t security = NSAPI_SECURITY_NONE) override;
 
