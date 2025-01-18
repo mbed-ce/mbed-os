@@ -27,10 +27,10 @@ using namespace rtos;
 using namespace std::chrono;
 using std::milli;
 
-ESP32 * ESP32::instESP32 = NULL;
+ESP32 *ESP32::instESP32 = NULL;
 
-ESP32 * ESP32::getESP32Inst(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
-                            PinName rts, PinName cts, int baudrate)
+ESP32 *ESP32::getESP32Inst(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
+                           PinName rts, PinName cts, int baudrate)
 {
     if (instESP32 == NULL) {
         instESP32 = new ESP32(en, io0, tx, rx, debug, rts, cts, baudrate);
@@ -42,7 +42,7 @@ ESP32 * ESP32::getESP32Inst(PinName en, PinName io0, PinName tx, PinName rx, boo
     return instESP32;
 }
 
-ESP32 * ESP32::getESP32Inst(bool debug)
+ESP32 *ESP32::getESP32Inst(bool debug)
 {
     return getESP32Inst(MBED_CONF_ESP32_WIFI_EN, MBED_CONF_ESP32_WIFI_IO0,
                         MBED_CONF_ESP32_WIFI_TX, MBED_CONF_ESP32_WIFI_RX, debug,
@@ -51,7 +51,7 @@ ESP32 * ESP32::getESP32Inst(bool debug)
 }
 
 ESP32::ESP32(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
-    PinName rts, PinName cts, int baudrate)
+             PinName rts, PinName cts, int baudrate)
     : _p_wifi_en(NULL), _p_wifi_io0(NULL), _init_end_common(false), _init_end_wifi(false)
     , _serial(tx, rx, ESP32_DEFAULT_BAUD_RATE), _parser(&_serial, "\r\n")
     , _packets(0), _packets_end(&_packets)
@@ -126,7 +126,7 @@ void ESP32::debugOn(bool debug)
     _parser.debug_on((debug) ? 1 : 0);
 }
 
-bool ESP32::get_version_info(char * ver_info, int buf_size)
+bool ESP32::get_version_info(char *ver_info, int buf_size)
 {
     bool ret;
     int idx = 0;
@@ -217,13 +217,13 @@ bool ESP32::_startup_wifi()
     }
 
     bool success = _parser.send("AT+CWMODE=%d", _wifi_mode)
-                && _parser.recv("OK")
-                && _parser.send("AT+CIPMUX=1")
-                && _parser.recv("OK")
-                && _parser.send("AT+CWAUTOCONN=0")
-                && _parser.recv("OK")
-                && _parser.send("AT+CWQAP")
-                && _parser.recv("OK");
+                   && _parser.recv("OK")
+                   && _parser.send("AT+CIPMUX=1")
+                   && _parser.recv("OK")
+                   && _parser.send("AT+CWAUTOCONN=0")
+                   && _parser.recv("OK")
+                   && _parser.send("AT+CWQAP")
+                   && _parser.recv("OK");
     if (success) {
         _init_end_wifi = true;
     }
@@ -241,9 +241,9 @@ bool ESP32::restart()
     reset();
     if (_init_end_wifi) {
         ret = _parser.send("AT+CWMODE=%d", _wifi_mode)
-           && _parser.recv("OK")
-           && _parser.send("AT+CIPMUX=1")
-           && _parser.recv("OK");
+              && _parser.recv("OK")
+              && _parser.send("AT+CIPMUX=1")
+              && _parser.recv("OK");
         if (!ret) {
             success = false;
         }
@@ -251,7 +251,7 @@ bool ESP32::restart()
 #if defined(TARGET_ESP32AT_BLE)
     if (_init_end_ble) {
         ret = _parser.send("AT+BLEINIT=%d", _ble_role)
-           && _parser.recv("OK");
+              && _parser.recv("OK");
         if (!ret) {
             success = false;
         }
@@ -285,7 +285,7 @@ bool ESP32::cre_server(int port)
     _smutex.lock();
     _startup_wifi();
     if (!(_parser.send("AT+CIPSERVER=1,%d", port)
-        && _parser.recv("OK"))) {
+            && _parser.recv("OK"))) {
         _smutex.unlock();
         return false;
     }
@@ -299,7 +299,7 @@ bool ESP32::del_server()
     _smutex.lock();
     _startup_wifi();
     if (!(_parser.send("AT+CIPSERVER=0")
-        && _parser.recv("OK"))) {
+            && _parser.recv("OK"))) {
         _smutex.unlock();
         return false;
     }
@@ -328,7 +328,7 @@ void ESP32::socket_handler(bool connect, int id)
     }
 }
 
-bool ESP32::accept(int * p_id)
+bool ESP32::accept(int *p_id)
 {
     bool ret = false;
 
@@ -366,7 +366,7 @@ bool ESP32::reset(void)
 
     for (int i = 0; i < 2; i++) {
         if (_parser.send("AT+RST")
-            && _parser.recv("OK")) {
+                && _parser.recv("OK")) {
             _serial.set_baud(ESP32_DEFAULT_BAUD_RATE);
 #if DEVICE_SERIAL_FC
             _serial.set_flow_control(SerialBase::Disabled);
@@ -377,7 +377,7 @@ bool ESP32::reset(void)
             _clear_socket_packets(ESP32_ALL_SOCKET_IDS);
 
             if (_parser.send("AT+UART_CUR=%d,8,1,0,%d", _baudrate, _flow_control)
-                && _parser.recv("OK")) {
+                    && _parser.recv("OK")) {
                 _serial.set_baud(_baudrate);
 #if DEVICE_SERIAL_FC
                 switch (_flow_control) {
@@ -400,16 +400,16 @@ bool ESP32::reset(void)
 
             ThisThread::sleep_for(5ms);
 
-            uint8_t wk_ver[4+1]; /* It needs 1 byte extra. */
+            uint8_t wk_ver[4 + 1]; /* It needs 1 byte extra. */
 
             if (_parser.send("AT+GMR")
-                && _parser.recv("AT version:%hhx.%hhx.%hhx.%hhx", &wk_ver[0], &wk_ver[1], &wk_ver[2], &wk_ver[3])
-                && _parser.recv("OK")
-            ) {
+                    && _parser.recv("AT version:%hhx.%hhx.%hhx.%hhx", &wk_ver[0], &wk_ver[1], &wk_ver[2], &wk_ver[3])
+                    && _parser.recv("OK")
+               ) {
                 _at_version = (wk_ver[0] << 24)
-                            | (wk_ver[1] << 16)
-                            | (wk_ver[2] << 8)
-                            | (wk_ver[3] << 0);
+                              | (wk_ver[1] << 16)
+                              | (wk_ver[2] << 8)
+                              | (wk_ver[3] << 0);
             }
 
             return true;
@@ -428,8 +428,8 @@ bool ESP32::dhcp(bool enabled, int mode)
 
     _smutex.lock();
     _startup_wifi();
-    bool done = _parser.send("AT+CWDHCP=%d,%d", enabled?1:0, mode)
-       && _parser.recv("OK");
+    bool done = _parser.send("AT+CWDHCP=%d,%d", enabled ? 1 : 0, mode)
+                && _parser.recv("OK");
     _smutex.unlock();
 
     return done;
@@ -446,7 +446,7 @@ bool ESP32::connect(const char *ap, const char *passPhrase)
 
     setTimeout(ESP32_CONNECT_TIMEOUT);
     ret = _parser.send("AT+CWJAP=\"%s\",\"%s\"", ap, passPhrase)
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     return ret;
@@ -459,7 +459,7 @@ bool ESP32::config_soft_ap(const char *ap, const char *passPhrase, uint8_t chl, 
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CWSAP=\"%s\",\"%s\",%hhu,%hhu", ap, passPhrase, chl, ecn)
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     _smutex.unlock();
     return ret;
 }
@@ -471,8 +471,8 @@ bool ESP32::get_ssid(char *ap)
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CWJAP?")
-       && _parser.recv("+CWJAP:\"%33[^\"]\",", ap)
-       && _parser.recv("OK");
+          && _parser.recv("+CWJAP:\"%33[^\"]\",", ap)
+          && _parser.recv("OK");
     _smutex.unlock();
     return ret;
 }
@@ -495,8 +495,8 @@ const char *ESP32::getIPAddress(void)
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CIFSR")
-       && _parser.recv("+CIFSR:STAIP,\"%15[^\"]\"", _ip_buffer)
-       && _parser.recv("OK");
+          && _parser.recv("+CIFSR:STAIP,\"%15[^\"]\"", _ip_buffer)
+          && _parser.recv("OK");
     _smutex.unlock();
     if (!ret) {
         return 0;
@@ -511,8 +511,8 @@ const char *ESP32::getIPAddress_ap(void)
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CIFSR")
-       && _parser.recv("+CIFSR:APIP,\"%15[^\"]\"", _ip_buffer_ap)
-       && _parser.recv("OK");
+          && _parser.recv("+CIFSR:APIP,\"%15[^\"]\"", _ip_buffer_ap)
+          && _parser.recv("OK");
     _smutex.unlock();
     if (!ret) {
         return 0;
@@ -527,8 +527,8 @@ const char *ESP32::getMACAddress(void)
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CIFSR")
-       && _parser.recv("+CIFSR:STAMAC,\"%17[^\"]\"", _mac_buffer)
-       && _parser.recv("OK");
+          && _parser.recv("+CIFSR:STAMAC,\"%17[^\"]\"", _mac_buffer)
+          && _parser.recv("OK");
     _smutex.unlock();
 
     if (!ret) {
@@ -544,8 +544,8 @@ const char *ESP32::getMACAddress_ap(void)
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CIFSR")
-       && _parser.recv("+CIFSR:APMAC,\"%17[^\"]\"", _mac_buffer_ap)
-       && _parser.recv("OK");
+          && _parser.recv("+CIFSR:APMAC,\"%17[^\"]\"", _mac_buffer_ap)
+          && _parser.recv("OK");
     _smutex.unlock();
 
     if (!ret) {
@@ -561,8 +561,8 @@ const char *ESP32::getGateway()
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CIPSTA?")
-       && _parser.recv("+CIPSTA:gateway:\"%15[^\"]\"", _gateway_buffer)
-       && _parser.recv("OK");
+          && _parser.recv("+CIPSTA:gateway:\"%15[^\"]\"", _gateway_buffer)
+          && _parser.recv("OK");
     _smutex.unlock();
 
     if (!ret) {
@@ -578,8 +578,8 @@ const char *ESP32::getGateway_ap()
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CIPAP?")
-       && _parser.recv("+CIPAP:gateway:\"%15[^\"]\"", _gateway_buffer_ap)
-       && _parser.recv("OK");
+          && _parser.recv("+CIPAP:gateway:\"%15[^\"]\"", _gateway_buffer_ap)
+          && _parser.recv("OK");
     _smutex.unlock();
 
     if (!ret) {
@@ -595,8 +595,8 @@ const char *ESP32::getNetmask()
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CIPSTA?")
-       && _parser.recv("+CIPSTA:netmask:\"%15[^\"]\"", _netmask_buffer)
-       && _parser.recv("OK");
+          && _parser.recv("+CIPSTA:netmask:\"%15[^\"]\"", _netmask_buffer)
+          && _parser.recv("OK");
     _smutex.unlock();
 
     if (!ret) {
@@ -612,8 +612,8 @@ const char *ESP32::getNetmask_ap()
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CIPAP?")
-       && _parser.recv("+CIPAP:netmask:\"%15[^\"]\"", _netmask_buffer_ap)
-       && _parser.recv("OK");
+          && _parser.recv("+CIPAP:netmask:\"%15[^\"]\"", _netmask_buffer_ap)
+          && _parser.recv("OK");
     _smutex.unlock();
 
     if (!ret) {
@@ -632,16 +632,16 @@ int8_t ESP32::getRSSI()
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CWJAP?")
-       && _parser.recv("+CWJAP:\"%32[^\"]\",\"%17[^\"]\"", ssid, bssid)
-       && _parser.recv("OK");
+          && _parser.recv("+CWJAP:\"%32[^\"]\",\"%17[^\"]\"", ssid, bssid)
+          && _parser.recv("OK");
     if (!ret) {
         _smutex.unlock();
         return 0;
     }
 
     ret = _parser.send("AT+CWLAP=\"%s\",\"%s\"", ssid, bssid)
-       && _parser.recv("+CWLAP:(%*d,\"%*[^\"]\",%hhd,", &rssi[0])
-       && _parser.recv("OK");
+          && _parser.recv("+CWLAP:(%*d,\"%*[^\"]\",%hhd,", &rssi[0])
+          && _parser.recv("OK");
     _smutex.unlock();
 
     if (!ret) {
@@ -694,7 +694,7 @@ bool ESP32::isConnected(void)
     return getIPAddress() != 0;
 }
 
-bool ESP32::open(const char *type, int id, const char* addr, int port, int opt)
+bool ESP32::open(const char *type, int id, const char *addr, int port, int opt)
 {
     bool ret;
 
@@ -708,10 +708,10 @@ bool ESP32::open(const char *type, int id, const char* addr, int port, int opt)
     setTimeout(ESP32_SEND_TIMEOUT);
     if (opt != 0) {
         ret = _parser.send("AT+CIPSTART=%d,\"%s\",\"%s\",%d,%d", id, type, addr, port, opt)
-           && _parser.recv("OK");
+              && _parser.recv("OK");
     } else {
         ret = _parser.send("AT+CIPSTART=%d,\"%s\",\"%s\",%d", id, type, addr, port)
-           && _parser.recv("OK");
+              && _parser.recv("OK");
     }
     setTimeout();
     _clear_socket_packets(id);
@@ -751,9 +751,9 @@ bool ESP32::send(int id, const void *data, uint32_t amount)
         _startup_wifi();
         setTimeout(ESP32_SEND_TIMEOUT);
         ret = _parser.send("AT+CIPSEND=%d,%d", id, send_size)
-           && _parser.recv(">")
-           && (_parser.write((char*)data + index, (int)send_size) >= 0)
-           && _parser.recv("SEND OK");
+              && _parser.recv(">")
+              && (_parser.write((char *)data + index, (int)send_size) >= 0)
+              && _parser.recv("SEND OK");
         setTimeout();
         _smutex.unlock();
         if (ret) {
@@ -782,8 +782,8 @@ void ESP32::_packet_handler()
         return;
     }
 
-    struct packet *packet = (struct packet*)malloc(
-            sizeof(struct packet) + amount);
+    struct packet *packet = (struct packet *)malloc(
+                                sizeof(struct packet) + amount);
     if (!packet) {
         return;
     }
@@ -795,7 +795,7 @@ void ESP32::_packet_handler()
 
     tmp_timeout = last_timeout_ms;
     setTimeout(500);
-    if (!(_parser.read((char*)(packet + 1), amount))) {
+    if (!(_parser.read((char *)(packet + 1), amount))) {
         free(packet);
         setTimeout(tmp_timeout);
         return;
@@ -829,7 +829,7 @@ int32_t ESP32::recv(int id, void *data, uint32_t amount, uint32_t timeout)
             struct packet *q = *p;
 
             if (q->len <= amount) { // Return and remove full packet
-                memcpy(&(((uint8_t *)data)[idx]), (uint8_t*)(q+1) + q->index, q->len);
+                memcpy(&(((uint8_t *)data)[idx]), (uint8_t *)(q + 1) + q->index, q->len);
                 if (_packets_end == &(*p)->next) {
                     _packets_end = p;
                 }
@@ -838,7 +838,7 @@ int32_t ESP32::recv(int id, void *data, uint32_t amount, uint32_t timeout)
                 amount -= q->len;
                 free(q);
             } else { // return only partial packet
-                memcpy(&(((uint8_t *)data)[idx]), (uint8_t*)(q+1) + q->index, amount);
+                memcpy(&(((uint8_t *)data)[idx]), (uint8_t *)(q + 1) + q->index, amount);
                 q->len -= amount;
                 q->index += amount;
                 idx += amount;
@@ -912,7 +912,7 @@ bool ESP32::close(int id, bool wait_close)
         _startup_wifi();
         setTimeout(500);
         if (_parser.send("AT+CIPCLOSE=%d", id)
-            && _parser.recv("OK")) {
+                && _parser.recv("OK")) {
             setTimeout();
             _clear_socket_packets(id);
             _ids[id] = false;
@@ -979,7 +979,7 @@ bool ESP32::recv_ap(nsapi_wifi_ap_t *ap)
         // "+CWLAP:"
         if (idx_0 >= (int)(sizeof(keyword_0) - 1)) {
             int sec;
-            uint8_t work_buf[6+1]; /* It needs 1 byte extra. */
+            uint8_t work_buf[6 + 1]; /* It needs 1 byte extra. */
             int8_t  work_rssi[2];  /* It needs 1 byte extra. */
 
             ret = _parser.recv("(%d,\"%32[^\"]\",%hhd,\"%hhx:%hhx:%hhx:%hhx:%hhx:%hhx\",%hhu)", &sec, ap->ssid,
@@ -1001,16 +1001,46 @@ bool ESP32::recv_ap(nsapi_wifi_ap_t *ap)
     return ret;
 }
 
-void ESP32::_connect_handler_0() { socket_handler(true, 0);  }
-void ESP32::_connect_handler_1() { socket_handler(true, 1);  }
-void ESP32::_connect_handler_2() { socket_handler(true, 2);  }
-void ESP32::_connect_handler_3() { socket_handler(true, 3);  }
-void ESP32::_connect_handler_4() { socket_handler(true, 4);  }
-void ESP32::_closed_handler_0()  { socket_handler(false, 0); }
-void ESP32::_closed_handler_1()  { socket_handler(false, 1); }
-void ESP32::_closed_handler_2()  { socket_handler(false, 2); }
-void ESP32::_closed_handler_3()  { socket_handler(false, 3); }
-void ESP32::_closed_handler_4()  { socket_handler(false, 4); }
+void ESP32::_connect_handler_0()
+{
+    socket_handler(true, 0);
+}
+void ESP32::_connect_handler_1()
+{
+    socket_handler(true, 1);
+}
+void ESP32::_connect_handler_2()
+{
+    socket_handler(true, 2);
+}
+void ESP32::_connect_handler_3()
+{
+    socket_handler(true, 3);
+}
+void ESP32::_connect_handler_4()
+{
+    socket_handler(true, 4);
+}
+void ESP32::_closed_handler_0()
+{
+    socket_handler(false, 0);
+}
+void ESP32::_closed_handler_1()
+{
+    socket_handler(false, 1);
+}
+void ESP32::_closed_handler_2()
+{
+    socket_handler(false, 2);
+}
+void ESP32::_closed_handler_3()
+{
+    socket_handler(false, 3);
+}
+void ESP32::_closed_handler_4()
+{
+    socket_handler(false, 4);
+}
 
 void ESP32::_connection_status_handler()
 {
@@ -1026,7 +1056,7 @@ void ESP32::_connection_status_handler()
             return;
         }
 
-        if(_wifi_status_cb) {
+        if (_wifi_status_cb) {
             _wifi_status_cb(_wifi_status);
         }
     }
@@ -1048,7 +1078,8 @@ int ESP32::get_free_id()
     return id;
 }
 
-void ESP32::event() {
+void ESP32::event()
+{
 #if defined(TARGET_ESP32AT_BLE)
     if ((_cbs_ble.callback) && (_cbs_ble.Notified == 0)) {
         _cbs_ble.Notified = 1;
@@ -1074,10 +1105,10 @@ bool ESP32::set_network(const char *ip_address, const char *netmask, const char 
     _smutex.lock();
     if ((netmask != NULL) && (gateway != NULL)) {
         ret = _parser.send("AT+CIPSTA=\"%s\",\"%s\",\"%s\"", ip_address, gateway, netmask)
-           && _parser.recv("OK");
+              && _parser.recv("OK");
     } else {
         ret = _parser.send("AT+CIPSTA=\"%s\"", ip_address)
-           && _parser.recv("OK");
+              && _parser.recv("OK");
     }
     _smutex.unlock();
 
@@ -1095,10 +1126,10 @@ bool ESP32::set_network_ap(const char *ip_address, const char *netmask, const ch
     _smutex.lock();
     if ((netmask != NULL) && (gateway != NULL)) {
         ret = _parser.send("AT+CIPAP=\"%s\",\"%s\",\"%s\"", ip_address, gateway, netmask)
-           && _parser.recv("OK");
+              && _parser.recv("OK");
     } else {
         ret = _parser.send("AT+CIPAP=\"%s\"", ip_address)
-           && _parser.recv("OK");
+              && _parser.recv("OK");
     }
     _smutex.unlock();
 
@@ -1138,13 +1169,13 @@ bool ESP32::ble_set_role(int role)
     return true;
 }
 
-bool ESP32::ble_get_role(int * role)
+bool ESP32::ble_get_role(int *role)
 {
     *role = _ble_role;
     return true;
 }
 
-bool ESP32::ble_set_device_name(const char * name)
+bool ESP32::ble_set_device_name(const char *name)
 {
     bool ret;
 
@@ -1152,7 +1183,7 @@ bool ESP32::ble_set_device_name(const char * name)
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLENAME=\"%s\"", name)
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1161,7 +1192,7 @@ bool ESP32::ble_set_device_name(const char * name)
     return true;
 }
 
-bool ESP32::ble_get_device_name(char * name)
+bool ESP32::ble_get_device_name(char *name)
 {
     bool ret;
 
@@ -1169,7 +1200,7 @@ bool ESP32::ble_get_device_name(char * name)
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLENAME?")
-       && _parser.recv("+BLENAME:%s\n", name);
+          && _parser.recv("+BLENAME:%s\n", name);
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1188,9 +1219,9 @@ bool ESP32::ble_start_services()
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEGATTSSRVCRE")
-       && _parser.recv("OK")
-       && _parser.send("AT+BLEGATTSSRVSTART")
-       && _parser.recv("OK");
+          && _parser.recv("OK")
+          && _parser.send("AT+BLEGATTSSRVSTART")
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1199,11 +1230,11 @@ bool ESP32::ble_start_services()
     return true;
 }
 
-bool ESP32::ble_set_scan_response(const uint8_t * data, int len)
+bool ESP32::ble_set_scan_response(const uint8_t *data, int len)
 {
     bool ret;
     int size = 0;
-    char * wk_buf = new char[1024];
+    char *wk_buf = new char[1024];
 
     if (wk_buf == NULL) {
         return false;
@@ -1219,7 +1250,7 @@ bool ESP32::ble_set_scan_response(const uint8_t * data, int len)
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("%s", wk_buf)
-        && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
 
@@ -1240,7 +1271,7 @@ bool ESP32::ble_start_advertising()
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEADVSTART")
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1258,7 +1289,7 @@ bool ESP32::ble_stop_advertising()
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEADVSTOP")
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1267,7 +1298,7 @@ bool ESP32::ble_stop_advertising()
     return true;
 }
 
-bool ESP32::ble_set_addr(int addr_type, const uint8_t * random_addr)
+bool ESP32::ble_set_addr(int addr_type, const uint8_t *random_addr)
 {
     bool ret;
 
@@ -1277,10 +1308,10 @@ bool ESP32::ble_set_addr(int addr_type, const uint8_t * random_addr)
     if ((addr_type == 1) && (random_addr != NULL)) {
         ret = _parser.send("AT+BLEADDR=1,\"%02x:%02x:%02x:%02x:%02x:%02x\"",
                            random_addr[0], random_addr[1], random_addr[2], random_addr[3], random_addr[4], random_addr[5])
-           && _parser.recv("OK");
+              && _parser.recv("OK");
     } else {
         ret = _parser.send("AT+BLEADDR=%d", addr_type)
-           && _parser.recv("OK");
+              && _parser.recv("OK");
     }
     setTimeout();
     _smutex.unlock();
@@ -1290,18 +1321,18 @@ bool ESP32::ble_set_addr(int addr_type, const uint8_t * random_addr)
     return true;
 }
 
-bool ESP32::ble_get_addr(uint8_t * public_addr)
+bool ESP32::ble_get_addr(uint8_t *public_addr)
 {
     bool ret;
-    uint8_t work_buf[6+1]; /* It needs 1 byte extra. */
+    uint8_t work_buf[6 + 1]; /* It needs 1 byte extra. */
 
     _smutex.lock();
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEADDR?")
-       && _parser.recv("+BLEADDR:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx\n",
-                       &work_buf[0], &work_buf[1], &work_buf[2], &work_buf[3], &work_buf[4], &work_buf[5])
-       && _parser.recv("OK");
+          && _parser.recv("+BLEADDR:%hhx:%hhx:%hhx:%hhx:%hhx:%hhx\n",
+                          &work_buf[0], &work_buf[1], &work_buf[2], &work_buf[3], &work_buf[4], &work_buf[5])
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1312,7 +1343,7 @@ bool ESP32::ble_get_addr(uint8_t * public_addr)
     return true;
 }
 
-bool ESP32::ble_set_advertising_param(const advertising_param_t * param)
+bool ESP32::ble_set_advertising_param(const advertising_param_t *param)
 {
     bool ret;
 
@@ -1321,11 +1352,11 @@ bool ESP32::ble_set_advertising_param(const advertising_param_t * param)
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEADVPARAM=%d,%d,%d,%d,%d,%d,%d,\"%02x:%02x:%02x:%02x:%02x:%02x\"",
-                        param->adv_int_min, param->adv_int_max, param->adv_type, param->own_addr_type,
-                        param->channel_map, param->adv_filter_policy, param->peer_addr_type,
-                        param->peer_addr[0], param->peer_addr[1], param->peer_addr[2],
-                        param->peer_addr[3], param->peer_addr[4], param->peer_addr[5])
-       && _parser.recv("OK");
+                       param->adv_int_min, param->adv_int_max, param->adv_type, param->own_addr_type,
+                       param->channel_map, param->adv_filter_policy, param->peer_addr_type,
+                       param->peer_addr[0], param->peer_addr[1], param->peer_addr[2],
+                       param->peer_addr[3], param->peer_addr[4], param->peer_addr[5])
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1334,11 +1365,11 @@ bool ESP32::ble_set_advertising_param(const advertising_param_t * param)
     return true;
 }
 
-bool ESP32::ble_set_advertising_data(const uint8_t * data, int len)
+bool ESP32::ble_set_advertising_data(const uint8_t *data, int len)
 {
     bool ret;
     int size = 0;
-    char * wk_buf = new char[1024];
+    char *wk_buf = new char[1024];
 
     if (wk_buf == NULL) {
         return false;
@@ -1354,7 +1385,7 @@ bool ESP32::ble_set_advertising_data(const uint8_t * data, int len)
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("%s", wk_buf)
-        && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
 
@@ -1366,14 +1397,14 @@ bool ESP32::ble_set_advertising_data(const uint8_t * data, int len)
     return true;
 }
 
-bool ESP32::ble_set_service(const gatt_service_t * service_list, int num)
+bool ESP32::ble_set_service(const gatt_service_t *service_list, int num)
 {
-    uint8_t header[17] = {0x9D,0x10,0x27,0x95,0x7B,0x22,0x53,0x65,0x72,0x76,0x69,0x63,0x65,0x22,0x3A,0x20,0x5B};
+    uint8_t header[17] = {0x9D, 0x10, 0x27, 0x95, 0x7B, 0x22, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x22, 0x3A, 0x20, 0x5B};
     bool ret;
     int idx = 0;
     int size = 0;
     uint8_t wk_data[4];
-    char * wk_buf = new char[1024];
+    char *wk_buf = new char[1024];
 
     if (wk_buf == NULL) {
         return false;
@@ -1386,11 +1417,11 @@ bool ESP32::ble_set_service(const gatt_service_t * service_list, int num)
 
     size = sizeof(header);
     ret = _parser.send("AT+SYSFLASH=0,\"ble_data\"")
-       && _parser.recv("OK")
-       && _parser.send("AT+SYSFLASH=1,\"ble_data\",0,%d", size)
-       && _parser.recv(">")
-       && (_parser.write((char*)header, size) >= 0)
-       && _parser.recv("OK");
+          && _parser.recv("OK")
+          && _parser.send("AT+SYSFLASH=1,\"ble_data\",0,%d", size)
+          && _parser.recv(">")
+          && (_parser.write((char *)header, size) >= 0)
+          && _parser.recv("OK");
     idx += size;
     if (!ret) {
         _smutex.unlock();
@@ -1436,9 +1467,9 @@ bool ESP32::ble_set_service(const gatt_service_t * service_list, int num)
         size = strlen(wk_buf);
 
         ret = _parser.send("AT+SYSFLASH=1,\"ble_data\",%d,%d", idx, size)
-           && _parser.recv(">")
-           && (_parser.write((char*)wk_buf, size) >= 0)
-           && _parser.recv("OK");
+              && _parser.recv(">")
+              && (_parser.write((char *)wk_buf, size) >= 0)
+              && _parser.recv("OK");
         idx += size;
         if (!ret) {
             break;
@@ -1455,7 +1486,7 @@ bool ESP32::ble_set_service(const gatt_service_t * service_list, int num)
     return true;
 }
 
-bool ESP32::ble_set_characteristic(int srv_index, int char_index, const uint8_t * data, int len)
+bool ESP32::ble_set_characteristic(int srv_index, int char_index, const uint8_t *data, int len)
 {
     bool ret;
 
@@ -1464,9 +1495,9 @@ bool ESP32::ble_set_characteristic(int srv_index, int char_index, const uint8_t 
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEGATTSSETATTR=%d,%d,,%d", srv_index, char_index, len)
-       && _parser.recv(">")
-       && (_parser.write((char*)data, len) >= 0)
-       && _parser.recv("OK");
+          && _parser.recv(">")
+          && (_parser.write((char *)data, len) >= 0)
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1475,7 +1506,7 @@ bool ESP32::ble_set_characteristic(int srv_index, int char_index, const uint8_t 
     return true;
 }
 
-bool ESP32::ble_notifies_characteristic(int srv_index, int char_index, const uint8_t * data, int len)
+bool ESP32::ble_notifies_characteristic(int srv_index, int char_index, const uint8_t *data, int len)
 {
     bool ret;
 
@@ -1484,9 +1515,9 @@ bool ESP32::ble_notifies_characteristic(int srv_index, int char_index, const uin
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEGATTSNTFY=0,%d,%d,%d", srv_index, char_index, len)
-       && _parser.recv(">")
-       && (_parser.write((char*)data, len) >= 0)
-       && _parser.recv("OK");
+          && _parser.recv(">")
+          && (_parser.write((char *)data, len) >= 0)
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1504,7 +1535,7 @@ bool ESP32::ble_set_scan_param(int scan_type, int own_addr_type, int filter_poli
     _startup_ble();
     ret = _parser.send("AT+BLESCANPARAM=%d,%d,%d,%d,%d",
                        scan_type, own_addr_type, filter_policy, scan_interval, scan_window)
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     _smutex.unlock();
     if (!ret) {
         return false;
@@ -1536,7 +1567,7 @@ bool ESP32::ble_stop_scan()
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLESCAN=0")
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1545,7 +1576,7 @@ bool ESP32::ble_stop_scan()
     return true;
 }
 
-bool ESP32::ble_connect(int conn_index, const uint8_t * remote_addr)
+bool ESP32::ble_connect(int conn_index, const uint8_t *remote_addr)
 {
     bool ret;
 
@@ -1556,7 +1587,7 @@ bool ESP32::ble_connect(int conn_index, const uint8_t * remote_addr)
     ret = _parser.send("AT+BLECONN=%d,\"%02x:%02x:%02x:%02x:%02x:%02x\"", conn_index,
                        remote_addr[0], remote_addr[1], remote_addr[2],
                        remote_addr[3], remote_addr[4], remote_addr[5])
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1574,7 +1605,7 @@ bool ESP32::ble_disconnect(int conn_index)
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEDISCONN=%d", conn_index)
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1583,7 +1614,7 @@ bool ESP32::ble_disconnect(int conn_index)
     return true;
 }
 
-bool ESP32::ble_discovery_service(int conn_index, ble_primary_service_t * service, int * num)
+bool ESP32::ble_discovery_service(int conn_index, ble_primary_service_t *service, int *num)
 {
     bool ret;
     int cpy_num;
@@ -1598,7 +1629,7 @@ bool ESP32::ble_discovery_service(int conn_index, ble_primary_service_t * servic
     setTimeout(ESP32_MISC_TIMEOUT);
     _primary_service_idx = 0;
     ret = _parser.send("AT+BLEGATTCPRIMSRV=%d", conn_index)
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1620,8 +1651,8 @@ bool ESP32::ble_discovery_service(int conn_index, ble_primary_service_t * servic
 
 bool ESP32::ble_discovery_characteristics(
     int conn_index, int srv_index,
-    ble_discovers_char_t * discovers_char, int * char_num,
-    ble_discovers_desc_t * discovers_desc, int * desc_num
+    ble_discovers_char_t *discovers_char, int *char_num,
+    ble_discovers_desc_t *discovers_desc, int *desc_num
 )
 {
     bool ret;
@@ -1634,7 +1665,7 @@ bool ESP32::ble_discovery_characteristics(
     _discovers_char_idx = 0;
     _discovers_desc_idx = 0;
     ret = _parser.send("AT+BLEGATTCCHAR=%d,%d", conn_index, srv_index)
-       && _parser.recv("OK");
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1672,7 +1703,7 @@ bool ESP32::ble_discovery_characteristics(
     return true;
 }
 
-int32_t ESP32::ble_read_characteristic(int conn_index, int srv_index, int char_index, uint8_t * data, int amount)
+int32_t ESP32::ble_read_characteristic(int conn_index, int srv_index, int char_index, uint8_t *data, int amount)
 {
     bool ret;
     int wk_conn_index;
@@ -1685,7 +1716,7 @@ int32_t ESP32::ble_read_characteristic(int conn_index, int srv_index, int char_i
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEGATTCRD=%d,%d,%d", conn_index, srv_index, char_index)
-       && _parser.recv("+BLEGATTCRD:%d,%d,", &wk_conn_index, &data_len);
+          && _parser.recv("+BLEGATTCRD:%d,%d,", &wk_conn_index, &data_len);
     if (!ret) {
         setTimeout();
         _smutex.unlock();
@@ -1705,7 +1736,7 @@ int32_t ESP32::ble_read_characteristic(int conn_index, int srv_index, int char_i
     return idx;
 }
 
-int32_t ESP32::ble_read_descriptor(int conn_index, int srv_index, int char_index, int desc_index, uint8_t * data, int amount)
+int32_t ESP32::ble_read_descriptor(int conn_index, int srv_index, int char_index, int desc_index, uint8_t *data, int amount)
 {
     bool ret;
     int wk_conn_index;
@@ -1718,7 +1749,7 @@ int32_t ESP32::ble_read_descriptor(int conn_index, int srv_index, int char_index
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEGATTCRD=%d,%d,%d,%d", conn_index, srv_index, char_index, desc_index)
-       && _parser.recv("+BLEGATTCRD:%d,%d,", &wk_conn_index, &data_len);
+          && _parser.recv("+BLEGATTCRD:%d,%d,", &wk_conn_index, &data_len);
     if (!ret) {
         setTimeout();
         _smutex.unlock();
@@ -1738,7 +1769,7 @@ int32_t ESP32::ble_read_descriptor(int conn_index, int srv_index, int char_index
     return idx;
 }
 
-bool ESP32::ble_write_characteristic(int conn_index, int srv_index, int char_index, const uint8_t * data, int amount)
+bool ESP32::ble_write_characteristic(int conn_index, int srv_index, int char_index, const uint8_t *data, int amount)
 {
     bool ret;
 
@@ -1747,9 +1778,9 @@ bool ESP32::ble_write_characteristic(int conn_index, int srv_index, int char_ind
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEGATTCWR=%d,%d,%d,,%d", conn_index, srv_index, char_index, amount)
-       && _parser.recv(">")
-       && (_parser.write((char*)data, amount) >= 0)
-       && _parser.recv("OK");
+          && _parser.recv(">")
+          && (_parser.write((char *)data, amount) >= 0)
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1758,7 +1789,7 @@ bool ESP32::ble_write_characteristic(int conn_index, int srv_index, int char_ind
     return true;
 }
 
-bool ESP32::ble_write_descriptor(int conn_index, int srv_index, int char_index, int desc_index, const uint8_t * data, int amount)
+bool ESP32::ble_write_descriptor(int conn_index, int srv_index, int char_index, int desc_index, const uint8_t *data, int amount)
 {
     bool ret;
 
@@ -1767,9 +1798,9 @@ bool ESP32::ble_write_descriptor(int conn_index, int srv_index, int char_index, 
     _startup_ble();
     setTimeout(ESP32_MISC_TIMEOUT);
     ret = _parser.send("AT+BLEGATTCWR=%d,%d,%d,%d,%d", conn_index, srv_index, char_index, desc_index, amount)
-       && _parser.recv(">")
-       && (_parser.write((char*)data, amount) >= 0)
-       && _parser.recv("OK");
+          && _parser.recv(">")
+          && (_parser.write((char *)data, amount) >= 0)
+          && _parser.recv("OK");
     setTimeout();
     _smutex.unlock();
     if (!ret) {
@@ -1841,7 +1872,7 @@ bool ESP32::_startup_ble()
 
     setTimeout(ESP32_MISC_TIMEOUT);
     bool success = _parser.send("AT+BLEINIT=%d", _ble_role)
-                && _parser.recv("OK");
+                   && _parser.recv("OK");
     setTimeout();
     if (success) {
         _init_end_ble = true;
@@ -1853,11 +1884,11 @@ bool ESP32::_startup_ble()
 void ESP32::_ble_conn()
 {
     int conn_index;
-    uint8_t remote_addr[6+1]; /* It needs 1 byte extra. */
+    uint8_t remote_addr[6 + 1]; /* It needs 1 byte extra. */
 
     _parser.recv("%d,\"%hhx:%hhx:%hhx:%hhx:%hhx:%hhx\"", &conn_index,
                  &remote_addr[0], &remote_addr[1], &remote_addr[2], &remote_addr[3], &remote_addr[4], &remote_addr[5]);
-    if(_ble_conn_cb) {
+    if (_ble_conn_cb) {
         _ble_conn_cb(conn_index, remote_addr);
     }
 }
@@ -1867,7 +1898,7 @@ void ESP32::_ble_disconn()
     int conn_index;
 
     _parser.recv("%d", &conn_index);
-    if(_ble_disconn_cb) {
+    if (_ble_disconn_cb) {
         _ble_disconn_cb(conn_index);
     }
 }
@@ -1882,7 +1913,7 @@ void ESP32::_ble_write()
     char c;
     uint32_t tmp_timeout;
 
-    if(!_ble_write_cb) {
+    if (!_ble_write_cb) {
         return;
     }
 
@@ -1895,8 +1926,8 @@ void ESP32::_ble_write()
     }
     _parser.recv("%d,", &amount);
 
-    ble_packet_t *ble_packet = (ble_packet_t*)malloc(
-            sizeof(ble_packet_t) + amount);
+    ble_packet_t *ble_packet = (ble_packet_t *)malloc(
+                                   sizeof(ble_packet_t) + amount);
     if (!ble_packet) {
         return;
     }
@@ -1909,12 +1940,12 @@ void ESP32::_ble_write()
 
     tmp_timeout = last_timeout_ms;
     setTimeout(500);
-    if (!(_parser.read((char*)(ble_packet + 1), amount))) {
+    if (!(_parser.read((char *)(ble_packet + 1), amount))) {
         free(ble_packet);
         setTimeout(tmp_timeout);
         return;
     }
-    if(_ble_write_cb) {
+    if (_ble_write_cb) {
         _ble_write_cb(ble_packet);
     }
     free(ble_packet);
@@ -1927,11 +1958,11 @@ void ESP32::_ble_scan()
     uint8_t work_buf[7];  /* It needs 1 byte extra. */
     int8_t  work_rssi[2]; /* It needs 1 byte extra. */
 
-    if(!_ble_scan_cb) {
+    if (!_ble_scan_cb) {
         return;
     }
 
-    ble_scan_t *ble_scan = (ble_scan_t*)malloc(sizeof(ble_scan_t));
+    ble_scan_t *ble_scan = (ble_scan_t *)malloc(sizeof(ble_scan_t));
     if (!ble_scan) {
         return;
     }
@@ -1985,7 +2016,7 @@ void ESP32::_ble_scan()
     _parser.recv("%hhd\n", &work_buf[0]);
     ble_scan->addr_type = work_buf[0];
 
-    if(_ble_scan_cb) {
+    if (_ble_scan_cb) {
         _ble_scan_cb(ble_scan);
     }
     free(ble_scan);
@@ -1995,11 +2026,11 @@ void ESP32::_ble_primsrv()
 {
     // fix me (supports only short uuid)
     int conn_index;
-    ble_primary_service_t * p_service = &_primary_service[_primary_service_idx];
+    ble_primary_service_t *p_service = &_primary_service[_primary_service_idx];
 
     if (_primary_service_idx < PRIMARY_SERVICE_BUF_NUM) {
         if (_parser.recv("%d,%d,%hx,%d\n", &conn_index, &p_service->srv_index,
-                          &p_service->srv_uuid, &p_service->srv_type)) {
+                         &p_service->srv_uuid, &p_service->srv_type)) {
             _primary_service_idx++;
         }
     }
@@ -2020,7 +2051,7 @@ void ESP32::_ble_discovers_char()
     if (_parser.recv(",%d,%d,", &conn_index, &srv_index)) {
         if (memcmp(type, "char", 4) == 0) {
             if (_discovers_char_idx < DISCOVERS_CHAR_BUF_NUM) {
-                ble_discovers_char_t * p_char = &_discovers_char[_discovers_char_idx];
+                ble_discovers_char_t *p_char = &_discovers_char[_discovers_char_idx];
                 if (_parser.recv("%d,%hx,%hhx\n", &p_char->char_index, &p_char->char_uuid, &work_buf[0])) {
                     p_char->char_prop = work_buf[0];
                     _discovers_char_idx++;
@@ -2028,7 +2059,7 @@ void ESP32::_ble_discovers_char()
             }
         } else if (memcmp(type, "desc", 4) == 0) {
             if (_discovers_desc_idx < DISCOVERS_DESC_BUF_NUM) {
-                ble_discovers_desc_t * p_desc = &_discovers_desc[_discovers_desc_idx];
+                ble_discovers_desc_t *p_desc = &_discovers_desc[_discovers_desc_idx];
                 if (_parser.recv("%d,%d,%hx\n", &p_desc->char_index, &p_desc->desc_index, &p_desc->desc_uuid)) {
                     _discovers_desc_idx++;
                 }
@@ -2063,12 +2094,12 @@ int ESP32::_char2int(char c)
     }
 }
 
-int ESP32::_set_char(char * buf1, const uint8_t * buf2, int size)
+int ESP32::_set_char(char *buf1, const uint8_t *buf2, int size)
 {
     int idx = 0;
 
     for (int i = 0; i < size; i++) {
-        buf1[idx++] = _int2char((buf2[i]>> 4) & 0x0F);
+        buf1[idx++] = _int2char((buf2[i] >> 4) & 0x0F);
         buf1[idx++] = _int2char(buf2[i] & 0x0F);
     }
     buf1[idx] = '\0';

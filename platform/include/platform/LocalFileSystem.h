@@ -37,7 +37,6 @@ FILEHANDLE local_file_open(const char *name, int flags);
 
 /**
  * @class LocalFileHandle
- * @ingroup platform
  */
 class LocalFileHandle : public FileHandle, private NonCopyable<LocalFileHandle> {
 
@@ -101,7 +100,6 @@ protected:
  *
  *  The drive will only re-appear when the microcontroller program exists. Note that if the program does
  *  not exit, you will need to hold down reset on the mbed Microcontroller to be able to see the drive again!
- * @ingroup platform
  */
 class LocalFileSystem : public FileSystemLike, private NonCopyable<LocalFileSystem> {
     // No modifiable state

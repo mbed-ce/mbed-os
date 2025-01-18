@@ -35,7 +35,7 @@ ESP32InterfaceAP::ESP32InterfaceAP() :
 }
 
 ESP32InterfaceAP::ESP32InterfaceAP(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
-    PinName rts, PinName cts, int baudrate) :
+                                   PinName rts, PinName cts, int baudrate) :
     ESP32Stack(en, io0, tx, rx, debug, rts, cts, baudrate, 1),
     _dhcp(true),
     _own_ch(1),
@@ -75,17 +75,6 @@ nsapi_error_t ESP32InterfaceAP::set_network(const SocketAddress &ip_address, con
     return NSAPI_ERROR_OK;
 }
 
-nsapi_error_t ESP32InterfaceAP::set_network(const char *ip_address, const char *netmask, const char *gateway)
-{
-    _dhcp = false;
-
-    _ip_address.set_ip_address(ip_address);
-    _netmask.set_ip_address(netmask);
-    _gateway.set_ip_address(gateway);
-
-    return NSAPI_ERROR_OK;
-}
-
 nsapi_error_t ESP32InterfaceAP::set_dhcp(bool dhcp)
 {
     _dhcp = dhcp;
@@ -94,7 +83,7 @@ nsapi_error_t ESP32InterfaceAP::set_dhcp(bool dhcp)
 }
 
 int ESP32InterfaceAP::connect(const char *ssid, const char *pass, nsapi_security_t security,
-                                        uint8_t channel)
+                              uint8_t channel)
 {
     int ret;
 
@@ -186,7 +175,7 @@ int ESP32InterfaceAP::disconnect()
     return NSAPI_ERROR_OK;
 }
 
-nsapi_error_t ESP32InterfaceAP::get_ip_address(SocketAddress* sockAddr)
+nsapi_error_t ESP32InterfaceAP::get_ip_address(SocketAddress *sockAddr)
 {
     if (sockAddr->set_ip_address(_esp->getIPAddress_ap())) {
         return NSAPI_ERROR_OK;
@@ -194,17 +183,12 @@ nsapi_error_t ESP32InterfaceAP::get_ip_address(SocketAddress* sockAddr)
     return NSAPI_ERROR_NO_ADDRESS;
 }
 
-const char *ESP32InterfaceAP::get_ip_address()
-{
-    return _esp->getIPAddress_ap();
-}
-
 const char *ESP32InterfaceAP::get_mac_address()
 {
     return _esp->getMACAddress_ap();
 }
 
-nsapi_error_t ESP32InterfaceAP::get_gateway(SocketAddress* sockAddr)
+nsapi_error_t ESP32InterfaceAP::get_gateway(SocketAddress *sockAddr)
 {
     if (sockAddr->set_ip_address(_esp->getGateway_ap())) {
         return NSAPI_ERROR_OK;
@@ -212,23 +196,12 @@ nsapi_error_t ESP32InterfaceAP::get_gateway(SocketAddress* sockAddr)
     return NSAPI_ERROR_NO_ADDRESS;
 }
 
-const char *ESP32InterfaceAP::get_gateway()
-{
-    return _esp->getGateway_ap();
-}
-
-nsapi_error_t ESP32InterfaceAP::get_netmask(SocketAddress* sockAddr)
+nsapi_error_t ESP32InterfaceAP::get_netmask(SocketAddress *sockAddr)
 {
     if (sockAddr->set_ip_address(_esp->getNetmask_ap())) {
         return NSAPI_ERROR_OK;
     }
     return NSAPI_ERROR_NO_ADDRESS;
-}
-
-
-const char *ESP32InterfaceAP::get_netmask()
-{
-    return _esp->getNetmask_ap();
 }
 
 int8_t ESP32InterfaceAP::get_rssi()

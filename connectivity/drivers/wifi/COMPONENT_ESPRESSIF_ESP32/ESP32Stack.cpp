@@ -20,7 +20,7 @@
 
 // ESP32Stack implementation
 ESP32Stack::ESP32Stack(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
-    PinName rts, PinName cts, int baudrate, int is_ap) : _is_ap(is_ap)
+                       PinName rts, PinName cts, int baudrate, int is_ap) : _is_ap(is_ap)
 {
     _esp = ESP32::getESP32Inst(en, io0, tx, rx, debug, rts, cts, baudrate);
     memset(_local_ports, 0, sizeof(_local_ports));
@@ -103,12 +103,12 @@ int ESP32Stack::socket_bind(void *handle, const SocketAddress &address)
         }
     }
 
-    if(address.get_addr().version != NSAPI_UNSPEC) {
+    if (address.get_addr().version != NSAPI_UNSPEC) {
         return NSAPI_ERROR_UNSUPPORTED;
     }
 
-    for(int id = 0; id < ESP32::SOCKET_COUNT; id++) {
-        if(_local_ports[id] == address.get_port() && id != socket->id) { // Port already reserved by another socket
+    for (int id = 0; id < ESP32::SOCKET_COUNT; id++) {
+        if (_local_ports[id] == address.get_port() && id != socket->id) { // Port already reserved by another socket
             return NSAPI_ERROR_PARAMETER;
         } else if (id == socket->id && socket->connected) {
             return NSAPI_ERROR_PARAMETER;
@@ -240,7 +240,7 @@ int ESP32Stack::socket_sendto(void *handle, const SocketAddress &addr, const voi
         }
         socket->addr = addr;
     }
-    
+
     return socket_send(socket, data, size);
 }
 
@@ -271,8 +271,8 @@ void ESP32Stack::socket_attach(void *handle, void (*callback)(void *), void *dat
     _esp->socket_attach(socket->id, callback, data);
 }
 
-nsapi_error_t ESP32Stack::setsockopt(nsapi_socket_t handle, int level, 
-        int optname, const void *optval, unsigned optlen)
+nsapi_error_t ESP32Stack::setsockopt(nsapi_socket_t handle, int level,
+                                     int optname, const void *optval, unsigned optlen)
 {
     struct esp32_socket *socket = (struct esp32_socket *)handle;
 
@@ -285,7 +285,7 @@ nsapi_error_t ESP32Stack::setsockopt(nsapi_socket_t handle, int level,
     if (level == NSAPI_SOCKET && socket->proto == NSAPI_TCP) {
         switch (optname) {
             case NSAPI_KEEPALIVE: {
-                if(socket->connected) {// ESP32 limitation, keepalive needs to be given before connecting
+                if (socket->connected) { // ESP32 limitation, keepalive needs to be given before connecting
                     return NSAPI_ERROR_UNSUPPORTED;
                 }
 
@@ -305,7 +305,7 @@ nsapi_error_t ESP32Stack::setsockopt(nsapi_socket_t handle, int level,
 }
 
 nsapi_error_t ESP32Stack::getsockopt(nsapi_socket_t handle, int level,
-        int optname, void *optval, unsigned *optlen)
+                                     int optname, void *optval, unsigned *optlen)
 {
     struct esp32_socket *socket = (struct esp32_socket *)handle;
 
@@ -318,7 +318,7 @@ nsapi_error_t ESP32Stack::getsockopt(nsapi_socket_t handle, int level,
     if (level == NSAPI_SOCKET && socket->proto == NSAPI_TCP) {
         switch (optname) {
             case NSAPI_KEEPALIVE: {
-                if(*optlen > sizeof(int)) {
+                if (*optlen > sizeof(int)) {
                     *optlen = sizeof(int);
                 }
                 memcpy(optval, &(socket->keepalive), *optlen);

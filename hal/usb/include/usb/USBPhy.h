@@ -77,7 +77,7 @@
  *      find more information on this in section 8.5.3.3 of the USB
  *      specification.
  *
- * @ingroup usb_device_core
+ * \defgroup usb_device_core USB Device Core
  */
 class USBPhy {
 public:

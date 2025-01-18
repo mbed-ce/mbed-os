@@ -60,7 +60,7 @@ enum DeviceKeyStatus {
 /** Use this singleton if you need to derive a new key from the device root of trust.
  *
  * @note Synchronization level: Thread safe
- * @ingroup device-key
+ * \defgroup device-key Device Key
  */
 /**
  */

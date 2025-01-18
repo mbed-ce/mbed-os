@@ -976,6 +976,7 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */cmake-build-*/* \
                          */rtos/TARGET_CORTEX/rtx* \
                          */cmsis/* \
+                         */venv/* \
                          */connectivity/drivers/emac/* \
                          */features/cryptocell/* \
                          */features/frameworks/* \

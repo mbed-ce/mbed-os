@@ -40,7 +40,7 @@ ESP32Interface::ESP32Interface() :
 }
 
 ESP32Interface::ESP32Interface(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
-    PinName rts, PinName cts, int baudrate) :
+                               PinName rts, PinName cts, int baudrate) :
     ESP32Stack(en, io0, tx, rx, debug, rts, cts, baudrate, 0),
     _rst_pin(en),
     _initialized(false),
@@ -86,18 +86,6 @@ nsapi_error_t ESP32Interface::set_network(const SocketAddress &ip_address, const
     return NSAPI_ERROR_OK;
 }
 
-nsapi_error_t ESP32Interface::set_network(const char *ip_address, const char *netmask, const char *gateway)
-{
-    _dhcp = false;
-
-    // Don't check return values, so user can clear the addresses by passing empty strings.
-    _ip_address.set_ip_address(ip_address);
-    _netmask.set_ip_address(netmask);
-    _gateway.set_ip_address(gateway);
-
-    return NSAPI_ERROR_OK;
-}
-
 nsapi_error_t ESP32Interface::set_dhcp(bool dhcp)
 {
     _dhcp = dhcp;
@@ -106,7 +94,7 @@ nsapi_error_t ESP32Interface::set_dhcp(bool dhcp)
 }
 
 int ESP32Interface::connect(const char *ssid, const char *pass, nsapi_security_t security,
-                                        uint8_t channel)
+                            uint8_t channel)
 {
     if (channel != 0) {
         return NSAPI_ERROR_UNSUPPORTED;
@@ -223,7 +211,7 @@ int ESP32Interface::disconnect()
     return NSAPI_ERROR_OK;
 }
 
-nsapi_error_t ESP32Interface::get_ip_address(SocketAddress* sockAddr)
+nsapi_error_t ESP32Interface::get_ip_address(SocketAddress *sockAddr)
 {
     if (sockAddr->set_ip_address(_esp->getIPAddress())) {
         return NSAPI_ERROR_OK;
@@ -231,17 +219,12 @@ nsapi_error_t ESP32Interface::get_ip_address(SocketAddress* sockAddr)
     return NSAPI_ERROR_NO_ADDRESS;
 }
 
-const char *ESP32Interface::get_ip_address()
-{
-    return _esp->getIPAddress();
-}
-
 const char *ESP32Interface::get_mac_address()
 {
     return _esp->getMACAddress();
 }
 
-nsapi_error_t ESP32Interface::get_gateway(SocketAddress* sockAddr)
+nsapi_error_t ESP32Interface::get_gateway(SocketAddress *sockAddr)
 {
     if (sockAddr->set_ip_address(_esp->getGateway())) {
         return NSAPI_ERROR_OK;
@@ -249,22 +232,12 @@ nsapi_error_t ESP32Interface::get_gateway(SocketAddress* sockAddr)
     return NSAPI_ERROR_NO_ADDRESS;
 }
 
-const char *ESP32Interface::get_gateway()
-{
-    return _esp->getGateway();
-}
-
-nsapi_error_t ESP32Interface::get_netmask(SocketAddress* sockAddr)
+nsapi_error_t ESP32Interface::get_netmask(SocketAddress *sockAddr)
 {
     if (sockAddr->set_ip_address(_esp->getNetmask())) {
         return NSAPI_ERROR_OK;
     }
     return NSAPI_ERROR_NO_ADDRESS;
-}
-
-const char *ESP32Interface::get_netmask()
-{
-    return _esp->getNetmask();
 }
 
 int8_t ESP32Interface::get_rssi()
@@ -316,10 +289,26 @@ void ESP32Interface::wifi_status_cb(int8_t wifi_status)
 
 #if MBED_CONF_ESP32_PROVIDE_DEFAULT
 
-WiFiInterface *WiFiInterface::get_default_instance() {
+WiFiInterface *WiFiInterface::get_default_instance()
+{
     static ESP32Interface esp32;
     return &esp32;
 }
+
+/*
+ * With e.g. GCC linker option "--undefined=<LINK_FOO>", pull in this
+ * object file anyway for being able to override weak symbol successfully
+ * even though from static library. See:
+ * https://stackoverflow.com/questions/42588983/what-does-the-gnu-ld-undefined-option-do
+ *
+ * NOTE: For C++ name mangling, 'extern "C"' is necessary to match the
+ *       <LINK_FOO> symbol correctly.
+ */
+extern "C"
+void LINK_ESP32INTERFACE_CPP(void)
+{
+}
+
 
 #endif
 

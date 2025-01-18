@@ -43,15 +43,14 @@
 /** ESP32Interface class.
     This is an interface to a ESP32 radio.
  */
-class ESP32
-{
+class ESP32 {
 public:
     /**
     * Static method to create or retrieve the single ESP32 instance
     */
-    static ESP32 * getESP32Inst(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
-                                PinName rts, PinName cts, int baudrate);
-    static ESP32 * getESP32Inst(bool debug = false);
+    static ESP32 *getESP32Inst(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
+                               PinName rts, PinName cts, int baudrate);
+    static ESP32 *getESP32Inst(bool debug = false);
 
     ESP32(PinName en, PinName io0, PinName tx, PinName rx, bool debug,
           PinName rts, PinName cts, int baudrate);
@@ -63,7 +62,7 @@ public:
     * @param buf_size  buffer size
     * @return String of Version Information
     */
-    bool get_version_info(char * ver_info, int buf_size);
+    bool get_version_info(char *ver_info, int buf_size);
 
     /**
     * Sets the Wi-Fi Mode
@@ -114,17 +113,17 @@ public:
     const char *getMACAddress(void);
     const char *getMACAddress_ap(void);
 
-     /** Get the local gateway
-     *
-     *  @return         Null-terminated representation of the local gateway
-     *                  or null if no network mask has been recieved
-     */
+    /** Get the local gateway
+    *
+    *  @return         Null-terminated representation of the local gateway
+    *                  or null if no network mask has been recieved
+    */
     const char *getGateway();
     const char *getGateway_ap();
 
     /** Get the local network mask
      *
-     *  @return         Null-terminated representation of the local network mask 
+     *  @return         Null-terminated representation of the local network mask
      *                  or null if no network mask has been recieved
      */
     const char *getNetmask();
@@ -164,7 +163,7 @@ public:
     *             type=" TCP" : TCP connection's keep alive time, zero means disabled
     * @return true only if socket opened successfully
     */
-    bool open(const char *type, int id, const char* addr, int port, int opt = 0);
+    bool open(const char *type, int id, const char *addr, int port, int opt = 0);
 
     /**
     * Sends data to an open socket
@@ -190,7 +189,7 @@ public:
     * Closes a socket
     *
     * @param id id of socket to close, valid only 0-4
-    * @param wait_close 
+    * @param wait_close
     * @return true only if socket is closed successfully
     */
     bool close(int id, bool wait_close = false);
@@ -221,7 +220,7 @@ public:
     bool get_ssid(char *ap);
     bool cre_server(int port);
     bool del_server();
-    bool accept(int * p_id);
+    bool accept(int *p_id);
 
     bool set_network(const char *ip_address, const char *netmask, const char *gateway);
     bool set_network_ap(const char *ip_address, const char *netmask, const char *gateway);
@@ -258,8 +257,8 @@ public:
     static const int8_t STATUS_GOT_IP = 2;
 
 private:
-    mbed::DigitalOut * _p_wifi_en;
-    mbed::DigitalOut * _p_wifi_io0;
+    mbed::DigitalOut *_p_wifi_en;
+    mbed::DigitalOut *_p_wifi_io0;
     bool _init_end_common;
     bool _init_end_wifi;
     mbed::BufferedSerial _serial;
@@ -282,7 +281,7 @@ private:
     uint32_t _id_bits;
     bool _server_act;
     rtos::Mutex _smutex; // Protect serial port access
-    static ESP32 * instESP32;
+    static ESP32 *instESP32;
     int8_t _wifi_status;
     mbed::Callback<void(int8_t)> _wifi_status_cb;
     uint32_t _at_version;
@@ -331,12 +330,12 @@ public:
         int      srv_index;          /**< service's index starting from 1 */
         int      char_index;         /**< characteristic's index starting from 1 */
         int      desc_index;         /**< descriptor's index */
-        void *   data;               /**< data buffer address */
+        void    *data;               /**< data buffer address */
         uint32_t len;                /**< data len */
     } ble_packet_t;
 
     typedef union {
-        const uint8_t * addr;        /**< buffer address */
+        const uint8_t *addr;         /**< buffer address */
         uint32_t        data;        /**< data */
     } union_data_t;
 
@@ -397,29 +396,29 @@ public:
     } ble_discovers_desc_t;
 
     // advertising_param_t:adv_type
-    #define ADV_TYPE_IND           0
-    #define ADV_TYPE_SCAN_IND      2
-    #define ADV_TYPE_NONCONN_IND   3
+#define ADV_TYPE_IND           0
+#define ADV_TYPE_SCAN_IND      2
+#define ADV_TYPE_NONCONN_IND   3
 
     // advertising_param_t:own_addr_type and peer_addr_type
-    #define BLE_ADDR_TYPE_PUBLIC   0
-    #define BLE_ADDR_TYPE_RANDOM   1
+#define BLE_ADDR_TYPE_PUBLIC   0
+#define BLE_ADDR_TYPE_RANDOM   1
 
     // advertising_param_t:channel_map
-    #define ADV_CHNL_37            0x01
-    #define ADV_CHNL_38            0x02
-    #define ADV_CHNL_39            0x04
-    #define ADV_CHNL_ALL           0x07
+#define ADV_CHNL_37            0x01
+#define ADV_CHNL_38            0x02
+#define ADV_CHNL_39            0x04
+#define ADV_CHNL_ALL           0x07
 
     // advertising_param_t:adv_filter_policy
-    #define ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY    0
-    #define ADV_FILTER_ALLOW_SCAN_WLST_CON_ANY   1
-    #define ADV_FILTER_ALLOW_SCAN_ANY_CON_WLST   2
-    #define ADV_FILTER_ALLOW_SCAN_WLST_CON_WLST  3
+#define ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY    0
+#define ADV_FILTER_ALLOW_SCAN_WLST_CON_ANY   1
+#define ADV_FILTER_ALLOW_SCAN_ANY_CON_WLST   2
+#define ADV_FILTER_ALLOW_SCAN_WLST_CON_WLST  3
 
     // ble_set_role: role
-    #define INIT_CLIENT_ROLE       1
-    #define INIT_SERVER_ROLE       2
+#define INIT_CLIENT_ROLE       1
+#define INIT_SERVER_ROLE       2
 
     /** Sets BLE Role
      *
@@ -433,21 +432,21 @@ public:
      *  @param role         INIT_CLIENT_ROLE: client role, INIT_SERVER_ROLE: server role
      *  @return             true: success, false: failure
      */
-    bool ble_get_role(int * role);
+    bool ble_get_role(int *role);
 
     /** Sets BLE Device's Name
      *
      *  @param name         The BLE device name
      *  @return             true: success, false: failure
      */
-    bool ble_set_device_name(const char * name);
+    bool ble_set_device_name(const char *name);
 
     /** Gets BLE Device's Name
      *
      *  @param name         The BLE device name
      *  @return             true: success, false: failure
      */
-    bool ble_get_device_name(char * name);
+    bool ble_get_device_name(char *name);
 
     /** GATTS Creates and Starts Services
      *
@@ -461,7 +460,7 @@ public:
      *  @param len          Data len
      *  @return             true: success, false: failure
      */
-    bool ble_set_scan_response(const uint8_t * data, int len);
+    bool ble_set_scan_response(const uint8_t *data, int len);
 
     /** Starts Advertising
      *
@@ -481,21 +480,21 @@ public:
      *  @param addr         Random address data. Valid only when addr_type is 1.
      *  @return             true: success, false: failure
      */
-    bool ble_set_addr(int addr_type, const uint8_t * random_addr = NULL);
+    bool ble_set_addr(int addr_type, const uint8_t *random_addr = NULL);
 
     /** Gets BLE Device's Address
      *
      *  @param public_addr  BLE public address
      *  @return             true: success, false: failure
      */
-    bool ble_get_addr(uint8_t * public_addr);
+    bool ble_get_addr(uint8_t *public_addr);
 
     /** Sets Parameters of Advertising
      *
      *  @param param        Parameters. See advertising_param_t.
      *  @return             true: success, false: failure
      */
-    bool ble_set_advertising_param(const advertising_param_t * param);
+    bool ble_set_advertising_param(const advertising_param_t *param);
 
     /** Sets Advertising Data
      *
@@ -503,7 +502,7 @@ public:
      *  @param len          Data len
      *  @return             true: success, false: failure
      */
-    bool ble_set_advertising_data(const uint8_t * data, int len);
+    bool ble_set_advertising_data(const uint8_t *data, int len);
 
     /** GATT Sets Service
      *
@@ -511,7 +510,7 @@ public:
      *  @param num          Number of GATT service list
      *  @return             true: success, false: failure
      */
-    bool ble_set_service(const gatt_service_t * service_list, int num);
+    bool ble_set_service(const gatt_service_t *service_list, int num);
 
     /** GATTS Sets Characteristic
      *
@@ -521,7 +520,7 @@ public:
      *  @param len          Data len
      *  @return             true: success, false: failure
      */
-    bool ble_set_characteristic(int srv_index, int char_index, const uint8_t * data, int len);
+    bool ble_set_characteristic(int srv_index, int char_index, const uint8_t *data, int len);
 
     /** GATTS Notifies of Characteristics
      *
@@ -531,7 +530,7 @@ public:
      *  @param len          Data len
      *  @return             true: success, false: failure
      */
-    bool ble_notifies_characteristic(int srv_index, int char_index, const uint8_t * data, int len);
+    bool ble_notifies_characteristic(int srv_index, int char_index, const uint8_t *data, int len);
 
     /** Sets Parameters of BLE Scanning
      *
@@ -568,7 +567,7 @@ public:
      *  @param remote_addr  Remote BLE address
      *  @return             true: success, false: failure
      */
-    bool ble_connect(int conn_index, const uint8_t * remote_addr);
+    bool ble_connect(int conn_index, const uint8_t *remote_addr);
 
     /** Ends BLE connection
      *
@@ -586,7 +585,7 @@ public:
      *  @param num          Number of service info
      *  @return             true: success, false: failure
      */
-    bool ble_discovery_service(int conn_index, ble_primary_service_t * service, int * num);
+    bool ble_discovery_service(int conn_index, ble_primary_service_t *service, int *num);
 
     /** GATTC Discovers Characteristics
      *
@@ -600,10 +599,10 @@ public:
      *  @return               true: success, false: failure
      */
     bool ble_discovery_characteristics(
-             int conn_index, int srv_index,
-             ble_discovers_char_t * discovers_char, int * char_num,
-             ble_discovers_desc_t * discovers_desc, int * desc_num
-         );
+        int conn_index, int srv_index,
+        ble_discovers_char_t *discovers_char, int *char_num,
+        ble_discovers_desc_t *discovers_desc, int *desc_num
+    );
 
     /** GATTC Reads a Characteristic
      *
@@ -615,7 +614,7 @@ public:
      *  @param amount       Amount of bytes to be received
      *  @return             Data size of received
      */
-    int32_t ble_read_characteristic(int conn_index, int srv_index, int char_index, uint8_t * data, int amount);
+    int32_t ble_read_characteristic(int conn_index, int srv_index, int char_index, uint8_t *data, int amount);
 
     /** GATTC Reads a Descriptor
      *
@@ -628,7 +627,7 @@ public:
      *  @param amount       Amount of bytes to be received
      *  @return             true: success, false: failure
      */
-    int32_t ble_read_descriptor(int conn_index, int srv_index, int char_index, int desc_index, uint8_t * data, int amount);
+    int32_t ble_read_descriptor(int conn_index, int srv_index, int char_index, int desc_index, uint8_t *data, int amount);
 
     /** GATTC Writes Characteristic
      *
@@ -640,7 +639,7 @@ public:
      *  @param amount       Amount of data to be written
      *  @return             true: success, false: failure
      */
-    bool ble_write_characteristic(int conn_index, int srv_index, int char_index, const uint8_t * data, int amount);
+    bool ble_write_characteristic(int conn_index, int srv_index, int char_index, const uint8_t *data, int amount);
 
     /** GATTC Writes Descriptor
      *
@@ -653,7 +652,7 @@ public:
      *  @param amount       Amount of data to be written
      *  @return             true: success, false: failure
      */
-    bool ble_write_descriptor(int conn_index, int srv_index, int char_index, int desc_index, const uint8_t * data, int amount);
+    bool ble_write_descriptor(int conn_index, int srv_index, int char_index, int desc_index, const uint8_t *data, int amount);
 
     /** For executing OOB processing on background
      *
@@ -711,9 +710,9 @@ public:
     void ble_attach_scan(mbed::Callback<void(ble_scan_t *)> cb_func);
 
 private:
-    #define PRIMARY_SERVICE_BUF_NUM    16
-    #define DISCOVERS_CHAR_BUF_NUM     16
-    #define DISCOVERS_DESC_BUF_NUM     16
+#define PRIMARY_SERVICE_BUF_NUM    16
+#define DISCOVERS_CHAR_BUF_NUM     16
+#define DISCOVERS_DESC_BUF_NUM     16
 
     struct {
         mbed::Callback<void()> callback;
@@ -742,7 +741,7 @@ private:
     void _ble_discovers_char();
     char _int2char(int data);
     int _char2int(char c);
-    int _set_char(char * buf1, const uint8_t * buf2, int size);
+    int _set_char(char *buf1, const uint8_t *buf2, int size);
 #endif /* TARGET_ESP32AT_BLE */
 
 };
