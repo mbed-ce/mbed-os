@@ -47,10 +47,10 @@
         },
         "COMPONENT_ESPRESSIF_ESP8266": {
             "description": "Wifi 802.11b/g/n MCU running ESP8266-IDF-AT AT command firmware",
-            "friendly_name": "Espressif ESP8366"
+            "friendly_name": "Espressif ESP8266"
         },
         "COMPONENT_ESPRESSIF_ESP32": {
-            "description": "Wifi 802.11b/g/n MCU running ESP32-IDF-AT AT command firmware",
+            "description": "Wifi 802.11b/g/n MCU running ESP-AT AT command firmware",
             "friendly_name": "Espressif ESP32"
         },
 
