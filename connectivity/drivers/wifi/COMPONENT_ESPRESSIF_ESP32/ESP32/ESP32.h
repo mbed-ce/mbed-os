@@ -269,7 +269,7 @@ private:
         uint32_t len;
         uint32_t index;
         // data follows
-    } *_packets, **_packets_end;
+    } *_packets, * *_packets_end;
     int _wifi_mode;
     int _baudrate;
     PinName _rts;
