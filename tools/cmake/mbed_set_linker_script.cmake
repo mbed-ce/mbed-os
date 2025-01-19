@@ -21,20 +21,19 @@ endfunction(mbed_set_linker_script)
 # Set up the linker script for the top-level Mbed OS targets.
 # If needed, this also creates another target to preprocess the linker script.
 #
-# mbed_os_target: CMake target for Mbed OS
-# mbed_baremetal_target: CMake target for Mbed Baremetal
+# mbed_os_target: CMake target for Mbed OS core library
 # target_defines_header: the full path to the header containing all of the Mbed target defines
 #
-function(mbed_setup_linker_script mbed_os_target mbed_baremetal_target target_defines_header)
+function(mbed_setup_linker_script mbed_os_target target_defines_header)
 
     # Find the path to the desired linker script
     # (the property should be set on both the OS and baremetal targets in a sane world)
-    get_property(RAW_LINKER_SCRIPT_PATHS_SET TARGET ${mbed_baremetal_target} PROPERTY INTERFACE_MBED_LINKER_SCRIPT SET)
+    get_property(RAW_LINKER_SCRIPT_PATHS_SET TARGET ${mbed_os_target} PROPERTY INTERFACE_MBED_LINKER_SCRIPT SET)
     if(NOT RAW_LINKER_SCRIPT_PATHS_SET)
         message(FATAL_ERROR "No linker script has been set for the Mbed target. Ensure that code is calling mbed_set_linker_script() for the mbed-<your-board-name> target or one of its parents")
     endif()
 
-    get_property(RAW_LINKER_SCRIPT_PATHS TARGET ${mbed_baremetal_target} PROPERTY INTERFACE_MBED_LINKER_SCRIPT)
+    get_property(RAW_LINKER_SCRIPT_PATHS TARGET ${mbed_os_target} PROPERTY INTERFACE_MBED_LINKER_SCRIPT)
 
     # Check if two (or more) different linker scripts got used
     list(REMOVE_DUPLICATES RAW_LINKER_SCRIPT_PATHS)
@@ -82,24 +81,22 @@ function(mbed_setup_linker_script mbed_os_target mbed_baremetal_target target_de
     # which is then added as a dependency of the MCU target.  This ensures the linker script will exist
     # by the time we need it.
     add_custom_target(mbed-linker-script DEPENDS ${LINKER_SCRIPT_PATH} VERBATIM)
-    foreach(TARGET ${mbed_baremetal_target} ${mbed_os_target})
-        add_dependencies(${TARGET} mbed-linker-script)
+    add_dependencies(${mbed_os_target} mbed-linker-script)
 
-        # When building the Mbed internal tests, the tests get created before the mbed-os target does.  So, the normal logic 
-        # in mbed_set_post_build() to set the linker script does not work.  So, we need to instead attach the linker script to 
-        # the mbed-os and mbed-baremetal libraries themselves, so it will get picked up automatically.
-        # This prevents a custom linker script from being used in STANDALONE mode, but we don't need to do that.
-        set_target_properties(${TARGET} PROPERTIES LINKER_SCRIPT_PATH  ${LINKER_SCRIPT_PATH})
+    # When building the Mbed internal tests, the tests get created before the mbed-os target does.  So, the normal logic
+    # in mbed_set_post_build() to set the linker script does not work.  So, we need to instead attach the linker script to
+    # the mbed-os and mbed-baremetal libraries themselves, so it will get picked up automatically.
+    # This prevents a custom linker script from being used in STANDALONE mode, but we don't need to do that.
+    set_target_properties(${mbed_os_target} PROPERTIES LINKER_SCRIPT_PATH  ${LINKER_SCRIPT_PATH})
 
-        #  add linker script only for tests
-        if(MBED_IS_STANDALONE)
-            target_link_options(${TARGET}
-                INTERFACE
-                    "-T" "${LINKER_SCRIPT_PATH}"
-                )
-            set_property(TARGET ${TARGET} APPEND PROPERTY INTERFACE_LINK_DEPENDS ${LINKER_SCRIPT_PATH})
-        endif()
-    endforeach()
+    #  add linker script only for tests
+    if(MBED_IS_STANDALONE)
+        target_link_options(${mbed_os_target}
+            INTERFACE
+                "-T" "${LINKER_SCRIPT_PATH}"
+            )
+        set_property(TARGET ${mbed_os_target} APPEND PROPERTY INTERFACE_LINK_DEPENDS ${LINKER_SCRIPT_PATH})
+    endif()
 
 endfunction(mbed_setup_linker_script)
 

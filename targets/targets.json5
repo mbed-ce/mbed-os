@@ -102,11 +102,11 @@
                 "value": false
             },
             "application-profile": {
-                "help": "Select application profile. Options: auto, full, bare-metal. 'auto' mode will check other build options and resolve to\
-                'full' mode by default or 'bare-metal' mode. 'full' mode enables the real-time OS and enables all features of Mbed to be used.\
-                'bare-metal' mode disables the real-time OS, preventing you from using threads and libraries that depend on them. 'bare-metal'\
-                mode is recommended for target MCUs with small amounts of flash and RAM.",
-                "value": "auto"
+                "help": "Select application profile. Options: 'full', 'bare-metal'. 'full' mode enables the real-time \
+OS and enables all features of Mbed to be used. \
+'bare-metal' mode disables the real-time OS, preventing you from using threads and libraries that depend on them. 'bare-metal' \
+mode is recommended for target MCUs with small amounts of flash and RAM.",
+                "value": "full"
             }
         }
     },
