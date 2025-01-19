@@ -127,12 +127,12 @@ add_library(mbed-core-flags INTERFACE) # Collects flags that are in mbed-os or m
 add_library(mbed-core-sources INTERFACE) # Collects source files that are in mbed-os or mbed-baremetal
                                          # depending on target.application-profile setting
 
-if("MBED_CONF_TARGET_APPLICATION_PROFILE=full" IN_LIST MBED_CONFIG_DEFINITIONS)
+if("MBED_CONF_TARGET_APPLICATION_PROFILE=full" IN_LIST MBED_CONFIG_DEFINITIONS OR MBED_IS_NATIVE_BUILD)
     set(APPLICATION_PROFILE_CONFIG_FULL TRUE)
 elseif("MBED_CONF_TARGET_APPLICATION_PROFILE=bare-metal" IN_LIST MBED_CONFIG_DEFINITIONS)
     set(APPLICATION_PROFILE_CONFIG_BAREMETAL TRUE)
 else()
-    message(FATAL_ERROR "target.application-profile must be set to either full or baremetal!")
+    message(FATAL_ERROR "target.application-profile must be set to either 'full' or 'bare-metal'!")
 endif()
 
 # mbed-core-flags/mbed-core-sources link mbed-rtos-flags/mbed-rtos-sources or not depending on
