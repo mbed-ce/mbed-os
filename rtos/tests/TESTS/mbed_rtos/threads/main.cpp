@@ -682,7 +682,7 @@ void test_msg_get_thread(Queue<int32_t, 1> *queue)
 {
     int32_t data;
     int32_t *pData = &data;
-    queue->try_get(&pData);
+    queue->try_get_for(Kernel::wait_for_u32_forever, &pData);
 }
 
 /** Testing thread states: wait message get
@@ -739,7 +739,7 @@ void test_msg_put()
     TEST_ASSERT_EQUAL(Thread::WaitingMessagePut, t.get_state());
     int32_t data;
     int32_t *pData = &data;
-    queue.try_get(&pData);
+    queue.try_get_for(Kernel::wait_for_u32_forever, &pData);
 }
 
 /** Utility function that places some date on the stack */
