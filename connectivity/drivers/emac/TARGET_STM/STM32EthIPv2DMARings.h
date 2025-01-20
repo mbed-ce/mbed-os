@@ -118,7 +118,8 @@ class STM32EthIPv2DMARings
 
     // Return Rx descriptors to the Ethernet MAC.
     // Descriptors can only be returned if there are free buffers in the pool to allocate to them.
-    // The first descriptor returned will be the one at RxBuildDescIdx
+    // The first descriptor returned will be the one at RxBuildDescIdx.
+    // After init, this shall only be called by the MAC thread.
     void buildRxDescriptors();
 
     /// Receive the next packet.  Call from the Rx thread when signal is delivered.
@@ -131,6 +132,9 @@ class STM32EthIPv2DMARings
 
     /// MAC thread loop
     void macThread();
+
+    /// Callback from memory manager when a pool buffer becomes available
+    void onPoolBufferAvail();
 
 public:
     // Alignment required for Rx memory buffers.  Normally they don't need alignment but

@@ -259,6 +259,18 @@ public:
         onPoolSpaceAvailCallback = cb;
     }
 
+    /**
+     * @brief Set callback which will be called when pool space becomes available
+     *
+     * \warning The callback could be called from any thread, and should make no assumptions about
+     *    being in the same thread as anything else.
+     *
+     * @param cb Callback to call
+     */
+    void set_on_pool_space_avail_cb(mbed::Callback<void()> cb) {
+        onPoolSpaceAvailCallback = cb;
+    }
+
 protected:
     ~NetStackMemoryManager() = default;
 };

@@ -24,14 +24,17 @@
 namespace mbed {
 
 // Thread flag constants
-static uint32_t THREAD_FLAG_TX_DESC_AVAILABLE = 1;
-static uint32_t THREAD_FLAG_RX_DESC_AVAILABLE = 2;
-static uint32_t THREAD_FLAG_SHUTDOWN = 4;
+static uint32_t THREAD_FLAG_TX_DESC_AVAILABLE = 1 << 0;
+static uint32_t THREAD_FLAG_RX_DESC_AVAILABLE = 1 << 1;
+static uint32_t THREAD_FLAG_RX_MEM_AVAILABLE = 1 << 2;
+static uint32_t THREAD_FLAG_SHUTDOWN = 1 << 3;
 
 // Event flag constants
 static uint32_t EVENT_FLAG_TX_DESC_AVAILABLE = 1;
 
 void STM32EthIPv2DMARings::buildRxDescriptors() {
+
+    const size_t origRxDescsOwnedByApplication = rxDescsOwnedByApplication;
 
     // Note: With this Ethernet peripheral, you can never give back every single descriptor to
     // the hardware, because then it thinks there are 0 descriptors left.
@@ -72,6 +75,8 @@ void STM32EthIPv2DMARings::buildRxDescriptors() {
         // to one location after the last DMA-owned descriptor in the FIFO.
         heth.Instance->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[rxBuildIndex]);
     }
+
+    tr_debug("buildRxDescriptors(): Returned %zu descriptors.", origRxDescsOwnedByApplication - rxDescsOwnedByApplication);
 }
 
 // TODO monitor for Rx buffer exhaustion conditions.  This happens when we have too few
@@ -146,7 +151,6 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
         // No complete packet identified.
         // Take the chance to rebuild any available descriptors, then return.
         tr_debug("No complete packets in Rx descs\n");
-        buildRxDescriptors();
         return nullptr;
     }
 
@@ -188,12 +192,9 @@ net_stack_mem_buf_t *STM32EthIPv2DMARings::rxNextPacket() {
     }
 #endif
 
-    tr_info("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
+    tr_debug("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
            memory_manager.get_total_len(headBuffer), memory_manager.get_ptr(headBuffer), firstDescIdx, lastDescIdx,
            &rxDescs[firstDescIdx], &rxDescs[lastDescIdx]);
-
-    // Rebuild descriptors if possible
-    buildRxDescriptors();
 
     return headBuffer;
 }
@@ -248,12 +249,12 @@ void STM32EthIPv2DMARings::macThread()
     while(true)
     {
         // Wait for something to happen
-        uint32_t flags = rtos::ThisThread::flags_wait_any(THREAD_FLAG_TX_DESC_AVAILABLE | THREAD_FLAG_SHUTDOWN | THREAD_FLAG_RX_DESC_AVAILABLE);
+        uint32_t flags = rtos::ThisThread::flags_wait_any(THREAD_FLAG_TX_DESC_AVAILABLE | THREAD_FLAG_SHUTDOWN | THREAD_FLAG_RX_DESC_AVAILABLE | THREAD_FLAG_RX_MEM_AVAILABLE);
         if(flags & THREAD_FLAG_SHUTDOWN)
         {
             return;
         }
-        if(flags & (THREAD_FLAG_RX_DESC_AVAILABLE | THREAD_FLAG_TX_DESC_AVAILABLE)) // TODO temp
+        if(flags & THREAD_FLAG_RX_DESC_AVAILABLE)
         {
             // Receive any available packets.
             // Note that if the ISR was delayed, we might get multiple packets per ISR, so we need to loop.
@@ -263,6 +264,9 @@ void STM32EthIPv2DMARings::macThread()
                 if(!packet) {
                     break;
                 }
+
+                // Rebuild descriptors if possible
+                buildRxDescriptors();
 
                 if(emac_link_input_cb)
                 {
@@ -278,7 +282,14 @@ void STM32EthIPv2DMARings::macThread()
         {
             reclaimTxDescs();
         }
+        if(flags & THREAD_FLAG_RX_MEM_AVAILABLE) {
+            buildRxDescriptors();
+        }
     }
+}
+
+void STM32EthIPv2DMARings::onPoolBufferAvail() {
+    thread.flags_set(THREAD_FLAG_RX_MEM_AVAILABLE);
 }
 
 
@@ -364,6 +375,9 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::startDMA()
         // Clear Tx and Rx process stopped flags
         heth.Instance->DMACSR = (ETH_DMACSR_TPS | ETH_DMACSR_RPS);
 
+        // Register memory available callback
+        memory_manager.set_on_pool_space_avail_cb(callback(this, &STM32EthIPv2DMARings::onPoolBufferAvail));
+
         // Start Rx thread
         thread.start(mbed::callback(this, &STM32EthIPv2DMARings::macThread));
 
@@ -391,7 +405,7 @@ void STM32EthIPv2DMARings::rxISR()
 
     for(size_t descCount = 0; descCount < rxPoolSize; descCount++)
     {
-        auto &descriptor = rxDescs[rxNextIndex];
+        auto &descriptor = rxDescs[(rxNextIndex + descCount) % rxPoolSize];
 
 #if __DCACHE_PRESENT
         SCB_InvalidateDCache_by_Addr(&descriptor, sizeof(ETH_DMADescTypeDef));
@@ -456,7 +470,7 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
         }
     }
 
-    printf("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+    tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
            memory_manager.get_total_len(buf), memory_manager.count_buffers(buf), neededDescs);
 
     // Step 2: Copy packet if needed
@@ -524,20 +538,6 @@ HAL_StatusTypeDef STM32EthIPv2DMARings::txPacket(net_stack_mem_buf_t * buf)
         {
             currDesc.packetFirstBuf = nullptr;
         }
-
-//        printf("Tx Ethernet buffer:");
-//        for(size_t byteIdx = 0; byteIdx < currDesc.txDesc.toDMAFmt.buffer1Len; ++byteIdx)
-//        {
-//            printf(" %02" PRIx8, reinterpret_cast<uint8_t const *>(currDesc.txDesc.toDMAFmt.buffer1Addr)[byteIdx]);
-//        }
-//        printf("\n");
-//
-//        printf("Tx Ethernet buffer2:");
-//        for(size_t byteIdx = 0; byteIdx < currDesc.txDesc.toDMAFmt.buffer2Len; ++byteIdx)
-//        {
-//            printf(" %02" PRIx8, reinterpret_cast<uint8_t const *>(currDesc.txDesc.toDMAFmt.buffer2Addr)[byteIdx]);
-//        }
-//        printf("\n");
 
 #if __DCACHE_PRESENT
         // Write buffers back to main memory

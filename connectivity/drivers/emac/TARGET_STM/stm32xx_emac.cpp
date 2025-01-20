@@ -828,8 +828,6 @@ void STM32_EMAC::set_all_multicast(bool all)
 
 void STM32_EMAC::power_down()
 {
-    tr_info("power_down");
-
     /* No-op at this stage */
     sleep_manager_unlock_deep_sleep();
 }
@@ -905,7 +903,7 @@ void STM32_EMAC::populateMcastFilterRegs() {
 
         if(perfFiltIdx < numPerfectFilterMacs)
         {
-            tr_info("Using perfect filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8,
+            tr_debug("Using perfect filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8,
                      mcastMacs[perfFiltIdx][0], mcastMacs[perfFiltIdx][1], mcastMacs[perfFiltIdx][2],
                      mcastMacs[perfFiltIdx][3], mcastMacs[perfFiltIdx][4], mcastMacs[perfFiltIdx][5]);
             writeMACAddress(mcastMacs[perfFiltIdx].data(), highReg, lowReg);
@@ -945,7 +943,7 @@ void STM32_EMAC::populateMcastFilterRegs() {
     {
         auto & currMacAddr = mcastMacs[hashFiltIdx + numPerfectFilterMacs];
 
-        tr_info("Using hash filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8,
+        tr_debug("Using hash filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8,
                  currMacAddr[0], currMacAddr[1], currMacAddr[2],
                  currMacAddr[3], currMacAddr[4], currMacAddr[5]);
 
