@@ -733,7 +733,7 @@ static const uint8_t * sn_coap_parser_options_parse(const uint8_t * restrict pac
         }
 
         /* Check for overflow */
-        if ((packet_data_ptr - packet_data_start_ptr) > packet_len) {
+        if ((packet_data_ptr - packet_data_start_ptr) > (int)packet_len) {
             return NULL;
         }
         message_left = packet_len - (packet_data_ptr - packet_data_start_ptr);
@@ -800,7 +800,7 @@ static const uint8_t *sn_coap_parser_options_parse_multiple_options(const uint8_
             first_option = false;
         }
 
-        if (((temp_parsed_uri_query_ptr - *dst_pptr) + option_number_len) > uri_query_needed_heap) {
+        if (((temp_parsed_uri_query_ptr - *dst_pptr) + (int)option_number_len) > uri_query_needed_heap) {
             return NULL;
         }
         if (0 != sn_coap_parser_check_packet_ptr(packet_data_ptr, start_ptr, packet_left_len, option_number_len)) {

@@ -27,6 +27,7 @@
 #endif
 
 using namespace utest::v1;
+using namespace std::chrono;
 
 namespace {
 static const int SIGNAL_SIGIO = 0x1;
@@ -117,7 +118,7 @@ void rcv_n_chk_against_rfc864_pattern(TCPSocket &sock)
         recvd_size += rd;
     }
     timer.stop();
-    tr_info("MBED: Time taken: %fs", timer.read());
+    tr_info("MBED: Time taken: %fs", duration<float>{timer.elapsed_time()}.count());
 }
 
 void TCPSOCKET_RECV_100K()
@@ -172,7 +173,7 @@ void rcv_n_chk_against_rfc864_pattern_nonblock(TCPSocket &sock)
         }
     }
     timer.stop();
-    tr_info("MBED: Time taken: %fs", timer.read());
+    tr_info("MBED: Time taken: %fs", duration<float>{timer.elapsed_time()}.count());
 }
 
 static void _sigio_handler(osThreadId id)

@@ -24,6 +24,7 @@
 #include "tcp_tests.h"
 
 using namespace utest::v1;
+using namespace std::chrono;
 
 void TCPSOCKET_SEND_TIMEOUT()
 {
@@ -47,7 +48,7 @@ void TCPSOCKET_SEND_TIMEOUT()
                 (timer.elapsed_time() <= 800ms)) {
             continue;
         }
-        tr_error("send: err %d, time %d", err, timer.read_ms());
+        tr_error("send: err %d, time %lld", err, duration_cast<milliseconds>(timer.elapsed_time()).count());
         TEST_FAIL();
         break;
     }

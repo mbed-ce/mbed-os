@@ -63,7 +63,7 @@ void UDPSOCKET_RECV_TIMEOUT()
 
         if (recvd == NSAPI_ERROR_WOULD_BLOCK) {
             osSignalWait(SIGNAL_SIGIO, SIGIO_TIMEOUT);
-            tr_info("MBED: recvfrom() took: %dms", timer.read_ms());
+            tr_info("MBED: recvfrom() took: %lldms", duration_cast<milliseconds>(timer.elapsed_time()).count());
             if (timer.elapsed_time() > 150ms) {
                 TEST_ASSERT(150ms - timer.elapsed_time() < 51ms);
             } else {

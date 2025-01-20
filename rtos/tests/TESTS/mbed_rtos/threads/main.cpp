@@ -680,7 +680,9 @@ void test_semaphore()
 
 void test_msg_get_thread(Queue<int32_t, 1> *queue)
 {
-    queue->get();
+    int32_t data;
+    int32_t *pData = &data;
+    queue->try_get(&pData);
 }
 
 /** Testing thread states: wait message get
@@ -735,7 +737,9 @@ void test_msg_put()
     ThisThread::yield();
 
     TEST_ASSERT_EQUAL(Thread::WaitingMessagePut, t.get_state());
-    queue.get();
+    int32_t data;
+    int32_t *pData = &data;
+    queue.try_get(&pData);
 }
 
 /** Utility function that places some date on the stack */

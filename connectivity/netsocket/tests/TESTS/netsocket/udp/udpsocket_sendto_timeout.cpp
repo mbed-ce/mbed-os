@@ -42,7 +42,7 @@ void UDPSOCKET_SENDTO_TIMEOUT()
     int sent = sock.sendto(udp_addr, tx_buffer, sizeof(tx_buffer));
     timer.stop();
     TEST_ASSERT_EQUAL(sizeof(tx_buffer), sent);
-    tr_info("MBED: Time taken: %fs", timer.read());
+    tr_info("MBED: Time taken: %fs", duration<float>{timer.elapsed_time()}.count());
     sock.set_timeout(1000);
 
     timer.reset();
@@ -50,7 +50,7 @@ void UDPSOCKET_SENDTO_TIMEOUT()
     sent = sock.sendto(udp_addr, tx_buffer, sizeof(tx_buffer));
     timer.stop();
     TEST_ASSERT_EQUAL(sizeof(tx_buffer), sent);
-    tr_info("MBED: Time taken: %fs", timer.read());
+    tr_info("MBED: Time taken: %fs", duration<float>{timer.elapsed_time()}.count());
 
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.close());
 }
