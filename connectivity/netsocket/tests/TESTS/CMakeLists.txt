@@ -5,24 +5,12 @@ if(DEFAULT_IFC_IDX EQUAL -1)
     set(TEST_SKIPPED "No default network interface on this target")
 endif()
 
-# Set up variables for wi-fi SSID and password
-if("MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE=WIFI" IN_LIST MBED_CONFIG_DEFINITIONS)
-    set(MBED_GREENTEA_WIFI_SECURE_SSID "" CACHE STRING "SSID of a secured wi-fi network with internet access, for greentea tests which need to connect to wifi")
-    set(MBED_GREENTEA_WIFI_SECURE_PASSWORD "" CACHE STRING "Password to the network given by MBED_GREENTEA_WIFI_SECURE_SSID")
-    set(MBED_GREENTEA_WIFI_SECURE_PROTOCOL "WPA2" CACHE STRING "WiFi security protocol, valid values are WEP, WPA, WPA2, WPA_WPA2, WPA3, WPA3_WPA2, NONE")
-
-    if("${MBED_GREENTEA_WIFI_SECURE_SSID}" STREQUAL "" OR "${MBED_GREENTEA_WIFI_SECURE_PASSWORD}" STREQUAL "")
-        message(WARNING "MBED_GREENTEA_WIFI_SECURE_SSID and MBED_GREENTEA_WIFI_SECURE_PASSWORD must be set in order for wi-fi greentea tests to pass")
-    else()
-        add_compile_definitions(
-            "MBED_GREENTEA_WIFI_SECURE_SSID=\"${MBED_GREENTEA_WIFI_SECURE_SSID}\""
-            "MBED_GREENTEA_WIFI_SECURE_PASSWORD=\"${MBED_GREENTEA_WIFI_SECURE_PASSWORD}\""
-            MBED_GREENTEA_WIFI_SECURE_PROTOCOL=${MBED_GREENTEA_WIFI_SECURE_PROTOCOL})
-    endif()
+# TEMPORARY: netsocket tests will not compile on STM32H7 until new EMAC driver is merged because the old EMAC driver
+# pulls in a dependency on lwip
+if("TARGET_STM32H7" IN_LIST MBED_TARGET_DEFINITIONS)
+    set(TEST_SKIPPED "Will not compile on STM32H7")
 endif()
 
-# Pull in common util header
-include_directories(common)
-
+add_subdirectory(common)
 add_subdirectory(netsocket)
 add_subdirectory(network)

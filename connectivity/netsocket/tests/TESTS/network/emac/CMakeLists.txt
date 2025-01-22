@@ -20,12 +20,6 @@ list(
             emac_test_unicast_long.cpp
 )
 
-# TEMPORARY: emac test will not compile on STM32H7 until new EMAC driver is merged because the old EMAC driver
-# pulls in a dependency on lwip
-if("TARGET_STM32H7" IN_LIST MBED_TARGET_DEFINITIONS)
-	set(TEST_SKIPPED "Will not compile on STM32H7")
-endif()
-
 mbed_greentea_add_test(
     TEST_NAME
         mbed-connectivity-network-emac
@@ -34,6 +28,7 @@ mbed_greentea_add_test(
     TEST_REQUIRED_LIBS
 		mbed-netsocket
         mbed-emac-test-utils
+		mbed-netsocket-tests-common-inc
     TEST_SKIPPED
         ${TEST_SKIPPED}
 )

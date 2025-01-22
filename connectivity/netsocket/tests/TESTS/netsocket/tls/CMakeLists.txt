@@ -33,13 +33,30 @@ endif()
 
 mbed_greentea_add_test(
     TEST_NAME
-        mbed-connectivity-netsocket-tls
+        mbed-connectivity-netsocket-lwipstack-tls
     TEST_SOURCES
         ${TEST_SOURCE_LIST}
     TEST_REQUIRED_LIBS
-        mbed-netsocket
+        mbed-netsocket-tests-common-inc
         mbed-storage-blockdevice
-    mbed-storage-littlefs
+        mbed-storage-littlefs
+        mbed-netsocket-api
+        mbed-netsocket-tests-use-lwipstack
+    TEST_SKIPPED
+        ${TEST_SKIPPED}
+)
+
+mbed_greentea_add_test(
+    TEST_NAME
+        mbed-connectivity-netsocket-nanostack-tls
+    TEST_SOURCES
+        ${TEST_SOURCE_LIST}
+    TEST_REQUIRED_LIBS
+        mbed-netsocket-tests-common-inc
+        mbed-storage-blockdevice
+        mbed-storage-littlefs
+        mbed-netsocket-api
+        mbed-netsocket-tests-use-nanostack
     TEST_SKIPPED
         ${TEST_SKIPPED}
 )

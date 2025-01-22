@@ -15,11 +15,29 @@ endif()
 
 mbed_greentea_add_test(
     TEST_NAME
-        mbed-connectivity-netsocket-network-interface
+        mbed-connectivity-netsocket-lwipstack-network-interface
     TEST_SOURCES
         ${TEST_SOURCE_LIST}
     TEST_REQUIRED_LIBS
         mbed-netsocket
+        mbed-netsocket-tests-common-inc
+        mbed-netsocket-api
+        mbed-netsocket-tests-use-lwipstack
     TEST_SKIPPED
         ${TEST_SKIPPED}
 )
+
+mbed_greentea_add_test(
+    TEST_NAME
+        mbed-connectivity-netsocket-nanostack-network-interface
+    TEST_SOURCES
+        ${TEST_SOURCE_LIST}
+    TEST_REQUIRED_LIBS
+        mbed-netsocket
+        mbed-netsocket-tests-common-inc
+        mbed-netsocket-api
+        mbed-netsocket-tests-use-nanostack
+    TEST_SKIPPED
+        ${TEST_SKIPPED}
+)
+
