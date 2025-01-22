@@ -22,6 +22,12 @@ target_sources(mbed-wifi
         mx_wifi/core/mx_wifi_slip.c
 )
 
+# This driver needs utility functions from LwIP
+target_link_libraries(mbed-wifi
+    PRIVATE
+        mbed-lwipstack
+)
+
 # Link override object file coming from static library anyway
 #
 # NOTE: This linker option is to pretend undefined symbol and won't cause
