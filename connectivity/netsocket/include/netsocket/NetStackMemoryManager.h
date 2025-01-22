@@ -100,10 +100,7 @@ public:
     /**
      * Get memory buffer pool size.
      *
-     * Returns the maximum size of contiguous memory that can be allocated from a pool.
-     *
-     * @param align    Memory alignment requirement in bytes
-     * @return         Contiguous memory size
+     * @return The maximum size of contiguous memory that can be allocated from a pool.
      */
     virtual uint32_t get_pool_size() const = 0;
 
@@ -222,7 +219,7 @@ public:
      * The allocated payload size will not change. It is not permitted
      * to change the length of a buffer that is not the first (or only) in a chain.
      *
-     * *Note as of Dec 2024: Different implementations (nanostack vs LwIP) disagree about
+     * *Note as of Dec 2024: Different implementations (Nanostack vs LwIP) disagree about
      * how to implement this operation.  Specifically, if called on the head of a buffer
      * chain, the LwIP implementation allows changing the length of the chain as a whole.
      * However, the Nanostack implementation does not and only can change the length of the head buffer.
