@@ -21,6 +21,7 @@
 #include "platform/arm_hal_interrupt.h"
 #include <stdlib.h>
 #include "ns_list.h"
+#include "mbed_toolchain.h"
 
 #ifndef STANDARD_MALLOC
 typedef enum mem_stat_update_t {
@@ -598,6 +599,10 @@ static bool pointer_address_validate(ns_mem_book_t *book, ns_mem_word_size_t *pt
     return false;
 }
 
+// Hook from nanostack to the Mbed EMAC memory manager when memory becomes free.
+MBED_WEAK void mbed_ns_heap_free_hook(void)
+{}
+
 void ns_mem_free(ns_mem_book_t *book, void *block)
 {
 #ifndef STANDARD_MALLOC
@@ -633,6 +638,8 @@ void ns_mem_free(ns_mem_book_t *book, void *block)
     free(block);
     platform_exit_critical();
 #endif
+
+    mbed_ns_heap_free_hook();
 }
 
 void ns_dyn_mem_free(void *block)

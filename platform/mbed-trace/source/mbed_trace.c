@@ -304,7 +304,7 @@ static int8_t mbed_trace_skip(int8_t dlevel, const char *grp)
         if (m_trace.filters_include[0] != '\0' &&
                 strstr(m_trace.filters_include, grp) == 0) {
             //grp was in include list
-            return 1;
+            return 0;
         }
     }
     return 0;
