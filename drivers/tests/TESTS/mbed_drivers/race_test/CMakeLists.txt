@@ -1,7 +1,7 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-if(${MBED_C_LIB} STREQUAL "small" OR MBED_GREENTEA_TEST_BAREMETAL)
+if(${MBED_C_LIB} STREQUAL "small" OR APPLICATION_PROFILE_CONFIG_BAREMETAL)
     set(TEST_SKIPPED "Mutex test cases require RTOS with multithread to run")
 endif()
 

@@ -22,8 +22,8 @@ if("MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE=WIFI" IN_LIST MBED_CONFIG_DE
 endif()
 
 # Tests can link one of the below two libraries to use lwipstack or nanostack
-add_library(mbed-netsocket-tests-use-lwipstack STATIC greentea_network_stack_lwipstack.cpp)
+add_library(mbed-netsocket-tests-use-lwipstack STATIC EXCLUDE_FROM_ALL greentea_network_stack_lwipstack.cpp)
 target_link_libraries(mbed-netsocket-tests-use-lwipstack PUBLIC mbed-lwipstack)
 
-add_library(mbed-netsocket-tests-use-nanostack STATIC greentea_network_stack_nanostack.cpp)
+add_library(mbed-netsocket-tests-use-nanostack STATIC EXCLUDE_FROM_ALL greentea_network_stack_nanostack.cpp)
 target_link_libraries(mbed-netsocket-tests-use-nanostack PUBLIC mbed-nanostack)
