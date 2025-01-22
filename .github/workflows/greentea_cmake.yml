@@ -146,7 +146,7 @@ jobs:
         # Note: We have to set a wifi network name and password so that the test will compile on devices that use wifi
         run: |
             rm -rf __build
-            cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_TEST_BAREMETAL=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }} -DMBED_APP_JSON_PATH=TESTS/configs/greentea_baremetal.json5
+            cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }} -DMBED_APP_JSON_PATH=TESTS/configs/greentea_baremetal.json5
             cmake --build __build
 
       - name: Build ${{ matrix.target }} with full profile

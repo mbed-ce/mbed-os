@@ -5,7 +5,7 @@ if(NOT "DEVICE_USBDEVICE=1" IN_LIST MBED_TARGET_DEFINITIONS)
     set(TEST_SKIPPED "USB Device is not supported for this target")
 endif()
 
-if(MBED_GREENTEA_TEST_BAREMETAL)
+if(APPLICATION_PROFILE_CONFIG_BAREMETAL)
     set(TEST_SKIPPED "USB MSD test is not compatible with mbed-baremetal")
 endif()
 

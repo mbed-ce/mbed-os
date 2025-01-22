@@ -3,7 +3,7 @@
 
 include(mbed_greentea)
 
-if(MBED_GREENTEA_TEST_BAREMETAL)
+if(APPLICATION_PROFILE_CONFIG_BAREMETAL)
     set(TEST_SKIPPED "RTOS required")
 endif()
 

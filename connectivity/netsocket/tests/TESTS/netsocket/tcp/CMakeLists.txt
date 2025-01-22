@@ -27,7 +27,7 @@ list(
             tcpsocket_recv_100k.cpp       	
 )
 
-if(MBED_GREENTEA_TEST_BAREMETAL)
+if(APPLICATION_PROFILE_CONFIG_BAREMETAL)
     set(TEST_SKIPPED "This test requires an RTOS!")
 endif()
 
