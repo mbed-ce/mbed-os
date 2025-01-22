@@ -22,6 +22,10 @@
 
         // Don't use any network stack as the default, so that we can manually select which one
         // is used in the tests.
-        "nsapi.default-stack": null
+        "nsapi.default-stack": null,
+
+        // Configure Nanostack for Ethernet mode only by default. This is sufficient for our tests and is
+        // needed because not every target has enough flash space for all of Nanostack (it can be more than 400kiB when you include the Mbed TLS deps it pulls in!)
+        "nanostack.configuration": "ethernet_host"
     }
 }
