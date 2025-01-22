@@ -47,7 +47,7 @@ void TCPSOCKET_SEND_TIMEOUT()
                 (timer.elapsed_time() <= 800ms)) {
             continue;
         }
-        tr_error("send: err %d, time %d", err, timer.read_ms());
+        tr_error("send: err %d, time %" PRIi64, err, std::chrono::duration_cast<chrono::milliseconds>(timer.elapsed_time()).count());
         TEST_FAIL();
         break;
     }
