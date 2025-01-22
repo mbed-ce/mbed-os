@@ -61,8 +61,6 @@
 
 #if defined(ETH_IP_VERSION_V2)
 #include "lan8742/lan8742.h"
-#include "lwip/memp.h"
-#include "lwip/api.h"
 #endif
 
 using namespace std::chrono;
