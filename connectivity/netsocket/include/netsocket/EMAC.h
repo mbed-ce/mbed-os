@@ -155,12 +155,18 @@ public:
     /** Add device to a multicast group
      *
      * @param address  A multicast group hardware address
+     *
+     * @note The network stack will ensure that no two threads can call this function at
+     *   the same time.  It doesn't need locking at the MAC level.
      */
     virtual void add_multicast_group(const uint8_t *address) = 0;
 
     /** Remove device from a multicast group
      *
      * @param address  A multicast group hardware address
+     *
+     * @note The network stack will ensure that no two threads can call this function at
+     *   the same time.  It doesn't need locking at the MAC level.
      */
     virtual void remove_multicast_group(const uint8_t *address) = 0;
 

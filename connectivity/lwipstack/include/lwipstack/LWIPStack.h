@@ -344,6 +344,12 @@ public:
       */
     void set_default_interface(OnboardNetworkStack::Interface *interface) override;
 
+    /// Get the memory manager for the LwIP stack
+    LWIPMemoryManager &get_memory_manager()
+    {
+        return memory_manager;
+    }
+
 protected:
     LWIP();
 

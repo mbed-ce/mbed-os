@@ -550,6 +550,9 @@ nsapi_size_or_error_t LWIP::socket_sendto_control(nsapi_socket_t handle, const S
 
     struct netbuf *buf = netbuf_new();
 
+    // Note: netbuf_ref() tells LwIP that it can reference the application-supplied buffer,
+    // but only until sendto() returns.  If it has to hold onto the buffer until later
+    // (e.g. due to an ARP packet that needs to be sent first), it must copy it.
     err_t err = netbuf_ref(buf, data, (u16_t)size);
     if (err != ERR_OK) {
         netbuf_free(buf);
