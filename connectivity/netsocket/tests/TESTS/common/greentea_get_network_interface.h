@@ -74,5 +74,4 @@ inline NetworkInterface *get_network_interface()
 #endif
 
 }
-
 #endif //MBED_OS_GREENTEA_GET_NETWORK_INTERFACE_H
