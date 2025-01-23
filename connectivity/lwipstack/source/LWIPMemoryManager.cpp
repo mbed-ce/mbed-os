@@ -189,9 +189,8 @@ void LWIPMemoryManager::set_total_len(struct pbuf *pbuf)
 
 void mbed_lwip_on_pbuf_pool_free_hook()
 {
-    auto & callback = LWIP::get_instance().get_memory_manager().onPoolSpaceAvailCallback;
-    if(callback)
-    {
+    auto &callback = LWIP::get_instance().get_memory_manager().onPoolSpaceAvailCallback;
+    if (callback) {
         callback();
     }
 }
