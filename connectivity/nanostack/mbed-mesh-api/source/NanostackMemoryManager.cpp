@@ -158,5 +158,9 @@ NetStackMemoryManager::Lifetime NanostackMemoryManager::get_lifetime(const net_s
 
 void mbed_ns_heap_free_hook()
 {
-    Nanostack::get_instance().get_memory_manager().onPoolSpaceAvailCallback();
+    auto & callback = Nanostack::get_instance().get_memory_manager().onPoolSpaceAvailCallback;
+    if(callback)
+    {
+        callback();
+    }
 }

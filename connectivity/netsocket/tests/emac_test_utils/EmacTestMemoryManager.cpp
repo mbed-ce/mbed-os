@@ -317,7 +317,7 @@ void EmacTestMemoryManager::free(emac_mem_buf_t *buf)
 
     m_mem_mutex.unlock();
 
-    if (pool_buf_freed) {
+    if (pool_buf_freed && onPoolSpaceAvailCallback) {
         onPoolSpaceAvailCallback();
     }
 }
@@ -514,7 +514,7 @@ void EmacTestMemoryManager::set_memory_available(bool memory)
     m_memory_available = memory;
 
     // Poke the EMAC in case it can allocate buffers
-    if (m_memory_available) {
+    if (m_memory_available && onPoolSpaceAvailCallback) {
         onPoolSpaceAvailCallback();
     }
 }
