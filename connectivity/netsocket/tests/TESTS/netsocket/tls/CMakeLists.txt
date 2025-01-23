@@ -37,11 +37,9 @@ mbed_greentea_add_test(
     TEST_SOURCES
         ${TEST_SOURCE_LIST}
     TEST_REQUIRED_LIBS
-        mbed-netsocket-tests-common-inc
         mbed-storage-blockdevice
         mbed-storage-littlefs
-        mbed-netsocket-api
-        mbed-netsocket-tests-use-lwipstack
+        ${MBED_NETSOCKET_TEST_COMMON_LIBS_LWIPSTACK}
     TEST_SKIPPED
         ${TEST_SKIPPED}
 )
@@ -52,11 +50,9 @@ mbed_greentea_add_test(
     TEST_SOURCES
         ${TEST_SOURCE_LIST}
     TEST_REQUIRED_LIBS
-        mbed-netsocket-tests-common-inc
         mbed-storage-blockdevice
         mbed-storage-littlefs
-        mbed-netsocket-api
-        mbed-netsocket-tests-use-nanostack
+        ${MBED_NETSOCKET_TEST_COMMON_LIBS_NANOSTACK}
     TEST_SKIPPED
         ${TEST_SKIPPED}
 )
