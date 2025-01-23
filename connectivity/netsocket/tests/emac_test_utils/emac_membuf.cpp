@@ -27,7 +27,7 @@
 #include "emac_membuf.h"
 #include "emac_util.h"
 
-int emac_if_memory_buffer_read(void *buf, unsigned char *eth_frame)
+int emac_if_memory_buffer_read_and_check(void *buf, unsigned char *eth_frame)
 {
     int eth_frame_index = 0;
     int invalid_data_index = 0;

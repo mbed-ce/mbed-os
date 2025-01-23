@@ -52,7 +52,7 @@ void test_emac_multicast_filter_cb(int opt)
                 break;
 
             case 1:
-                printf("STEP 1: set ipv6 multicast filter, test if input message is filtered\r\n\r\n");
+                printf("STEP 1: set ipv6 multicast filter to wrong address, test if input message is correctly filtered out (NOT received)\r\n\r\n");
                 {
                     unsigned char filter[] = {0x33, 0x33, 0x1b, 0x1c, 0x1d, 0x1e};
                     char forw_addr[] = {0x33, 0x33, 0x11, 0x22, 0x33, 0x44};
@@ -63,7 +63,7 @@ void test_emac_multicast_filter_cb(int opt)
                 break;
 
             case 2:
-                printf("STEP 2: set ipv6 multicast filter, test that input message is not filtered\r\n\r\n");
+                printf("STEP 2: set ipv6 multicast filter, test that input message is passed by mcast filter\r\n\r\n");
                 {
                     unsigned char filter[] = {0x33, 0x33, 0xaa, 0xbb, 0xcc, 0xdd};
                     emac_if_add_multicast_group(filter);
@@ -73,7 +73,7 @@ void test_emac_multicast_filter_cb(int opt)
                 break;
 
             case 3:
-                printf("STEP 3: set ipv4 multicast filter, test if input message is filtered\r\n\r\n");
+                printf("STEP 3: set ipv4 multicast filter to wrong address, test if input message is correctly filtered out (NOT received)\r\n\r\n");
                 {
                     unsigned char filter[] = {0x01, 0x00, 0x5e, 0xa1, 0xa2, 0xa3};
                     char forw_addr[] = {0x01, 0x00, 0x5e, 0x11, 0x22, 0x33};
@@ -84,7 +84,7 @@ void test_emac_multicast_filter_cb(int opt)
                 break;
 
             case 4:
-                printf("STEP 4: set ipv4 multicast filter, test that input message is not filtered\r\n\r\n");
+                printf("STEP 4: set ipv4 multicast filter, test that input message is passed by mcast filter\r\n\r\n");
                 {
                     unsigned char filter[] = {0x01, 0x00, 0x5e, 0xa5, 0xa6, 0xa7};
                     emac_if_add_multicast_group(filter);
@@ -93,8 +93,45 @@ void test_emac_multicast_filter_cb(int opt)
                 receive = true;
                 break;
 
+
             case 5:
-                printf("STEP 5: set receive all multicast, verify that input messages are not filtered\r\n\r\n");
+                printf("STEP 5: Remove last added mcast address, check that it no longer works\r\n\r\n");
+                {
+                    unsigned char filter[] = {0x01, 0x00, 0x5e, 0xa5, 0xa6, 0xa7};
+                    emac_if_remove_multicast_group(filter);
+                }
+                receive = false;
+                break;
+
+            case 6:
+                printf("STEP 6: Check that second to last added mcast address still works\r\n\r\n");
+                {
+                    unsigned char filter[] = {0x01, 0x00, 0x5e, 0xa1, 0xa2, 0xa3};
+                    memcpy(forward_addr, filter, 6);
+                }
+                receive = true;
+                break;
+
+            case 7:
+                printf("STEP 7: Check that first added mcast address still works\r\n\r\n");
+                {
+                    unsigned char filter[] = {0x33, 0x33, 0xaa, 0xbb, 0xcc, 0xdd};
+                    memcpy(forward_addr, filter, 6);
+                }
+                receive = true;
+                break;
+
+            case 8:
+                printf("STEP 8: Remove first added mcast address, check that it does not work now\r\n\r\n");
+                {
+                    unsigned char filter[] = {0x33, 0x33, 0xaa, 0xbb, 0xcc, 0xdd};
+                    emac_if_remove_multicast_group(filter);
+                }
+                receive = false;
+                break;
+
+            case 9:
+                printf("STEP 9: set receive all multicast, verify that all mcast addresses are passed now\r\n\r\n");
                 {
                     emac_if_set_all_multicast(true);
                     char forw_addr[] = {0x33, 0x33, 0x11, 0x12, 0x33, 0x44};
@@ -103,10 +140,11 @@ void test_emac_multicast_filter_cb(int opt)
                 receive = true;
                 break;
 
-            case 6:
+            case 10:
                 // Test ended
                 if (!multicasts_are_filtered) {
                     printf("multicast filtering was not enabled!!!\r\n\r\n");
+                    SET_ERROR_FLAGS(TEST_FAILED);
                 }
                 END_TEST_LOOP;
         }
@@ -119,7 +157,7 @@ void test_emac_multicast_filter_cb(int opt)
         no_response_cnt = 0;
     } else if (opt == TIMEOUT) {
         if (++no_response_cnt > 5) {
-            if (++retries > 3) {
+            if (++retries > 1) {
                 if (receive) {
                     printf("too many retries\r\n\r\n");
                     SET_ERROR_FLAGS(TEST_FAILED);
@@ -137,7 +175,7 @@ void test_emac_multicast_filter_cb(int opt)
     // Echo response received
     if (opt == INPUT) {
         if (receive == false) {
-            printf("multicast was not filtered\r\n\r\n");
+            printf("ERROR: multicast was received but should not have been!\r\n\r\n");
             multicasts_are_filtered = false;
         }
         next_step = true;
@@ -145,15 +183,7 @@ void test_emac_multicast_filter_cb(int opt)
 
     if (next_step) {
         RESET_OUTGOING_MSG_DATA;
-#if (MBED_CONF_NETWORK_EMAC_NO_SUPPORT_FOR_IPV4_MULTICAST_FILTER == 1)
-        if (test_step == 2) {
-            test_step = 5;
-        } else {
-            test_step++;
-        }
-#else
         test_step++;
-#endif
         retries = 0;
         send_request = true;
     }
@@ -165,7 +195,7 @@ void test_emac_multicast_filter()
     SET_TRACE_LEVEL(TRACE_SEND | TRACE_ETH_FRAMES | TRACE_SUCCESS | TRACE_FAILURE);
 
     if (ECHO_SERVER_ADDRESS_KNOWN) {
-        START_TEST_LOOP(test_emac_multicast_filter_cb, 1s);
+        START_TEST_LOOP(test_emac_multicast_filter_cb, 250ms);
     }
 
     PRINT_ERROR_FLAGS;

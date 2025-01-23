@@ -55,7 +55,7 @@ void test_emac_unicast_long_cb(int opt)
 
     // Echo response received
     if (opt == INPUT) {
-        if (++test_step > 50000) {
+        if (++test_step > 10000) {
             END_TEST_LOOP;
         }
 

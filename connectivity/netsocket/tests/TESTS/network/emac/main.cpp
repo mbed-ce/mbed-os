@@ -46,7 +46,7 @@ utest::v1::status_t test_setup(const size_t number_of_cases)
 
 Case cases[] = {
     Case("EMAC initialize", test_emac_initialize),
-    Case("EMAC broadcast", test_emac_broadcast),
+    Case("EMAC broadcast", test_emac_broadcast), // note: this test case has the side effect of finding the CTP server MAC address and saving it
     Case("EMAC unicast", test_emac_unicast),
     Case("EMAC unicast frame length", test_emac_unicast_frame_len),
     Case("EMAC unicast burst", test_emac_unicast_burst),

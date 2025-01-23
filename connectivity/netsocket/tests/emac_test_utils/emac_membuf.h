@@ -18,7 +18,16 @@
 #ifndef EMAC_MEMBUF_H
 #define EMAC_MEMBUF_H
 
-int emac_if_memory_buffer_read(void *buf, unsigned char *eth_frame);
+/**
+ * Read data from an Ethernet CTP frame received from the MAC.
+ * The first ETH_FRAME_HEADER_LEN bytes are copied into \c eth_frame.
+ * Bytes after there must be a fixed test pattern.
+ *
+ * @return Index (with 0 being the first byte of the Ethernet payload) of the first
+ *    byte that did not match the test pattern, or 0 on success.
+ */
+int emac_if_memory_buffer_read_and_check(void *buf, unsigned char *eth_frame);
+
 void emac_if_memory_buffer_write(void *buf, unsigned char *eth_frame, bool write_data);
 
 #endif /* EMAC_MEMBUF_H */
