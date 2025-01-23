@@ -117,7 +117,7 @@ void rcv_n_chk_against_rfc864_pattern(TCPSocket &sock)
         recvd_size += rd;
     }
     timer.stop();
-    tr_info("MBED: Time taken: %fs", timer.read());
+    tr_info("MBED: Time taken: %" PRIi64 "ms", std::chrono::duration_cast<std::chrono::milliseconds>(timer.elapsed_time()).count());
 }
 
 void TCPSOCKET_RECV_100K()
@@ -172,7 +172,7 @@ void rcv_n_chk_against_rfc864_pattern_nonblock(TCPSocket &sock)
         }
     }
     timer.stop();
-    tr_info("MBED: Time taken: %fs", timer.read());
+    tr_info("MBED: Time taken: %" PRIi64 "ms", std::chrono::duration_cast<std::chrono::milliseconds>(timer.elapsed_time()).count());
 }
 
 static void _sigio_handler(osThreadId id)

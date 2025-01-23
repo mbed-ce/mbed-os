@@ -1,11 +1,21 @@
-/* Linker script for mbed LPC1768 */
-#if !defined(MBED_APP_START)
-  #define MBED_APP_START 0x00000000
-#endif
-
-#if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE 512K
-#endif
+/* mbed Microcontroller Library
+ * Copyright (c) 2025 Jamie Smith
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+  
+#include "../cmsis_nvic.h"
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
     #define MBED_CONF_TARGET_BOOT_STACK_SIZE 0x400
@@ -13,14 +23,16 @@
 
 STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 
+#define VTORS_NEEDED_SPACE NVIC_NUM_VECTORS * 4
+
 /* Linker script to configure memory regions. */
 MEMORY
 {
-  FLASH (rx) : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
-  RAM (rwx) : ORIGIN = 0x100000C8, LENGTH = (32K - 0xC8 - 32)  /* topmost 32 bytes used by IAP functions */
+  FLASH (rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START, LENGTH = MBED_CONFIGURED_ROM_BANK_IROM1_SIZE
+  RAM (rwx) : ORIGIN = MBED_RAM_BANK_IRAM1_START + VTORS_NEEDED_SPACE, LENGTH = (MBED_RAM_BANK_IRAM1_SIZE - VTORS_NEEDED_SPACE - 32)  /* topmost 32 bytes used by IAP functions */
 
-  USB_RAM(rwx) : ORIGIN = 0x2007C000, LENGTH = 16K
-  ETH_RAM(rwx) : ORIGIN = 0x20080000, LENGTH = 16K
+  AHBSRAM0(rwx) : ORIGIN = MBED_RAM_BANK_IRAM2_START, LENGTH = 16K
+  AHBSRAM1(rwx) : ORIGIN = MBED_RAM_BANK_IRAM2_START + 16K, LENGTH = 16K
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -56,9 +68,13 @@ SECTIONS
     .text :
     {
         KEEP(*(.isr_vector))
-        /* Code Read Protect data */
+
+#if MBED_CONFIGURED_ROM_BANK_IROM1_START == MBED_ROM_BANK_IROM1_START
+        /* Code Read Protect data, if this is at the start of flash*/
         . = 0x000002FC ;
         KEEP(*(.CRPSection))
+#endif
+
         /* End of Code Read Protect */
         *(.text*)
 
@@ -144,14 +160,13 @@ SECTIONS
         Image$$RW_IRAM1$$ZI$$Limit = . ;
     } > RAM
 
-    
-    .heap (NOLOAD):
+    .heap_0 (NOLOAD): ALIGN(8)
     {
         __end__ = .;
         end = __end__;
-        *(.heap*)
-        . = ORIGIN(RAM) + LENGTH(RAM) - STACK_SIZE;
-        __HeapLimit = .;
+        __mbed_sbrk_start_0 = .;
+        . = (ORIGIN(RAM) + LENGTH(RAM) - STACK_SIZE);
+        __mbed_krbs_start_0 = .;
     } > RAM
 
     /* .stack_dummy section doesn't contains any symbols. It is only
@@ -173,7 +188,7 @@ SECTIONS
 
 
     /* Code can explicitly ask for data to be 
-       placed in these higher RAM banks where
+       placed in this higher RAM bank where
        they will be left uninitialized. 
     */
     .AHBSRAM0 (NOLOAD):
@@ -181,12 +196,13 @@ SECTIONS
         Image$$RW_IRAM2$$Base = . ;
         *(AHBSRAM0)
         Image$$RW_IRAM2$$ZI$$Limit = .;
-    } > USB_RAM
+    } > AHBSRAM0
 
-    .AHBSRAM1 (NOLOAD):
+    /* Fill all of AHBSRAM1 with additional heap */
+    .heap (NOLOAD): ALIGN(8)
     {
-        Image$$RW_IRAM3$$Base = . ;
-        *(AHBSRAM1)
-        Image$$RW_IRAM3$$ZI$$Limit = .;
-    } > ETH_RAM
+        __mbed_sbrk_start = .;
+        . = ORIGIN(AHBSRAM1) + LENGTH(AHBSRAM1);
+        __mbed_krbs_start = .;
+    } > AHBSRAM1
 }

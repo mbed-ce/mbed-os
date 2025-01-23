@@ -31,7 +31,7 @@
 #ifndef MBED_CMSIS_NVIC_H
 #define MBED_CMSIS_NVIC_H
 
-#define NVIC_NUM_VECTORS        (16 + 33)
+#define NVIC_NUM_VECTORS        (16 + 35)
 #define NVIC_RAM_VECTOR_ADDRESS 0x10000000    // Location of vectors in RAM
 
 #endif

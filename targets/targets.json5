@@ -419,6 +419,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_toolchains": [
             "GCC_ARM"
         ],
+        "macros": [
+            "MBED_SPLIT_HEAP"
+        ],
         "device_has": [
             "RTC",
             "USTICKER",
