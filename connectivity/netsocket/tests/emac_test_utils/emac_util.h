@@ -111,6 +111,7 @@ extern void emac_if_link_state_change_cb(bool up);
 
 void emac_if_set_all_multicast(bool all);
 void emac_if_add_multicast_group(uint8_t *address);
+void emac_if_remove_multicast_group(uint8_t *address);
 
 void emac_if_set_output_memory(bool memory);
 void emac_if_set_input_memory(bool memory);

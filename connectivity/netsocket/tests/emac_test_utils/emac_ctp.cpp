@@ -31,62 +31,63 @@ static int receipt_number = 0;
 
 static int emac_if_ctp_header_build(unsigned char *eth_frame, const unsigned char *dest_addr, const unsigned char *origin_addr, const unsigned char *forward_addr)
 {
-    memcpy(&eth_frame[0], dest_addr, 6);
-    memcpy(&eth_frame[6], origin_addr, 6);
+    auto *ctpFrame = reinterpret_cast<EthernetCTPFrame *>(eth_frame);
 
-    eth_frame[12] = 0x90; /* loop back */
-    eth_frame[13] = 0x00;
+    memcpy(ctpFrame->destMAC, dest_addr, 6);
+    memcpy(ctpFrame->srcMAC, origin_addr, 6);
+    ctpFrame->etherType = __builtin_bswap16(CTP_ETHERTYPE);
+    ctpFrame->skipCount = 0;
 
-    eth_frame[14] = 0x00; /* skip count */
-    eth_frame[15] = 0x00;
+    auto *forwardCommand = reinterpret_cast<CTPForwardCommand *>(ctpFrame->nextCommand);
 
-    eth_frame[16] = 0x02; /* function, forward */
-    eth_frame[17] = 0x00;
+    forwardCommand->function = ctp_function::FORWARD;
+    memcpy(forwardCommand->forwardMAC, forward_addr, 6);
 
-    memcpy(&eth_frame[18], forward_addr, 6);
-
-    eth_frame[24] = 0x01; /* function, reply */
-    eth_frame[25] = 0x00;
+    auto *replyCommand = reinterpret_cast<CTPReplyCommand *>(forwardCommand->nextCommand);
+    replyCommand->function = ctp_function::REPLY;
 
     receipt_number++;
-
-    eth_frame[26] = receipt_number; /* receipt number */
-    eth_frame[27] = receipt_number >> 8;
+    replyCommand->receiptNumber = receipt_number;
 
     return receipt_number;
 }
 
-ctp_function emac_if_ctp_header_handle(unsigned char *eth_input_frame, unsigned char *eth_output_frame, unsigned char const *origin_addr, int *receipt_number)
+ctp_function emac_if_ctp_header_handle(unsigned char const *eth_input_frame, unsigned char *eth_output_frame, unsigned char const *origin_addr, int *receipt_number)
 {
-    if (eth_input_frame[12] != 0x90 || eth_input_frame[13] != 0x00) {
-        return CTP_NONE;
+    auto *ctpFrame = reinterpret_cast<EthernetCTPFrame const *>(eth_input_frame);
+
+    if (__builtin_bswap16(ctpFrame->etherType) != CTP_ETHERTYPE) {
+        return ctp_function::INVALID;
     }
 
-    int skip_count = eth_input_frame[15] << 8 | eth_input_frame[14];
-    unsigned char *ethernet_ptr = &eth_input_frame[16] + skip_count;
-
-    int function = ethernet_ptr[1] << 8 | ethernet_ptr[0];
-    ethernet_ptr += 2;
+    unsigned char const *command_ptr = ctpFrame->nextCommand + ctpFrame->skipCount;
+    ctp_function command_function = *reinterpret_cast<ctp_function const *>(command_ptr);
 
     // Forward
-    if (function == 0x0002) {
+    if (command_function == ctp_function::FORWARD) {
+        auto const *forwardCommandPtr = reinterpret_cast<const CTPForwardCommand *>(command_ptr);
+
         memcpy(eth_output_frame, eth_input_frame, ETH_FRAME_HEADER_LEN);
-        // Update skip count
-        skip_count += 8;
-        eth_output_frame[14] = skip_count;
-        eth_output_frame[15] = skip_count >> 8;
+        auto *ctpFrameOut = reinterpret_cast<EthernetCTPFrame *>(eth_output_frame);
+
+        // Update skip count so that the receiver will process the command after this one
+        ctpFrameOut->skipCount = ctpFrame->skipCount + sizeof(CTPForwardCommand);
+
         // Set forward address to destination address
-        memcpy(&eth_output_frame[0], ethernet_ptr, 6);
+        memcpy(ctpFrameOut->destMAC, forwardCommandPtr->forwardMAC, 6);
         // Copy own address to origin
-        memcpy(&eth_output_frame[6], origin_addr, 6);
-        return CTP_FORWARD;
-        // reply
-    } else if (function == 0x0001) {
-        *receipt_number = ethernet_ptr[1] << 8 | ethernet_ptr[0];
-        return CTP_REPLY;
+        memcpy(ctpFrameOut->srcMAC, origin_addr, 6);
+
+        return ctp_function::FORWARD;
+    }
+    // Reply
+    else if (command_function == ctp_function::REPLY) {
+        auto const *replyCommandPtr = reinterpret_cast<const CTPReplyCommand *>(command_ptr);
+        *receipt_number = replyCommandPtr->receiptNumber;
+        return ctp_function::REPLY;
     }
 
-    return CTP_NONE;
+    return ctp_function::INVALID;
 }
 
 void emac_if_ctp_msg_build(int eth_frame_len, const unsigned char *dest_addr, const unsigned char *origin_addr, const unsigned char *forward_addr, int options)
@@ -96,7 +97,9 @@ void emac_if_ctp_msg_build(int eth_frame_len, const unsigned char *dest_addr, co
     }
 
     if (emac_if_get_trace_level() & TRACE_SEND) {
-        printf("message sent %x:%x:%x:%x:%x:%x\r\n\r\n", dest_addr[0], dest_addr[1], dest_addr[2], dest_addr[3], dest_addr[4], dest_addr[5]);
+        printf("message sent to %x:%x:%x:%x:%x:%x, fwd to %x:%x:%x:%x:%x:%x \r\n\r\n",
+               dest_addr[0], dest_addr[1], dest_addr[2], dest_addr[3], dest_addr[4], dest_addr[5],
+               forward_addr[0], forward_addr[1], forward_addr[2], forward_addr[3], forward_addr[4], forward_addr[5]);
     }
 
     int outgoing_msg_index = emac_if_add_outgoing_msg(eth_frame_len);
@@ -113,13 +116,7 @@ void emac_if_ctp_msg_build(int eth_frame_len, const unsigned char *dest_addr, co
         align = 1;                 // Reserve memory overhead to align to odd address
     }
 
-    emac_mem_buf_t *buf;
-    if (options & CTP_OPT_HEAP) {
-        buf = EmacTestMemoryManager::get_instance().alloc_heap(eth_frame_len, align, alloc_opt);
-    } else {
-        // Default allocation is from pool
-        buf = EmacTestMemoryManager::get_instance().alloc_pool(eth_frame_len, align, alloc_opt);
-    }
+    emac_mem_buf_t *buf = EmacTestMemoryManager::get_instance().alloc_heap(eth_frame_len, align, alloc_opt);
 
     if (!buf) {
         SET_ERROR_FLAGS(NO_FREE_MEM_BUF);

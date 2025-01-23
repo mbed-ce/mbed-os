@@ -80,8 +80,8 @@ static Event<void(void *)> link_input_event(&worker_loop_event_queue, link_input
 static unsigned char eth_mac_echo_server_addr[ECHO_SERVER_COUNT][ETH_MAC_ADDR_LEN];
 static int etc_mac_echo_server_free_index = 0;
 
-static bool output_memory = true;
-static bool input_memory = true;
+static bool allow_output_memory_allocs = true;
+static bool allow_input_memory_allocs = true;
 
 static void (*current_test_step_cb_fnc)(int opt);
 
@@ -371,14 +371,19 @@ void emac_if_add_multicast_group(uint8_t *address)
     EmacTestNetworkStack::get_instance().get_emac()->add_multicast_group(address);
 }
 
+void emac_if_remove_multicast_group(uint8_t *address)
+{
+    EmacTestNetworkStack::get_instance().get_emac()->remove_multicast_group(address);
+}
+
 void emac_if_set_output_memory(bool memory)
 {
-    output_memory = memory;
+    allow_output_memory_allocs = memory;
 }
 
 void emac_if_set_input_memory(bool memory)
 {
-    input_memory = memory;
+    allow_input_memory_allocs = memory;
 
     emac_if_set_memory(memory);
 }
@@ -386,9 +391,9 @@ void emac_if_set_input_memory(bool memory)
 void emac_if_check_memory(bool output)
 {
     if (output) {
-        emac_if_set_memory(output_memory);
+        emac_if_set_memory(allow_output_memory_allocs);
     } else {
-        emac_if_set_memory(input_memory);
+        emac_if_set_memory(allow_input_memory_allocs);
     }
 }
 
@@ -428,41 +433,43 @@ static void link_input_event_cb(void *buf)
         static unsigned char eth_input_frame_data[ETH_FRAME_HEADER_LEN];
         memset(eth_input_frame_data, 0, ETH_FRAME_HEADER_LEN);
 
-        int invalid_data_index = emac_if_memory_buffer_read(buf, eth_input_frame_data);
+        int invalid_data_index = emac_if_memory_buffer_read_and_check(buf, eth_input_frame_data);
 
-        if (eth_input_frame_data[12] == 0x90 && eth_input_frame_data[13] == 0x00) {
-            unsigned char eth_output_frame_data[ETH_FRAME_HEADER_LEN];
-            int receipt_number;
+        if (trace_level & TRACE_ETH_FRAMES) {
+            printf("INP> LEN %i\r\n\r\n", length);
+            const char trace_type[] = "INP>";
 
-            ctp_function function = emac_if_ctp_header_handle(eth_input_frame_data, eth_output_frame_data, EmacTestNetworkStack::get_instance().get_mac_addr(), &receipt_number);
+            emac_if_trace_to_ascii_hex_dump(trace_type, ETH_FRAME_HEADER_LEN, eth_input_frame_data);
+        }
 
-            if (function == CTP_REPLY) {
-                // If reply has valid receipt number
-                if (emac_if_update_reply_to_outgoing_msg(receipt_number, length, invalid_data_index)) {
-                    // Checks received messages for errors
-                    emac_if_validate_outgoing_msg();
-                    // Removes not replied retry entries if any
-                    emac_if_reset_outgoing_msg();
-                    // Removes retry entries no response flags
-                    emac_if_reset_error_flags(NO_RESPONSE);
-                    // Calls test loop
-                    worker_loop_event_queue.call(current_test_step_cb_fnc, INPUT);
-                }
+        unsigned char eth_output_frame_data[ETH_FRAME_HEADER_LEN];
+        int receipt_number;
+
+        ctp_function function = emac_if_ctp_header_handle(eth_input_frame_data, eth_output_frame_data, EmacTestNetworkStack::get_instance().get_mac_addr(), &receipt_number);
+
+        if (function == ctp_function::REPLY) {
+            // If reply has valid receipt number
+            if (emac_if_update_reply_to_outgoing_msg(receipt_number, length, invalid_data_index)) {
+                // Checks received messages for errors
+                emac_if_validate_outgoing_msg();
+                // Removes not replied retry entries if any
+                emac_if_reset_outgoing_msg();
+                // Removes retry entries no response flags
+                emac_if_reset_error_flags(NO_RESPONSE);
+                // Calls test loop
+                worker_loop_event_queue.call(current_test_step_cb_fnc, INPUT);
             }
-            // Echoes only if configured as echo server
-            else if (function == CTP_FORWARD && ctp_server_mode) {
-                emac_if_memory_buffer_write(buf, eth_output_frame_data, false);
-                EmacTestNetworkStack::get_instance().get_emac()->link_out(buf);
-                buf = nullptr;
-            }
+        }
+        // Echoes only if configured as echo server
+        else if (function == ctp_function::FORWARD && ctp_server_mode) {
+            emac_if_memory_buffer_write(buf, eth_output_frame_data, false);
+            EmacTestNetworkStack::get_instance().get_emac()->link_out(buf);
+            buf = nullptr;
+        }
 
+        // Save echo server address
+        if (function != ctp_function::INVALID) {
             emac_if_add_echo_server_addr(&eth_input_frame_data[6]);
-
-            if (trace_level & TRACE_ETH_FRAMES) {
-                printf("INP> LEN %i\r\n\r\n", length);
-                const char trace_type[] = "INP>";
-                emac_if_trace_to_ascii_hex_dump(trace_type, ETH_FRAME_HEADER_LEN, eth_input_frame_data);
-            }
         }
     }
 
