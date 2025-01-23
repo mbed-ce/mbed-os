@@ -37,7 +37,7 @@
 #  elif defined(TOOLCHAIN_GCC_CR)
 #     define ETHMEM_SECTION __attribute__((section(".data.$RamPeriph32")))
 #  else
-#     define ETHMEM_SECTION __attribute__((section("AHBSRAM0"),aligned))
+#     define ETHMEM_SECTION __attribute__((section("AHBSRAM"),aligned))
 #  endif
 #elif defined(TARGET_STM32H7)
 #  if defined (__ICCARM__)

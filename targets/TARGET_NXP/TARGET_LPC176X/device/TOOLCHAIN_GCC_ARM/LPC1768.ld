@@ -30,9 +30,7 @@ MEMORY
 {
   FLASH (rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START, LENGTH = MBED_CONFIGURED_ROM_BANK_IROM1_SIZE
   RAM (rwx) : ORIGIN = MBED_RAM_BANK_IRAM1_START + VTORS_NEEDED_SPACE, LENGTH = (MBED_RAM_BANK_IRAM1_SIZE - VTORS_NEEDED_SPACE - 32)  /* topmost 32 bytes used by IAP functions */
-
-  AHBSRAM0(rwx) : ORIGIN = MBED_RAM_BANK_IRAM2_START, LENGTH = 16K
-  AHBSRAM1(rwx) : ORIGIN = MBED_RAM_BANK_IRAM2_START + 16K, LENGTH = 16K
+  AHBSRAM(rwx) : ORIGIN = MBED_RAM_BANK_IRAM2_START, LENGTH = MBED_RAM_BANK_IRAM2_SIZE
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -191,18 +189,16 @@ SECTIONS
        placed in this higher RAM bank where
        they will be left uninitialized. 
     */
-    .AHBSRAM0 (NOLOAD):
+    .AHBSRAM_bss (NOLOAD):
     {
-        Image$$RW_IRAM2$$Base = . ;
-        *(AHBSRAM0)
-        Image$$RW_IRAM2$$ZI$$Limit = .;
-    } > AHBSRAM0
+        *(AHBSRAM)
+    } > AHBSRAM
 
-    /* Fill all of AHBSRAM1 with additional heap */
+    /* Fill remaining space in AHBSRAM with additional heap */
     .heap (NOLOAD): ALIGN(8)
     {
         __mbed_sbrk_start = .;
-        . = ORIGIN(AHBSRAM1) + LENGTH(AHBSRAM1);
+        . = ORIGIN(AHBSRAM) + LENGTH(AHBSRAM);
         __mbed_krbs_start = .;
-    } > AHBSRAM1
+    } > AHBSRAM
 }

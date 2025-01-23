@@ -51,7 +51,7 @@ char s_trace_buffer[100] = MEM_MNGR_TRACE;
 #  elif defined(TOOLCHAIN_GCC_CR)
 #     define ETHMEM_SECTION __attribute__((section(".data.$RamPeriph32")))
 #  else
-#     define ETHMEM_SECTION __attribute__((section("AHBSRAM0"),aligned))
+#     define ETHMEM_SECTION __attribute__((section("AHBSRAM"),aligned))
 #  endif
 #endif
 #endif
