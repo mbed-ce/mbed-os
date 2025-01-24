@@ -22,6 +22,8 @@
 #include "cmsis.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <inttypes.h>
 
 #define MEMMAP     (*((volatile unsigned long *) 0x400FC040))
 
@@ -122,10 +124,18 @@ int32_t flash_program_page(flash_t *obj, uint32_t address,
     // On LPC1768, the first RAM bank starts at 0x1000000, so anywhere below that has to be flash.
     // The IAP firmware does not support flash to flash copies, so if the source data is in flash
     // it must be buffered in RAM.
-    bool isFlashToFlashCopy = (ptrdiff_t)(data) < 0x10000000;
+    // Additionally, there seems to be an issue where the IAP ROM won't operate if a source page to be copied
+    // crosses the boundary between AHBSRAM0 and AHBSRAM1
+    const bool startsInAHBSRAM1 = ((uint32_t)data) >= MBED_CONFIGURED_RAM_BANK_IRAM2_START && ((uint32_t)data) < (MBED_CONFIGURED_RAM_BANK_IRAM2_START + 16384);
+    const bool endsInAHBSRAM2 = startsInAHBSRAM1 && ((((uint32_t)data) + size) >= MBED_CONFIGURED_RAM_BANK_IRAM2_START + 16384);
+    const bool sourceAddressPageAligned = (((uint32_t)data) % pageSize) == 0;
+    bool mustBuffer = ((ptrdiff_t)(data) < MBED_CONFIGURED_RAM_BANK_IRAM1_START) || (startsInAHBSRAM1 && endsInAHBSRAM2 && !sourceAddressPageAligned);
+
+    // printf("Flash program: flash address = 0x%" PRIx32 ", source data = 0x%" PRIx32 ", size = 0x%" PRIx32 ", startsInAHBSRAM1 = %d, endsInAHBSRAM2=%d, mustBuffer=%d\n",
+    //         address, (ptrdiff_t)data, size, !!startsInAHBSRAM1, !!endsInAHBSRAM2, !!mustBuffer);
 
     // check word boundary
-    if (isFlashToFlashCopy) {
+    if (mustBuffer) {
         // always malloc outside critical section
         tempBuffer = malloc(pageSize);
         if (tempBuffer == 0) {
@@ -140,7 +150,7 @@ int32_t flash_program_page(flash_t *obj, uint32_t address,
     for(size_t pageIdx = 0; pageIdx < (size / pageSize); ++pageIdx)
     {
         uint8_t * pageSourceAddr = source + (pageIdx * pageSize);
-        if (isFlashToFlashCopy) {
+        if (mustBuffer) {
             memcpy(tempBuffer, pageSourceAddr, pageSize);
             pageSourceAddr = tempBuffer;
         }
@@ -166,6 +176,7 @@ int32_t flash_program_page(flash_t *obj, uint32_t address,
         IAP_Call (&IAP.cmd, &IAP.stat); // Call IAP Command
         if (IAP.stat) {
             core_util_critical_section_exit();
+            //printf("IAP copy failed, address=0x%lx, pageSourceAddr=0x%lx, pageSize=%u\n", address, pageSourceAddr, pageSize);
             return -1; // Command Failed
         }
 

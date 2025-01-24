@@ -103,6 +103,8 @@ cmake_install.cmake
 CMakeFiles/
 cmake_build/
 Testing/
+cmake-variants.yaml
+CMakeUserPresets.json
 
 # CLion
 cmake-build-*/
