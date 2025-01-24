@@ -163,7 +163,7 @@ SECTIONS
         __end__ = .;
         end = __end__;
         __mbed_sbrk_start_0 = .;
-        . = (ORIGIN(RAM) + LENGTH(RAM) - STACK_SIZE);
+        . += (ORIGIN(RAM) + LENGTH(RAM) - STACK_SIZE) - __mbed_sbrk_start_0;
         __mbed_krbs_start_0 = .;
     } > RAM
 
@@ -198,7 +198,7 @@ SECTIONS
     .heap (NOLOAD): ALIGN(8)
     {
         __mbed_sbrk_start = .;
-        . = ORIGIN(AHBSRAM) + LENGTH(AHBSRAM);
+        . += (ORIGIN(AHBSRAM) + LENGTH(AHBSRAM)) - __mbed_sbrk_start;
         __mbed_krbs_start = .;
     } > AHBSRAM
 }
