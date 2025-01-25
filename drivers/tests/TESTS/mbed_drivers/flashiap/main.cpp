@@ -294,9 +294,8 @@ void flashiap_timing_test()
             }
             timer.reset();
             ret = flash_device.program(buf, address, write_size);
-            
-            if(ret)
-            {
+
+            if (ret) {
                 printf("Failed programming %" PRIu32 " bytes at address 0x%" PRIx32 "\n!", write_size, address);
                 TEST_FAIL();
             }
