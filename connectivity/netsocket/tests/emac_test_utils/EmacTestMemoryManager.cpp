@@ -36,8 +36,6 @@
 
 #define CHECK_ASSERT(value, fmt, ...) check_value(value, fmt, ##__VA_ARGS__)
 
-#define BUF_POOL_SIZE   (14 + 40 + 20 + 536) /* Ethernet + IP + TCP + payload */
-
 #define MEM_MNGR_TRACE "test mem mngr: "
 
 char s_trace_buffer[100] = MEM_MNGR_TRACE;
@@ -74,7 +72,8 @@ void emac_heap_error_handler(heap_fail_t event)
 EmacTestMemoryManager::EmacTestMemoryManager()
     : m_mem_mutex(),
       m_mem_buffers(),
-      m_alloc_unit(BUF_POOL_SIZE),
+      m_alloc_unit(MBED_CONF_NSAPI_EMAC_RX_POOL_BUF_SIZE),
+      m_pool_size(MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS),
       m_memory_available(true)
 {
 #ifdef ETHMEM_SECTION
