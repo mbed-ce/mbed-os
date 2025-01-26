@@ -299,9 +299,6 @@ bool STM32_EMAC::low_level_init_successful()
     // Set MAC address
     writeMACAddress(MACAddr, &EthHandle.Instance->MACA0HR, &EthHandle.Instance->MACA0LR);
 
-    // Enable multicast hash and perfect filter
-    EthHandle.Instance->MACFFR = ETH_MACFFR_HM | ETH_MACFFR_HPF;
-
     uint32_t TempRegisterValue;
     if (HAL_ETH_ReadPHYRegister(&EthHandle, 2, &TempRegisterValue) != HAL_OK) {
         tr_error("HAL_ETH_ReadPHYRegister 2 issue");
@@ -1076,13 +1073,13 @@ void STM32_EMAC::populateMcastFilterRegs() {
 
 #if defined(ETH_IP_VERSION_V2)
     uint32_t volatile * hashRegs[] = {
-        &EthHandle.Instance->MACHT1R,
-        &EthHandle.Instance->MACHT0R
+        &EthHandle.Instance->MACHT0R,
+        &EthHandle.Instance->MACHT1R
     };
 #else
     uint32_t volatile * hashRegs[] = {
-        &EthHandle.Instance->MACHTHR,
-        &EthHandle.Instance->MACHTLR
+        &EthHandle.Instance->MACHTLR,
+        &EthHandle.Instance->MACHTHR
     };
 #endif
 

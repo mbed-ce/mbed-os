@@ -37,7 +37,7 @@ void _eth_config_mac(ETH_HandleTypeDef *heth)
         .BroadcastFramesReception = ETH_BROADCASTFRAMESRECEPTION_ENABLE,
         .DestinationAddrFilter = ETH_DESTINATIONADDRFILTER_NORMAL,
         .PromiscuousMode = ETH_PROMISCUOUS_MODE_DISABLE,
-        .MulticastFramesFilter = ETH_MULTICASTFRAMESFILTER_NONE, // Disable multicast filter
+        .MulticastFramesFilter = ETH_MULTICASTFRAMESFILTER_PERFECTHASHTABLE,
         .UnicastFramesFilter = ETH_UNICASTFRAMESFILTER_PERFECT,
         .HashTableHigh = 0x0U,
         .HashTableLow = 0x0U,
