@@ -105,8 +105,8 @@ void test_emac_memory_cb(int opt)
         send_request = false;
         no_response_cnt = 0;
     } else if (opt == TIMEOUT) {
-        if (++no_response_cnt > 5) {
-            if (++retries > 3) {
+        if (++no_response_cnt > 3) {
+            if (++retries > 1) {
                 // If echo replies should be received fails the test case
                 if (echo_should_work) {
                     printf("too many retries\r\n\r\n");
