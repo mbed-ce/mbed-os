@@ -15,7 +15,10 @@
         // Allow lots of reboots so that we don't get in a situation where the MCU refuses to boot
         // after crashing and being reflashed (since some MCUs/flash tools don't reset the
         // crash data RAM)
-        "platform.error-reboot-max": 99999,
+        "platform.error-reboot-max": 2147483648,
+
+        // Emit a KV pair when an assert fail or hardfault occurs
+        "platform.mbed-error-emit-greentea-kv": true,
 
         // Enable mbed trace prints for tests that use it
         "mbed-trace.enable": true,

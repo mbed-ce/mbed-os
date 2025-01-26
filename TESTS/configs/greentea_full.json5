@@ -11,6 +11,9 @@
         // crash data RAM)
         "platform.error-reboot-max": 99999,
 
+        // Emit a KV pair when an assert fail or hardfault occurs
+        "platform.mbed-error-emit-greentea-kv": true,
+
         // Enable mbed trace prints for tests that use it
         "mbed-trace.enable": true,
 

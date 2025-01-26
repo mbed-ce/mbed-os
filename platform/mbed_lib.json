@@ -164,6 +164,10 @@
         "minimal-printf-set-floating-point-max-decimals": {
             "help": "Maximum number of decimals to be printed when using minimal printf library",
             "value": 6
+        },
+        "mbed-error-emit-greentea-kv": {
+            "help": "Option that can be used when building Greentea tests. Causes the mbed_error() function (caused by assert failures and HardFaults) to emit a Greentea key-value pair indicating that an error has occurred.",
+            "value": null
         }
     },
     "target_overrides": {

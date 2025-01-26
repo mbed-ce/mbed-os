@@ -171,12 +171,24 @@ class HostTestCallbackBase(BaseHostTestAbstract):
         """
         self.notify_complete(value == 'success')
 
+    def _default_mbed_error_callback(self, key: str, value: str, timestamp: float):
+        # End the test immediately on error by default. This prevents wasting test runner time
+        # by waiting for the timeout to expire!
+        self.log("Detected target fatal error. Failing test...")
+        self.notify_complete(False)
+
     def __assign_default_callbacks(self):
         """! Assigns default callback handlers """
         for key in self.__consume_by_default:
             self.__callbacks[key] = self.__callback_default
         # Register default handler for event 'end' before assigning user defined callbacks to let users over write it.
         self.register_callback('end', self.__default_end_callback)
+        self.register_callback("mbed_error", self._default_mbed_error_callback)
+
+        # Register empty callbacks for the error details, to prevent "orphan event" warnings
+        self.register_callback("mbed_error_module", self.__callback_default)
+        self.register_callback("mbed_error_code", self.__callback_default)
+        self.register_callback("mbed_error_message", self.__callback_default)
 
     def __assign_decorated_callbacks(self):
         """
