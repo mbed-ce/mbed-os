@@ -36,7 +36,7 @@
    control */
 #ifndef ETHMEM_SECTION
 #  if defined(TARGET_LPC1768)
-#    define ETHMEM_SECTION __attribute__((section("AHBSRAM0"),aligned))
+#    define ETHMEM_SECTION __attribute__((section("AHBSRAM"),aligned))
 #  else
 #    define ETHMEM_SECTION
 #  endif
