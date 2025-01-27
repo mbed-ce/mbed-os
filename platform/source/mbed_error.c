@@ -666,7 +666,7 @@ static void print_error_report(const mbed_error_ctx *ctx, const char *error_msg,
 #ifdef MBED_CONF_PLATFORM_MBED_ERROR_EMIT_GREENTEA_KV
     // Flag that error occurred. Print this first because the default test runner
     // just ends the test right away when it sees this.
-    mbed_error_printf("{{mbed_error;1}}\r\n"); 
+    mbed_error_printf("{{mbed_error;1}}\r\n");
 
     mbed_error_printf("{{mbed_error_module;%d}}\r\n", error_module);
     mbed_error_printf("{{mbed_error_code;%d}}\r\n", error_code);
