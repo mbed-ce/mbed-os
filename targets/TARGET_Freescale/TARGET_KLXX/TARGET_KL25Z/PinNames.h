@@ -195,54 +195,49 @@ typedef enum {
     PTE30 = 0x4078,
     PTE31 = 0x407c,
 
-    LED_RED = PTB18,
-    LED_GREEN = PTB19,
-    LED_BLUE = PTD1,
-
-    // mbed original LED naming
-    LED1 = LED_RED,
-    LED2 = LED_GREEN,
-    LED3 = LED_BLUE,
-    LED4 = LED_BLUE,
-
     // USB Pins
     CONSOLE_TX = PTA2,
     CONSOLE_RX = PTA1,
 
+#ifdef TARGET_FF_ARDUINO_UNO
     // Arduino Headers
-    D0 = PTA1,
-    D1 = PTA2,
-    D2 = PTD4,
-    D3 = PTA12,
-    D4 = PTA4,
-    D5 = PTA5,
-    D6 = PTC8,
-    D7 = PTC9,
-    D8 = PTA13,
-    D9 = PTD5,
-    D10 = PTD0,
-    D11 = PTD2,
-    D12 = PTD3,
-    D13 = PTD1,
-    D14 = PTE0,
-    D15 = PTE1,
+    ARDUINO_UNO_D0 = PTA1,
+    ARDUINO_UNO_D1 = PTA2,
+    ARDUINO_UNO_D2 = PTD4,
+    ARDUINO_UNO_D3 = PTA12,
+    ARDUINO_UNO_D4 = PTA4,
+    ARDUINO_UNO_D5 = PTA5,
+    ARDUINO_UNO_D6 = PTC8,
+    ARDUINO_UNO_D7 = PTC9,
+    ARDUINO_UNO_D8 = PTA13,
+    ARDUINO_UNO_D9 = PTD5,
+    ARDUINO_UNO_D10 = PTD0,
+    ARDUINO_UNO_D11 = PTD2,
+    ARDUINO_UNO_D12 = PTD3,
+    ARDUINO_UNO_D13 = PTD1,
+    ARDUINO_UNO_D14 = PTE0,
+    ARDUINO_UNO_D15 = PTE1,
 
-    A0 = PTB0,
-    A1 = PTB1,
-    A2 = PTB2,
-    A3 = PTB3,
-    A4 = PTC2,
-    A5 = PTC1,
-
-    I2C_SCL = D15,
-    I2C_SDA = D14,
-
-    TSI_ELEC0 = PTB16,
-    TSI_ELEC1 = PTB17,
+    ARDUINO_UNO_A0 = PTB0,
+    ARDUINO_UNO_A1 = PTB1,
+    ARDUINO_UNO_A2 = PTB2,
+    ARDUINO_UNO_A3 = PTB3,
+    ARDUINO_UNO_A4 = PTC2,
+    ARDUINO_UNO_A5 = PTC1,
+#endif
 
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
+
+// LEDs -------------------------------
+#define LED1 PTB18 // LED_RED
+#define LED2 PTB19 // LED_BLUE
+#define LED3 PTD1 // LED_GREEN
+
+// Touch Sensor Pins ------------------
+#define TSI_ELEC0 PTB16
+#define TSI_ELEC1 PTB17
 
 /* PullDown not available for KL25 */
 typedef enum {

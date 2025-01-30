@@ -521,7 +521,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     // Freescale (now NXP) Kinetis Targets -----------------------------------------------------------------------------
     "KL25Z": {
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "core": "Cortex-M0+",
         "extra_labels": [
