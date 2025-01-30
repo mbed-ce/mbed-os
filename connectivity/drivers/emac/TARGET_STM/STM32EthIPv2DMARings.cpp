@@ -265,9 +265,6 @@ void STM32EthIPv2DMARings::macThread()
                     break;
                 }
 
-                // Rebuild descriptors if possible
-                buildRxDescriptors();
-
                 if(emac_link_input_cb)
                 {
                     emac_link_input_cb(packet);
@@ -276,6 +273,9 @@ void STM32EthIPv2DMARings::macThread()
                 {
                     memory_manager.free(packet);
                 }
+
+                // Rebuild descriptors if possible
+                buildRxDescriptors();
             }
         }
         if(flags & THREAD_FLAG_TX_DESC_AVAILABLE)

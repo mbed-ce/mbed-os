@@ -51,6 +51,7 @@ namespace mbed
  */
 class CompositeEMAC : public EMAC
 {
+public:
     enum class ErrCode
     {
         SUCCESS = 0,
@@ -77,6 +78,11 @@ class CompositeEMAC : public EMAC
 
     typedef std::array<uint8_t, 6> MACAddress;
 
+    /**
+     * @brief Abstract interface for a driver for the low level ethernet MAC hardware.
+     *
+     * Thread safety: CompositeEMAC will guarantee only one thread is utilizing this class at a time.
+     */
     class MACDriver
     {
         /**
@@ -124,7 +130,7 @@ class CompositeEMAC : public EMAC
          *
          * @return Error code or success.
          */
-        virtual ErrCode mdioRead(uint16_t devAddr, uint8_t regAddr, uint16_t & result) = 0;
+        virtual ErrCode mdioRead(uint8_t devAddr, uint8_t regAddr, uint16_t & result) = 0;
 
         /**
          * @brief Write a register to the PHY over the MDIO bus.
@@ -135,7 +141,7 @@ class CompositeEMAC : public EMAC
          *
          * @return Error code or success.
          */
-        virtual ErrCode mdioWrite(uint16_t devAddr, uint8_t regAddr, uint16_t data) = 0;
+        virtual ErrCode mdioWrite(uint8_t devAddr, uint8_t regAddr, uint16_t data) = 0;
 
         /**
          * @brief Get the reset pin for the Ethernet PHY.
@@ -180,14 +186,133 @@ class CompositeEMAC : public EMAC
         virtual ErrCode setPromiscuous(bool enable);
     };
 
+    /**
+     * @brief Interface for a driver for the Ethernet PHY.
+     *
+     * Thread safety: CompositeEMAC will guarantee only one thread is utilizing this class at a time.
+     */
     class PhyDriver
     {
+    protected:
+        /// MAC driver. Shall be set in init().
+        MACDriver * mac = nullptr;
+
+    public:
+        /// Set the MAC driver of this PHY. Will be called by CompositeEMAC before init().
+        void setMAC(MACDriver * mac) { this->mac = mac; }
+
         /**
-         * @brief Get the expected
-         * @return
+         * @brief Initialize the PHY and set it up for Ethernet operation.
+         *
+         * @return Error code or success
          */
-        virtual std::pair<uint8_t, uint8_t> getOUIAndModel() = 0;
+        ErrCode init();
+
+        /**
+         * @brief Check whether the link is up or down
+         *
+         * @param[out] status Set to true or false depending on whether the link is up or down
+         *
+         * @return Error code or success
+         */
+        ErrCode checkLinkStatus(bool & status);
+
+        /**
+         * @brief Get the negotiated (or preset) Ethernet speed and duplex, given that the link is up
+         *
+         * @param[out] speed Link speed
+         * @param[out] duplex Link duplex
+         *
+         * @return Error code or success
+         */
+        ErrCode checkLinkType(LinkSpeed & speed, Duplex & duplex);
     };
+
+    /**
+     * @brief Abstract interface for a driver for the Tx DMA ring in the Ethernet MAC.
+     *
+     * Thread safety: CompositeEMAC will guarantee only one thread is utilizing this class at a time.
+     */
+    class TxDMA {
+    protected:
+        /// Pointer to memory manager for the EMAC
+        EMACMemoryManager * memory_manager = nullptr;
+
+    public:
+        /// Set the mem manager of this DMA ring. Will be called by CompositeEMAC before init().
+        void setMemoryManager(EMACMemoryManager * memory_manager) { this->memory_manager = memory_manager; }
+
+        /// Initialize this Tx DMA ring.
+        ErrCode init();
+
+        /// Stop the DMA running. init() should be able to be called again after this function completes to restart DMA.
+        ErrCode deinit();
+
+        /// Called by CompositeEMAC when the MAC generates a transmit complete interrupt
+        void txISR();
+
+        /// Transmit a packet out of the Tx DMA ring.  Note that this function
+        /// *takes ownership of* the passed packet and must free it either now or after
+        /// it's been transmitted.
+        /// Should block until there is space to transmit the packet.
+        HAL_StatusTypeDef txPacket(net_stack_mem_buf_t * buf);
+    };
+
+    /**
+     * @brief Abstract interface for a driver for the Rx DMA ring in the Ethernet MAC.
+     *
+     * Thread safety: CompositeEMAC will guarantee only one thread is utilizing this class at a time.
+     */
+    class RxDMA {
+    protected:
+        /// Pointer to memory manager for the EMAC
+        EMACMemoryManager * memory_manager = nullptr;
+
+    public:
+        /// Set the mem manager of this DMA ring. Will be called by CompositeEMAC before init().
+        void setMemoryManager(EMACMemoryManager * memory_manager) { this->memory_manager = memory_manager; }
+
+        /// Initialize this Rx DMA ring.
+        ErrCode init();
+
+        /// Stop the DMA running. init() should be able to be called again after this function completes to restart DMA.
+        ErrCode deinit();
+
+        /**
+         * @brief Check if the MAC may have a packet to receive. Called from the Rx ISR.
+         *
+         * This function is called to provide a hint to CompositeEMAC about whether it needs to call
+         * dequeuePacket() after an Rx ISR is received.
+         *
+         * @return True if the MAC might have a descriptor to receive. False if there is definitely no complete packet yet.
+         */
+        bool rxHasPackets_ISR();
+
+        /**
+         * @brief Dequeue a packet, if one is ready to be received.
+         *
+         * This function should also dequeue and dispose of any error or incomplete DMA descriptors.
+         * The MAC thread calls it over and over again until it returns nullptr.
+         *
+         * @return Packet pointer, or nullptr if there were no packets.
+         */
+        net_stack_mem_buf_t * dequeuePacket();
+
+        /**
+         * @brief Rebuild DMA descriptors, if there are descriptors that need building and there is free pool memory.
+         *
+         * This function is called by the MAC thread after a packet has been dequeued and afte r
+         */
+        void rebuildDescriptors();
+    };
+
+protected:
+
+    /// Subclass should call this when a receive interrupt is detected
+    void rxISR();
+
+    /// Subclass should call this when a transmit complete interrupt is detected
+    void txISR();
 };
 
 }
