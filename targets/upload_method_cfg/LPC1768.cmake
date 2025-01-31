@@ -22,9 +22,10 @@ set(MBED_RESET_BAUDRATE 115200)
 # https://github.com/pyocd/pyOCD/issues/745
 # https://github.com/pyocd/pyOCD/issues/1124
 
-#set(PYOCD_UPLOAD_ENABLED TRUE)
-#set(PYOCD_TARGET_NAME LPC1768)
-#set(PYOCD_CLOCK_SPEED 4000k)
+set(PYOCD_UPLOAD_ENABLED TRUE)
+set(PYOCD_TARGET_NAME LPC1768)
+set(PYOCD_CLOCK_SPEED 4000k)
+set(PYOCD_UPLOAD_INTERFACE SWD)
 
 # Config options for OPENOCD
 # -------------------------------------------------------------
@@ -45,3 +46,10 @@ set(OPENOCD_VERSION_RANGE 0.10...<0.13)
 # -------------------------------------------------------------
 set(LINKSERVER_UPLOAD_ENABLED TRUE)
 set(LINKSERVER_DEVICE LPC1768)
+
+# Config options for JLINK
+# -------------------------------------------------------------
+set(JLINK_UPLOAD_ENABLED TRUE)
+set(JLINK_CPU_NAME LPC1768)
+set(JLINK_CLOCK_SPEED 4000)
+set(JLINK_UPLOAD_INTERFACE SWD)
