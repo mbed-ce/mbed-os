@@ -1,4 +1,4 @@
-# Mbed OS upload method configuration file for target K64F.
+# Mbed OS upload method configuration file for target KL25Z.
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
