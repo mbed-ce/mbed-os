@@ -3,6 +3,7 @@
 
 add_subdirectory(TARGET_ARCH_PRO EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_MBED_LPC1768 EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_LPCXPRESSO_LPC1769 EXCLUDE_FROM_ALL)
 
 add_library(mbed-lpc176x INTERFACE)
 
@@ -49,3 +50,4 @@ target_link_libraries(mbed-lpc176x INTERFACE mbed-nxp)
 
 mbed_set_linker_script(mbed-arch-pro ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
 mbed_set_linker_script(mbed-lpc1768 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
+mbed_set_linker_script(mbed-lpcxpresso-lpc1769 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})

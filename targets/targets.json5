@@ -494,6 +494,92 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "image_url": "https://os.mbed.com/media/cache/platforms/LPC1768.jpg.250x250_q85.jpg"
     },
+    "MCU_LPC176X": {
+        "inherits": [
+            "LPCTarget"
+        ],
+        "public": false,
+        "core": "Cortex-M3",
+        "extra_labels": [
+            "NXP",
+            "LPC176X",
+            "NXP_EMAC"
+        ],
+        "supported_toolchains": [
+            "GCC_ARM"
+        ],
+        "macros": [
+            "MBED_SPLIT_HEAP"
+        ],
+        "device_has": [
+            "RTC",
+            "USTICKER",
+            "ANALOGIN",
+            "ANALOGOUT",
+            "CAN",
+            "DEBUG_AWARENESS",
+            "EMAC",
+            "I2C",
+            "I2CSLAVE",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "SERIAL",
+            "SERIAL_FC",
+            "SLEEP",
+            "SPI",
+            "SPISLAVE",
+            "FLASH",
+            "MPU",
+            "USBDEVICE",
+            "WATCHDOG",
+            "RESET_REASON"
+        ],
+        "release_versions": [
+            "5"
+        ],
+        "device_name": "LPC1768",
+        "bootloader_supported": true,
+        "config": {
+            "us-ticker-timer": {
+                "help": "Chooses which timer (0-3) to use for us_ticker.c",
+                "value": 3
+            }
+        },
+        "overrides": {
+            "network-default-interface-type": "ETHERNET",
+        },
+        "supported_c_libs": {
+            "arm": [
+                "std", "small"
+            ],
+            "gcc_arm": [
+                "std", "small"
+            ]
+        },
+        "supported_application_profiles": [
+            "full", "bare-metal"
+        ],
+        "is_mcu_family_target": true
+    },
+    "LPCXPRESSO_LPC1769": {
+        "inherits": [
+            "MCU_LPC176X"
+        ],
+        "core": "Cortex-M3",
+        "extra_labels_add": [
+            "MBED_LPC1768",
+        ],
+        "components_add": [
+            "LOCALFILESYSTEM"
+        ],
+        "overrides": {
+            "default-adc-vref": 3.3 // Vref is 3.3V
+        },
+        "image_url": "https://www.embeddedartists.com/wp-content/uploads/2018/06/lpc1769_xpr_540x333-540x333.png"
+    },
     "ARCH_PRO": {
         "supported_form_factors": [
             "ARDUINO"
