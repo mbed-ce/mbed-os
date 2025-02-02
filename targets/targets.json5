@@ -509,7 +509,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "GCC_ARM"
         ],
         "macros": [
-            "MBED_SPLIT_HEAP"
+            "MBED_SPLIT_HEAP",
+            "TARGET_LPC17XX"  // for lpc-emac and lpc-usb
+
         ],
         "device_has": [
             "RTC",
