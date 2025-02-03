@@ -15,4 +15,16 @@
  */
 
 
-#include "CompositeEthMac.h"
+#include "CompositeEMAC.h"
+
+void mbed::CompositeEMAC::get_ifname(char *name, uint8_t size) const {
+    // Note that LwIP only supports a two character interface name prefix.
+    // So, no point in going longer than that.
+    // Also note that we don't want to copy the terminating null if it doesn't fit.
+    const char * const ifPrefix = "en";
+    memcpy(name, ifPrefix, (size < strlen(ifPrefix) + 1) ? size : strlen(ifPrefix) + 1);
+}
+
+void mbed::CompositeEMAC::set_hwaddr(const uint8_t *addr) {
+    if(mac.se)
+}

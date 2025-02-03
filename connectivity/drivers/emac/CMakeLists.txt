@@ -6,8 +6,9 @@ if(NOT "DEVICE_EMAC=1" IN_LIST MBED_TARGET_DEFINITIONS)
 endif()
 
 add_library(mbed-emac STATIC EXCLUDE_FROM_ALL
-    sources/CompositeEthMac.cpp
-    sources/GenericEthPhy.cpp)
+    sources/CompositeEMAC.cpp
+    sources/GenericEthPhy.cpp
+    sources/PhyDrivers.cpp)
 
 target_include_directories(mbed-emac PUBLIC include)
 

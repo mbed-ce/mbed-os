@@ -20,7 +20,6 @@ target_sources(mbed-emac
     PRIVATE
         stm32xx_emac.cpp
         STM32EthIPv2DMARings.cpp
-        ../sources/CompositeEthMac.cpp
 )
 
 target_compile_options(mbed-emac PRIVATE -Wno-packed-bitfield-compat)
