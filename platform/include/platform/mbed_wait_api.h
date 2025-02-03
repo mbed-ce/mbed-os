@@ -147,6 +147,15 @@ inline void _wait_us_inline(unsigned int us)
 #endif // Known-rate, initialised timer
 
 #ifdef __cplusplus
+#include <chrono>
+
+// Override of wait_us() allowing a std::chrono type convertible to microseconds to be passed in.
+static inline void _wait_us_inline(std::chrono::microseconds us) {
+    _wait_us_inline(us.count());
+}
+#endif
+
+#ifdef __cplusplus
 }
 #endif
 

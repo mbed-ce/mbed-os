@@ -18,6 +18,7 @@
 #define MBED_OS_COMPOSITEETHMAC_H
 
 #include "EMAC.h"
+#include "NonCopyable.h"
 
 namespace mbed
 {
@@ -60,9 +61,11 @@ public:
         PHY_NOT_RESPONDING = 3,
         OUT_OF_MEMORY = 4,
         INVALID_ARGUMENT = 5,
-        INVALID_USAGE = 6
+        INVALID_USAGE = 6,
+        NEGOTIATION_FAILED = 7,
     };
 
+    /// Enumeration of possible Ethernet link speeds
     enum class LinkSpeed
     {
         LINK_10MBIT,
@@ -70,13 +73,16 @@ public:
         LINK_1GBIT
     };
 
+    /// Enumeration of possible Ethernet link duplexes
     enum class Duplex
     {
         HALF,
         FULL
     };
 
-    typedef std::array<uint8_t, 6> MACAddress;
+    /// Basic MAC address type
+    static constexpr size_t MAC_ADDR_SIZE = 6;
+    typedef std::array<uint8_t, MAC_ADDR_SIZE> MACAddress;
 
     /**
      * @brief Abstract interface for a driver for the low level ethernet MAC hardware.
@@ -85,15 +91,14 @@ public:
      */
     class MACDriver
     {
+    public:
         /**
          * @brief Initialize the MAC, map pins, and prepare it to send and receive packets.
          *    It should not be enabled yet.
          *
-         * @param ownAddress MAC address that this device should use
-         *
          * @return Error code or SUCCESS
          */
-        virtual ErrCode init(MACAddress const & ownAddress) = 0;
+        virtual ErrCode init() = 0;
 
         /**
          * @brief Deinit the MAC so that it's not using any clock/power. Should prepare for init() to be called
@@ -119,6 +124,15 @@ public:
          * @return Error code or SUCCESS
          */
         virtual ErrCode disable() = 0;
+
+        /**
+         * @brief Set the own address of this MAC.
+         *
+         * \note This shall be called by CompositeEMAC after init but before enable.
+         *
+         * @param ownAddress Address this MAC will use for itself on the network.
+         */
+        virtual void setOwnMACAddr(MACAddress const & ownAddress) = 0;
 
         /**
          * @brief Read a register from the PHY over the MDIO bus.
@@ -191,13 +205,15 @@ public:
      *
      * Thread safety: CompositeEMAC will guarantee only one thread is utilizing this class at a time.
      */
-    class PhyDriver
+    class PhyDriver : NonCopyable<PhyDriver>
     {
     protected:
         /// MAC driver. Shall be set in init().
         MACDriver * mac = nullptr;
 
     public:
+        virtual ~PhyDriver() = default;
+
         /// Set the MAC driver of this PHY. Will be called by CompositeEMAC before init().
         void setMAC(MACDriver * mac) { this->mac = mac; }
 
@@ -206,7 +222,7 @@ public:
          *
          * @return Error code or success
          */
-        ErrCode init();
+        virtual ErrCode init() = 0;
 
         /**
          * @brief Check whether the link is up or down
@@ -215,17 +231,19 @@ public:
          *
          * @return Error code or success
          */
-        ErrCode checkLinkStatus(bool & status);
+        virtual ErrCode checkLinkStatus(bool & status) = 0;
 
         /**
          * @brief Get the negotiated (or preset) Ethernet speed and duplex, given that the link is up
+         *
+         * \note Result speed and duplex undefined if the link is not up.
          *
          * @param[out] speed Link speed
          * @param[out] duplex Link duplex
          *
          * @return Error code or success
          */
-        ErrCode checkLinkType(LinkSpeed & speed, Duplex & duplex);
+        virtual ErrCode checkLinkType(LinkSpeed & speed, Duplex & duplex) = 0;
     };
 
     /**
@@ -301,18 +319,76 @@ public:
         /**
          * @brief Rebuild DMA descriptors, if there are descriptors that need building and there is free pool memory.
          *
-         * This function is called by the MAC thread after a packet has been dequeued and afte r
+         * This function is called by the MAC thread after a packet has been dequeued and when memory in the Rx
+         * pool becomes free.
          */
         void rebuildDescriptors();
     };
 
 protected:
 
+    // Instances of each of the 4 component classes
+    MACDriver & mac;
+    PhyDriver & phy;
+    TxDMA & txDMA;
+    RxDMA & rxDMA;
+
+    // State of the MAC
+    enum PowerState {
+
+    };
+
     /// Subclass should call this when a receive interrupt is detected
     void rxISR();
 
     /// Subclass should call this when a transmit complete interrupt is detected
     void txISR();
+
+public:
+    uint32_t get_mtu_size() const override {
+        // Regular Ethernet has an MTU of 1500.
+        // Some MACs support Jumbo Frames of up to 9000 bytes; this might be worth adding at some point
+        return 1500;
+    }
+
+    uint32_t get_align_preference() const override {
+        // Most DMAs require or work best with word-aligned buffers.
+        // NOTE: As of Feb 2025, nothing in Mbed actually uses this value.
+        return 4;
+    }
+
+    void get_ifname(char *name, uint8_t size) const override;
+
+    uint8_t get_hwaddr_size() const override {
+        return MAC_ADDR_SIZE;
+    }
+
+    bool get_hwaddr(uint8_t *addr) const override {
+        // Return false to tell upper layer code to use mbed_mac_address() to get the MAC address.
+        // TODO once we support more than 1 ethernet port per device, this will need to be updated
+        // to make sure each interface has a different MAC address.
+        return false;
+    }
+
+    void set_hwaddr(const uint8_t *addr) override;
+
+    bool link_out(emac_mem_buf_t *buf) override;
+
+    bool power_up() override;
+
+    void power_down() override;
+
+    void set_link_input_cb(emac_link_input_cb_t input_cb) override;
+
+    void set_link_state_cb(emac_link_state_change_cb_t state_cb) override;
+
+    void add_multicast_group(const uint8_t *address) override;
+
+    void remove_multicast_group(const uint8_t *address) override;
+
+    void set_all_multicast(bool all) override;
+
+    void set_memory_manager(EMACMemoryManager &mem_mngr) override;
 };
 
 }
