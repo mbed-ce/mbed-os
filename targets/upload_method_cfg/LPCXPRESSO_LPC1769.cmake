@@ -46,3 +46,10 @@ set(OPENOCD_VERSION_RANGE 0.10...<0.13)
 set(LINKSERVER_UPLOAD_ENABLED TRUE)
 set(LINKSERVER_DEVICE LPC1769)
 
+# Config options for JLINK
+# -------------------------------------------------------------
+set(JLINK_UPLOAD_ENABLED TRUE)
+set(JLINK_CPU_NAME LPC1769)
+set(JLINK_CLOCK_SPEED 4000)
+set(JLINK_UPLOAD_INTERFACE SWD)
+
