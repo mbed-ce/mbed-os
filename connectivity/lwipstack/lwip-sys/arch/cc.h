@@ -136,7 +136,7 @@ void trace_to_ascii_hex_dump(char* prefix, int len, char *data);
 #  elif defined(TOOLCHAIN_GCC_CR)
 #     define MEMP_SECTION __attribute__((section(".data.$RamPeriph32")))
 #  else
-#     define MEMP_SECTION __attribute__((section("AHBSRAM1"),aligned))
+#     define MEMP_SECTION __attribute__((section("AHBSRAM"),aligned))
 #  endif
 #endif
 #endif
