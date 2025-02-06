@@ -23,17 +23,28 @@ list(
             asynchronous_dns_cache.cpp
 )
 
-if(MBED_GREENTEA_TEST_BAREMETAL)
+if(APPLICATION_PROFILE_CONFIG_BAREMETAL)
     set(TEST_SKIPPED "This test requires an RTOS!")
 endif()
 
 mbed_greentea_add_test(
     TEST_NAME
-        mbed-connectivity-netsocket-dns
+        mbed-connectivity-netsocket-lwipstack-dns
     TEST_SOURCES
         ${TEST_SOURCE_LIST}
     TEST_REQUIRED_LIBS
-        mbed-netsocket
+        ${MBED_NETSOCKET_TEST_COMMON_LIBS_LWIPSTACK}
+    TEST_SKIPPED
+        ${TEST_SKIPPED}
+)
+
+mbed_greentea_add_test(
+    TEST_NAME
+        mbed-connectivity-netsocket-nanostack-dns
+    TEST_SOURCES
+        ${TEST_SOURCE_LIST}
+    TEST_REQUIRED_LIBS
+        ${MBED_NETSOCKET_TEST_COMMON_LIBS_NANOSTACK}
     TEST_SKIPPED
         ${TEST_SKIPPED}
 )

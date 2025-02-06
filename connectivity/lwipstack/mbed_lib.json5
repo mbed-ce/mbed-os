@@ -118,14 +118,6 @@
             "help": "Priority of lwip TCPIP thread",
             "value": "osPriorityNormal"
         },
-        "pbuf-pool-size": {
-            "help": "Number of pbufs in pool - usually used for received packets, so this determines how much data can be buffered between reception and the application reading, see LWIP's opt.h for more information. If a driver uses PBUF_RAM for reception, less pool may be needed. Current default  is 5.",
-            "value": 5
-        },
-        "pbuf-pool-bufsize": {
-            "help": "Size of pbufs in pool, see LWIP's opt.h for more information.",
-            "value": null
-        },
         "mem-size": {
             "help": "Size of heap (bytes) - used for outgoing packets, and also used by some drivers for reception, see LWIP's opt.h for more information. Current default is 1600.",
             "value": 1600
@@ -189,34 +181,19 @@
         "RZ_A1XX": {
             "tcpip-thread-stacksize": 1328,
             "default-thread-stacksize": 640,
-            "memp-num-tcp-seg": 32,
-            "tcp-mss": 1440,
-            "tcp-snd-buf": "(8 * TCP_MSS)",
-            "tcp-wnd": "(TCP_MSS * 8)",
-            "pbuf-pool-size": 16,
             "mem-size": 51200
         },
         "RZ_A2XX": {
             "tcpip-thread-stacksize": 1328,
             "default-thread-stacksize": 640,
-            "memp-num-tcp-seg": 32,
-            "tcp-mss": 1440,
-            "tcp-snd-buf": "(8 * TCP_MSS)",
-            "tcp-wnd": "(TCP_MSS * 8)",
-            "pbuf-pool-size": 16,
             "mem-size": 51200
         },
         "MCU_PSOC6": {
             "tcpip-thread-stacksize": 8192,
             "default-thread-stacksize": 640,
-            "memp-num-tcp-seg": 24,
             "tcp-socket-max": 10,
             "udp-socket-max":10,
             "socket-max":18,
-            "tcp-mss": 1540,
-            "tcp-snd-buf": "(6 * TCP_MSS)",
-            "tcp-wnd": "(TCP_MSS * 6)",
-            "pbuf-pool-size": 14,
             "mem-size": 65536
         },
         "MIMXRT105X": {

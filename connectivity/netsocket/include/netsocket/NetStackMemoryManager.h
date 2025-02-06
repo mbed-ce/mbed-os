@@ -21,17 +21,23 @@
 /**
  * Network Stack interface memory manager
  *
+ * \par
  * This interface provides abstraction for memory modules used in different IP stacks (often to accommodate zero
  * copy). NetStack interface is required to accept output packets and provide received data using this stack-
  * independent API. This header should be implemented for each IP stack, so that we keep EMAC module independent.
  *
+ * \par
  * NetStack memory interface uses memory buffer chains to store data. Data passed in either direction
- * may be either contiguous (a single-buffer chain), or may consist of multiple buffers.
+ * may either be contiguous (a single-buffer chain), or may consist of multiple buffers.
  * Chaining of the buffers is made using singly-linked list. The NetStack data-passing APIs do not specify
  * alignment or structure of the chain in either direction.
  *
+ * \par
  * Memory buffers can be allocated either from heap or from memory pools. Heap buffers are always contiguous.
- * Memory pool buffers may be either contiguous or chained depending on allocation size.
+ * Memory pool buffers may be either contiguous or chained depending on allocation size. By LwIP convention,
+ * the pool should only be used for Rx packets -- the EMAC may opt to keep buffers pre-allocated from the pool
+ * for receiving packets into. This is done because LwIP will do special stuff when the pool runs out of space,
+ * e.g. flushing TCP out-of-sequence segment buffers to free up memory.
  *
  * On NetStack interface buffer chain ownership is transferred. EMAC must free buffer chain that it is given for
  * link output and the stack must free the buffer chain that it is given for link input.
@@ -39,10 +45,22 @@
  */
 
 #include "nsapi.h"
+#include "Callback.h"
 
 typedef void net_stack_mem_buf_t;          // Memory buffer
 
 class NetStackMemoryManager {
+protected:
+    /// Callback which shall be called (if set) by the implementation after one or more buffer spaces
+    /// become free in the pool. This is used by zero-copy Ethernet MACs as a hint that
+    /// now is a good time to allocate fresh buffers off the pool into Ethernet descriptors.
+    /// It *is* legal to call this function if you aren't totally sure new memory is available --
+    /// the mac will try to allocate more buffers, and if it can't, oh well.
+    /// However, it is not legal for memory to become available without a call to this function.
+    /// Such a situation might lead to a lockup of the MAC due to not having memory allocated for Rx.
+    // TODO this eventually needs to get converted to a list once we support boards with more than 1 EMAC
+    mbed::Callback<void()> onPoolSpaceAvailCallback;
+
 public:
 
     /**
@@ -78,6 +96,13 @@ public:
      * @return         Contiguous memory size
      */
     virtual uint32_t get_pool_alloc_unit(uint32_t align) const = 0;
+
+    /**
+     * Get memory buffer pool size.
+     *
+     * @return The maximum size of contiguous memory that can be allocated from a pool.
+     */
+    virtual uint32_t get_pool_size() const = 0;
 
     /**
      * Free memory buffer chain
@@ -157,6 +182,22 @@ public:
     virtual net_stack_mem_buf_t *get_next(const net_stack_mem_buf_t *buf) const = 0;
 
     /**
+     * @brief Count the number of buffers in a buffer chain
+     *
+     * @param buf      Memory buffer
+     * @return         The number of buffers in the chain
+     */
+    size_t count_buffers(const net_stack_mem_buf_t *buf)
+    {
+        size_t count = 0;
+        while (buf != nullptr) {
+            count += 1;
+            buf = get_next(buf);
+        }
+        return count;
+    }
+
+    /**
      * Return pointer to the payload of the buffer
      *
      * @param buf      Memory buffer
@@ -165,7 +206,7 @@ public:
     virtual void *get_ptr(const net_stack_mem_buf_t *buf) const = 0;
 
     /**
-     * Return payload size of the buffer
+     * Return payload size of this individual buffer (NOT including any chained buffers)
      *
      * @param buf      Memory buffer
      * @return         Size in bytes
@@ -178,10 +219,45 @@ public:
      * The allocated payload size will not change. It is not permitted
      * to change the length of a buffer that is not the first (or only) in a chain.
      *
+     * *Note as of Dec 2024: Different implementations (Nanostack vs LwIP) disagree about
+     * how to implement this operation.  Specifically, if called on the head of a buffer
+     * chain, the LwIP implementation allows changing the length of the chain as a whole.
+     * However, the Nanostack implementation does not and only can change the length of the head buffer.
+     * For fear of breaking existing code, I do not want to change this behavior.
+     * So, if constructing a buffer chain, it is safest to set the buffer lengths first before
+     * building the chain.
+     *
      * @param buf      Memory buffer
      * @param len      Payload size, must be less or equal to the allocated size
      */
     virtual void set_len(net_stack_mem_buf_t *buf, uint32_t len) = 0;
+
+    enum class Lifetime {
+        POOL_ALLOCATED, ///< Allocated from the memory manager's pool
+        HEAP_ALLOCATED, ///< Allocated from the memory manager's heap
+        CONSTANT, ///< Buffer points to constant data (e.g. in ROM) that will live forever
+        VOLATILE ///< Buffer points to data from the application that will not live past the current network stack call.
+    };
+
+    /**
+     * Gets the lifetime of the buffer
+     *
+     * @param buf      Memory buffer
+     */
+    virtual Lifetime get_lifetime(net_stack_mem_buf_t const *buf) const = 0;
+
+    /**
+     * @brief Set callback which will be called when pool space becomes available
+     *
+     * \warning The callback could be called from any thread, and should make no assumptions about
+     *    being in the same thread as anything else.
+     *
+     * @param cb Callback to call
+     */
+    void set_on_pool_space_avail_cb(mbed::Callback<void()> cb)
+    {
+        onPoolSpaceAvailCallback = cb;
+    }
 
 protected:
     ~NetStackMemoryManager() = default;

@@ -9,6 +9,7 @@
 *
 * Copyright(C) 2011, NXP Semiconductor
 * All rights reserved.
+* SPDX-License-Identifier: Apache-2.0
 *
 ***********************************************************************
 * Software that is described herein is for illustrative purposes only
@@ -127,7 +128,7 @@ struct lpc_enetdata {
 
 #if defined(TARGET_LPC17XX)
 #  if defined(TOOLCHAIN_GCC_ARM) || defined(TOOLCHAIN_ARM)
-#     define ETHMEM_SECTION __attribute__((section("AHBSRAM1"),aligned))
+#     define ETHMEM_SECTION __attribute__((section("AHBSRAM"),aligned))
 #  endif
 #endif
 

@@ -3,7 +3,7 @@
 
 include(mbed_greentea)
 
-if(${MBED_C_LIB} STREQUAL "small" OR MBED_GREENTEA_TEST_BAREMETAL)
+if(${MBED_C_LIB} STREQUAL "small" OR APPLICATION_PROFILE_CONFIG_BAREMETAL)
     set(TEST_SKIPPED "Queue test cases require RTOS with multithread to run")
 endif()
 

@@ -241,6 +241,9 @@
     "target_overrides": {
         "KW41Z": {
             "mbed-mesh-api.heap-size": 14000
+        },
+        "LPC1768": {
+            "mbed-mesh-api.heap-size": 16383
         }
     }
 }

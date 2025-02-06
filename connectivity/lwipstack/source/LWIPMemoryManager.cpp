@@ -17,6 +17,8 @@
 #include "pbuf.h"
 #include "LWIPMemoryManager.h"
 
+#include <LWIPStack.h>
+
 net_stack_mem_buf_t *LWIPMemoryManager::alloc_heap(uint32_t size, uint32_t align)
 {
     struct pbuf *pbuf = pbuf_alloc(PBUF_RAW, size + align, PBUF_RAM);
@@ -47,6 +49,11 @@ uint32_t LWIPMemoryManager::get_pool_alloc_unit(uint32_t align) const
 {
     uint32_t alloc_unit = LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - align;
     return alloc_unit;
+}
+
+uint32_t LWIPMemoryManager::get_pool_size() const
+{
+    return PBUF_POOL_SIZE;
 }
 
 void LWIPMemoryManager::free(net_stack_mem_buf_t *buf)
@@ -105,6 +112,23 @@ void LWIPMemoryManager::set_len(net_stack_mem_buf_t *buf, uint32_t len)
     set_total_len(pbuf);
 }
 
+NetStackMemoryManager::Lifetime LWIPMemoryManager::get_lifetime(const net_stack_mem_buf_t *buf) const
+{
+    auto const *p = static_cast<const struct pbuf *>(buf);
+
+    uint8_t allocSrc = pbuf_get_allocsrc(p);
+
+    if (allocSrc == PBUF_TYPE_ALLOC_SRC_MASK_STD_MEMP_PBUF && PBUF_NEEDS_COPY(p)) {
+        return Lifetime::VOLATILE;
+    } else if (allocSrc == PBUF_TYPE_ALLOC_SRC_MASK_STD_MEMP_PBUF) {
+        return Lifetime::CONSTANT;
+    } else if (allocSrc == PBUF_TYPE_ALLOC_SRC_MASK_STD_MEMP_PBUF_POOL) {
+        return Lifetime::POOL_ALLOCATED;
+    } else {
+        return Lifetime::HEAP_ALLOCATED;
+    }
+}
+
 uint32_t LWIPMemoryManager::count_total_align(uint32_t size, uint32_t align)
 {
     uint32_t buffers = size / get_pool_alloc_unit(align);
@@ -160,5 +184,13 @@ void LWIPMemoryManager::set_total_len(struct pbuf *pbuf)
 
         pbuf->tot_len = total_len;
         pbuf = pbuf->next;
+    }
+}
+
+void mbed_lwip_on_pbuf_pool_free_hook()
+{
+    auto &callback = LWIP::get_instance().get_memory_manager().onPoolSpaceAvailCallback;
+    if (callback) {
+        callback();
     }
 }

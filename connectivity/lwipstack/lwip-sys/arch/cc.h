@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2001-2003 Swedish Institute of Computer Science.
  * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -136,7 +137,7 @@ void trace_to_ascii_hex_dump(char* prefix, int len, char *data);
 #  elif defined(TOOLCHAIN_GCC_CR)
 #     define MEMP_SECTION __attribute__((section(".data.$RamPeriph32")))
 #  else
-#     define MEMP_SECTION __attribute__((section("AHBSRAM1"),aligned))
+#     define MEMP_SECTION __attribute__((section("AHBSRAM"),aligned))
 #  endif
 #endif
 #endif

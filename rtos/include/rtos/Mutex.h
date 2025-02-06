@@ -55,17 +55,26 @@ typedef mbed::ScopedLock<Mutex> ScopedMutexLock;
  * @{
  */
 
-/** The Mutex class is used to synchronize the execution of threads.
- This is, for example, used to protect access to a shared resource.
-
- In bare-metal builds, the Mutex class is a dummy, so lock() and unlock() are no-ops.
-
- @note You cannot use member functions of this class in ISR context. If you require Mutex functionality within
- ISR handler, consider using @a Semaphore.
-
- @note
- Memory considerations: The mutex control structures are created on the current thread's stack, both for the Mbed OS
- and underlying RTOS objects (static or dynamic RTOS memory pools are not being used).
+/**
+ * @brief The Mutex class is used to synchronize the execution of threads.
+ *
+ * \par
+ * This is, for example, used to protect access to a shared resource.
+ *
+ * \par
+ * In bare-metal builds, the Mutex class is a dummy, so lock() and unlock() are no-ops.
+ *
+ * \par
+ * Mbed Mutexes are recursive. So, if you call the \c lock() function multiple times,
+ * you must call \c unlock() the same number of times to unlock the mutex.  This means that it's okay to lock
+ * a mutex, then call another function that also locks and unlocks the mutex, and the mutex won't actually
+ * get unlocked until your function unlocks it.
+ *
+ * @note You cannot use member functions of this class in ISR context. If you require Mutex functionality within ISR handler, consider using @a Semaphore.
+ *
+ * @note
+ * Memory considerations: The mutex control structures are created on the current thread's stack, both for the Mbed OS
+ * and underlying RTOS objects (static or dynamic RTOS memory pools are not being used).
 */
 class Mutex : private mbed::NonCopyable<Mutex> {
 public:

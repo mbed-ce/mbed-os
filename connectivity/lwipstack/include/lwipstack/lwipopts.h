@@ -1,4 +1,5 @@
 /* Copyright (C) 2012 mbed.org, MIT License
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -136,11 +137,11 @@
 
 // Number of pool pbufs.
 // Each requires 684 bytes of RAM (if MSS=536 and PBUF_POOL_BUFSIZE defaulting to be based on MSS)
-#define PBUF_POOL_SIZE              MBED_CONF_LWIP_PBUF_POOL_SIZE
+#define PBUF_POOL_SIZE              MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS
 
-#ifdef MBED_CONF_LWIP_PBUF_POOL_BUFSIZE
+#ifdef MBED_CONF_NSAPI_EMAC_RX_POOL_BUF_SIZE
 #undef PBUF_POOL_BUFSIZE
-#define PBUF_POOL_BUFSIZE           LWIP_MEM_ALIGN_SIZE(MBED_CONF_LWIP_PBUF_POOL_BUFSIZE)
+#define PBUF_POOL_BUFSIZE           LWIP_MEM_ALIGN_SIZE(MBED_CONF_NSAPI_EMAC_RX_POOL_BUF_SIZE)
 #else
 #ifndef PBUF_POOL_BUFSIZE
 #if LWIP_IPV6

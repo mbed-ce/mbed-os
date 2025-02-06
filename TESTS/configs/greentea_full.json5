@@ -18,6 +18,14 @@
         "mbed-trace.enable": true,
 
         // Disable colored traces in tests, as the test runner does not like the terminal control chars
-        "mbed-trace.default-config": "TRACE_ACTIVE_LEVEL_INFO | TRACE_CARRIAGE_RETURN"
+        "mbed-trace.default-config": "TRACE_ACTIVE_LEVEL_INFO | TRACE_CARRIAGE_RETURN",
+
+        // Don't use any network stack as the default, so that we can manually select which one
+        // is used in the tests.
+        "nsapi.default-stack": null,
+
+        // Configure Nanostack for Ethernet mode only by default. This is sufficient for our tests and is
+        // needed because not every target has enough flash space for all of Nanostack (it can be more than 400kiB when you include the Mbed TLS deps it pulls in!)
+        "nanostack.configuration": "ethernet_host"
     }
 }

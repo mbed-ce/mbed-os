@@ -19,6 +19,7 @@
 #include <string.h>
 #include "mbed_assert.h"
 #include "NanostackMemoryManager.h"
+#include "NanostackEthernetInterface.h"
 
 struct ns_stack_mem_t {
     ns_stack_mem_t *next;
@@ -55,12 +56,18 @@ emac_mem_buf_t *NanostackMemoryManager::alloc_heap(uint32_t size, uint32_t align
 
 emac_mem_buf_t *NanostackMemoryManager::alloc_pool(uint32_t size, uint32_t align)
 {
+    // Unlike LwIP, Nanostack does not treat pool buffers any differently from heap ones.
     return alloc_heap(size, align);
 }
 
 uint32_t NanostackMemoryManager::get_pool_alloc_unit(uint32_t align) const
 {
-    return 1536; // arbitrary nicely-aligned number big enough for Ethernet
+    return MBED_CONF_NSAPI_EMAC_RX_POOL_BUF_SIZE;
+}
+
+uint32_t NanostackMemoryManager::get_pool_size() const
+{
+    return MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS;
 }
 
 void NanostackMemoryManager::free(emac_mem_buf_t *mem)
@@ -140,4 +147,19 @@ void NanostackMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
     ns_stack_mem_t *mem = static_cast<ns_stack_mem_t *>(buf);
 
     mem->len = len;
+}
+
+NetStackMemoryManager::Lifetime NanostackMemoryManager::get_lifetime(const net_stack_mem_buf_t *buf) const
+{
+    // For Nanostack, all buffers are heap allocated and can be kept around as long as
+    // is needed by the EMAC driver.
+    return Lifetime::HEAP_ALLOCATED;
+}
+
+void mbed_ns_heap_free_hook()
+{
+    auto &callback = Nanostack::get_instance().get_memory_manager().onPoolSpaceAvailCallback;
+    if (callback) {
+        callback();
+    }
 }

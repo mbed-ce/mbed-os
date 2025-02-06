@@ -32,9 +32,19 @@
 #include "ns_trace.h"
 #define TRACE_GROUP  "m6-mesh-system"
 
+/* For LPC boards define the heap memory bank ourselves to give us section placement
+   control */
+#ifndef ETHMEM_SECTION
+#  if defined(TARGET_LPC1768)
+#    define ETHMEM_SECTION __attribute__((section("AHBSRAM"),aligned))
+#  else
+#    define ETHMEM_SECTION
+#  endif
+#endif
+
 /* Heap for NanoStack */
 #if !MBED_CONF_MBED_MESH_API_USE_MALLOC_FOR_HEAP
-static uint8_t app_stack_heap[MBED_CONF_MBED_MESH_API_HEAP_SIZE + 1];
+ETHMEM_SECTION uint8_t app_stack_heap[MBED_CONF_MBED_MESH_API_HEAP_SIZE + 1];
 #else
 static uint8_t *app_stack_heap;
 #endif

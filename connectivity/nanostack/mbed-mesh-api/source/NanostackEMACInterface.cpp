@@ -122,7 +122,7 @@ int8_t EMACPhy::address_write(phy_address_type_e address_type, uint8_t *address_
 
 int8_t EMACPhy::tx(uint8_t *data_ptr, uint16_t data_len, uint8_t tx_handle, data_protocol_e data_flow)
 {
-    emac_mem_buf_t *mem = memory_manager.alloc_pool(data_len, 0);
+    emac_mem_buf_t *mem = memory_manager.alloc_heap(data_len, 0);
     if (!mem) {
         return -1;
     }

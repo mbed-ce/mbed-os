@@ -26,8 +26,8 @@ mbed_greentea_add_test(
     TEST_SOURCES
         ${TEST_SOURCE_LIST}
     TEST_REQUIRED_LIBS
-		mbed-netsocket
         mbed-emac-test-utils
+		${MBED_NETSOCKET_TEST_COMMON_LIBS} # We don't want LwIP or nanostack
     TEST_SKIPPED
         ${TEST_SKIPPED}
 )

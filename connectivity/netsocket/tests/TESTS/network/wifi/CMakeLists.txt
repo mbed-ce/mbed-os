@@ -35,17 +35,30 @@ list(
 
 mbed_greentea_add_test(
     TEST_NAME
-        mbed-connectivity-network-wifi
+        mbed-connectivity-network-lwipstack-wifi
     TEST_SOURCES
         ${TEST_SOURCE_LIST}
     TEST_REQUIRED_LIBS
-        mbed-netsocket
+		${MBED_NETSOCKET_TEST_COMMON_LIBS_LWIPSTACK}
     TEST_SKIPPED
         ${TEST_SKIPPED}
 )
 
-if(TARGET test-mbed-connectivity-network-wifi)
-	target_compile_definitions(test-mbed-connectivity-network-wifi PRIVATE
-		MBED_GREENTEA_WIFI_MAX_SCAN_SIZE=${MBED_GREENTEA_WIFI_MAX_SCAN_SIZE}
-		MBED_GREENTEA_WIFI_SECURE_CHANNEL=${MBED_GREENTEA_WIFI_SECURE_CHANNEL})
-endif()
+mbed_greentea_add_test(
+	TEST_NAME
+		mbed-connectivity-network-nanostack-wifi
+	TEST_SOURCES
+		${TEST_SOURCE_LIST}
+	TEST_REQUIRED_LIBS
+		${MBED_NETSOCKET_TEST_COMMON_LIBS_NANOSTACK}
+	TEST_SKIPPED
+		${TEST_SKIPPED}
+)
+
+foreach(TARGET test-mbed-connectivity-network-lwipstack-wifi test-mbed-connectivity-network-nanostack-wifi)
+	if(TARGET ${TARGET})
+		target_compile_definitions(${TARGET} PRIVATE
+			MBED_GREENTEA_WIFI_MAX_SCAN_SIZE=${MBED_GREENTEA_WIFI_MAX_SCAN_SIZE}
+			MBED_GREENTEA_WIFI_SECURE_CHANNEL=${MBED_GREENTEA_WIFI_SECURE_CHANNEL})
+	endif()
+endforeach()

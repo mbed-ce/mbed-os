@@ -1,6 +1,7 @@
 /**
  * @file
  * Packet buffer management
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 /**
@@ -739,6 +740,9 @@ pbuf_free(struct pbuf *p)
   PERF_START;
 
   count = 0;
+
+  bool pbuf_pool_freed = false;
+
   /* de-allocate all consecutive pbufs from the head of the chain that
    * obtain a zero reference count after decrementing*/
   while (p != NULL) {
@@ -771,6 +775,9 @@ pbuf_free(struct pbuf *p)
         /* is this a pbuf from the pool? */
         if (alloc_src == PBUF_TYPE_ALLOC_SRC_MASK_STD_MEMP_PBUF_POOL) {
           memp_free(MEMP_PBUF_POOL, p);
+
+          // Mbed OS Patch: set flag that buffer was from the pool
+          pbuf_pool_freed = true;
           /* is this a ROM or RAM referencing pbuf? */
         } else if (alloc_src == PBUF_TYPE_ALLOC_SRC_MASK_STD_MEMP_PBUF) {
           memp_free(MEMP_PBUF, p);
@@ -793,6 +800,13 @@ pbuf_free(struct pbuf *p)
       p = NULL;
     }
   }
+
+  // Mbed OS Patch: Hook into the memory manager when a POOL buffer is freed.
+  if(pbuf_pool_freed) {
+    extern void mbed_lwip_on_pbuf_pool_free_hook(void);
+    mbed_lwip_on_pbuf_pool_free_hook();
+  }
+
   PERF_STOP("pbuf_free");
   /* return number of de-allocated pbufs */
   return count;

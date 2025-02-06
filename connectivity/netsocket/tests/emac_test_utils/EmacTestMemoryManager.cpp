@@ -36,8 +36,6 @@
 
 #define CHECK_ASSERT(value, fmt, ...) check_value(value, fmt, ##__VA_ARGS__)
 
-#define BUF_POOL_SIZE   (14 + 40 + 20 + 536) /* Ethernet + IP + TCP + payload */
-
 #define MEM_MNGR_TRACE "test mem mngr: "
 
 char s_trace_buffer[100] = MEM_MNGR_TRACE;
@@ -74,7 +72,8 @@ void emac_heap_error_handler(heap_fail_t event)
 EmacTestMemoryManager::EmacTestMemoryManager()
     : m_mem_mutex(),
       m_mem_buffers(),
-      m_alloc_unit(BUF_POOL_SIZE),
+      m_alloc_unit(MBED_CONF_NSAPI_EMAC_RX_POOL_BUF_SIZE),
+      m_pool_size(MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS),
       m_memory_available(true)
 {
 #ifdef ETHMEM_SECTION
@@ -123,6 +122,7 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_heap(uint32_t size, uint32_t align,
     buf->orig_len = size;
     buf->len = size;
     buf->first = true;
+    buf->lifetime = Lifetime::HEAP_ALLOCATED;
 
     if (opt & MEM_NO_ALIGN) {
         if (reinterpret_cast<uint32_t>(buf->ptr) % sizeof(uint16_t) == 0) {
@@ -144,6 +144,13 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_heap(uint32_t size, uint32_t align,
 
     char *buffer_tail = static_cast<char *>(buf->ptr) + buf->len;
     memcpy(buffer_tail, BUF_TAIL, BUF_TAIL_SIZE);
+
+    // Scribble over the buffer contents with 'y' so it's totally obvious if someone uses it uninitialized.
+    // Do this in both the cache and the main memory.
+    memset(buf->ptr, 'y', buf->orig_len);
+#if __DCACHE_PRESENT
+    SCB_CleanDCache_by_Addr(buf->ptr, buf->orig_len);
+#endif
 
     m_mem_buffers.push_front(buf);
 
@@ -169,9 +176,21 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_pool(uint32_t size, uint32_t align,
         return NULL;
     }
 
+    // Lock memory mutex
+    rtos::ScopedMutexLock lock(m_mem_mutex);
+
     // Contiguous allocation
     if (size + align <= m_alloc_unit) {
-        return alloc_heap(size, align, opt);
+        if (m_pool_bufs_used > m_pool_size) {
+            return nullptr;
+        }
+
+        auto *buf = alloc_heap(size, align, opt);
+
+        static_cast<emac_memory_t *>(buf)->lifetime = Lifetime::POOL_ALLOCATED;
+        ++m_pool_bufs_used;
+
+        return buf;
     }
 
     unsigned int pool_buffer_max_size = m_alloc_unit - align;
@@ -195,7 +214,18 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_pool(uint32_t size, uint32_t align,
             size_left = 0;
         }
 
+        if (m_pool_bufs_used > m_pool_size) {
+            // No simulated pool space left, free and return nullptr
+            if (first_buf != nullptr) {
+                free(first_buf);
+            }
+            return nullptr;
+        }
+
         emac_memory_t *new_buf = static_cast<emac_memory_t *>(alloc_heap(alloc_size, align, opt));
+
+        static_cast<emac_memory_t *>(new_buf)->lifetime = Lifetime::POOL_ALLOCATED;
+        ++m_pool_bufs_used;
 
         if (prev_buf) {
             new_buf->first = false;
@@ -232,6 +262,8 @@ void EmacTestMemoryManager::free(emac_mem_buf_t *buf)
 
     m_mem_mutex.lock();
 
+    bool pool_buf_freed = false;
+
     while (mem_buf) {
         for (mem_buf_entry = m_mem_buffers.begin(); mem_buf_entry != m_mem_buffers.end(); ++mem_buf_entry) {
             if (*mem_buf_entry == mem_buf) {
@@ -255,6 +287,19 @@ void EmacTestMemoryManager::free(emac_mem_buf_t *buf)
             CHECK_ASSERT(0, "free(): %p tail overwrite", mem_buf);
         }
 
+        // Scribble over the buffer contents with 'z' so it's totally obvious if someone reuses it later.
+        // Do this in both the cache and the main memory.
+        memset(mem_buf->ptr, 'z', mem_buf->orig_len);
+#if __DCACHE_PRESENT
+        SCB_CleanDCache_by_Addr(mem_buf->ptr, mem_buf->orig_len);
+#endif
+
+        // Update pool size
+        if (mem_buf->lifetime == Lifetime::POOL_ALLOCATED) {
+            --m_pool_bufs_used;
+            pool_buf_freed = true;
+        }
+
         emac_memory_t *next = mem_buf->next;
 
         m_mem_buffers.erase(mem_buf_entry);
@@ -270,6 +315,10 @@ void EmacTestMemoryManager::free(emac_mem_buf_t *buf)
     }
 
     m_mem_mutex.unlock();
+
+    if (pool_buf_freed && onPoolSpaceAvailCallback) {
+        onPoolSpaceAvailCallback();
+    }
 }
 
 uint32_t EmacTestMemoryManager::get_total_len(const emac_mem_buf_t *buf) const
@@ -437,6 +486,16 @@ void EmacTestMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
     mem_buf->len = len;
 }
 
+uint32_t EmacTestMemoryManager::get_pool_size() const
+{
+    return m_pool_size;
+}
+
+NetStackMemoryManager::Lifetime EmacTestMemoryManager::get_lifetime(const net_stack_mem_buf_t *buf) const
+{
+    return static_cast<emac_memory_t const *>(buf)->lifetime;
+}
+
 void EmacTestMemoryManager::set_alloc_unit(uint32_t alloc_unit)
 {
     validate_list();
@@ -444,9 +503,19 @@ void EmacTestMemoryManager::set_alloc_unit(uint32_t alloc_unit)
     m_alloc_unit = alloc_unit;
 }
 
+void EmacTestMemoryManager::set_pool_size(size_t size)
+{
+    m_pool_size = size;
+}
+
 void EmacTestMemoryManager::set_memory_available(bool memory)
 {
     m_memory_available = memory;
+
+    // Poke the EMAC in case it can allocate buffers
+    if (m_memory_available && onPoolSpaceAvailCallback) {
+        onPoolSpaceAvailCallback();
+    }
 }
 
 void EmacTestMemoryManager::get_memory_statistics(int *buffers, int *memory)
@@ -541,5 +610,6 @@ EmacTestMemoryManager &EmacTestMemoryManager::get_instance()
     static EmacTestMemoryManager test_memory_manager;
     return test_memory_manager;
 }
+
 
 #endif // defined(MBED_CONF_RTOS_PRESENT)
