@@ -1,6 +1,7 @@
 /**
  * @file
  * Packet buffer management
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 /**

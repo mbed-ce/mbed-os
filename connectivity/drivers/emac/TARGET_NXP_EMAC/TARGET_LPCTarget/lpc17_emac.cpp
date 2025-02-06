@@ -9,6 +9,7 @@
 *
 * Copyright(C) 2011, NXP Semiconductor
 * All rights reserved.
+* SPDX-License-Identifier: Apache-2.0
 *
 ***********************************************************************
 * Software that is described herein is for illustrative purposes only
