@@ -70,8 +70,6 @@ public:
 
     void set_len(emac_mem_buf_t *buf, uint32_t len) override;
 
-    uint32_t get_pool_size() const override;
-
     Lifetime get_lifetime(const net_stack_mem_buf_t *buf) const override;
 
     /**
@@ -108,16 +106,6 @@ public:
      * @param alloc_unit   Contiguous memory size
      */
     virtual void set_alloc_unit(uint32_t alloc_unit);
-
-    /**
-     * Sets memory buffer pool size
-     *
-     * Sets the number of buffers that may be allocated from the pool.  If the number of buffers currently
-     * in use is >= this number, new pool allocations will fail.
-     *
-     * @param size Pool size
-     */
-    virtual void set_pool_size(size_t size);
 
     /**
      * Sets whether memory is available

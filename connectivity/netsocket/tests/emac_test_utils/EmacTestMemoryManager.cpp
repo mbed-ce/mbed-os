@@ -486,11 +486,6 @@ void EmacTestMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
     mem_buf->len = len;
 }
 
-uint32_t EmacTestMemoryManager::get_pool_size() const
-{
-    return m_pool_size;
-}
-
 NetStackMemoryManager::Lifetime EmacTestMemoryManager::get_lifetime(const net_stack_mem_buf_t *buf) const
 {
     return static_cast<emac_memory_t const *>(buf)->lifetime;
@@ -501,11 +496,6 @@ void EmacTestMemoryManager::set_alloc_unit(uint32_t alloc_unit)
     validate_list();
 
     m_alloc_unit = alloc_unit;
-}
-
-void EmacTestMemoryManager::set_pool_size(size_t size)
-{
-    m_pool_size = size;
 }
 
 void EmacTestMemoryManager::set_memory_available(bool memory)

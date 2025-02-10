@@ -22,6 +22,7 @@
 #include "CacheAlignedBuffer.h"
 #include "mbed_critical.h"
 #include <atomic>
+#include <optional>
 
 #define TRACE_GROUP  "GEDMA"
 
@@ -51,9 +52,13 @@ namespace mbed {
         /// EventFlag used to signal when a Tx descriptor becomes available
         rtos::EventFlags txDescAvailFlag;
 
+        // Indexes for descriptor rings.
+        // NOTE: when working with these indices, it's important to consider the case where e.g. the send and reclaim indexes are
+        // equal.  This could mean *either* that the Tx ring is completely full of data, or that the Tx ring is empty.
+        // To resolve this ambiguity, we maintain separate count variables that track how many entries are in the ring at present.
         size_t txSendIndex; ///< Index of the next Tx descriptor that can be filled with data
-        std::atomic<size_t> txDescsOwnedByApplication; ///< Number of Tx descriptors owned by the application.  Incremented by the mac thread and decremented by the application thread.
-        size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the mac thread.
+        std::atomic<size_t> txDescsOwnedByApplication; ///< Number of Tx descriptors owned by the application. Decremented by txPacket() and incremented by reclaimTxDescs()
+        size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the mac thread calling reclaimTxDescs().
 
         /// Configure DMA registers to point to the DMA ring,
         /// and enable DMA. This is done before the MAC itself is enabled.
@@ -71,6 +76,8 @@ namespace mbed {
         /// the buffer has been set.
         /// Note: if the descriptor needs to be flushed from CPU cache, you need to do that
         /// at the correct point in the implementation of this method!
+        /// Also, if the DMA ran out of data to transmit, you may need to do a "poke"/"wake" operation
+        /// to tell it to start running again.
         virtual void giveToDMA(size_t descIdx, bool firstDesc, bool lastDesc) = 0;
 
     public:
@@ -267,6 +274,277 @@ namespace mbed {
             return CompositeEMAC::ErrCode::SUCCESS;
         }
 
+    };
+
+    /**
+     * @brief Generic receive DMA loop
+     *
+     * This implementation of Rx DMA should work for the large majority of embedded MCUs that use a DMA ring-based
+     * ethernet MAC.
+     *
+     * @tparam DescriptorT Type representing an Ethernet descriptor.
+     *
+     * @note If the MCU has a D-cache, then \c DescriptorT must be padded to an exact number of cache lines in size!
+     */
+    template<typename DescriptorT>
+    class GenericRxDMALoop : public CompositeEMAC::RxDMA {
+    protected:
+        /// Rx descriptor array. It's up to the subclass to allocate these in the correct location.
+        CacheAlignedBuffer<DescriptorT> & rxDescs = nullptr;
+
+        /// How many extra buffers to leave in the Rx pool, relative to how many we keep assigned to Rx descriptors.
+        /// We want to keep some amount of extra buffers because constantly hitting the network stack with failed pool
+        /// allocations can produce some negative consequences in some cases.
+        static constexpr size_t RX_POOL_EXTRA_BUFFERS = 3;
+
+        /// Number of entries in the Rx descriptor ring
+        /// Note: + 1 because for some EMACs (STM32 v2) we have to always keep one descriptor owned by the application
+        // TODO: When we add multiple Ethernet support, this calculation may need to be changed, because the pool buffers will be split between multiple EMACs
+        static constexpr size_t RX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS - RX_POOL_EXTRA_BUFFERS + 1;
+
+        /// Pointer to the network stack buffer associated with the corresponding Rx descriptor.
+        net_stack_mem_buf_t * rxDescStackBufs[RX_NUM_DESCS];
+
+        // Indexes for descriptor rings.
+        size_t rxBuildIndex; ///< Index of the next Rx descriptor that needs to be built.  Updated by application and used by ISR.
+        size_t rxDescsOwnedByApplication; ///< Number of Rx descriptors owned by the application and needing buffers allocated.
+        std::atomic<size_t> rxNextIndex; ///< Index of the next descriptor that the DMA will populate.  Updated by application but used by ISR.
+
+        // Alignment required for Rx memory buffers.  Normally they don't need alignment but
+        // if we are doing cache operations they need to be cache aligned.
+#if __DCACHE_PRESENT
+        static constexpr size_t RX_BUFFER_ALIGN = __SCB_DCACHE_LINE_SIZE;
+#else
+        static constexpr size_t RX_BUFFER_ALIGN = 2;
+#endif
+
+        /// Payload size of buffers allocated from the Rx pool.  This is the allocation unit size
+        /// of the pool minus any overhead needed for alignment.
+        size_t rxPoolPayloadSize;
+
+        /// Constructor. Subclass must allocate descriptor array of size RX_NUM_DESCS
+        GenericRxDMALoop(CacheAlignedBuffer<DescriptorT> & rxDescs) : rxDescs(rxDescs) {}
+
+        /// Configure DMA registers to point to the DMA ring,
+        /// and enable DMA. This is done before the MAC itself is enabled.
+        virtual void startDMA() = 0;
+
+        /// Stop the DMA running. This is done after MAC transmit & receive are disabled.
+        virtual void stopDMA() = 0;
+
+        /// Return a descriptor to DMA so that DMA can receive into it.
+        /// Is passed the buffer address (fixed size) to attach to this descriptor.
+        /// Note: if the descriptor needs to be flushed from CPU cache, you need to do that
+        /// at the correct point in the implementation of this method!
+        /// Also, if the DMA ran out of data to transmit, you may need to do a "poke"/"wake" operation
+        /// to tell it to start running again.
+        virtual void returnDescriptor(size_t descIdx, uint8_t * buffer) = 0;
+
+    public:
+        CompositeEMAC::ErrCode init() override {
+            rxPoolPayloadSize = memory_manager->get_pool_alloc_unit(RX_BUFFER_ALIGN);
+
+            // At the start, we own all the descriptors
+            rxDescsOwnedByApplication = RX_NUM_DESCS;
+
+            // Build all descriptors
+            rebuildDescriptors();
+
+            // init DMA peripheral
+            startDMA();
+
+            return CompositeEMAC::ErrCode::SUCCESS;
+        }
+
+        CompositeEMAC::ErrCode deinit() override {
+            stopDMA();
+
+            // Deallocate buffers associated with all descriptors
+            for(size_t descIdx = 0; descIdx < RX_NUM_DESCS; ++descIdx) {
+                if(rxDescStackBufs[descIdx] != nullptr) {
+                    memory_manager->free(rxDescStackBufs[descIdx]);
+                }
+            }
+
+            return CompositeEMAC::ErrCode::SUCCESS;
+        }
+
+        void rebuildDescriptors() override {
+            const size_t origRxDescsOwnedByApplication [[maybe_unused]] = rxDescsOwnedByApplication;
+
+            // Note: With some Ethernet peripherals, you can never give back every single descriptor to
+            // the hardware, because then it thinks there are 0 descriptors left.
+            while (rxDescsOwnedByApplication > 1) {
+                // Allocate new buffer
+                auto *const buffer = memory_manager->alloc_pool(rxPoolPayloadSize, RX_BUFFER_ALIGN);
+                if (buffer == nullptr) {
+                    // No memory, cannot return any more descriptors.
+                    return;
+                }
+
+                // Store buffer address
+                rxDescStackBufs[rxBuildIndex] = buffer;
+
+                // Send descriptor to DMA
+                returnDescriptor(rxBuildIndex, static_cast<uint8_t *>(memory_manager->get_ptr(buffer)));
+
+                // Move to next descriptor
+                --rxDescsOwnedByApplication;
+                rxBuildIndex = (rxBuildIndex + 1) % RX_NUM_DESCS;
+            }
+
+            tr_debug("buildRxDescriptors(): Returned %zu descriptors.", origRxDescsOwnedByApplication - rxDescsOwnedByApplication);
+        }
+
+        bool rxHasPackets_ISR() override {
+            // First, we need to check if at least one DMA descriptor that is owned by the application
+            // has its last descriptor flag or error flag set, indicating we have received at least one complete packet
+            // or there is an error descriptor that can be reclaimed by the application.
+            // Note that we want to bias towards false positives here, because false positives just waste CPU time,
+            // while false negatives would cause packets to be dropped.
+            // So, for simplicity, we just check every descriptor currently owned by the application until we
+            // find one with the FS bit set or the error bits set.
+            // This could potentially produce a false positive if we do this in the middle of receiving
+            // an existing packet, but that is unlikely and will not cause anything bad to happen if it does.
+
+            for(size_t descCount = 0; descCount < RX_NUM_DESCS; descCount++)
+            {
+                auto &descriptor = rxDescs[(rxNextIndex + descCount) % RX_NUM_DESCS];
+
+#if __DCACHE_PRESENT
+                SCB_InvalidateDCache_by_Addr(&descriptor, sizeof(DescriptorT));
+#endif
+
+                if(descriptor.ownedByDMA())
+                {
+                    // Descriptor owned by DMA.  We are out of descriptors to process.
+                    return false;
+                }
+                if(descriptor.isErrorDesc() or descriptor.isLastDesc())
+                {
+                    // Reclaimable descriptor or complete packet detected.
+                    return true;
+                }
+            }
+
+            // Processed all descriptors.
+            return false;
+        }
+
+        net_stack_mem_buf_t * dequeuePacket() override {
+            // Indices of the first and last descriptors for the packet will be saved here
+            std::optional<size_t> firstDescIdx, lastDescIdx;
+
+            // Prevent looping around into descriptors waiting for rebuild by limiting how many
+            // we can process.
+            const size_t maxDescsToProcess = RX_NUM_DESCS - rxDescsOwnedByApplication;
+
+            const size_t startIdx = rxNextIndex;
+
+            for (size_t descCount = 0; descCount < maxDescsToProcess && !lastDescIdx.has_value(); descCount++) {
+                size_t descIdx = (startIdx + descCount) % RX_NUM_DESCS;
+                auto &descriptor = rxDescs[descIdx];
+
+        #if __DCACHE_PRESENT
+                SCB_InvalidateDCache_by_Addr(&descriptor, sizeof(DescriptorT));
+        #endif
+
+                if (descriptor.ownedByDMA()) {
+                    // Descriptor owned by DMA and has not been filled in yet.  We are out of descriptors to process.
+                    break;
+                }
+                const auto type = getType(descriptor);
+
+                if (descriptor.isErrorDesc() ||
+                    (!descriptor.isFirstDesc() && !firstDescIdx.has_value())) {
+                    // Context or error descriptor, or a non-first-descriptor before a first descriptor
+                    // (could be caused by incomplete packets/junk in the DMA buffer).
+                    // Ignore, free associated memory, and schedule for rebuild.
+                    memory_manager->free(rxDescStackBufs[descIdx]);
+                    rxDescStackBufs[descIdx] = nullptr;
+                    ++rxDescsOwnedByApplication;
+                    ++rxNextIndex;
+
+                    // We should only get one of these error descriptors before the start of the packet, not
+                    // during it.
+                    if(descriptor.isErrorDesc()) {
+                        MBED_ASSERT(!firstDescIdx.has_value());
+                    }
+
+                    continue;
+                }
+
+                if (descriptor.isFirstDesc()) {
+                    // We should see first descriptor only once and before last descriptor. If this rule is violated, it's likely
+                    // because we ran out of descriptors during receive earlier and the MAC tossed out the rest of the packet.
+                    if(firstDescIdx.has_value()) {
+                        // Clean up the old first descriptor and any descriptors between there and here
+                        for(size_t descToCleanIdx = *firstDescIdx; descToCleanIdx != descIdx; descToCleanIdx = (descToCleanIdx + 1) % RX_NUM_DESCS) {
+                            memory_manager->free(rxDescStackBufs[descToCleanIdx]);
+                            rxDescStackBufs[descToCleanIdx] = nullptr;
+                            ++rxDescsOwnedByApplication;
+                            ++rxNextIndex;
+                        }
+                    }
+                    firstDescIdx = descIdx;
+                }
+
+                if (descriptor.isLastDesc()) {
+                    lastDescIdx = descIdx;
+                }
+            }
+
+            if (!lastDescIdx.has_value()) {
+                // No complete packet identified.
+                // Take the chance to rebuild any available descriptors, then return.
+                rebuildDescriptors();
+                tr_debug("No complete packets in Rx descs\n");
+                return nullptr;
+            }
+
+            // We will receive next into the descriptor after this one.
+            // Update this now to tell the ISR to search for descriptors after lastDescIdx only.
+            rxNextIndex = (*lastDescIdx + 1) % RX_NUM_DESCS;
+
+            // NOTE: Currently we do not make any attempt to set the length of the Rx buffer to match
+            // how many bytes were actually received. This is because different MACs provide this info differently:
+            // some provide a byte count in each descriptor while others provide one in the first descriptor
+            // for the entire chain. It's easier to simply ignore this information as the network stack can
+            // figure it out.
+            // So, the buffers we pass up will always have a langth that's a multiple of the pool alloc unit.
+
+
+            // Iterate through the subsequent descriptors in this packet and link the buffers
+            // Note that this also transfers ownership of subsequent buffers to the first buffer,
+            // so if the first buffer is deleted, the others will be as well.
+            net_stack_mem_buf_t *const headBuffer = rxDescStackBufs[*firstDescIdx];
+            ++rxDescsOwnedByApplication; // for first buffer
+            rxDescStackBufs[*firstDescIdx] = nullptr;
+            for (size_t descIdx = (*firstDescIdx + 1) % RX_NUM_DESCS;
+                 descIdx != (*lastDescIdx + 1) % RX_NUM_DESCS;
+                 descIdx = (descIdx + 1) % RX_NUM_DESCS) {
+
+                memory_manager->cat(headBuffer, rxDescs[descIdx].buffer);
+                rxDescs[descIdx].buffer = nullptr;
+                ++rxDescsOwnedByApplication;
+            }
+
+            // Invalidate cache for all data buffers, as these were written by the DMA to main memory
+        #if __DCACHE_PRESENT
+            auto * bufToInvalidate = headBuffer;
+            while(bufToInvalidate != nullptr)
+            {
+                SCB_InvalidateDCache_by_Addr(memory_manager.get_ptr(bufToInvalidate), rxPoolPayloadSize);
+                bufToInvalidate = memory_manager.get_next(bufToInvalidate);
+            }
+        #endif
+
+            tr_debug("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
+                   memory_manager.get_total_len(headBuffer), memory_manager.get_ptr(headBuffer), firstDescIdx, lastDescIdx,
+                   &rxDescs[firstDescIdx], &rxDescs[lastDescIdx]);
+
+            return headBuffer;
+        }
     };
 }
 

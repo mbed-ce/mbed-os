@@ -82,4 +82,48 @@ namespace mbed {
         // This tells the MAC to transmit until it reaches the given descriptor, then stop.
         base->DMACTDTPR = reinterpret_cast<uint32_t>(&txDescs[txSendIndex]);
     }
+
+    void STM32EthMacV2::RxDMA::startDMA()
+    {
+        // Configure Rx buffer size.  Per the datasheet and HAL code, we need to round this down to
+        // the nearest multiple of 4.
+        MBED_ASSERT(rxPoolPayloadSize % sizeof(uint32_t) == 0);
+        base->DMACRCR |= rxPoolPayloadSize << ETH_DMACRCR_RBSZ_Pos;
+
+        // Configure Rx descriptor ring
+        base->DMACRDRLR = RX_NUM_DESCS - 1; // Ring size
+        base->DMACRDLAR = reinterpret_cast<uint32_t>(&rxDescs[0]); // Ring base address
+        base->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[0]); // Next descriptor (tail) pointer
+
+        // Enable Rx DMA.
+        base->DMACRCR |= ETH_DMACRCR_SR;
+
+        // Clear Rx process stopped flag
+        base->DMACSR = ETH_DMACSR_RPS;
+    }
+
+    void STM32EthMacV2::RxDMA::returnDescriptor(size_t descIdx, uint8_t *buffer) {
+        auto & desc = rxDescs[descIdx];
+
+        // Clear out any bits previously set in the descriptor (from when the DMA gave it back to us)
+        memset(&desc, 0, sizeof(stm32_ethv2::EthRxDescriptor));
+
+        // Store buffer address
+        desc.formats.toDMA.buffer1Addr = memory_manager->get_ptr(buffer);
+
+        // Configure descriptor
+        desc.formats.toDMA.buffer1Valid = true;
+        desc.formats.toDMA.intrOnCompletion = true;
+        desc.formats.toDMA.dmaOwn = true;
+
+#if __DCACHE_PRESENT
+        // Flush to main memory
+        SCB_CleanDCache_by_Addr(&desc, __SCB_DCACHE_LINE_SIZE);
+#endif
+
+        // Update tail ptr to issue "rx poll demand" and mark this descriptor for receive.
+        // Rx stops when the current and tail pointers are equal, so we want to set the tail pointer
+        // to one location after the last DMA-owned descriptor in the FIFO.
+        base->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[rxBuildIndex]);
+    }
 }

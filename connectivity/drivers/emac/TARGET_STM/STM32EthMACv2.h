@@ -31,6 +31,7 @@ namespace mbed {
         {
         protected:
             ETH_TypeDef * const base; // Base address of Ethernet peripheral
+            StaticCacheAlignedBuffer<stm32_ethv2::EthTxDescriptor, MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS> txDescs; // Tx descriptors
 
             void startDMA() override;
 
@@ -39,7 +40,35 @@ namespace mbed {
             bool isDMAReadableBuffer(uint8_t const * start, size_t size) const override;
 
             void giveToDMA(size_t descIdx, bool firstDesc, bool lastDesc) override;
+        public:
+            explicit TxDMA(ETH_TypeDef * const base):
+            GenericTxDMALoop<stm32_ethv2::EthTxDescriptor>(txDescs),
+            base(base)
+            {}
         };
+
+        class RxDMA : public GenericRxDMALoop<stm32_ethv2::EthRxDescriptor> {
+        protected:
+            ETH_TypeDef * const base; // Base address of Ethernet peripheral
+            StaticCacheAlignedBuffer<stm32_ethv2::EthRxDescriptor, RX_NUM_DESCS> rxDescs; // Rx descriptors
+
+            void startDMA() override;
+
+            void stopDMA() override;
+
+            void returnDescriptor(size_t descIdx, uint8_t *buffer) override;
+
+            DescriptorType getType(const stm32_ethv2::EthRxDescriptor &desc) override;
+
+        public:
+            explicit RxDMA(ETH_TypeDef * const base):
+            GenericRxDMALoop<mbed::stm32_ethv2::EthRxDescriptor>(rxDescs),
+            base(base)
+            {}
+        };
+
+        // Components of the ethernet MAC
+        TxDMA txDMA;
     };
 }
 
