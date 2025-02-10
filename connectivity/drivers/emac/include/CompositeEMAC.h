@@ -19,6 +19,7 @@
 
 #include "EMAC.h"
 #include "NonCopyable.h"
+#include <atomic>
 
 namespace mbed
 {
@@ -261,19 +262,22 @@ public:
         void setMemoryManager(EMACMemoryManager * memory_manager) { this->memory_manager = memory_manager; }
 
         /// Initialize this Tx DMA ring.
-        ErrCode init();
+        virtual ErrCode init() = 0;
 
-        /// Stop the DMA running. init() should be able to be called again after this function completes to restart DMA.
-        ErrCode deinit();
+        /// Stop the DMA running. This is called after the MAC is disabled.
+        /// init() should be able to be called again after this function completes to restart DMA.
+        virtual ErrCode deinit() = 0;
 
-        /// Called by CompositeEMAC when the MAC generates a transmit complete interrupt
-        void txISR();
+        /// Reclaims the Tx buffers for any transmitted packets and frees their memory.
+        /// Invoked by the CompositeEMAC internal thread after a Tx interrupt happens.
+        /// Returns true if any descriptors became available, false otherwise
+        virtual bool reclaimTxDescs() = 0;
 
         /// Transmit a packet out of the Tx DMA ring.  Note that this function
         /// *takes ownership of* the passed packet and must free it either now or after
         /// it's been transmitted.
         /// Should block until there is space to transmit the packet.
-        HAL_StatusTypeDef txPacket(net_stack_mem_buf_t * buf);
+        virtual ErrCode txPacket(net_stack_mem_buf_t * buf) = 0;
     };
 
     /**
@@ -334,9 +338,13 @@ protected:
     RxDMA & rxDMA;
 
     // State of the MAC
-    enum PowerState {
-
+    enum class PowerState {
+        OFF = 0,
+        ON_NO_LINK,
+        ON_LINK_UP
     };
+
+    std::atomic<PowerState> state = PowerState::OFF;
 
     /// Subclass should call this when a receive interrupt is detected
     void rxISR();

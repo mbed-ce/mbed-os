@@ -50,7 +50,9 @@
 #define HAL_DTS_MODULE_ENABLED
 #define HAL_DSI_MODULE_ENABLED
 
-#define HAL_ETH_MODULE_ENABLED
+// Mbed uses a handwritten driver for Eth V2
+// #define HAL_ETH_MODULE_ENABLED
+
 #define HAL_EXTI_MODULE_ENABLED
 #define HAL_FDCAN_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED

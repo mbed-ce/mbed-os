@@ -17,6 +17,10 @@
 
 #include "CompositeEMAC.h"
 
+#include <mbed_trace.h>
+
+#define TRACE_GROUP "CEMAC"
+
 void mbed::CompositeEMAC::get_ifname(char *name, uint8_t size) const {
     // Note that LwIP only supports a two character interface name prefix.
     // So, no point in going longer than that.
@@ -26,5 +30,12 @@ void mbed::CompositeEMAC::get_ifname(char *name, uint8_t size) const {
 }
 
 void mbed::CompositeEMAC::set_hwaddr(const uint8_t *addr) {
-    if(mac.se)
+    if(state != PowerState::ON_NO_LINK) {
+        tr_err("MAC address can only be set after power up, before link up!");
+        return;
+    }
+
+    MACAddress macAddr;
+    memcpy(macAddr.data(), addr, MAC_ADDR_SIZE);
+    mac.setOwnMACAddr(macAddr);
 }
