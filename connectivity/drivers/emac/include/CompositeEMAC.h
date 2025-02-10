@@ -295,10 +295,10 @@ public:
         void setMemoryManager(EMACMemoryManager * memory_manager) { this->memory_manager = memory_manager; }
 
         /// Initialize this Rx DMA ring.
-        ErrCode init();
+        virtual ErrCode init() = 0;
 
         /// Stop the DMA running. init() should be able to be called again after this function completes to restart DMA.
-        ErrCode deinit();
+        virtual ErrCode deinit() = 0;
 
         /**
          * @brief Check if the MAC may have a packet to receive. Called from the Rx ISR.
@@ -308,7 +308,7 @@ public:
          *
          * @return True if the MAC might have a descriptor to receive. False if there is definitely no complete packet yet.
          */
-        bool rxHasPackets_ISR();
+        virtual bool rxHasPackets_ISR() = 0;
 
         /**
          * @brief Dequeue a packet, if one is ready to be received.
@@ -318,15 +318,15 @@ public:
          *
          * @return Packet pointer, or nullptr if there were no packets.
          */
-        net_stack_mem_buf_t * dequeuePacket();
+        virtual net_stack_mem_buf_t * dequeuePacket() = 0;
 
         /**
          * @brief Rebuild DMA descriptors, if there are descriptors that need building and there is free pool memory.
          *
-         * This function is called by the MAC thread after a packet has been dequeued and when memory in the Rx
+         * This function is called by the MAC thread after a packet has been dequeued, and also when memory in the Rx
          * pool becomes free.
          */
-        void rebuildDescriptors();
+        virtual void rebuildDescriptors() = 0;
     };
 
 protected:

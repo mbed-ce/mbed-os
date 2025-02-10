@@ -88,6 +88,12 @@ namespace mbed {
                 EthTxDescriptorFromDMAFmt fromDMA;
             } formats;
 
+            // If we have a data cache, we need each descriptor to be in its own cache line.  So,
+    		// pad up to 32 byte cache line size
+#if __DCACHE_PRESENT
+    		uint8_t _padding[__SCB_DCACHE_LINE_SIZE - sizeof(decltype(formats))];
+#endif
+
             bool ownedByDMA() const {
                 return formats.toDMA.dmaOwn;
             }
@@ -98,6 +104,9 @@ namespace mbed {
                 formats.toDMA.buffer1Len = len;
             }
         };
+#if __DCACHE_PRESENT
+		static_assert(sizeof(EthTxDescriptor) == __SCB_DCACHE_LINE_SIZE, "Tx descriptor size must equal cache line size");
+#endif
 
         // Rx descriptor ------------------------------------------------------------------------------------------
 
@@ -170,10 +179,45 @@ namespace mbed {
             bool dmaOwn: 1;
         };
 
-        union alignas(uint32_t) EthRxDescriptor {
-            EthRxDescriptorToDMAFmt toDMAFmt;
-            EthRxDescriptorFromDMAFmt fromDMAFmt;
+        struct alignas(uint32_t) EthRxDescriptor {
+          	union {
+                EthRxDescriptorToDMAFmt toDMA;
+                EthRxDescriptorFromDMAFmt fromDMA;
+            } formats;
+
+            // If we have a data cache, we need each descriptor to be in its own cache line.  So,
+    		// pad up to 32 byte cache line size
+#if __DCACHE_PRESENT
+    		uint8_t _padding[__SCB_DCACHE_LINE_SIZE - sizeof(decltype(formats))];
+#endif
+
+            bool ownedByDMA() const {
+                return formats.fromDMA.dmaOwn;
+            }
+
+            bool isErrorDesc() const {
+                // For right now, we treat context descriptors equivalent to error descs.
+                // Currently we do not use them, so if we did get one, we just want to get rid of it.
+                return formats.fromDMA.errorSummary || formats.fromDMA.context;
+            }
+
+            bool isFirstDesc() const {
+                return formats.fromDMA.firstDescriptor;
+            }
+
+            bool isLastDesc() const {
+                return formats.fromDMA.lastDescriptor;
+            }
+
+            bool getPayloadLength() const {
+                return formats.fromDMA.pktLength;
+            }
         };
+
+#if __DCACHE_PRESENT
+		static_assert(sizeof(EthRxDescriptor) == __SCB_DCACHE_LINE_SIZE, "Tx descriptor size must equal cache line size");
+#endif
+
 
     }
 }

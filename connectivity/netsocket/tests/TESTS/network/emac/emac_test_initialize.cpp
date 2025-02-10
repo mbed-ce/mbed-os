@@ -38,7 +38,6 @@ void test_emac_initialize()
 
     // Set memory manager parameters
     EmacTestMemoryManager::get_instance().set_alloc_unit(256); // Use a relatively small allocation unit size so packets have to be split up into a lot of buffers
-    EmacTestMemoryManager::get_instance().set_pool_size(10); // Start with 10 buffers in the Rx pool. One max-len Eth packet uses 6 256-byte buffers, and some MACs need up to 4 extra ones.
 
     static NetworkInterface *network_interface = get_network_interface();
 
