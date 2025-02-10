@@ -16,10 +16,11 @@ target_include_directories(mbed-emac
         .
 )
 
-target_sources(mbed-emac
-    PRIVATE
-        stm32xx_emac.cpp
-        STM32EthIPv2DMARings.cpp
-)
+if("STM32H7" IN_LIST MBED_TARGET_LABELS OR "STM32H5" IN_LIST MBED_TARGET_LABELS)
+    target_sources(mbed-emac
+        PRIVATE
+            STM32EthMACv2.cpp
+    )
+endif()
 
 target_compile_options(mbed-emac PRIVATE -Wno-packed-bitfield-compat)

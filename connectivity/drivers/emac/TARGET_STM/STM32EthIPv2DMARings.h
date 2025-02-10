@@ -113,9 +113,6 @@ class STM32EthIPv2DMARings
     DynamicCacheAlignedBuffer<WrappedEthRxDescriptor> rxDescs;
     StaticCacheAlignedBuffer<WrappedEthTxDescriptor, MBED_CONF_STM32_EMAC_ETH_TXBUFNB> txDescs;
 
-    // Tx buffers just need to be aligned to the nearest 4 bytes.
-    uint32_t txBuffers[MBED_CONF_STM32_EMAC_ETH_TXBUFNB][ETH_MAX_PACKET_SIZE / sizeof(uint32_t)];
-
     // Return Rx descriptors to the Ethernet MAC.
     // Descriptors can only be returned if there are free buffers in the pool to allocate to them.
     // The first descriptor returned will be the one at RxBuildDescIdx.

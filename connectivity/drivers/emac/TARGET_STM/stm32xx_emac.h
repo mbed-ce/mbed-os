@@ -23,6 +23,7 @@
 #include "rtos/Thread.h"
 
 #include "STM32EthIPv2DMARings.h"
+#include "GenericEthDMA.h"
 
 #include <optional>
 
