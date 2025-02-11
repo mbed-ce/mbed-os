@@ -208,10 +208,6 @@ namespace mbed {
             bool isLastDesc() const {
                 return formats.fromDMA.lastDescriptor;
             }
-
-            bool getPayloadLength() const {
-                return formats.fromDMA.pktLength;
-            }
         };
 
 #if __DCACHE_PRESENT

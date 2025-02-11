@@ -197,8 +197,8 @@ namespace mbed {
                 }
             }
 
-            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
-               memory_manager.get_total_len(buf), memory_manager.count_buffers(buf), neededDescs);
+            tr_info("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+               memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), neededDescs);
 
             // Step 2: Copy packet if needed
             if(needToCopy)
@@ -340,6 +340,11 @@ namespace mbed {
         /// to tell it to start running again.
         virtual void returnDescriptor(size_t descIdx, uint8_t * buffer) = 0;
 
+        /// Get the length of the packet starting at firstDescIdx and continuing until the
+        /// next descriptor with the last descriptor flag set. Descriptors have already been validated to contain a
+        /// complete packet at this point.
+        virtual size_t getTotalLen(size_t firstDescIdx) = 0;
+
     public:
         CompositeEMAC::ErrCode init() override {
             rxPoolPayloadSize = memory_manager->get_pool_alloc_unit(RX_BUFFER_ALIGN);
@@ -453,7 +458,6 @@ namespace mbed {
                     // Descriptor owned by DMA and has not been filled in yet.  We are out of descriptors to process.
                     break;
                 }
-                const auto type = getType(descriptor);
 
                 if (descriptor.isErrorDesc() ||
                     (!descriptor.isFirstDesc() && !firstDescIdx.has_value())) {
@@ -506,42 +510,45 @@ namespace mbed {
             // Update this now to tell the ISR to search for descriptors after lastDescIdx only.
             rxNextIndex = (*lastDescIdx + 1) % RX_NUM_DESCS;
 
-            // NOTE: Currently we do not make any attempt to set the length of the Rx buffer to match
-            // how many bytes were actually received. This is because different MACs provide this info differently:
-            // some provide a byte count in each descriptor while others provide one in the first descriptor
-            // for the entire chain. It's easier to simply ignore this information as the network stack can
-            // figure it out.
-            // So, the buffers we pass up will always have a langth that's a multiple of the pool alloc unit.
-
+            // Set length of first buffer
+            net_stack_mem_buf_t *const headBuffer = rxDescStackBufs[*firstDescIdx];
+            size_t lenRemaining = getTotalLen(*firstDescIdx);
+            memory_manager->set_len(headBuffer, std::min(lenRemaining, rxPoolPayloadSize));
+            lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
 
             // Iterate through the subsequent descriptors in this packet and link the buffers
             // Note that this also transfers ownership of subsequent buffers to the first buffer,
             // so if the first buffer is deleted, the others will be as well.
-            net_stack_mem_buf_t *const headBuffer = rxDescStackBufs[*firstDescIdx];
+
             ++rxDescsOwnedByApplication; // for first buffer
             rxDescStackBufs[*firstDescIdx] = nullptr;
             for (size_t descIdx = (*firstDescIdx + 1) % RX_NUM_DESCS;
                  descIdx != (*lastDescIdx + 1) % RX_NUM_DESCS;
                  descIdx = (descIdx + 1) % RX_NUM_DESCS) {
 
-                memory_manager->cat(headBuffer, rxDescs[descIdx].buffer);
-                rxDescs[descIdx].buffer = nullptr;
+                // We have to set the buffer length first before concatenating it to the chain
+                MBED_ASSERT(lenRemaining > 0);
+                memory_manager->set_len(rxDescStackBufs[descIdx], std::min(lenRemaining, rxPoolPayloadSize));
+                lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
+
+                memory_manager->cat(headBuffer, rxDescStackBufs[descIdx]);
+                rxDescStackBufs[descIdx] = nullptr;
                 ++rxDescsOwnedByApplication;
             }
 
             // Invalidate cache for all data buffers, as these were written by the DMA to main memory
-        #if __DCACHE_PRESENT
+#if __DCACHE_PRESENT
             auto * bufToInvalidate = headBuffer;
             while(bufToInvalidate != nullptr)
             {
-                SCB_InvalidateDCache_by_Addr(memory_manager.get_ptr(bufToInvalidate), rxPoolPayloadSize);
-                bufToInvalidate = memory_manager.get_next(bufToInvalidate);
+                SCB_InvalidateDCache_by_Addr(memory_manager->get_ptr(bufToInvalidate), rxPoolPayloadSize);
+                bufToInvalidate = memory_manager->get_next(bufToInvalidate);
             }
-        #endif
+#endif
 
-            tr_debug("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
-                   memory_manager.get_total_len(headBuffer), memory_manager.get_ptr(headBuffer), firstDescIdx, lastDescIdx,
-                   &rxDescs[firstDescIdx], &rxDescs[lastDescIdx]);
+            tr_info("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
+                   memory_manager->get_total_len(headBuffer), memory_manager->get_ptr(headBuffer), *firstDescIdx, *lastDescIdx,
+                   &rxDescs[*firstDescIdx], &rxDescs[*lastDescIdx]);
 
             return headBuffer;
         }

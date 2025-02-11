@@ -58,7 +58,7 @@ namespace mbed {
 
             void returnDescriptor(size_t descIdx, uint8_t *buffer) override;
 
-            DescriptorType getType(const stm32_ethv2::EthRxDescriptor &desc) override;
+            size_t getTotalLen(size_t firstDescIdx) override;
 
         public:
             explicit RxDMA(ETH_TypeDef * const base):
@@ -67,8 +67,14 @@ namespace mbed {
             {}
         };
 
+        ETH_TypeDef * const base; // Base address of Ethernet peripheral
+
         // Components of the ethernet MAC
         TxDMA txDMA;
+        RxDMA rxDMA;
+
+    public:
+        STM32EthMacV2();
     };
 }
 

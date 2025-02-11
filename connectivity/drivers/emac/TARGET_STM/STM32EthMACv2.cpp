@@ -39,7 +39,7 @@ namespace mbed {
         base->DMACTCR &= ~ETH_DMACTCR_ST;
     }
 
-    bool STM32EthMacV2::TxDMA::isDMAReadableBuffer(uint8_t const *start, size_t size) const
+    bool STM32EthMacV2::TxDMA::isDMAReadableBuffer(uint8_t const *start, const size_t size) const
     {
         // On STM32H7, the Ethernet DMA cannot access data in DTCM.  So, if someone sends
         // a packet with a data pointer in DTCM (e.g. a stack allocated payload), everything
@@ -54,7 +54,7 @@ namespace mbed {
         return true;
     }
 
-    void STM32EthMacV2::TxDMA::giveToDMA(size_t descIdx, bool firstDesc, bool lastDesc) {
+    void STM32EthMacV2::TxDMA::giveToDMA(const size_t descIdx, const bool firstDesc, const bool lastDesc) {
         auto & desc = txDescs[descIdx];
 
         // Note that we have to configure these every time as
@@ -102,7 +102,7 @@ namespace mbed {
         base->DMACSR = ETH_DMACSR_RPS;
     }
 
-    void STM32EthMacV2::RxDMA::returnDescriptor(size_t descIdx, uint8_t *buffer) {
+    void STM32EthMacV2::RxDMA::returnDescriptor(const size_t descIdx, uint8_t * const buffer) {
         auto & desc = rxDescs[descIdx];
 
         // Clear out any bits previously set in the descriptor (from when the DMA gave it back to us)
@@ -125,5 +125,18 @@ namespace mbed {
         // Rx stops when the current and tail pointers are equal, so we want to set the tail pointer
         // to one location after the last DMA-owned descriptor in the FIFO.
         base->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[rxBuildIndex]);
+    }
+
+    size_t STM32EthMacV2::RxDMA::getTotalLen(const size_t firstDescIdx) {
+        // Total length of the packet is in the first descriptor
+        return rxDescs[firstDescIdx].formats.fromDMA.pktLength;
+    }
+
+    STM32EthMacV2::STM32EthMacV2():
+    CompositeEMAC(txDMA, rxDMA),
+    base(ETH),
+    txDMA(base),
+    rxDMA(base)
+    {
     }
 }

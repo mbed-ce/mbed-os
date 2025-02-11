@@ -184,21 +184,21 @@ public:
         /**
          * @brief Set whether the MAC passes all multicast traffic up to the application.
          *
-         * @param pass True to pass all mcasts, false otherwise
+         * CompositeEMAC will ensure this is called only after init().
          *
-         * @return Error code or success
+         * @param pass True to pass all mcasts, false otherwise
          */
-        virtual ErrCode setPassAllMcast(bool pass);
+        virtual void setPassAllMcast(bool pass);
 
         /**
          * @brief Set promiscuous mode (where the Eth MAC passes all traffic up to the application, regardless
          *   of its destination address).
          *
-         * @param enable True to pass all traffic, false otherwise
+         * CompositeEMAC will ensure this is called only after init().
          *
-         * @return Error code or success
+         * @param enable True to pass all traffic, false otherwise
          */
-        virtual ErrCode setPromiscuous(bool enable);
+        virtual void setPromiscuous(bool enable);
     };
 
     /**
@@ -331,6 +331,9 @@ public:
 
 protected:
 
+    /// Pointer to memory manager for the EMAC
+    EMACMemoryManager * memory_manager = nullptr;
+
     // Instances of each of the 4 component classes
     MACDriver & mac;
     PhyDriver & phy;
@@ -346,11 +349,25 @@ protected:
 
     std::atomic<PowerState> state = PowerState::OFF;
 
+    // Multicast subscribe information
+    MACAddress mcastMacs[MBED_CONF_NSAPI_EMAC_MAX_MCAST_SUBSCRIBES];
+
+    // Note: if this variable becomes >= MBED_CONF_NSAPI_EMAC_MAX_MCAST_SUBSCRIBES, we are in multicast
+    // fallback mode and are accepting all multicasts. The only way to get out of this mode is to power down
+    // and power up the MAC.
+    size_t numSubscribedMcastMacs;
+
     /// Subclass should call this when a receive interrupt is detected
     void rxISR();
 
     /// Subclass should call this when a transmit complete interrupt is detected
     void txISR();
+
+    /// Constructor. Should be called by subclass.
+    CompositeEMAC(TxDMA & txDMA, RxDMA & rxDMA):
+    txDMA(txDMA),
+    rxDMA(rxDMA)
+    {}
 
 public:
     uint32_t get_mtu_size() const override {
@@ -396,7 +413,10 @@ public:
 
     void set_all_multicast(bool all) override;
 
-    void set_memory_manager(EMACMemoryManager &mem_mngr) override;
+    void set_memory_manager(EMACMemoryManager &mem_mngr) override {
+        MBED_ASSERT(state == PowerState::OFF);
+        memory_manager = &mem_mngr;
+    }
 };
 
 }
