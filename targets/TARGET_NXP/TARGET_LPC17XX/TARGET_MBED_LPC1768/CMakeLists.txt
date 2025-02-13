@@ -3,13 +3,13 @@
 
 include(mbed_set_post_build_nxp)
 
-add_library(mbed-lpcxpresso-lpc1769 INTERFACE)
+add_library(mbed-lpc1768 INTERFACE)
 
-target_include_directories(mbed-lpcxpresso-lpc1769
+target_include_directories(mbed-lpc1768
     INTERFACE
         .
 )
 
-target_link_libraries(mbed-lpcxpresso-lpc1769 INTERFACE mbed-lpc176x)
+target_link_libraries(mbed-lpc1768 INTERFACE mbed-lpc17xx)
 
 mbed_post_build_lpc_patch_vtable("LPC1768")

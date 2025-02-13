@@ -31,20 +31,10 @@
 
 /* Define the heap ourselves to give us section placement control */
 #ifndef ETHMEM_SECTION
-#if defined(TARGET_LPC1768)
-#  if defined (__ICCARM__)
-#     define ETHMEM_SECTION
-#  elif defined(TOOLCHAIN_GCC_CR)
-#     define ETHMEM_SECTION __attribute__((section(".data.$RamPeriph32")))
-#  else
-#     define ETHMEM_SECTION __attribute__((section("AHBSRAM"),aligned))
-#  endif
+#if defined(TARGET_LPC17XX)
+#   define ETHMEM_SECTION __attribute__((section("AHBSRAM"),aligned))
 #elif defined(TARGET_STM32H7)
-#  if defined (__ICCARM__)
-#     define ETHMEM_SECTION
-#  else
-#     define ETHMEM_SECTION __attribute__((section(".ethusbram")))
-#  endif
+#   define ETHMEM_SECTION __attribute__((section(".ethusbram")))
 #else
 #define ETHMEM_SECTION
 #endif
@@ -65,9 +55,6 @@ struct mem {
 #define SIZEOF_STRUCT_MEM    LWIP_MEM_ALIGN_SIZE(sizeof(struct mem))
 #define MEM_SIZE_ALIGNED     LWIP_MEM_ALIGN_SIZE(MEM_SIZE)
 
-#if defined (__ICCARM__)
-#pragma location = ".ethusbram"
-#endif
 LWIP_DECLARE_MEMORY_ALIGNED(lwip_ram_heap, MEM_SIZE_ALIGNED + (2U*SIZEOF_STRUCT_MEM)) ETHMEM_SECTION;
 
  #if NO_SYS==1
@@ -320,7 +307,7 @@ err_t sys_sem_new(sys_sem_t *sem, u8_t count) {
     sem->id = osSemaphoreNew(UINT16_MAX, count, &sem->attr);
     if (sem->id == NULL)
         MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_NETWORK_STACK, MBED_ERROR_CODE_FAILED_OPERATION), "sys_sem_new create error\n", (u32_t)sem);
-    
+
     return ERR_OK;
 }
 
@@ -349,12 +336,12 @@ err_t sys_sem_new(sys_sem_t *sem, u8_t count) {
  *---------------------------------------------------------------------------*/
 u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout) {
     u32_t start = osKernelGetTickCount();
-    
+
     if (osSemaphoreAcquire(sem->id, (timeout != 0)?(timeout):(osWaitForever)) != osOK) {
         MBED_WARNING1(MBED_MAKE_ERROR(MBED_MODULE_NETWORK_STACK, MBED_ERROR_CODE_TIME_OUT), "sys_arch_sem_wait time out\n", (u32_t)sem);
         return SYS_ARCH_TIMEOUT;
     }
-    
+
     return osKernelGetTickCount() - start;
 }
 
@@ -394,7 +381,7 @@ err_t sys_mutex_new(sys_mutex_t *mutex) {
         MBED_WARNING1(MBED_MAKE_ERROR(MBED_MODULE_NETWORK_STACK, MBED_ERROR_CODE_FAILED_OPERATION), "sys_mutex_new error\n", (u32_t)mutex);
         return ERR_MEM;
     }
-    
+
     return ERR_OK;
 }
 
@@ -521,7 +508,7 @@ static sys_thread_data_t thread_pool[SYS_THREAD_POOL_N];
  *---------------------------------------------------------------------------*/
 #ifndef MBED_TZ_DEFAULT_ACCESS
 #define MBED_TZ_DEFAULT_ACCESS   0
-#endif    
+#endif
 
  sys_thread_t sys_thread_new(const char *pcName,
                             void (*thread)(void *arg),
@@ -547,7 +534,7 @@ static sys_thread_data_t thread_pool[SYS_THREAD_POOL_N];
     t->id = osThreadNew((osThreadFunc_t)thread, arg, &t->attr);
     if (t->id == NULL)
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_NETWORK_STACK, MBED_ERROR_CODE_THREAD_CREATE_FAILED), "sys_thread_new create error\n");
-    
+
     return t;
 }
 
