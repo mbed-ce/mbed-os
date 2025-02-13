@@ -7412,7 +7412,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels": [
             "NUVOTON",
             "NUC472",
-            "NU_XRAM_SUPPORTED",
             "FLASH_CMSIS_ALGO",
             "NUVOTON_EMAC"
         ],
@@ -7449,7 +7448,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             },
             "eadc-extsmpt-list": {
                 "help": "For EADC, comma separated {pin, value} list to extend sampling time in EADC clocks on per-pin basis. Value must be in the range [0, 255]."
-            }
+            },
+            "ebi-enable": {
+                "help": "Enable EBI for EBI RAM",
+                "options": [false, true]
+            },
         },
         "inherits": [
             "Target"
@@ -7501,7 +7504,25 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "lxt-present": true,
             "network-default-interface-type": "ETHERNET",
             "deep-sleep-latency": 1,
-            "tickless-from-us-ticker": true
+            "tickless-from-us-ticker": true,
+            "ebi-enable": true
+        },
+        "memory_banks": {
+            "EBIRAM1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x100000,
+                "start": 0x60000000,
+                "startup": false
+            }
         },
         "detect_code": [
             "1302"
@@ -7941,6 +7962,23 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "hbi-mfp-reg-list": "0x40000534, 0x4000057C, 0x40000590, 0x40000594",
             "hbi-mfp-reg-msk-list": "0xFFFFFF00, 0xFFFFFFFF, 0xFFFF0000, 0xFFFFFFFF",
             "hbi-mfp-reg-val-list": "0x10101000, 0x10101010, 0x10100000, 0x10101010"
+        },
+        "memory_banks": {
+            "HYPERRAM1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x800000,
+                "start": 0x80000000,
+                "startup": false
+            }
         },
         "image_url": "https://os.mbed.com/media/cache/platforms/NuMaker-IoT-M467_V1.1_F.png.250x250_q85.png"
     },
