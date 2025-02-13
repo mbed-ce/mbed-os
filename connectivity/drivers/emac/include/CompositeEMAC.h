@@ -90,9 +90,11 @@ public:
      *
      * Thread safety: CompositeEMAC will guarantee only one thread is utilizing this class at a time.
      */
-    class MACDriver
+    class MACDriver : NonCopyable<MACDriver>
     {
     public:
+        virtual ~MACDriver() = default;
+
         /**
          * @brief Initialize the MAC, map pins, and prepare it to send and receive packets.
          *    It should not be enabled yet.
@@ -364,9 +366,10 @@ protected:
     void txISR();
 
     /// Constructor. Should be called by subclass.
-    CompositeEMAC(TxDMA & txDMA, RxDMA & rxDMA):
+    CompositeEMAC(TxDMA & txDMA, RxDMA & rxDMA, MACDriver & macDriver):
     txDMA(txDMA),
-    rxDMA(rxDMA)
+    rxDMA(rxDMA),
+    mac(macDriver)
     {}
 
 public:
