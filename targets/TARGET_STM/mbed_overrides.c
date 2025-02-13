@@ -299,3 +299,34 @@ void mbed_sdk_init()
 
     mbed_sdk_inited = 1;
 }
+
+// Override MAC default MAC address based on chip unique ID
+#if defined (TARGET_STM32F2) || defined (TARGET_STM32F4) || defined (TARGET_STM32F7) || defined (TARGET_STM32H7) || defined(TARGET_STM32H5)
+void mbed_mac_address(char *mac)
+{
+    unsigned char ST_mac_addr[3] = {0x00, 0x80, 0xe1}; // default STMicro mac address
+
+    // Read unic id
+#if defined (TARGET_STM32F2)
+    uint32_t word0 = *(uint32_t *)0x1FFF7A10;
+#elif defined (TARGET_STM32F4)
+    uint32_t word0 = *(uint32_t *)0x1FFF7A10;
+#elif defined (TARGET_STM32F7)
+    uint32_t word0 = *(uint32_t *)0x1FF0F420;
+#elif defined (TARGET_STM32H7) || defined(TARGET_STM32H5)
+    uint32_t word0 = *(uint32_t *)UID_BASE;
+#else
+#error MAC address can not be derived from target unique Id
+#endif
+
+    mac[0] = ST_mac_addr[0];
+    mac[1] = ST_mac_addr[1];
+    mac[2] = ST_mac_addr[2];
+
+    // TODO this code is only using 24 bits of the 96 bit unique identifier, so collisions are possible.
+    // It should be updated to use a hash.
+    mac[3] = (word0 & 0x00ff0000) >> 16;
+    mac[4] = (word0 & 0x0000ff00) >> 8;
+    mac[5] = (word0 & 0x000000ff);
+}
+#endif

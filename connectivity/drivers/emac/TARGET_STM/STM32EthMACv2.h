@@ -67,14 +67,64 @@ namespace mbed {
             {}
         };
 
+        class MacDriver : public CompositeEMAC::MACDriver {
+            ETH_TypeDef * const base; // Base address of Ethernet peripheral
+
+            /**
+             * @brief  Configures the Clock range of ETH MDIO interface.
+             *
+             * Copied from STM32CubeHAL.
+             *
+             * @param base Base address of Ethernet peripheral
+             */
+            static void ETH_SetMDIOClockRange(ETH_TypeDef * const base);
+
+        public:
+            explicit MacDriver(ETH_TypeDef * const base):
+            base(base)
+            {}
+
+            ErrCode init() override;
+
+            ErrCode deinit() override;
+
+            ErrCode enable(LinkSpeed speed, Duplex duplex) override;
+
+            ErrCode disable() override;
+
+            void setOwnMACAddr(const MACAddress &ownAddress) override;
+
+            ErrCode mdioRead(uint8_t devAddr, uint8_t regAddr, uint16_t &result) override;
+
+            ErrCode mdioWrite(uint8_t devAddr, uint8_t regAddr, uint16_t data) override;
+
+            PinName getPhyResetPin() override;
+
+            ErrCode addMcastMAC(MACAddress mac) override;
+
+            ErrCode clearMcastFilter() override;
+
+            void setPassAllMcast(bool pass) override;
+
+            void setPromiscuous(bool enable) override;
+        };
+
+        // Pointer to global instance, for ISR to use.
+        // TODO if we support more than 1 EMAC per MCU, this will need to be an array
+        static STM32EthMacV2 * instance;
+
         ETH_TypeDef * const base; // Base address of Ethernet peripheral
 
         // Components of the ethernet MAC
         TxDMA txDMA;
         RxDMA rxDMA;
+        MACDriver macDriver;
 
     public:
         STM32EthMacV2();
+
+        // Interrupt callback
+        static void STM32EthMacV2::irqHandler();
     };
 }
 
