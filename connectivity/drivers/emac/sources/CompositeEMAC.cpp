@@ -63,7 +63,45 @@ bool mbed::CompositeEMAC::power_up()
     rxDMA.setMemoryManager(memory_manager);
 
     // Power up the MAC
+    if(mac.init() != ErrCode::SUCCESS) {
+        tr_err("power_up(): Failed to init MAC!");
+        return false;
+    }
 
+    state = PowerState::ON_NO_LINK;
+    return true;
+}
+
+void mbed::CompositeEMAC::power_down() {
+    // TODO stop phy task
+
+    state = PowerState::OFF;
+
+    // TODO sync with other thread(s), ensure that no other threads are accessing the MAC
+    // (lock mutex?)
+
+    // Clear multicast filter, so that we start with a clean slate next time
+    if(mac.clearMcastFilter() != ErrCode::SUCCESS) {
+        tr_err("power_down(): Failed to clear mcast filter");
+        return;
+    }
+
+    // Disable tx & rx
+    if(mac.disable() != ErrCode::SUCCESS) {
+        tr_err("power_down(): Failed to disable MAC");
+        return;
+    }
+
+    // Disable DMA
+    if(txDMA.deinit() != ErrCode::SUCCESS || rxDMA.deinit() != ErrCode::SUCCESS) {
+        tr_err("power_down(): Failed to disable DMA");
+        return;
+    }
+
+    // Finally, disable the MAC itself
+    if(mac.deinit() != ErrCode::SUCCESS) {
+        tr_err("power_down(): Failed to disable MAC");
+    }
 }
 
 void mbed::CompositeEMAC::add_multicast_group(const uint8_t *address)

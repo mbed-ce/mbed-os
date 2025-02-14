@@ -67,8 +67,11 @@ namespace mbed {
             {}
         };
 
-        class MacDriver : public CompositeEMAC::MACDriver {
+        class MACDriver : public CompositeEMAC::MACDriver {
             ETH_TypeDef * const base; // Base address of Ethernet peripheral
+
+            // Number of MAC address perfect filter registers used
+            size_t numPerfectFilterRegsUsed = 0;
 
             /**
              * @brief  Configures the Clock range of ETH MDIO interface.
@@ -79,8 +82,14 @@ namespace mbed {
              */
             static void ETH_SetMDIOClockRange(ETH_TypeDef * const base);
 
+            /// Write a MAC address into the given registers with the needed encoding
+            void writeMACAddress(const MACAddress & mac, volatile uint32_t *addrHighReg, volatile uint32_t *addrLowReg);
+
+            /// Add a MAC address to the multicast hash filter.
+            void addHashFilterMAC(const MACAddress & mac);
+
         public:
-            explicit MacDriver(ETH_TypeDef * const base):
+            explicit MACDriver(ETH_TypeDef * const base):
             base(base)
             {}
 
@@ -118,13 +127,13 @@ namespace mbed {
         // Components of the ethernet MAC
         TxDMA txDMA;
         RxDMA rxDMA;
-        MACDriver macDriver;
+        STM32EthMacV2::MACDriver macDriver;
 
     public:
         STM32EthMacV2();
 
         // Interrupt callback
-        static void STM32EthMacV2::irqHandler();
+        static void irqHandler();
     };
 }
 

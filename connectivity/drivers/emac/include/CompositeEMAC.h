@@ -107,6 +107,9 @@ public:
          * @brief Deinit the MAC so that it's not using any clock/power. Should prepare for init() to be called
          *    again.
          *
+         * After this function is called (from EMAC::power_down()), the MAC will not be used again
+         * until power_up() is called and the process starts again.
+         *
          * @return Error code or SUCCESS
          */
         virtual ErrCode deinit() = 0;
@@ -266,8 +269,9 @@ public:
         /// Initialize this Tx DMA ring.
         virtual ErrCode init() = 0;
 
-        /// Stop the DMA running. This is called after the MAC is disabled.
+        /// Stop the DMA running.
         /// init() should be able to be called again after this function completes to restart DMA.
+        /// This shall be called after the MAC is disabled but before it is powered down.
         virtual ErrCode deinit() = 0;
 
         /// Reclaims the Tx buffers for any transmitted packets and frees their memory.
@@ -300,6 +304,7 @@ public:
         virtual ErrCode init() = 0;
 
         /// Stop the DMA running. init() should be able to be called again after this function completes to restart DMA.
+        /// This shall be called after the MAC is disabled but before it is powered down.
         virtual ErrCode deinit() = 0;
 
         /**
@@ -367,8 +372,8 @@ protected:
 
     /// Constructor. Should be called by subclass.
     CompositeEMAC(TxDMA & txDMA, RxDMA & rxDMA, MACDriver & macDriver):
-    txDMA(txDMA),
     rxDMA(rxDMA),
+    txDMA(txDMA),
     mac(macDriver)
     {}
 
