@@ -30,6 +30,7 @@
 
 #include "stm32h7xx_hal.h"
 #include "platform/mbed_critical.h"
+#include "PinNames.h"
 
 #define MCO_Pin GPIO_PIN_0
 #define MCO_GPIO_Port GPIOH
@@ -150,4 +151,10 @@ void EthDeinitPinmappings()
     HAL_GPIO_DeInit(RMII_TXD1_GPIO_Port, RMII_TXD1_Pin);
 
     HAL_GPIO_DeInit(GPIOG, RMII_TX_EN_Pin | RMII_TXD0_Pin);
+}
+
+// Get Ethernet PHY reset pin
+PinName EthGetPhyResetPin(void)
+{
+    return NC; // Not connected on this board
 }

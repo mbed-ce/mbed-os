@@ -37,6 +37,7 @@
 
 #include "stm32h7xx_hal.h"
 #include "platform/mbed_critical.h"
+#include "PinNames.h"
 
 #define ETH_TX_EN_Pin GPIO_PIN_11
 #define ETH_TX_EN_GPIO_Port GPIOG
@@ -135,4 +136,10 @@ void EthDeinitPinmappings()
     HAL_GPIO_DeInit(GPIOC, ETH_MDC_SAI4_D1_Pin | ETH_RXD0_Pin | ETH_RXD1_Pin);
 
     HAL_GPIO_DeInit(GPIOA, ETH_MDIO_Pin | ETH_REF_CLK_Pin | ETH_CRS_DV_Pin);
+}
+
+// Get Ethernet PHY reset pin
+PinName EthGetPhyResetPin(void)
+{
+    return NC; // Not connected on this board
 }
