@@ -94,7 +94,8 @@ namespace mbed {
 
         // Move tail pointer register to point to the descriptor after this descriptor.
         // This tells the MAC to transmit until it reaches the given descriptor, then stop.
-        base->DMACTDTPR = reinterpret_cast<uint32_t>(&txDescs[txSendIndex]);
+        const auto nextDescIdx = (descIdx + 1) % MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
+        base->DMACTDTPR = reinterpret_cast<uint32_t>(&txDescs[nextDescIdx]);
     }
 
     void STM32EthMacV2::RxDMA::startDMA()
@@ -147,9 +148,9 @@ namespace mbed {
         base->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[nextDescIdx]);
     }
 
-    size_t STM32EthMacV2::RxDMA::getTotalLen(const size_t firstDescIdx) {
-        // Total length of the packet is in the first descriptor
-        return rxDescs[firstDescIdx].formats.fromDMA.pktLength;
+    size_t STM32EthMacV2::RxDMA::getTotalLen(const size_t firstDescIdx, const size_t lastDescIdx) {
+        // Total length of the packet is in the last descriptor
+        return rxDescs[lastDescIdx].formats.fromDMA.pktLength;
     }
 
     void STM32EthMacV2::MACDriver::ETH_SetMDIOClockRange(ETH_TypeDef * const base)
@@ -275,7 +276,8 @@ namespace mbed {
         base->MAC1USTCR = (HAL_RCC_GetHCLKFreq() / 1000000U) - 1U;
 
         // MAC configuration
-        base->MACCR = ETH_MACCR_SARC_REPADDR0; // Replace the SA field in Tx packets with the configured source address
+        base->MACCR = ETH_MACCR_SARC_REPADDR0 | // Replace the SA field in Tx packets with the configured source address
+            ETH_MACCR_CST_Msk; // Don't include the CRC when forwarding Rx packets to the application
         base->MTLTQOMR |= ETH_MTLTQOMR_TSF_Msk; // Enable store and forward mode for transmission (default in the HAL)
 
         // Enable multicast hash and perfect filter

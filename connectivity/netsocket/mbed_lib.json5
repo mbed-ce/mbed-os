@@ -83,7 +83,7 @@
             "value": 592 // LwIP default value (assuming default TCP MSS)
         },
         "emac-rx-pool-num-bufs": {
-            "help": "Number of buffers (of size netsocket.emac-rx-pool-buf-size) in the EMAC receive pool. This controls how much memory is preallocated for Ethernet reception. A larger number means that more Ethernet packets can be received per second without dropping any. Some EMACs need up to 4 extra buffers, so this should be set such that this value minus 4 times the buffer size is at least 1514 (so we can receive one full Ethernet frame).",
+            "help": "Number of buffers (of size netsocket.emac-rx-pool-buf-size) in the EMAC receive pool. This controls how much memory is preallocated for Ethernet reception. A larger number means that more Ethernet packets can be received per second without dropping any. Some EMACs need up to 4 extra buffers, so this should be set such that (this value minus 4) times the buffer size is at least 1514 (so we can receive one full Ethernet frame).",
             "value": 7
         },
         "emac-tx-num-descs": {

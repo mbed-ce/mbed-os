@@ -36,9 +36,6 @@ void test_emac_initialize()
     worker_loop_init();
     mbed_trace_init();
 
-    // Set memory manager parameters
-    EmacTestMemoryManager::get_instance().set_alloc_unit(256); // Use a relatively small allocation unit size so packets have to be split up into a lot of buffers
-
     static NetworkInterface *network_interface = get_network_interface();
 
     // Power up the interface and emac driver

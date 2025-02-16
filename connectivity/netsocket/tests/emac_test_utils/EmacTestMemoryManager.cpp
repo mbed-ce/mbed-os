@@ -73,7 +73,6 @@ EmacTestMemoryManager::EmacTestMemoryManager()
     : m_mem_mutex(),
       m_mem_buffers(),
       m_alloc_unit(MBED_CONF_NSAPI_EMAC_RX_POOL_BUF_SIZE),
-      m_pool_size(MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS),
       m_memory_available(true)
 {
 #ifdef ETHMEM_SECTION

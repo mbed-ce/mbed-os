@@ -197,7 +197,7 @@ namespace mbed {
                 }
             }
 
-            tr_info("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), neededDescs);
 
             // Step 2: Copy packet if needed
@@ -341,9 +341,9 @@ namespace mbed {
         virtual void returnDescriptor(size_t descIdx, uint8_t * buffer) = 0;
 
         /// Get the length of the packet starting at firstDescIdx and continuing until the
-        /// next descriptor with the last descriptor flag set. Descriptors have already been validated to contain a
+        /// given last descriptor. Descriptors have already been validated to contain a
         /// complete packet at this point.
-        virtual size_t getTotalLen(size_t firstDescIdx) = 0;
+        virtual size_t getTotalLen(size_t firstDescIdx, size_t lastDescIdx) = 0;
 
     public:
         CompositeEMAC::ErrCode init() override {
@@ -512,7 +512,7 @@ namespace mbed {
 
             // Set length of first buffer
             net_stack_mem_buf_t *const headBuffer = rxDescStackBufs[*firstDescIdx];
-            size_t lenRemaining = getTotalLen(*firstDescIdx);
+            size_t lenRemaining = getTotalLen(*firstDescIdx, *lastDescIdx);
             memory_manager->set_len(headBuffer, std::min(lenRemaining, rxPoolPayloadSize));
             lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
 
@@ -546,7 +546,7 @@ namespace mbed {
             }
 #endif
 
-            tr_info("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
+            tr_debug("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
                    memory_manager->get_total_len(headBuffer), memory_manager->get_ptr(headBuffer), *firstDescIdx, *lastDescIdx,
                    &rxDescs[*firstDescIdx], &rxDescs[*lastDescIdx]);
 

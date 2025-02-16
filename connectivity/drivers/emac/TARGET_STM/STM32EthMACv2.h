@@ -58,7 +58,7 @@ namespace mbed {
 
             void returnDescriptor(size_t descIdx, uint8_t *buffer) override;
 
-            size_t getTotalLen(size_t firstDescIdx) override;
+            size_t getTotalLen(size_t firstDescIdx, size_t lastDescIdx) override;
 
         public:
             explicit RxDMA(ETH_TypeDef * const base):
