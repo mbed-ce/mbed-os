@@ -253,7 +253,11 @@ namespace mbed {
         HAL_SYSCFG_ETHInterfaceSelect(SYSCFG_ETH_RMII);
 
         /* Dummy read to sync with ETH */
+#ifdef TARGET_STM32H5
+        (void)SBS->PMCR;
+#else
         (void)SYSCFG->PMCR;
+#endif
 
         /* Ethernet Software reset */
         /* Set the SWR bit: resets all MAC subsystem internal registers and logic */

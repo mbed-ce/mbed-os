@@ -145,6 +145,17 @@ namespace mbed {
         }
     }
 
+    void CompositeEMAC::onRxPoolSpaceAvail() {
+        rtos::ScopedMutexLock lock(macOpsMutex);
+
+        if(state == PowerState::OFF) {
+            // MAC is off, not interested in callbacks
+            return;
+        }
+
+        macThread->flags_set(THREAD_FLAG_RX_MEM_AVAILABLE);
+    }
+
     void CompositeEMAC::get_ifname(char *name, uint8_t size) const {
         // Note that LwIP only supports a two character interface name prefix.
         // So, no point in going longer than that.
@@ -200,6 +211,9 @@ namespace mbed {
         }
         txDMA.setMemoryManager(memory_manager);
         rxDMA.setMemoryManager(memory_manager);
+
+        // Register memory available callback
+        memory_manager->set_on_pool_space_avail_cb(callback(this, &CompositeEMAC::onRxPoolSpaceAvail));
 
         // Power up the MAC
         if(mac.init() != ErrCode::SUCCESS) {

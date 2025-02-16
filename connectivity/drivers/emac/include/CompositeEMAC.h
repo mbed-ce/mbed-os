@@ -404,6 +404,9 @@ protected:
     /// Run in its own thread to service the MAC.
     void macTask();
 
+    /// Callback from memory manager when Rx pool space frees up
+    void onRxPoolSpaceAvail();
+
     /// Constructor. Should be called by subclass.
     CompositeEMAC(TxDMA & txDMA, RxDMA & rxDMA, MACDriver & macDriver):
     rxDMA(rxDMA),

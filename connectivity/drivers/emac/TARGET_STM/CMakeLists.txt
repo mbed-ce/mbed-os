@@ -9,6 +9,8 @@ elseif("STM32F7" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_STM32F7)
 elseif("STM32H7" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_STM32H7)
+elseif("STM32H5" IN_LIST MBED_TARGET_LABELS)
+    add_subdirectory(TARGET_STM32H5)
 endif()
 
 target_include_directories(mbed-emac
