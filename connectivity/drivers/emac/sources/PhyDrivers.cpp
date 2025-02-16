@@ -29,7 +29,6 @@ namespace LAN8742 {
 inline constexpr GenericEthPhy::Config DefaultConfig = {
     .OUI = 0x1F0,
     .model = 0x13,
-    // TODO this is 1 on ARCH_MAX
     .address = 0, // Address set via PHYAD[0] strap.
 };
 
@@ -44,5 +43,28 @@ public:
 /// @}
 
 }
+
+/**
+ * @brief Obtains the PHY driver for Ethernet port 0.
+ *
+ * The default implementation constructs a built-in driver (given by \c nsapi.emac-phy-model ) using the
+ * configured MDIO address ( \c nsapi.emac-phy-mdio-address ).  However, it can be overridden by the
+ * application if it wishes to use another phy driver class!
+ *
+ * @return Phy driver class instance, or nullptr if none is configured.
+ */
+MBED_WEAK CompositeEMAC::PhyDriver * mbed_get_eth_phy_driver()
+{
+#ifdef MBED_CONF_NSAPI_EMAC_PHY_MODEL
+    static GenericEthPhy::Config driverConfig = MBED_CONF_NSAPI_EMAC_PHY_MODEL::DefaultConfig;
+#ifdef MBED_CONF_NSAPI_EMAC_PHY_MDIO_ADDRESS
+    driverConfig.address = MBED_CONF_NSAPI_EMAC_PHY_MDIO_ADDRESS;
+#endif
+    static MBED_CONF_NSAPI_EMAC_PHY_MODEL::Driver driver(driverConfig);
+    return &driver;
+#else
+    return nullptr;
+#endif
+};
 
 }

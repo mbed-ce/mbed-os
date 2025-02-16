@@ -23,6 +23,8 @@
 
 using namespace std::chrono_literals;
 
+#define TRACE_GROUP "STEMACv2"
+
 // Defined in stm32_eth_init.c
 extern "C" void EthInitPinmappings();
 extern "C" void EthDeinitPinmappings();
@@ -112,6 +114,11 @@ namespace mbed {
 
         // Clear Rx process stopped flag
         base->DMACSR = ETH_DMACSR_RPS;
+    }
+
+    void STM32EthMacV2::RxDMA::stopDMA() {
+        // Disable Rx DMA
+        base->DMACTCR &= ~ETH_DMACRCR_SR;
     }
 
     void STM32EthMacV2::RxDMA::returnDescriptor(const size_t descIdx, uint8_t * const buffer) {
@@ -395,6 +402,8 @@ namespace mbed {
         // Get result
         result = base->MACMDIODR & ETH_MACMDIODR_MD_Msk;
 
+        tr_debug("MDIO read devAddr %" PRIu8 ", regAddr 0x%" PRIx8 " -> 0x%" PRIx16, devAddr, regAddr, result);
+
         return ErrCode::SUCCESS;
     }
 
@@ -426,6 +435,8 @@ namespace mbed {
             // Transaction failed to complete within expected timeout
             return ErrCode::TIMEOUT;
         }
+
+        tr_debug("MDIO write devAddr %" PRIu8 ", regAddr 0x%" PRIx8 " <- 0x%" PRIx16, devAddr, regAddr, data);
 
         return ErrCode::SUCCESS;
     }
@@ -472,6 +483,28 @@ namespace mbed {
         return ErrCode::SUCCESS;
     }
 
+    void STM32EthMacV2::MACDriver::setPassAllMcast(bool pass) {
+        if(pass)
+        {
+            base->MACPFR |= ETH_MACPFR_PM;
+        }
+        else
+        {
+            base->MACPFR &= ~ETH_MACPFR_PM;
+        }
+    }
+
+    void STM32EthMacV2::MACDriver::setPromiscuous(bool enable) {
+        if(enable)
+        {
+            base->MACPFR |= ETH_MACPFR_PR;
+        }
+        else
+        {
+            base->MACPFR &= ~ETH_MACPFR_PR;
+        }
+    }
+
     STM32EthMacV2 * STM32EthMacV2::instance = nullptr;
 
     STM32EthMacV2::STM32EthMacV2():
@@ -514,5 +547,11 @@ namespace mbed {
                    "STM32 EMAC v2: Hardware reports fatal DMA error\n");
         }
     }
+}
 
+// Provide default EMAC driver
+MBED_WEAK EMAC &EMAC::get_default_instance()
+{
+    static mbed::STM32EthMacV2 emac;
+    return emac;
 }
