@@ -19,6 +19,8 @@
 
 #include "EMAC.h"
 #include "NonCopyable.h"
+#include "Thread.h"
+
 #include <atomic>
 
 namespace mbed
@@ -345,11 +347,21 @@ protected:
     /// Pointer to memory manager for the EMAC
     EMACMemoryManager * memory_manager = nullptr;
 
+    // Callbacks to the MAC
+    emac_link_state_change_cb_t linkStateCallback{};
+    emac_link_input_cb_t linkInputCallback{};
+
     // Instances of each of the 4 component classes
     PhyDriver * phy = nullptr;
     RxDMA & rxDMA;
     TxDMA & txDMA;
     MACDriver & mac;
+
+    // Event queue handle for phy task
+    int phyTaskHandle;
+
+    // Thread running inside the MAC. Processes interrupts (both Tx and Rx) and receives packets.
+    rtos::Thread * macThread = nullptr;
 
     // State of the MAC
     enum class PowerState {
@@ -360,6 +372,14 @@ protected:
 
     std::atomic<PowerState> state = PowerState::OFF;
 
+    // State of the link
+    enum class LinkState {
+        DOWN,
+        UP
+    };
+
+    std::atomic<LinkState> linkState = LinkState::DOWN;
+
     // Multicast subscribe information
     MACAddress mcastMacs[MBED_CONF_NSAPI_EMAC_MAX_MCAST_SUBSCRIBES];
 
@@ -368,11 +388,21 @@ protected:
     // and power up the MAC.
     size_t numSubscribedMcastMacs;
 
+    // Mutex that must be acquired before interacting with the MAC. This is used to protect against, for example,
+    // one thread calling power_down() while the phy task is still running.
+    rtos::Mutex macOpsMutex;
+
     /// Subclass should call this when a receive interrupt is detected
     void rxISR();
 
     /// Subclass should call this when a transmit complete interrupt is detected
     void txISR();
+
+    /// Called periodically to poll the phy and bring link up/down
+    void phyTask();
+
+    /// Run in its own thread to service the MAC.
+    void macTask();
 
     /// Constructor. Should be called by subclass.
     CompositeEMAC(TxDMA & txDMA, RxDMA & rxDMA, MACDriver & macDriver):

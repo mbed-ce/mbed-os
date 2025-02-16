@@ -18,19 +18,131 @@
 #include "CompositeEMAC.h"
 
 #include <mbed_trace.h>
+#include <mbed_shared_queues.h>
+#include <ThisThread.h>
 
 #include <algorithm>
 
 #define TRACE_GROUP "CEMAC"
+
+// Flags for the MAC thread
+static uint32_t THREAD_FLAG_TX_DESC_AVAILABLE = 1 << 0;
+static uint32_t THREAD_FLAG_RX_DESC_AVAILABLE = 1 << 1;
+static uint32_t THREAD_FLAG_RX_MEM_AVAILABLE = 1 << 2;
+static uint32_t THREAD_FLAG_SHUTDOWN = 1 << 3;
 
 namespace mbed {
     // Defined in PhyDrivers.cpp
     CompositeEMAC::PhyDriver * mbed_get_eth_phy_driver();
 
     void CompositeEMAC::rxISR() {
+        // Note: Not locking mutex here as this is an ISR and should be able to run while the MAC thread is executing.
+        if(rxDMA.rxHasPackets_ISR()) {
+            // Reclaimable descriptor or complete packet detected.
+            macThread->flags_set(THREAD_FLAG_RX_DESC_AVAILABLE);
+        }
     }
 
     void CompositeEMAC::txISR() {
+        // Reclaimable Tx descriptor detected
+        macThread->flags_set(THREAD_FLAG_TX_DESC_AVAILABLE);
+    }
+
+    void CompositeEMAC::phyTask() {
+        rtos::ScopedMutexLock lock(macOpsMutex);
+
+        // If the MAC has been powered off, bail immediately (this event is about to be canceled)
+        if(state == PowerState::OFF) {
+            return;
+        }
+
+        bool phyLinkState = false;
+        if(phy->checkLinkStatus(phyLinkState) != ErrCode::SUCCESS) {
+            tr_error("phyTask(): Phy failed to check link status");
+        }
+
+        if(linkState == LinkState::UP) {
+            if(!phyLinkState) {
+                tr_info("Link down");
+                linkState = LinkState::DOWN;
+
+                if(mac.disable() != ErrCode::SUCCESS) {
+                    tr_error("phyTask(): Mac failed to disable");
+                }
+
+                linkStateCallback(false);
+            }
+        }
+        else { // LinkState::DOWN
+            if(phyLinkState) {
+                Duplex duplex;
+                LinkSpeed speed;
+                if(phy->checkLinkType(speed, duplex)!= ErrCode::SUCCESS) {
+                    tr_error("phyTask(): Phy failed to check link type");
+                    return;
+                }
+
+                char const * speedStr;
+                if(speed == LinkSpeed::LINK_10MBIT) {
+                    speedStr = "10Mbps";
+                }
+                else if(speed == LinkSpeed::LINK_100MBIT) {
+                    speedStr = "100Mbps";
+                }
+                else {
+                    speedStr = "1Gbps";
+                }
+
+                tr_info("Link up at %s %s duplex", speedStr, duplex == Duplex::FULL ? "full" : "half");
+
+                linkState = LinkState::UP;
+                if(mac.enable(speed, duplex) != ErrCode::SUCCESS) {
+                    tr_error("phyTask(): Mac failed to enable");
+                }
+
+                linkStateCallback(true);
+            }
+        }
+    }
+
+    void CompositeEMAC::macTask() {
+        while(true)
+        {
+            // Wait for something to happen
+            uint32_t flags = rtos::ThisThread::flags_wait_any(THREAD_FLAG_TX_DESC_AVAILABLE | THREAD_FLAG_SHUTDOWN | THREAD_FLAG_RX_DESC_AVAILABLE | THREAD_FLAG_RX_MEM_AVAILABLE);
+            if(flags & THREAD_FLAG_SHUTDOWN)
+            {
+                return;
+            }
+
+            // Now lock the mutex for the other cases
+            rtos::ScopedMutexLock lock(macOpsMutex);
+
+            if(flags & THREAD_FLAG_RX_DESC_AVAILABLE)
+            {
+                // Receive any available packets.
+                // Note that if the ISR was delayed, we might get multiple packets per ISR, so we need to loop.
+                while(true)
+                {
+                    auto * packet = rxDMA.dequeuePacket();
+                    if(!packet) {
+                        break;
+                    }
+
+                    linkInputCallback(packet);
+
+                    // Rebuild descriptors if possible
+                    rxDMA.rebuildDescriptors();
+                }
+            }
+            if(flags & THREAD_FLAG_TX_DESC_AVAILABLE)
+            {
+                txDMA.reclaimTxDescs();
+            }
+            if(flags & THREAD_FLAG_RX_MEM_AVAILABLE) {
+                rxDMA.rebuildDescriptors();
+            }
+        }
     }
 
     void CompositeEMAC::get_ifname(char *name, uint8_t size) const {
@@ -42,6 +154,8 @@ namespace mbed {
     }
 
     void CompositeEMAC::set_hwaddr(const uint8_t *addr) {
+        rtos::ScopedMutexLock lock(macOpsMutex);
+
         if(state != PowerState::ON_NO_LINK) {
             tr_err("MAC address can only be set after power up, before link up!");
             return;
@@ -54,11 +168,19 @@ namespace mbed {
 
     bool CompositeEMAC::link_out(emac_mem_buf_t *buf)
     {
+        rtos::ScopedMutexLock lock(macOpsMutex);
+        const auto ret = txDMA.txPacket(buf);
 
+        if(ret != ErrCode::SUCCESS) {
+            tr_warn("link_out(): Tx failed.");
+        }
+        return ret == ErrCode::SUCCESS;
     }
 
     bool CompositeEMAC::power_up()
     {
+        rtos::ScopedMutexLock lock(macOpsMutex);
+
         if(state != PowerState::OFF) {
             tr_err("power_up(): Already powered up!");
             return false;
@@ -85,6 +207,12 @@ namespace mbed {
             return false;
         }
 
+        // Init DMA rungs
+        if(txDMA.init() != ErrCode::SUCCESS || rxDMA.init() != ErrCode::SUCCESS) {
+            tr_err("power_up(): Failed to init DMA!");
+            return false;
+        }
+
         // Initialize the PHY
         phy->setMAC(&mac);
         if(phy->init() != ErrCode::SUCCESS) {
@@ -93,16 +221,32 @@ namespace mbed {
         }
 
         state = PowerState::ON_NO_LINK;
+
+        // Start phy task
+        phyTaskHandle = mbed_event_queue()->call_every(std::chrono::milliseconds(MBED_CONF_NSAPI_EMAC_PHY_POLL_PERIOD),
+                callback(this, &CompositeEMAC::phyTask));
+
+        // Start MAC thread.
+        // We want to run this thread at high priority since reclaiming descriptors generally needs to happen quickly
+        // for the application to use the network at full speed.
+        macThread = new rtos::Thread(osPriorityHigh, 2048, nullptr, "EMAC Thread");
+        macThread->start(callback(this, &CompositeEMAC::macTask));
+
         return true;
     }
 
     void CompositeEMAC::power_down() {
-        // TODO stop phy task
+        // Stop MAC thread (don't need to lock mutex for this)
+        macThread->flags_set(THREAD_FLAG_SHUTDOWN);
+        macThread->join();
+        delete macThread;
+
+        rtos::ScopedMutexLock lock(macOpsMutex);
+
+        mbed_event_queue()->cancel(phyTaskHandle);
 
         state = PowerState::OFF;
-
-        // TODO sync with other thread(s), ensure that no other threads are accessing the MAC
-        // (lock mutex?)
+        linkState = LinkState::DOWN;
 
         // Clear multicast filter, so that we start with a clean slate next time
         if(mac.clearMcastFilter() != ErrCode::SUCCESS) {
@@ -129,13 +273,25 @@ namespace mbed {
     }
 
     void CompositeEMAC::set_link_input_cb(emac_link_input_cb_t input_cb) {
+        if(state != PowerState::OFF) {
+            tr_err("Not available while MAC is on!");
+            return;
+        }
+        linkInputCallback = input_cb;
     }
 
     void CompositeEMAC::set_link_state_cb(emac_link_state_change_cb_t state_cb) {
+        if(state != PowerState::OFF) {
+            tr_err("Not available while MAC is on!");
+            return;
+        }
+        linkStateCallback = state_cb;
     }
 
     void CompositeEMAC::add_multicast_group(const uint8_t *address)
     {
+        rtos::ScopedMutexLock lock(macOpsMutex);
+
         if(state == PowerState::OFF) {
             tr_err("Not available while MAC is off!");
             return;
@@ -159,6 +315,8 @@ namespace mbed {
     }
 
     void CompositeEMAC::remove_multicast_group(const uint8_t *address) {
+        rtos::ScopedMutexLock lock(macOpsMutex);
+
         if(state == PowerState::OFF) {
             tr_err("Not available while MAC is off!");
             return;
@@ -205,6 +363,8 @@ namespace mbed {
     }
 
     void CompositeEMAC::set_all_multicast(bool all) {
+        rtos::ScopedMutexLock lock(macOpsMutex);
+
         if(state == PowerState::OFF) {
             tr_err("Not available while MAC is off!");
             return;

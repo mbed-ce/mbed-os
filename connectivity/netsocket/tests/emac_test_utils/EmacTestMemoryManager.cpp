@@ -326,7 +326,7 @@ uint32_t EmacTestMemoryManager::get_total_len(const emac_mem_buf_t *buf) const
     validate_list();
 
     if (!validate_ptr(buf)) {
-        CHECK_ASSERT(0, "get_total_len(): %p invalid buffer", buf);
+        CHECK_ASSERT(0, "get_total_len(): %p invalid buffer\n", buf);
         return 0;
     }
 
@@ -344,17 +344,17 @@ void EmacTestMemoryManager::copy(emac_mem_buf_t *to_buf, const emac_mem_buf_t *f
     validate_list();
 
     if (!validate_ptr(to_buf)) {
-        CHECK_ASSERT(0, "copy(): %p invalid to buffer", to_buf);
+        CHECK_ASSERT(0, "copy(): %p invalid to buffer\n", to_buf);
         return;
     }
 
     if (!validate_ptr(from_buf)) {
-        CHECK_ASSERT(0, "copy(): %p invalid from buffer", from_buf);
+        CHECK_ASSERT(0, "copy(): %p invalid from buffer\n", from_buf);
         return;
     }
 
     if (get_total_len(to_buf) != get_total_len(from_buf)) {
-        CHECK_ASSERT(0, "copy(): %p to and %p from buffer total lengths not same", to_buf, from_buf);
+        CHECK_ASSERT(0, "copy(): %p to and %p from buffer total lengths not same\n", to_buf, from_buf);
         return;
     }
 
@@ -397,19 +397,19 @@ void EmacTestMemoryManager::cat(emac_mem_buf_t *to_buf, emac_mem_buf_t *cat_buf)
     validate_list();
 
     if (!validate_ptr(to_buf)) {
-        CHECK_ASSERT(0, "cat(): %p invalid to buffer", to_buf);
+        CHECK_ASSERT(0, "cat(): %p invalid to buffer\n", to_buf);
         return;
     }
 
     if (!validate_ptr(cat_buf)) {
-        CHECK_ASSERT(0, "cat(): %p invalid cat buffer", cat_buf);
+        CHECK_ASSERT(0, "cat(): %p invalid cat buffer\n", cat_buf);
         return;
     }
 
     emac_memory_t *cat_mem_buf = static_cast<emac_memory_t *>(cat_buf);
 
     if (!cat_mem_buf->first) {
-        CHECK_ASSERT(0, "cat(): %p cat buffer does not point to head of chain", cat_buf);
+        CHECK_ASSERT(0, "cat(): %p cat buffer does not point to head of chain\n", cat_buf);
         return;
     }
 
@@ -428,7 +428,7 @@ emac_mem_buf_t *EmacTestMemoryManager::get_next(const emac_mem_buf_t *buf) const
     validate_list();
 
     if (!validate_ptr(buf)) {
-        CHECK_ASSERT(0, "get_next(): %p invalid buffer", buf);
+        CHECK_ASSERT(0, "get_next(): %p invalid buffer\n", buf);
         return NULL;
     }
 
@@ -441,7 +441,7 @@ void *EmacTestMemoryManager::get_ptr(const emac_mem_buf_t *buf) const
     validate_list();
 
     if (!validate_ptr(buf)) {
-        CHECK_ASSERT(0, "get_ptr(): %p invalid buffer", buf);
+        CHECK_ASSERT(0, "get_ptr(): %p invalid buffer\n", buf);
         return NULL;
     }
 
@@ -454,7 +454,7 @@ uint32_t EmacTestMemoryManager::get_len(const emac_mem_buf_t *buf) const
     validate_list();
 
     if (!validate_ptr(buf)) {
-        CHECK_ASSERT(0, "get_len(): %p invalid buffer", buf);
+        CHECK_ASSERT(0, "get_len(): %p invalid buffer\n", buf);
         return 0;
     }
 
@@ -467,19 +467,19 @@ void EmacTestMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
     validate_list();
 
     if (!validate_ptr(buf)) {
-        CHECK_ASSERT(0, "set_len(): %p invalid buffer", buf);
+        CHECK_ASSERT(0, "set_len(): %p invalid buffer\n", buf);
         return;
     }
 
     emac_memory_t *mem_buf = static_cast<emac_memory_t *>(buf);
 
     if (len > mem_buf->orig_len) {
-        CHECK_ASSERT(0, "set_len(): %p new length %i must be less or equal allocated size %i", buf, len, mem_buf->orig_len);
+        CHECK_ASSERT(0, "set_len(): %p new length %i must be less or equal allocated size %i\n", buf, len, mem_buf->orig_len);
         return;
     }
 
     if (!mem_buf->first) {
-        CHECK_ASSERT(0, "set_len(): %p buffer does not point to head of chain", buf);
+        CHECK_ASSERT(0, "set_len(): %p buffer does not point to head of chain\n", buf);
         return;
     }
 
