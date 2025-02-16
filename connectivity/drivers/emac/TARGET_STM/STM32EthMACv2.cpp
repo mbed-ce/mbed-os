@@ -128,7 +128,7 @@ namespace mbed {
         memset(&desc, 0, sizeof(stm32_ethv2::EthRxDescriptor));
 
         // Store buffer address
-        desc.formats.toDMA.buffer1Addr = memory_manager->get_ptr(buffer);
+        desc.formats.toDMA.buffer1Addr = buffer;
 
         // Configure descriptor
         desc.formats.toDMA.buffer1Valid = true;
