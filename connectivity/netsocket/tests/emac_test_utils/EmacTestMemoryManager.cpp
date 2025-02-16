@@ -181,7 +181,7 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_pool(uint32_t size, uint32_t align,
 
     // Contiguous allocation
     if (size + align <= m_alloc_unit) {
-        if (m_pool_bufs_used > m_pool_size) {
+        if (m_pool_bufs_used > MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS) {
             return nullptr;
         }
 
@@ -214,7 +214,7 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_pool(uint32_t size, uint32_t align,
             size_left = 0;
         }
 
-        if (m_pool_bufs_used > m_pool_size) {
+        if (m_pool_bufs_used > MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS) {
             // No simulated pool space left, free and return nullptr
             if (first_buf != nullptr) {
                 free(first_buf);

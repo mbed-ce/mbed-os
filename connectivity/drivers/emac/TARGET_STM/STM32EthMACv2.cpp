@@ -143,7 +143,8 @@ namespace mbed {
         // Update tail ptr to issue "rx poll demand" and mark this descriptor for receive.
         // Rx stops when the current and tail pointers are equal, so we want to set the tail pointer
         // to one location after the last DMA-owned descriptor in the FIFO.
-        base->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[rxBuildIndex]);
+        const auto nextDescIdx = (descIdx + 1) % RX_NUM_DESCS;
+        base->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[nextDescIdx]);
     }
 
     size_t STM32EthMacV2::RxDMA::getTotalLen(const size_t firstDescIdx) {

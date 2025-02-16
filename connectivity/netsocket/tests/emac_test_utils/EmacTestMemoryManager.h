@@ -134,7 +134,6 @@ private:
     mutable rtos::Mutex m_mem_mutex;
     std::list<emac_memory_t *> m_mem_buffers;
     unsigned int m_alloc_unit;
-    size_t m_pool_size;
     size_t m_pool_bufs_used = 0;
     bool m_memory_available;
 };

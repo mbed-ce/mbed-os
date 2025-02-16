@@ -352,11 +352,11 @@ namespace mbed {
             // At the start, we own all the descriptors
             rxDescsOwnedByApplication = RX_NUM_DESCS;
 
-            // Build all descriptors
-            rebuildDescriptors();
-
             // init DMA peripheral
             startDMA();
+
+            // Build all descriptors
+            rebuildDescriptors();
 
             return CompositeEMAC::ErrCode::SUCCESS;
         }
