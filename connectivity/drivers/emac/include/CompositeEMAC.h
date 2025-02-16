@@ -173,6 +173,10 @@ public:
         /**
          * @brief Add a multicast MAC address that should be accepted by the MAC.
          *
+         * \note Only a maximum of \c nsapi.emac-max-mcast-subscribes multicast addresses will be subscribed to
+         * at once by the upper layer. If the application tried to subscribe to more than that, CEMAC will fall
+         * back to enabling pass all mcast.
+         *
          * @param mac MAC address to accept
          *
          * @return Error code or success
@@ -193,7 +197,7 @@ public:
          *
          * @param pass True to pass all mcasts, false otherwise
          */
-        virtual void setPassAllMcast(bool pass);
+        virtual void setPassAllMcast(bool pass) = 0;
 
         /**
          * @brief Set promiscuous mode (where the Eth MAC passes all traffic up to the application, regardless
@@ -203,7 +207,7 @@ public:
          *
          * @param enable True to pass all traffic, false otherwise
          */
-        virtual void setPromiscuous(bool enable);
+        virtual void setPromiscuous(bool enable) = 0;
     };
 
     /**
@@ -342,10 +346,10 @@ protected:
     EMACMemoryManager * memory_manager = nullptr;
 
     // Instances of each of the 4 component classes
-    MACDriver & mac;
-    PhyDriver & phy;
-    TxDMA & txDMA;
+    PhyDriver * phy = nullptr;
     RxDMA & rxDMA;
+    TxDMA & txDMA;
+    MACDriver & mac;
 
     // State of the MAC
     enum class PowerState {

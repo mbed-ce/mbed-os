@@ -60,7 +60,7 @@ CompositeEMAC::ErrCode GenericEthPhy::init() {
 
     if(actualID1 == expectedID1 && (actualID2 & expectedID2Mask) == expectedID2) {
         // OK
-        tr_info("Detected ethernet PHY at MDIO addr %" PRIu8 " with OUI %" PRIu32 ", model %" PRIu8 ", and revision number %" PRIu8, config.address, config.OUI, config.model, actualID2 % 0xF);
+        tr_info("Detected ethernet PHY at MDIO addr %" PRIu8 " with OUI 0x%" PRIx32 ", model 0x%" PRIx8 ", and revision number %" PRIu8, config.address, config.OUI, config.model, actualID2 % 0xF);
     }
     else if(actualID1 == std::numeric_limits<uint16_t>::max() && actualID2 == std::numeric_limits<uint16_t>::max()) {
         tr_error("Got all 0xFFs when reading Ethernet PHY. Since MDIO is an open drain bus, this means the phy is not connected or not responding.");

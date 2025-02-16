@@ -1,8 +1,0 @@
-{
-    "name": "stm32-emac",
-    "target_overrides": {
-        "ARCH_MAX": {
-            "eth-phy-address": 1
-        }
-    }
-}
