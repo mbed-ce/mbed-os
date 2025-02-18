@@ -102,7 +102,10 @@ public:
      *
      * @return The number of pool buffers that can be allocated at any one time
      */
-    uint32_t get_pool_size() { return MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS; }
+    uint32_t get_pool_size()
+    {
+        return MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS;
+    }
 
     /**
      * Free memory buffer chain

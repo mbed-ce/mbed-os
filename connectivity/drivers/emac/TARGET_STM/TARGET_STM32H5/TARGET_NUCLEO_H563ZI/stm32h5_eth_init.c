@@ -33,7 +33,9 @@
 #include "PinNames.h"
 
 /**
- * Override HAL Eth Init function
+ * Override HAL Eth Init function.
+ * 
+ * Note: This was copied from HAL_ETH_MspInit() in a project for the NUCLEO-H563ZI in STM32CubeIDE
  */
 void EthInitPinmappings(void)
 {

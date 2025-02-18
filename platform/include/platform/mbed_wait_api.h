@@ -154,7 +154,8 @@ inline void _wait_us_inline(unsigned int us)
 #include <chrono>
 
 // Override of wait_us() allowing a std::chrono type convertible to microseconds to be passed in.
-static inline void _wait_us_inline(std::chrono::microseconds const us) {
+static inline void _wait_us_inline(std::chrono::microseconds const us)
+{
     _wait_us_inline(us.count());
 }
 #endif
