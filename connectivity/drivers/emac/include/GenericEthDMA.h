@@ -310,12 +310,12 @@ namespace mbed {
         size_t rxDescsOwnedByApplication; ///< Number of Rx descriptors owned by the application and needing buffers allocated.
         std::atomic<size_t> rxNextIndex; ///< Index of the next descriptor that the DMA will populate.  Updated by application but used by ISR.
 
-        // Alignment required for Rx memory buffers.  Normally they don't need alignment but
+        // Alignment required for Rx memory buffers.  Normally they don't need more than word alignment but
         // if we are doing cache operations they need to be cache aligned.
 #if __DCACHE_PRESENT
         static constexpr size_t RX_BUFFER_ALIGN = __SCB_DCACHE_LINE_SIZE;
 #else
-        static constexpr size_t RX_BUFFER_ALIGN = 2;
+        static constexpr size_t RX_BUFFER_ALIGN = sizeof(uint32_t);
 #endif
 
         /// Payload size of buffers allocated from the Rx pool.  This is the allocation unit size

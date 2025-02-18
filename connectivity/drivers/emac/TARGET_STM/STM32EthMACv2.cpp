@@ -249,14 +249,19 @@ namespace mbed {
         /* Init the low level hardware : GPIO, CLOCK, NVIC. */
         EthInitPinmappings();
 
+
+#ifdef TARGET_STM32H7
         // Use RMII
         HAL_SYSCFG_ETHInterfaceSelect(SYSCFG_ETH_RMII);
 
         /* Dummy read to sync with ETH */
-#ifdef TARGET_STM32H5
-        (void)SBS->PMCR;
-#else
         (void)SYSCFG->PMCR;
+#else
+        __HAL_RCC_SBS_CLK_ENABLE();
+        HAL_SBS_ETHInterfaceSelect(SBS_ETH_RMII);
+
+        /* Dummy read to sync with ETH */
+        (void)SBS->PMCR;
 #endif
 
         /* Ethernet Software reset */
