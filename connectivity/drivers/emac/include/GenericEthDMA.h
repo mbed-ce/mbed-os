@@ -154,6 +154,8 @@ namespace mbed {
                 txReclaimIndex = (txReclaimIndex + 1) % MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
                 ++txDescsOwnedByApplication;
 
+                tr_debug("Reclaimed descriptor %zu", txReclaimIndex);
+
                 returnedAnyDescriptors = true;
             }
 
@@ -459,9 +461,8 @@ namespace mbed {
                     break;
                 }
 
-                if (descriptor.isErrorDesc() ||
-                    (!descriptor.isFirstDesc() && !firstDescIdx.has_value())) {
-                    // Context or error descriptor, or a non-first-descriptor before a first descriptor
+                if (!firstDescIdx.has_value() && (descriptor.isErrorDesc() || !descriptor.isFirstDesc())) {
+                    // Error or non-first-descriptor before a first descriptor
                     // (could be caused by incomplete packets/junk in the DMA buffer).
                     // Ignore, free associated memory, and schedule for rebuild.
                     memory_manager->free(rxDescStackBufs[descIdx]);
@@ -469,27 +470,30 @@ namespace mbed {
                     ++rxDescsOwnedByApplication;
                     ++rxNextIndex;
 
-                    // We should only get one of these error descriptors before the start of the packet, not
-                    // during it.
-                    if(descriptor.isErrorDesc()) {
-                        MBED_ASSERT(!firstDescIdx.has_value());
-                    }
-
                     continue;
                 }
+                else if(firstDescIdx.has_value() && (descriptor.isErrorDesc() || descriptor.isFirstDesc()))
+                {
+                    // Already seen a first descriptor, but we have an error descriptor or another first descriptor.
+                    // So, delete the in-progress packet up to this point.
 
-                if (descriptor.isFirstDesc()) {
-                    // We should see first descriptor only once and before last descriptor. If this rule is violated, it's likely
-                    // because we ran out of descriptors during receive earlier and the MAC tossed out the rest of the packet.
-                    if(firstDescIdx.has_value()) {
-                        // Clean up the old first descriptor and any descriptors between there and here
-                        for(size_t descToCleanIdx = *firstDescIdx; descToCleanIdx != descIdx; descToCleanIdx = (descToCleanIdx + 1) % RX_NUM_DESCS) {
-                            memory_manager->free(rxDescStackBufs[descToCleanIdx]);
-                            rxDescStackBufs[descToCleanIdx] = nullptr;
-                            ++rxDescsOwnedByApplication;
-                            ++rxNextIndex;
-                        }
+                    // Clean up the old first descriptor and any descriptors between there and here
+                    const size_t endIdx = descriptor.isFirstDesc() ? descIdx : (descIdx + 1) % RX_NUM_DESCS;
+
+                    for(size_t descToCleanIdx = *firstDescIdx; descToCleanIdx != endIdx; descToCleanIdx = (descToCleanIdx + 1) % RX_NUM_DESCS) {
+                        memory_manager->free(rxDescStackBufs[descToCleanIdx]);
+                        rxDescStackBufs[descToCleanIdx] = nullptr;
+                        ++rxDescsOwnedByApplication;
+                        ++rxNextIndex;
                     }
+
+                    if(!descriptor.isErrorDesc())
+                    {
+                        firstDescIdx = descIdx;
+                    }
+                }
+                else if(descriptor.isFirstDesc())
+                {
                     firstDescIdx = descIdx;
                 }
 
