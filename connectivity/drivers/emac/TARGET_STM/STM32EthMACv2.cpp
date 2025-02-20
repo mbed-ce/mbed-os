@@ -15,11 +15,11 @@
  */
 
 #include "STM32EthMACv2.h"
+#include "STM32EthMACCommon.h"
 
 #include "mbed_power_mgmt.h"
 #include "Timer.h"
 #include "mbed_error.h"
-#include "MbedCRC.h"
 
 using namespace std::chrono_literals;
 
@@ -31,10 +31,7 @@ extern "C" void EthDeinitPinmappings();
 extern "C" PinName EthGetPhyResetPin();
 
 namespace mbed {
-    void STM32EthMacV2::TxDMA::startDMA() {
-        // Flush Tx queue
-        base->MTLTQOMR |= ETH_MTLTQOMR_FTQ;
-
+    void STM32EthMACv2::TxDMA::startDMA() {
         // Configure Tx descriptor ring
         base->DMACTDRLR = MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS - 1; // Ring size
         base->DMACTDLAR = reinterpret_cast<uint32_t>(&txDescs[0]); // Ring base address
@@ -48,12 +45,12 @@ namespace mbed {
         base->DMACSR = ETH_DMACSR_TPS;
     }
 
-    void STM32EthMacV2::TxDMA::stopDMA() {
+    void STM32EthMACv2::TxDMA::stopDMA() {
         // Disable Tx DMA
         base->DMACTCR &= ~ETH_DMACTCR_ST;
     }
 
-    bool STM32EthMacV2::TxDMA::isDMAReadableBuffer(uint8_t const *start, const size_t size) const
+    bool STM32EthMACv2::TxDMA::isDMAReadableBuffer(uint8_t const *start, const size_t size) const
     {
         // On STM32H7, the Ethernet DMA cannot access data in DTCM.  So, if someone sends
         // a packet with a data pointer in DTCM (e.g. a stack allocated payload), everything
@@ -68,7 +65,7 @@ namespace mbed {
         return true;
     }
 
-    void STM32EthMacV2::TxDMA::giveToDMA(const size_t descIdx, const bool firstDesc, const bool lastDesc) {
+    void STM32EthMACv2::TxDMA::giveToDMA(const size_t descIdx, const bool firstDesc, const bool lastDesc) {
         auto & desc = txDescs[descIdx];
 
         // Note that we have to configure these every time as
@@ -98,7 +95,7 @@ namespace mbed {
         base->DMACTDTPR = reinterpret_cast<uint32_t>(&txDescs[nextDescIdx]);
     }
 
-    void STM32EthMacV2::RxDMA::startDMA()
+    void STM32EthMACv2::RxDMA::startDMA()
     {
         // Configure Rx buffer size.  Per the datasheet and HAL code, we need to round this down to
         // the nearest multiple of 4.
@@ -117,12 +114,12 @@ namespace mbed {
         base->DMACSR = ETH_DMACSR_RPS;
     }
 
-    void STM32EthMacV2::RxDMA::stopDMA() {
+    void STM32EthMACv2::RxDMA::stopDMA() {
         // Disable Rx DMA
         base->DMACTCR &= ~ETH_DMACRCR_SR;
     }
 
-    void STM32EthMacV2::RxDMA::returnDescriptor(const size_t descIdx, uint8_t * const buffer) {
+    void STM32EthMACv2::RxDMA::returnDescriptor(const size_t descIdx, uint8_t * const buffer) {
         auto & desc = rxDescs[descIdx];
 
         // Clear out any bits previously set in the descriptor (from when the DMA gave it back to us)
@@ -148,12 +145,12 @@ namespace mbed {
         base->DMACRDTPR = reinterpret_cast<uint32_t>(&rxDescs[nextDescIdx]);
     }
 
-    size_t STM32EthMacV2::RxDMA::getTotalLen(const size_t firstDescIdx, const size_t lastDescIdx) {
+    size_t STM32EthMACv2::RxDMA::getTotalLen(const size_t firstDescIdx, const size_t lastDescIdx) {
         // Total length of the packet is in the last descriptor
         return rxDescs[lastDescIdx].formats.fromDMA.pktLength;
     }
 
-    void STM32EthMacV2::MACDriver::ETH_SetMDIOClockRange(ETH_TypeDef * const base)
+    void STM32EthMACv2::MACDriver::ETH_SetMDIOClockRange(ETH_TypeDef * const base)
     {
         uint32_t hclk;
         uint32_t tmpreg;
@@ -203,46 +200,7 @@ namespace mbed {
         base->MACMDIOAR = (uint32_t)tmpreg;
     }
 
-    void STM32EthMacV2::MACDriver::writeMACAddress(const MACAddress &mac, volatile uint32_t *addrHighReg,
-        volatile uint32_t *addrLowReg) {
-        /* Set MAC addr bits 32 to 47 */
-        *addrHighReg = (static_cast<uint32_t>(mac[5]) << 8) | static_cast<uint32_t>(mac[4]) | ETH_MACA1HR_AE_Msk;
-        /* Set MAC addr bits 0 to 31 */
-        *addrLowReg = (static_cast<uint32_t>(mac[3]) << 24) | (static_cast<uint32_t>(mac[2]) << 16) |
-                      (static_cast<uint32_t>(mac[1]) << 8) | static_cast<uint32_t>(mac[0]);
-    }
-
-    void STM32EthMacV2::MACDriver::addHashFilterMAC(const MACAddress &mac) {
-
-        uint32_t volatile * hashRegs[] = {
-            &base->MACHT0R,
-            &base->MACHT1R
-        };
-
-        // Note: as always, the datasheet description of how to do this CRC was vague and slightly wrong.
-        // This forum thread figured it out: https://community.st.com/t5/stm32-mcus-security/calculating-ethernet-multicast-filter-hash-value/td-p/416984
-        // What the datasheet SHOULD say is:
-        // Compute the Ethernet CRC-32 of the MAC address, with initial value of 1s, final XOR of ones, and input reflection on but output reflection off
-        // Then, take the upper 6 bits and use that to index the hash table.
-
-        mbed::MbedCRC<POLY_32BIT_ANSI> crcCalc(0xFFFFFFFF, 0xFFFFFFFF, true, false);
-        tr_debug("Using hash filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8,
-                 currMacAddr[0], currMacAddr[1], currMacAddr[2],
-                 currMacAddr[3], currMacAddr[4], currMacAddr[5]);
-
-        // Compute Ethernet CRC-32 of the MAC address
-        uint32_t crc;
-        crcCalc.compute(mac.data(), mac.size(), &crc);
-
-        // Take upper 6 bits
-        uint32_t hashVal = crc >> 26;
-
-        // Set correct bit in hash filter
-        *hashRegs[hashVal >> 5] |= (1 << (hashVal & 0x1F));
-    }
-
-
-    CompositeEMAC::ErrCode STM32EthMacV2::MACDriver::init() {
+    CompositeEMAC::ErrCode STM32EthMACv2::MACDriver::init() {
         sleep_manager_lock_deep_sleep();
 
         // Note: Following code is based on HAL_Eth_Init() from the HAL
@@ -274,7 +232,8 @@ namespace mbed {
         timeoutTimer.start();
         while(timeoutTimer.elapsed_time() < ETH_SW_RESET_TIMEOUT && (base->DMAMR & ETH_DMAMR_SWR)) {}
         if(base->DMAMR & ETH_DMAMR_SWR) {
-            // Reset failed to complete within expected timeout
+            // Reset failed to complete within expected timeout.
+            // Note: This is usually because of a missing RMII clock from the PHY.
             return ErrCode::TIMEOUT;
         }
 
@@ -318,7 +277,7 @@ namespace mbed {
         base->DMACCR |= wordsToSkip << ETH_DMACCR_DSL_Pos;
 
         // Set up interrupt handler
-        NVIC_SetVector(ETH_IRQn, reinterpret_cast<uint32_t>(&STM32EthMacV2::irqHandler));
+        NVIC_SetVector(ETH_IRQn, reinterpret_cast<uint32_t>(&STM32EthMACv2::irqHandler));
         HAL_NVIC_SetPriority(ETH_IRQn, 0x7, 0);
         HAL_NVIC_EnableIRQ(ETH_IRQn);
 
@@ -332,7 +291,7 @@ namespace mbed {
         return ErrCode::SUCCESS;
     }
 
-    CompositeEMAC::ErrCode STM32EthMacV2::MACDriver::deinit()
+    CompositeEMAC::ErrCode STM32EthMACv2::MACDriver::deinit()
     {
         // Disable interrupt
         HAL_NVIC_DisableIRQ(ETH_IRQn);
@@ -346,7 +305,7 @@ namespace mbed {
         return ErrCode::SUCCESS;
     }
 
-    CompositeEMAC::ErrCode STM32EthMacV2::MACDriver::enable(LinkSpeed speed, Duplex duplex)
+    CompositeEMAC::ErrCode STM32EthMACv2::MACDriver::enable(LinkSpeed speed, Duplex duplex)
     {
         if(speed == LinkSpeed::LINK_1GBIT) {
             return ErrCode::INVALID_ARGUMENT;
@@ -372,20 +331,22 @@ namespace mbed {
         return ErrCode::SUCCESS;
     }
 
-    CompositeEMAC::ErrCode STM32EthMacV2::MACDriver::disable()
+    CompositeEMAC::ErrCode STM32EthMACv2::MACDriver::disable()
     {
         base->MACCR &= ~(ETH_MACCR_TE | ETH_MACCR_RE);
+
+        // Get rid of any packets still in the transmit FIFO
+        base->MTLTQOMR |= ETH_MTLTQOMR_FTQ;
+
         return ErrCode::SUCCESS;
     }
 
-    void STM32EthMacV2::MACDriver::setOwnMACAddr(const MACAddress &ownAddress) {
+    void STM32EthMACv2::MACDriver::setOwnMACAddr(const MACAddress &ownAddress) {
         // Set MAC address
         writeMACAddress(ownAddress, &base->MACA0HR, &base->MACA0LR);
     }
 
-    const auto MDIO_TRANSACTION_TIMEOUT = 1ms; // used by STMicro HAL
-
-    CompositeEMAC::ErrCode STM32EthMacV2::MACDriver::mdioRead(uint8_t devAddr, uint8_t regAddr, uint16_t &result) {
+    CompositeEMAC::ErrCode STM32EthMACv2::MACDriver::mdioRead(uint8_t devAddr, uint8_t regAddr, uint16_t &result) {
         // This code based on HAL_ETH_ReadPHYRegister()
         if(base->MACMDIOAR & ETH_MACMDIOAR_MB_Msk) {
             // MDIO operation already in progress
@@ -419,7 +380,7 @@ namespace mbed {
         return ErrCode::SUCCESS;
     }
 
-    CompositeEMAC::ErrCode STM32EthMacV2::MACDriver::mdioWrite(uint8_t devAddr, uint8_t regAddr, uint16_t data) {
+    CompositeEMAC::ErrCode STM32EthMACv2::MACDriver::mdioWrite(uint8_t devAddr, uint8_t regAddr, uint16_t data) {
         // This code based on HAL_ETH_WritePHYRegister()
         if(base->MACMDIOAR & ETH_MACMDIOAR_MB_Msk) {
             // MDIO operation already in progress
@@ -453,18 +414,11 @@ namespace mbed {
         return ErrCode::SUCCESS;
     }
 
-    PinName STM32EthMacV2::MACDriver::getPhyResetPin() {
+    PinName STM32EthMACv2::MACDriver::getPhyResetPin() {
         return EthGetPhyResetPin();
     }
 
-    inline constexpr size_t NUM_PERFECT_FILTER_REGS = 3;
-    std::pair<volatile uint32_t *, volatile uint32_t *> MAC_ADDR_PERF_FILTER_REGS[NUM_PERFECT_FILTER_REGS] = {
-        {&ETH->MACA1HR, &ETH->MACA1LR},
-        {&ETH->MACA2HR, &ETH->MACA2LR},
-        {&ETH->MACA3HR, &ETH->MACA3LR}
-    };
-
-    CompositeEMAC::ErrCode STM32EthMacV2::MACDriver::addMcastMAC(MACAddress mac) {
+    CompositeEMAC::ErrCode STM32EthMACv2::MACDriver::addMcastMAC(MACAddress mac) {
         if(numPerfectFilterRegsUsed < NUM_PERFECT_FILTER_REGS) {
             size_t perfFiltIdx = numPerfectFilterRegsUsed;
             ++numPerfectFilterRegsUsed;
@@ -475,12 +429,14 @@ namespace mbed {
         }
         else {
             // Out of spaces in perfect filter, use hash filter instead
-            addHashFilterMAC(mac);
+            tr_debug("Using hash filtering for %02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8 ":%02" PRIx8,
+                     mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+            addHashFilterMAC(base, mac);
         }
         return ErrCode::SUCCESS;
     }
 
-    CompositeEMAC::ErrCode STM32EthMacV2::MACDriver::clearMcastFilter() {
+    CompositeEMAC::ErrCode STM32EthMACv2::MACDriver::clearMcastFilter() {
         // Reset perfect filter registers
         for(auto regPair : MAC_ADDR_PERF_FILTER_REGS) {
             *regPair.first = 0;
@@ -495,7 +451,7 @@ namespace mbed {
         return ErrCode::SUCCESS;
     }
 
-    void STM32EthMacV2::MACDriver::setPassAllMcast(bool pass) {
+    void STM32EthMACv2::MACDriver::setPassAllMcast(bool pass) {
         if(pass)
         {
             base->MACPFR |= ETH_MACPFR_PM;
@@ -506,7 +462,7 @@ namespace mbed {
         }
     }
 
-    void STM32EthMacV2::MACDriver::setPromiscuous(bool enable) {
+    void STM32EthMACv2::MACDriver::setPromiscuous(bool enable) {
         if(enable)
         {
             base->MACPFR |= ETH_MACPFR_PR;
@@ -517,9 +473,9 @@ namespace mbed {
         }
     }
 
-    STM32EthMacV2 * STM32EthMacV2::instance = nullptr;
+    STM32EthMACv2 * STM32EthMACv2::instance = nullptr;
 
-    STM32EthMacV2::STM32EthMacV2():
+    STM32EthMACv2::STM32EthMACv2():
     CompositeEMAC(txDMA, rxDMA, macDriver),
     base(ETH),
     txDMA(base),
@@ -529,7 +485,7 @@ namespace mbed {
         instance = this;
     }
 
-    void STM32EthMacV2::irqHandler()
+    void STM32EthMACv2::irqHandler()
     {
         const auto emacInst = instance;
         uint32_t dma_flag = emacInst->base->DMACSR;
@@ -564,6 +520,6 @@ namespace mbed {
 // Provide default EMAC driver
 MBED_WEAK EMAC &EMAC::get_default_instance()
 {
-    static mbed::STM32EthMacV2 emac;
+    static mbed::STM32EthMACv2 emac;
     return emac;
 }

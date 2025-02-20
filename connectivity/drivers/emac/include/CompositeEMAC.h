@@ -101,6 +101,12 @@ public:
          * @brief Initialize the MAC, map pins, and prepare it to send and receive packets.
          *    It should not be enabled yet.
          *
+         * Implementations of this method should:
+         * - Lock deep sleep (unless the MAC functions in deep sleep)
+         * - Enable clock to the MAC
+         * - Mux all MAC and PHY pins appropriately
+         * - Configure MAC registers for operation (but NOT enable tx or rx, yet)
+         *
          * @return Error code or SUCCESS
          */
         virtual ErrCode init() = 0;
@@ -195,7 +201,9 @@ public:
         /**
          * @brief Set whether the MAC passes all multicast traffic up to the application.
          *
-         * CompositeEMAC will ensure this is called only after init().
+         * CompositeEMAC will ensure this is called only after init(). It will call this either if
+         * the network stack requests it, or if it can no longer track the mcast addresses that have
+         * been added and wants to fall back to enabling all multicasts.
          *
          * @param pass True to pass all mcasts, false otherwise
          */

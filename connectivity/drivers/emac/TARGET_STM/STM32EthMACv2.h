@@ -25,7 +25,7 @@ namespace mbed {
     /**
      * @brief EMAC implementation for STM32 MCUs with Ethernet IP v2
      */
-    class STM32EthMacV2 : public CompositeEMAC {
+    class STM32EthMACv2 : public CompositeEMAC {
 
         class TxDMA : public GenericTxDMALoop<stm32_ethv2::EthTxDescriptor>
         {
@@ -82,12 +82,6 @@ namespace mbed {
              */
             static void ETH_SetMDIOClockRange(ETH_TypeDef * const base);
 
-            /// Write a MAC address into the given registers with the needed encoding
-            void writeMACAddress(const MACAddress & mac, volatile uint32_t *addrHighReg, volatile uint32_t *addrLowReg);
-
-            /// Add a MAC address to the multicast hash filter.
-            void addHashFilterMAC(const MACAddress & mac);
-
         public:
             explicit MACDriver(ETH_TypeDef * const base):
             base(base)
@@ -120,17 +114,17 @@ namespace mbed {
 
         // Pointer to global instance, for ISR to use.
         // TODO if we support more than 1 EMAC per MCU, this will need to be an array
-        static STM32EthMacV2 * instance;
+        static STM32EthMACv2 * instance;
 
         ETH_TypeDef * const base; // Base address of Ethernet peripheral
 
         // Components of the ethernet MAC
         TxDMA txDMA;
         RxDMA rxDMA;
-        STM32EthMacV2::MACDriver macDriver;
+        STM32EthMACv2::MACDriver macDriver;
 
     public:
-        STM32EthMacV2();
+        STM32EthMACv2();
 
         // Interrupt callback
         static void irqHandler();
