@@ -159,6 +159,7 @@ int fetch_stats()
 utest::v1::status_t greentea_setup(const size_t number_of_cases)
 {
     GREENTEA_SETUP(tcp_global::TESTS_TIMEOUT.count(), "default_auto");
+    mbed_trace_init();
     _ifup();
     tc_bucket.start();
     return greentea_test_setup_handler(number_of_cases);
