@@ -83,13 +83,38 @@
             "value": 592 // LwIP default value (assuming default TCP MSS)
         },
         "emac-rx-pool-num-bufs": {
-            "help": "Number of buffers (of size netsocket.emac-rx-pool-buf-size) in the EMAC receive pool. This controls how much memory is preallocated for Ethernet reception. A larger number means that more Ethernet packets can be received per second without dropping any. Some EMACs need up to 4 extra buffers, so this should be set such that this value minus 4 times the buffer size is at least 1514 (so we can receive one full Ethernet frame).",
+            "help": "Number of buffers (of size netsocket.emac-rx-pool-buf-size) in the EMAC receive pool. This controls how much memory is preallocated for Ethernet reception. A larger number means that more Ethernet packets can be received per second without dropping any. Some EMACs need up to 4 extra buffers, so this should be set such that (this value minus 4) times the buffer size is at least 1514 (so we can receive one full Ethernet frame).",
             "value": 7
+        },
+        "emac-tx-num-descs": {
+            "help": "Number of Tx descriptors in the Ethernet MAC DMA ring. This affects how much data can be queued for Tx at one time",
+            "value": 8
+        },
+        "emac-max-mcast-subscribes": {
+            "help" : "Maximum supported number of multicast addresses that the application can subscribe to. If this limit is reached, we give up and enable all mcast groups.",
+            "value" : 8
+        },
+        "emac-phy-model": {
+            "help": "Model of the Ethernet PHY on the board. Should correspond to a driver defined in PhyDrivers.cpp",
+            "value": null
+        },
+        "emac-phy-mdio-address": {
+            "help": "MDIO address of the phy chip. Usually set with strapping pins. NOTE: 0 is *supposed* to be reserved as the general call address but lots of phy chips use it anyway.",
+            "value": null
+        },
+        "emac-phy-poll-period": {
+            "help": "How often (in ms) to poll the Ethernet PHY and check for link status changes.",
+            "value": 100
         }
     },
     "target_overrides": {
         "TB_SENSE_12": {
             "nsapi.default-mesh-type": "LOWPAN"
+        },
+        "MCU_STM32": {
+            // First-party STM32 boards generally use a LAN8742 PHY at MDIO address 0
+            "nsapi.emac-phy-model": "LAN8742",
+            "nsapi.emac-phy-mdio-address": 0
         }
     }
 }

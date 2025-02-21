@@ -65,11 +65,6 @@ uint32_t NanostackMemoryManager::get_pool_alloc_unit(uint32_t align) const
     return MBED_CONF_NSAPI_EMAC_RX_POOL_BUF_SIZE;
 }
 
-uint32_t NanostackMemoryManager::get_pool_size() const
-{
-    return MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS;
-}
-
 void NanostackMemoryManager::free(emac_mem_buf_t *mem)
 {
     ns_dyn_mem_free(mem);
