@@ -40,7 +40,7 @@ void STM32EthMACv1::TxDMA::startDMA() {
     txDescs[TX_NUM_DESCS - 1].endOfRing = true;
 
     // Set descriptor list address register
-    base->DMARDLAR = reinterpret_cast<ptrdiff_t>(&txDescs[0]);
+    base->DMATDLAR = reinterpret_cast<ptrdiff_t>(&txDescs[0]);
 
     // Start Tx DMA
     base->DMAOMR |= ETH_DMAOMR_ST_Msk;
@@ -254,7 +254,7 @@ CompositeEMAC::ErrCode STM32EthMACv1::MACDriver::init() {
     ETH_SetMDIOClockRange(base);
 
     // Configure MAC settings
-    base->MACCR |= ETH_MACCR_APCS_Msk; // Strip padding and CRC from frames
+    base->MACCR |= (1 << 25); // Strip CRC from frames. CSTF bit definition missing from CMSIS header for some reason?
     base->MACFFR = ETH_MACFFR_HPF_Msk | ETH_MACFFR_HM_Msk; // Use perfect and hash filters for multicast
 
     // Configure DMA settings. Default STM32CubeHAL settings used.
@@ -278,6 +278,8 @@ CompositeEMAC::ErrCode STM32EthMACv1::MACDriver::init() {
     // trigger if we run out of Rx descriptors, and we don't want to fatal error
     // in that case.
     base->DMAIER = ETH_DMAIER_NISE | ETH_DMAIER_RIE | ETH_DMAIER_TIE | ETH_DMAIER_FBEIE | ETH_DMAIER_AISE;
+
+    return CompositeEMAC::ErrCode::SUCCESS;
 }
 
 CompositeEMAC::ErrCode STM32EthMACv1::MACDriver::deinit() {
@@ -361,7 +363,7 @@ CompositeEMAC::ErrCode STM32EthMACv1::MACDriver::mdioRead(uint8_t devAddr, uint8
     // Get result
     result = base->MACMIIDR;
 
-    tr_info("MDIO read devAddr %" PRIu8 ", regAddr 0x%" PRIx8 " -> 0x%" PRIx16, devAddr, regAddr, result);
+    tr_debug("MDIO read devAddr %" PRIu8 ", regAddr 0x%" PRIx8 " -> 0x%" PRIx16, devAddr, regAddr, result);
 
     return ErrCode::SUCCESS;
 }
@@ -459,6 +461,8 @@ void STM32EthMACv1::MACDriver::setPromiscuous(bool enable) {
     }
 }
 
+STM32EthMACv1 * STM32EthMACv1::instance = nullptr;
+
 STM32EthMACv1::STM32EthMACv1():
 CompositeEMAC(txDMA, rxDMA, macDriver),
 base(ETH),
@@ -495,8 +499,9 @@ void STM32EthMACv1::irqHandler() {
     if(dma_flag & ETH_DMASR_FBES_Msk)
     {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ETHERNET, EIO), \
-               "STM32 EMAC v2: Hardware reports fatal DMA error\n");
+               "STM32 EMAC v1: Hardware reports fatal DMA error\n");
     }
+}
 }
 
 // Provide default EMAC driver
@@ -504,6 +509,4 @@ MBED_WEAK EMAC &EMAC::get_default_instance()
 {
     static mbed::STM32EthMACv1 emac;
     return emac;
-}
-
 }

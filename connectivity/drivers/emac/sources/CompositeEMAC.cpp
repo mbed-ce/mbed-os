@@ -221,7 +221,7 @@ namespace mbed {
             return false;
         }
 
-        // Init DMA rungs
+        // Init DMA rings
         if(txDMA.init() != ErrCode::SUCCESS || rxDMA.init() != ErrCode::SUCCESS) {
             tr_err("power_up(): Failed to init DMA!");
             return false;

@@ -147,7 +147,7 @@ namespace mbed {
                 txReclaimIndex = (txReclaimIndex + 1) % MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
                 ++txDescsOwnedByApplication;
 
-                tr_debug("Reclaimed descriptor %zu", txReclaimIndex);
+                tr_info("Reclaimed descriptor %zu", txReclaimIndex);
 
                 returnedAnyDescriptors = true;
             }
@@ -234,11 +234,11 @@ namespace mbed {
                 SCB_CleanDCache_by_Addr(memory_manager->get_ptr(currBuf), memory_manager->get_len(currBuf));
 #endif
 
-                // Move to next buffer
-                currBuf = memory_manager->get_next(currBuf);
-                if(currBuf == nullptr)
+                // Get next buffer
+                const auto nextBuf = memory_manager->get_next(currBuf);
+                if(nextBuf == nullptr)
                 {
-                    // Last descriptor, store buffer address for freeing
+                    // Last descriptor, store head buffer address for freeing
                     descStackBuffers[txSendIndex] = buf;
                 }
                 else
@@ -246,19 +246,26 @@ namespace mbed {
                     descStackBuffers[txSendIndex] = nullptr;
                 }
 
+                // Get the pointer and length of the packet because this might not be doable in a critical section
+                const auto bufferPtr = static_cast<uint8_t *>(memory_manager->get_ptr(currBuf));
+                const auto bufferLen = memory_manager->get_len(currBuf);
+
                 // Enter a critical section, because we could run into weird corner cases if the
                 // interrupt executes while we are half done configuring this descriptor and updating
                 // the counters.
                 core_util_critical_section_enter();
 
                 // Configure settings.
-                giveToDMA(txSendIndex, static_cast<uint8_t *>(memory_manager->get_ptr(currBuf)), memory_manager->get_len(currBuf), descCount == 0, currBuf == nullptr);
+                giveToDMA(txSendIndex, bufferPtr, bufferLen, descCount == 0, nextBuf == nullptr);
 
                 // Update descriptor count and index
                 --txDescsOwnedByApplication;
                 txSendIndex = (txSendIndex + 1) % MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
 
                 core_util_critical_section_exit();
+
+                // Move to next buffer
+                currBuf = nextBuf;
             }
 
             return CompositeEMAC::ErrCode::SUCCESS;
@@ -558,9 +565,8 @@ namespace mbed {
             }
 #endif
 
-            tr_debug("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu (%p-%p)\n",
-                   memory_manager->get_total_len(headBuffer), memory_manager->get_ptr(headBuffer), *firstDescIdx, *lastDescIdx,
-                   &rxDescs[*firstDescIdx], &rxDescs[*lastDescIdx]);
+            tr_info("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu\n",
+                   memory_manager->get_total_len(headBuffer), memory_manager->get_ptr(headBuffer), *firstDescIdx, *lastDescIdx);
 
             return headBuffer;
         }
