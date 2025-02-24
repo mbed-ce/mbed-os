@@ -32,17 +32,12 @@ namespace mbed {
      *
      * This implementation of Tx DMA should work for the large majority of embedded MCUs that use a DMA ring-based
      * ethernet MAC.
-     *
-     * @tparam DescriptorT Type representing an Ethernet descriptor.
-     *
-     * @note If the MCU has a D-cache, then \c DescriptorT must be padded to an exact number of cache lines in size!
      */
-    template<typename DescriptorT>
     class GenericTxDMALoop : public CompositeEMAC::TxDMA
     {
     protected:
-        /// Tx descriptor array. It's up to the subclass to allocate these in the correct location.
-        CacheAlignedBuffer<DescriptorT> & txDescs;
+        /// Number of entries in the Tx descriptor ring
+        static constexpr size_t TX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
 
         /// Pointer to first memory buffer in the chain associated with descriptor n.
         /// The buffer address shall only be set for the *last* descriptor, so that the entire chain is freed
@@ -67,29 +62,28 @@ namespace mbed {
         /// Stop the DMA running. This is done after MAC transmit & recieve are disabled.
         virtual void stopDMA() = 0;
 
+#if __DCACHE_PRESENT
+        /// Invalidate cache for the descriptor at the given index so it gets reloaded from main memory
+        virtual void cacheInvalidateDescriptor(size_t descIdx) = 0;
+#endif
+
+        /// Is the given descriptor owned by DMA?
+        /// Note that the descriptor will already have been invalidated in cache if needed.
+        virtual bool descOwnedByDMA(size_t descIdx) = 0;
+
         /// Get whether the given buffer is in a memory region readable by the Ethernet DMA.
         /// If this returns false for a buffer being transmitted, the buffer will be copied into a new
         /// heap-allocated buffer.
         virtual bool isDMAReadableBuffer(uint8_t const * start, size_t size) const = 0;
 
-        /// Give the descriptor at the given index to DMA to be transmitted. This is called after
-        /// the buffer has been set.
+        /// Give the descriptor at the given index to DMA to be transmitted with the given buffer.
         /// Note: if the descriptor needs to be flushed from CPU cache, you need to do that
         /// at the correct point in the implementation of this method!
         /// Also, if the DMA ran out of data to transmit, you may need to do a "poke"/"wake" operation
         /// to tell it to start running again.
-        virtual void giveToDMA(size_t descIdx, bool firstDesc, bool lastDesc) = 0;
+        virtual void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) = 0;
 
     public:
-        /**
-         * @brief Construct GenericTxDMALoop
-         * @param txDescs Tx descriptor buffer, containing exactly MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS
-         *    descriptors. Subclass must allocate this with the correct configuration and location.
-         */
-        GenericTxDMALoop(CacheAlignedBuffer<DescriptorT> & txDescs):
-        txDescs(txDescs)
-        {}
-
         CompositeEMAC::ErrCode init() override {
             // At the start, we own all the descriptors
             txDescsOwnedByApplication = MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
@@ -132,13 +126,12 @@ namespace mbed {
                     break;
                 }
 
-                auto &currDesc = txDescs[txReclaimIndex];
 
 #if __DCACHE_PRESENT
-                SCB_InvalidateDCache_by_Addr(&currDesc, sizeof(DescriptorT));
+                cacheInvalidateDescriptor(txReclaimIndex);
 #endif
 
-                if (currDesc.ownedByDMA()) {
+                if (descOwnedByDMA(txReclaimIndex)) {
                     // This desc is owned by the DMA, so we have reached the part of the ring buffer
                     // that is still being transmitted.
                     // Done for now!
@@ -199,7 +192,7 @@ namespace mbed {
                 }
             }
 
-            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+            tr_info("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), neededDescs);
 
             // Step 2: Copy packet if needed
@@ -236,10 +229,6 @@ namespace mbed {
             net_stack_mem_buf_t * currBuf = buf;
             for(size_t descCount = 0; descCount < neededDescs; descCount++)
             {
-                auto & currDesc = txDescs[txSendIndex];
-
-                // Set buffer 1
-                currDesc.setBuffer(static_cast<uint8_t *>(memory_manager->get_ptr(currBuf)), memory_manager->get_len(currBuf));
 #if __DCACHE_PRESENT
                 // Write buffer back to main memory
                 SCB_CleanDCache_by_Addr(memory_manager->get_ptr(currBuf), memory_manager->get_len(currBuf));
@@ -247,7 +236,6 @@ namespace mbed {
 
                 // Move to next buffer
                 currBuf = memory_manager->get_next(currBuf);
-
                 if(currBuf == nullptr)
                 {
                     // Last descriptor, store buffer address for freeing
@@ -264,7 +252,7 @@ namespace mbed {
                 core_util_critical_section_enter();
 
                 // Configure settings.
-                giveToDMA(txSendIndex, descCount == 0, currBuf == nullptr);
+                giveToDMA(txSendIndex, static_cast<uint8_t *>(memory_manager->get_ptr(currBuf)), memory_manager->get_len(currBuf), descCount == 0, currBuf == nullptr);
 
                 // Update descriptor count and index
                 --txDescsOwnedByApplication;
@@ -284,16 +272,11 @@ namespace mbed {
      * This implementation of Rx DMA should work for the large majority of embedded MCUs that use a DMA ring-based
      * ethernet MAC.
      *
-     * @tparam DescriptorT Type representing an Ethernet descriptor.
-     *
-     * @note If the MCU has a D-cache, then \c DescriptorT must be padded to an exact number of cache lines in size!
+     * The subclass must allocate the DMA descriptors, and all access to them is done through virtual functions
+     * that the subclass must override.
      */
-    template<typename DescriptorT>
     class GenericRxDMALoop : public CompositeEMAC::RxDMA {
     protected:
-        /// Rx descriptor array. It's up to the subclass to allocate these in the correct location.
-        CacheAlignedBuffer<DescriptorT> & rxDescs = nullptr;
-
         /// How many extra buffers to leave in the Rx pool, relative to how many we keep assigned to Rx descriptors.
         /// We want to keep some amount of extra buffers because constantly hitting the network stack with failed pool
         /// allocations can produce some negative consequences in some cases.
@@ -325,26 +308,48 @@ namespace mbed {
         size_t rxPoolPayloadSize;
 
         /// Constructor. Subclass must allocate descriptor array of size RX_NUM_DESCS
-        GenericRxDMALoop(CacheAlignedBuffer<DescriptorT> & rxDescs) : rxDescs(rxDescs) {}
+        GenericRxDMALoop() = default;
 
         /// Configure DMA registers to point to the DMA ring,
-        /// and enable DMA. This is done before the MAC itself is enabled.
+        /// and enable DMA. This is done before the MAC itself is enabled, and before any descriptors
+        /// are given to DMA.
         virtual void startDMA() = 0;
 
         /// Stop the DMA running. This is done after MAC transmit & receive are disabled.
         virtual void stopDMA() = 0;
 
+#if __DCACHE_PRESENT
+        /// Invalidate cache for the descriptor at the given index so it gets reloaded from main memory
+        virtual void cacheInvalidateDescriptor(size_t descIdx) = 0;
+#endif
+
+        /// Is the given descriptor owned by DMA?
+        /// Note that the descriptor will already have been invalidated in cache if needed.
+        virtual bool descOwnedByDMA(size_t descIdx) = 0;
+
+        /// Does the given descriptor contain the start of a packet?
+        /// Note that the descriptor will already have been invalidated in cache if needed.
+        virtual bool isFirstDesc(size_t descIdx) = 0;
+
+        /// Does the given descriptor contain the end of a packet?
+        /// /// Note that the descriptor will already have been invalidated in cache if needed.
+        virtual bool isLastDesc(size_t descIdx) = 0;
+
+        /// Is the given descriptor an error descriptor?
+        /// /// Note that the descriptor will already have been invalidated in cache if needed.
+        virtual bool isErrorDesc(size_t descIdx) = 0;
+
         /// Return a descriptor to DMA so that DMA can receive into it.
-        /// Is passed the buffer address (fixed size) to attach to this descriptor.
+        /// Is passed the buffer address (fixed size equal to rxPoolPayloadSize) to attach to this descriptor.
         /// Note: if the descriptor needs to be flushed from CPU cache, you need to do that
         /// at the correct point in the implementation of this method!
         /// Also, if the DMA ran out of data to transmit, you may need to do a "poke"/"wake" operation
         /// to tell it to start running again.
         virtual void returnDescriptor(size_t descIdx, uint8_t * buffer) = 0;
 
-        /// Get the length of the packet starting at firstDescIdx and continuing until the
-        /// given last descriptor. Descriptors have already been validated to contain a
-        /// complete packet at this point.
+        /// Get the length of the packet starting at firstDescIdx and continuing until
+        /// lastDescIdx (which might or might not be the same as firstDescIdx). Descriptors have already been
+        /// validated to contain a complete packet at this point.
         virtual size_t getTotalLen(size_t firstDescIdx, size_t lastDescIdx) = 0;
 
     public:
@@ -416,18 +421,18 @@ namespace mbed {
 
             for(size_t descCount = 0; descCount < RX_NUM_DESCS; descCount++)
             {
-                auto &descriptor = rxDescs[(rxNextIndex + descCount) % RX_NUM_DESCS];
+                size_t descIdx = (rxNextIndex + descCount) % RX_NUM_DESCS;
 
 #if __DCACHE_PRESENT
-                SCB_InvalidateDCache_by_Addr(&descriptor, sizeof(DescriptorT));
+                cacheInvalidateDescriptor(descIdx);
 #endif
 
-                if(descriptor.ownedByDMA())
+                if(descOwnedByDMA(descIdx))
                 {
                     // Descriptor owned by DMA.  We are out of descriptors to process.
                     return false;
                 }
-                if(descriptor.isErrorDesc() or descriptor.isLastDesc())
+                if(isErrorDesc(descIdx) || isLastDesc(descIdx))
                 {
                     // Reclaimable descriptor or complete packet detected.
                     return true;
@@ -450,18 +455,21 @@ namespace mbed {
 
             for (size_t descCount = 0; descCount < maxDescsToProcess && !lastDescIdx.has_value(); descCount++) {
                 size_t descIdx = (startIdx + descCount) % RX_NUM_DESCS;
-                auto &descriptor = rxDescs[descIdx];
 
-        #if __DCACHE_PRESENT
-                SCB_InvalidateDCache_by_Addr(&descriptor, sizeof(DescriptorT));
-        #endif
+#if __DCACHE_PRESENT
+                cacheInvalidateDescriptor(descIdx);
+#endif
 
-                if (descriptor.ownedByDMA()) {
+                if (descOwnedByDMA(descIdx)) {
                     // Descriptor owned by DMA and has not been filled in yet.  We are out of descriptors to process.
                     break;
                 }
 
-                if (!firstDescIdx.has_value() && (descriptor.isErrorDesc() || !descriptor.isFirstDesc())) {
+                const bool isError = isErrorDesc(descIdx);
+                const bool isFirst = isFirstDesc(descIdx);
+                const bool isLast = isLastDesc(descIdx);
+
+                if (!firstDescIdx.has_value() && (isError || !isFirst)) {
                     // Error or non-first-descriptor before a first descriptor
                     // (could be caused by incomplete packets/junk in the DMA buffer).
                     // Ignore, free associated memory, and schedule for rebuild.
@@ -472,13 +480,13 @@ namespace mbed {
 
                     continue;
                 }
-                else if(firstDescIdx.has_value() && (descriptor.isErrorDesc() || descriptor.isFirstDesc()))
+                else if(firstDescIdx.has_value() && (isError || isFirst))
                 {
                     // Already seen a first descriptor, but we have an error descriptor or another first descriptor.
                     // So, delete the in-progress packet up to this point.
 
                     // Clean up the old first descriptor and any descriptors between there and here
-                    const size_t endIdx = descriptor.isFirstDesc() ? descIdx : (descIdx + 1) % RX_NUM_DESCS;
+                    const size_t endIdx = isFirst ? descIdx : (descIdx + 1) % RX_NUM_DESCS;
 
                     for(size_t descToCleanIdx = *firstDescIdx; descToCleanIdx != endIdx; descToCleanIdx = (descToCleanIdx + 1) % RX_NUM_DESCS) {
                         memory_manager->free(rxDescStackBufs[descToCleanIdx]);
@@ -487,17 +495,17 @@ namespace mbed {
                         ++rxNextIndex;
                     }
 
-                    if(!descriptor.isErrorDesc())
+                    if(!isError)
                     {
                         firstDescIdx = descIdx;
                     }
                 }
-                else if(descriptor.isFirstDesc())
+                else if(isFirst)
                 {
                     firstDescIdx = descIdx;
                 }
 
-                if (descriptor.isLastDesc()) {
+                if (isLast) {
                     lastDescIdx = descIdx;
                 }
             }

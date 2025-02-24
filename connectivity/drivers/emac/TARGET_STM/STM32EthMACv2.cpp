@@ -50,23 +50,47 @@ namespace mbed {
         base->DMACTCR &= ~ETH_DMACTCR_ST;
     }
 
+#if __DCACHE_PRESENT
+    void STM32EthMACv2::TxDMA::cacheInvalidateDescriptor(size_t descIdx) {
+        SCB_InvalidateDCache_by_Addr(&txDescs[descIdx], sizeof(stm32_ethv2::EthTxDescriptor));
+    }
+#endif
+
+    bool STM32EthMACv2::TxDMA::descOwnedByDMA(size_t descIdx) {
+        return txDescs[descIdx].formats.fromDMA.dmaOwn;
+    }
+
     bool STM32EthMACv2::TxDMA::isDMAReadableBuffer(uint8_t const *start, const size_t size) const
     {
+#ifdef TARGET_STM32H7
         // On STM32H7, the Ethernet DMA cannot access data in DTCM.  So, if someone sends
         // a packet with a data pointer in DTCM (e.g. a stack allocated payload), everything
         // will break if we don't copy it first.
-#ifdef MBED_RAM_BANK_SRAM_DTC_START
-        if(reinterpret_cast<ptrdiff_t>(start) >= MBED_RAM_BANK_SRAM_DTC_START &&
+        if(reinterpret_cast<ptrdiff_t>(start) >= MBED_RAM_BANK_SRAM_DTC_START ||
             reinterpret_cast<ptrdiff_t>(start + size) <= MBED_RAM_BANK_SRAM_DTC_START + MBED_RAM_BANK_SRAM_DTC_SIZE)
         {
             return false;
         }
 #endif
+
+#ifdef TARGET_STM32H5
+        // On STM32H7, the Ethernet DMA cannot access data in backup SRAM.
+        if(reinterpret_cast<ptrdiff_t>(start) >= MBED_RAM_BANK_SRAM_BKUP_START ||
+            reinterpret_cast<ptrdiff_t>(start + size) <= MBED_RAM_BANK_SRAM_BKUP_START + MBED_RAM_BANK_SRAM_BKUP_SIZE)
+        {
+            return false;
+        }
+#endif
+
         return true;
     }
 
-    void STM32EthMACv2::TxDMA::giveToDMA(const size_t descIdx, const bool firstDesc, const bool lastDesc) {
+    void STM32EthMACv2::TxDMA::giveToDMA(const size_t descIdx, uint8_t const * const buffer, const size_t len, const bool firstDesc, const bool lastDesc) {
         auto & desc = txDescs[descIdx];
+
+        // Set buffer
+        desc.formats.toDMA.buffer1Addr = buffer;
+        desc.formats.toDMA.buffer1Len = len;
 
         // Note that we have to configure these every time as
         // they get wiped away when the DMA gives back the descriptor
@@ -84,9 +108,11 @@ namespace mbed {
         desc.formats.toDMA.timestampEnable = false;
         desc.formats.toDMA.dmaOwn = true;
 
-#if __DCACHE_PRESENT
         // Write descriptor back to main memory
+#if __DCACHE_PRESENT
         SCB_CleanDCache_by_Addr(&desc, sizeof(stm32_ethv2::EthTxDescriptor));
+#else
+        __DMB(); // Make sure descriptor is written before the below lines
 #endif
 
         // Move tail pointer register to point to the descriptor after this descriptor.
@@ -119,6 +145,30 @@ namespace mbed {
         base->DMACTCR &= ~ETH_DMACRCR_SR;
     }
 
+#if __DCACHE_PRESENT
+    void STM32EthMACv2::RxDMA::cacheInvalidateDescriptor(size_t descIdx) {
+        SCB_InvalidateDCache_by_Addr(&rxDescs[descIdx], sizeof(stm32_ethv2::EthRxDescriptor));
+    }
+#endif
+
+    bool STM32EthMACv2::RxDMA::descOwnedByDMA(size_t descIdx) {
+        return rxDescs[descIdx].formats.toDMA.dmaOwn;
+    }
+
+    bool STM32EthMACv2::RxDMA::isFirstDesc(size_t descIdx) {
+        return rxDescs[descIdx].formats.fromDMA.firstDescriptor;
+    }
+
+    bool STM32EthMACv2::RxDMA::isLastDesc(size_t descIdx) {
+        return rxDescs[descIdx].formats.fromDMA.lastDescriptor;
+    }
+
+    bool STM32EthMACv2::RxDMA::isErrorDesc(size_t descIdx) {
+        // For right now, we treat context descriptors equivalent to error descs.
+        // Currently we do not use them, so if we did get one, we just want to get rid of it.
+        return rxDescs[descIdx].formats.fromDMA.errorSummary || rxDescs[descIdx].formats.fromDMA.context;
+    }
+
     void STM32EthMACv2::RxDMA::returnDescriptor(const size_t descIdx, uint8_t * const buffer) {
         auto & desc = rxDescs[descIdx];
 
@@ -136,6 +186,8 @@ namespace mbed {
 #if __DCACHE_PRESENT
         // Flush to main memory
         SCB_CleanDCache_by_Addr(&desc, __SCB_DCACHE_LINE_SIZE);
+#else
+        __DMB(); // Make sure descriptor is written before the below lines
 #endif
 
         // Update tail ptr to issue "rx poll demand" and mark this descriptor for receive.

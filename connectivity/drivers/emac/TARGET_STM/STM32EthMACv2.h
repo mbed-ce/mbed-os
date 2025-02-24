@@ -27,7 +27,7 @@ namespace mbed {
      */
     class STM32EthMACv2 : public CompositeEMAC {
 
-        class TxDMA : public GenericTxDMALoop<stm32_ethv2::EthTxDescriptor>
+        class TxDMA : public GenericTxDMALoop
         {
         protected:
             ETH_TypeDef * const base; // Base address of Ethernet peripheral
@@ -37,17 +37,22 @@ namespace mbed {
 
             void stopDMA() override;
 
+#if __DCACHE_PRESENT
+            void cacheInvalidateDescriptor(size_t descIdx) override;
+#endif
+
+            bool descOwnedByDMA(size_t descIdx) override;
+
             bool isDMAReadableBuffer(uint8_t const * start, size_t size) const override;
 
-            void giveToDMA(size_t descIdx, bool firstDesc, bool lastDesc) override;
+            void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
         public:
             explicit TxDMA(ETH_TypeDef * const base):
-            GenericTxDMALoop<stm32_ethv2::EthTxDescriptor>(txDescs),
             base(base)
             {}
         };
 
-        class RxDMA : public GenericRxDMALoop<stm32_ethv2::EthRxDescriptor> {
+        class RxDMA : public GenericRxDMALoop {
         protected:
             ETH_TypeDef * const base; // Base address of Ethernet peripheral
             StaticCacheAlignedBuffer<stm32_ethv2::EthRxDescriptor, RX_NUM_DESCS> rxDescs; // Rx descriptors
@@ -56,13 +61,24 @@ namespace mbed {
 
             void stopDMA() override;
 
+#if __DCACHE_PRESENT
+            void cacheInvalidateDescriptor(size_t descIdx) override;
+#endif
+
+            bool descOwnedByDMA(size_t descIdx) override;
+
+            bool isFirstDesc(size_t descIdx) override;
+
+            bool isLastDesc(size_t descIdx) override;
+
+            bool isErrorDesc(size_t descIdx) override;
+
             void returnDescriptor(size_t descIdx, uint8_t *buffer) override;
 
             size_t getTotalLen(size_t firstDescIdx, size_t lastDescIdx) override;
 
         public:
             explicit RxDMA(ETH_TypeDef * const base):
-            GenericRxDMALoop<mbed::stm32_ethv2::EthRxDescriptor>(rxDescs),
             base(base)
             {}
         };

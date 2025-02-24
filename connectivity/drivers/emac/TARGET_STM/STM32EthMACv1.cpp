@@ -20,6 +20,7 @@
 #include <mbed_power_mgmt.h>
 #include <Timer.h>
 #include <mbed_trace.h>
+#include "mbed_error.h"
 
 #define TRACE_GROUP "STEMACv1"
 
@@ -31,7 +32,129 @@ extern "C" void EthDeinitPinmappings();
 extern "C" PinName EthGetPhyResetPin();
 
 namespace mbed {
-    void STM32EthMACv1::MACDriver::ETH_SetMDIOClockRange(ETH_TypeDef * const base) {
+void STM32EthMACv1::TxDMA::startDMA() {
+    // Zero all the Tx descriptors
+    memset(txDescs.data(), 0, sizeof(stm32_ethv1::TxDescriptor) * TX_NUM_DESCS);
+
+    // Set the end-of-ring bit on the last descriptor
+    txDescs[TX_NUM_DESCS - 1].endOfRing = true;
+
+    // Set descriptor list address register
+    base->DMARDLAR = reinterpret_cast<ptrdiff_t>(&txDescs[0]);
+
+    // Start Tx DMA
+    base->DMAOMR |= ETH_DMAOMR_ST_Msk;
+}
+
+void STM32EthMACv1::TxDMA::stopDMA() {
+    base->DMAOMR &= ~ETH_DMAOMR_ST_Msk;
+}
+
+#if __DCACHE_PRESENT
+void STM32EthMACv1::TxDMA::cacheInvalidateDescriptor(const size_t descIdx) {
+    SCB_InvalidateDCache_by_Addr(&txDescs[descIdx], sizeof(stm32_ethv1::TxDescriptor));
+}
+
+bool STM32EthMACv1::TxDMA::descOwnedByDMA(size_t descIdx) {
+    return txDescs[descIdx].dmaOwn;
+}
+
+bool STM32EthMACv1::TxDMA::isDMAReadableBuffer(uint8_t const *start, size_t size) const {
+#ifdef TARGET_STM32F7
+    if(reinterpret_cast<ptrdiff_t>(start) < 1024*16) {
+        // In ITCM memory, not accessible by DMA. Note that ITCM is not included in the CMSIS memory map (yet).
+        return false;
+    }
+#endif
+
+#if TARGET_STM32F2 || TARGET_STM32F4
+    // On STM32F2 and F2, ethernet DMA cannot access the flash memory.
+    if(reinterpret_cast<ptrdiff_t>(start) >= MBED_ROM_START ||
+        reinterpret_cast<ptrdiff_t>(start + size) <= MBED_ROM_START + MBED_ROM_SIZE)
+    {
+        return false;
+    }
+#endif
+
+    return true;
+}
+
+void STM32EthMACv1::TxDMA::giveToDMA(size_t descIdx, uint8_t const *buffer, size_t len, bool firstDesc, bool lastDesc) {
+
+}
+#endif
+
+void STM32EthMACv1::RxDMA::startDMA() {
+
+    // Rx buffer size must be a multiple of 4, per the descriptor definition
+    MBED_ASSERT(rxPoolPayloadSize % sizeof(uint32_t) == 0);
+
+    // Zero all the Rx descriptors
+    memset(rxDescs.data(), 0, sizeof(stm32_ethv1::RxDescriptor) * RX_NUM_DESCS);
+
+    // Set the end-of-ring bit on the last descriptor
+    rxDescs[RX_NUM_DESCS - 1].endOfRing = true;
+
+    // Set descriptor list address register
+    base->DMARDLAR = reinterpret_cast<ptrdiff_t>(&rxDescs[0]);
+
+    // Start Rx DMA
+    base->DMAOMR |= ETH_DMAOMR_SR_Msk;
+}
+
+void STM32EthMACv1::RxDMA::stopDMA() {
+    base->DMAOMR &= ~ETH_DMAOMR_SR_Msk;
+}
+
+#if __DCACHE_PRESENT
+void STM32EthMACv1::RxDMA::cacheInvalidateDescriptor(const size_t descIdx) {
+    SCB_InvalidateDCache_by_Addr(&rxDescs[descIdx], sizeof(stm32_ethv1::RxDescriptor));
+}
+#endif
+
+bool STM32EthMACv1::RxDMA::descOwnedByDMA(const size_t descIdx) {
+    return rxDescs[descIdx].dmaOwn;
+}
+
+bool STM32EthMACv1::RxDMA::isFirstDesc(const size_t descIdx) {
+    return rxDescs[descIdx].firstDescriptor;
+}
+
+bool STM32EthMACv1::RxDMA::isLastDesc(const size_t descIdx) {
+    return rxDescs[descIdx].lastDescriptor;
+}
+
+bool STM32EthMACv1::RxDMA::isErrorDesc(const size_t descIdx) {
+    return rxDescs[descIdx].errSummary;
+}
+
+void STM32EthMACv1::RxDMA::returnDescriptor(const size_t descIdx, uint8_t *buffer)
+{
+    // Configure descriptor
+    rxDescs[descIdx].buffer1 = buffer;
+    rxDescs[descIdx].buffer1Size = rxPoolPayloadSize;
+    rxDescs[descIdx].dmaOwn = true;
+
+    // Flush back to main memory
+#ifdef __DCACHE_PRESENT
+    SCB_CleanDCache_by_Addr(&rxDescs[descIdx], sizeof(stm32_ethv1::RxDescriptor));
+#else
+    __DMB(); // Make sure descriptor is written before the below lines
+#endif
+
+    // Clear buffer unavailable flag (I think this is for information only though)
+    base->DMASR = ETH_DMASR_RBUS_Msk;
+
+    // Demand (good sir!) an Rx descriptor poll
+    base->DMARPDR = 1;
+}
+
+size_t STM32EthMACv1::RxDMA::getTotalLen(const size_t firstDescIdx, const size_t lastDescIdx) {
+    // Total length of the packet is in the last descriptor
+    return rxDescs[lastDescIdx].frameLen;
+}
+
+void STM32EthMACv1::MACDriver::ETH_SetMDIOClockRange(ETH_TypeDef * const base) {
         /* Get the ETHERNET MACMIIAR value */
         uint32_t tempreg = base->MACMIIAR;
         /* Clear CSR Clock Range CR[2:0] bits */
@@ -61,10 +184,16 @@ namespace mbed {
             /* CSR Clock Range between 100-150 MHz */
             tempreg |= (uint32_t)ETH_MACMIIAR_CR_Div62;
         }
-        else /* ((hclk >= 150000000)&&(hclk <= 216000000)) */
+#ifdef ETH_MACMIIAR_CR_Div102
+        else if((hclk >= 150000000)&&(hclk <= 216000000))
         {
             /* CSR Clock Range between 150-216 MHz */
             tempreg |= (uint32_t)ETH_MACMIIAR_CR_Div102;
+        }
+#endif
+        else {
+            MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ETHERNET, EIO), \
+                   "STM32 EMAC v1: Unsupported HCLK range\n");
         }
 
         /* Write to ETHERNET MAC MIIAR: Configure the ETHERNET CSR Clock Range */

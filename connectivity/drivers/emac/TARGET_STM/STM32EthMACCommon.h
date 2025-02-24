@@ -21,7 +21,7 @@
 #include "MbedCRC.h"
 
 // Figure out the Ethernet IP version in use
-#ifdef TARGET_STM32H5 || TARGET_STM32H7
+#if defined(TARGET_STM32H5) || defined(TARGET_STM32H7)
 #define ETH_IP_VERSION_V2
 #else
 #define ETH_IP_VERSION_V1

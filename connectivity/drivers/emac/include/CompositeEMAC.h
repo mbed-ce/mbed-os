@@ -277,6 +277,8 @@ public:
         EMACMemoryManager * memory_manager = nullptr;
 
     public:
+        virtual ~TxDMA() = default;
+
         /// Set the mem manager of this DMA ring. Will be called by CompositeEMAC before init().
         void setMemoryManager(EMACMemoryManager * memory_manager) { this->memory_manager = memory_manager; }
 
@@ -311,6 +313,8 @@ public:
         EMACMemoryManager * memory_manager = nullptr;
 
     public:
+        virtual ~RxDMA() = default;
+
         /// Set the mem manager of this DMA ring. Will be called by CompositeEMAC before init().
         void setMemoryManager(EMACMemoryManager * memory_manager) { this->memory_manager = memory_manager; }
 
