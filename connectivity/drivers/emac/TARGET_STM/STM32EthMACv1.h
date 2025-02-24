@@ -130,7 +130,20 @@ class STM32EthMACv1 : public CompositeEMAC
         void setPromiscuous(bool enable) override;
     };
 
+    // Pointer to global instance, for ISR to use.
+    // TODO if we support more than 1 EMAC per MCU, this will need to be an array
+    static STM32EthMACv1 * instance;
+
+    ETH_TypeDef * const base; // Base address of Ethernet peripheral
+
+    // Components of the ethernet MAC
+    TxDMA txDMA;
+    RxDMA rxDMA;
+    MACDriver macDriver;
+
 public:
+    STM32EthMACv1();
+
     // Interrupt callback
     static void irqHandler();
 };

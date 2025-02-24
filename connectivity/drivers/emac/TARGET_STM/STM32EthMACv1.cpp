@@ -54,6 +54,7 @@ void STM32EthMACv1::TxDMA::stopDMA() {
 void STM32EthMACv1::TxDMA::cacheInvalidateDescriptor(const size_t descIdx) {
     SCB_InvalidateDCache_by_Addr(&txDescs[descIdx], sizeof(stm32_ethv1::TxDescriptor));
 }
+#endif
 
 bool STM32EthMACv1::TxDMA::descOwnedByDMA(size_t descIdx) {
     return txDescs[descIdx].dmaOwn;
@@ -80,9 +81,29 @@ bool STM32EthMACv1::TxDMA::isDMAReadableBuffer(uint8_t const *start, size_t size
 }
 
 void STM32EthMACv1::TxDMA::giveToDMA(size_t descIdx, uint8_t const *buffer, size_t len, bool firstDesc, bool lastDesc) {
+    // Configure descriptor with buffer and size
+    txDescs[descIdx].buffer1 = buffer;
+    txDescs[descIdx].buffer1Size = len;
+    txDescs[descIdx].firstSegment = firstDesc;
+    txDescs[descIdx].lastSegment = lastDesc;
+    txDescs[descIdx].intrOnComplete = true;
 
-}
+    // Return to DMA
+    txDescs[descIdx].dmaOwn = true;
+
+    // Flush back to main memory
+#ifdef __DCACHE_PRESENT
+    SCB_CleanDCache_by_Addr(&txDescs[descIdx], sizeof(stm32_ethv1::TxDescriptor));
+#else
+    __DMB(); // Make sure descriptor is written before the below lines
 #endif
+
+    // Clear buffer unavailable flag (I think this is for information only though)
+    base->DMASR = ETH_DMASR_TBUS_Msk;
+
+    // Demand (good sir!) a Tx descriptor poll
+    base->DMATPDR = 1;
+}
 
 void STM32EthMACv1::RxDMA::startDMA() {
 
@@ -437,4 +458,52 @@ void STM32EthMACv1::MACDriver::setPromiscuous(bool enable) {
         base->MACFFR &= ~ETH_MACFFR_PM_Msk;
     }
 }
+
+STM32EthMACv1::STM32EthMACv1():
+CompositeEMAC(txDMA, rxDMA, macDriver),
+base(ETH),
+txDMA(base),
+rxDMA(base),
+macDriver(base)
+{
+    instance = this;
+}
+
+void STM32EthMACv1::irqHandler() {
+    const auto emacInst = instance;
+    uint32_t dma_flag = emacInst->base->DMASR;
+
+    /* Packet received */
+    if ((dma_flag & ETH_DMASR_RS_Msk) != 0U)
+    {
+        /* Clear the Eth DMA Rx IT pending bits */
+        ETH->DMASR = ETH_DMASR_RS_Msk | ETH_DMASR_NIS_Msk;
+
+        emacInst->rxISR();
+    }
+
+    /* Packet transmitted */
+    if ((dma_flag & ETH_DMASR_TS_Msk) != 0U)
+    {
+        /* Clear the Eth DMA Tx IT pending bits */
+        ETH->DMASR = ETH_DMASR_TS_Msk | ETH_DMASR_NIS_Msk;
+
+        emacInst->txISR();
+    }
+
+    /* ETH DMA Error */
+    if(dma_flag & ETH_DMASR_FBES_Msk)
+    {
+        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ETHERNET, EIO), \
+               "STM32 EMAC v2: Hardware reports fatal DMA error\n");
+    }
+}
+
+// Provide default EMAC driver
+MBED_WEAK EMAC &EMAC::get_default_instance()
+{
+    static mbed::STM32EthMACv1 emac;
+    return emac;
+}
+
 }
