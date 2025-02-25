@@ -24,7 +24,7 @@ namespace stm32_ethv1 {
     /// Struct for an enhanced Tx descriptor in the STM32 Eth IP v1.
     /// From STM32F7 Reference Manual, section 42.6.7.
     /// Note that even when there is no CPU cache, descriptors must be 32 bit aligned.
-    struct __attribute__ ((packed)) alignas(uint32_t) TxDescriptor
+    struct __attribute__((packed, aligned(4))) TxDescriptor
     {
         // TDES0 fields
         bool deferred : 1;
@@ -83,7 +83,7 @@ namespace stm32_ethv1 {
     /// Struct for an enhanced Rx descriptor in the STM32 Eth IP v1.
     /// From STM32F7 Reference Manual, section 42.6.8
     /// Note that even when there is no CPU cache, descriptors must be 32 bit aligned.
-    struct __attribute__ ((packed)) alignas(uint32_t) RxDescriptor
+    struct __attribute__((packed, aligned(4))) RxDescriptor
     {
         // RDES0 fields
         bool extStatusAvail : 1;
