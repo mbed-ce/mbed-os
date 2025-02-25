@@ -177,7 +177,7 @@ void STM32EthMACv1::MACDriver::ETH_SetMDIOClockRange(ETH_TypeDef * const base) {
         /* Get the ETHERNET MACMIIAR value */
         uint32_t tempreg = base->MACMIIAR;
         /* Clear CSR Clock Range CR[2:0] bits */
-        tempreg &= ETH_MACMIIAR_CR_MASK;
+        tempreg &= ETH_MACMIIAR_CR_Msk;
 
         /* Get hclk frequency value */
         uint32_t hclk = HAL_RCC_GetHCLKFreq();

@@ -43,7 +43,10 @@
 #define HAL_DAC_MODULE_ENABLED
 #define HAL_DCMI_MODULE_ENABLED
 #define HAL_DMA_MODULE_ENABLED
-#define HAL_ETH_MODULE_ENABLED
+
+// Mbed uses a handwritten driver for Ethernet
+// #define HAL_ETH_MODULE_ENABLED 
+
 #define HAL_EXTI_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_NAND_MODULE_ENABLED

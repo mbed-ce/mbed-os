@@ -535,7 +535,7 @@ template <typename TYPE> void EmacTestMemoryManager::check_value(TYPE value, con
         va_list ap;
         va_start(ap, fmt);
         vfprintf(stderr, fmt, ap);
-        assert(false);
+        MBED_ASSERT(false);
         va_end(ap);
     }
 }

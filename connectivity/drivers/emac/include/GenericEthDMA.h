@@ -85,8 +85,8 @@ namespace mbed {
 
         // Utility function for implementing isDMAReadableBuffer().
         // 1D intersection test between a buffer and a memory bank.
-        static bool bufferTouchesMemoryBank(uint8_t const * start, size_t size, uint32_t bankStartAddr, uint32_t bankSize) {
-            const auto startAddrInt = reinterpret_cast<ptrdiff_t>(start);
+        static bool bufferTouchesMemoryBank(uint8_t const * start, const size_t size, const uint32_t bankStartAddr, const uint32_t bankSize) {
+            const auto startAddrInt = reinterpret_cast<uint32_t>(start);
 
             if(startAddrInt < bankStartAddr) {
                 // Case 1: buffer begins before bank
