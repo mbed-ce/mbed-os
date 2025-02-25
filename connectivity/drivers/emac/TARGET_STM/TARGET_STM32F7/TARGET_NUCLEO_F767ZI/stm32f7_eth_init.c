@@ -53,6 +53,8 @@ void EthInitPinmappings(void)
       RMII_MII_TX_EN --------------------> PG11
       RMII_MII_TXD0 ---------------------> PG13
       RMII_MII_TXD1 ---------------------> PB13
+
+      NOTE: Must install JP6 and JP7 on board to use Ethernet.
      */
     /* Configure PA1, PA2 and PA7 */
     GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;

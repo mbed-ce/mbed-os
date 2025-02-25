@@ -147,7 +147,7 @@ namespace mbed {
                 txReclaimIndex = (txReclaimIndex + 1) % MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
                 ++txDescsOwnedByApplication;
 
-                tr_info("Reclaimed descriptor %zu", txReclaimIndex);
+                tr_debug("Reclaimed descriptor %zu", txReclaimIndex);
 
                 returnedAnyDescriptors = true;
             }
@@ -192,7 +192,7 @@ namespace mbed {
                 }
             }
 
-            tr_info("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), neededDescs);
 
             // Step 2: Copy packet if needed
@@ -565,7 +565,7 @@ namespace mbed {
             }
 #endif
 
-            tr_info("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu\n",
+            tr_debug("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu\n",
                    memory_manager->get_total_len(headBuffer), memory_manager->get_ptr(headBuffer), *firstDescIdx, *lastDescIdx);
 
             return headBuffer;
