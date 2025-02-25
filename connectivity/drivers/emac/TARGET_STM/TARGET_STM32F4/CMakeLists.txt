@@ -6,8 +6,3 @@ if("NUCLEO_F429ZI" IN_LIST MBED_TARGET_LABELS)
 elseif("NUCLEO_F439ZI" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_NUCLEO_F439ZI)
 endif()
-
-target_include_directories(mbed-emac
-    PUBLIC
-        .
-)
