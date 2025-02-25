@@ -83,6 +83,25 @@ namespace mbed {
         /// to tell it to start running again.
         virtual void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) = 0;
 
+        // Utility function for implementing isDMAReadableBuffer().
+        // 1D intersection test between a buffer and a memory bank.
+        static bool bufferTouchesMemoryBank(uint8_t const * start, size_t size, uint32_t bankStartAddr, uint32_t bankSize) {
+            const auto startAddrInt = reinterpret_cast<ptrdiff_t>(start);
+
+            if(startAddrInt < bankStartAddr) {
+                // Case 1: buffer begins before bank
+                return (startAddrInt + size) > bankStartAddr;
+            }
+            else if(startAddrInt >= bankStartAddr && startAddrInt < (bankStartAddr + bankSize)) {
+                // Case 2: buffer begins inside bank
+                return true;
+            }
+            else {
+                // Case 3: buffer begins after bank
+                return false;
+            }
+        }
+
     public:
         CompositeEMAC::ErrCode init() override {
             // At the start, we own all the descriptors

@@ -12,13 +12,3 @@ elseif("NUCLEO_F756ZG" IN_LIST MBED_TARGET_LABELS)
 elseif("NUCLEO_F767ZI" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_NUCLEO_F767ZI)
 endif()
-
-target_include_directories(mbed-emac
-    PUBLIC
-        .
-)
-
-target_sources(mbed-emac
-    PRIVATE
-        stm32f7_eth_conf.c
-)

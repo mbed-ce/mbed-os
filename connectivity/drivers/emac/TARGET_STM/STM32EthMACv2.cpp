@@ -66,18 +66,14 @@ namespace mbed {
         // On STM32H7, the Ethernet DMA cannot access data in DTCM.  So, if someone sends
         // a packet with a data pointer in DTCM (e.g. a stack allocated payload), everything
         // will break if we don't copy it first.
-        if(reinterpret_cast<ptrdiff_t>(start) >= MBED_RAM_BANK_SRAM_DTC_START ||
-            reinterpret_cast<ptrdiff_t>(start + size) <= MBED_RAM_BANK_SRAM_DTC_START + MBED_RAM_BANK_SRAM_DTC_SIZE)
-        {
+        if(bufferTouchesMemoryBank(start, size, MBED_RAM_BANK_SRAM_DTC_START, MBED_RAM_BANK_SRAM_DTC_SIZE)) {
             return false;
         }
 #endif
 
 #ifdef TARGET_STM32H5
-        // On STM32H7, the Ethernet DMA cannot access data in backup SRAM.
-        if(reinterpret_cast<ptrdiff_t>(start) >= MBED_RAM_BANK_SRAM_BKUP_START ||
-            reinterpret_cast<ptrdiff_t>(start + size) <= MBED_RAM_BANK_SRAM_BKUP_START + MBED_RAM_BANK_SRAM_BKUP_SIZE)
-        {
+        // On STM32H5, the Ethernet DMA cannot access data in backup SRAM.
+        if(bufferTouchesMemoryBank(start, size, MBED_RAM_BANK_SRAM_BKUP_START, MBED_RAM_BANK_SRAM_BKUP_SIZE)) {
             return false;
         }
 #endif

@@ -62,7 +62,7 @@ bool STM32EthMACv1::TxDMA::descOwnedByDMA(size_t descIdx) {
 
 bool STM32EthMACv1::TxDMA::isDMAReadableBuffer(uint8_t const *start, size_t size) const {
 #ifdef TARGET_STM32F7
-    if(reinterpret_cast<ptrdiff_t>(start) < 1024*16) {
+    if(bufferTouchesMemoryBank(start, size, 0, 1024*16)) {
         // In ITCM memory, not accessible by DMA. Note that ITCM is not included in the CMSIS memory map (yet).
         return false;
     }
@@ -70,9 +70,7 @@ bool STM32EthMACv1::TxDMA::isDMAReadableBuffer(uint8_t const *start, size_t size
 
 #if TARGET_STM32F2 || TARGET_STM32F4
     // On STM32F2 and F2, ethernet DMA cannot access the flash memory.
-    if(reinterpret_cast<ptrdiff_t>(start) >= MBED_ROM_START ||
-        reinterpret_cast<ptrdiff_t>(start + size) <= MBED_ROM_START + MBED_ROM_SIZE)
-    {
+    if(bufferTouchesMemoryBank(start, size, MBED_ROM_START, MBED_ROM_SIZE)) {
         return false;
     }
 #endif
