@@ -150,6 +150,24 @@ inline void _wait_us_inline(unsigned int us)
 }
 #endif
 
+#ifdef __cplusplus
+#include <chrono>
+
+// Override of wait_us() allowing a std::chrono type convertible to microseconds to be passed in.
+#if defined US_TICKER_PERIOD_NUM
+static inline void _wait_us_inline(std::chrono::microseconds const us)
+{
+    _wait_us_inline(us.count());
+}
+#else
+static inline void wait_us(std::chrono::microseconds const us)
+{
+    wait_us(us.count());
+}
+#endif
+
+#endif
+
 #endif
 
 /** @}*/

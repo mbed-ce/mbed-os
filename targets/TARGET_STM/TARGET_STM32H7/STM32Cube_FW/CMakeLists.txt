@@ -26,11 +26,8 @@ target_sources(mbed-stm32h7cube-fw
         STM32H7xx_HAL_Driver/stm32h7xx_hal_dma_ex.c
         STM32H7xx_HAL_Driver/stm32h7xx_hal_dsi.c
         STM32H7xx_HAL_Driver/stm32h7xx_hal_dts.c
-
-		# Temporary: using legacy Ethernet driver for now
-        STM32H7xx_HAL_Driver/Legacy/stm32h7xx_hal_eth.c
-        STM32H7xx_HAL_Driver/Legacy/stm32h7xx_hal_eth_ex.c
-
+        STM32H7xx_HAL_Driver/stm32h7xx_hal_eth.c
+        STM32H7xx_HAL_Driver/stm32h7xx_hal_eth_ex.c
         STM32H7xx_HAL_Driver/stm32h7xx_hal_exti.c
         STM32H7xx_HAL_Driver/stm32h7xx_hal_fdcan.c
         STM32H7xx_HAL_Driver/stm32h7xx_hal_flash.c

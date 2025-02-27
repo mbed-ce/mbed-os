@@ -48,6 +48,8 @@ Case cases[] = {
     Case("EMAC initialize", test_emac_initialize),
     Case("EMAC broadcast", test_emac_broadcast), // note: this test case has the side effect of finding the CTP server MAC address and saving it
     Case("EMAC unicast", test_emac_unicast),
+    Case("EMAC power down and power up", test_emac_power_down_and_power_up),
+    Case("EMAC unicast again after power cycle", test_emac_unicast),
     Case("EMAC unicast frame length", test_emac_unicast_frame_len),
     Case("EMAC unicast burst", test_emac_unicast_burst),
     Case("EMAC unicast long", test_emac_unicast_long),

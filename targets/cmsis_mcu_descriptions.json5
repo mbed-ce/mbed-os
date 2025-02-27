@@ -7704,7 +7704,8 @@
                 "start": 134217728,
                 "startup": true
             },
-            "SRAM1_2": {
+            // Combined SRAMs 1, 2, and 3
+            "SRAM1_2_3": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -7716,13 +7717,16 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 327680,
-                "start": 536870912,
+                "size": 0xA0000, // 640 kiB
+                "start": 0x20000000,
                 "startup": false
             },
-            "SRAM3": {
+            // Backup SRAM. This is mentioned in the datasheet but neither the reference manual nor the CMSIS pack
+            // gives its address...
+            // Got this info from a forum post: https://community.st.com/t5/stm32-mcus-products/backup-sram-on-stm32h563/td-p/580633
+            "SRAM_BKUP": {
                 "access": {
-                    "execute": true,
+                    "execute": false,
                     "non_secure": false,
                     "non_secure_callable": false,
                     "peripheral": false,
@@ -7730,10 +7734,8 @@
                     "secure": false,
                     "write": true
                 },
-                "default": false,
-                "p_name": null,
-                "size": 327680,
-                "start": 537198592,
+                "size": 0x1000,
+                "start": 0x40036400,
                 "startup": false
             }
         },

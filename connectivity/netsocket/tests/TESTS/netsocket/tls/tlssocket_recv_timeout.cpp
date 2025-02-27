@@ -69,7 +69,7 @@ void TLSSOCKET_RECV_TIMEOUT()
                     TEST_FAIL();
                     goto CLEANUP;
                 }
-                tr_info("MBED: recv() took: %dus\n", timer.read_us());
+                tr_info("MBED: recv() took: %" PRIi64 "us\n", std::chrono::duration_cast<std::chrono::microseconds>(timer.elapsed_time()).count());
                 continue;
             } else if (recvd < 0) {
                 tr_error("[pkt#%02d] network error %d\n", i, recvd);

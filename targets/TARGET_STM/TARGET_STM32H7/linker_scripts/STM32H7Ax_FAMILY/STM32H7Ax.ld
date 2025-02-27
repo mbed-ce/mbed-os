@@ -16,7 +16,6 @@
 */
 
 #include "cmsis_nvic.h"
-#include "../stm32_eth_region_size_calcs.h"
 
 M_CRASH_DATA_RAM_SIZE = 0x100;
 
@@ -211,19 +210,6 @@ SECTIONS
         . = ALIGN(8);
         __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
     } > SRAM_D3
-
-    /* Ethernet DMA descriptors should be at the start of SRAM_AXI because they need an MPU region.*/
-    .eth_descriptors (NOLOAD) : {
-        ASSERT(. == ORIGIN(SRAM_AXI), "Eth Descriptors region must be at the start of SRAM_D2");
-        PROVIDE(__eth_descriptors_start = .);
-        *(.EthDescriptors)
-        . = __eth_descriptors_start + STM32_DMA_DESCRIP_REGION_SIZE;
-    } >SRAM_AXI
-
-    /* Ethernet buffers are recommended to be in SRAM_AXI but don't need any special MPU region. */
-    .eth_buffers (NOLOAD) : {
-        *(.EthBuffers)
-    } >SRAM_AXI 
 
     /* Use SRAM_AXI as additional heap */
     .heap (NOLOAD):

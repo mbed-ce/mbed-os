@@ -35,8 +35,6 @@ public:
 
     uint32_t get_pool_alloc_unit(uint32_t align) const override;
 
-    uint32_t get_pool_size() const override;
-
     void free(emac_mem_buf_t *buf) override;
 
     uint32_t get_total_len(const emac_mem_buf_t *buf) const override;

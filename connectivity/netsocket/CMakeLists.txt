@@ -90,7 +90,9 @@ if("DEVICE_EMAC=1" IN_LIST MBED_TARGET_DEFINITIONS)
     )
 endif()
 
-add_library(mbed-netsocket INTERFACE)
+add_library(mbed-netsocket INTERFACE
+        tests/TESTS/common/greentea_network_stack_nanostack.cpp
+        tests/TESTS/common/greentea_network_stack_lwipstack.cpp)
 
 target_link_libraries(mbed-netsocket
     INTERFACE

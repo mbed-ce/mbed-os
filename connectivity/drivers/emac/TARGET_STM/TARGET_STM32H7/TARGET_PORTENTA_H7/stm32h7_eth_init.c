@@ -30,11 +30,11 @@
 
 #define ETHERNET 1
 
-#ifndef USE_USER_DEFINED_HAL_ETH_MSPINIT
 
 #include "stm32h7xx_hal.h"
 #include "portenta_power.h"
 #include "platform/mbed_critical.h"
+#include "PinNames.h"
 
 #define ETH_TX_EN_Pin GPIO_PIN_11
 #define ETH_TX_EN_GPIO_Port GPIOG
@@ -58,124 +58,113 @@
 /**
  * Override HAL Eth Init function
  */
-void HAL_ETH_MspInit(ETH_HandleTypeDef *heth)
+void EthInitPinmappings(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
-    if (heth->Instance == ETH) {
-        enableEthPowerSupply();
+    enableEthPowerSupply();
 
-#if !(defined(DUAL_CORE) && defined(CORE_CM4))
-        /* Disable DCache for STM32H7 family */
-        core_util_critical_section_enter();
-        SCB_DisableDCache();
-        core_util_critical_section_exit();
-#endif
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    // __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOG_CLK_ENABLE();
+    // __HAL_RCC_GPIOH_CLK_ENABLE();
 
-        /* GPIO Ports Clock Enable */
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-        // __HAL_RCC_GPIOB_CLK_ENABLE();
-        __HAL_RCC_GPIOC_CLK_ENABLE();
-        __HAL_RCC_GPIOG_CLK_ENABLE();
-        // __HAL_RCC_GPIOH_CLK_ENABLE();
+    /* Enable Peripheral clock */
+    __HAL_RCC_ETH1MAC_CLK_ENABLE();
+    __HAL_RCC_ETH1TX_CLK_ENABLE();
+    __HAL_RCC_ETH1RX_CLK_ENABLE();
 
-        /* Enable Peripheral clock */
-        __HAL_RCC_ETH1MAC_CLK_ENABLE();
-        __HAL_RCC_ETH1TX_CLK_ENABLE();
-        __HAL_RCC_ETH1RX_CLK_ENABLE();
+    /* Set pinstrap for 100mbit */
+    // TODO
 
-        /* Set pinstrap for 100mbit */
-        // TODO
+    /* Reset ETH Phy */
+    __HAL_RCC_GPIOJ_CLK_ENABLE();
+    GPIO_InitTypeDef  gpio_eth_rst_init_structure;
+    gpio_eth_rst_init_structure.Pin = GPIO_PIN_15;
+    gpio_eth_rst_init_structure.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_eth_rst_init_structure.Pull = GPIO_NOPULL;
+    gpio_eth_rst_init_structure.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOJ, &gpio_eth_rst_init_structure);
 
-        /* Reset ETH Phy */
-        __HAL_RCC_GPIOJ_CLK_ENABLE();
-        GPIO_InitTypeDef  gpio_eth_rst_init_structure;
-        gpio_eth_rst_init_structure.Pin = GPIO_PIN_15;
-        gpio_eth_rst_init_structure.Mode = GPIO_MODE_OUTPUT_PP;
-        gpio_eth_rst_init_structure.Pull = GPIO_NOPULL;
-        gpio_eth_rst_init_structure.Speed = GPIO_SPEED_FREQ_LOW;
-        HAL_GPIO_Init(GPIOJ, &gpio_eth_rst_init_structure);
+    gpio_eth_rst_init_structure.Pin = ETH_RXD0_Pin | ETH_RXD1_Pin;
+    HAL_GPIO_Init(GPIOC, &gpio_eth_rst_init_structure);
+    HAL_GPIO_WritePin(GPIOC, ETH_RXD0_Pin, 1);
+    HAL_GPIO_WritePin(GPIOC, ETH_RXD1_Pin, 1);
+    gpio_eth_rst_init_structure.Pin = ETH_CRS_DV_Pin;
+    HAL_GPIO_Init(GPIOA, &gpio_eth_rst_init_structure);
+    HAL_GPIO_WritePin(GPIOA, ETH_CRS_DV_Pin, 1);
 
-        gpio_eth_rst_init_structure.Pin = ETH_RXD0_Pin | ETH_RXD1_Pin;
-        HAL_GPIO_Init(GPIOC, &gpio_eth_rst_init_structure);
-        HAL_GPIO_WritePin(GPIOC, ETH_RXD0_Pin, 1);
-        HAL_GPIO_WritePin(GPIOC, ETH_RXD1_Pin, 1);
-        gpio_eth_rst_init_structure.Pin = ETH_CRS_DV_Pin;
-        HAL_GPIO_Init(GPIOA, &gpio_eth_rst_init_structure);
-        HAL_GPIO_WritePin(GPIOA, ETH_CRS_DV_Pin, 1);
+    HAL_Delay(25);
+    HAL_GPIO_WritePin(GPIOJ, GPIO_PIN_15, 0);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(GPIOJ, GPIO_PIN_15, 1);
 
-        HAL_Delay(25);
-        HAL_GPIO_WritePin(GPIOJ, GPIO_PIN_15, 0);
-        HAL_Delay(100);
-        HAL_GPIO_WritePin(GPIOJ, GPIO_PIN_15, 1);
+    /**ETH GPIO Configuration
+    PG11     ------> ETH_TX_EN
+    PG12     ------> ETH_TXD1
+    PG13     ------> ETH_TXD0
+    PC1     ------> ETH_MDC
+    PA2     ------> ETH_MDIO
+    PA1     ------> ETH_REF_CLK
+    PA7     ------> ETH_CRS_DV
+    PC4     ------> ETH_RXD0
+    PC5     ------> ETH_RXD1
+    */
+    GPIO_InitStruct.Pin = ETH_TX_EN_Pin | ETH_TXD1_Pin | ETH_TXD0_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
-        /**ETH GPIO Configuration
-        PG11     ------> ETH_TX_EN
-        PG12     ------> ETH_TXD1
-        PG13     ------> ETH_TXD0
-        PC1     ------> ETH_MDC
-        PA2     ------> ETH_MDIO
-        PA1     ------> ETH_REF_CLK
-        PA7     ------> ETH_CRS_DV
-        PC4     ------> ETH_RXD0
-        PC5     ------> ETH_RXD1
-        */
-        GPIO_InitStruct.Pin = ETH_TX_EN_Pin | ETH_TXD1_Pin | ETH_TXD0_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = ETH_MDC_SAI4_D1_Pin | ETH_RXD0_Pin | ETH_RXD1_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-        GPIO_InitStruct.Pin = ETH_MDC_SAI4_D1_Pin | ETH_RXD0_Pin | ETH_RXD1_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-        GPIO_InitStruct.Pin = ETH_MDIO_Pin | ETH_REF_CLK_Pin | ETH_CRS_DV_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-    }
+    GPIO_InitStruct.Pin = ETH_MDIO_Pin | ETH_REF_CLK_Pin | ETH_CRS_DV_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
 /**
  * Override HAL Eth DeInit function
  */
-void HAL_ETH_MspDeInit(ETH_HandleTypeDef *heth)
+void EthDeinitPinmappings()
 {
-    if (heth->Instance == ETH) {
-        /* Peripheral clock disable */
-        __HAL_RCC_ETH1MAC_CLK_DISABLE();
-        __HAL_RCC_ETH1TX_CLK_DISABLE();
-        __HAL_RCC_ETH1RX_CLK_DISABLE();
+    /* Peripheral clock disable */
+    __HAL_RCC_ETH1MAC_CLK_DISABLE();
+    __HAL_RCC_ETH1TX_CLK_DISABLE();
+    __HAL_RCC_ETH1RX_CLK_DISABLE();
 
-        /**ETH GPIO Configuration
-        PG11     ------> ETH_TX_EN
-        PG12     ------> ETH_TXD1
-        PG13     ------> ETH_TXD0
-        PC1     ------> ETH_MDC
-        PA2     ------> ETH_MDIO
-        PA1     ------> ETH_REF_CLK
-        PA7     ------> ETH_CRS_DV
-        PC4     ------> ETH_RXD0
-        PC5     ------> ETH_RXD1
-        */
-        HAL_GPIO_DeInit(GPIOG, ETH_TX_EN_Pin | ETH_TXD1_Pin | ETH_TXD0_Pin);
+    /**ETH GPIO Configuration
+    PG11     ------> ETH_TX_EN
+    PG12     ------> ETH_TXD1
+    PG13     ------> ETH_TXD0
+    PC1     ------> ETH_MDC
+    PA2     ------> ETH_MDIO
+    PA1     ------> ETH_REF_CLK
+    PA7     ------> ETH_CRS_DV
+    PC4     ------> ETH_RXD0
+    PC5     ------> ETH_RXD1
+    */
+    HAL_GPIO_DeInit(GPIOG, ETH_TX_EN_Pin | ETH_TXD1_Pin | ETH_TXD0_Pin);
 
-        HAL_GPIO_DeInit(GPIOC, ETH_MDC_SAI4_D1_Pin | ETH_RXD0_Pin | ETH_RXD1_Pin);
+    HAL_GPIO_DeInit(GPIOC, ETH_MDC_SAI4_D1_Pin | ETH_RXD0_Pin | ETH_RXD1_Pin);
 
-        HAL_GPIO_DeInit(GPIOA, ETH_MDIO_Pin | ETH_REF_CLK_Pin | ETH_CRS_DV_Pin);
+    HAL_GPIO_DeInit(GPIOA, ETH_MDIO_Pin | ETH_REF_CLK_Pin | ETH_CRS_DV_Pin);
 
-        HAL_GPIO_WritePin(GPIOJ, GPIO_PIN_15, 0);
-    }
+    HAL_GPIO_WritePin(GPIOJ, GPIO_PIN_15, 0);
 }
 
-#endif /* USE_USER_DEFINED_HAL_ETH_MSPINIT */
-
-// Blank, non-weak-override function to make sure the linker pulls in this file
-void stm32_eth_init_weak_symbol_helper()
-{}
+// Get Ethernet PHY reset pin
+PinName EthGetPhyResetPin(void)
+{
+    return PJ_15;
+}

@@ -28,10 +28,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef USE_USER_DEFINED_HAL_ETH_MSPINIT
-
 #include "stm32h7xx_hal.h"
 #include "platform/mbed_critical.h"
+#include "PinNames.h"
 
 #define MCO_Pin GPIO_PIN_0
 #define MCO_GPIO_Port GPIOH
@@ -61,109 +60,100 @@
 /**
  * Override HAL Eth Init function
  */
-void HAL_ETH_MspInit(ETH_HandleTypeDef *heth)
+void EthInitPinmappings(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
-    if (heth->Instance == ETH) {
-        /* Disable DCache for STM32H7 family */
-        core_util_critical_section_enter();
-        SCB_DisableDCache();
-        core_util_critical_section_exit();
+    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOH_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOG_CLK_ENABLE();
 
-        /* GPIO Ports Clock Enable */
-        __HAL_RCC_GPIOH_CLK_ENABLE();
-        __HAL_RCC_GPIOC_CLK_ENABLE();
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-        __HAL_RCC_GPIOB_CLK_ENABLE();
-        __HAL_RCC_GPIOG_CLK_ENABLE();
+    /* Enable Peripheral clock */
+    __HAL_RCC_ETH1MAC_CLK_ENABLE();
+    __HAL_RCC_ETH1TX_CLK_ENABLE();
+    __HAL_RCC_ETH1RX_CLK_ENABLE();
 
-        /* Enable Peripheral clock */
-        __HAL_RCC_ETH1MAC_CLK_ENABLE();
-        __HAL_RCC_ETH1TX_CLK_ENABLE();
-        __HAL_RCC_ETH1RX_CLK_ENABLE();
+    /**ETH GPIO Configuration
+        PC1     ------> ETH_MDC
+        PA1     ------> ETH_REF_CLK
+        PA2     ------> ETH_MDIO
+        PA7     ------> ETH_CRS_DV
+        PC4     ------> ETH_RXD0
+        PC5     ------> ETH_RXD1
+        PB13     ------> ETH_TXD1
+        PG11     ------> ETH_TX_EN
+        PG13     ------> ETH_TXD0
+    */
+    GPIO_InitStruct.Pin = RMII_MDC_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+    HAL_GPIO_Init(RMII_MDC_GPIO_Port, &GPIO_InitStruct);
 
-        /**ETH GPIO Configuration
-            PC1     ------> ETH_MDC
-            PA1     ------> ETH_REF_CLK
-            PA2     ------> ETH_MDIO
-            PA7     ------> ETH_CRS_DV
-            PC4     ------> ETH_RXD0
-            PC5     ------> ETH_RXD1
-            PB13     ------> ETH_TXD1
-            PG11     ------> ETH_TX_EN
-            PG13     ------> ETH_TXD0
-        */
-        GPIO_InitStruct.Pin = RMII_MDC_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-        GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(RMII_MDC_GPIO_Port, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = RMII_REF_CLK_Pin | RMII_MDIO_Pin | RMII_CRS_DV_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-        GPIO_InitStruct.Pin = RMII_REF_CLK_Pin | RMII_MDIO_Pin | RMII_CRS_DV_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = RMII_RXD0_Pin | RMII_RXD1_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-        GPIO_InitStruct.Pin = RMII_RXD0_Pin | RMII_RXD1_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = RMII_TXD1_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+    HAL_GPIO_Init(RMII_TXD1_GPIO_Port, &GPIO_InitStruct);
 
-        GPIO_InitStruct.Pin = RMII_TXD1_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(RMII_TXD1_GPIO_Port, &GPIO_InitStruct);
-
-        GPIO_InitStruct.Pin = RMII_TX_EN_Pin | RMII_TXD0_Pin;
-        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-        GPIO_InitStruct.Pull = GPIO_NOPULL;
-        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-        HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
-    }
+    GPIO_InitStruct.Pin = RMII_TX_EN_Pin | RMII_TXD0_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 }
 
 /**
  * Override HAL Eth DeInit function
  */
-void HAL_ETH_MspDeInit(ETH_HandleTypeDef *heth)
+void EthDeinitPinmappings()
 {
-    if (heth->Instance == ETH) {
-        /* Disable Peripheral clock */
-        __HAL_RCC_ETH1MAC_CLK_DISABLE();
-        __HAL_RCC_ETH1TX_CLK_DISABLE();
-        __HAL_RCC_ETH1RX_CLK_DISABLE();
+    /* Disable Peripheral clock */
+    __HAL_RCC_ETH1MAC_CLK_DISABLE();
+    __HAL_RCC_ETH1TX_CLK_DISABLE();
+    __HAL_RCC_ETH1RX_CLK_DISABLE();
 
-        /**ETH GPIO Configuration
-            PC1     ------> ETH_MDC
-            PA1     ------> ETH_REF_CLK
-            PA2     ------> ETH_MDIO
-            PA7     ------> ETH_CRS_DV
-            PC4     ------> ETH_RXD0
-            PC5     ------> ETH_RXD1
-            PB13     ------> ETH_TXD1
-            PG11     ------> ETH_TX_EN
-            PG13     ------> ETH_TXD0
-        */
-        HAL_GPIO_DeInit(GPIOC, RMII_MDC_Pin | RMII_RXD0_Pin | RMII_RXD1_Pin);
+    /**ETH GPIO Configuration
+        PC1     ------> ETH_MDC
+        PA1     ------> ETH_REF_CLK
+        PA2     ------> ETH_MDIO
+        PA7     ------> ETH_CRS_DV
+        PC4     ------> ETH_RXD0
+        PC5     ------> ETH_RXD1
+        PB13     ------> ETH_TXD1
+        PG11     ------> ETH_TX_EN
+        PG13     ------> ETH_TXD0
+    */
+    HAL_GPIO_DeInit(GPIOC, RMII_MDC_Pin | RMII_RXD0_Pin | RMII_RXD1_Pin);
 
-        HAL_GPIO_DeInit(GPIOA, RMII_REF_CLK_Pin | RMII_MDIO_Pin | RMII_CRS_DV_Pin);
+    HAL_GPIO_DeInit(GPIOA, RMII_REF_CLK_Pin | RMII_MDIO_Pin | RMII_CRS_DV_Pin);
 
-        HAL_GPIO_DeInit(RMII_TXD1_GPIO_Port, RMII_TXD1_Pin);
+    HAL_GPIO_DeInit(RMII_TXD1_GPIO_Port, RMII_TXD1_Pin);
 
-        HAL_GPIO_DeInit(GPIOG, RMII_TX_EN_Pin | RMII_TXD0_Pin);
-    }
+    HAL_GPIO_DeInit(GPIOG, RMII_TX_EN_Pin | RMII_TXD0_Pin);
 }
 
-// Blank, non-weak-override function to make sure the linker pulls in this file
-void stm32_eth_init_weak_symbol_helper()
-{}
-
-#endif /* USE_USER_DEFINED_HAL_ETH_MSPINIT */
+// Get Ethernet PHY reset pin
+PinName EthGetPhyResetPin(void)
+{
+    return NC; // Not connected on this board
+}

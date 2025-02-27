@@ -236,6 +236,14 @@
         "radius-retry-count": {
             "help": "RADIUS retry trickle count; default 3",
             "value": 3
+        },
+        "emac-rx-pool-size": {
+            "help": "Number of Rx buffers that will allocated to the EMAC receive buffer pool when using an Ethernet MAC interface",
+            "value": 5
+        },
+        "emac-rx-pool-bufsize": {
+            "help": "Size of each buffer in the EMAC receive pool.",
+            "value": 512
         }
     },
     "target_overrides": {
