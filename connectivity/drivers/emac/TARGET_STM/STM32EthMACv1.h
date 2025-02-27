@@ -21,6 +21,10 @@
 #include "CacheAlignedBuffer.h"
 #include "GenericEthDMA.h"
 
+#if TARGET_STM32F7
+#define ENABLE_ERRATA_2_21_6_WORKAROUND 1
+#endif
+
 namespace mbed
 {
 
@@ -99,6 +103,13 @@ class STM32EthMACv1 : public CompositeEMAC
          * @param base Base address of Ethernet peripheral
          */
         static void ETH_SetMDIOClockRange(ETH_TypeDef * const base);
+
+#if ENABLE_ERRATA_2_21_6_WORKAROUND
+        // Workaround for ETH errata 2.21.6 from the STM32F7 errata sheet
+        int rmiiWatchdogHandle;
+        std::atomic<bool> rmiiWatchdogRunning = false;
+        void rmiiWatchdog();
+#endif
 
     public:
         explicit MACDriver(ETH_TypeDef * const base):

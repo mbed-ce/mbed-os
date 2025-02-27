@@ -21,6 +21,8 @@
 #include <Timer.h>
 #include <mbed_trace.h>
 #include "mbed_error.h"
+#include "mbed_events.h"
+#include "CriticalSectionLock.h"
 
 #define TRACE_GROUP "STEMACv1"
 
@@ -219,6 +221,29 @@ void STM32EthMACv1::MACDriver::ETH_SetMDIOClockRange(ETH_TypeDef * const base) {
         base->MACMIIAR = (uint32_t)tempreg;
     }
 
+#if ENABLE_ERRATA_2_21_6_WORKAROUND
+void STM32EthMACv1::MACDriver::rmiiWatchdog() {
+    CriticalSectionLock lock;
+
+    if(!rmiiWatchdogRunning) {
+        // Already canceled by main thread, bail
+        return;
+    }
+
+    /* some good packets are received */
+    if (base->MMCRGUFCR > 0) {
+        /* RMII Init is OK - cancel watchdog task */
+        mbed_event_queue()->cancel(rmiiWatchdogRunning);
+        rmiiWatchdogRunning = false;
+    } else if (base->MMCRFCECR > 10) {
+        /* ETH received too many packets with CRC errors, resetting RMII */
+        SYSCFG->PMC &= ~SYSCFG_PMC_MII_RMII_SEL;
+        SYSCFG->PMC |= SYSCFG_PMC_MII_RMII_SEL;
+        base->MMCCR |= ETH_MMCCR_CR;
+    }
+}
+#endif
+
 CompositeEMAC::ErrCode STM32EthMACv1::MACDriver::init() {
     sleep_manager_lock_deep_sleep();
 
@@ -277,12 +302,28 @@ CompositeEMAC::ErrCode STM32EthMACv1::MACDriver::init() {
     // in that case.
     base->DMAIER = ETH_DMAIER_NISE | ETH_DMAIER_RIE | ETH_DMAIER_TIE | ETH_DMAIER_FBEIE | ETH_DMAIER_AISE;
 
+#if ENABLE_ERRATA_2_21_6_WORKAROUND
+    // Start RMII watchdog task
+    rmiiWatchdogHandle = mbed_event_queue()->call_every(std::chrono::milliseconds(MBED_CONF_NSAPI_EMAC_PHY_POLL_PERIOD),
+                callback(this, &STM32EthMACv1::MACDriver::rmiiWatchdog));
+    rmiiWatchdogRunning = true;
+#endif
+
     return CompositeEMAC::ErrCode::SUCCESS;
 }
 
 CompositeEMAC::ErrCode STM32EthMACv1::MACDriver::deinit() {
     // Disable interrupt
     HAL_NVIC_DisableIRQ(ETH_IRQn);
+
+#if ENABLE_ERRATA_2_21_6_WORKAROUND
+    // Disable RMII watchdog if still running
+    if(rmiiWatchdogRunning) {
+        CriticalSectionLock lock;
+        mbed_event_queue()->cancel(rmiiWatchdogRunning);
+        rmiiWatchdogRunning = false;
+    }
+#endif
 
     // Unlock deep sleep
     sleep_manager_unlock_deep_sleep();

@@ -44,4 +44,13 @@ void test_emac_initialize()
     worker_loop_link_up_wait();
 }
 
+/*
+ * Test which powers the EMAC down and then up again
+ */
+void test_emac_power_down_and_power_up() {
+    EmacTestNetworkStack::get_instance().get_emac()->power_down();
+
+    TEST_ASSERT_TRUE(EmacTestNetworkStack::get_instance().get_emac()->power_up())
+}
+
 #endif // defined(MBED_CONF_RTOS_PRESENT)

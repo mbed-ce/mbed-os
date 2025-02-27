@@ -104,7 +104,11 @@ public:
      */
     uint32_t get_pool_size()
     {
+#if UNITTEST
+        return 0;
+#else
         return MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS;
+#endif
     }
 
     /**
