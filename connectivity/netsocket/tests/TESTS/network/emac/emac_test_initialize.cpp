@@ -47,10 +47,15 @@ void test_emac_initialize()
 /*
  * Test which powers the EMAC down and then up again
  */
-void test_emac_power_down_and_power_up() {
+void test_emac_power_down_and_power_up()
+{
     EmacTestNetworkStack::get_instance().get_emac()->power_down();
 
-    TEST_ASSERT_TRUE(EmacTestNetworkStack::get_instance().get_emac()->power_up())
+    // Note: Currently the EMAC does not deliver a link state change to down callback when powered down.
+    // Might change that in the future but for now we need to deliver the callback manually.
+    emac_if_link_state_change_cb(false);
+
+    TEST_ASSERT_TRUE(EmacTestNetworkStack::get_instance().get_emac()->power_up());
 }
 
 #endif // defined(MBED_CONF_RTOS_PRESENT)

@@ -138,7 +138,7 @@ namespace mbed {
 
     void STM32EthMACv2::RxDMA::stopDMA() {
         // Disable Rx DMA
-        base->DMACTCR &= ~ETH_DMACRCR_SR;
+        base->DMACRCR &= ~ETH_DMACRCR_SR;
     }
 
 #if __DCACHE_PRESENT
@@ -254,8 +254,6 @@ namespace mbed {
         // Note: Following code is based on HAL_Eth_Init() from the HAL
         /* Init the low level hardware : GPIO, CLOCK, NVIC. */
         EthInitPinmappings();
-
-
 #ifdef TARGET_STM32H7
         // Use RMII
         HAL_SYSCFG_ETHInterfaceSelect(SYSCFG_ETH_RMII);
