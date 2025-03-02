@@ -223,6 +223,9 @@ void STM32EthMACv1::MACDriver::ETH_SetMDIOClockRange(ETH_TypeDef * const base) {
 
 #if ENABLE_ERRATA_2_21_6_WORKAROUND
 void STM32EthMACv1::MACDriver::rmiiWatchdog() {
+    // mbed_event_queue() is not ISR safe, so get the pointer before entering the critical section
+    auto * const equeue = mbed_event_queue();
+
     CriticalSectionLock lock;
 
     if(!rmiiWatchdogRunning) {
@@ -233,7 +236,7 @@ void STM32EthMACv1::MACDriver::rmiiWatchdog() {
     /* some good packets are received */
     if (base->MMCRGUFCR > 0) {
         /* RMII Init is OK - cancel watchdog task */
-        mbed_event_queue()->cancel(rmiiWatchdogRunning);
+        equeue->cancel(rmiiWatchdogHandle);
         rmiiWatchdogRunning = false;
     } else if (base->MMCRFCECR > 10) {
         /* ETH received too many packets with CRC errors, resetting RMII */
@@ -319,9 +322,14 @@ CompositeEMAC::ErrCode STM32EthMACv1::MACDriver::deinit() {
 #if ENABLE_ERRATA_2_21_6_WORKAROUND
     // Disable RMII watchdog if still running
     if(rmiiWatchdogRunning) {
+        // mbed_event_queue() is not ISR safe, so get the pointer before entering the critical section
+        auto * const equeue = mbed_event_queue();
+
         CriticalSectionLock lock;
-        mbed_event_queue()->cancel(rmiiWatchdogRunning);
-        rmiiWatchdogRunning = false;
+        if(rmiiWatchdogRunning) { // Recheck flag inside critical section
+            equeue->cancel(rmiiWatchdogHandle);
+            rmiiWatchdogRunning = false;
+        }
     }
 #endif
 
