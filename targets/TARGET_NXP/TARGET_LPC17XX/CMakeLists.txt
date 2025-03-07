@@ -5,7 +5,7 @@ add_subdirectory(TARGET_ARCH_PRO EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_MBED_LPC1768 EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_LPCXPRESSO_LPC1769 EXCLUDE_FROM_ALL)
 
-add_library(mbed-lpc176x INTERFACE)
+add_library(mbed-lpc17xx INTERFACE)
 
 if(${MBED_TOOLCHAIN} STREQUAL "ARM")
     set(STARTUP_FILE device/TOOLCHAIN_ARM_STD/startup_LPC17xx.S)
@@ -15,13 +15,13 @@ elseif(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
     set(LINKER_FILE device/TOOLCHAIN_GCC_ARM/LPC1768.ld)
 endif()
 
-target_include_directories(mbed-lpc176x
+target_include_directories(mbed-lpc17xx
     INTERFACE
         .
         device
 )
 
-target_sources(mbed-lpc176x
+target_sources(mbed-lpc17xx
     INTERFACE
         analogin_api.c
         analogout_api.c
@@ -46,8 +46,10 @@ target_sources(mbed-lpc176x
         ${STARTUP_FILE}
 )
 
-target_link_libraries(mbed-lpc176x INTERFACE mbed-nxp)
+target_link_libraries(mbed-lpc17xx INTERFACE mbed-nxp)
 
-mbed_set_linker_script(mbed-arch-pro ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
-mbed_set_linker_script(mbed-lpc1768 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
-mbed_set_linker_script(mbed-lpcxpresso-lpc1769 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
+mbed_set_linker_script(mbed-lpc17xx ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
+
+# mbed_set_linker_script(mbed-arch-pro ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
+# mbed_set_linker_script(mbed-lpc1768 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
+# mbed_set_linker_script(mbed-lpcxpresso-lpc1769 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
