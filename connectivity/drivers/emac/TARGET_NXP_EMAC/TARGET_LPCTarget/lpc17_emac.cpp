@@ -128,7 +128,7 @@ struct lpc_enetdata {
 
 #if defined(TARGET_LPC17XX)
 #  if defined(TOOLCHAIN_GCC_ARM) || defined(TOOLCHAIN_ARM)
-#     define ETHMEM_SECTION __attribute__((section("AHBSRAM"),aligned))
+#     define ETHMEM_SECTION __attribute__((section("AHBSRAM"), aligned(32)))
 #  endif
 #endif
 
