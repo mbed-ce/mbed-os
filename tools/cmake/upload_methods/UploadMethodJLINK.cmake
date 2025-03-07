@@ -39,7 +39,7 @@ endif()
 
 option(JLINK_NO_GUI "If true, suppress GUI dialog boxes from the J-Link software.  Note: does not suppress license dialogs from J-Link EDU and On-Board probes, these are intentionally impossible to disable." FALSE)
 if(JLINK_NO_GUI)
-	set(JLINK_NOGUI_ARG -Nogui CACHE INTERNAL "" FORCE)
+	set(JLINK_NOGUI_ARG "-NoGui 1" CACHE INTERNAL "" FORCE)
 else()
 	set(JLINK_NOGUI_ARG "" CACHE INTERNAL "" FORCE)
 endif()
@@ -53,7 +53,11 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 	# Note: loadfile currently only honors the base address for .bin files.  For hex files it uses the offset read
 	# from the hex file.  Unsure if that will be an issue or not...
 	file(GENERATE OUTPUT ${COMMAND_FILE_PATH} CONTENT
-"loadfile ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR}
+"
+JTAGConf -1,-1
+ExitOnError 1
+connect
+loadfile ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR}
 r
 go
 exit
@@ -62,13 +66,11 @@ exit
 		COMMENT "Flashing ${TARGET_NAME} with J-Link..."
 		COMMAND ${JLINK}
 		${JLINK_SELECT_ARG}
-		${JLINK_NOGUI_ARG}
 		-Device \"${JLINK_CPU_NAME}\"
 		-Speed ${JLINK_CLOCK_SPEED}
 		-if ${JLINK_UPLOAD_INTERFACE}
-		-JTAGConf -1,-1
-		-AutoConnect 1
-		-ExitOnError
+        -AutoConnect 1
+        -NoGui 1
 		-CommandFile ${COMMAND_FILE_PATH})
 
 endfunction(gen_upload_target)
