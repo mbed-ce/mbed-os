@@ -47,8 +47,6 @@ utest::v1::status_t test_setup(const size_t number_of_cases)
 Case cases[] = {
     Case("EMAC initialize", test_emac_initialize),
     Case("EMAC broadcast", test_emac_broadcast), // note: this test case has the side effect of finding the CTP server MAC address and saving it
-    Case("EMAC power down and power up", test_emac_power_down_and_power_up),
-    Case("EMAC broadcast again after power cycle", test_emac_broadcast),
     Case("EMAC unicast", test_emac_unicast),
     Case("EMAC unicast frame length", test_emac_unicast_frame_len),
     Case("EMAC unicast burst", test_emac_unicast_burst),
@@ -57,7 +55,9 @@ Case cases[] = {
     (MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI))
     Case("EMAC multicast filter", test_emac_multicast_filter),
 #endif // !(MBED_CONF_NETWORK_EMAC_NO_SUPPORT_FOR_MULTICAST_FILTER == 1)
-    Case("EMAC memory", test_emac_memory)
+    Case("EMAC memory", test_emac_memory),
+    Case("EMAC power down and power up", test_emac_power_down_and_power_up),
+    Case("EMAC unicast again after power cycle", test_emac_unicast),
 };
 
 Specification specification(test_setup, cases);

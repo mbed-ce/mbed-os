@@ -56,6 +56,12 @@ void test_emac_power_down_and_power_up()
     emac_if_link_state_change_cb(false);
 
     TEST_ASSERT_TRUE(EmacTestNetworkStack::get_instance().get_emac()->power_up());
+
+    // Currently EMACs may expect set_hwaddr() to be called after power up as this API is not well defined.
+    EmacTestNetworkStack::get_instance().get_emac()->set_hwaddr(EmacTestNetworkStack::get_instance().get_mac_addr());
+
+    // Wait for link to come back up before continuing
+    worker_loop_link_up_wait();
 }
 
 #endif // defined(MBED_CONF_RTOS_PRESENT)
