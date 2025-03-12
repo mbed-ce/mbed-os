@@ -141,7 +141,7 @@ public:
     /**
      * Sets a callback that needs to be called for packets received for this interface.
      *
-     * Note that the callback function will contain appropriate locking such that may be called from any OS thread.
+     * Note that the callback function will contain appropriate locking such that it may be called from any OS thread.
      * However, it shall not be called from an interrupt.
      *
      * Also note that the callback will take ownership of the passed packet and must free it in all cases.
@@ -153,7 +153,7 @@ public:
     /**
      * Sets a callback that needs to be called on link status changes for given interface
      *
-     * Note that the callback function will contain appropriate locking such that may be called from any OS thread.
+     * Note that the callback function will contain appropriate locking such that it may be called from any OS thread.
      * However, it shall not be called from an interrupt.
      *
      * @param state_cb Function to be registered as a callback

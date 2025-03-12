@@ -90,7 +90,7 @@ public:
     /**
      * @brief Abstract interface for a driver for the low level ethernet MAC hardware.
      *
-     * Thread safety: CompositeEMAC will guarantee only one thread is utilizing this class at a time.
+     * Thread safety: CompositeEMAC will guarantee only one thread is interacting with this class at a time.
      */
     class MACDriver : NonCopyable<MACDriver>
     {
@@ -339,7 +339,8 @@ public:
          * @brief Dequeue a packet, if one is ready to be received.
          *
          * This function should also dequeue and dispose of any error or incomplete DMA descriptors.
-         * The MAC thread calls it over and over again until it returns nullptr.
+         * After rxHasPackets_ISR() returns true, the MAC thread will call this it over and over again
+         * until it returns nullptr.
          *
          * @return Packet pointer, or nullptr if there were no packets.
          */

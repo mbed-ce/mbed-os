@@ -65,10 +65,6 @@ void test_emac_unicast_cb(int opt)
 
 void test_emac_unicast()
 {
-    if(test_step != 0) {
-        printf("Got here!\n");
-    }
-
     // Reset flags
     send_request = true;
     no_response_cnt = 0;
