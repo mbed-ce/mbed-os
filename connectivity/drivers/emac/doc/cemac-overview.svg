@@ -24,8 +24,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="2.175463"
-     inkscape:cx="295.33943"
-     inkscape:cy="245.69483"
+     inkscape:cx="295.56927"
+     inkscape:cy="246.1545"
      inkscape:window-width="2560"
      inkscape:window-height="1417"
      inkscape:window-x="-8"
@@ -260,27 +260,27 @@
        style="white-space:pre;shape-inside:url(#rect3);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
          x="188.00586"
          y="126.75639"
-         id="tspan9"><tspan
+         id="tspan4"><tspan
    style="font-weight:bold"
-   id="tspan8">CompositeEMAC</tspan>
+   id="tspan3">CompositeEMAC</tspan>
 </tspan><tspan
          x="188.00586"
          y="141.75639"
-         id="tspan11"><tspan
+         id="tspan6"><tspan
            style="font-size:10.1029px"
-           id="tspan10">- Implements EMAC API
+           id="tspan5">- Implements EMAC API
 </tspan></tspan><tspan
          x="188.00586"
          y="156.75639"
-         id="tspan13"><tspan
+         id="tspan64"><tspan
            style="font-size:10.1029px"
-           id="tspan12">- Implements locking &amp; the EMAC thread
+           id="tspan7">- Implements locking &amp; the EMAC thread
 </tspan></tspan><tspan
          x="188.00586"
          y="171.75639"
-         id="tspan15"><tspan
+         id="tspan66"><tspan
            style="font-size:10.1029px"
-           id="tspan14">- Delegates Ethernet functionality to subclasses</tspan></tspan></text>
+           id="tspan65">- Delegates Ethernet functionality to subclasses</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.25014782,0,0,0.23883968,-40.807765,33.144577)"
@@ -288,39 +288,39 @@
        style="white-space:pre;shape-inside:url(#rect3-3);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
          x="188.00586"
          y="126.75639"
-         id="tspan17"><tspan
+         id="tspan68"><tspan
    style="font-weight:bold"
-   id="tspan16">MACDriver</tspan>
+   id="tspan67">MACDriver</tspan>
 </tspan><tspan
          x="188.00586"
          y="141.75639"
-         id="tspan19"><tspan
+         id="tspan70"><tspan
            style="font-size:10.1029px"
-           id="tspan18">- Inits MAC hardware
+           id="tspan69">- Inits MAC hardware
 </tspan></tspan><tspan
          x="188.00586"
          y="156.75639"
-         id="tspan21"><tspan
+         id="tspan72"><tspan
            style="font-size:10.1029px"
-           id="tspan20">- Sets up interrupts
+           id="tspan71">- Sets up interrupts
 </tspan></tspan><tspan
          x="188.00586"
          y="171.75639"
-         id="tspan23"><tspan
+         id="tspan74"><tspan
            style="font-size:10.1029px"
-           id="tspan22">- Does MDIO transactions
+           id="tspan73">- Does MDIO transactions
 </tspan></tspan><tspan
          x="188.00586"
          y="186.75639"
-         id="tspan25"><tspan
+         id="tspan76"><tspan
            style="font-size:10.1029px"
-           id="tspan24">- Manages the MAC addr
+           id="tspan75">- Manages the MAC addr
 </tspan></tspan><tspan
          x="188.00586"
          y="201.75639"
-         id="tspan27"><tspan
+         id="tspan78"><tspan
            style="font-size:10.1029px"
-           id="tspan26">- controls MAC filtering</tspan></tspan></text>
+           id="tspan77">- controls MAC filtering</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.25014782,0,0,0.23883968,-2.4034306,41.171943)"
@@ -328,37 +328,37 @@
        style="white-space:pre;shape-inside:url(#rect3-3-7);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
          x="188.00586"
          y="126.75639"
-         id="tspan29"><tspan
+         id="tspan80"><tspan
    style="font-weight:bold"
-   id="tspan28">PHYDriver</tspan>
+   id="tspan79">PHYDriver</tspan>
 </tspan><tspan
          x="188.00586"
          y="141.75639"
-         id="tspan31"><tspan
+         id="tspan82"><tspan
            style="font-size:10.1029px"
-           id="tspan30">- Inits Eth PHY chip
+           id="tspan81">- Inits Eth PHY chip
 </tspan></tspan><tspan
          x="188.00586"
          y="156.75639"
-         id="tspan33"><tspan
+         id="tspan84"><tspan
            style="font-size:10.1029px"
-           id="tspan32">- Configures Eth settings </tspan></tspan><tspan
+           id="tspan83">- Configures Eth settings </tspan></tspan><tspan
          x="188.00586"
          y="171.75639"
-         id="tspan35"><tspan
+         id="tspan86"><tspan
            style="font-size:10.1029px"
-           id="tspan34">(duplex, speed, </tspan></tspan><tspan
+           id="tspan85">(duplex, speed, </tspan></tspan><tspan
          x="188.00586"
          y="186.75639"
-         id="tspan37"><tspan
+         id="tspan88"><tspan
            style="font-size:10.1029px"
-           id="tspan36">autonegotiation)
+           id="tspan87">autonegotiation)
 </tspan></tspan><tspan
          x="188.00586"
          y="201.75639"
-         id="tspan39"><tspan
+         id="tspan90"><tspan
            style="font-size:10.1029px"
-           id="tspan38">- Checks link status</tspan></tspan></text>
+           id="tspan89">- Checks link status</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.25014782,0,0,0.23883968,37.523144,41.374757)"
@@ -366,36 +366,36 @@
        style="white-space:pre;shape-inside:url(#rect3-3-7-5);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
          x="188.00586"
          y="126.75639"
-         id="tspan41"><tspan
+         id="tspan92"><tspan
    style="font-weight:bold"
-   id="tspan40">TxDMARing</tspan>
+   id="tspan91">TxDMARing</tspan>
 </tspan><tspan
          x="188.00586"
          y="141.75639"
-         id="tspan43"><tspan
+         id="tspan94"><tspan
            style="font-size:10.1029px"
-           id="tspan42">- Enqueues packets into </tspan></tspan><tspan
+           id="tspan93">- Enqueues packets into </tspan></tspan><tspan
          x="188.00586"
          y="156.75639"
-         id="tspan45"><tspan
+         id="tspan96"><tspan
            style="font-size:10.1029px"
-           id="tspan44">the Ethernet transmit </tspan></tspan><tspan
+           id="tspan95">the Ethernet transmit </tspan></tspan><tspan
          x="188.00586"
          y="171.75639"
-         id="tspan47"><tspan
+         id="tspan98"><tspan
            style="font-size:10.1029px"
-           id="tspan46">DMA
+           id="tspan97">DMA
 </tspan></tspan><tspan
          x="188.00586"
          y="186.75639"
-         id="tspan49"><tspan
+         id="tspan100"><tspan
            style="font-size:10.1029px"
-           id="tspan48">- Reclaims their memory </tspan></tspan><tspan
+           id="tspan99">- Reclaims their memory </tspan></tspan><tspan
          x="188.00586"
          y="201.75639"
-         id="tspan51"><tspan
+         id="tspan102"><tspan
            style="font-size:10.1029px"
-           id="tspan50">once they're transmitted</tspan></tspan></text>
+           id="tspan101">once they're transmitted</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.25014782,0,0,0.23883968,75.013753,33.819297)"
@@ -403,37 +403,37 @@
        style="white-space:pre;shape-inside:url(#rect3-3-7-5-8);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
          x="188.00586"
          y="126.75639"
-         id="tspan53"><tspan
+         id="tspan104"><tspan
    style="font-weight:bold"
-   id="tspan52">TxDMARing</tspan>
+   id="tspan103">RxDMARing</tspan>
 </tspan><tspan
          x="188.00586"
          y="141.75639"
-         id="tspan55"><tspan
+         id="tspan106"><tspan
            style="font-size:10.1029px"
-           id="tspan54">- Sets up Rx DMA with </tspan></tspan><tspan
+           id="tspan105">- Sets up Rx DMA with </tspan></tspan><tspan
          x="188.00586"
          y="156.75639"
-         id="tspan57"><tspan
+         id="tspan108"><tspan
            style="font-size:10.1029px"
-           id="tspan56">buffers to receive into
+           id="tspan107">buffers to receive into
 </tspan></tspan><tspan
          x="188.00586"
          y="171.75639"
-         id="tspan59"><tspan
+         id="tspan110"><tspan
            style="font-size:10.1029px"
-           id="tspan58">- Detects when packets </tspan></tspan><tspan
+           id="tspan109">- Detects when packets </tspan></tspan><tspan
          x="188.00586"
          y="186.75639"
-         id="tspan61"><tspan
+         id="tspan112"><tspan
            style="font-size:10.1029px"
-           id="tspan60">have been received
+           id="tspan111">have been received
 </tspan></tspan><tspan
          x="188.00586"
          y="201.75639"
-         id="tspan63"><tspan
+         id="tspan114"><tspan
            style="font-size:10.1029px"
-           id="tspan62">- Dequeues pkts for EMAC</tspan></tspan></text>
+           id="tspan113">- Dequeues pkts for EMAC</tspan></tspan></text>
     <path
        style="fill:#c0cadb;fill-opacity:1;stroke:#595959;stroke-width:0.403127;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ConcaveTriangle-6-4)"
        d="m 87.903775,46.343941 9.641524,18.216064"
