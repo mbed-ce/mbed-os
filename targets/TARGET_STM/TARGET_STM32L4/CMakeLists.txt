@@ -16,6 +16,7 @@ add_subdirectory(TARGET_STM32L4R5xI EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32L4R9xI EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32L4S5xI EXCLUDE_FROM_ALL)
 add_subdirectory(STM32Cube_FW EXCLUDE_FROM_ALL)
+add_subdirectory(linker_scripts)
 
 add_library(mbed-stm32l4 INTERFACE)
 

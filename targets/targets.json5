@@ -4175,7 +4175,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L432xC"
         ],
         "macros_add": [
-            "STM32L432xx"
+            "STM32L432xx",
+            "MBED_SPLIT_HEAP"
         ]
     },
     "NUCLEO_L432KC": {
@@ -4197,7 +4198,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L433xC"
         ],
         "macros_add": [
-            "STM32L433xx"
+            "STM32L433xx",
+            "MBED_SPLIT_HEAP"
         ]
     },
     "NUCLEO_L433RC_P": {
@@ -4440,7 +4442,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "lpuart_clock_source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
         },
         "macros_add": [
-            "STM32L496xx"
+            "STM32L496xx",
+            "MBED_SPLIT_HEAP"
         ]
     },
     "DISCO_L496AG": {

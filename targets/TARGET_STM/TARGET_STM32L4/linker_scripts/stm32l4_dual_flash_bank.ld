@@ -1,4 +1,6 @@
-/* Linker script to configure memory regions. */
+/* Linker script for all STM32L4xx targets that have one flash bank
+ * and two RAM banks. */
+
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  ******************************************************************************
@@ -15,16 +17,8 @@
  ******************************************************************************
 */
 
-#include "../cmsis_nvic.h"
+#include "cmsis_nvic.h"
 
-
-#if !defined(MBED_APP_START)
-  #define MBED_APP_START  MBED_ROM_START
-#endif
-
-#if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE  MBED_ROM_SIZE
-#endif
 
 M_CRASH_DATA_RAM_SIZE = 0x100;
 
@@ -39,9 +33,9 @@ M_CRASH_DATA_RAM_SIZE = 0x100;
 
 MEMORY
 {
-  FLASH (rx)   : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
-  SRAM2 (rwx)  : ORIGIN = MBED_RAM1_START + VECTORS_SIZE, LENGTH = MBED_RAM1_SIZE - VECTORS_SIZE
-  SRAM1 (rwx)  : ORIGIN = MBED_RAM_START, LENGTH = 0x20000
+  FLASH (rx)   : ORIGIN = MBED_CONFIGURED_ROM_START, LENGTH = MBED_CONFIGURED_ROM_SIZE
+  SRAM2 (rwx)  : ORIGIN = MBED_RAM_BANK_IRAM2_START + VECTORS_SIZE, LENGTH = MBED_RAM_BANK_IRAM2_SIZE - VECTORS_SIZE
+  SRAM1 (rwx)  : ORIGIN = MBED_RAM_BANK_IRAM1_START, LENGTH = MBED_RAM_BANK_IRAM1_SIZE
 }
 
 /* Linker script to place sections and symbol values. Should be used together

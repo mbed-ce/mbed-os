@@ -5,10 +5,8 @@ add_subdirectory(TARGET_MTS_DRAGONFLY_L471QG EXCLUDE_FROM_ALL)
 
 if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
     set(STARTUP_FILE TOOLCHAIN_GCC_ARM/startup_stm32l471xx.S)
-    set(LINKER_FILE TOOLCHAIN_GCC_ARM/stm32l471xg.ld)
 elseif(${MBED_TOOLCHAIN} STREQUAL "ARM")
     set(STARTUP_FILE TOOLCHAIN_ARM/startup_stm32l471xx.S)
-    set(LINKER_FILE TOOLCHAIN_ARM/stm32l471xg.sct)
 endif()
 
 
@@ -24,8 +22,5 @@ target_include_directories(mbed-stm32l471xg
     INTERFACE
         .
 )
-
-
-mbed_set_linker_script(mbed-stm32l471xg ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
 
 target_link_libraries(mbed-stm32l471xg INTERFACE mbed-stm32l4)
