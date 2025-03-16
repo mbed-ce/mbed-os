@@ -35,11 +35,6 @@
 
 void EthInitPinmappings(void)
 {
-    /* Disable DCache for STM32F7 family */
-    core_util_critical_section_enter();
-    SCB_DisableDCache();
-    core_util_critical_section_exit();
-
     /* Enable GPIOs clocks */
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
