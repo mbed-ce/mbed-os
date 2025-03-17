@@ -78,7 +78,7 @@ namespace GenPhyRegs {
  * Passed a configuration which sets most attributes of the phy.
  * May be extended to handle chip-specific quirks.
  */
-class GenericEthPhy : public mbed::CompositeEMAC::PhyDriver {
+class GenericEthPhy : public mbed::CompositeEMAC::PHYDriver {
 public:
     /// Configuration structure for a generic Ethernet PHY
     struct Config {

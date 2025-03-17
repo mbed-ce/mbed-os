@@ -225,14 +225,14 @@ public:
      *
      * Thread safety: CompositeEMAC will guarantee only one thread is utilizing this class at a time.
      */
-    class PhyDriver : NonCopyable<PhyDriver>
+    class PHYDriver : NonCopyable<PHYDriver>
     {
     protected:
         /// MAC driver. Shall be set in init().
         MACDriver * mac = nullptr;
 
     public:
-        virtual ~PhyDriver() = default;
+        virtual ~PHYDriver() = default;
 
         /// Set the MAC driver of this PHY. Will be called by CompositeEMAC before init().
         void setMAC(MACDriver * mac) { this->mac = mac; }
@@ -365,7 +365,7 @@ protected:
     emac_link_input_cb_t linkInputCallback{};
 
     // Instances of each of the 4 component classes
-    PhyDriver * phy = nullptr;
+    PHYDriver * phy = nullptr;
     RxDMA & rxDMA;
     TxDMA & txDMA;
     MACDriver & mac;

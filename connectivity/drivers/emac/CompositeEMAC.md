@@ -32,6 +32,66 @@ How does the DMA know where in RAM to read and write packets, though? On every e
 
 ![DMA descriptor ring](doc/stm32f2-eth-dma-descriptors.png)
 
-A descriptor is a few-word-long structure in memory that contains control information and one or more pointers to memory buffers (which contain the actual packet data). For Tx, the DMA will fetch the descriptor, and then transmit the data in the buffers. For Rx, the DMA will fetch the descriptor, then write the packet to the descriptor's buffers. Either way, when done with the descriptor, the DMA will write status information (e.g. whether the checksum passed, or what timestamp the packet was sent at) back to the descriptor, set a flag, and then interrupt the CPU to tell it it has something to process.
+A descriptor is a structure in memory that contains control information and one or more pointers to memory buffers (which contain the actual packet data). For Tx, the DMA will fetch the descriptor, then transmit the data in the buffers. For Rx, the DMA will fetch the descriptor, then write the packet to the descriptor's buffers. Either way, when the MAC is done with the descriptor, the DMA will write back status information (e.g. whether the checksum passed, or what timestamp the packet was sent at) to the descriptor, set a "done" flag, and then interrupt the CPU to tell it it has something to process.
 
-But we don't want the DMA to have to wait for the CPU, do we? To avoid this, each descriptor also specifies a "next descriptor", either via an offset or a pointer. The DMA can move to this next descriptor and start processing it right away to send or receive the next packet. The CPU will process the completed descriptor on its own time and give it back to the DMA. In this manner, as long as your ring of descriptors is big enough and your CPU can keep up with processing them, the CPU and MAC never have to wait for each other!
+But we don't want the DMA to have to wait for the CPU, do we? To avoid this, each descriptor also specifies a "next descriptor", either via an offset or a pointer. The DMA can move to this next descriptor and start processing it right away to send or receive the next packet. The CPU will process the completed descriptor on its own time and give it back to the DMA. In this manner, as long as your ring of descriptors is big enough and your CPU can keep up with the processing them, the CPU and MAC never have to wait for each other!
+
+## Components of the Composite EMAC
+### MAC Driver
+
+The MAC driver (which must be implemented as a subclass of `CompositeEMAC::MACDriver`) is usually fairly simple. It provides an interface between Mbed and the MAC's configuration register block and MDIO master interface. Its responsibilities include:
+- Initializing and muxing the RMII and MDIO pins
+- Initializing all needed clocks
+- Configuring all settings needed for MAC operation
+- Configuring the unicast MAC address (as in, the MAC address that the device uses on the network)
+- Adding and removing multicast subscriptions
+- Configuring interrupts
+- Talking to the PHY over MDIO
+
+### PHY Driver
+
+The PHY driver must be a subclass of `CompositeEMAC::PHYDriver`. It must:
+- Confirm the existence of the PHY chip and initialize it
+- Configure the selected Ethernet settings (autonegotiation, speed, duplex) into the PHY
+- Check if link has been established and, if so, what kind
+
+Unlike the MAC driver and the DMA, the PHY driver does not need to be subclassed for each target device. Thankfully, the Ethernet standard imposes some order on the chaotic sea of PHY parts, and it mandates that the lower 16 registers are standardized and must work the same way on each part. Using this standard behavior, we have implemented the `mbed::GenericEthPhy` class, which should function as a driver for any 802.3u standard compliant PHY. All it needs is configuration, like the PHY's part number and its address on the MDIO bus. When porting to a new target, all you need to do is indicate the PHY model in `mbed-os/connectivity/netsocket/mbed_lib.json` like so:
+
+```json5
+"MY_TARGET": {
+    "nsapi.emac-phy-model": "LAN8742",
+    "nsapi.emac-phy-mdio-address": 0
+}
+```
+
+This will work out of the box, as long as `LAN8742` names a PHY driver defined in PhyDrivers.cpp. Individual PHY models will generally need their own drivers, since often PHYs have errata that need to be worked around or need other configuration that isn't defined in the standard. However, GenericEthPhy allows implementing the absolute minimum amount of logic per-phy as possible!
+
+Since user boards may want to use a different ethernet PHY, the driver can be customized in an application by overriding the `mbed::get_eth_phy_driver` weak function. This might look something like
+
+```c++
+namespace MY_PHY {
+inline constexpr GenericEthPhy::Config Config = {
+    // These are found in the PHY datasheet. See GenericEthPhy::Config for documentation.
+    .OUI = 0x123,
+    .model = 0x45,
+    .address = 0,
+};
+
+class Driver : public GenericEthPhy {
+public:
+    explicit Driver(GenericEthPhy::Config const & config = DefaultConfig):
+    GenericEthPhy(config)
+    {}
+    
+    // You may override/replace any functions of `GenericEthPhy` here
+};
+}
+
+namespace mbed {
+CompositeEMAC::PHYDriver * get_eth_phy_driver()
+{
+    static MY_PHY::Driver(MY_PHY::Config) phyDriver;
+    return &phyDriver;
+}
+}
+```

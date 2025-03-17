@@ -33,7 +33,7 @@ static uint32_t THREAD_FLAG_SHUTDOWN = 1 << 3;
 
 namespace mbed {
     // Defined in PhyDrivers.cpp
-    CompositeEMAC::PhyDriver * mbed_get_eth_phy_driver();
+    CompositeEMAC::PHYDriver * get_eth_phy_driver();
 
     void CompositeEMAC::rxISR() {
         // Note: Not locking mutex here as this is an ISR and should be able to run while the MAC thread is executing.
@@ -198,9 +198,9 @@ namespace mbed {
         }
 
         // Get phy
-        phy = mbed_get_eth_phy_driver();
+        phy = get_eth_phy_driver();
         if(phy == nullptr) {
-            tr_err("power_up(): No Ethernet PHY driver configured! Either set nsapi.emac-phy-model or override mbed_get_eth_phy_driver().");
+            tr_err("power_up(): No Ethernet PHY driver configured! Either set nsapi.emac-phy-model or override mbed::get_eth_phy_driver().");
             return false;
         }
 

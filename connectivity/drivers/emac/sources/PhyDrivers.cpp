@@ -53,7 +53,7 @@ public:
  *
  * @return Phy driver class instance, or nullptr if none is configured.
  */
-MBED_WEAK CompositeEMAC::PhyDriver * mbed_get_eth_phy_driver()
+MBED_WEAK CompositeEMAC::PHYDriver * get_eth_phy_driver()
 {
 #ifdef MBED_CONF_NSAPI_EMAC_PHY_MODEL
     static GenericEthPhy::Config driverConfig = MBED_CONF_NSAPI_EMAC_PHY_MODEL::DefaultConfig;
