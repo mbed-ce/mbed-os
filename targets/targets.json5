@@ -3111,9 +3111,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER",
             "CAN",
 			"SERIAL_FC",
-            "WATCHDOG",
-            "ETHERNET",
-            "EMAC"
+            "WATCHDOG"
         ],
         "is_mcu_family_target": true
     },
@@ -3141,7 +3139,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
             // ADC reference voltage is same as MCU VDD.
             // MCU VDD defaults to 3.3V though can be changed to 1.8V based on JP2 setting on nucleo board.
-            "default-adc-vref": 3.3
+            "default-adc-vref": 3.3,
         },
         "device_has_remove": [
             "ANALOGOUT" // both DAC pins are in conflict with LED1 and STDIO_UART_TX
@@ -3166,6 +3164,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "STM32H563xx"
+        ],
+        "overrides": {
+            "network-default-interface-type": "ETHERNET"
+        },
+        "device_has_add": [
+            "EMAC"
         ]
     },
 	"NUCLEO_H563ZI": {

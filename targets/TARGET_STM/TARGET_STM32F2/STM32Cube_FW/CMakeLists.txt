@@ -19,7 +19,6 @@ target_sources(mbed-stm32f2cube-fw
         STM32F2xx_HAL_Driver/stm32f2xx_hal_dcmi_ex.c
         STM32F2xx_HAL_Driver/stm32f2xx_hal_dma.c
         STM32F2xx_HAL_Driver/stm32f2xx_hal_dma_ex.c
-        STM32F2xx_HAL_Driver/stm32f2xx_hal_eth.c
         STM32F2xx_HAL_Driver/stm32f2xx_hal_exti.c
         STM32F2xx_HAL_Driver/stm32f2xx_hal_flash.c
         STM32F2xx_HAL_Driver/stm32f2xx_hal_flash_ex.c

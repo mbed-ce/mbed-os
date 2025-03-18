@@ -67,8 +67,8 @@ typedef mbed::ScopedLock<Mutex> ScopedMutexLock;
  * \par
  * Mbed Mutexes are recursive. So, if you call the \c lock() function multiple times,
  * you must call \c unlock() the same number of times to unlock the mutex.  This means that it's okay to lock
- * a mutex, then call another function that also locks and unlocks the mutex, and the mutex won't actually
- * get unlocked until your function unlocks it.
+ * a mutex, then call another function that also locks and unlocks the mutex. The mutex won't actually
+ * get unlocked until the top level function unlocks it.
  *
  * @note You cannot use member functions of this class in ISR context. If you require Mutex functionality within ISR handler, consider using @a Semaphore.
  *

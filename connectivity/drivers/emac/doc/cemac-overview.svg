@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="600"
+   height="400"
+   viewBox="0 0 158.75 105.83333"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   sodipodi:docname="cemac-overview.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="2.175463"
+     inkscape:cx="295.56927"
+     inkscape:cy="246.1545"
+     inkscape:window-width="2560"
+     inkscape:window-height="1417"
+     inkscape:window-x="-8"
+     inkscape:window-y="810"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <rect
+       x="188.00596"
+       y="115.83741"
+       width="272.12598"
+       height="75.845924"
+       id="rect3" />
+    <marker
+       style="overflow:visible"
+       id="ConcaveTriangle"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Concave triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="M -2,-4 9,0 -2,4 c 2,-2.33 2,-5.66 0,-8 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path7" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ConcaveTriangle-6"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Concave triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="M -2,-4 9,0 -2,4 c 2,-2.33 2,-5.66 0,-8 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path7-5" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ConcaveTriangle-6-8"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Concave triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="M -2,-4 9,0 -2,4 c 2,-2.33 2,-5.66 0,-8 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path7-5-3" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ConcaveTriangle-6-4"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Concave triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="M -2,-4 9,0 -2,4 c 2,-2.33 2,-5.66 0,-8 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path7-5-5" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="ConcaveTriangle-6-81"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Concave triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="M -2,-4 9,0 -2,4 c 2,-2.33 2,-5.66 0,-8 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path7-5-7" />
+    </marker>
+    <rect
+       x="188.00597"
+       y="115.83741"
+       width="122.86289"
+       height="95.705451"
+       id="rect3-3" />
+    <rect
+       x="188.00597"
+       y="115.83741"
+       width="122.86289"
+       height="95.705452"
+       id="rect3-3-7" />
+    <rect
+       x="188.00597"
+       y="115.83741"
+       width="122.86289"
+       height="95.705452"
+       id="rect3-3-7-5" />
+    <rect
+       x="188.00597"
+       y="115.83741"
+       width="129.66968"
+       height="96.214671"
+       id="rect3-3-7-5-8" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#c0cadb;fill-opacity:1;stroke:#000000;stroke-width:0.2;stroke-opacity:1;stroke-dasharray:none"
+       id="rect1"
+       width="63.799553"
+       height="8.0968504"
+       x="47.032658"
+       y="5.8029261" />
+    <rect
+       style="fill:#c0cadb;fill-opacity:1;stroke:#000000;stroke-width:0.2;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1-0"
+       width="63.702412"
+       height="18.215925"
+       x="47.128662"
+       y="27.771231" />
+    <rect
+       style="fill:#c0cadb;fill-opacity:1;stroke:#000000;stroke-width:0.2;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1-0-6"
+       width="31.889481"
+       height="24.592182"
+       x="4.9768543"
+       y="58.712101" />
+    <rect
+       style="fill:#c0cadb;fill-opacity:1;stroke:#000000;stroke-width:0.2;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1-0-6-7"
+       width="31.889481"
+       height="24.592182"
+       x="43.816998"
+       y="67.014809" />
+    <rect
+       style="fill:#c0cadb;fill-opacity:1;stroke:#000000;stroke-width:0.2;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1-0-6-7-1"
+       width="31.889481"
+       height="24.592182"
+       x="82.657143"
+       y="67.014809" />
+    <rect
+       style="fill:#c0cadb;fill-opacity:1;stroke:#000000;stroke-width:0.2;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1-0-6-7-1-9"
+       width="31.889481"
+       height="24.592182"
+       x="121.49729"
+       y="59.606472" />
+    <path
+       style="fill:#c0cadb;fill-opacity:1;stroke:#595959;stroke-width:0.403127;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ConcaveTriangle)"
+       d="m 79.508505,27.720115 0.155037,-11.33799"
+       id="path1" />
+    <path
+       style="fill:#c0cadb;fill-opacity:1;stroke:#595959;stroke-width:0.403127;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ConcaveTriangle-6)"
+       d="M 47.211226,46.335672 38.244642,56.767953"
+       id="path1-0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#c0cadb;fill-opacity:1;stroke:#595959;stroke-width:0.403127;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ConcaveTriangle-6-8)"
+       d="m 67.882717,46.326767 -8.115233,18.58093"
+       id="path1-0-8"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:2.52147px;fill:#595959;fill-opacity:1;stroke:none;stroke-width:0.317666;stroke-dasharray:none;stroke-opacity:1"
+       x="80.661278"
+       y="22.124941"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="fill:#595959;fill-opacity:1;stroke:none;stroke-width:0.317666"
+         x="80.661278"
+         y="22.124941">Implements</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.52147px;fill:#595959;fill-opacity:1;stroke:none;stroke-width:0.317666;stroke-dasharray:none;stroke-opacity:1"
+       x="67.848129"
+       y="51.134895"
+       id="text1-0"><tspan
+         sodipodi:role="line"
+         id="tspan1-7"
+         style="fill:#595959;fill-opacity:1;stroke:none;stroke-width:0.317666"
+         x="67.848129"
+         y="51.134895">Has References</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.4;stroke-dasharray:none;stroke-opacity:1"
+       x="72.12162"
+       y="10.702703"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="stroke-width:0.4"
+         x="72.12162"
+         y="10.702703">EMAC API</tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.25014782,0,0,0.23883968,2.2336339,2.1767303)"
+       id="text3"
+       style="white-space:pre;shape-inside:url(#rect3);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="188.00586"
+         y="126.75639"
+         id="tspan4"><tspan
+   style="font-weight:bold"
+   id="tspan3">CompositeEMAC</tspan>
+</tspan><tspan
+         x="188.00586"
+         y="141.75639"
+         id="tspan6"><tspan
+           style="font-size:10.1029px"
+           id="tspan5">- Implements EMAC API
+</tspan></tspan><tspan
+         x="188.00586"
+         y="156.75639"
+         id="tspan64"><tspan
+           style="font-size:10.1029px"
+           id="tspan7">- Implements locking &amp; the EMAC thread
+</tspan></tspan><tspan
+         x="188.00586"
+         y="171.75639"
+         id="tspan66"><tspan
+           style="font-size:10.1029px"
+           id="tspan65">- Delegates Ethernet functionality to subclasses</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.25014782,0,0,0.23883968,-40.807765,33.144577)"
+       id="text3-6"
+       style="white-space:pre;shape-inside:url(#rect3-3);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="188.00586"
+         y="126.75639"
+         id="tspan68"><tspan
+   style="font-weight:bold"
+   id="tspan67">MACDriver</tspan>
+</tspan><tspan
+         x="188.00586"
+         y="141.75639"
+         id="tspan70"><tspan
+           style="font-size:10.1029px"
+           id="tspan69">- Inits MAC hardware
+</tspan></tspan><tspan
+         x="188.00586"
+         y="156.75639"
+         id="tspan72"><tspan
+           style="font-size:10.1029px"
+           id="tspan71">- Sets up interrupts
+</tspan></tspan><tspan
+         x="188.00586"
+         y="171.75639"
+         id="tspan74"><tspan
+           style="font-size:10.1029px"
+           id="tspan73">- Does MDIO transactions
+</tspan></tspan><tspan
+         x="188.00586"
+         y="186.75639"
+         id="tspan76"><tspan
+           style="font-size:10.1029px"
+           id="tspan75">- Manages the MAC addr
+</tspan></tspan><tspan
+         x="188.00586"
+         y="201.75639"
+         id="tspan78"><tspan
+           style="font-size:10.1029px"
+           id="tspan77">- controls MAC filtering</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.25014782,0,0,0.23883968,-2.4034306,41.171943)"
+       id="text3-6-7"
+       style="white-space:pre;shape-inside:url(#rect3-3-7);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="188.00586"
+         y="126.75639"
+         id="tspan80"><tspan
+   style="font-weight:bold"
+   id="tspan79">PHYDriver</tspan>
+</tspan><tspan
+         x="188.00586"
+         y="141.75639"
+         id="tspan82"><tspan
+           style="font-size:10.1029px"
+           id="tspan81">- Inits Eth PHY chip
+</tspan></tspan><tspan
+         x="188.00586"
+         y="156.75639"
+         id="tspan84"><tspan
+           style="font-size:10.1029px"
+           id="tspan83">- Configures Eth settings </tspan></tspan><tspan
+         x="188.00586"
+         y="171.75639"
+         id="tspan86"><tspan
+           style="font-size:10.1029px"
+           id="tspan85">(duplex, speed, </tspan></tspan><tspan
+         x="188.00586"
+         y="186.75639"
+         id="tspan88"><tspan
+           style="font-size:10.1029px"
+           id="tspan87">autonegotiation)
+</tspan></tspan><tspan
+         x="188.00586"
+         y="201.75639"
+         id="tspan90"><tspan
+           style="font-size:10.1029px"
+           id="tspan89">- Checks link status</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.25014782,0,0,0.23883968,37.523144,41.374757)"
+       id="text3-6-7-9"
+       style="white-space:pre;shape-inside:url(#rect3-3-7-5);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="188.00586"
+         y="126.75639"
+         id="tspan92"><tspan
+   style="font-weight:bold"
+   id="tspan91">TxDMARing</tspan>
+</tspan><tspan
+         x="188.00586"
+         y="141.75639"
+         id="tspan94"><tspan
+           style="font-size:10.1029px"
+           id="tspan93">- Enqueues packets into </tspan></tspan><tspan
+         x="188.00586"
+         y="156.75639"
+         id="tspan96"><tspan
+           style="font-size:10.1029px"
+           id="tspan95">the Ethernet transmit </tspan></tspan><tspan
+         x="188.00586"
+         y="171.75639"
+         id="tspan98"><tspan
+           style="font-size:10.1029px"
+           id="tspan97">DMA
+</tspan></tspan><tspan
+         x="188.00586"
+         y="186.75639"
+         id="tspan100"><tspan
+           style="font-size:10.1029px"
+           id="tspan99">- Reclaims their memory </tspan></tspan><tspan
+         x="188.00586"
+         y="201.75639"
+         id="tspan102"><tspan
+           style="font-size:10.1029px"
+           id="tspan101">once they're transmitted</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.25014782,0,0,0.23883968,75.013753,33.819297)"
+       id="text3-6-7-9-4"
+       style="white-space:pre;shape-inside:url(#rect3-3-7-5-8);display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.51181;stroke-dasharray:none;stroke-opacity:1"><tspan
+         x="188.00586"
+         y="126.75639"
+         id="tspan104"><tspan
+   style="font-weight:bold"
+   id="tspan103">RxDMARing</tspan>
+</tspan><tspan
+         x="188.00586"
+         y="141.75639"
+         id="tspan106"><tspan
+           style="font-size:10.1029px"
+           id="tspan105">- Sets up Rx DMA with </tspan></tspan><tspan
+         x="188.00586"
+         y="156.75639"
+         id="tspan108"><tspan
+           style="font-size:10.1029px"
+           id="tspan107">buffers to receive into
+</tspan></tspan><tspan
+         x="188.00586"
+         y="171.75639"
+         id="tspan110"><tspan
+           style="font-size:10.1029px"
+           id="tspan109">- Detects when packets </tspan></tspan><tspan
+         x="188.00586"
+         y="186.75639"
+         id="tspan112"><tspan
+           style="font-size:10.1029px"
+           id="tspan111">have been received
+</tspan></tspan><tspan
+         x="188.00586"
+         y="201.75639"
+         id="tspan114"><tspan
+           style="font-size:10.1029px"
+           id="tspan113">- Dequeues pkts for EMAC</tspan></tspan></text>
+    <path
+       style="fill:#c0cadb;fill-opacity:1;stroke:#595959;stroke-width:0.403127;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ConcaveTriangle-6-4)"
+       d="m 87.903775,46.343941 9.641524,18.216064"
+       id="path1-0-5"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#c0cadb;fill-opacity:1;stroke:#595959;stroke-width:0.403127;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#ConcaveTriangle-6-81)"
+       d="m 111.42427,46.175303 8.42531,11.405254"
+       id="path1-0-76"
+       sodipodi:nodetypes="cc" />
+  </g>
+</svg>

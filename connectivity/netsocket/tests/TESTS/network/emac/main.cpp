@@ -55,7 +55,9 @@ Case cases[] = {
     (MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI))
     Case("EMAC multicast filter", test_emac_multicast_filter),
 #endif // !(MBED_CONF_NETWORK_EMAC_NO_SUPPORT_FOR_MULTICAST_FILTER == 1)
-    Case("EMAC memory", test_emac_memory)
+    Case("EMAC memory", test_emac_memory),
+    Case("EMAC power down and power up", test_emac_power_down_and_power_up),
+    Case("EMAC unicast again after power cycle", test_emac_unicast),
 };
 
 Specification specification(test_setup, cases);

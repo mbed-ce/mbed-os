@@ -19,6 +19,7 @@
 #define EMAC_TESTS_H
 
 void test_emac_initialize();
+void test_emac_power_down_and_power_up();
 void test_emac_broadcast();
 void test_emac_unicast();
 void test_emac_unicast_frame_len();

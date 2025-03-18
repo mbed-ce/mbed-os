@@ -118,10 +118,10 @@ public:
     /**
      * Sends the packet over the link
      *
-     * That can not be called from an interrupt context.
+     * Will not be called from an interrupt context.
      *
-     * @param buf  Packet to be send
-     * @return     True if the packet was send successfully, False otherwise
+     * @param buf  Packet to be sent. This packet is now owned by the MAC and must be freed in all cases.
+     * @return True if the packet was sent successfully, False otherwise
      */
     virtual bool link_out(emac_mem_buf_t *buf) = 0;
 
@@ -139,16 +139,24 @@ public:
     virtual void power_down() = 0;
 
     /**
-     * Sets a callback that needs to be called for packets received for that interface
+     * Sets a callback that needs to be called for packets received for this interface.
      *
-     * @param input_cb Function to be register as a callback
+     * Note that the callback function will contain appropriate locking such that it may be called from any OS thread.
+     * However, it shall not be called from an interrupt.
+     *
+     * Also note that the callback will take ownership of the passed packet and must free it in all cases.
+     *
+     * @param input_cb Function to be registered as a callback
      */
     virtual void set_link_input_cb(emac_link_input_cb_t input_cb) = 0;
 
     /**
      * Sets a callback that needs to be called on link status changes for given interface
      *
-     * @param state_cb Function to be register as a callback
+     * Note that the callback function will contain appropriate locking such that it may be called from any OS thread.
+     * However, it shall not be called from an interrupt.
+     *
+     * @param state_cb Function to be registered as a callback
      */
     virtual void set_link_state_cb(emac_link_state_change_cb_t state_cb) = 0;
 
@@ -183,12 +191,5 @@ public:
      */
     virtual void set_memory_manager(EMACMemoryManager &mem_mngr) = 0;
 };
-
-
-/** These need to be defined by targets wishing to provide an Ethernet driver using EMAC interface. It will
- *  be used by the EMACInterface class's default constructor to initialize the networking subsystem.
- */
-//extern const emac_interface_ops_t mbed_emac_eth_ops_default;
-//extern void *mbed_emac_eth_hw_default;
 
 #endif  /* EMAC_H */

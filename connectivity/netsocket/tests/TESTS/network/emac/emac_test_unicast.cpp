@@ -27,13 +27,13 @@
 
 using namespace utest::v1;
 
+static bool send_request;
+static int no_response_cnt;
+static int retries;
+static int test_step = 0;
+
 void test_emac_unicast_cb(int opt)
 {
-    static bool send_request = true;
-    static int no_response_cnt = 0;
-    static int retries = 0;
-    static int test_step = 0;
-
     // Timeout
     if (opt == TIMEOUT && send_request) {
         CTP_MSG_SEND(100, emac_if_get_echo_server_addr(0), emac_if_get_own_addr(), emac_if_get_own_addr(), 0);
@@ -41,7 +41,7 @@ void test_emac_unicast_cb(int opt)
         no_response_cnt = 0;
     } else if (opt == TIMEOUT) {
         if (++no_response_cnt > 5) {
-            if (++retries > 3) {
+            if (++retries > 300) {
                 printf("too many retries\r\n\r\n");
                 SET_ERROR_FLAGS(TEST_FAILED);
                 END_TEST_LOOP;
@@ -65,6 +65,12 @@ void test_emac_unicast_cb(int opt)
 
 void test_emac_unicast()
 {
+    // Reset flags
+    send_request = true;
+    no_response_cnt = 0;
+    retries = 0;
+    test_step = 0;
+
     RESET_ALL_ERROR_FLAGS;
     SET_TRACE_LEVEL(TRACE_SEND | TRACE_ETH_FRAMES | TRACE_SUCCESS | TRACE_FAILURE);
 

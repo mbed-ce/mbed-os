@@ -100,9 +100,16 @@ public:
     /**
      * Get memory buffer pool size.
      *
-     * @return The maximum size of contiguous memory that can be allocated from a pool.
+     * @return The number of pool buffers that can be allocated at any one time
      */
-    virtual uint32_t get_pool_size() const = 0;
+    uint32_t get_pool_size()
+    {
+#if UNITTEST
+        return 0;
+#else
+        return MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS;
+#endif
+    }
 
     /**
      * Free memory buffer chain
