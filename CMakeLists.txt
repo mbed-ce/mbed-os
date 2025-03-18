@@ -132,7 +132,7 @@ if("MBED_CONF_TARGET_APPLICATION_PROFILE=full" IN_LIST MBED_CONFIG_DEFINITIONS O
 elseif("MBED_CONF_TARGET_APPLICATION_PROFILE=bare-metal" IN_LIST MBED_CONFIG_DEFINITIONS)
     set(APPLICATION_PROFILE_CONFIG_BAREMETAL TRUE)
 else()
-    message(FATAL_ERROR "target.application-profile must be set to either 'full' or 'bare-metal'!")
+    message(FATAL_ERROR "target.application-profile must be set to either 'full' or 'bare-metal'! If you are getting this after upgrading mbed-os then you likely need to clear your CMake cache.")
 endif()
 
 # mbed-core-flags/mbed-core-sources link mbed-rtos-flags/mbed-rtos-sources or not depending on
