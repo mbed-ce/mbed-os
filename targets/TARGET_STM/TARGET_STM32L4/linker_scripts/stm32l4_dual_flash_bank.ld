@@ -123,34 +123,13 @@ SECTIONS
         __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
     } > SRAM2
 
-    /* .stack section doesn't contains any symbols. It is only
-     * used for linker to reserve space for the isr stack section
-     * WARNING: .stack should come immediately after the last secure memory
-     * section.  This provides stack overflow detection. */
-    .stack (NOLOAD):
-    {
-        __StackLimit = .;
-        *(.stack*);
-        . += MBED_CONF_TARGET_BOOT_STACK_SIZE - (. - __StackLimit);
-    } > SRAM2
-
-    /* Set stack top to end of RAM, and stack limit move down by
-     * size of stack_dummy section */
-    __StackTop = ADDR(.stack) + SIZEOF(.stack);
-    _estack = __StackTop;
-    __StackLimit = ADDR(.stack);
-    PROVIDE(__stack = __StackTop);
-
-    /* Place holder for additional heap */
+    /* Use all remaining SRAM2 as heap 0 */
     .heap_0 (COPY):
     {
         __mbed_sbrk_start_0 = .;
         . += (ORIGIN(SRAM2) + LENGTH(SRAM2) - .);
         __mbed_krbs_start_0 = .;
     } > SRAM2
-
-    /* Check if heap exceeds SRAM2 */
-    ASSERT(__mbed_krbs_start_0 <= (ORIGIN(SRAM2)+LENGTH(SRAM2)), "Heap is too big for SRAM2")
 
     .data : AT (__etext)
     {
@@ -201,11 +180,8 @@ SECTIONS
         __bss_end__ = .;
         _ebss = .;
     } > SRAM1
-
-    /* Check if bss exceeds SRAM1 */
-    ASSERT(__bss_end__ <= (ORIGIN(SRAM1)+LENGTH(SRAM1)), "BSS is too big for SRAM1")
     
-    /* Placeholder for default single heap */
+    /* Placeholder for heap 0 space */
     .heap (COPY):
     {
         __end__ = .;
@@ -217,6 +193,12 @@ SECTIONS
         __HeapLimit = .;
     } > SRAM1
 
-    /* Check if heap exceeds SRAM1 */
-    ASSERT(__HeapLimit <= (ORIGIN(SRAM1)+LENGTH(SRAM1)), "Heap is too big for SRAM1")
+    /* Set stack top to end of SRAM1, and stack limit to be less than that by the boot stack size */
+    __StackTop = ORIGIN(SRAM1) + LENGTH(SRAM1);
+    _estack = __StackTop;
+    PROVIDE(__stack = __StackTop);
+    __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
+
+    /* Check if bss exceeds SRAM1 */
+    ASSERT(__bss_end__ < __StackLimit, "Size of static variables does not leave enough room for minimum stack size")
 }
