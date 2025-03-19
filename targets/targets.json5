@@ -3668,20 +3668,28 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "QSPIF"
         ],
         "image_url": "https://store-usa.arduino.cc/cdn/shop/products/ABX00063_00.default_643x483.jpg?v=1677493878",
-
-        // Leave room for the Arduino bootloader
-        "memory_bank_config": {
-            "IROM1": {
-                start: 0x08020000,
-                size: 0x1E0000
-            }
-        }
     },
     "ARDUINO_GIGA_CM7": {
         inherits: ["MCU_STM32H747xI_CM7", "ARDUINO_GIGA"],
+
+        // Leave room for the Arduino bootloader, using the next 1M of space
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x08020000,
+                "size": 0x100000
+            },
+        }
     },
     "ARDUINO_GIGA_CM4": {
         inherits: ["MCU_STM32H747xI_CM4", "ARDUINO_GIGA"],
+
+        // Leave room for the Arduino bootloader and the CM7 application, using the next 896k of space
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x08120000,
+                "size": 0xE0000
+            },
+        }
     },
     "ARDUINO_PORTENTA_H7": {
         "public": false,
