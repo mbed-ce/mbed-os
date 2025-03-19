@@ -3667,7 +3667,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         components_add: [
             "QSPIF"
         ],
-        "image_url": "https://store-usa.arduino.cc/cdn/shop/products/ABX00063_00.default_643x483.jpg?v=1677493878"
+        "image_url": "https://store-usa.arduino.cc/cdn/shop/products/ABX00063_00.default_643x483.jpg?v=1677493878",
+
+        // Leave room for the Arduino bootloader
+        "memory_bank_config": {
+            "IROM1": {
+                start: 0x08020000,
+                size: 0x1E0000
+            }
+        }
     },
     "ARDUINO_GIGA_CM7": {
         inherits: ["MCU_STM32H747xI_CM7", "ARDUINO_GIGA"],
