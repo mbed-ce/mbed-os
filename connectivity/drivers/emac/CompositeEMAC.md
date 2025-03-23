@@ -100,4 +100,68 @@ CompositeEMAC::PHYDriver * get_eth_phy_driver()
 
 ### Tx DMA
 
-The Rx and Tx DMAs are implemented as their own driver classes, as they are somewhat complicated and generally don't interact with the other pieces of the EMAC very much. The Tx DMA must be implemented as a subclass of `CompositeEMAC::TxDMA`. However, since the large majority of microcontrollers implement Tx DMA in a very similar way, the `GenericTxDMARing` class has been provided which implements most of the needed functionality.
+The Rx and Tx DMAs are implemented as their own driver classes, instead of in the MAC driver, as they are somewhat complicated and generally don't interact with the other pieces of the EMAC very much. To work with CompositeEMAC, the Tx DMA must be implemented as a subclass of `CompositeEMAC::TxDMA`. However, since the large majority of microcontrollers implement Tx DMA in a very similar way, the `GenericTxDMARing` class has been provided which provides most of the needed functionality.
+
+#### Generic Tx DMA Ring Operation
+
+`GenericTxDMARing` assumes the basics: there is a ring of descriptors which are processed in sequence. The Ethernet DMA may transmit a packet once it is marked as "owned by DMA" in the ring (usually via a bitfield in the descriptor). Once the packet is done transmitting, the Ethernet DMA gives it back to the application by clearing the own flag and delivering an interrupt.
+
+Mbed's generic Tx DMA ring driver uses two indexes to manage the ring of descriptors: `txSendIndex`, the index of the next Tx descriptor that can be filled with data, and `txReclaimIndex`, the index of the next descriptor that can be reclaimed by the driver. Together, these indexes, plus a count variable, describe the state of the descriptor ring.
+
+To explain how this works, let's go through an example of transmitting some packets via the descriptors.
+
+##### Initial State
+When the driver starts, both indexes point to descriptor 0. No data is in the DMA ring.
+
+![Initial DMA ring state](doc/tx-ring-initial-state.svg)
+
+
+##### Packet 0 Enqueued
+Now suppose we enqueue a packet to be transmitted into the ring. The packet will go into desc 0, since that is where `txSendIndex` is pointing. The driver will give desc 0 to the DMA, so it will start being transmitted out of the Ethernet port.
+
+![DMA ring with packet 0](doc/tx-ring-step-1.svg)
+
+##### Packet 1 Enqueued
+Now, very soon after the first packet, we enqueue another packet to be transmitted. This packet is split between two buffers (common when using zero-copy transmission), so it takes up two descriptors. These two descriptors are then given to the DMA to send.
+
+![DMA ring with packet 1](doc/tx-ring-step-2.svg)
+
+##### Packet 0 Completes
+Soon after, the MAC completes the transmission of packet 0. It sets the DMA own flag in the descriptor back to false, and delivers a Tx interrupt to the application. The below picture shows the state of the descriptors when the interrupt fires.
+
+![DMA ring after packet 0 completes](doc/tx-ring-step-3.svg)
+
+##### After Packet 0 Tx Interrupt
+The Tx interrupt* will detect that the descriptor pointed to by `txReclaimIndex` has completed. It can then deallocate the memory for Packet 0, collect any needed status information (e.g. the timestamp) from the descriptor, and advance `txReclaimIndex` forward. Last but not least, it sets a thread flag to unblock any threads which are waiting for a Tx descriptor in order to send a packet.
+
+![DMA ring after packet 0 deallocated](doc/tx-ring-step-4.svg)
+
+*Actually, interrupts cannot deallocate memory in Mbed, so the Tx interrupt handler actually signals the MAC thread to wake up and process the completed descriptor.
+
+##### Final State
+Eventually, after a couple hundred microseconds, the second packet will be transmitted, and its descriptors will also be reclaimed. The Tx descriptor ring is now empty, except that the descriptor pointers are now both pointing to Desc 3.
+
+![DMA ring after packet 1 deallocated](doc/tx-ring-step-5.svg)
+
+Note that in most cases, once the ring is empty like this, the Tx DMA in the hardware will simply sit and wait until dmaOwn is set on Desc 3. However, this depends a bit on the hardware -- some MACs need an additional "poke" command to make them recheck the descriptor, and yet others simply need to be told which descriptor address to transmit once a new one is made available.
+
+##### Descriptor Exhaustion
+You might notice a slight problem with the send and reclaim indexes, as described so far. When the Tx descriptor ring is totally full, they both end up pointing to the same descriptor:
+
+![DMA ring with all descs allocated](doc/tx-ring-exhausted.svg)
+
+This is a problem because, earlier, we said that the initial state of the DMA ring, with no packets enqueued, also has both indices pointing to the same descriptor. This might cause us to naively calculate that the descriptor ring is empty! 
+
+This is a classic problem with circular FIFOs, and to solve it, we go for the classic solution. An additional count variable, `txDescsOwnedByApplication`, counts how many descriptors are known to be NOT owned by DMA. It's decremented each time we give a descriptor to DMA, and incremented each time we reclaim one back. We can then use this count variable to dis-ambiguate the situation where `txSendIndex == txReclaimIndex`.
+
+#### Target-Specific Tx DMA Implementation
+
+For each target, the `GenericTxDMARing` class needs to be extended. The subclass must provide a couple functions:
+
+- Allocating the actual DMA descriptors (since this often has special requirements on alignment or memory banks)
+- Initializing and deinitializing the Tx DMA
+- Checking the dmaOwn flag on a descriptor
+- Checking if a given buffer address is accessible by the DMA controller (since, on many MCUs, certain areas of memory are not OK and the buffer will need to be copied)
+- Giving a descriptor to DMA after populating it with a given buffer
+
+Everything else, including the descriptor tracking and memory management, is done by the superclass. This should let target implementations focus only on the low level descriptor format while relying on common code for everything else.

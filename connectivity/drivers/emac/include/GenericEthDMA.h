@@ -105,7 +105,7 @@ namespace mbed {
     public:
         CompositeEMAC::ErrCode init() override {
             // At the start, we own all the descriptors
-            txDescsOwnedByApplication = MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
+            txDescsOwnedByApplication = TX_NUM_DESCS;
 
             // Next descriptor will be descriptor 0
             txSendIndex = 0;
@@ -164,7 +164,7 @@ namespace mbed {
                 }
 
                 // Update counters
-                txReclaimIndex = (txReclaimIndex + 1) % MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
+                txReclaimIndex = (txReclaimIndex + 1) % TX_NUM_DESCS;
                 ++txDescsOwnedByApplication;
 
                 tr_debug("Reclaimed descriptor %zu", txReclaimIndex);
@@ -183,11 +183,17 @@ namespace mbed {
             // Step 1: Figure out if we can send this zero-copy, or if we need to copy it.
             size_t neededDescs = memory_manager->count_buffers(buf);
             bool needToCopy = false;
-            if(neededDescs >= MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS)
+            if(neededDescs >= TX_NUM_DESCS)
             {
                 // Packet uses too many buffers, we have to copy it into a continuous buffer.
                 // Note: Some Eth DMAs (e.g. STM32 v2) cannot enqueue all the descs in the ring at the same time
                 // so we can't use every single descriptor to send the packet.
+                needToCopy = true;
+            }
+
+            if(!needToCopy && (neededDescs < txDescsOwnedByApplication || txDescsOwnedByApplication > 0)) {
+                // Packet uses more buffers than we have descriptors, but we can send it immediately if we copy
+                // it into a single buffer.
                 needToCopy = true;
             }
 
