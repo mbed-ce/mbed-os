@@ -191,7 +191,7 @@ namespace mbed {
                 needToCopy = true;
             }
 
-            if(!needToCopy && (neededDescs < txDescsOwnedByApplication || txDescsOwnedByApplication > 0)) {
+            if(!needToCopy && (neededDescs > txDescsOwnedByApplication && txDescsOwnedByApplication > 0)) {
                 // Packet uses more buffers than we have descriptors, but we can send it immediately if we copy
                 // it into a single buffer.
                 needToCopy = true;
@@ -228,7 +228,6 @@ namespace mbed {
                 if(newBuf == nullptr)
                 {
                     // No free memory, drop packet
-                    memory_manager->free(newBuf);
                     return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
                 }
 
@@ -478,9 +477,30 @@ namespace mbed {
             return false;
         }
 
+    private:
+
+        /// Helper function: Discard received Rx descriptors from a given start index (inclusive) to stop index (exclusive)
+        void discardRxDescs(size_t startIdx, size_t stopIdx)
+        {
+            for(size_t descToCleanIdx = startIdx; descToCleanIdx != stopIdx; descToCleanIdx = (descToCleanIdx + 1) % RX_NUM_DESCS) {
+                // Free Rx buffer attached to this desc
+                memory_manager->free(rxDescStackBufs[descToCleanIdx]);
+                rxDescStackBufs[descToCleanIdx] = nullptr;
+
+                // Allow desc to be rebuilt
+                ++rxDescsOwnedByApplication;
+                ++rxNextIndex;
+            }
+        }
+
+    public:
+
         net_stack_mem_buf_t * dequeuePacket() override {
             // Indices of the first and last descriptors for the packet will be saved here
             std::optional<size_t> firstDescIdx, lastDescIdx;
+
+            // Packet length is stored here once we check it
+            size_t pktLen;
 
             // Prevent looping around into descriptors waiting for rebuild by limiting how many
             // we can process.
@@ -508,39 +528,33 @@ namespace mbed {
                     // Error or non-first-descriptor before a first descriptor
                     // (could be caused by incomplete packets/junk in the DMA buffer).
                     // Ignore, free associated memory, and schedule for rebuild.
-                    memory_manager->free(rxDescStackBufs[descIdx]);
-                    rxDescStackBufs[descIdx] = nullptr;
-                    ++rxDescsOwnedByApplication;
-                    ++rxNextIndex;
-
+                    discardRxDescs(descIdx, (descIdx + 1) % RX_NUM_DESCS);
                     continue;
                 }
-                else if(firstDescIdx.has_value() && (isError || isFirst))
+                else if(firstDescIdx.has_value() && isError)
                 {
-                    // Already seen a first descriptor, but we have an error descriptor or another first descriptor.
-                    // So, delete the in-progress packet up to this point.
-
-                    // Clean up the old first descriptor and any descriptors between there and here
-                    const size_t endIdx = isFirst ? descIdx : (descIdx + 1) % RX_NUM_DESCS;
-
-                    for(size_t descToCleanIdx = *firstDescIdx; descToCleanIdx != endIdx; descToCleanIdx = (descToCleanIdx + 1) % RX_NUM_DESCS) {
-                        memory_manager->free(rxDescStackBufs[descToCleanIdx]);
-                        rxDescStackBufs[descToCleanIdx] = nullptr;
-                        ++rxDescsOwnedByApplication;
-                        ++rxNextIndex;
-                    }
-
-                    if(!isError)
-                    {
-                        firstDescIdx = descIdx;
-                    }
+                    // Already seen a first descriptor, but we have an error descriptor.
+                    // So, delete the in-progress packet up to this point. 
+                    discardRxDescs(*firstDescIdx, (descIdx + 1) % RX_NUM_DESCS);
+                    firstDescIdx.reset();
+                    continue;
+                }
+                else if(firstDescIdx.has_value() && isFirst)
+                {
+                    // Already seen a first descriptor, but we have another first descriptor.
+                    // Some MACs do this if they run out of Rx descs when halfway through a packet.
+                    // Delete the in-progress packet up to this point and start over from descIdx.
+                    discardRxDescs(*firstDescIdx, descIdx);
+                    firstDescIdx = descIdx;
                 }
                 else if(isFirst)
                 {
+                    // Normal first descriptor.
                     firstDescIdx = descIdx;
                 }
 
-                if (isLast) {
+                if(isLast) {
+                    pktLen = getTotalLen(*firstDescIdx, descIdx);
                     lastDescIdx = descIdx;
                 }
             }
@@ -559,9 +573,9 @@ namespace mbed {
 
             // Set length of first buffer
             net_stack_mem_buf_t *const headBuffer = rxDescStackBufs[*firstDescIdx];
-            size_t lenRemaining = getTotalLen(*firstDescIdx, *lastDescIdx);
-            memory_manager->set_len(headBuffer, std::min(lenRemaining, rxPoolPayloadSize));
-            lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
+            
+            memory_manager->set_len(headBuffer, std::min(pktLen, rxPoolPayloadSize));
+            size_t lenRemaining = pktLen - std::min(pktLen, rxPoolPayloadSize);
 
             // Iterate through the subsequent descriptors in this packet and link the buffers
             // Note that this also transfers ownership of subsequent buffers to the first buffer,
