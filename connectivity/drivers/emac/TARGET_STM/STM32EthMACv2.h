@@ -31,7 +31,7 @@ namespace mbed {
         {
         protected:
             ETH_TypeDef * const base; // Base address of Ethernet peripheral
-            StaticCacheAlignedBuffer<stm32_ethv2::EthTxDescriptor, MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS> txDescs; // Tx descriptors
+            StaticCacheAlignedBuffer<stm32_ethv2::EthTxDescriptor, TX_NUM_DESCS> txDescs; // Tx descriptors
 
             void startDMA() override;
 
@@ -52,7 +52,7 @@ namespace mbed {
             {}
         };
 
-        class RxDMA : public GenericRxDMALoop {
+        class RxDMA : public GenericRxDMARing {
         protected:
             ETH_TypeDef * const base; // Base address of Ethernet peripheral
             StaticCacheAlignedBuffer<stm32_ethv2::EthRxDescriptor, RX_NUM_DESCS> rxDescs; // Rx descriptors

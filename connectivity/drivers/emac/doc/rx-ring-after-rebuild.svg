@@ -8,7 +8,7 @@
    version="1.1"
    id="svg1"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
-   sodipodi:docname="tx-ring-exhausted.svg"
+   sodipodi:docname="rx-ring-after-rebuild.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="3.0765692"
-     inkscape:cx="270.91866"
-     inkscape:cy="82.722014"
+     inkscape:zoom="2.1754629"
+     inkscape:cx="158.3571"
+     inkscape:cy="173.52628"
      inkscape:window-width="2560"
      inkscape:window-height="1417"
      inkscape:window-x="-8"
@@ -150,12 +150,12 @@
     <text
        xml:space="preserve"
        style="font-size:17.6548px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-opacity:1"
-       x="68.515808"
-       y="140.89551"
+       x="68.975479"
+       y="134.23026"
        id="text1"><tspan
          sodipodi:role="line"
-         x="68.515808"
-         y="140.89551"
+         x="68.975479"
+         y="134.23026"
          style="stroke-width:1.5"
          id="tspan7">Desc 0</tspan></text>
     <rect
@@ -168,13 +168,13 @@
     <text
        xml:space="preserve"
        style="font-size:17.6548px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-opacity:1"
-       x="163.07722"
-       y="140.89551"
+       x="163.5369"
+       y="134.23026"
        id="text1-2"><tspan
          sodipodi:role="line"
          id="tspan1-2"
-         x="163.07722"
-         y="140.89551"
+         x="163.5369"
+         y="134.23026"
          style="stroke-width:1.5">Desc 1</tspan></text>
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-opacity:1"
@@ -186,13 +186,13 @@
     <text
        xml:space="preserve"
        style="font-size:17.6548px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-opacity:1"
-       x="257.63861"
-       y="140.89551"
+       x="258.0983"
+       y="134.23026"
        id="text1-6"><tspan
          sodipodi:role="line"
          id="tspan1-0"
-         x="257.63861"
-         y="140.89551"
+         x="258.0983"
+         y="134.23026"
          style="stroke-width:1.5">Desc 2</tspan></text>
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-opacity:1"
@@ -204,24 +204,24 @@
     <text
        xml:space="preserve"
        style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="353.20132"
-       y="160.96394"
+       x="353.68887"
+       y="154.13815"
        id="text9-0-56"><tspan
          sodipodi:role="line"
          id="tspan9-3-8"
-         x="353.20132"
-         y="160.96394"
+         x="353.68887"
+         y="154.13815"
          style="stroke-width:1.50047">dmaOwn = true</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:17.6548px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-opacity:1"
-       x="352.20004"
-       y="140.89551"
+       x="352.65973"
+       y="134.23026"
        id="text1-4"><tspan
          sodipodi:role="line"
          id="tspan1-5"
-         x="352.20004"
-         y="140.89551"
+         x="352.65973"
+         y="134.23026"
          style="stroke-width:1.5">Desc 3</tspan></text>
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-opacity:1"
@@ -233,13 +233,13 @@
     <text
        xml:space="preserve"
        style="font-size:17.6548px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-opacity:1"
-       x="446.76144"
-       y="140.89551"
+       x="447.22113"
+       y="134.23026"
        id="text1-60"><tspan
          sodipodi:role="line"
          id="tspan1-00"
-         x="446.76144"
-         y="140.89551"
+         x="447.22113"
+         y="134.23026"
          style="stroke-width:1.5">Desc 4</tspan></text>
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-opacity:1"
@@ -251,13 +251,13 @@
     <text
        xml:space="preserve"
        style="font-size:17.6548px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-opacity:1"
-       x="541.32281"
-       y="140.89551"
+       x="541.78247"
+       y="134.23026"
        id="text1-1"><tspan
          sodipodi:role="line"
          id="tspan1-1"
-         x="541.32281"
-         y="140.89551"
+         x="541.78247"
+         y="134.23026"
          style="stroke-width:1.5">Desc 5</tspan></text>
     <text
        xml:space="preserve"
@@ -291,39 +291,50 @@
     <text
        xml:space="preserve"
        style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="67.100975"
-       y="159.27441"
-       id="text9-0"><tspan
+       x="164.99373"
+       y="161.99115"
+       id="text9-0-42-9"><tspan
          sodipodi:role="line"
-         id="tspan9-3"
-         x="67.100975"
-         y="159.27441"
-         style="stroke-width:1.50047">dmaOwn = true</tspan></text>
+         id="tspan9-3-13-1"
+         x="164.99373"
+         y="161.99115"
+         style="fill:#000000;fill-opacity:1;stroke-width:1.50047">flags = none</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="164.29408"
-       y="160.7341"
-       id="text9-0-7"><tspan
+       x="353.03329"
+       y="162.15367"
+       id="text9-0-42-90"><tspan
          sodipodi:role="line"
-         id="tspan9-3-0"
-         x="164.29408"
-         y="160.7341"
-         style="stroke-width:1.50047">dmaOwn = true</tspan></text>
+         id="tspan9-3-13-9"
+         x="353.03329"
+         y="162.15367"
+         style="fill:#000000;fill-opacity:1;stroke-width:1.50047">flags = none</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="258.13278"
-       y="160.50427"
-       id="text9-0-5"><tspan
+       x="446.31256"
+       y="162.08635"
+       id="text9-0-42-5"><tspan
          sodipodi:role="line"
-         id="tspan9-3-3"
-         x="258.13278"
-         y="160.50427"
-         style="stroke-width:1.50047">dmaOwn = true</tspan></text>
+         id="tspan9-3-13-91"
+         x="446.31256"
+         y="162.08635"
+         style="fill:#000000;fill-opacity:1;stroke-width:1.50047">flags = none</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="544.39642"
+       y="161.99115"
+       id="text9-0-42-70"><tspan
+         sodipodi:role="line"
+         id="tspan9-3-13-99"
+         x="544.39642"
+         y="161.99115"
+         style="fill:#000000;fill-opacity:1;stroke-width:1.50047">flags = none</tspan></text>
     <g
        id="g1"
-       transform="translate(-118.25292,0.91934455)">
+       transform="translate(94.125637,0.53853953)">
       <path
          style="fill:#f8acac;fill-opacity:1;stroke:#000000;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
          d="m 159.12411,32.393844 v 70.208076 h -8.77601 l 14.62668,14.62668 14.62668,-14.62668 h -8.77601 V 32.393844 Z"
@@ -343,96 +354,162 @@
     </g>
     <path
        style="fill:#acacf8;fill-opacity:1;stroke:#000000;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       d="m 86.071359,33.037193 v 70.208057 h -8.77601 l 14.62668,14.62668 14.626681,-14.62668 H 97.772699 V 33.037193 Z"
+       d="m 346.10127,32.712156 v 70.208054 h -8.77601 l 14.62668,14.62668 14.62668,-14.62668 h -8.77601 V 32.712156 Z"
        id="path9-4" />
     <text
        xml:space="preserve"
        style="font-size:12px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#484848;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="-63.108498"
-       y="81.938576"
+       x="-62.783459"
+       y="341.96848"
        id="text10-4"
        transform="rotate(-90)"><tspan
          sodipodi:role="line"
          id="tspan10-2"
-         x="-63.108498"
-         y="81.938576"
+         x="-62.783459"
+         y="341.96848"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Consolas;-inkscape-font-specification:Consolas;fill:#484848;fill-opacity:1">rxNextIndex</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="68.823723"
-       y="150.44464"
-       id="text11"><tspan
-         sodipodi:role="line"
-         id="tspan11"
-         x="68.823723"
-         y="150.44464"
-         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="163.91342"
-       y="151.51054"
-       id="text11-3"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.67391px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="257.90567"
+       y="144.62485"
+       id="text11-04"><tspan
          sodipodi:role="line"
          id="tspan11-6"
-         x="163.91342"
-         y="151.51054"
-         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
+         x="257.90567"
+         y="144.62485"
+         style="stroke-width:1.50047">Empty</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="446.07462"
-       y="160.90982"
+       x="446.56216"
+       y="154.08403"
        id="text9-0-4"><tspan
          sodipodi:role="line"
          id="tspan9-3-1"
-         x="446.07462"
-         y="160.90982"
+         x="446.56216"
+         y="154.08403"
+         style="stroke-width:1.50047">dmaOwn = true</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="353.30719"
+       y="144.76285"
+       id="text11-9"><tspan
+         sodipodi:role="line"
+         id="tspan11-2"
+         x="353.30719"
+         y="144.76285"
+         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="447.06949"
+       y="145.04907"
+       id="text11-8"><tspan
+         sodipodi:role="line"
+         id="tspan11-62"
+         x="447.06949"
+         y="145.04907"
+         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.6877px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#3f31ec;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="258.75677"
+       y="154.32993"
+       id="text8-8-3-11-2"><tspan
+         sodipodi:role="line"
+         id="tspan8-0-3-6-5"
+         x="258.75677"
+         y="154.32993"
+         style="stroke-width:1.50047">dmaOwn = false</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="259.13913"
+       y="162.31619"
+       id="text9-0-42-9-9"><tspan
+         sodipodi:role="line"
+         id="tspan9-3-13-1-6"
+         x="259.13913"
+         y="162.31619"
+         style="fill:#000000;fill-opacity:1;stroke-width:1.50047">flags = none</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="67.530281"
+       y="161.54604"
+       id="text9-0-42-9-3"><tspan
+         sodipodi:role="line"
+         id="tspan9-3-13-1-1"
+         x="67.530281"
+         y="161.54604"
+         style="fill:#000000;fill-opacity:1;stroke-width:1.50047">flags = none</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="541.99829"
+       y="145.89854"
+       id="text11-8-8"><tspan
+         sodipodi:role="line"
+         id="tspan11-62-9"
+         x="541.99829"
+         y="145.89854"
+         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="69.325699"
+       y="145.01405"
+       id="text11-8-2"><tspan
+         sodipodi:role="line"
+         id="tspan11-62-5"
+         x="69.325699"
+         y="145.01405"
+         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="163.55766"
+       y="145.31241"
+       id="text11-8-4"><tspan
+         sodipodi:role="line"
+         id="tspan11-62-0"
+         x="163.55766"
+         y="145.31241"
+         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="543.0965"
+       y="154.51309"
+       id="text9-0-4-4"><tspan
+         sodipodi:role="line"
+         id="tspan9-3-1-6"
+         x="543.0965"
+         y="154.51309"
          style="stroke-width:1.50047">dmaOwn = true</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="542.91211"
-       y="161.11041"
-       id="text9-0-6"><tspan
+       x="67.487534"
+       y="153.849"
+       id="text9-0-4-6"><tspan
          sodipodi:role="line"
-         id="tspan9-3-7"
-         x="542.91211"
-         y="161.11041"
+         id="tspan9-3-1-3"
+         x="67.487534"
+         y="153.849"
          style="stroke-width:1.50047">dmaOwn = true</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="258.30356"
-       y="151.34666"
-       id="text11-2"><tspan
+       style="font-size:7.77683px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#ec3131;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
+       x="164.33047"
+       y="153.9054"
+       id="text9-0-4-62"><tspan
          sodipodi:role="line"
-         id="tspan11-7"
-         x="258.30356"
-         y="151.34666"
-         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="352.81964"
-       y="151.58864"
-       id="text11-9"><tspan
-         sodipodi:role="line"
-         id="tspan11-2"
-         x="352.81964"
-         y="151.58864"
-         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.82376px;font-family:Calibri;-inkscape-font-specification:Calibri;text-align:center;text-anchor:middle;fill:#000100;fill-opacity:1;stroke:none;stroke-width:1.50047;stroke-dasharray:none;stroke-opacity:1"
-       x="446.58194"
-       y="151.87486"
-       id="text11-8"><tspan
-         sodipodi:role="line"
-         id="tspan11-62"
-         x="446.58194"
-         y="151.87486"
-         style="stroke-width:1.50047">Points to Blank Buffer</tspan></text>
+         id="tspan9-3-1-5"
+         x="164.33047"
+         y="153.9054"
+         style="stroke-width:1.50047">dmaOwn = true</tspan></text>
   </g>
 </svg>

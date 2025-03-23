@@ -42,7 +42,7 @@ namespace mbed {
         /// Pointer to first memory buffer in the chain associated with descriptor n.
         /// The buffer address shall only be set for the *last* descriptor, so that the entire chain is freed
         /// when the last descriptor is returned.
-        std::array<net_stack_mem_buf_t *, MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS> descStackBuffers{};
+        std::array<net_stack_mem_buf_t *, TX_NUM_DESCS> descStackBuffers{};
 
         /// EventFlag used to signal when a Tx descriptor becomes available
         rtos::EventFlags txDescAvailFlag;
@@ -307,7 +307,7 @@ namespace mbed {
      * The subclass must allocate the DMA descriptors, and all access to them is done through virtual functions
      * that the subclass must override.
      */
-    class GenericRxDMALoop : public CompositeEMAC::RxDMA {
+    class GenericRxDMARing : public CompositeEMAC::RxDMA {
     protected:
         /// How many extra buffers to leave in the Rx pool, relative to how many we keep assigned to Rx descriptors.
         /// We want to keep some amount of extra buffers because constantly hitting the network stack with failed pool
@@ -340,7 +340,7 @@ namespace mbed {
         size_t rxPoolPayloadSize;
 
         /// Constructor. Subclass must allocate descriptor array of size RX_NUM_DESCS
-        GenericRxDMALoop() = default;
+        GenericRxDMARing() = default;
 
         /// Configure DMA registers to point to the DMA ring,
         /// and enable DMA. This is done before the MAC itself is enabled, and before any descriptors

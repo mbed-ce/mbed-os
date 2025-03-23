@@ -58,7 +58,7 @@ class STM32EthMACv1 : public CompositeEMAC
         {}
     };
 
-    class RxDMA : public GenericRxDMALoop {
+    class RxDMA : public GenericRxDMARing {
     protected:
         ETH_TypeDef * const base; // Base address of Ethernet peripheral
         StaticCacheAlignedBuffer<stm32_ethv1::RxDescriptor, RX_NUM_DESCS> rxDescs; // Rx descriptors
