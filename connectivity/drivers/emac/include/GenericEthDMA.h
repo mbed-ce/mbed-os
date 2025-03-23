@@ -33,7 +33,7 @@ namespace mbed {
      * This implementation of Tx DMA should work for the large majority of embedded MCUs that use a DMA ring-based
      * ethernet MAC.
      */
-    class GenericTxDMALoop : public CompositeEMAC::TxDMA
+    class GenericTxDMARing : public CompositeEMAC::TxDMA
     {
     protected:
         /// Number of entries in the Tx descriptor ring

@@ -27,7 +27,7 @@ namespace mbed {
      */
     class STM32EthMACv2 : public CompositeEMAC {
 
-        class TxDMA : public GenericTxDMALoop
+        class TxDMA : public GenericTxDMARing
         {
         protected:
             ETH_TypeDef * const base; // Base address of Ethernet peripheral

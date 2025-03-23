@@ -37,6 +37,8 @@ A descriptor is a structure in memory that contains control information and one 
 But we don't want the DMA to have to wait for the CPU, do we? To avoid this, each descriptor also specifies a "next descriptor", either via an offset or a pointer. The DMA can move to this next descriptor and start processing it right away to send or receive the next packet. The CPU will process the completed descriptor on its own time and give it back to the DMA. In this manner, as long as your ring of descriptors is big enough and your CPU can keep up with the processing them, the CPU and MAC never have to wait for each other!
 
 ## Components of the Composite EMAC
+Now that we've covered how an EMAC works in hardware, we can talk through how CompositeEMAC works, and what needs to be implemented for each MCU target.
+
 ### MAC Driver
 
 The MAC driver (which must be implemented as a subclass of `CompositeEMAC::MACDriver`) is usually fairly simple. It provides an interface between Mbed and the MAC's configuration register block and MDIO master interface. Its responsibilities include:
@@ -66,7 +68,7 @@ Unlike the MAC driver and the DMA, the PHY driver does not need to be subclassed
 
 This will work out of the box, as long as `LAN8742` names a PHY driver defined in PhyDrivers.cpp. Individual PHY models will generally need their own drivers, since often PHYs have errata that need to be worked around or need other configuration that isn't defined in the standard. However, GenericEthPhy allows implementing the absolute minimum amount of logic per-phy as possible!
 
-Since user boards may want to use a different ethernet PHY, the driver can be customized in an application by overriding the `mbed::get_eth_phy_driver` weak function. This might look something like
+Since user boards may want to use a different ethernet PHY, the driver can be customized in an application by overriding the `mbed::get_eth_phy_driver` weak function to return a different driver class. This might look something like
 
 ```c++
 namespace MY_PHY {
@@ -95,3 +97,7 @@ CompositeEMAC::PHYDriver * get_eth_phy_driver()
 }
 }
 ```
+
+### Tx DMA
+
+The Rx and Tx DMAs are implemented as their own driver classes, as they are somewhat complicated and generally don't interact with the other pieces of the EMAC very much. The Tx DMA must be implemented as a subclass of `CompositeEMAC::TxDMA`. However, since the large majority of microcontrollers implement Tx DMA in a very similar way, the `GenericTxDMARing` class has been provided which implements most of the needed functionality.

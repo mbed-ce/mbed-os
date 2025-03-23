@@ -72,7 +72,7 @@ CompositeEMAC::ErrCode GenericEthPhy::init() {
     }
 
     // Software reset, if we couldn't use the hardware reset line earlier
-    if(mac->getPhyResetPin() != NC) {
+    if(mac->getPhyResetPin() == NC) {
         uint16_t bmcrVal;
         FORWARD_ERR(mac->mdioRead(config.address, GenPhyRegs::BMCR, bmcrVal));
         FORWARD_ERR(mac->mdioWrite(config.address, GenPhyRegs::BMCR, bmcrVal | GenPhyRegs::BMCR_SW_RST_Msk));
