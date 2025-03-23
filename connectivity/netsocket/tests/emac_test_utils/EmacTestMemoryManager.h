@@ -108,13 +108,22 @@ public:
     virtual void set_alloc_unit(uint32_t alloc_unit);
 
     /**
-     * Sets whether memory is available
+     * Sets whether memory (heap or pool) is available
      *
      * Can be used to disable memory allocation request from emac.
      *
      * @param memory    True if memory is available
      */
     void set_memory_available(bool memory);
+
+    /**
+     * Sets whether pool memory is available.
+     *
+     * Can be used to disable memory allocation request for the pool from emac.
+     *
+     * @param memory    True if memory is available
+     */
+    void set_pool_memory_available(bool memory);
 
     /**
      * Gets memory statistics
@@ -136,6 +145,7 @@ private:
     unsigned int m_alloc_unit;
     size_t m_pool_bufs_used = 0;
     bool m_memory_available;
+    bool m_pool_memory_available;
 };
 
 #endif /* EMAC_TEST_MEMORY_MANAGER_H */

@@ -384,25 +384,15 @@ void emac_if_set_output_memory(bool memory)
 void emac_if_set_input_memory(bool memory)
 {
     allow_input_memory_allocs = memory;
-
-    emac_if_set_memory(memory);
+    EmacTestMemoryManager::get_instance().set_pool_memory_available(allow_input_memory_allocs);
 }
 
 void emac_if_check_memory(bool output)
 {
     if (output) {
-        emac_if_set_memory(allow_output_memory_allocs);
+        EmacTestMemoryManager::get_instance().set_memory_available(allow_output_memory_allocs);
     } else {
-        emac_if_set_memory(allow_input_memory_allocs);
-    }
-}
-
-void emac_if_set_memory(bool memory)
-{
-    static bool memory_value = true;
-    if (memory_value != memory) {
-        memory_value = memory;
-        EmacTestMemoryManager::get_instance().set_memory_available(memory);
+        EmacTestMemoryManager::get_instance().set_memory_available(allow_input_memory_allocs);
     }
 }
 

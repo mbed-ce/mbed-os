@@ -113,10 +113,17 @@ void emac_if_set_all_multicast(bool all);
 void emac_if_add_multicast_group(uint8_t *address);
 void emac_if_remove_multicast_group(uint8_t *address);
 
+/// If called with false as the arg, disables memory allocation
+/// (a) from the pool at all times, and 
+/// (b) from the heap when not actively transmitting a packet
 void emac_if_set_output_memory(bool memory);
+
+/// If called with true as the arg, disables memory allocation from the pool and heap during packet Tx.
 void emac_if_set_input_memory(bool memory);
+
+/// Switches between input (false) and output (true) mode for the memory allocation disable.
+/// Called by the CTP code when it's sending a packet.
 void emac_if_check_memory(bool output);
-void emac_if_set_memory(bool memory);
 
 void emac_if_set_ctp_server_enabled(bool enabled);
 

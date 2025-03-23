@@ -73,7 +73,8 @@ EmacTestMemoryManager::EmacTestMemoryManager()
     : m_mem_mutex(),
       m_mem_buffers(),
       m_alloc_unit(MBED_CONF_NSAPI_EMAC_RX_POOL_BUF_SIZE),
-      m_memory_available(true)
+      m_memory_available(true),
+      m_pool_memory_available(true)
 {
 #ifdef ETHMEM_SECTION
     static bool ns_heap_init = false;
@@ -171,7 +172,7 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_pool(uint32_t size, uint32_t align,
 
     check_align(align);
 
-    if ((opt & MEM_CHECK) && !m_memory_available) {
+    if ((opt & MEM_CHECK) && (!m_memory_available || !m_pool_memory_available)) {
         return NULL;
     }
 
@@ -503,6 +504,16 @@ void EmacTestMemoryManager::set_memory_available(bool memory)
 
     // Poke the EMAC in case it can allocate buffers
     if (m_memory_available && onPoolSpaceAvailCallback) {
+        onPoolSpaceAvailCallback();
+    }
+}
+
+void EmacTestMemoryManager::set_pool_memory_available(bool memory)
+{
+    m_pool_memory_available = memory;
+
+    // Poke the EMAC in case it can allocate buffers
+    if (m_pool_memory_available && m_memory_available && onPoolSpaceAvailCallback) {
         onPoolSpaceAvailCallback();
     }
 }
