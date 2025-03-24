@@ -39,6 +39,10 @@ namespace mbed {
         /// Number of entries in the Tx descriptor ring
         static constexpr size_t TX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
 
+        /// Extra, unfilled Tx descs to leave in the DMA ring at all times.
+        /// This is used to support Eth MACs that don't allow enqueuing every single descriptor at a time.
+        const size_t extraTxDescsToLeave;
+
         /// Pointer to first memory buffer in the chain associated with descriptor n.
         /// The buffer address shall only be set for the *last* descriptor, so that the entire chain is freed
         /// when the last descriptor is returned.
@@ -54,6 +58,11 @@ namespace mbed {
         size_t txSendIndex; ///< Index of the next Tx descriptor that can be filled with data
         std::atomic<size_t> txDescsOwnedByApplication; ///< Number of Tx descriptors owned by the application. Decremented by txPacket() and incremented by reclaimTxDescs()
         size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the mac thread calling reclaimTxDescs().
+
+        /// Construct, passing a value for extraTxDescsToLeave
+        GenericTxDMARing(size_t extraTxDescsToLeave = 0):
+        extraTxDescsToLeave(extraTxDescsToLeave)
+        {}
 
         /// Configure DMA registers to point to the DMA ring,
         /// and enable DMA. This is done before the MAC itself is enabled.
@@ -181,9 +190,10 @@ namespace mbed {
 
         CompositeEMAC::ErrCode txPacket(net_stack_mem_buf_t * buf) {
             // Step 1: Figure out if we can send this zero-copy, or if we need to copy it.
-            size_t neededDescs = memory_manager->count_buffers(buf);
+            size_t packetDescsUsed = memory_manager->count_buffers(buf);
+            size_t neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             bool needToCopy = false;
-            if(neededDescs >= TX_NUM_DESCS)
+            if(neededFreeDescs >= TX_NUM_DESCS)
             {
                 // Packet uses too many buffers, we have to copy it into a continuous buffer.
                 // Note: Some Eth DMAs (e.g. STM32 v2) cannot enqueue all the descs in the ring at the same time
@@ -191,7 +201,7 @@ namespace mbed {
                 needToCopy = true;
             }
 
-            if(!needToCopy && (neededDescs > txDescsOwnedByApplication && txDescsOwnedByApplication > 0)) {
+            if(!needToCopy && (neededFreeDescs > txDescsOwnedByApplication && txDescsOwnedByApplication > extraTxDescsToLeave)) {
                 // Packet uses more buffers than we have descriptors, but we can send it immediately if we copy
                 // it into a single buffer.
                 needToCopy = true;
@@ -233,7 +243,8 @@ namespace mbed {
 
                 // We should have gotten just one contiguous buffer
                 MBED_ASSERT(memory_manager->get_next(newBuf) == nullptr);
-                neededDescs = 1;
+                packetDescsUsed = 1;
+                neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
 
                 // Copy data over
                 memory_manager->copy_from_buf(static_cast<uint8_t *>(memory_manager->get_ptr(newBuf)), memory_manager->get_len(newBuf), buf);
@@ -245,14 +256,14 @@ namespace mbed {
             // Note that, in my experience, it's better to block here, as dropping the packet
             // due to not having enough buffers can create weird effects when the application sends
             // lots of packets at once.
-            while(txDescsOwnedByApplication < neededDescs)
+            while(txDescsOwnedByApplication < neededFreeDescs)
             {
                 txDescAvailFlag.wait_any_for(1, rtos::Kernel::wait_for_u32_forever);
             }
 
             // Step 4: Load buffer into descriptors and send
             net_stack_mem_buf_t * currBuf = buf;
-            for(size_t descCount = 0; descCount < neededDescs; descCount++)
+            for(size_t descCount = 0; descCount < packetDescsUsed; descCount++)
             {
 #if __DCACHE_PRESENT
                 // Write buffer back to main memory
@@ -453,6 +464,8 @@ namespace mbed {
             // This could potentially produce a false positive if we do this in the middle of receiving
             // an existing packet, but that is unlikely and will not cause anything bad to happen if it does.
 
+            bool seenFirstDesc = false;
+
             for(size_t descCount = 0; descCount < RX_NUM_DESCS; descCount++)
             {
                 size_t descIdx = (rxNextIndex + descCount) % RX_NUM_DESCS;
@@ -465,6 +478,20 @@ namespace mbed {
                 {
                     // Descriptor owned by DMA.  We are out of descriptors to process.
                     return false;
+                }
+                if(isFirstDesc(descIdx))
+                {
+                    if(seenFirstDesc)
+                    {
+                        // First desc seen after another first desc.
+                        // Some MACs do this if they run out of Rx descs when halfway through a packet.
+                        // dequeuePacket() can clean this up and reclaim the partial packet desc(s).
+                        return true;
+                    }
+                    else
+                    {
+                        seenFirstDesc = true;
+                    }
                 }
                 if(isErrorDesc(descIdx) || isLastDesc(descIdx))
                 {

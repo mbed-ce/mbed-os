@@ -48,6 +48,7 @@ namespace mbed {
             void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
         public:
             explicit TxDMA(ETH_TypeDef * const base):
+            GenericTxDMARing(1), // Request that 1 Tx descriptor is always left unfilled
             base(base)
             {}
         };

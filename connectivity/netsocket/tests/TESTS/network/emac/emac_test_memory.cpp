@@ -49,12 +49,10 @@ void test_emac_memory_cb(int opt)
         // Verify that, if this was a test step where allocations were supposed to fail, they actually did fail.
         // We can accept a couple of successful packets due to buffers that had been allocated earlier, but the
         // *majority* of the packets should have failed.
-        if(test_step > 0 && !echo_may_succeed)
-        {
-            if(successful_pkts_this_step >= failed_pkts_this_step)
-            {
+        if (test_step > 0 && !echo_may_succeed) {
+            if (successful_pkts_this_step >= failed_pkts_this_step) {
                 printf("Too many successful packets (%d) vs failed packets (%d). This was supposed to be a failure test!\r\n",
-                    successful_pkts_this_step, failed_pkts_this_step);
+                       successful_pkts_this_step, failed_pkts_this_step);
                 SET_ERROR_FLAGS(TEST_FAILED);
                 END_TEST_LOOP;
             }
@@ -164,8 +162,7 @@ void test_emac_memory_cb(int opt)
         }
     }
 
-    if(opt == INPUT)
-    {
+    if (opt == INPUT) {
         successful_pkts_this_step += 1;
     }
 

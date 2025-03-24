@@ -114,7 +114,7 @@ void emac_if_add_multicast_group(uint8_t *address);
 void emac_if_remove_multicast_group(uint8_t *address);
 
 /// If called with false as the arg, disables memory allocation
-/// (a) from the pool at all times, and 
+/// (a) from the pool at all times, and
 /// (b) from the heap when not actively transmitting a packet
 void emac_if_set_output_memory(bool memory);
 
