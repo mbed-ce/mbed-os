@@ -210,6 +210,25 @@ Once the descriptors have been rebuilt, we will basically be back in the initial
 
 ![Rx ring after rebuild](doc/rx-ring-after-rebuild.svg)
 
+*In most EMAC drivers, you would just copy the Rx packet out of the DMA buffer, then re-enqueue the descriptor without changing the buffer. However, since this is a zero-copy EMAC, we give the original DMA buffer to the network stack, so we then need to get a fresh buffer before we can re-enqueue the descriptor. 
+
 ##### Memory Exhaustion
 
+Running out of Rx pool memory is a problem for zero-copy Rx drivers in particular -- if the driver cannot rebuild an Rx descriptor when a packet is dequeued, it has to rebuild it at some later date. If this never happens, no reception can occur.
+
+Until CompositeEMAC was added, Mbed didn't have a good way to solve this problem. Some zero-copy drivers (e.g. LPC1768) would at least try and rebuild unbuilt descriptors the next time a packet was received, but none of them could handle the case where all Rx memory was exhausted -- there would be no built descriptors in the ring, so no packets could be received, and the MAC would be stuck forever.
+
+To solve this problem, the CompositeEMAC PR series added a new hook in both of the IP stacks for when a pool buffer is deallocated. This then triggers a callback to the memory manager, then to the MAC. This way, the MAC will know when Rx memory is available again and can unstick itself!
+
 #### Target-Specific Rx DMA Implementation
+
+For each target, the `GenericRxDMARing` class needs to be extended. The subclass must provide a couple functions:
+
+- Allocating the actual DMA descriptors (since this often has special requirements on alignment or memory banks)
+- Initializing and deinitializing the Rx DMA
+- Checking the dmaOwn flag on a descriptor
+- Checking the flags (first, last, error) on a descriptor
+- Getting the total length of a packet received into a series of descriptors
+- Returning a rebuilt descriptor to the DMA controller, with a given buffer address
+
+Everything else, including the descriptor tracking and memory management, is done by the superclass. This should let target implementations focus only on the low level descriptor format while relying on common code for everything else.
