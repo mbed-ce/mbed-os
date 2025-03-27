@@ -3675,7 +3675,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         // Leave room for the Arduino bootloader, using the next 1M of space
         "memory_bank_config": {
             "IROM1": {
-                "start": 0x08020000,
+                "start": 0x08040000,
                 "size": 0x100000
             },
         }
@@ -3683,11 +3683,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "ARDUINO_GIGA_CM4": {
         inherits: ["MCU_STM32H747xI_CM4", "ARDUINO_GIGA"],
 
-        // Leave room for the Arduino bootloader and the CM7 application, using the next 896k of space
+        // Leave room for the Arduino bootloader and the CM7 application, using the next 768k of space
         "memory_bank_config": {
             "IROM1": {
-                "start": 0x08120000,
-                "size": 0xE0000
+                "start": 0x08140000,
+                "size": 0xC0000
             },
         }
     },
