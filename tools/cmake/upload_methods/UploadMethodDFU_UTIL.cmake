@@ -28,6 +28,8 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 			--download ${BINARY_FILE}
 			--alt ${DFU_UTIL_TARGET_INTERFACE}
 			${DFU_UTIL_SERIAL_ARGS}
-			--dfuse-address ${MBED_UPLOAD_BASE_ADDR}:leave)
+			--dfuse-address ${MBED_UPLOAD_BASE_ADDR}:leave
+		VERBATIM
+		USES_TERMINAL)
 
 endfunction(gen_upload_target)
