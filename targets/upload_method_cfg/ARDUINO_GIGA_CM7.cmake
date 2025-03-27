@@ -49,5 +49,11 @@ set(STM32CUBE_GDBSERVER_ARGS --swd --initialize-reset --apid 0)
 # -------------------------------------------------------------
 
 set(STLINK_UPLOAD_ENABLED TRUE)
-set(STLINK_LOAD_ADDRESS 0x8000000)
 set(STLINK_ARGS --connect-under-reset)
+
+# Config options for dfu-util
+# -------------------------------------------------------------
+
+set(DFU_UTIL_UPLOAD_ENABLED TRUE)
+set(DFU_UTIL_TARGET_VID_PID 2341:0366)
+set(DFU_UTIL_TARGET_INTERFACE 0)
