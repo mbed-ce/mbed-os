@@ -1,0 +1,177 @@
+var group__hal =
+[
+    [ "Analogin hal functions", "group__hal__analogin.html", "group__hal__analogin" ],
+    [ "Analogout hal functions", "group__hal__analogout.html", "group__hal__analogout" ],
+    [ "Hardware CRC", "group__hal__crc.html", "group__hal__crc" ],
+    [ "Critical Section HAL functions", "group__hal__critical.html", "group__hal__critical" ],
+    [ "Flash HAL API", "group__flash__hal.html", "group__flash__hal" ],
+    [ "GPIO HAL functions", "group__hal__gpio.html", "group__hal__gpio" ],
+    [ "GPIO IRQ HAL functions", "group__hal__gpioirq.html", "group__hal__gpioirq" ],
+    [ "I2C Events Macros", "group__hal___i2_c_events.html", "group__hal___i2_c_events" ],
+    [ "I2C Configuration Functions", "group__hal___general_i2_c.html", "group__hal___general_i2_c" ],
+    [ "Synchronous I2C Hardware Abstraction Layer for slave", "group___synch_i2_c.html", "group___synch_i2_c" ],
+    [ "Asynchronous I2C Hardware Abstraction Layer", "group__hal___asynch_i2_c.html", "group__hal___asynch_i2_c" ],
+    [ "Instrumented Trace Macrocell HAL API", "group__itm__hal.html", "group__itm__hal" ],
+    [ "Low Power Ticker", "group__hal__lp__ticker.html", "group__hal__lp__ticker" ],
+    [ "MPU hal", "group__hal__mpu.html", "group__hal__mpu" ],
+    [ "Port HAL functions", "group__hal__port.html", "group__hal__port" ],
+    [ "Pwmout hal functions", "group__hal__pwmout.html", "group__hal__pwmout" ],
+    [ "QSPI HAL", "group__hal__qspi.html", "group__hal__qspi" ],
+    [ "ResetReason HAL API", "group__hal__reset__reason.html", "group__hal__reset__reason" ],
+    [ "RTC hal", "group__hal__rtc.html", "group__hal__rtc" ],
+    [ "Serial TX Events Macros", "group___serial_t_x_events.html", null ],
+    [ "Serial RX Events Macros", "group___serial_r_x_events.html", null ],
+    [ "Serial Configuration Functions", "group__hal___general_serial.html", "group__hal___general_serial" ],
+    [ "Asynchronous Serial Hardware Abstraction Layer", "group__hal___asynch_serial.html", "group__hal___asynch_serial" ],
+    [ "sleep hal requirements", "group__hal__sleep.html", "group__hal__sleep" ],
+    [ "SPI Events Macros", "group__hal___s_p_i_events.html", "group__hal___s_p_i_events" ],
+    [ "SPI Configuration Functions", "group__hal___general_s_p_i.html", "group__hal___general_s_p_i" ],
+    [ "Synchronous SPI Hardware Abstraction Layer", "group___synch_s_p_i.html", "group___synch_s_p_i" ],
+    [ "Asynchronous SPI Hardware Abstraction Layer", "group___asynch_s_p_i.html", "group___asynch_s_p_i" ],
+    [ "Ticker HAL functions", "group__hal__ticker.html", "group__hal__ticker" ],
+    [ "TRNG hal functions", "group__hal__trng.html", "group__hal__trng" ],
+    [ "Microsecond Ticker", "group__hal__us__ticker.html", "group__hal__us__ticker" ],
+    [ "Watchdog HAL API", "group__hal__watchdog.html", "group__hal__watchdog" ],
+    [ "buffer_s", "structbuffer__s.html", [
+      [ "buffer", "structbuffer__s.html#a368f7094dc38acca20612bbb392552f4", null ],
+      [ "length", "structbuffer__s.html#ae809d5359ac030c60a30a8f0b2294b82", null ],
+      [ "pos", "structbuffer__s.html#a5438a597ee291f523ae04a9fe355924f", null ],
+      [ "width", "structbuffer__s.html#a09a2a45f731b02946ff6d3cd15c1a476", null ]
+    ] ],
+    [ "can_pinmap_t", "structcan__pinmap__t.html", null ],
+    [ "CAN_Message", "struct_c_a_n___message.html", null ],
+    [ "crc_mbed_config", "structcrc__mbed__config.html", [
+      [ "polynomial", "structcrc__mbed__config.html#abbaed4d7eae04f71f20739687944763c", null ],
+      [ "width", "structcrc__mbed__config.html#a325272ddd9a962f05deb905101d25cbd", null ],
+      [ "initial_xor", "structcrc__mbed__config.html#a2fdeecaf4968c93f6fba4dd995bf2ba7", null ],
+      [ "final_xor", "structcrc__mbed__config.html#af33e0b4f3e3014304a746920a96f75d0", null ],
+      [ "reflect_in", "structcrc__mbed__config.html#a73ff346d65ef1204e900c5a129ac93a7", null ],
+      [ "reflect_out", "structcrc__mbed__config.html#ad1438be6081f837b54df9fbef0ac16e7", null ]
+    ] ],
+    [ "i2c_t", "structi2c__t.html", [
+      [ "i2c", "structi2c__t.html#a05e24dc4381756fa577cd363e579c245", null ],
+      [ "tx_buff", "structi2c__t.html#ac1ee0c1b6e3718e90992ad549358d37b", null ],
+      [ "rx_buff", "structi2c__t.html#ae5ead6b84771ba6b3f9deae4e799fe48", null ]
+    ] ],
+    [ "i2c_pinmap_t", "structi2c__pinmap__t.html", null ],
+    [ "LowPowerTickerWrapper", "class_low_power_ticker_wrapper.html", [
+      [ "LowPowerTickerWrapper", "class_low_power_ticker_wrapper.html#a0ea11a4301bacff519ffa05852b8c720", null ],
+      [ "irq_handler", "class_low_power_ticker_wrapper.html#a8cab5c29017a9917bc79288711e66ebd", null ],
+      [ "suspend", "class_low_power_ticker_wrapper.html#a3605b58fb45d69d498721bc2f2a14b1c", null ],
+      [ "resume", "class_low_power_ticker_wrapper.html#a41de8150eff044a237990c271d57ea27", null ],
+      [ "timeout_pending", "class_low_power_ticker_wrapper.html#a1639dfeb4b4a4719943f1b625d551a14", null ]
+    ] ],
+    [ "PinMap", "struct_pin_map.html", null ],
+    [ "PinList", "struct_pin_list.html", null ],
+    [ "PeripheralList", "struct_peripheral_list.html", null ],
+    [ "serial_t", "structserial__t.html", [
+      [ "serial", "structserial__t.html#af5335ae3808e461311502637c9e7f446", null ],
+      [ "tx_buff", "structserial__t.html#ac1ee0c1b6e3718e90992ad549358d37b", null ],
+      [ "rx_buff", "structserial__t.html#ae5ead6b84771ba6b3f9deae4e799fe48", null ],
+      [ "char_match", "structserial__t.html#adba361ac9e16c6ca0074b4f555320392", null ],
+      [ "char_found", "structserial__t.html#a9e466a3f7333a21c800b22f205a4b631", null ]
+    ] ],
+    [ "serial_pinmap_t", "structserial__pinmap__t.html", null ],
+    [ "serial_fc_pinmap_t", "structserial__fc__pinmap__t.html", null ],
+    [ "spi_t", "structspi__t.html", [
+      [ "spi", "structspi__t.html#a68630994950ee26c66ebd97d38004c49", null ],
+      [ "tx_buff", "structspi__t.html#ac1ee0c1b6e3718e90992ad549358d37b", null ],
+      [ "rx_buff", "structspi__t.html#ae5ead6b84771ba6b3f9deae4e799fe48", null ]
+    ] ],
+    [ "spi_pinmap_t", "structspi__pinmap__t.html", null ],
+    [ "spi_capabilities_t", "structspi__capabilities__t.html", [
+      [ "minimum_frequency", "structspi__capabilities__t.html#ae458b22f79cfd9f9580bd6de764fdda4", null ],
+      [ "maximum_frequency", "structspi__capabilities__t.html#a96b7950e1b7d096179a2ed67816ee17a", null ],
+      [ "word_length", "structspi__capabilities__t.html#a501da8d41c9e621bce80e32045061437", null ],
+      [ "slave_delay_between_symbols_ns", "structspi__capabilities__t.html#a08a00775093b0809d17412647fc8ffaf", null ],
+      [ "clk_modes", "structspi__capabilities__t.html#a84dafc8255284308fdd2e0ab9acbd5cf", null ],
+      [ "support_slave_mode", "structspi__capabilities__t.html#ae1f633c0d63b428f1c784bfa143c69b6", null ],
+      [ "hw_cs_handle", "structspi__capabilities__t.html#ac1085d360f6d80cd47282328bd81235a", null ],
+      [ "async_mode", "structspi__capabilities__t.html#a6d553fde28851ace7330b3e4beb05ebd", null ],
+      [ "tx_rx_buffers_equal_length", "structspi__capabilities__t.html#a02ab4b9502323477971b183b7cc9b874", null ]
+    ] ],
+    [ "ticker_event_s", "structticker__event__s.html", [
+      [ "timestamp", "structticker__event__s.html#a1cee1570cce1a471a148008a85a63890", null ],
+      [ "id", "structticker__event__s.html#abaabdc509cdaba7df9f56c6c76f3ae19", null ],
+      [ "next", "structticker__event__s.html#a064f2566b1d3fa9c0b6cc9a09b43412f", null ]
+    ] ],
+    [ "ticker_info_t", "structticker__info__t.html", [
+      [ "frequency", "structticker__info__t.html#ab632fb0b4d5156ea4df0b1e15410e913", null ],
+      [ "bits", "structticker__info__t.html#afeda3c90a255fe7e4b1e99b4308cce2c", null ]
+    ] ],
+    [ "ticker_interface_t", "structticker__interface__t.html", [
+      [ "init", "structticker__interface__t.html#a70526eb95af7b40162c92b34a7124698", null ],
+      [ "read", "structticker__interface__t.html#acb477ca84c520b63679083c039927af6", null ],
+      [ "disable_interrupt", "structticker__interface__t.html#a55f07c69212d545d9db9af7e0636cbde", null ],
+      [ "clear_interrupt", "structticker__interface__t.html#a48cdeca376557a27a53dd7b07b06bc34", null ],
+      [ "set_interrupt", "structticker__interface__t.html#a0b1b6549e6f589a85f735bb80057e360", null ],
+      [ "fire_interrupt", "structticker__interface__t.html#a1c8a49f978ae1f725beeabe04f27c022", null ],
+      [ "free", "structticker__interface__t.html#ad574c12590abce4178b707a3cfb5665b", null ],
+      [ "get_info", "structticker__interface__t.html#a49241b6c1a811f1d3f67198943874f5c", null ],
+      [ "runs_in_deep_sleep", "structticker__interface__t.html#a95ba134c7aa2730a2bd42d9f4cb493a2", null ]
+    ] ],
+    [ "ticker_event_queue_t", "structticker__event__queue__t.html", [
+      [ "event_handler", "structticker__event__queue__t.html#abadbb2e2c2f64499c355a34c08b9c9a7", null ],
+      [ "head", "structticker__event__queue__t.html#a3a7f9e6d621693e134b58294804c165c", null ],
+      [ "period_num", "structticker__event__queue__t.html#a37cadf165907f448b54e41dc367e4831", null ],
+      [ "period_den", "structticker__event__queue__t.html#a862257082790ad350cb6237eca38e581", null ],
+      [ "bitmask", "structticker__event__queue__t.html#a9977f11e12ad47bc62ee74fda71e777a", null ],
+      [ "max_delta", "structticker__event__queue__t.html#ab5546cee6d235daa91edf4aa1200e583", null ],
+      [ "max_delta_us", "structticker__event__queue__t.html#a91cc30da038f1b20294a1aff18d8a8df", null ],
+      [ "tick_last_read", "structticker__event__queue__t.html#abd72c3e7faf55f895d94c52f18391591", null ],
+      [ "tick_remainder", "structticker__event__queue__t.html#a401c5a98cdd1b75c9da63a02d40cb154", null ],
+      [ "present_time", "structticker__event__queue__t.html#aaeb61106a0fbed1b4f3648c62a01f282", null ],
+      [ "initialized", "structticker__event__queue__t.html#aedeffc7d23da25d52b9a50045189fe2b", null ],
+      [ "dispatching", "structticker__event__queue__t.html#aa928397795835ce4ee78f2bc8029ea1e", null ],
+      [ "suspended", "structticker__event__queue__t.html#ae0ed5063d998fba626c0783a36391f3c", null ],
+      [ "period_num_shifts", "structticker__event__queue__t.html#a61675e2918833e9447253367555ddac6", null ],
+      [ "period_den_shifts", "structticker__event__queue__t.html#a050ebbb3bc7fa320ec2c32a29fbe2d9c", null ]
+    ] ],
+    [ "ticker_data_t", "structticker__data__t.html", [
+      [ "interface", "structticker__data__t.html#a75babe50893e40aee513d47787afd264", null ],
+      [ "queue", "structticker__data__t.html#a2ed6f5a80b1d1cd5d74c417f7afbfd9a", null ]
+    ] ],
+    [ "analogin_t", "group__hal.html#gafa32cdedb214c3418acfc08948c7c795", null ],
+    [ "dac_t", "group__hal.html#ga125c25ad6ab46870e3c0a3310cae2a2e", null ],
+    [ "buffer_t", "group__hal.html#ga81b62558b8599f883304a26b742aa44f", null ],
+    [ "crc_polynomial_t", "group__hal.html#gaaa1fa2bb611c113fa66e2c3e02f82f37", null ],
+    [ "gpio_irq_t", "group__hal.html#gaa7bafeb9d84d6a832a86441a38b9c64c", null ],
+    [ "port_t", "group__hal.html#gaed62f3ea86da10b6ac0aa7fa2e599aff", null ],
+    [ "pwmout_t", "group__hal.html#ga6609ec508d3754cc47e6b771cbdca74d", null ],
+    [ "timestamp_t", "group__hal.html#gaf889abd7a487d58af4c374658afc1dd3", null ],
+    [ "us_timestamp_t", "group__hal.html#gafbbb0a24d16addef2bc749c63e2a7f0f", null ],
+    [ "ticker_event_t", "group__hal.html#ga72ca2ef9e5e60ec062b314f8f8e5cf47", null ],
+    [ "trng_t", "group__hal.html#gae0cd96de14996dac6d3b5f2d83f93c07", null ],
+    [ "CANFormat", "group__hal.html#ga3728669b02b962d5e84c37d4587189b2", null ],
+    [ "CANType", "group__hal.html#ga2fb469bfd68de3955e9552b34cb86bcd", null ],
+    [ "crc_polynomial", "group__hal.html#gaac29aaabcf8b2e9348a5a2a730fdf46a", [
+      [ "POLY_7BIT_SD", "group__hal.html#ggaac29aaabcf8b2e9348a5a2a730fdf46aa7fb8f90dfd5ee3cd5b2767bac79ae99d", null ],
+      [ "POLY_8BIT_CCITT", "group__hal.html#ggaac29aaabcf8b2e9348a5a2a730fdf46aa11f0187e6192505aec2bf4269c26d5ea", null ],
+      [ "POLY_16BIT_CCITT", "group__hal.html#ggaac29aaabcf8b2e9348a5a2a730fdf46aae788c7d08ed51c9e1fba9bc3295a13c6", null ],
+      [ "POLY_16BIT_IBM", "group__hal.html#ggaac29aaabcf8b2e9348a5a2a730fdf46aa892af83ad6b24294e7d82e1a5ac87509", null ],
+      [ "POLY_32BIT_ANSI", "group__hal.html#ggaac29aaabcf8b2e9348a5a2a730fdf46aaf75299fa9ab0db23269d0f43bb7a0f45", null ]
+    ] ],
+    [ "DMAUsage", "group__hal.html#ga9fb5be593465bb507b7bc23945ddf30c", [
+      [ "DMA_USAGE_NEVER", "group__hal.html#gga9fb5be593465bb507b7bc23945ddf30ca751c73ff3789b621320107027b533e9f", null ],
+      [ "DMA_USAGE_OPPORTUNISTIC", "group__hal.html#gga9fb5be593465bb507b7bc23945ddf30ca791c54919034efe9eaea8161f0a6a7be", null ],
+      [ "DMA_USAGE_ALWAYS", "group__hal.html#gga9fb5be593465bb507b7bc23945ddf30ca9f20d0bf9b39d8b1b9147499d1436ad0", null ]
+    ] ],
+    [ "gpio_irq_event", "group__hal.html#gaa0af91058c138031cbcc5b93121644af", null ],
+    [ "SerialIrq", "group__hal.html#ga8dbaa98202e6883fc0398bcc14f582b7", [
+      [ "RxIrq", "group__hal.html#gga8dbaa98202e6883fc0398bcc14f582b7ada2693bfed74737c8d61d4818bc6171f", null ],
+      [ "TxIrq", "group__hal.html#gga8dbaa98202e6883fc0398bcc14f582b7aa4066880713ec11ad8d574f89336aed0", null ]
+    ] ],
+    [ "can_rd_pinmap", "group__hal.html#ga8ec7aa2bbc55e3b216efa4dcbf5b6b76", null ],
+    [ "can_td_pinmap", "group__hal.html#ga9e1f92d761f1176680457e5116699517", null ],
+    [ "lp_ticker_wrapper_irq_handler", "group__hal.html#ga65850cdc87426b77db63ba9c47cb6f45", null ],
+    [ "get_lp_ticker_wrapper_data", "group__hal.html#gaee14a49afbf5aa206d477daf21edd942", null ],
+    [ "lp_ticker_wrapper_suspend", "group__hal.html#ga310d29666242ef625fb9da87efeb3fb4", null ],
+    [ "lp_ticker_wrapper_resume", "group__hal.html#ga87f8f594864eb5a2eb0f603b1f2bf9cc", null ],
+    [ "pinmap_find_peripheral_pins", "group__hal.html#ga52634f7ff3d1d9d0ed8b09a693ff6c09", null ],
+    [ "pinmap_list_has_pin", "group__hal.html#ga7ffc53b3b5ab1e198b1ab8a4179cce4d", null ],
+    [ "pinmap_list_has_peripheral", "group__hal.html#ga09b821a6247d8868d82f5c41f9f7d96e", null ],
+    [ "pinmap_restricted_pins", "group__hal.html#ga7ae9bbf0c2ebac1a1baf216f7e29a626", null ],
+    [ "pinmap_uart_restricted_peripherals", "group__hal.html#ga855ef5029bbfd6e6613826b55499a49b", null ],
+    [ "pinmap_gpio_restricted_pins", "group__hal.html#ga2e5c288b96f369bd0d4229f708b62809", null ],
+    [ "get_usb_phy", "group__hal.html#gaea729d6f98dd0f78eaf21bcb3716f43b", null ]
+];
