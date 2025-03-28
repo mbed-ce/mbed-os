@@ -98,7 +98,7 @@ endif()
 # Load the upload method.
 # Upload methods are expected to refer to the following variables:
 # - MBED_UPLOAD_SERIAL_NUMBER - USB serial number of the mbed board or of the programmer
-# - MBED_UPLOAD_BASE_ADDR - Base address of the flash where the bin file will be updated
+# - MBED_UPLOAD_BASE_ADDR - Base address of the flash where the bin file will be written to
 #
 # Upload methods are expected to set the following variables:
 # - UPLOAD_${UPLOAD_METHOD}_FOUND - True iff the dependencies for this upload method were found
