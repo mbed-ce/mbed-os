@@ -17,7 +17,7 @@
 #ifndef MBED_CMSIS_NVIC_H
 #define MBED_CMSIS_NVIC_H
 
-#define NVIC_NUM_VECTORS        36
+#define NVIC_NUM_VECTORS        48
 #define NVIC_RAM_VECTOR_ADDRESS MBED_RAM_BANK_SRAM1_START
 
 #endif
