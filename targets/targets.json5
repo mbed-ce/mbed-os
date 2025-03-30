@@ -4756,7 +4756,60 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF268050.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
-
+    // STM32U0 Targets -------------------------------------------------------------------------------------------------
+    "MCU_STM32U0": {
+        "inherits": [
+            "MCU_STM32"
+        ],
+        "public": false,
+        "core": "Cortex-M0+",
+        "extra_labels_add": [
+            "STM32U0"
+        ],
+        "macros_add": [
+            "MBED_TICKLESS",
+            "EXTRA_IDLE_STACK_REQUIRED"
+        ],
+        "config": {
+            "clock_source": {
+                "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
+                "value": "USE_PLL_HSI",
+                "macro_name": "CLOCK_SOURCE"
+            },
+            "lpticker_lptim": {
+                "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
+                "value": 0
+            },
+            "i2c_timing_value_algo": {
+                "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
+                "value": false
+            }
+        },
+        "overrides": {
+            "lpticker_delay_ticks": 0,
+            //"lpuart_clock_source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+        },
+        "device_has_add": [
+        //    "CRC",
+        //    "FLASH",
+            "MPU",
+        //    "TRNG"
+        ],
+        "is_mcu_family_target": true
+    },
+    "MCU_STM32U083xC": {
+        "inherits": [
+            "MCU_STM32U0"
+        ],
+        "public": false,
+        "extra_labels_add": [
+            "STM32U083xC"
+        ],
+        "macros_add": [
+            "STM32U083xx"
+        ]
+    },
+  
     // STM32U5 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32U5": {
         "inherits": [
