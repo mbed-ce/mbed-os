@@ -34,7 +34,9 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		${STM32CUBE_CONNECT_COMMAND}
 		${STM32CUBE_UPLOAD_PROBE_ARGS} # probe arg must be immediately after -c command as it gets appended to -c
 		-w ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR}
-		-rst)
+		-rst
+		VERBATIM
+		USES_TERMINAL)
 
 endfunction(gen_upload_target)
 
