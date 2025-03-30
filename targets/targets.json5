@@ -4767,8 +4767,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32U0"
         ],
         "macros_add": [
-            "MBED_TICKLESS",
-            "EXTRA_IDLE_STACK_REQUIRED"
+            "MBED_TICKLESS"
         ],
         "config": {
             "clock_source": {
