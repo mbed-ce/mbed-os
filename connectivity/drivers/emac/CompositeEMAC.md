@@ -1,6 +1,6 @@
 # Composite EMAC
 
-The original Mbed OS EMAC API was added in Mbed OS 5.9. That API grouped all EMAC functionality into a single abstract class that targets/vendors had to implement, the `EMAC` class. Since then, dozens of Mbed targets have received EMAC drivers, and the strengths and weaknesses of this API have become clear. The general structure is good, and the idea of abstracting the memory manager and the network stack from the EMAC driver works well.
+The original Mbed OS Ethernet driver (aka EMAC driver) API was added in Mbed OS 5.9. That API grouped all Ethernet MAC functionality into a single abstract class that targets/vendors had to implement, the `EMAC` class. Since then, dozens of Mbed targets have received EMAC drivers, and the strengths and weaknesses of this API have become clear. The general structure is good, and the idea of abstracting the memory manager and the network stack from the EMAC driver works well.
 
 However, the [EMAC interface](https://github.com/mbed-ce/mbed-os/blob/0553c111850997d847dc6a3189ac0b7048304e57/connectivity/netsocket/include/netsocket/EMAC.h#L33) is difficult to implement, especially for people not intimately familiar with Mbed and its IP stacks. It requires EMAC implementations to implement the specifics of memory management, MAC address tracking, and DMA ring usage themselves, even though quite a bit of this logic is common to all MAC drivers. This has led to duplicated code, and quite often to half-assed code as well as chip vendors have struggled to conform to the (in some ways not very well defined) EMAC API. 
 
@@ -20,11 +20,13 @@ Before we can get into the details of how CompositeEMAC works, we need to go ove
 
 To run an ethernet connection, two chips need to work together*: the microcontroller and an external Ethernet PHY (PHYsical layer transceiver) chip. The microcontroller sends and receives logic level Ethernet packets, while the PHY transforms those into Ethernet signals, which are decidedly *not* logic level (and actually have a lot in common with radio signals). The Ethernet signals, called MDI (Media Dependent Interface) pairs, are sent through an isolation transformer, which removes common mode interference and provides electrical isolation (e.g. so that the two ends of the connection can have different ground voltage levels). Then, they go into the ethernet jack and across the ethernet cable to the link partner!
 
+*though some MCUs, e.g. TI's TM4C129 line, do have the Ethernet PHY integrated into the MCU.
+
 The PHY and the MCU are connected via a standard called [Reduced Media Independent Interface](https://en.wikipedia.org/wiki/Media-independent_interface#RMII) (RMII), which transfers the Ethernet packets as serialized bytes. This is an 8-wire bus with a 50MHz clock, four receive lines, and three transmit lines. The clock is traditionally either supplied by the PHY or by a dedicated clock generator chip, though some MCUs support supplying this clock as well. In addition to RMII, there's also a two-wire command and control bus called [Management Data IO](https://en.wikipedia.org/wiki/Management_Data_Input/Output) (MDIO) (though it can also be referred to Station Management Interface (SMI) or even "MiiM" for some reason). MDIO is used for talking directly to the PHY, not for sending Ethernet packets. MDIO is an open-drain bus similar to I2C, but with 16-bit words instead of bytes and a specific frame format (referred to as "Clause 22"). Unlike RMII, MDIO is a multi-drop bus, so you can actually connect up to 15 PHYs or other devices to one set of MDIO lines as long as they have different addresses!
 
 Inside the microcontroller, the bridge between the CPU and Ethernet is a peripheral called the Ethernet MAC. MAC stands for "Media Access Control" and refers to the second layer of the Ethernet protocol stack, the logic which encodes Ethernet packets and decides when to send them across the wire. The MAC has a number of moving parts inside, which are shown in the diagram above. The simplest is the block of configuration registers, which is accessible at a specific memory address and sets up operation of the MAC (e.g. what MAC addresses the hardware should accept and which checksums should be inserted/checked by the MAC). There is also an MDIO master interface, which controls the MDIO lines to talk to the PHY. And then, we have the DMA.
 
-Every Ethernet MAC I've seen also has DMA functionality. This means that the Ethernet peripheral can transmit and receive packets without direct CPU intervention. This is very important because it means your device can hit high network speeds without needing to have your CPU blocked for lots of time waiting on Ethernet packets to move through the hardware! For transmit, there will be a Tx DMA module which fetches data from the main RAM, and then enqueues the packet bytes plus control information into a FIFO (which is usually at least a couple thousand bytes long). Then, another block in the MAC, sometimes called the MTL (MAC Translation Layer) takes these bytes, applies any needed Ethernet framing, and shifts them out of the RMII Tx port.
+Every Ethernet MAC I've seen also has DMA functionality. This means that the Ethernet peripheral can transmit and receive packets without direct CPU intervention. This is very important because it means your device can hit high network speeds without needing to have your CPU blocked for lots of time waiting on Ethernet packets to move through the hardware! For transmit, there will be a Tx DMA module which fetches data from the main RAM, and then enqueues the packet bytes plus control information into a FIFO (which is usually at least a couple thousand bytes long). Then, another block in the MAC operating on its own timing, sometimes called the MTL (MAC Translation Layer) takes these bytes, applies any needed Ethernet framing, and shifts them out of the RMII Tx port.
 
 For reception, the process works the same but in reverse: the decoder and shifter block takes in packets and enqueues their bytes into the Rx FIFO. Then, the Rx DMA dequeues the packets and stores them into RAM at the right location.
 
@@ -139,7 +141,7 @@ The Tx interrupt* will detect that the descriptor pointed to by `txReclaimIndex`
 *Actually, interrupts cannot deallocate memory in Mbed, so the Tx interrupt handler actually signals the MAC thread to wake up and process the completed descriptor.
 
 ##### Final State
-Eventually, after a couple hundred microseconds, the second packet will be transmitted, and its descriptors will also be reclaimed. The Tx descriptor ring is now empty, except that the descriptor pointers are now both pointing to Desc 3.
+Eventually, after a couple hundred microseconds, the second packet will be transmitted, and its descriptors will also be reclaimed. The Tx descriptor ring is now empty, and matches the initial state except that the descriptor pointers are now both pointing to Desc 3.
 
 ![DMA ring after packet 1 deallocated](doc/tx-ring-step-5.svg)
 
@@ -196,7 +198,7 @@ Anyway, when the packet is received, the MAC will write it into the next three a
 
 The Rx ISR checks the DMA ring to make sure we have at least one complete packet. Then, it signals the MAC thread to dequeue the packet and pass it off to the IP stack.
 
-When the packet is dequeued, the buffers will be removed from the descriptors and, for now, they stay in the "owned by application" region of the descriptor ring (between `rxNextIndex` and `rxBuildIndex`).
+When the packet is dequeued, the buffers will be removed from the descriptors and, for now, the descriptors stay in the "owned by application" region of the descriptor ring (between `rxNextIndex` and `rxBuildIndex`).
 
 ![Rx ring after dequeue](doc/rx-ring-after-dequeue.svg)
 
