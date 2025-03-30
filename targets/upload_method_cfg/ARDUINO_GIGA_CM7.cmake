@@ -49,5 +49,17 @@ set(STM32CUBE_GDBSERVER_ARGS --swd --initialize-reset --apid 0)
 # -------------------------------------------------------------
 
 set(STLINK_UPLOAD_ENABLED TRUE)
-set(STLINK_LOAD_ADDRESS 0x8000000)
 set(STLINK_ARGS --connect-under-reset)
+
+# Config options for dfu-util
+# -------------------------------------------------------------
+
+set(DFU_UTIL_UPLOAD_ENABLED TRUE)
+set(DFU_UTIL_TARGET_VID_PID 0483:df11) # STM32 USB ROM bootloader
+set(DFU_UTIL_TARGET_INTERFACE 0)
+
+# Config options for STM32CUBE_DFU
+# -------------------------------------------------------------
+
+set(STM32CUBE_DFU_UPLOAD_ENABLED TRUE)
+set(STM32CUBE_DFU_CONNECT_COMMAND port=USB vid=0x0483 pid=0xdf11) # STM32 USB ROM bootloader
