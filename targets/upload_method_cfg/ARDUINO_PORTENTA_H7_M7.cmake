@@ -1,4 +1,4 @@
-# Mbed OS upload method configuration file for target ARDUINO_GIGA_CM7.
+# Mbed OS upload method configuration file for target ARDUINO_PORTENTA_H7_M7.
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
@@ -36,7 +36,7 @@ set(PYOCD_CLOCK_SPEED 4000k)
 
 set(OPENOCD_UPLOAD_ENABLED TRUE)
 set(OPENOCD_CHIP_CONFIG_COMMANDS
-    -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/stm32h747.cfg)
+        -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/stm32h747.cfg)
 
 # Config options for STM32Cube
 # -------------------------------------------------------------
@@ -44,6 +44,12 @@ set(OPENOCD_CHIP_CONFIG_COMMANDS
 set(STM32CUBE_UPLOAD_ENABLED TRUE)
 set(STM32CUBE_CONNECT_COMMAND -c port=SWD reset=HWrst)
 set(STM32CUBE_GDBSERVER_ARGS --swd --initialize-reset --apid 0)
+
+# Config options for STM32Cube DFU
+# -------------------------------------------------------------
+
+set(STM32CUBE_DFU_UPLOAD_ENABLED TRUE)
+set(STM32CUBE_CONNECT_COMMAND -c port=USB vid=0x2341 pid=0x035b)
 
 # Config options for stlink
 # -------------------------------------------------------------
@@ -55,11 +61,5 @@ set(STLINK_ARGS --connect-under-reset)
 # -------------------------------------------------------------
 
 set(DFU_UTIL_UPLOAD_ENABLED TRUE)
-set(DFU_UTIL_TARGET_VID_PID 0483:df11) # STM32 USB ROM bootloader
+set(DFU_UTIL_TARGET_VID_PID 2341:035b)
 set(DFU_UTIL_TARGET_INTERFACE 0)
-
-# Config options for STM32CUBE_DFU
-# -------------------------------------------------------------
-
-set(STM32CUBE_DFU_UPLOAD_ENABLED TRUE)
-set(STM32CUBE_DFU_CONNECT_COMMAND port=USB vid=0x0483 pid=0xdf11) # STM32 USB ROM bootloader

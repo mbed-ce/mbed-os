@@ -3706,16 +3706,34 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "hse_value": 25000000,
             // Can use overdrive because LDO is regulating core voltage (even though
             // the LDO power comes from the SMPS).
-            "enable-overdrive-mode": 1
+            "enable-overdrive-mode": 1,
+            "console-usb": true,
+            "console-uart": false
         },
         "device_name": "STM32H747XIHx",
         "image_url": "https://store.arduino.cc/cdn/shop/products/ABX00042_00.iso_1200x900.jpg?v=1675840144"
     },
     "ARDUINO_PORTENTA_H7_M7": {
-        "inherits": ["MCU_STM32H747xI_CM7", "ARDUINO_PORTENTA_H7"]
+        "inherits": ["MCU_STM32H747xI_CM7", "ARDUINO_PORTENTA_H7"],
+
+        // Leave room for the Arduino bootloader, using the next 1M of space
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x08040000,
+                "size": 0x100000
+            },
+        }
     },
     "ARDUINO_PORTENTA_H7_M4": {
-        "inherits": ["MCU_STM32H747xI_CM4", "ARDUINO_PORTENTA_H7"]
+        "inherits": ["MCU_STM32H747xI_CM4", "ARDUINO_PORTENTA_H7"],
+
+        // Leave room for the Arduino bootloader and the CM7 application, using the next 768k of space
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x08140000,
+                "size": 0xC0000
+            },
+        }
     },
     "MCU_STM32H750xB": {
         "inherits": [
