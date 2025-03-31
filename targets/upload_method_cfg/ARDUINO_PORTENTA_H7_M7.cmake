@@ -49,7 +49,7 @@ set(STM32CUBE_GDBSERVER_ARGS --swd --initialize-reset --apid 0)
 # -------------------------------------------------------------
 
 set(STM32CUBE_DFU_UPLOAD_ENABLED TRUE)
-set(STM32CUBE_CONNECT_COMMAND -c port=USB vid=0x2341 pid=0x035b)
+set(STM32CUBE_DFU_CONNECT_COMMAND -c port=USB vid=0x2341 pid=0x035b)
 
 # Config options for stlink
 # -------------------------------------------------------------

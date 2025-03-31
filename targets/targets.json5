@@ -3710,6 +3710,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "console-usb": true,
             "console-uart": false
         },
+        macros_add: [
+            "BT_UART_NO_3M_SUPPORT",
+            "LSE_STARTUP_TIMEOUT=200"
+        ],
+        components_add: [
+            "QSPIF"
+        ],
         "device_name": "STM32H747XIHx",
         "image_url": "https://store.arduino.cc/cdn/shop/products/ABX00042_00.iso_1200x900.jpg?v=1675840144"
     },
