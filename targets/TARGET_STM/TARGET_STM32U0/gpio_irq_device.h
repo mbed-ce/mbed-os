@@ -22,27 +22,14 @@ extern "C" {
 
 #include "stm32u0xx_ll_exti.h"
 
-#define CHANNEL_NUM (16)
+#define CHANNEL_NUM (3)
 
-#define EXTI_IRQ0_NUM_LINES 1
-#define EXTI_IRQ1_NUM_LINES 1
-#define EXTI_IRQ2_NUM_LINES 1
-#define EXTI_IRQ3_NUM_LINES 1
-#define EXTI_IRQ4_NUM_LINES 1
-#define EXTI_IRQ5_NUM_LINES 1
-#define EXTI_IRQ6_NUM_LINES 1
-#define EXTI_IRQ7_NUM_LINES 1
-#define EXTI_IRQ8_NUM_LINES 1
-#define EXTI_IRQ9_NUM_LINES 1
-#define EXTI_IRQ10_NUM_LINES 1
-#define EXTI_IRQ11_NUM_LINES 1
-#define EXTI_IRQ12_NUM_LINES 1
-#define EXTI_IRQ13_NUM_LINES 1
-#define EXTI_IRQ14_NUM_LINES 1
-#define EXTI_IRQ15_NUM_LINES 1
+#define EXTI_IRQ0_NUM_LINES 2
+#define EXTI_IRQ1_NUM_LINES 2
+#define EXTI_IRQ2_NUM_LINES 12
 
-// Max pins for one line (max with EXTI10_15)
-#define MAX_PIN_LINE (EXTI_IRQ1_NUM_LINES)
+// Max pins for one line (max with EXTI4_15)
+#define MAX_PIN_LINE (EXTI_IRQ2_NUM_LINES)
 
 /*  Structure to describe how the HW EXTI lines are defined in this HW */
 typedef struct exti_lines {
