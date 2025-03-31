@@ -1113,12 +1113,14 @@ int QSPIFBlockDevice::_handle_vendor_quirks()
         case 0xc2:
             // Macronix devices have several quirks:
             // 1. Have one status register and several config registers, with a nonstandard instruction for reading the config registers
-            // 2. Require setting a "fast mode" bit in config register 2 to operate at higher clock rates
+            // 2. Require setting a "fast mode" bit in config register 2 to operate at higher clock rates (if config register 2 exists)
             // 3. Should never attempt to enable 4-byte addressing (it causes reads and writes to fail)
             tr_debug("Applying quirks for macronix");
-            _needs_fast_mode = true;
             _num_status_registers = MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER;
             _read_status_reg_2_inst = QSPIF_INST_RDCR;
+            if(MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER >= 3) {
+                _needs_fast_mode = true;
+            }
             break;
         case 0x9d:
             // ISSI devices have only one status register
