@@ -1118,7 +1118,7 @@ int QSPIFBlockDevice::_handle_vendor_quirks()
             tr_debug("Applying quirks for macronix");
             _num_status_registers = MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER;
             _read_status_reg_2_inst = QSPIF_INST_RDCR;
-            if(MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER >= 3) {
+            if (MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER >= 3) {
                 _needs_fast_mode = true;
             }
             break;
