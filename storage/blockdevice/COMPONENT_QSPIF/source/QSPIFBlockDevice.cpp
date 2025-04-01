@@ -1114,14 +1114,15 @@ int QSPIFBlockDevice::_handle_vendor_quirks()
             // Macronix devices have several quirks:
             // 1. Have one status register and several config registers, with a nonstandard instruction for reading the config registers
             // 2. Require setting a "fast mode" bit in config register 2 to operate at higher clock rates (if config register 2 exists)
-            // 3. Should never attempt to enable 4-byte addressing (it causes reads and writes to fail)
+            // 3. Should never attempt to enable 4-byte addressing (it causes reads and writes to fail). On MX25L12833F at least, the
+            //    SFDP table claims to have 4-byte support but it actually does not!
             tr_debug("Applying quirks for macronix");
             _num_status_registers = MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER;
             _read_status_reg_2_inst = QSPIF_INST_RDCR;
-            if (MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER >= 3) {
+            if(MBED_CONF_QSPI_MACRONIX_NUM_STATUS_REGISTER >= 3) {
                 _needs_fast_mode = true;
             }
-            break;
+            _attempt_4_byte_addressing = false;
         case 0x9d:
             // ISSI devices have only one status register
             tr_debug("Applying quirks for ISSI");
