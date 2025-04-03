@@ -12,6 +12,7 @@ target_sources(mbed-stm32u0
     analogin_device.c
     analogout_device.c
     gpio_irq_device.c
+    pwmout_device.c
     serial_device.c
 )
 
