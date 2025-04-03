@@ -88,7 +88,7 @@ void trng_init(trng_t *obj)
         }
     }
 
-#elif defined(TARGET_STM32G4)
+#elif defined(TARGET_STM32G4) || defined(TARGET_STM32U0)
     /* RNG and USB clocks have the same HSI48 source which has been enabled in SetSysClock */
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
 

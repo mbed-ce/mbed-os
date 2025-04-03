@@ -112,7 +112,7 @@
 #define RCC_LPTIMCLKSOURCE_LSE    RCC_LPTIM1CLKSOURCE_LSE
 #define RCC_LPTIMCLKSOURCE_LSI    RCC_LPTIM1CLKSOURCE_LSI
 
-#if defined(STM32G051xx) || defined(STM32G061xx) || defined(STM32G071xx) || defined(STM32G081xx) || defined(STM32G0B1xx) || defined(STM32G0C1xx)
+#if defined(STM32G051xx) || defined(STM32G061xx) || defined(STM32G071xx) || defined(STM32G081xx) || defined(STM32G0B1xx) || defined(STM32G0C1xx) || defined(STM32U0)
 #define LPTIM_MST_IRQ             TIM6_DAC_LPTIM1_IRQn
 #else // STM32G0xx
 #define LPTIM_MST_IRQ             LPTIM1_IRQn

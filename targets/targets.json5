@@ -4777,7 +4777,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             },
             "lpticker_lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
-                "value": 0
+                "value": 1
             },
             "i2c_timing_value_algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
@@ -4789,11 +4789,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             //"lpuart_clock_source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
         },
         "device_has_add": [
-        //    "CRC",
-        //    "FLASH",
+            "CRC",
+            "FLASH",
             "MPU",
             "ANALOGOUT",
-        //    "TRNG"
+            "TRNG"
         ],
         "is_mcu_family_target": true
     },
@@ -4814,23 +4814,17 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32U083xC"
         ],
 		 "overrides": {
-            "lse_available":  0,
+            "lse_available":  1,
             "clock_source": "USE_PLL_HSI",
         },
 		"device_has_remove": [
-            "LPTICKER",
-            "RTC",
             "I2C",
             "I2CSLAVE",
             "I2C_ASYNCH",
-            //"PWMOUT",
             "SERIAL_FC",
-            "SLEEP",
             "SPI",
             "SPISLAVE",
-            "SPI_ASYNCH",
-            "WATCHDOG",
-            "RESET_REASON"
+            "SPI_ASYNCH"
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
