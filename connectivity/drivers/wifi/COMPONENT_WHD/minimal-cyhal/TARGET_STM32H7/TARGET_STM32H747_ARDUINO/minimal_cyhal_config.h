@@ -59,7 +59,7 @@
 #define BSP_LED1            PI_12
 #define BSP_LED2            PE_3
 #define BSP_LED3            PJ_13
-#elif TARGET_ARDUINO_PORTENTA
+#elif TARGET_ARDUINO_PORTENTA_H7
 #define WIFI_SDIO_OOB_IRQ   PJ_5
 #define WIFI_WL_REG_ON      PJ_1
 #define BSP_LED1            PK_5
