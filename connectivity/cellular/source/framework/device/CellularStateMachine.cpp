@@ -28,7 +28,7 @@ using namespace std::chrono_literals;
 
 // timeout to wait for AT responses
 #define TIMEOUT_POWER_ON     1s
-#define TIMEOUT_SIM_PIN      1s
+#define TIMEOUT_SIM_PIN      10s
 #define TIMEOUT_NETWORK      10s
 /** CellularStateMachine does connecting up to packet service attach, and
  *  after that it's up to CellularContext::connect() to connect to PDN.

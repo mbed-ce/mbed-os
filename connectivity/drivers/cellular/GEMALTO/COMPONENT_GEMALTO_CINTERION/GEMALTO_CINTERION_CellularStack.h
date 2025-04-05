@@ -48,6 +48,10 @@ protected:
 
     virtual nsapi_error_t socket_connect(nsapi_socket_t handle, const SocketAddress &address);
 
+#ifdef MBED_CONF_CELLULAR_OFFLOAD_DNS_QUERIES
+    virtual nsapi_error_t gethostbyname(const char *host, SocketAddress *address, nsapi_version_t version, const char *interface_name);
+#endif
+
 private:
     // socket URC handlers as per Cinterion AT manuals
     void urc_sis();
@@ -67,6 +71,11 @@ private:
     const char *_apn;
     const char *_user;
     const char *_password;
+
+#ifdef MBED_CONF_CELLULAR_OFFLOAD_DNS_QUERIES
+    hostbyname_cb_t _dns_callback;
+    nsapi_version_t _dns_version;
+#endif
 };
 
 } // namespace mbed

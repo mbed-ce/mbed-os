@@ -70,6 +70,8 @@ nsapi_error_t GEMALTO_CINTERION::init()
         init_module_ems31();
     } else if (memcmp(model, "EHS5-E", sizeof("EHS5-E") - 1) == 0) {
         init_module_ehs5e();
+    } else if (memcmp(model, "TX62", sizeof("TX62") - 1) == 0) {
+        init_module_tx62();
     } else {
         tr_error("Cinterion model unsupported %s", model);
         return NSAPI_ERROR_UNSUPPORTED;
@@ -200,6 +202,35 @@ void GEMALTO_CINTERION::init_module_ehs5e()
     };
     set_cellular_properties(cellular_properties);
     _module = ModuleEHS5E;
+}
+
+void GEMALTO_CINTERION::init_module_tx62()
+{
+    // TX-62
+    static const intptr_t cellular_properties[AT_CellularDevice::PROPERTY_MAX] = {
+        AT_CellularNetwork::RegistrationModeLAC,// C_EREG
+        AT_CellularNetwork::RegistrationModeDisable,    // C_GREG
+        AT_CellularNetwork::RegistrationModeDisable,    // C_REG
+        0,  // AT_CGSN_WITH_TYPE
+        0,  // AT_CGDATA
+        1,  // AT_CGAUTH
+        1,  // AT_CNMI
+        1,  // AT_CSMP
+        1,  // AT_CMGF
+        0,  // AT_CSDH
+        1,  // PROPERTY_IPV4_STACK
+        0,  // PROPERTY_IPV6_STACK
+        0,  // PROPERTY_IPV4V6_STACK
+        0,  // PROPERTY_NON_IP_PDP_TYPE
+        0,  // PROPERTY_AT_CGEREP
+        0,  // PROPERTY_AT_COPS_FALLBACK_AUTO
+        7,  // PROPERTY_SOCKET_COUNT
+        1,  // PROPERTY_IP_TCP
+        1,  // PROPERTY_IP_UDP
+        100,  // PROPERTY_AT_SEND_DELAY
+    };
+    set_cellular_properties(cellular_properties);
+    _module = ModuleTX62;
 }
 
 #if MBED_CONF_GEMALTO_CINTERION_PROVIDE_DEFAULT
