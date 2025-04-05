@@ -109,6 +109,19 @@ nsapi_error_t AT_CellularContext::connect()
     }
     call_network_cb(NSAPI_STATUS_CONNECTING);
 
+    set_device_ready();
+
+    _at.lock();
+    bool valid_context = get_context();
+    _at.unlock();
+    if(!valid_context) {
+        set_new_context(_cid);
+    }
+
+    do_user_authentication();
+
+    enable_access_technology();
+
     nsapi_error_t err = _device->attach_to_network();
     _cb_data.error = check_operation(err, OP_CONNECT);
     _retry_count = 0;
@@ -278,6 +291,16 @@ void AT_CellularContext::set_credentials(const char *apn, const char *uname, con
     _pwd = pwd;
 }
 
+void AT_CellularContext::set_access_technology(RadioAccessTechnologyType rat)
+{
+    _rat = rat;
+}
+
+void AT_CellularContext::set_band(FrequencyBand band)
+{
+    _band = band;
+}
+
 // PDP Context handling
 void AT_CellularContext::delete_current_context()
 {
@@ -352,7 +375,7 @@ bool AT_CellularContext::get_context()
         int pdp_type_len = _at.read_string(pdp_type_from_context, sizeof(pdp_type_from_context));
         if (pdp_type_len > 0) {
             apn_len = _at.read_string(apn, sizeof(apn));
-            if (apn_len >= 0) {
+            if (apn_len > 0) {
                 if (_apn && (strcmp(apn, _apn) != 0)) {
                     tr_debug("CID %d APN \"%s\"", cid, apn);
                     continue;
@@ -369,6 +392,9 @@ bool AT_CellularContext::get_context()
                     _pdp_type = pdp_type;
                     set_cid(cid);
                 }
+            }
+            else {
+                cid_max = 0;
             }
         }
     }

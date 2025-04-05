@@ -41,6 +41,29 @@ namespace mbed {
  * @{
  */
 
+/// Radio Access Technology type
+enum RadioAccessTechnologyType {
+    CATM1 = 7, ///< LTE CAT-M or LTE-M
+    CATNB = 8 ///< NB-IoT (Narrowband IoT)
+};
+
+enum FrequencyBand {
+    BAND_1 = 0x01,
+    BAND_2 = 0x02,
+    BAND_3 = 0x04,
+    BAND_4 = 0x08,
+    BAND_5 = 0x10,
+    BAND_8 = 0x80,
+    BAND_12 = 0x800,
+    BAND_13 = 0x1000,
+    BAND_18 = 0x20000,
+    BAND_19 = 0x40000,
+    BAND_20 = 0x80000,
+    BAND_25 = 0x1000000,
+    BAND_26 = 0x2000000,
+    BAND_28 = 0x8000000
+};
+
 /// CellularContext is CellularInterface/NetworkInterface with extensions for cellular connectivity
 class CellularContext : public CellularInterface {
 
@@ -158,6 +181,8 @@ public: // from NetworkInterface
     virtual nsapi_error_t connect(const char *sim_pin, const char *apn = 0, const char *uname = 0,
                                   const char *pwd = 0) = 0;
     virtual void set_credentials(const char *apn, const char *uname = 0, const char *pwd = 0) = 0;
+    virtual void set_access_technology(RadioAccessTechnologyType rat = CATM1) = 0;
+    virtual void set_band(FrequencyBand band = BAND_20) = 0;
     virtual bool is_connected() = 0;
 
     /** Same as NetworkInterface::get_default_instance()

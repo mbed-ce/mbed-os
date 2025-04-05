@@ -22,6 +22,7 @@
 #include "rtos/Semaphore.h"
 #include "AT_CellularDevice.h"
 
+#include <optional>
 
 const int MAX_APN_LENGTH = 63 + 1;
 
@@ -54,6 +55,8 @@ public:
     virtual nsapi_error_t connect(const char *sim_pin, const char *apn = 0, const char *uname = 0,
                                   const char *pwd = 0);
     virtual void set_credentials(const char *apn, const char *uname = 0, const char *pwd = 0);
+    virtual void set_access_technology(RadioAccessTechnologyType rat = CATM1);
+    virtual void set_band(FrequencyBand band = BAND_20);
 
 // from CellularContext
     virtual nsapi_error_t get_pdpcontext_params(pdpContextList_t &params_list);
@@ -115,6 +118,13 @@ protected:
      */
     virtual const char *get_nonip_context_type_str();
 
+    /**
+     * @brief Set the cellular technology and band based on the \c _rat and \c _band class variables.
+     *
+     * Modems which support this functionality should override this in their CellularContext implementations.
+     */
+    virtual void enable_access_technology() {}
+
 private:
 #if NSAPI_PPP_AVAILABLE
     nsapi_error_t open_data_channel();
@@ -146,6 +156,8 @@ protected:
     bool _cp_req;
     bool _is_connected;
     ATHandler &_at;
+    std::optional<RadioAccessTechnologyType> _rat;
+    std::optional<FrequencyBand> _band;
 };
 
 /**

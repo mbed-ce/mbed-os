@@ -49,4 +49,54 @@ NetworkStack *GEMALTO_CINTERION_CellularContext::get_stack()
 }
 #endif // NSAPI_PPP_AVAILABLE
 
+nsapi_error_t GEMALTO_CINTERION_CellularContext::do_user_authentication()
+{
+    // if user has defined user name and password we need to call CGAUTH before activating or modifying context
+    if (_pwd && _uname) {
+        if (!get_device()->get_property(AT_CellularDevice::PROPERTY_AT_CGAUTH)) {
+            return NSAPI_ERROR_UNSUPPORTED;
+        }
+
+        _at.at_cmd_discard("^SGAUTH", "=", "%d%d%s%s", _cid, _authentication_type, _uname, _pwd);
+
+        if (_at.get_last_error() != NSAPI_ERROR_OK) {
+            return NSAPI_ERROR_AUTH_FAILURE;
+        }
+    }
+
+    return NSAPI_ERROR_OK;
+}
+
+void GEMALTO_CINTERION_CellularContext::enable_access_technology()
+{
+    if (!_rat.has_value()) {
+        return;
+    }
+
+    switch (*_rat)
+    {
+    case CATM1:
+        _at.at_cmd_discard("^SXRAT", "=","%d", *_rat);
+        _at.cmd_start_stop("^SCFG", "=","%s%d", "Radio/Band/CatM", *_band);
+        _at.resp_start("^SCFG");
+        _at.cmd_start_stop("^SCFG", "=","%s%d%d", "Radio/Band/CatNB",0,0);
+        _at.resp_start("^SCFG");
+        break;
+
+    case CATNB:
+        _at.at_cmd_discard("^SXRAT", "=","%d", *_rat);
+        _at.cmd_start_stop("^SCFG", "=","%s%d", "Radio/Band/CatNB", *_band);
+        _at.resp_start("^SCFG");
+        _at.cmd_start_stop("^SCFG", "=","%s%d%d", "Radio/Band/CatM",0,0);
+        _at.resp_start("^SCFG");
+        break;
+
+    default:
+        break;
+    }
+
+    _at.cmd_start_stop("^SCFG", "=", "%s%s", "Tcp/withURCs", "on");
+    _at.resp_start("^SCFG");
+}
+
 } /* namespace mbed */

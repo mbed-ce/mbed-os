@@ -414,7 +414,8 @@ nsapi_error_t AT_CellularDevice::init()
         _at.flush();
         _at.at_cmd_discard("E0", "");
         if (_at.get_last_error() == NSAPI_ERROR_OK) {
-            _at.at_cmd_discard("+CMEE", "=1");
+            // Enable verbose error messages
+            _at.at_cmd_discard("+CMEE", "=2");
             _at.at_cmd_discard("+CFUN", "=1");
             if (_at.get_last_error() == NSAPI_ERROR_OK) {
                 break;
