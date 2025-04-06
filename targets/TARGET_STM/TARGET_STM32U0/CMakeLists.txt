@@ -11,7 +11,10 @@ target_sources(mbed-stm32u0
     clock_cfg/system_clock.c
     analogin_device.c
     analogout_device.c
+    flash_api.c
     gpio_irq_device.c
+    i2c_device.c
+    spi_api.c
     pwmout_device.c
     serial_device.c
 )
