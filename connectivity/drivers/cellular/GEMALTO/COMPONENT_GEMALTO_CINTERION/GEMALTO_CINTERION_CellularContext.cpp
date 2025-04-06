@@ -76,27 +76,24 @@ void GEMALTO_CINTERION_CellularContext::enable_access_technology()
     switch (*_rat)
     {
     case CATM1:
-        _at.at_cmd_discard("^SXRAT", "=","%d", *_rat);
-        _at.cmd_start_stop("^SCFG", "=","%s%d", "Radio/Band/CatM", *_band);
-        _at.resp_start("^SCFG");
-        _at.cmd_start_stop("^SCFG", "=","%s%d%d", "Radio/Band/CatNB",0,0);
+        _at.at_cmd_discard("^SXRAT", "=","%d", 7); // 7 = CAT.M1
+
+        // Ensure all bands are enabled by setting ^SCFG to the bitmask of all valid bands
+        _at.cmd_start_stop("^SCFG", "=","%s%d", "Radio/Band/CatM", "F0E189F");
         _at.resp_start("^SCFG");
         break;
 
     case CATNB:
-        _at.at_cmd_discard("^SXRAT", "=","%d", *_rat);
-        _at.cmd_start_stop("^SCFG", "=","%s%d", "Radio/Band/CatNB", *_band);
-        _at.resp_start("^SCFG");
-        _at.cmd_start_stop("^SCFG", "=","%s%d%d", "Radio/Band/CatM",0,0);
+        _at.at_cmd_discard("^SXRAT", "=","%d", 8); // 8 = CAT.NB1
+
+        // Ensure all bands are enabled by setting ^SCFG to the bitmask of all valid bands
+        _at.cmd_start_stop("^SCFG", "=","%s%s", "Radio/Band/CatNB", "10000200000000");
         _at.resp_start("^SCFG");
         break;
 
     default:
         break;
     }
-
-    _at.cmd_start_stop("^SCFG", "=", "%s%s", "Tcp/withURCs", "on");
-    _at.resp_start("^SCFG");
 }
 
 } /* namespace mbed */

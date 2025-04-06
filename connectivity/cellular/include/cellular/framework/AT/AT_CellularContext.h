@@ -56,7 +56,6 @@ public:
                                   const char *pwd = 0);
     virtual void set_credentials(const char *apn, const char *uname = 0, const char *pwd = 0);
     virtual void set_access_technology(RadioAccessTechnologyType rat = CATM1);
-    virtual void set_band(FrequencyBand band = BAND_20);
 
 // from CellularContext
     virtual nsapi_error_t get_pdpcontext_params(pdpContextList_t &params_list);
@@ -157,7 +156,6 @@ protected:
     bool _is_connected;
     ATHandler &_at;
     std::optional<RadioAccessTechnologyType> _rat;
-    std::optional<FrequencyBand> _band;
 };
 
 /**
