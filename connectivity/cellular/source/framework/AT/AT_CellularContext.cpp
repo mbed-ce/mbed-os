@@ -296,11 +296,6 @@ void AT_CellularContext::set_access_technology(RadioAccessTechnologyType rat)
     _rat = rat;
 }
 
-void AT_CellularContext::set_band(FrequencyBand band)
-{
-    _band = band;
-}
-
 // PDP Context handling
 void AT_CellularContext::delete_current_context()
 {
