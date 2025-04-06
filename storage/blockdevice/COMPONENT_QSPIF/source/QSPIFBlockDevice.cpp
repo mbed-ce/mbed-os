@@ -1123,6 +1123,7 @@ int QSPIFBlockDevice::_handle_vendor_quirks()
                 _needs_fast_mode = true;
             }
             _attempt_4_byte_addressing = false;
+            break;
         case 0x9d:
             // ISSI devices have only one status register
             tr_debug("Applying quirks for ISSI");
