@@ -2172,6 +2172,25 @@ uint32_t i2c_get_timing(I2CName i2c, uint32_t current_timing, int current_hz,
                 }
                 break;
 #endif
+#if defined (I2C_PCLK_56M)
+            case I2C_PCLK_56M:
+                switch (hz) {
+                    case 100000:
+                        tim = TIMING_VAL_56M_CLK_100KHZ;
+                        break;
+                    case 400000:
+                        tim = TIMING_VAL_56M_CLK_400KHZ;
+                        break;
+                    case 1000000:
+                        tim = TIMING_VAL_56M_CLK_1MHZ;
+                        break;
+                    default:
+                        MBED_ASSERT((hz == 100000) || (hz == 400000) || \
+                                    (hz == 1000000));
+                        break;
+                }
+                break;
+#endif
 #if defined(I2C_PCLK_64M)
             case I2C_PCLK_64M:
                 switch (hz) {

@@ -51,7 +51,7 @@ typedef enum {
 #define DEVICE_SPI_COUNT 3
 typedef enum {
     SPI_1 = (int)SPI1_BASE,
-#if SPI3_BASE
+#if SPI2_BASE
     SPI_2 = (int)SPI2_BASE,
 #endif
 #if SPI3_BASE

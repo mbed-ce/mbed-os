@@ -4766,14 +4766,18 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "STM32U0"
         ],
-        //"macros_add": [
-        //    "MBED_TICKLESS"
-        //],
+        "macros_add": [
+            "MBED_TICKLESS"
+        ],
         "config": {
             "clock_source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
                 "value": "USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
+            },
+            "lse_drive_load_level": {
+                "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
+                "value": "RCC_LSEDRIVE_LOW"
             },
             "lpticker_lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
@@ -4793,7 +4797,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH",
             "MPU",
             "ANALOGOUT",
-            "TRNG"
+            "TRNG",
+            "USB"
         ],
         "is_mcu_family_target": true
     },
@@ -4814,18 +4819,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32U083xC"
         ],
 		 "overrides": {
-            "lse_available":  1,
             "clock_source": "USE_PLL_HSI",
+            "lse_available":  1,
+            "default-adc-vref": 3.3
         },
-		"device_has_remove": [
-            "I2C",
-            "I2CSLAVE",
-            "I2C_ASYNCH",
-            "SERIAL_FC",
-            "SPI",
-            "SPISLAVE",
-            "SPI_ASYNCH"
-        ],
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
@@ -4833,9 +4830,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "detect_code": [
             "0888"
         ],
-        "overrides": {
-            "default-adc-vref": 3.3
-        },
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF273876.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
   
