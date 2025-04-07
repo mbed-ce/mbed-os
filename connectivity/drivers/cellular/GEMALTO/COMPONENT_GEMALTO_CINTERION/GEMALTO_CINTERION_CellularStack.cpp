@@ -104,9 +104,9 @@ void GEMALTO_CINTERION_CellularStack::sisr_urc_handler(int sock_id, int urc_code
 {
     CellularSocket *sock = find_socket(sock_id);
     if (sock) {
-        if (urc_code == 1) { // data available
+        if (urc_code > 0) { // data available
             if (sock->_cb) {
-                sock->pending_bytes = 1;
+                sock->pending_bytes = urc_code;
                 sock->_cb(sock->_data);
             }
         }
@@ -151,6 +151,46 @@ nsapi_error_t GEMALTO_CINTERION_CellularStack::socket_close_impl(int sock_id)
     return _at.get_last_error();
 }
 
+#ifdef MBED_CONF_CELLULAR_OFFLOAD_DNS_QUERIES
+nsapi_error_t GEMALTO_CINTERION_CellularStack::gethostbyname(const char *host, SocketAddress *address,
+                                                        nsapi_version_t version, const char *interface_name)
+{
+    (void) interface_name;
+    MBED_ASSERT(host);
+    MBED_ASSERT(address);
+
+    _at.lock();
+
+    if (_dns_callback) {
+        _at.unlock();
+        return NSAPI_ERROR_BUSY;
+    }
+
+    if (!address->set_ip_address(host)) {
+        //_at.set_at_timeout(1min);
+        _at.cmd_start_stop("^SISX" , "=" , "%s%d%s", "HostByName" , _cid, host);
+        _at.resp_start("^SISX: \"HostByName\",");
+        char ipAddress[NSAPI_IP_SIZE];
+        int size = _at.read_string(ipAddress, sizeof(ipAddress));
+        if (size) {
+            //Valid string received
+            tr_info("Read %d bytes. Valid string: %s\n", size, ipAddress);
+            _at.restore_at_timeout();
+            if (!address->set_ip_address(ipAddress)) {
+                _at.unlock();
+                return NSAPI_ERROR_DNS_FAILURE;
+            }
+        } else {
+            //Null string received
+            tr_info("Read %d bytes. Null string\n", size);
+            return NSAPI_ERROR_NO_ADDRESS;
+        }
+    }
+
+    return _at.unlock_return_error();
+}
+#endif
+
 nsapi_error_t GEMALTO_CINTERION_CellularStack::socket_open_defer(CellularSocket *socket, const SocketAddress *address)
 {
     int retry_open = 1;
@@ -159,6 +199,11 @@ retry_open:
     int internet_service_id = find_socket_index(socket);
     bool foundSrvType = false;
     bool foundConIdType = false;
+
+    if (GEMALTO_CINTERION::get_module() == GEMALTO_CINTERION::ModuleTX62) {
+        _at.cmd_start_stop("^SICA", "=", "%d%d", 1, _cid);
+    }
+
     _at.cmd_start_stop("^SISS", "?");
     _at.resp_start("^SISS:");
     /*
@@ -421,16 +466,17 @@ sisr_retry:
         return NSAPI_ERROR_WOULD_BLOCK;
     }
     if (len == -1) {
+        if (GEMALTO_CINTERION::get_module() == GEMALTO_CINTERION::ModuleTX62 && _at.get_last_read_error() == -2) {
+            tr_error("Socket %d recvfrom finished!", socket->id);
+            socket->pending_bytes = 0;
+            return NSAPI_ERROR_OK;
+        }
         tr_error("Socket %d recvfrom failed!", socket->id);
         return NSAPI_ERROR_DEVICE_ERROR;
     }
-    socket->pending_bytes = 0;
+    socket->pending_bytes = 1;
     if (len >= (nsapi_size_or_error_t)size) {
         len = (nsapi_size_or_error_t)size;
-        int remain_len = _at.read_int();
-        if (remain_len > 0) {
-            socket->pending_bytes = 1;
-        }
     }
 
     // UDP Udp_RemClient
@@ -472,6 +518,10 @@ sisr_retry:
     }
 
     nsapi_size_or_error_t recv_len = _at.read_bytes((uint8_t *)buffer, len);
+
+    if (recv_len < len) {
+        goto sisr_retry;
+    }
 
     _at.resp_stop();
 

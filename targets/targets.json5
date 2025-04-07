@@ -3568,22 +3568,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
             "enable-overdrive-mode": 0
-        }
-    },
-    "DISCO_H747I_CM7": {
-		// NOTE: inherit from MCU_STM32H747xI_CM7 first so that target's attributes get priority over
-		// DISCO_H747I's attributes.
-        "inherits": [
-		    "MCU_STM32H747xI_CM7",
-		    "DISCO_H747I"
-        ],
+        },
         "supported_form_factors": [
             "ARDUINO_UNO",
             "STMOD",
             "PMOD"
         ],
         "extra_labels_add": [
-            "DISCO_H747I",
             "MT25QL512"
         ],
         "components_add": [
@@ -3597,27 +3588,19 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32H747XIHx"
     },
+    "DISCO_H747I_CM7": {
+        // NOTE: inherit from MCU_STM32H747xI_CM7 first so that target's attributes get priority over
+        // DISCO_H747I's attributes.
+        "inherits": [
+            "MCU_STM32H747xI_CM7",
+            "DISCO_H747"
+        ]
+    },
     "DISCO_H747I_CM4": {
         "inherits": [
 			"MCU_STM32H747xI_CM4",
             "DISCO_H747I"
-        ],
-        "extra_labels_add": [
-            "DISCO_H747I",
-            "MT25QL512"
-        ],
-        "device_has_add": [
-            "QSPI"
-        ],
-        "components_add": [
-            "QSPIF"
-        ],
-        "supported_form_factors": [
-            "ARDUINO_UNO",
-            "STMOD",
-            "PMOD"
-        ],
-        "device_name": "STM32H747XIHx"
+        ]
     },
     // Umbrella target for all Arduino boards that use an H747 chip
     "STM32H747_ARDUINO": {
@@ -3627,6 +3610,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "usb_speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_HS"
+            },
+            "wifi_driver_in_qspi_flash": {
+                help: "If this is false, and wifi is used in the application, the wifi chip firmware will be included in the application firmware (+411kiB code size).  If true, then the wifi firmware is loaded from the external QSPI flash instead, and you must install it using the Arduino IDE sketch for this purpose.",
+                value: false
             }
         },
         "components_add": [
@@ -3657,6 +3644,53 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "device_name": "STM32H747XIHx"
     },
+    "ARDUINO_GIGA": {
+        public: false,
+        inherits: ["STM32H747_ARDUINO"],
+        overrides: {
+            system_power_supply: "PWR_LDO_SUPPLY",
+            "enable-overdrive-mode": 1,
+            clock_source: "USE_PLL_HSE_XTAL | USE_PLL_HSI",
+            "network-default-interface-type": "WIFI",
+            lpuart_clock_source: "USE_LPUART_CLK_HSI",
+            "hse_value": 16000000,
+
+            // Arduino Giga connects the primary USB port (USB-C port) to the USB Full Speed pins.
+            // TODO eventually this needs to be runtime configurable so that the two USB ports
+            // can use different speeds.  With the current setting, Mbed will not be able to use
+            // the host mode port as that port uses high speed.
+            "usb_speed": "USE_USB_OTG_FS",
+        },
+        macros_add: [
+            "BT_UART_NO_3M_SUPPORT"
+        ],
+        components_add: [
+            "QSPIF"
+        ],
+        "image_url": "https://store-usa.arduino.cc/cdn/shop/products/ABX00063_00.default_643x483.jpg?v=1677493878",
+    },
+    "ARDUINO_GIGA_CM7": {
+        inherits: ["MCU_STM32H747xI_CM7", "ARDUINO_GIGA"],
+
+        // Leave room for the Arduino bootloader, using the next 1M of space
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x08040000,
+                "size": 0x100000
+            },
+        }
+    },
+    "ARDUINO_GIGA_CM4": {
+        inherits: ["MCU_STM32H747xI_CM4", "ARDUINO_GIGA"],
+
+        // Leave room for the Arduino bootloader and the CM7 application, using the next 768k of space
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x08140000,
+                "size": 0xC0000
+            },
+        }
+    },
     "ARDUINO_PORTENTA_H7": {
         "public": false,
         "detect_code": ["0813"],
@@ -3672,16 +3706,41 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "hse_value": 25000000,
             // Can use overdrive because LDO is regulating core voltage (even though
             // the LDO power comes from the SMPS).
-            "enable-overdrive-mode": 1
+            "enable-overdrive-mode": 1,
+            "console-usb": true,
+            "console-uart": false
         },
+        macros_add: [
+            "BT_UART_NO_3M_SUPPORT",
+            "LSE_STARTUP_TIMEOUT=200"
+        ],
+        components_add: [
+            "QSPIF"
+        ],
         "device_name": "STM32H747XIHx",
         "image_url": "https://store.arduino.cc/cdn/shop/products/ABX00042_00.iso_1200x900.jpg?v=1675840144"
     },
     "ARDUINO_PORTENTA_H7_M7": {
-        "inherits": ["MCU_STM32H747xI_CM7", "ARDUINO_PORTENTA_H7"]
+        "inherits": ["MCU_STM32H747xI_CM7", "ARDUINO_PORTENTA_H7"],
+
+        // Leave room for the Arduino bootloader, using the next 1M of space
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x08040000,
+                "size": 0x100000
+            },
+        }
     },
     "ARDUINO_PORTENTA_H7_M4": {
-        "inherits": ["MCU_STM32H747xI_CM4", "ARDUINO_PORTENTA_H7"]
+        "inherits": ["MCU_STM32H747xI_CM4", "ARDUINO_PORTENTA_H7"],
+
+        // Leave room for the Arduino bootloader and the CM7 application, using the next 768k of space
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x08140000,
+                "size": 0xC0000
+            },
+        }
     },
     "MCU_STM32H750xB": {
         "inherits": [
