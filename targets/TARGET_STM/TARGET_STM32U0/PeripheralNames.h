@@ -124,11 +124,7 @@ typedef enum {
 } PWMName;
 
 typedef enum {
-#if defined USB_DRD_FS_BASE 
-    USB_FS = (int)USB_DRD_FS_BASE
-#else
     USB_FS = (int)USB_DRD_BASE
-#endif
 } USBName;
 
 

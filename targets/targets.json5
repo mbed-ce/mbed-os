@@ -4786,6 +4786,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "i2c_timing_value_algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
+            },
+            "usb_speed": {
+                "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
+                "value": "USE_USB_NO_OTG"
             }
         },
         "overrides": {
@@ -4798,7 +4802,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "ANALOGOUT",
             "TRNG",
-            "USB"
+            "USBDEVICE"
         ],
         "is_mcu_family_target": true
     },
