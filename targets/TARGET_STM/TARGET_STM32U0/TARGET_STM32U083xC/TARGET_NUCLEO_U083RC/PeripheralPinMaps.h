@@ -1,6 +1,6 @@
 /* mbed Microcontroller Library
  *******************************************************************************
- * Copyright (c) 2015, STMicroelectronics
+ * Copyright (c) 2025, STMicroelectronics
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -133,7 +133,7 @@ MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_I2C_SCL[] = {
 
 //*** PWM ***
 
-//  PWM_2 cannot be used because already used by the us_ticker
+//  TIM2 (PWM_2) cannot be used because already used by the us_ticker
 // (update us_ticker_data.h file if another timer is chosen)
 MSTD_CONSTEXPR_OBJ_11 PinMap PinMap_PWM[] = {
 //    {PA_0,       PWM_2,  STM_PIN_DATA_EXT(STM_MODE_AF_PP, GPIO_NOPULL, GPIO_AF1_TIM2, 1, 0)}, // TIM2_CH1

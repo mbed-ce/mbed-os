@@ -94,7 +94,7 @@ LoopFillZerobss:
   bcc FillZerobss
   
 /* Call the application's entry point.*/
- 	bl _start
+  bl _start
   
 LoopForever:
   b LoopForever
