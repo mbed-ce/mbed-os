@@ -41,13 +41,13 @@ extern "C" {
 #define TIMING_VAL_56M_CLK_100KHZ 0x20C04963   // Standard mode with Rise Time = 400ns and Fall Time = 100ns
 #define TIMING_VAL_56M_CLK_400KHZ 0x2060091A   // Fast mode with Rise Time = 250ns and Fall Time = 100ns
 #define TIMING_VAL_56M_CLK_1MHZ   0x00600A19   // Fast mode Plus with Rise Time = 60ns and Fall Time = 100ns
-#define I2C_PCLK_56M              56000000    // 56 MHz
+#define I2C_PCLK_56M              56000000     // 56 MHz
 
 #define I2C_IT_ALL (I2C_IT_ERRI|I2C_IT_TCI|I2C_IT_STOPI|I2C_IT_NACKI|I2C_IT_ADDRI|I2C_IT_RXI|I2C_IT_TXI)
 
 /*  Family specifc settings for clock source */
-#define I2CAPI_I2C1_CLKSRC RCC_I2C1CLKSOURCE_SYSCLK
-#define I2CAPI_I2C3_CLKSRC RCC_I2C3CLKSOURCE_SYSCLK
+#define I2CAPI_I2C1_CLKSRC RCC_I2C1CLKSOURCE_PCLK1 
+#define I2CAPI_I2C3_CLKSRC RCC_I2C3CLKSOURCE_PCLK1 
 
 uint32_t i2c_get_pclk(I2CName i2c);
 uint32_t i2c_get_timing(I2CName i2c, uint32_t current_timing, int current_hz, int hz);
