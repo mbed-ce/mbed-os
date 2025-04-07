@@ -139,6 +139,8 @@ private:
     nsapi_error_t check_operation(nsapi_error_t err, ContextOperation op);
     void ciot_opt_cb(mbed::CellularNetwork::CIoT_Supported_Opt ciot_opt);
     virtual void do_connect_with_retry();
+
+protected:
     void set_cid(int cid);
 
 private:
