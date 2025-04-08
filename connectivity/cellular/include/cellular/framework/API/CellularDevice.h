@@ -424,6 +424,14 @@ public: //Common functions
      */
     void set_retry_timeout_array(const uint16_t timeout[], int array_len);
 
+    /**
+     * @brief Enable serial multiplexing according to <a href="https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=1516">3GPP TS 27.010</a>, if implemented
+     *     on this modem.
+     *
+     * @return Error code or success
+     */
+    virtual nsapi_error_t enable_cmux() { return NSAPI_ERROR_UNSUPPORTED;};
+
 protected: //Common functions
     friend class AT_CellularNetwork;
     friend class AT_CellularContext;
@@ -452,6 +460,8 @@ protected: //Member variables
     events::EventQueue _queue;
     CellularStateMachine *_state_machine;
     Callback<void(nsapi_event_t, intptr_t)> _status_cb;
+
+    bool _cmux_enabled = false;
 
 private: //Member variables
     CellularNetwork *_nw;

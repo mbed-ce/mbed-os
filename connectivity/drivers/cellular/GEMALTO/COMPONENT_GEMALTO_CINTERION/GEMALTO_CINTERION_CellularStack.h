@@ -34,6 +34,21 @@ public:
      */
     nsapi_error_t socket_stack_init();
 
+    /**
+     * @brief Enable GNSS output, if supported by the Cinterion module
+     *
+     * @param gnss_cb Callback which will be called when a new GNSS sentence is received
+     */
+    void beginGNSS(mbed::Callback<void(char*)> gnss_cb);
+
+    void enableCmux();
+    void endGNSS();
+    int startGNSS();
+    void stopGNSS();
+
+    /// Set whether Power Save Mode is enabled for the GNSS in the Cinterion module
+    void setGNSS_PSM(bool enable);
+
 protected:
 
     virtual nsapi_error_t socket_close_impl(int sock_id);
@@ -56,9 +71,11 @@ private:
     // socket URC handlers as per Cinterion AT manuals
     void urc_sis();
     void urc_sisw();
+    void urc_sysstart();
     void sisw_urc_handler(int sock_id, int urc_code);
     void urc_sisr();
     void sisr_urc_handler(int sock_id, int urc_code);
+    void urc_gnss();
 
     // sockets need a connection profile, one profile is enough to support single stack sockets
     nsapi_error_t create_connection_profile(int connection_profile_id);
@@ -71,6 +88,9 @@ private:
     const char *_apn;
     const char *_user;
     const char *_password;
+    bool _engine;
+
+    mbed::Callback<void(char*)> _gnss_cb;
 
 #ifdef MBED_CONF_CELLULAR_OFFLOAD_DNS_QUERIES
     hostbyname_cb_t _dns_callback;

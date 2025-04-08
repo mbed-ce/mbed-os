@@ -624,6 +624,29 @@ nsapi_error_t AT_CellularDevice::set_baud_rate(int baud_rate)
     return error;
 }
 
+nsapi_error_t AT_CellularDevice::enable_cmux()
+{
+    setup_at_handler();
+
+    _at.lock();
+    for (int retry = 1; retry <= 3; retry++) {
+        _at.clear_error();
+        _at.flush();
+        _at.at_cmd_discard("E0", "");
+        if (_at.get_last_error() == NSAPI_ERROR_OK) {
+            _at.at_cmd_discard("+CMUX", "=0");
+            if (_at.get_last_error() == NSAPI_ERROR_OK) {
+                _cmux_enabled = true;
+                break;
+            }
+        }
+        tr_debug("Wait 100ms to init modem");
+        rtos::ThisThread::sleep_for(100ms); // let modem have time to get ready
+    }
+
+    return _at.unlock_return_error();
+}
+
 nsapi_error_t AT_CellularDevice::set_baud_rate_impl(int baud_rate)
 {
     return _at.at_cmd_discard("+IPR", "=", "%d", baud_rate);
