@@ -35,9 +35,6 @@ time_t GEMALTO_CINTERION::get_time()
 {
     tr_info("GEMALTO_CINTERION::get_time\n");
 
-    //Enable automatic time zone update:
-    set_automatic_time_zone_update();
-
     _at.lock();
 
     //"+CCLK: \"%y/%m/%d,%H:%M:%S+ZZ"
@@ -299,20 +296,23 @@ void GEMALTO_CINTERION::init_module_tx62()
         1,  // AT_CNMI
         1,  // AT_CSMP
         1,  // AT_CMGF
-        0,  // AT_CSDH
+        1,  // AT_CSDH
         1,  // PROPERTY_IPV4_STACK
         0,  // PROPERTY_IPV6_STACK
         0,  // PROPERTY_IPV4V6_STACK
         0,  // PROPERTY_NON_IP_PDP_TYPE
-        0,  // PROPERTY_AT_CGEREP
-        0,  // PROPERTY_AT_COPS_FALLBACK_AUTO
+        1,  // PROPERTY_AT_CGEREP
+        1,  // PROPERTY_AT_COPS_FALLBACK_AUTO
         7,  // PROPERTY_SOCKET_COUNT
         1,  // PROPERTY_IP_TCP
         1,  // PROPERTY_IP_UDP
-        100,  // PROPERTY_AT_SEND_DELAY
+        0,  // PROPERTY_AT_SEND_DELAY
     };
     set_cellular_properties(cellular_properties);
     _module = ModuleTX62;
+
+    // Enable network time zone updates
+    _at.at_cmd_discard("+CTZU", "=", "%d", 1);
 }
 
 time_t GEMALTO_CINTERION::parse_time(char const *time_str) {

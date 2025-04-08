@@ -74,8 +74,8 @@ protected: // AT_CellularDevice
     virtual AT_CellularInformation *open_information_impl(ATHandler &at);
     AT_CellularNetwork *open_network_impl(ATHandler &at) override;
 
-protected:
-    virtual nsapi_error_t init();
+public:
+    nsapi_error_t init() override;
 
 private:
     static Module _module;
