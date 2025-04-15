@@ -292,7 +292,7 @@ int TDBStore::read_record(uint8_t area, uint32_t offset, char *key,
         return MBED_ERROR_INVALID_DATA_DETECTED;
     }
 
-    if (offset + total_size >= _size) {
+    if (offset + total_size > _size) {
         return MBED_ERROR_INVALID_DATA_DETECTED;
     }
 
