@@ -1,4 +1,4 @@
-# Copyright (c) 2025 ARM Limited. All rights reserved.
+# Copyright (c) 2025 Jan Kamidra
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(TARGET_NUCLEO_U083RC EXCLUDE_FROM_ALL)

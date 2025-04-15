@@ -1,4 +1,4 @@
-# Copyright (c) 2025 ARM Limited. All rights reserved.
+# Copyright (c) 2025 Jan Kamidra
 # SPDX-License-Identifier: Apache-2.0
 
 add_library(mbed-stm32u0cube-fw INTERFACE)
