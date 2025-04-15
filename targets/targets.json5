@@ -4831,7 +4831,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "default-adc-vref": 3.3
         },
         "supported_form_factors": [
-            //"ARDUINO_UNO"
+            "ARDUINO_UNO"
         ],
         "device_name": "STM32U083RCTx",
         "detect_code": [
