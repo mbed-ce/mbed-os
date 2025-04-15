@@ -120,15 +120,9 @@ struct lpc_enetdata {
     uint32_t lpc_reserved_tx_num; /**< Number of reserved TX descriptors, zero-copy mode */
 };
 
-#if defined(TARGET_LPC1768)
-/** \brief Group LPC17xx processors into one definition
- */
-#define TARGET_LPC17XX
-#endif
-
 #if defined(TARGET_LPC17XX)
 #  if defined(TOOLCHAIN_GCC_ARM) || defined(TOOLCHAIN_ARM)
-#     define ETHMEM_SECTION __attribute__((section("AHBSRAM"),aligned))
+#     define ETHMEM_SECTION __attribute__((section("AHBSRAM"), aligned(32)))
 #  endif
 #endif
 
@@ -385,9 +379,9 @@ int32_t LPC17_EMAC::lpc_packet_addr_notsafe(void *addr)
     /* Check for legal address ranges */
 #if defined(TARGET_LPC17XX)
     if ((((uint32_t) addr >= 0x2007C000) && ((uint32_t) addr < 0x20083FFF))) {
-#endif
         return 0;
     }
+#endif
     return 1;
 }
 
