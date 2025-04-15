@@ -319,17 +319,17 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
                 case 6:
                 case 7:
                     return DMA1_Channel4_5_6_7_IRQn;
-                    // STM32L0 has shared ISRs for Ch2-Ch3 and Ch4-Ch7
+// STM32U0 has shared ISRs for Ch2-Ch3 and Ch4-Ch7
 #elif defined(TARGET_MCU_STM32U0)
-case 2:
-case 3:
-    return DMA1_Channel2_3_IRQn;
+                case 2:
+                case 3:
+                    return DMA1_Channel2_3_IRQn;
 
-case 4:
-case 5:
-case 6:
-case 7:
-    return DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX_OVR_IRQn;
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                    return DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX_OVR_IRQn;
 #else
 #ifdef DMA1_Channel2
                 case 2:

@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2016-2024 STMicroelectronics
+ * Copyright (c) 2016-2025 STMicroelectronics
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@
 #include "cmsis.h"
 #include "stm_dma_utils.h"
 
-// STM32h5 devices.
+// STM32U0 devices.
 // On this device, the DMA channels may be chosen arbitrarily.
 
 /// Mapping from SPI index to DMA link info for Tx
