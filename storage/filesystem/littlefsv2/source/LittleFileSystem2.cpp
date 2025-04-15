@@ -149,7 +149,6 @@ LittleFileSystem2::LittleFileSystem2(const char *name, BlockDevice *bd,
                                      lfs2_size_t cache_size, lfs2_size_t lookahead_size)
     : FileSystem(name)
 {
-    memset(&_config, 0, sizeof(_config));
     _config.block_size = block_size;
     _config.block_cycles = block_cycles;
     _config.cache_size = cache_size;
