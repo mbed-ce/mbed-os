@@ -290,7 +290,7 @@ protected:
 
 private:
     lfs2_t _lfs{}; // The actual file system
-    struct lfs2_config _config{};
+    struct lfs2_config _config {};
     mbed::BlockDevice *_bd = nullptr; // The block device
 
     // thread-safe locking
