@@ -5606,7 +5606,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros": [
             "CPU_LPC54628J512ET180",
             "FSL_RTOS_MBED",
-            "MBED_TICKLESS"
+            "MBED_TICKLESS",
+            "MBED_SPLIT_HEAP",
+            "MBED_MPU_CUSTOM"
         ],
         "inherits": [
             "Target"
@@ -5623,7 +5625,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "PORTINOUT",
             "PORTOUT",
             "SERIAL",
-            "SLEEP",
+            //"SLEEP",
             "SPI",
             "SPISLAVE",
             "FLASH",
@@ -5636,7 +5638,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "init-us-ticker-at-boot": true,
             "network-default-interface-type": "ETHERNET"
         },
-        "device_name": "LPC54628J512ET180",
         "post_binary_hook": {
             "function": "LPCTargetCode.lpc_patch"
         },
@@ -5672,6 +5673,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "components_add": [
             "QSPIF"
         ],
+        "device_name": "LPC54628J512ET180",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/LPCXpresso54608_back.png"
     },
     "FF_LPC546XX": {
@@ -5687,6 +5689,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "release_versions": [
             "5"
         ],
+        "components_add": [
+            "DATAFLASH"
+        ],
+        "device_name": "LPC54606J512BD100",
         "image_url": "https://os.mbed.com/media/cache/platforms/t17_VBxJMp4.png.250x250_q85.png"
     },
 

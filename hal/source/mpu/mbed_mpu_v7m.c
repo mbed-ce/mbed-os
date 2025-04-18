@@ -59,7 +59,7 @@ void mbed_mpu_init()
     MBED_ASSERT(regions >= 4);
 #endif
 
-    // Disable the MCU
+    // Disable the MPU
     MPU->CTRL = 0;
 
     // Reset all mapping

@@ -1731,21 +1731,6 @@
             "version": "11.0.0"
         },
         "memories": {
-            "EEPROM": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": false
-                },
-                "default": false,
-                "size": 16384,
-                "start": 1074823168,
-                "startup": false
-            },
             "PROGRAM_FLASH": {
                 "access": {
                     "execute": true,
@@ -1760,6 +1745,21 @@
                 "size": 524288,
                 "start": 0,
                 "startup": true
+            },
+            "EEPROM": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": false,
+                "size": 16384,
+                "start": 1074823168,
+                "startup": false
             },
             "SRAMX": {
                 "access": {
@@ -1821,6 +1821,135 @@
                 0,
                 32768
             ]
+        ],
+        "sub_family": null,
+        "vendor": "NXP:11"
+    },
+    "LPC54606J512BD100": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "devices/LPC54606/arm/LPC5460x_512.FLM",
+                "ram_size": 8192,
+                "ram_start": 536870912,
+                "size": 524288,
+                "start": 0,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "devices/LPC54606/arm/LPC5460x_MT25QL128.FLM",
+                "ram_size": 8192,
+                "ram_start": 536870912,
+                "size": 134217728,
+                "start": 268435456,
+                "style": "Keil"
+            }
+        ],
+        "family": "LPC54606",
+        "from_pack": {
+            "pack": "LPC54606_DFP",
+            "url": "https://mcuxpresso.nxp.com/cmsis_pack/repo/",
+            "vendor": "NXP",
+            "version": "25.03.00"
+        },
+        "memories": {
+            "PROGRAM_FLASH": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 524288,
+                "start": 0,
+                "startup": true
+            },
+            "EEPROM": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 16384,
+                "start": 1074823168,
+                "startup": false
+            },
+            "SRAMX": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 32768,
+                "start": 67108864,
+                "startup": false
+            },
+            "SRAM_UPPER": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 163840,
+                "start": 536870912,
+                "startup": false
+            },
+            "USB_RAM": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 8192,
+                "start": 1074790400,
+                "startup": false
+            }
+        },
+        "name": "LPC54606J512BD100",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM4",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "devices/LPC54606/LPC54606.xml",
+                "unit": 0
+            }
         ],
         "sub_family": null,
         "vendor": "NXP:11"

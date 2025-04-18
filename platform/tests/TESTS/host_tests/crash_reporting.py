@@ -40,6 +40,10 @@ class CrashReportingTest(BaseHostTest):
     def setup(self):
         self.register_callback(MSG_KEY_DEVICE_READY, self.cb_device_ready)
 
+        # Disable the default behavior of ending the test when the target experiences a fatal error.
+        # In this test, we intentionally generate a fatal error!
+        self.register_callback("mbed_error", lambda key, value, timestamp: None)
+
     def cb_device_ready(self, key, value, timestamp):
         """Acknowledge device rebooted correctly and feed the test execution
         """
@@ -68,7 +72,7 @@ class CrashReportingTest(BaseHostTest):
         
         system_reset = yield
         if self.reset == False:
-            raise RuntimeError('Platform did not auto-reboot as expected.')
+            raise RuntimeError('Platform did not auto-reboot as expected. This is likely due to failing to auto-reboot after a reset, or failing to preserve the contents of crash data RAM across resets.')
 
         # The sequence is correct -- test passed.
         yield True

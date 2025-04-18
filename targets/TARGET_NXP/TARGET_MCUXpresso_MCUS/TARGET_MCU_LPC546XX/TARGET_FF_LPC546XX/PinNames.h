@@ -246,6 +246,10 @@ typedef enum {
     NC = (int)0xFFFFFFFF
 } PinName;
 
+#define LED1 P1_3
+#define LED2 P1_26
+#define LED3 P1_27
+#define LED4 P1_28
 
 typedef enum {
     PullNone = 0,

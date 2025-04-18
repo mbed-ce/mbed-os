@@ -189,6 +189,7 @@ class HostTestCallbackBase(BaseHostTestAbstract):
         self.register_callback("mbed_error_module", self.__callback_default)
         self.register_callback("mbed_error_code", self.__callback_default)
         self.register_callback("mbed_error_message", self.__callback_default)
+        self.register_callback("mbed_error_location", self.__callback_default)
 
     def __assign_decorated_callbacks(self):
         """

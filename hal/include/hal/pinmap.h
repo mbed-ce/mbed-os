@@ -74,7 +74,6 @@ uint32_t pinmap_find_function(PinName pin, const PinMap *map);
  * {
  *     int per = spi_master_cs_pinmap()->peripheral;
  *     const PinList *pins_ff = pinmap_ff_default_pins();
- *     const PinList *pins_avoid = pinmap_restricted_pins();
  *     PinName mosi = NC;
  *     PinName miso = NC;
  *     PinName sclk = NC;
@@ -137,22 +136,6 @@ bool pinmap_list_has_pin(const PinList *list, PinName pin);
  * @return true if the peripheral is in the list, false otherwise
  */
 bool pinmap_list_has_peripheral(const PeripheralList *list, int peripheral);
-
-/**
- * Get the pin list of pins to avoid during testing
- *
- * The restricted pin list is used to indicate to testing
- * that a pin should be skipped due to some caveat about it.
- * For example, using CONSOLE_RX and CONSOLE_TX during tests will interfere
- * with the test runner and should be avoided.
- *
- * Targets should override the weak implementation of this
- * function if they have additional pins which should be
- * skipped during testing.
- *
- * @return Pointer to a pin list of pins to avoid
- */
-const PinList *pinmap_restricted_pins(void);
 
 /**
  * Get the pin list of peripherals per interface to avoid during testing

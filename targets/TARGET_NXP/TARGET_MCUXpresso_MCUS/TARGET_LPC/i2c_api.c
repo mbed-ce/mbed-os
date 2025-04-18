@@ -314,7 +314,7 @@ int i2c_slave_receive(i2c_t *obj)
     uint32_t status_flags = I2C_GetStatusFlags(i2c_addrs[obj->instance]);
 
     if (status_flags & kI2C_SlaveSelected) {
-        if (((status_flags >> I2C_STAT_SLVSTATE_SHIFT) & I2C_STAT_SLVSTATE_MASK) == 0x1) {
+        if (((status_flags & I2C_STAT_SLVSTATE_MASK) >> I2C_STAT_SLVSTATE_SHIFT) == 0x1) {
             // read addressed
             return 1;
         } else {
