@@ -11492,6 +11492,94 @@
         ],
         "sub_family": "STM32L562",
         "vendor": "STMicroelectronics:13"
+    },    
+	"STM32U083RCTx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32U0xx_256k.FLM",
+                "ram_size": 8192,
+                "ram_start": 536870912,
+                "size": 262144,
+                "start": 134217728,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32U0 Series",
+        "from_pack": {
+            "pack": "STM32U0xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "1.0.0"
+        },
+        "memories": {
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 262144,
+                "start": 134217728,
+                "startup": true
+            },
+            "SRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 32768,
+                "start": 536870912,
+                "startup": false
+            },
+            "SRAM2": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "p_name": null,
+                "size": 8192,
+                "start": 536903680,
+                "startup": false
+            }
+        },
+        "name": "STM32U083RCTx",
+        "processors": [
+            {
+                "address": null,
+                "ap": 0,
+                "apid": null,
+                "core": "CortexM0Plus",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "None",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32U083.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32U083",
+        "vendor": "STMicroelectronics:13"
     },
     "STM32U575ZITx": {
         "algorithms": [

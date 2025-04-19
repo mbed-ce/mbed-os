@@ -198,6 +198,7 @@ DEFAULT_PLATFORM_DB = {
         u"0885": u"B_L4S5I_IOT01A",
         u"0886": u"NUCLEO_U575ZI_Q",
         u"0887": u"B_U585I_IOT02A",
+        u"0888": u"NUCLEO_U083RC",
         u"0900": u"SAMR21G18A",
         u"0905": u"SAMD21G18A",
         u"0910": u"SAML21J18A",

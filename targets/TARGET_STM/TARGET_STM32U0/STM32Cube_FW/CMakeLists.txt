@@ -1,0 +1,84 @@
+# Copyright (c) 2025 Jan Kamidra
+# SPDX-License-Identifier: Apache-2.0
+
+add_library(mbed-stm32u0cube-fw INTERFACE)
+
+target_sources(mbed-stm32u0cube-fw
+    INTERFACE
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_lptim.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_lpuart.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_opamp.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_pwr.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_rng.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_rtc.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_spi.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_tim.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_usart.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_usb.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_utils.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_adc.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_adc_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_comp.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_cortex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_crc.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_crc_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_cryp.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_cryp_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_dac.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_dac_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_dma.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_dma_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_exti.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_flash.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_flash_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_gpio.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_i2c.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_i2c_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_irda.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_iwdg.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_lcd.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_lptim.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_opamp.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_opamp_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_pcd.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_pcd_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_pwr.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_pwr_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_rcc.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_rcc_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_rng.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_rng_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_rtc.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_rtc_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_smartcard.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_smartcard_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_spi.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_spi_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_tim.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_tim_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_tsc.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_uart.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_uart_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_usart.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_usart_ex.c
+        STM32U0xx_HAL_Driver/stm32u0xx_hal_wwdg.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_adc.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_comp.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_crc.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_crs.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_dac.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_dma.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_exti.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_gpio.c
+        STM32U0xx_HAL_Driver/stm32u0xx_ll_i2c.c
+        system_stm32u0xx.c
+)
+
+target_include_directories(mbed-stm32u0cube-fw
+    INTERFACE
+        .
+        CMSIS
+        STM32U0xx_HAL_Driver
+        STM32U0xx_HAL_Driver/Legacy
+)

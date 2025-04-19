@@ -31,7 +31,7 @@
 
 #if !defined(MBED_CONF_TARGET_USB_SPEED)
 
-#if defined (USB)
+#if defined (USB) || defined(USB_DRD_FS)
 #define MBED_CONF_TARGET_USB_SPEED USE_USB_NO_OTG
 #elif defined(USB_OTG_FS)
 #define MBED_CONF_TARGET_USB_SPEED USE_USB_OTG_FS
@@ -49,17 +49,17 @@
 #define USBHAL_IRQn  USB_LP_CAN_RX0_IRQn
 #elif defined(TARGET_STM32L5)
 #define USBHAL_IRQn  USB_FS_IRQn
+#elif defined(TARGET_STM32U0)
+#define USBHAL_IRQn USB_DRD_FS_IRQn
 #else
 #define USBHAL_IRQn  USB_IRQn
-#endif
+#endif /* #if defined(TARGET_STM32F1) | */
 
 #elif (MBED_CONF_TARGET_USB_SPEED == USE_USB_OTG_FS)
 #define USBHAL_IRQn  OTG_FS_IRQn
-
 #else
 #define USBHAL_IRQn  OTG_HS_IRQn
-
-#endif
+#endif /* #if MBED_CONF_TARGET_USB_SPEED == USE_USB_NO_OTG */
 
 #define NB_ENDPOINT  8
 
