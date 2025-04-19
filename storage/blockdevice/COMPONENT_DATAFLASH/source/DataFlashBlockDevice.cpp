@@ -26,7 +26,8 @@ using namespace mbed;
 #define DATAFLASH_READ_SIZE        1
 #define DATAFLASH_PROG_SIZE        1
 #define DATAFLASH_TIMEOUT          10000
-#define DATAFLASH_ID_MATCH         0x1F20
+#define DATAFLASH_ID_MASK          0xFFE0 // Matches Manufacturer ID and Family Code
+#define DATAFLASH_ID_MATCH         0x1F20 // Matches Adesto/Renesas AT45Dxxx family
 #define DATAFLASH_ID_DENSITY_MASK  0x001F
 #define DATAFLASH_PAGE_SIZE_256    0x0100
 #define DATAFLASH_PAGE_SIZE_264    0x0108
@@ -41,7 +42,7 @@ using namespace mbed;
 
 /* enable debug */
 #ifndef DATAFLASH_DEBUG
-#define DATAFLASH_DEBUG 0
+#define DATAFLASH_DEBUG 1
 #endif /* DATAFLASH_DEBUG */
 
 #if DATAFLASH_DEBUG
@@ -186,13 +187,13 @@ int DataFlashBlockDevice::init()
     /* read ID register to validate model and set dimensions */
     uint16_t id = _get_register(DATAFLASH_OP_ID);
 
-    DEBUG_PRINTF("id: %04X\r\n", id & DATAFLASH_ID_MATCH);
+    DEBUG_PRINTF("id: %04X\r\n", id);
 
     /* get status register to verify the page size mode */
     uint16_t status = _get_register(DATAFLASH_OP_STATUS);
 
     /* manufacture ID match */
-    if ((id & DATAFLASH_ID_MATCH) == DATAFLASH_ID_MATCH) {
+    if ((id & DATAFLASH_ID_MASK) == DATAFLASH_ID_MATCH) {
 
         /* calculate density */
         _device_size = 0x8000 << (id & DATAFLASH_ID_DENSITY_MASK);

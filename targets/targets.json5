@@ -5625,7 +5625,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "PORTINOUT",
             "PORTOUT",
             "SERIAL",
-            //"SLEEP",
+            "SLEEP",
             "SPI",
             "SPISLAVE",
             "FLASH",
@@ -5689,9 +5689,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "release_versions": [
             "5"
         ],
-        "components_add": [
-            "DATAFLASH"
-        ],
+        // Note: this target has a DataFlash flash on the board, BUT they actually pinned it out wrong:
+        // SCLK is connected to SPI3, while MOSI and MISO are connected to SPI5. So, the flash is
+        // impossible to use, at least without bodge wires!
         "device_name": "LPC54606J512BD100",
         "image_url": "https://os.mbed.com/media/cache/platforms/t17_VBxJMp4.png.250x250_q85.png"
     },

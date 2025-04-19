@@ -14,13 +14,5 @@
             "help": "Configure device to use DataFlash address space.",
             "value": "0"
         }
-    },
-    "target_overrides": {
-        "FF_LPC546XX": {
-            "SPI_MOSI": "P0_8",
-            "SPI_MISO": "P0_9",
-            "SPI_CLK":  "P0_6",
-            "SPI_CS":   "P0_7"
-        }
     }
 }
