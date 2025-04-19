@@ -253,6 +253,9 @@
         },
         "MIMXRT105X": {
             "crash-capture-enabled": true
+        },
+        "MCU_LPC546XX": {
+            "crash-capture-enabled": true
         }
     }
 }

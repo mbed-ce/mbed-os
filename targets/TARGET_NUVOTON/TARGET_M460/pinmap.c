@@ -84,27 +84,6 @@ void pin_mode(PinName pin, PinMode mode)
      */
 }
 
-/* List of pins excluded from testing */
-const PinList *pinmap_restricted_pins()
-{
-    static const PinName pins[] = {
-        CONSOLE_TX, CONSOLE_RX,     // Dedicated to USB VCOM
-#if MBED_CONF_TARGET_EXCLUDE_UNO_SPI_FROM_FPGA_CI_TEST_SHIELD_TEST
-        ARDUINO_UNO_D8,             // Dedicated to on-board SPI flash
-        ARDUINO_UNO_D9,
-        ARDUINO_UNO_D10,
-        ARDUINO_UNO_D11,
-        ARDUINO_UNO_D12,
-        ARDUINO_UNO_D13,
-#endif
-    };
-    static const PinList pin_list = {
-        sizeof(pins) / sizeof(pins[0]),
-        pins
-    };
-    return &pin_list;
-}
-
 /* List of UART peripherals excluded from testing */
 #if DEVICE_SERIAL
 const PeripheralList *pinmap_uart_restricted_peripherals()

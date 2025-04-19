@@ -34,7 +34,9 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		${PYOCD_PROBE_ARGS}
 		--base-address ${MBED_UPLOAD_BASE_ADDR}
 		${PYOCD_EXTRA_OPTIONS}
-		${BINARY_FILE})
+		${BINARY_FILE}
+		VERBATIM
+		USES_TERMINAL)
 
 endfunction(gen_upload_target)
 

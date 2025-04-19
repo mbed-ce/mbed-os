@@ -21,9 +21,6 @@
 #include "fsl_flashiap.h"
 #include "hal/pinmap.h"
 
-#define CRC16
-#include "crc.h"
-
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -43,31 +40,6 @@
 #define SDRAM_MODEREG_VALUE (0x23u)
 #define SDRAM_DEV_MEMORYMAP (0x09u) /* 128Mbits (8M*16, 4banks, 12 rows, 9 columns)*/
 
-uint32_t FLASHIAP_ReadUid(uint32_t *addr)
-{
-    uint32_t command[5], result[5];
-
-    command[0] = kIapCmd_FLASHIAP_ReadUid;
-    iap_entry(command, result);
-
-    memcpy(addr, &result[1], (sizeof(uint32_t) * 4));
-
-    return result[0];
-}
-
-// called before main
-void mbed_sdk_init()
-{
-    if (SYSCON->DEVICE_ID0 == 0xFFF54628) {
-        BOARD_BootClockFROHF96M(); /* Boot up FROHF96M for SPIFI to use*/
-        /* LPC54628 runs at a higher core speed */
-        BOARD_BootClockPLL220M();
-    } else {
-        BOARD_BootClockFROHF96M(); /* Boot up FROHF96M for SPIFI to use*/
-        BOARD_BootClockPLL180M();
-    }
-}
-
 // Change the NMI pin to an input. This allows NMI pin to
 //  be used as a low power mode wakeup.  The application will
 //  need to change the pin back to NMI_b or wakeup only occurs once!
@@ -77,67 +49,6 @@ void NMI_Handler(void)
     //gpio_init_in(&gpio, PTA4);
 }
 
-// Enable the RTC oscillator if available on the board
-void rtc_setup_oscillator(void)
-{
-    /* Enable the RTC 32K Oscillator */
-    SYSCON->RTCOSCCTRL |= SYSCON_RTCOSCCTRL_EN_MASK;
-}
-
-uint32_t us_ticker_get_clock()
-{
-    return CLOCK_GetFreq(kCLOCK_BusClk);;
-}
-
-// Provide ethernet devices with a semi-unique MAC address from the UUID
-void mbed_mac_address(char *mac)
-{
-    uint16_t MAC[3];                        // 3 16 bits words for the MAC
-    uint32_t UID[4];
-
-    // get UID via ISP commands
-    FLASHIAP_ReadUid(UID);
-
-    // generate three CRC16's using different slices of the UUID
-    MAC[0] = crcSlow((const uint8_t *)UID, 8);  // most significant half-word
-    MAC[1] = crcSlow((const uint8_t *)UID, 12);
-    MAC[2] = crcSlow((const uint8_t *)UID, 16); // least significant half word
-
-    // The network stack expects an array of 6 bytes
-    // so we copy, and shift and copy from the half-word array to the byte array
-    mac[0] = MAC[0] >> 8;
-    mac[1] = MAC[0];
-    mac[2] = MAC[1] >> 8;
-    mac[3] = MAC[1];
-    mac[4] = MAC[2] >> 8;
-    mac[5] = MAC[2];
-
-    // We want to force bits [1:0] of the most significant byte [0]
-    // to be "10"
-    // http://en.wikipedia.org/wiki/MAC_address
-
-    mac[0] |= 0x02; // force bit 1 to a "1" = "Locally Administered"
-    mac[0] &= 0xFE; // force bit 0 to a "0" = Unicast
-
-}
-
-void ADC_ClockPower_Configuration(void)
-{
-    /* SYSCON power. */
-    POWER_DisablePD(kPDRUNCFG_PD_VDDA);    /* Power on VDDA. */
-    POWER_DisablePD(kPDRUNCFG_PD_ADC0);    /* Power on the ADC converter. */
-    POWER_DisablePD(kPDRUNCFG_PD_VD2_ANA); /* Power on the analog power supply. */
-    POWER_DisablePD(kPDRUNCFG_PD_VREFP);   /* Power on the reference voltage source. */
-    POWER_DisablePD(kPDRUNCFG_PD_TS);      /* Power on the temperature sensor. */
-
-
-    /* CLOCK_AttachClk(kMAIN_CLK_to_ADC_CLK); */
-    /* Sync clock source is not used. Using sync clock source and would be divided by 2.
-     * The divider would be set when configuring the converter.
-     */
-    CLOCK_EnableClock(kCLOCK_Adc0); /* SYSCON->AHBCLKCTRL[0] |= SYSCON_AHBCLKCTRL_ADC0_MASK; */
-    RESET_PeripheralReset(kADC0_RST_SHIFT_RSTn);
-}
 
 /* Initialize the external memory. */
 void BOARD_InitSDRAM(void)
@@ -180,26 +91,3 @@ void BOARD_InitSDRAM(void)
     /* EMC Dynamc memory configuration. */
     EMC_DynamicMemInit(EMC, &dynTiming, &dynChipConfig, 1);
 }
-
-// Get the QSPI clock frequency
-uint32_t qspi_get_freq(void)
-{
-    CLOCK_AttachClk(kFRO_HF_to_SPIFI_CLK);
-
-    return CLOCK_GetFroHfFreq();
-}
-
-const PinList *pinmap_restricted_pins()
-{
-    /* D6 pin is used by the LCD
-       A4 pin is used by the accelerometer */
-    static const PinName pins[] = {
-        D6, A4
-    };
-    static const PinList pin_list = {
-        sizeof(pins) / sizeof(pins[0]),
-        pins
-    };
-    return &pin_list;
-}
-

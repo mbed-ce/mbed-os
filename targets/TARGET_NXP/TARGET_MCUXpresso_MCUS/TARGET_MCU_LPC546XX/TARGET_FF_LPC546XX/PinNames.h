@@ -184,15 +184,6 @@ typedef enum {
     P4_15 = (4 <<  PORT_SHIFT | 15),
     P4_16 = (4 <<  PORT_SHIFT | 16),
 
-
-
-    // mbed original LED naming
-    LED1 = P1_3,
-    LED2 = P1_27,
-    LED3 = P1_26,
-    LED4 = P1_28,
-
-
     // USB Pins
     CONSOLE_TX = P0_30,
     CONSOLE_RX = P0_29,
@@ -233,19 +224,20 @@ typedef enum {
     p29 = P0_0,
     p30 = P0_1,
 
-
-    I2C_SCL2 = P0_27,
-    I2C_SDA2 = P0_26,
-    I2C_SCL7 = P1_30,
-    I2C_SDA7 = P1_29,
-    I2C_SCL  = I2C_SCL2,
-    I2C_SDA  = I2C_SDA2,
-
-
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
 
+#define LED1 P1_3
+#define LED2 P1_27
+#define LED3 P1_22
+#define LED4 P1_28
+
+#define I2C_SCL0 P0_27
+#define I2C_SDA0 P0_26
+
+#define I2C_SCL1 P1_30
+#define I2C_SDA1 P1_29
 
 typedef enum {
     PullNone = 0,

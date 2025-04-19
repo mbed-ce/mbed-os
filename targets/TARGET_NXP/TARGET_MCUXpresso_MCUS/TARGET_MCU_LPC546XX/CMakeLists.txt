@@ -6,13 +6,9 @@ include(mbed_set_post_build_nxp)
 add_subdirectory(TARGET_FF_LPC546XX EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_LPCXpresso EXCLUDE_FROM_ALL)
 
-if(${MBED_TOOLCHAIN} STREQUAL "ARM")
-    set(STARTUP_FILE device/TOOLCHAIN_ARM_STD/startup_LPC54628.S)
-    set(LINKER_FILE device/TOOLCHAIN_ARM_STD/LPC54628J512.sct)
-    set(LIB_POWER device/TOOLCHAIN_ARM_STD/lib_power.ar)
-elseif(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
-    set(STARTUP_FILE device/TOOLCHAIN_GCC_ARM/startup_LPC54628.S)
-    set(LINKER_FILE device/TOOLCHAIN_GCC_ARM/LPC54628J512.ld)
+if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
+    set(STARTUP_FILE device/TOOLCHAIN_GCC_ARM/startup_LPC546xx.S)
+    set(LINKER_FILE device/TOOLCHAIN_GCC_ARM/LPC546xx.ld)
     set(LIB_POWER device/TOOLCHAIN_GCC_ARM/libpower.a)
 endif()
 
@@ -35,6 +31,8 @@ target_sources(mbed-mcu-lpc546xx
     INTERFACE
         flash_api.c
         trng_api.c
+        mbed_overrides.cpp
+        mbed_mpu_lpc546xx.c
 
         device/system_LPC54628.c
 

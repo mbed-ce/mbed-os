@@ -84,22 +84,6 @@ void pin_mode(PinName pin, PinMode mode)
      */
 }
 
-/* List of pins excluded from testing */
-const PinList *pinmap_restricted_pins()
-{
-    static const PinName pins[] = {
-        CONSOLE_TX, CONSOLE_RX,   // Dedicated to USB VCOM
-#if defined(TARGET_NUMAKER_IOT_M487)
-        A2, A3,         // Dedicated to on-board ESP8266 WiFi module RTS/CTS
-#endif
-    };
-    static const PinList pin_list = {
-        sizeof(pins) / sizeof(pins[0]),
-        pins
-    };
-    return &pin_list;
-}
-
 /* List of UART peripherals excluded from testing */
 #if DEVICE_SERIAL
 const PeripheralList *pinmap_uart_restricted_peripherals()

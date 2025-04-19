@@ -3,7 +3,8 @@
 
 ### NXP LinkServer Upload Method
 # This method needs the following parameters:
-# LINKSERVER_DEVICE - Chip name and board to connect to, separated by a colon.
+# LINKSERVER_DEVICE - Chip name and board to connect to, separated by a colon, or path to custom
+#                     device JSON file.
 
 set(UPLOAD_SUPPORTS_DEBUG TRUE)
 
@@ -41,7 +42,9 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 			${LINKSERVER_DEVICE}
 			load
 			--addr ${MBED_UPLOAD_BASE_ADDR}
-			${BINARY_FILE})
+			${BINARY_FILE}
+		USES_TERMINAL
+		VERBATIM)
 
 endfunction(gen_upload_target)
 

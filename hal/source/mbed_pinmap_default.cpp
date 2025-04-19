@@ -66,19 +66,6 @@ const char *pinmap_ff_arduino_uno_pin_to_string(PinName pin)
 
 #endif // defined (TARGET_FF_ARDUINO) || (TARGET_FF_ARDUINO_UNO)
 
-//*** Default restricted pins ***
-MBED_WEAK const PinList *pinmap_restricted_pins()
-{
-    static const PinName pins[] = {
-        CONSOLE_TX, CONSOLE_RX
-    };
-    static const PinList pin_list = {
-        sizeof(pins) / sizeof(pins[0]),
-        pins
-    };
-    return &pin_list;
-}
-
 //*** Default restricted gpio pins ***
 // GPIO pins are special case because there are no pin-maps for GPIO
 MBED_WEAK const PinList *pinmap_gpio_restricted_pins()

@@ -12,7 +12,6 @@ target_sources(mbed-ff-lpc546xx
     INTERFACE
         PeripheralPins.c
         clock_config.c
-        mbed_overrides.c
 )
 
 target_link_libraries(mbed-ff-lpc546xx INTERFACE mbed-mcu-lpc546xx)
