@@ -69,8 +69,22 @@ public:
 
     enum Flow {
         Disabled = 0,
+
+        /// RS-232-E RTS flow control. This is used to prevent the other end of the connection from sending more
+        /// bytes than the Mbed MCU can process.
+        /// When this flow control is active, the RTS signal will normally be asserted (low),
+        /// but will go deasserted (high) if the Mbed MCU might not have Rx buffer space to store another byte.
+        /// Note that in this configuration the RTS signal actually operates as a "ready to receive" (RTR) output,
+        /// not a true RTS.
         RTS,
+
+        /// RS-232 CTS flow control. This is used to prevent the Mbed MCU from sending more bytes than the
+        /// other end of the connection can process.
+        /// When this flow control is active, the CTS pin will be sampled after transmitting each byte, and if
+        /// if is deasserted (high), transmission will pause until it becomes asserted (low) again.
         CTS,
+
+        /// Combination of RTS and CTS flow control as previously defined.
         RTSCTS
     };
 

@@ -97,14 +97,12 @@ const PinMap PinMap_SPI_SCLK[] = {
 const PinMap PinMap_SPI_MOSI[] = {
     {P1_5,  SPI_0, 1},
     {P1_24, SPI_2, 1},
-    {P0_8,  SPI_3, 1},
     {NC   , NC   , 0}
 };
 
 const PinMap PinMap_SPI_MISO[] = {
     {P1_6,  SPI_0, 1},
     {P1_25, SPI_2, 1},
-    {P0_9,  SPI_3, 1},
     {NC   , NC   , 0}
 };
 
