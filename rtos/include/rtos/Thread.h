@@ -241,10 +241,13 @@ public:
      */
     const char *get_name() const;
 
-    /** Get thread id
-      @return  thread ID for reference by other functions.
-
-      @note You may call this function from ISR context.
+    /**
+     * @brief Get thread ID
+     * @return Unique ID number of this thread. No other running thread will have this ID number.
+     *
+     * If the thread is not running, or has not started yet, 0 will be returned.
+     *
+     * @note You may call this function from ISR context.
      */
     osThreadId_t get_id() const;
 

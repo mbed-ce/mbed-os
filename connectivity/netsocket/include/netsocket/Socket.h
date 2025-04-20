@@ -50,6 +50,9 @@ public:
      *  Closes any open connection and deallocates any memory associated
      *  with the socket. Called from destructor if socket is not closed.
      *
+     *  If this socket was allocated by an accept() call, then calling this will also delete
+     *  the socket object itself.
+     *
      *  @return         NSAPI_ERROR_OK on success.
      *                  Negative subclass-dependent error code on failure.
      */
@@ -307,20 +310,22 @@ public:
      */
     virtual nsapi_error_t getsockopt(int level, int optname, void *optval, unsigned *optlen) = 0;
 
-    /** Accepts a connection on a socket.
+    /**
+     *  @brief Waits for a client to try to connect to this socket, then returns a socket for the new connection.
      *
-     *  The server socket must be bound and set to listen for connections.
-     *  On a new connection, returns connected network socket to call close()
-     *  that deallocates the resources. Referencing a returned pointer after a close()
-     *  call is not allowed and leads to undefined behavior.
+     *  On error, returns nullptr and sets the error code parameter (if provided).
      *
-     *  By default, accept blocks until incoming connection occurs. If socket is set to
+     *  Note that if a socket is returned, you must eventually call close() on it to release its resources.
+     *  Calling close() will also delete the socket object, no separate delete() is required.
+     *  Referencing the returned socket after a close() call is not allowed and leads to undefined behavior.
+     *
+     *  By default, this function blocks until incoming connection occurs. If socket is set to
      *  non-blocking or times out, error is set to NSAPI_ERROR_WOULD_BLOCK.
      *
-     *  @param error      Pointer to storage of the error value or NULL.
-     *  @return           Pointer to a socket.
+     *  @param error      If you wish to check the error code, pass an error code pointer here.
+     *  @return           Pointer to a socket, or nullptr on error
      */
-    virtual Socket *accept(nsapi_error_t *error = NULL) = 0;
+    virtual Socket *accept(nsapi_error_t *error = nullptr) = 0;
 
     /** Listen for incoming connections.
      *
