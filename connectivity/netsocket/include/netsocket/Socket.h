@@ -316,11 +316,11 @@ public:
      *  On error, returns nullptr and sets the error code parameter (if provided).
      *
      *  Note that if a socket is returned, you must eventually call close() on it to release its resources.
-     *  Calling close() will also delete the socket object, no separate delete() is required.
+     *  Calling close() will also delete the socket object, no separate \c delete is required.
      *  Referencing the returned socket after a close() call is not allowed and leads to undefined behavior.
      *
-     *  By default, this function blocks until incoming connection occurs. If socket is set to
-     *  non-blocking or times out, error is set to NSAPI_ERROR_WOULD_BLOCK.
+     *  By default, this function blocks until an incoming connection occurs. If socket is set to
+     *  non-blocking or times out, an \c NSAPI_ERROR_WOULD_BLOCK error is returned.
      *
      *  @param error      If you wish to check the error code, pass an error code pointer here.
      *  @return           Pointer to a socket, or nullptr on error
