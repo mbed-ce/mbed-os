@@ -42,7 +42,7 @@ using namespace mbed;
 
 /* enable debug */
 #ifndef DATAFLASH_DEBUG
-#define DATAFLASH_DEBUG 1
+#define DATAFLASH_DEBUG 0
 #endif /* DATAFLASH_DEBUG */
 
 #if DATAFLASH_DEBUG
