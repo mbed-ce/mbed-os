@@ -4826,7 +4826,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32U083xC"
         ],
 		 "overrides": {
-            "clock_source": "USE_PLL_HSI", // Nucleo's default for the rest are necessary hardware changes
+            "clock_source": "USE_PLL_HSI", // Use HSI by default, other options require hardware changes
             "lse_available":  1,
             "default-adc-vref": 3.3
         },
