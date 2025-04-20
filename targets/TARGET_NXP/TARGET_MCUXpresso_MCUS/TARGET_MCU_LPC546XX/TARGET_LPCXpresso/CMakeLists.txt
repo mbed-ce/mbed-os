@@ -13,5 +13,5 @@ target_sources(mbed-lpc546xx-xpresso
         PeripheralPins.c
         clock_config.c
         crc.c
-        mbed_overrides.c
+        overrides.c
 )
