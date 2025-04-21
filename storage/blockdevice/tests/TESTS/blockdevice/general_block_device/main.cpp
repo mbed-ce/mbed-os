@@ -855,7 +855,7 @@ void test_deinit_bd()
 
 void test_write_deinit_init()
 {
-    //TEST_SKIP_UNLESS_MESSAGE(block_device != NULL, "no block device found.");
+    TEST_SKIP_UNLESS_MESSAGE(block_device != NULL, "no block device found.");
     // Determine start_address & stop_address
     bd_addr_t addr = sectors_addr[rand() % num_of_sectors];
     bd_size_t erase_size = block_device->get_erase_size(addr);
