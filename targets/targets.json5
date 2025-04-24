@@ -4803,10 +4803,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TRNG",
             //"USBDEVICE" // TODO
         ],
-        "device_has_remove": [
-            "I2C",      // Not tested just prepared
-            "I2CSLAVE"  // Not tested just prepared
-        ],
         "is_mcu_family_target": true
     },
     "MCU_STM32U083xC": {

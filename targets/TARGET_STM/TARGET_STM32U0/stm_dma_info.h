@@ -26,10 +26,10 @@
 
 /// Mapping from SPI index to DMA link info for Tx
 static const DMALinkInfo SPITxDMALinks[] = {
-        {1, 0, DMA_REQUEST_SPI1_TX},
-        {1, 2, DMA_REQUEST_SPI2_TX},
+        {1, 2, DMA_REQUEST_SPI1_TX},
+        {1, 4, DMA_REQUEST_SPI2_TX},
 #if defined (SPI3)
-        {1, 4, DMA_REQUEST_SPI3_TX}
+        {1, 6, DMA_REQUEST_SPI3_TX}
 #endif
 };
 

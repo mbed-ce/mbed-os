@@ -1120,11 +1120,11 @@ int i2c_byte_read(i2c_t *obj, int last)
     if (last) {
         /* Disable Address Acknowledge */
         tmpreg = tmpreg & (~I2C_CR2_RELOAD);
-        tmpreg |= I2C_CR2_NACK | (I2C_CR2_NBYTES & (1 << 16));
+        tmpreg |= I2C_CR2_NACK | (1 << I2C_CR2_NBYTES_Pos);
     } else {
         /* Enable reload mode as we don't know how many bytes will be sent */
         /* and set transfer size to 1 */
-        tmpreg |= I2C_CR2_RELOAD | (I2C_CR2_NBYTES & (1 << 16));
+        tmpreg |= I2C_CR2_RELOAD | (1 << I2C_CR2_NBYTES_Pos);
     }
 
     /* Set the prepared configuration */
