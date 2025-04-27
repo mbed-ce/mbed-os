@@ -33,6 +33,8 @@
 #error "BLE FEATURE CANNOT BE REMOVED"
 #endif
 
+#include "stm_dma_info.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -98,6 +100,7 @@ struct qspi_s {
     PinName io3;
     PinName sclk;
     PinName ssel;
+    bool dmaInitialized;
 };
 #endif
 

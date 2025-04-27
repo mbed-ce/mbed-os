@@ -44,5 +44,11 @@ static const DMALinkInfo SPIRxDMALinks[] = {
 #endif
 };
 
+/// Mapping from QSPI index to DMA link info
+static const DMALinkInfo QSPIDMALinks[] = {
+#if defined(QUADSPI)
+        {1, 7, DMA_REQUEST_QUADSPI },
+#endif
+};
 
 #endif //MBED_OS_STM_DMA_INFO_H

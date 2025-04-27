@@ -31,6 +31,8 @@
 #include "stm32l4xx_ll_pwr.h"
 #include "stm32l4xx_ll_rcc.h"
 
+#include "stm_dma_utils.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -106,6 +108,7 @@ struct can_s {
 struct qspi_s {
 #if defined(OCTOSPI1)
     OSPI_HandleTypeDef handle;
+    IRQn_Type qspiIRQ;
 #else
     QSPI_HandleTypeDef handle;
 #endif
@@ -116,6 +119,7 @@ struct qspi_s {
     PinName io3;
     PinName sclk;
     PinName ssel;
+    bool dmaInitialized;
 };
 #endif
 
@@ -134,6 +138,8 @@ struct ospi_s {
     PinName sclk;
     PinName ssel;
     PinName dqs;
+    IRQn_Type ospiIRQ;
+    bool dmaInitialized;    
 };
 #endif
 
