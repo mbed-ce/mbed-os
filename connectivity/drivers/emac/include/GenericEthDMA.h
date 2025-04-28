@@ -527,7 +527,7 @@ namespace mbed {
             std::optional<size_t> firstDescIdx, lastDescIdx;
 
             // Packet length is stored here once we check it
-            size_t pktLen;
+            size_t pktLen{};
 
             // Prevent looping around into descriptors waiting for rebuild by limiting how many
             // we can process.

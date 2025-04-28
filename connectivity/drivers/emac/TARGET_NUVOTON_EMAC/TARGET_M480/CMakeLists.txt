@@ -8,5 +8,6 @@ target_include_directories(mbed-emac
 
 target_sources(mbed-emac
     PRIVATE
-        m480_eth.c
+        NuvotonM480EthMAC.cpp
+        m480_eth_pins.c
 )

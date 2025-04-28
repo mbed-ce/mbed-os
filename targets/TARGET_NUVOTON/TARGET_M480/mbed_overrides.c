@@ -105,3 +105,42 @@ void mbed_sdk_init(void)
         SYS_LockReg();
     }
 }
+
+// Override mbed_mac_address of mbed_interface.c to provide ethernet devices with a semi-unique MAC address
+void mbed_mac_address(char *mac)
+{
+    uint32_t uID1;
+    // Fetch word 0
+    uint32_t word0 = *(uint32_t *)0x7F804; // 2KB Data Flash at 0x7F800
+    // Fetch word 1
+    // we only want bottom 16 bits of word1 (MAC bits 32-47)
+    // and bit 9 forced to 1, bit 8 forced to 0
+    // Locally administered MAC, reduced conflicts
+    // http://en.wikipedia.org/wiki/MAC_address
+    uint32_t word1 = *(uint32_t *)0x7F800; // 2KB Data Flash at 0x7F800
+
+    if (word0 == 0xFFFFFFFF) {       // Not burn any mac address at 1st 2 words of Data Flash
+        // with a semi-unique MAC address from the UUID
+        /* Enable FMC ISP function */
+        SYS_UnlockReg();
+        FMC_Open();
+        // = FMC_ReadUID(0);
+        uID1 = FMC_ReadUID(1);
+        word1 = (uID1 & 0x003FFFFF) | ((uID1 & 0x030000) << 6) >> 8;
+        word0 = ((FMC_ReadUID(0) >> 4) << 20) | ((uID1 & 0xFF) << 12) | (FMC_ReadUID(2) & 0xFFF);
+        /* Disable FMC ISP function */
+        FMC_Close();
+        /* Lock protected registers */
+        SYS_LockReg();
+    }
+
+    word1 |= 0x00000200;
+    word1 &= 0x0000FEFF;
+
+    mac[0] = (word1 & 0x0000ff00) >> 8;
+    mac[1] = (word1 & 0x000000ff);
+    mac[2] = (word0 & 0xff000000) >> 24;
+    mac[3] = (word0 & 0x00ff0000) >> 16;
+    mac[4] = (word0 & 0x0000ff00) >> 8;
+    mac[5] = (word0 & 0x000000ff);
+}

@@ -29,6 +29,7 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #ifdef NU_TRACE
 #define NU_DEBUGF(x) { printf x; }
