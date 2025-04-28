@@ -4,7 +4,7 @@
 
 # Notes:
 # 1. The Nuvoton fork of OpenOCD is required: https://github.com/OpenNuvoton/OpenOCD-Nuvoton/releases .
-#    Point CMake to it via setting the OpenOCD option:
+#    Point CMake to it via setting the OpenOCD option. For example:
 #    -DOpenOCD="C:/Program Files (x86)/OpenOCD-nuvoton/bin/openocd.exe"
 # 2. Take note of the "MSG" DIP switch on the Nu-Link section of the board. If set to ON, the Nu-Link will run in
 #    mass storage mode and can only work with the "MBED" upload method. If set to OFF, the Nu-Link will run in
