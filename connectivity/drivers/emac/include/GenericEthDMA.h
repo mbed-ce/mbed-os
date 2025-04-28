@@ -319,7 +319,7 @@ namespace mbed {
      * that the subclass must override.
      */
     class GenericRxDMARing : public CompositeEMAC::RxDMA {
-    protected:
+    public:
         /// How many extra buffers to leave in the Rx pool, relative to how many we keep assigned to Rx descriptors.
         /// We want to keep some amount of extra buffers because constantly hitting the network stack with failed pool
         /// allocations can produce some negative consequences in some cases.
@@ -330,6 +330,14 @@ namespace mbed {
         // TODO: When we add multiple Ethernet support, this calculation may need to be changed, because the pool buffers will be split between multiple EMACs
         static constexpr size_t RX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS - RX_POOL_EXTRA_BUFFERS + 1;
 
+        // Alignment required for Rx memory buffers.  Normally they don't need more than word alignment but
+        // if we are doing cache operations they need to be cache aligned.
+#if __DCACHE_PRESENT
+        static constexpr size_t RX_BUFFER_ALIGN = __SCB_DCACHE_LINE_SIZE;
+#else
+        static constexpr size_t RX_BUFFER_ALIGN = sizeof(uint32_t);
+#endif
+    protected:
         /// Pointer to the network stack buffer associated with the corresponding Rx descriptor.
         net_stack_mem_buf_t * rxDescStackBufs[RX_NUM_DESCS];
 
@@ -338,14 +346,7 @@ namespace mbed {
         size_t rxDescsOwnedByApplication; ///< Number of Rx descriptors owned by the application and needing buffers allocated.
         std::atomic<size_t> rxNextIndex; ///< Index of the next descriptor that the DMA will populate.  Updated by application but used by ISR.
 
-        // Alignment required for Rx memory buffers.  Normally they don't need more than word alignment but
-        // if we are doing cache operations they need to be cache aligned.
-#if __DCACHE_PRESENT
-        static constexpr size_t RX_BUFFER_ALIGN = __SCB_DCACHE_LINE_SIZE;
-#else
-        static constexpr size_t RX_BUFFER_ALIGN = sizeof(uint32_t);
-#endif
-
+    protected:
         /// Payload size of buffers allocated from the Rx pool.  This is the allocation unit size
         /// of the pool minus any overhead needed for alignment.
         size_t rxPoolPayloadSize;

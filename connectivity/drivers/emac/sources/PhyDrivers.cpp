@@ -51,8 +51,8 @@ namespace IP101G {
     /// @{
 
     inline constexpr GenericEthPhy::Config DefaultConfig = {
-        .OUI = 0x90C0,
-        .model = 0x24,
+        .OUI = 0x90C3,
+        .model = 0x5,
         .address = 1, // Address set via strapping pins, 1 is used on Nuvoton boards
     };
 

@@ -76,8 +76,10 @@ CompositeEMAC::ErrCode NuvotonM480EthMAC::MACDriver::init() {
     base->CAMCTL = EMAC_CAMCTL_CMPEN_Msk |
                     EMAC_CAMCTL_ABP_Msk;
 
-    /* Limit the max receive frame length to the size of one Rx buffer */
-    base->MRFL = MBED_CONF_NSAPI_EMAC_RX_POOL_BUF_SIZE;
+    // Maximum frame length.
+    // Don't know exactly why, but need to set this 4 bytes higher than the MTU of 1514 bytes
+    // or 1514 byte packets get rejected
+    base->MRFL = 1518;
 
     /* Set RX FIFO threshold as 8 words */
     base->FIFOCTL = 0x00200100;
