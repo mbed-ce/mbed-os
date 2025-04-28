@@ -6,11 +6,14 @@
 # 1. The Nuvoton fork of OpenOCD is required: https://github.com/OpenNuvoton/OpenOCD-Nuvoton/releases .
 #    Point CMake to it via setting the OpenOCD option:
 #    -DOpenOCD="C:/Program Files (x86)/OpenOCD-nuvoton/bin/openocd.exe"
-# 2. Take note of the "MSG" switch on the Nu-Link section of the board. If set to ON, the Nu-Link will run in
+# 2. Take note of the "MSG" DIP switch on the Nu-Link section of the board. If set to ON, the Nu-Link will run in
 #    mass storage mode and can only work with the "MBED" upload method. If set to OFF, the Nu-Link will run in
 #    Nu-Link mode and only works with Nuvoton OpenOCD.
 # 3. On Windows you will need to install the Nu-Link Keil USB driver, which can be found near the bottom here:
 #    https://www.nuvoton.com/tool-and-software/ide-and-compiler/
+# 4. The onboard nu-link does not have a unique USB serial number configured, so the MBED_UPLOAD_SERIAL_NUMBER
+#    option will not work (and it doesn't seem to work with OpenOCD 0.10.x anyway). This means, sadly, it's impossible
+#    to work with more than one Nuvoton board at a time on a given machine.
 
 # General config parameters
 # -------------------------------------------------------------
