@@ -82,6 +82,7 @@ namespace mbed {
                     return;
                 }
 
+#if MBED_TRACE_MAX_LEVEL >= TRACE_LEVEL_INFO
                 char const * speedStr;
                 if(speed == LinkSpeed::LINK_10MBIT) {
                     speedStr = "10Mbps";
@@ -94,6 +95,7 @@ namespace mbed {
                 }
 
                 tr_info("Link up at %s %s duplex", speedStr, duplex == Duplex::FULL ? "full" : "half");
+#endif
 
                 linkState = LinkState::UP;
                 if(mac.enable(speed, duplex) != ErrCode::SUCCESS) {

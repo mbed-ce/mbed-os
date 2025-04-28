@@ -8230,6 +8230,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "detect_code": [
             "1304"
         ],
+        "components_add": [
+            "SPIF" // 4MiB SPI flash.
+
+            // Note that this board also has a MicroSD slot, but it is not hooked up to the right pins for SPI
+            // operation, so Mbed currently cannot use it.
+        ],
         "overrides": {
             "hxt-present": false,
             "lxt-present": true,

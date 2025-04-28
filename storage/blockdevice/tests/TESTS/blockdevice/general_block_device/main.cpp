@@ -738,7 +738,7 @@ void test_contiguous_erase_write_read()
         }
     }
 
-    free(write_read_buf);
+    delete[] write_read_buf;
 }
 
 void test_program_read_small_data_sizes()
@@ -867,7 +867,7 @@ void test_write_deinit_init()
 
     for (int i = 0; i < 3; i++) {
         // Generate test pattern
-        for (int j = 0; j < prog_size; j++) {
+        for (bd_size_t j = 0; j < prog_size; j++) {
             prog[j] = (uint8_t)'0' + i + j;
         }
 

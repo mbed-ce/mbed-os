@@ -70,6 +70,12 @@
        },
        "ARDUINO_NICLA_SENSE_ME": {
           "SPI_CS":   "CS_FLASH"
-       }
+       },
+       "NUMAKER_PFM_M487": {
+           "SPI_MOSI": "PC_0",
+           "SPI_MISO": "PC_1",
+           "SPI_CLK":  "PC_2",
+           "SPI_CS":   "PC_3"
+      }
     }
 }

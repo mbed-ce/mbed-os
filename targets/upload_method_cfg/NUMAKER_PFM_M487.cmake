@@ -2,6 +2,16 @@
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
+# Notes:
+# 1. The Nuvoton fork of OpenOCD is required: https://github.com/OpenNuvoton/OpenOCD-Nuvoton/releases .
+#    Point CMake to it via setting the OpenOCD option:
+#    -DOpenOCD="C:/Program Files (x86)/OpenOCD-nuvoton/bin/openocd.exe"
+# 2. Take note of the "MSG" switch on the Nu-Link section of the board. If set to ON, the Nu-Link will run in
+#    mass storage mode and can only work with the "MBED" upload method. If set to OFF, the Nu-Link will run in
+#    Nu-Link mode and only works with Nuvoton OpenOCD.
+# 3. On Windows you will need to install the Nu-Link Keil USB driver, which can be found near the bottom here:
+#    https://www.nuvoton.com/tool-and-software/ide-and-compiler/
+
 # General config parameters
 # -------------------------------------------------------------
 set(UPLOAD_METHOD_DEFAULT MBED)
@@ -10,12 +20,6 @@ set(UPLOAD_METHOD_DEFAULT MBED)
 # -------------------------------------------------------------
 set(MBED_UPLOAD_ENABLED TRUE)
 set(MBED_RESET_BAUDRATE 115200)
-
-# Config options for PYOCD
-# -------------------------------------------------------------
-set(PYOCD_UPLOAD_ENABLED TRUE)
-set(PYOCD_TARGET_NAME m487jidae)
-set(PYOCD_CLOCK_SPEED 4000k)
 
 # Config options for OPENOCD
 # -------------------------------------------------------------
