@@ -228,9 +228,6 @@ namespace mbed {
                 }
             }
 
-            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
-               memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), neededDescs);
-
             // Step 2: Copy packet if needed
             if(needToCopy)
             {
@@ -251,6 +248,9 @@ namespace mbed {
                 memory_manager->free(buf);
                 buf = newBuf;
             }
+
+            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), packetDescsUsed);
 
             // Step 3: Wait for needed amount of buffers to be available.
             // Note that, in my experience, it's better to block here, as dropping the packet

@@ -116,11 +116,11 @@
         },
         "tcpip-thread-priority": {
             "help": "Priority of lwip TCPIP thread",
-            "value": "osPriorityNormal"
+            "value": "osPriorityHigh"
         },
         "mem-size": {
-            "help": "Size of heap (bytes) - used for outgoing packets, and also used by some drivers for reception, see LWIP's opt.h for more information. Current default is 1600.",
-            "value": 1600
+            "help": "Size of heap (bytes) - used for outgoing packets, and also used by some drivers for reception, see LWIP's opt.h for more information.",
+            "value": 4000
         },
         "tcpip-thread-stacksize": {
             "help": "Stack size for lwip TCPIP thread",
@@ -160,9 +160,6 @@
         }
     },
     "target_overrides": {
-        "STM": {
-            "mem-size": 2310
-        },
         "Freescale": {
             "mem-size": 33270
         },

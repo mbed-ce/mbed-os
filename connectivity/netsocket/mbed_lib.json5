@@ -127,9 +127,6 @@
             // receives the CRC (plus other stuff??) at the end of the packet, with no way to turn it off. So, we need an extra 6 
             // bytes padding that can be clobbered here.
             "emac-rx-pool-buf-size": 1524,
-
-            // Decrease number of buffers somewhat to reduce memory consumption
-            "emac-rx-pool-num-bufs": 4
         }
     }
 }

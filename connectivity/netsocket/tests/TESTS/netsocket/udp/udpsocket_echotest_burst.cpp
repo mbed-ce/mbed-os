@@ -186,6 +186,7 @@ void UDPSOCKET_ECHOTEST_BURST_NONBLOCK()
     int recvd = 0;
     int bt_total = 0;
     for (int i = 0; i < BURST_CNT; i++) {
+        tr_info("Sending burst #%d", i);
         for (int x = 0; x < BURST_PKTS; x++) {
             nsapi_size_or_error_t sent = sock.sendto(udp_addr, tx_buffers[x].payload, tx_buffers[x].len);
             if (sent != NSAPI_ERROR_WOULD_BLOCK) {

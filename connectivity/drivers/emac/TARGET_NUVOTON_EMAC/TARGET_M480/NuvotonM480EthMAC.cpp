@@ -208,8 +208,7 @@ bool NuvotonM480EthMAC::TxDMA::descOwnedByDMA(size_t descIdx) {
 }
 
 bool NuvotonM480EthMAC::TxDMA::isDMAReadableBuffer(uint8_t const *start, size_t size) const {
-    // DMA can read anything that is 4 byte aligned
-    return reinterpret_cast<uint32_t>(start) % sizeof(uint32_t) == 0;
+    return false;
 }
 
 void NuvotonM480EthMAC::TxDMA::giveToDMA(size_t descIdx, uint8_t const *buffer, size_t len, bool firstDesc,
