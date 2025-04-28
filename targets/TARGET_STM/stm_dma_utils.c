@@ -1080,20 +1080,20 @@ void DMA1_Channel1_IRQHandler(void)
 
 void DMA1_Channel2_3_IRQHandler(void)
 {
-    if(stmDMAHandles[0][1] != NULL) {
+    if(stmDMAHandles[0][1].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][1].hdma);
     }
-    if(stmDMAHandles[0][2] != NULL) {
+    if(stmDMAHandles[0][2].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][2].hdma);
     }
 }
 
 void DMA1_Channel4_5_IRQHandler(void)
 {
-    if(stmDMAHandles[0][3] != NULL) {
+    if(stmDMAHandles[0][3].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][3].hdma);
     }
-    if(stmDMAHandles[0][4] != NULL) {
+    if(stmDMAHandles[0][4].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][4].hdma);
     }
 }
@@ -1102,10 +1102,10 @@ void DMA1_Channel4_5_IRQHandler(void)
 
 void DMA1_Channel2_3_IRQHandler(void)
 {
-    if(stmDMAHandles[0][1] != NULL) {
+    if(stmDMAHandles[0][1].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][1].hdma);
     }
-    if(stmDMAHandles[0][2] != NULL) {
+    if(stmDMAHandles[0][2].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][2].hdma);
     }
 }
@@ -1113,57 +1113,57 @@ void DMA1_Channel2_3_IRQHandler(void)
 #ifdef DMA2
 void DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX1_OVR_IRQHandler(void)
 {
-    if(stmDMAHandles[0][3] != NULL) {
+    if(stmDMAHandles[0][3].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][3].hdma);
     }
-    if(stmDMAHandles[0][4] != NULL) {
+    if(stmDMAHandles[0][4].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][4].hdma);
     }
-    if(stmDMAHandles[0][5] != NULL) {
+    if(stmDMAHandles[0][5].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][5].hdma);
     }
-    if(stmDMAHandles[0][6] != NULL) {
+    if(stmDMAHandles[0][6].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][6].hdma);
     }
-    if(stmDMAHandles[1][0] != NULL) {
+    if(stmDMAHandles[1][0].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[1][0].hdma);
     }
-    if(stmDMAHandles[1][1] != NULL) {
+    if(stmDMAHandles[1][1].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[1][1].hdma);
     }
-    if(stmDMAHandles[1][2] != NULL) {
+    if(stmDMAHandles[1][2].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[1][2].hdma);
     }
-    if(stmDMAHandles[1][3] != NULL) {
+    if(stmDMAHandles[1][3].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[1][3].hdma);
     }
-    if(stmDMAHandles[1][4] != NULL) {
+    if(stmDMAHandles[1][4].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[1][4].hdma);
     }
 }
 #elif defined(DMA1_Channel7)
 void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
 {
-    if(stmDMAHandles[0][3] != NULL) {
+    if(stmDMAHandles[0][3].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][3].hdma);
     }
-    if(stmDMAHandles[0][4] != NULL) {
+    if(stmDMAHandles[0][4].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][4].hdma);
     }
-    if(stmDMAHandles[0][5] != NULL) {
+    if(stmDMAHandles[0][5].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][5].hdma);
     }
-    if(stmDMAHandles[0][6] != NULL) {
+    if(stmDMAHandles[0][6].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][6].hdma);
     }
 }
 #else
 void DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler(void)
 {
-    if(stmDMAHandles[0][3] != NULL) {
+    if(stmDMAHandles[0][3].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][3].hdma);
     }
-    if(stmDMAHandles[0][4] != NULL) {
+    if(stmDMAHandles[0][4].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][4].hdma);
     }
 }
@@ -1173,26 +1173,26 @@ void DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler(void)
 
 void DMA1_Channel2_3_IRQHandler(void)
 {
-    if(stmDMAHandles[0][1] != NULL) {
+    if(stmDMAHandles[0][1].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][1].hdma);
     }
-    if(stmDMAHandles[0][2] != NULL) {
+    if(stmDMAHandles[0][2].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][2].hdma);
     }
 }
 
 void DMA1_Channel4_5_6_7_IRQHandler(void)
 {
-    if(stmDMAHandles[0][3] != NULL) {
+    if(stmDMAHandles[0][3].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][3].hdma);
     }
-    if(stmDMAHandles[0][4] != NULL) {
+    if(stmDMAHandles[0][4].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][4].hdma);
     }
-    if(stmDMAHandles[0][5] != NULL) {
+    if(stmDMAHandles[0][5].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][5].hdma);
     }
-    if(stmDMAHandles[0][6] != NULL) {
+    if(stmDMAHandles[0][6].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][6].hdma);
     }
 }
