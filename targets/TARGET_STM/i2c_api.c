@@ -548,6 +548,17 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
         obj_s->hz = 100000;    // 100 kHz per default
     }
 
+    // Set remaining init parameters to defaults
+    obj_s->handle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
+    obj_s->handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    obj_s->handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    obj_s->handle.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
+    obj_s->handle.Init.OwnAddress1     = 0;
+    obj_s->handle.Init.OwnAddress2     = 0;
+#ifdef I2C_IP_VERSION_V2
+    obj_s->handle.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+#endif
+
     // Reset to clear pending flags if any
     i2c_hw_reset(obj);
     i2c_frequency(obj, obj_s->hz);
@@ -784,18 +795,14 @@ void i2c_frequency(i2c_t *obj, int hz)
     /* hz value is stored for computing timing value next time */
     obj_s->current_hz = hz;
 #endif // I2C_IP_VERSION_V2
-
-    // I2C configuration
-    handle->Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
-    handle->Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-    handle->Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-    handle->Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
-    handle->Init.OwnAddress1     = 0;
-    handle->Init.OwnAddress2     = 0;
-#ifdef I2C_IP_VERSION_V2
-    handle->Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-#endif
+    
     HAL_I2C_Init(handle);
+
+    // In slave mode, reenable slave interrupts after calling init
+    if(obj_s->slave != 0)
+    {
+        HAL_I2C_EnableListen_IT(&obj_s->handle);
+    }
 
     /*  store frequency for timeout computation */
     obj_s->hz = hz;
