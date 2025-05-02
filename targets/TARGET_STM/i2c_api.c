@@ -1512,15 +1512,16 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     uint32_t event_code = 0;
 
 #if DEVICE_I2CSLAVE
-    uint32_t address = 0;
-    /*  Store address to handle it after reset */
-    if (obj_s->slave) {
-        address = handle->Init.OwnAddress1;
+    if(obj_s->slave_rx_transfer_in_progress && handle->ErrorCode == HAL_I2C_ERROR_AF)
+    {
+        // We get here if the master NACKed a write operation after fewer than expected
+        // bytes. Just mark the slave transfer as done and return.
+        obj_s->slave_rx_transfer_in_progress = 0;
+        return;
     }
 #endif
 
-
-    if ((handle->ErrorCode & HAL_I2C_ERROR_AF) == HAL_I2C_ERROR_AF) {
+    if (handle->ErrorCode & HAL_I2C_ERROR_AF) {
         /* Keep Set event flag */
         event_code = (I2C_EVENT_TRANSFER_EARLY_NACK) | (I2C_EVENT_ERROR_NO_SLAVE);
     }
@@ -1534,6 +1535,14 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     }
 
     DEBUG_PRINTF("HAL_I2C_ErrorCallback:%d, index=%d\r\n", (int) hi2c->ErrorCode, obj_s->index);
+
+#if DEVICE_I2CSLAVE
+    uint32_t address = 0;
+    /*  Store address to handle it after reset */
+    if (obj_s->slave) {
+        address = handle->Init.OwnAddress1;
+    }
+#endif
 
     /* re-init IP to try and get back in a working state */
     i2c_init_internal(obj, NULL);
@@ -1717,7 +1726,7 @@ int i2c_slave_read(i2c_t *obj, char *data, int length)
             if (obj_s->slave == SLAVE_MODE_LISTEN) {
                 count = obj_s->slave_rx_count;
             } else {
-                count = _length;
+                count = length - handle->XferCount;
             }
         } else {
             DEBUG_PRINTF("TIMEOUT or error in i2c_slave_read\r\n");

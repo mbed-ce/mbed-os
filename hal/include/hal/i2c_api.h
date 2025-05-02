@@ -323,7 +323,7 @@ int  i2c_slave_receive(i2c_t *obj);
  *  @param obj The I2C object
  *  @param data    The buffer for receiving
  *  @param length  Number of bytes to read
- *  @return non-zero if a value is available, or zero on error
+ *  @return Number of bytes read, or zero on error
  */
 int  i2c_slave_read(i2c_t *obj, char *data, int length);
 
