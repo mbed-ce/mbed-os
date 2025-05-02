@@ -1512,9 +1512,8 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     uint32_t event_code = 0;
 
 #if DEVICE_I2CSLAVE
-    if(obj_s->slave_rx_transfer_in_progress && handle->ErrorCode == HAL_I2C_ERROR_AF)
-    {
-        // We get here if the master NACKed a write operation after fewer than expected
+    if(obj_s->slave_rx_transfer_in_progress && handle->ErrorCode == HAL_I2C_ERROR_AF) {
+        // We get here if the master ended a write operation after fewer than expected
         // bytes. Just mark the slave transfer as done and return.
         obj_s->slave_rx_transfer_in_progress = 0;
         return;
