@@ -43,6 +43,10 @@ namespace mbed {
         /// This is used to support Eth MACs that don't allow enqueuing every single descriptor at a time.
         const size_t extraTxDescsToLeave;
 
+        /// Whether the hardware supports chaining multiple descriptors together to send one
+        /// packet that's split across multiple buffers.
+        const bool supportsDescChaining;
+
         /// Pointer to first memory buffer in the chain associated with descriptor n.
         /// The buffer address shall only be set for the *last* descriptor, so that the entire chain is freed
         /// when the last descriptor is returned.
@@ -60,8 +64,9 @@ namespace mbed {
         size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the mac thread calling reclaimTxDescs().
 
         /// Construct, passing a value for extraTxDescsToLeave
-        GenericTxDMARing(size_t extraTxDescsToLeave = 0):
-        extraTxDescsToLeave(extraTxDescsToLeave)
+        GenericTxDMARing(size_t extraTxDescsToLeave = 0, bool supportsDescChaining = true):
+        extraTxDescsToLeave(extraTxDescsToLeave),
+        supportsDescChaining(supportsDescChaining)
         {}
 
         /// Configure DMA registers to point to the DMA ring,
@@ -193,6 +198,14 @@ namespace mbed {
             size_t packetDescsUsed = memory_manager->count_buffers(buf);
             size_t neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             bool needToCopy = false;
+
+            if(packetDescsUsed > 1 && !supportsDescChaining)
+            {
+                /// Packet uses more than 1 descriptor and the hardware doesn't support that so
+                /// we have to copy it into one single descriptor.
+                needToCopy = true;
+            }
+
             if(neededFreeDescs >= TX_NUM_DESCS)
             {
                 // Packet uses too many buffers, we have to copy it into a continuous buffer.

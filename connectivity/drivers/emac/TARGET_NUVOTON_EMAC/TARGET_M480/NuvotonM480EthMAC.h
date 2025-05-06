@@ -86,6 +86,7 @@ class NuvotonM480EthMAC : public CompositeEMAC
         void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
     public:
         explicit TxDMA(EMAC_T * const base):
+        GenericTxDMARing(0, false), // we do NOT support multiple descriptors in the hardware
         base(base)
         {}
     };
