@@ -77,7 +77,7 @@ CompositeEMAC::ErrCode NuvotonM480EthMAC::MACDriver::init() {
                     EMAC_CAMCTL_ABP_Msk;
 
     // Maximum frame length.
-    // Don't know exactly why, but need to set this 4 bytes higher than the MTU of 1514 bytes
+    // This apparently includes the CRC, so we need to set this 4 bytes higher than the MTU of 1514 bytes
     // or 1514 byte packets get rejected
     base->MRFL = 1518;
 
