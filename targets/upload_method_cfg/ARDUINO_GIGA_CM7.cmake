@@ -5,6 +5,8 @@
 # Notes:
 # 1. To use this target with PyOCD, you need to install a pack: `pyocd pack install STM32H747XIHx`.
 #    You might also need to run `pyocd pack update` first.
+# 2. To use the DFU upload methods, you need to double-tap the reset button first to put the
+#    board in DFU mode.
 
 # General config parameters
 # -------------------------------------------------------------
