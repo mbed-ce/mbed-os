@@ -7,6 +7,8 @@
 #    You might also need to run `pyocd pack update` first.
 # 2. To use the DFU upload methods, you need to double-tap the reset button first to put the
 #    board in DFU mode.
+# 3. On Linux, you will need to add a udev rule to be able to upload over DFU:
+#    SUBSYSTEM=="usb", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0366", MODE="664", GROUP="plugdev"
 
 # General config parameters
 # -------------------------------------------------------------
