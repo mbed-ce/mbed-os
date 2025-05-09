@@ -6,7 +6,7 @@
 * @version	1.0
 * @date		20 Nov. 2011
 * @author	NXP MCU SW Application Team
-* 
+*
 * Copyright(C) 2011, NXP Semiconductor
 * All rights reserved.
 *
@@ -61,7 +61,7 @@
  */
 #define PHY_USE_100MBS 1 /**< Sets data rate to 100Mbps. */
 
-/**		  
+/**
  * @}
  */
 
@@ -95,7 +95,7 @@
  */
 #define LPC_TX_PBUF_BOUNCE_EN 1
 
-/**		  
+/**
  * @}
  */
 
