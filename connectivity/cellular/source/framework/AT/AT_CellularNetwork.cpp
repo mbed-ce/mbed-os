@@ -219,6 +219,7 @@ nsapi_error_t AT_CellularNetwork::set_registration(const char *plmn)
             return NSAPI_ERROR_DEVICE_ERROR;
         }
         if (mode != NWModeAutomatic) {
+            // Force operator registration
             return _at.at_cmd_discard("+COPS", "=0");
         }
         return NSAPI_ERROR_OK;
