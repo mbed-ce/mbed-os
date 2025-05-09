@@ -254,8 +254,10 @@ namespace mbed {
         // Note: Following code is based on HAL_Eth_Init() from the HAL
         /* Init the low level hardware : GPIO, CLOCK, NVIC. */
         EthInitPinmappings();
-#ifdef TARGET_STM32H7
+
         // Use RMII
+#ifdef TARGET_STM32H7
+        __HAL_RCC_SYSCFG_CLK_ENABLE();
         HAL_SYSCFG_ETHInterfaceSelect(SYSCFG_ETH_RMII);
 
         /* Dummy read to sync with ETH */
