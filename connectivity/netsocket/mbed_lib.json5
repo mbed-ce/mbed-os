@@ -115,6 +115,18 @@
             // First-party STM32 boards generally use a LAN8742 PHY at MDIO address 0
             "nsapi.emac-phy-model": "LAN8742",
             "nsapi.emac-phy-mdio-address": 0
+        },
+        "MCU_M480": {
+            "nsapi.emac-phy-model": "IP101G",
+            "nsapi.emac-phy-mdio-address": 1,
+            "nsapi.emac-max-mcast-subscribes": 14, // Max supported by hardware
+
+            // The M480 EMAC sadly does not support splitting one frame across multiple Rx descriptors.
+            // So, we need to make each Rx descriptor large enough to fit a max size Ethernet packet.
+            // Normally that would be 1518 (1514 byte MTU plus 4 bytes for alignment overhead), but this EMAC also always 
+            // receives the CRC and length at the end of the packet, with no way to turn it off. So, we need an extra 6 
+            // bytes padding that can be clobbered here.
+            "emac-rx-pool-buf-size": 1524,
         }
     }
 }

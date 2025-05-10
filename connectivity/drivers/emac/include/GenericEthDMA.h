@@ -43,6 +43,10 @@ namespace mbed {
         /// This is used to support Eth MACs that don't allow enqueuing every single descriptor at a time.
         const size_t extraTxDescsToLeave;
 
+        /// Whether the hardware supports chaining multiple descriptors together to send one
+        /// packet that's split across multiple buffers.
+        const bool supportsDescChaining;
+
         /// Pointer to first memory buffer in the chain associated with descriptor n.
         /// The buffer address shall only be set for the *last* descriptor, so that the entire chain is freed
         /// when the last descriptor is returned.
@@ -60,8 +64,9 @@ namespace mbed {
         size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the mac thread calling reclaimTxDescs().
 
         /// Construct, passing a value for extraTxDescsToLeave
-        GenericTxDMARing(size_t extraTxDescsToLeave = 0):
-        extraTxDescsToLeave(extraTxDescsToLeave)
+        GenericTxDMARing(size_t extraTxDescsToLeave = 0, bool supportsDescChaining = true):
+        extraTxDescsToLeave(extraTxDescsToLeave),
+        supportsDescChaining(supportsDescChaining)
         {}
 
         /// Configure DMA registers to point to the DMA ring,
@@ -193,6 +198,14 @@ namespace mbed {
             size_t packetDescsUsed = memory_manager->count_buffers(buf);
             size_t neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             bool needToCopy = false;
+
+            if(packetDescsUsed > 1 && !supportsDescChaining)
+            {
+                /// Packet uses more than 1 descriptor and the hardware doesn't support that so
+                /// we have to copy it into one single descriptor.
+                needToCopy = true;
+            }
+
             if(neededFreeDescs >= TX_NUM_DESCS)
             {
                 // Packet uses too many buffers, we have to copy it into a continuous buffer.
@@ -228,9 +241,6 @@ namespace mbed {
                 }
             }
 
-            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
-               memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), neededDescs);
-
             // Step 2: Copy packet if needed
             if(needToCopy)
             {
@@ -251,6 +261,9 @@ namespace mbed {
                 memory_manager->free(buf);
                 buf = newBuf;
             }
+
+            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), packetDescsUsed);
 
             // Step 3: Wait for needed amount of buffers to be available.
             // Note that, in my experience, it's better to block here, as dropping the packet
@@ -319,7 +332,7 @@ namespace mbed {
      * that the subclass must override.
      */
     class GenericRxDMARing : public CompositeEMAC::RxDMA {
-    protected:
+    public:
         /// How many extra buffers to leave in the Rx pool, relative to how many we keep assigned to Rx descriptors.
         /// We want to keep some amount of extra buffers because constantly hitting the network stack with failed pool
         /// allocations can produce some negative consequences in some cases.
@@ -330,6 +343,14 @@ namespace mbed {
         // TODO: When we add multiple Ethernet support, this calculation may need to be changed, because the pool buffers will be split between multiple EMACs
         static constexpr size_t RX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS - RX_POOL_EXTRA_BUFFERS + 1;
 
+        // Alignment required for Rx memory buffers.  Normally they don't need more than word alignment but
+        // if we are doing cache operations they need to be cache aligned.
+#if __DCACHE_PRESENT
+        static constexpr size_t RX_BUFFER_ALIGN = __SCB_DCACHE_LINE_SIZE;
+#else
+        static constexpr size_t RX_BUFFER_ALIGN = sizeof(uint32_t);
+#endif
+    protected:
         /// Pointer to the network stack buffer associated with the corresponding Rx descriptor.
         net_stack_mem_buf_t * rxDescStackBufs[RX_NUM_DESCS];
 
@@ -338,14 +359,7 @@ namespace mbed {
         size_t rxDescsOwnedByApplication; ///< Number of Rx descriptors owned by the application and needing buffers allocated.
         std::atomic<size_t> rxNextIndex; ///< Index of the next descriptor that the DMA will populate.  Updated by application but used by ISR.
 
-        // Alignment required for Rx memory buffers.  Normally they don't need more than word alignment but
-        // if we are doing cache operations they need to be cache aligned.
-#if __DCACHE_PRESENT
-        static constexpr size_t RX_BUFFER_ALIGN = __SCB_DCACHE_LINE_SIZE;
-#else
-        static constexpr size_t RX_BUFFER_ALIGN = sizeof(uint32_t);
-#endif
-
+    protected:
         /// Payload size of buffers allocated from the Rx pool.  This is the allocation unit size
         /// of the pool minus any overhead needed for alignment.
         size_t rxPoolPayloadSize;
@@ -527,7 +541,7 @@ namespace mbed {
             std::optional<size_t> firstDescIdx, lastDescIdx;
 
             // Packet length is stored here once we check it
-            size_t pktLen;
+            size_t pktLen{};
 
             // Prevent looping around into descriptors waiting for rebuild by limiting how many
             // we can process.

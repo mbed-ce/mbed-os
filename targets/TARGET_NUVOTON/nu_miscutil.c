@@ -40,22 +40,31 @@ void nu_nop(uint32_t n)
     switch (rmn) {
         case 9:
             __NOP();
+            // fall through
         case 8:
             __NOP();
+            // fall through
         case 7:
             __NOP();
+            // fall through
         case 6:
             __NOP();
+            // fall through
         case 5:
             __NOP();
+            // fall through
         case 4:
             __NOP();
+            // fall through
         case 3:
             __NOP();
+            // fall through
         case 2:
             __NOP();
+            // fall through
         case 1:
             __NOP();
+            // fall through
         default:
             break;
     }

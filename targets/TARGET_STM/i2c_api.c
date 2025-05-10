@@ -548,6 +548,17 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
         obj_s->hz = 100000;    // 100 kHz per default
     }
 
+    // Set remaining init parameters to defaults
+    obj_s->handle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
+    obj_s->handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    obj_s->handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    obj_s->handle.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
+    obj_s->handle.Init.OwnAddress1     = 0;
+    obj_s->handle.Init.OwnAddress2     = 0;
+#ifdef I2C_IP_VERSION_V2
+    obj_s->handle.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+#endif
+
     // Reset to clear pending flags if any
     i2c_hw_reset(obj);
     i2c_frequency(obj, obj_s->hz);
@@ -784,18 +795,14 @@ void i2c_frequency(i2c_t *obj, int hz)
     /* hz value is stored for computing timing value next time */
     obj_s->current_hz = hz;
 #endif // I2C_IP_VERSION_V2
-
-    // I2C configuration
-    handle->Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
-    handle->Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-    handle->Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-    handle->Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
-    handle->Init.OwnAddress1     = 0;
-    handle->Init.OwnAddress2     = 0;
-#ifdef I2C_IP_VERSION_V2
-    handle->Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-#endif
+    
     HAL_I2C_Init(handle);
+
+    // In slave mode, reenable slave interrupts after calling init
+    if(obj_s->slave != 0)
+    {
+        HAL_I2C_EnableListen_IT(&obj_s->handle);
+    }
 
     /*  store frequency for timeout computation */
     obj_s->hz = hz;
@@ -1120,11 +1127,11 @@ int i2c_byte_read(i2c_t *obj, int last)
     if (last) {
         /* Disable Address Acknowledge */
         tmpreg = tmpreg & (~I2C_CR2_RELOAD);
-        tmpreg |= I2C_CR2_NACK | (I2C_CR2_NBYTES & (1 << 16));
+        tmpreg |= I2C_CR2_NACK | (1 << I2C_CR2_NBYTES_Pos);
     } else {
         /* Enable reload mode as we don't know how many bytes will be sent */
         /* and set transfer size to 1 */
-        tmpreg |= I2C_CR2_RELOAD | (I2C_CR2_NBYTES & (1 << 16));
+        tmpreg |= I2C_CR2_RELOAD | (1 << I2C_CR2_NBYTES_Pos);
     }
 
     /* Set the prepared configuration */
@@ -1505,15 +1512,15 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     uint32_t event_code = 0;
 
 #if DEVICE_I2CSLAVE
-    uint32_t address = 0;
-    /*  Store address to handle it after reset */
-    if (obj_s->slave) {
-        address = handle->Init.OwnAddress1;
+    if(obj_s->slave_rx_transfer_in_progress && handle->ErrorCode == HAL_I2C_ERROR_AF) {
+        // We get here if the master ended a write operation after fewer than expected
+        // bytes. Just mark the slave transfer as done and return.
+        obj_s->slave_rx_transfer_in_progress = 0;
+        return;
     }
 #endif
 
-
-    if ((handle->ErrorCode & HAL_I2C_ERROR_AF) == HAL_I2C_ERROR_AF) {
+    if (handle->ErrorCode & HAL_I2C_ERROR_AF) {
         /* Keep Set event flag */
         event_code = (I2C_EVENT_TRANSFER_EARLY_NACK) | (I2C_EVENT_ERROR_NO_SLAVE);
     }
@@ -1527,6 +1534,14 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     }
 
     DEBUG_PRINTF("HAL_I2C_ErrorCallback:%d, index=%d\r\n", (int) hi2c->ErrorCode, obj_s->index);
+
+#if DEVICE_I2CSLAVE
+    uint32_t address = 0;
+    /*  Store address to handle it after reset */
+    if (obj_s->slave) {
+        address = handle->Init.OwnAddress1;
+    }
+#endif
 
     /* re-init IP to try and get back in a working state */
     i2c_init_internal(obj, NULL);
@@ -1710,7 +1725,7 @@ int i2c_slave_read(i2c_t *obj, char *data, int length)
             if (obj_s->slave == SLAVE_MODE_LISTEN) {
                 count = obj_s->slave_rx_count;
             } else {
-                count = _length;
+                count = length - handle->XferCount;
             }
         } else {
             DEBUG_PRINTF("TIMEOUT or error in i2c_slave_read\r\n");

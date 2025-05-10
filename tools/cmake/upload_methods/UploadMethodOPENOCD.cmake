@@ -48,7 +48,8 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 		${OPENOCD_ADAPTER_SERIAL_COMMAND}
 		-c "gdb_port disabled" # Don't start a GDB server when just programming
 		-c "program ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR} reset exit"
-		VERBATIM)
+		VERBATIM
+		USES_TERMINAL)
 
 endfunction(gen_upload_target)
 

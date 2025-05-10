@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 target_include_directories(mbed-wifi
-    INTERFACE
+    PUBLIC
         .
         ./interface
         ./network
@@ -10,7 +10,7 @@ target_include_directories(mbed-wifi
 )
 
 target_sources(mbed-wifi
-    INTERFACE
+    PRIVATE
         interface/CyDhcpServer.cpp
         interface/WhdAccessPoint.cpp
         interface/WhdSTAInterface.cpp

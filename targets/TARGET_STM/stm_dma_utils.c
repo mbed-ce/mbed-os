@@ -554,7 +554,7 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink)
         case 2:
             switch(dmaLink->channelIdx)
             {
-#ifdef TARGET_MCU_STM32G0
+#if defined(TARGET_MCU_STM32G0)
                 // STM32G0 does its own thing and has all DMA2 channels under 1 IRQ
                 case 1:
                 case 2:
@@ -760,7 +760,7 @@ DMAHandlePointer stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink)
 }
 
 DMAHandlePointer stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t direction, bool periphInc, bool memInc,
-                                     uint8_t periphDataAlignment, uint8_t memDataAlignment){
+                                     uint8_t periphDataAlignment, uint8_t memDataAlignment, uint32_t mode){
 
     DMAHandlePointer dmaHandlePointer;
     dmaHandlePointer.hdma = NULL;
@@ -857,7 +857,6 @@ DMAHandlePointer stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t directio
                 default:
                     dmaHandle->Init.SrcDataWidth = DMA_SRC_DATAWIDTH_BYTE;
                     break;
-
             }
         }
         else {
@@ -959,7 +958,7 @@ DMAHandlePointer stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t directio
 
     #endif
 
-        dmaHandle->Init.Mode = DMA_NORMAL;
+        dmaHandle->Init.Mode = mode;
 
         HAL_DMA_Init(dmaHandle);
     }
@@ -1060,7 +1059,6 @@ DMAHandlePointer stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t directio
                 default:
                     dmaHandle->Init.DestDataSize = MDMA_DEST_DATASIZE_BYTE;
                     break;
-
             }
         }
         dmaHandle->Init.DataAlignment = MDMA_DATAALIGN_PACKENABLE;
@@ -1073,7 +1071,7 @@ DMAHandlePointer stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t directio
 
         dmaHandle->Instance = stm_get_dma_channel(dmaLink).mchannel;
 
-        HAL_MDMA_Init(dmaHandle);
+      HAL_MDMA_Init(dmaHandle);
     }
 #endif
     // Set up interrupt
@@ -1220,6 +1218,77 @@ void DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler(void)
     }
     if(stmDMAHandles[0][4].hdma != NULL) {
         HAL_DMA_IRQHandler(stmDMAHandles[0][4].hdma);
+    }
+}
+#endif
+
+#elif defined(TARGET_MCU_STM32U0)
+
+void DMA1_Channel2_3_IRQHandler(void)
+{
+    if(stmDMAHandles[0][1] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][1]);
+    }
+    if(stmDMAHandles[0][2] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][2]);
+    }
+}
+
+#ifdef DMA2
+void DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX_OVR_IRQHandler(void)
+{
+    if(stmDMAHandles[0][3] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+    }
+    if(stmDMAHandles[0][4] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
+    }
+    if(stmDMAHandles[0][5] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][5]);
+    }
+    if(stmDMAHandles[0][6] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
+    }
+    if(stmDMAHandles[1][0] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][0]);
+    }
+    if(stmDMAHandles[1][1] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][1]);
+    }
+    if(stmDMAHandles[1][2] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][2]);
+    }
+    if(stmDMAHandles[1][3] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][3]);
+    }
+    if(stmDMAHandles[1][4] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[1][4]);
+    }
+}
+#elif defined(DMA1_Channel7)
+void DMA1_Ch4_7_DMAMUX_OVR_IRQHandler(void)
+{
+    if(stmDMAHandles[0][3] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+    }
+    if(stmDMAHandles[0][4] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
+    }
+    if(stmDMAHandles[0][5] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][5]);
+    }
+    if(stmDMAHandles[0][6] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
+    }
+}
+#else
+void DMA1_Ch4_5_DMAMUX_OVR_IRQHandler(void)
+{
+    if(stmDMAHandles[0][3] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+    }
+    if(stmDMAHandles[0][4] != NULL) {
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
     }
 }
 #endif

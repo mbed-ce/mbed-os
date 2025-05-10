@@ -19,6 +19,6 @@ else()
 	# Build as part of the minimal CyHAL if it's enabled
 	if(TARGET mbed-minimal-cyhal)
 		target_sources(mbed-minimal-cyhal PRIVATE ${CY_RTOS_RTX_ADAPTER_SOURCES})
-		target_include_directories(mbed-minimal-cyhal INTERFACE ${CY_RTOS_RTX_ADAPTER_INCLUDE_DIRS})
+		target_include_directories(mbed-minimal-cyhal PUBLIC ${CY_RTOS_RTX_ADAPTER_INCLUDE_DIRS})
 	endif()
 endif()

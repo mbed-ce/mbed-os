@@ -44,6 +44,30 @@ public:
 
 }
 
+namespace IP101G {
+
+    /// Driver for the IC+ IP101Gx PHY
+    /// Datasheet: https://www.lcsc.com/datasheet/lcsc_datasheet_IC-Plus-IP101GR_C79324.pdf
+    /// @{
+
+    inline constexpr GenericEthPhy::Config DefaultConfig = {
+        .OUI = 0x90C3,
+        .model = 0x5,
+        .address = 1, // Address set via strapping pins, 1 is used on Nuvoton boards
+    };
+
+    class Driver : public GenericEthPhy {
+    public:
+        explicit Driver(GenericEthPhy::Config const & config = DefaultConfig):
+        GenericEthPhy(config)
+        {}
+    };
+
+
+    /// @}
+
+}
+
 /**
  * @brief Obtains the PHY driver for Ethernet port 0.
  *

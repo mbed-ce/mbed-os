@@ -598,7 +598,6 @@ void EmacTestMemoryManager::validate_list() const
         char *buffer_tail = static_cast<char *>(mem_buf->ptr) + mem_buf->orig_len;
         if (memcmp(buffer_tail, BUF_TAIL, BUF_TAIL_SIZE) != 0) {
             CHECK_ASSERT(0, "validate_list(): %p tail overwrite", mem_buf);
-
         }
     }
 
