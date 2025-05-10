@@ -483,6 +483,7 @@ ospi_status_t ospi_frequency(ospi_t *obj, int hz)
 
     obj->handle.Init.ClockPrescaler = div;
 
+    HAL_OSPI_DeInit(&obj->handle);
     if (HAL_OSPI_Init(&obj->handle) != HAL_OK) {
         tr_error("HAL_OSPI_Init error");
         status = OSPI_STATUS_ERROR;

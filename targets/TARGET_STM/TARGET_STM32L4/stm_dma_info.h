@@ -40,6 +40,12 @@ static const DMALinkInfo SPIRxDMALinks[] = {
         {1, 6, DMA_REQUEST_SPI3_RX}
 };
 
+/// Mapping from OSPI index to DMA link info
+static const DMALinkInfo OSPIDMALinks[] = {
+        {1, 7, DMA_REQUEST_OCTOSPI1},
+        {2, 1, DMA_REQUEST_OCTOSPI2},
+};
+
 #else
 
 
@@ -58,6 +64,11 @@ static const DMALinkInfo SPIRxDMALinks[] = {
         {1, 2, 1}, // SPI1 Rx is DMA1 Ch2 Request 1
         {1, 4, 1}, // SPI2 Rx is DMA1 Ch4 Request 1
         {2, 1, 3}  // SPI3 Rx is DMA2 Ch1 Request 3
+};
+
+/// Mapping from QSPI index to DMA link info
+static const DMALinkInfo QSPIDMALinks[] = {
+        {2, 7, 3}, // QUADSPI is DMA2 Ch7 Request 3
 };
 
 #endif

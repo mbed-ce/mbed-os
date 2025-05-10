@@ -31,6 +31,10 @@
 #include "stm32h7xx_ll_pwr.h"
 #include "stm32h7xx_ll_system.h"
 
+#include "stm_dma_info.h"
+#include "cmsis_os.h"
+#include "cmsis_os2.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -84,6 +88,7 @@ struct analogin_s {
 struct qspi_s {
 #if defined(OCTOSPI1)
     OSPI_HandleTypeDef handle;
+    IRQn_Type qspiIRQ;
 #else
     QSPI_HandleTypeDef handle;
 #endif
@@ -94,12 +99,16 @@ struct qspi_s {
     PinName io3;
     PinName sclk;
     PinName ssel;
+    bool dmaInitialized;
+    osSemaphoreId_t semaphoreId;
+    osRtxSemaphore_t semaphoreMem;
 };
 #endif
 
 #if DEVICE_OSPI
 struct ospi_s {
     OSPI_HandleTypeDef handle;
+    IRQn_Type ospiIRQ;
     OSPIName ospi;
     PinName io0;
     PinName io1;
@@ -112,6 +121,9 @@ struct ospi_s {
     PinName sclk;
     PinName ssel;
     PinName dqs;
+    bool dmaInitialized;
+    osSemaphoreId_t semaphoreId;
+    osRtxSemaphore_t semaphoreMem;
 };
 #endif
 
