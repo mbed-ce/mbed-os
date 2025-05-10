@@ -504,7 +504,7 @@ static void qspi_init_dma(struct qspi_s * obj)
         dmaLink = &OSPIDMALinks[0];
 #endif
         // Initialize DMA channel
-        DMAHandlePointer dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1);
+        DMAHandlePointer dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1, DMA_NORMAL);
         if(dmaHandle.hdma == NULL)
         {
             mbed_error(MBED_ERROR_ALREADY_IN_USE, "DMA channel already used by something else!", 0, MBED_FILENAME, __LINE__);
@@ -700,7 +700,7 @@ static void qspi_init_dma(struct qspi_s * obj)
         DMALinkInfo const *dmaLink = &QSPIDMALinks[0];
 
         // Initialize DMA channel
-        DMAHandlePointer dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1);
+        DMAHandlePointer dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1, DMA_NORMAL);
         if(dmaHandle.hdma == NULL)
         {
             mbed_error(MBED_ERROR_ALREADY_IN_USE, "DMA channel already used by something else!", 0, MBED_FILENAME, __LINE__);

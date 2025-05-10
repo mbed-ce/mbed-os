@@ -1227,10 +1227,10 @@ void DMA1_Ch4_5_DMAMUX1_OVR_IRQHandler(void)
 void DMA1_Channel2_3_IRQHandler(void)
 {
     if(stmDMAHandles[0][1] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][1]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][1].hdma);
     }
     if(stmDMAHandles[0][2] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][2]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][2].hdma);
     }
 }
 
@@ -1238,57 +1238,57 @@ void DMA1_Channel2_3_IRQHandler(void)
 void DMA1_Ch4_7_DMA2_Ch1_5_DMAMUX_OVR_IRQHandler(void)
 {
     if(stmDMAHandles[0][3] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3].hdma);
     }
     if(stmDMAHandles[0][4] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4].hdma);
     }
     if(stmDMAHandles[0][5] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][5]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][5].hdma);
     }
     if(stmDMAHandles[0][6] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][6].hdma);
     }
     if(stmDMAHandles[1][0] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[1][0]);
+        HAL_DMA_IRQHandler(stmDMAHandles[1][0].hdma);
     }
     if(stmDMAHandles[1][1] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[1][1]);
+        HAL_DMA_IRQHandler(stmDMAHandles[1][1].hdma);
     }
     if(stmDMAHandles[1][2] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[1][2]);
+        HAL_DMA_IRQHandler(stmDMAHandles[1][2].hdma);
     }
     if(stmDMAHandles[1][3] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[1][3]);
+        HAL_DMA_IRQHandler(stmDMAHandles[1][3].hdma);
     }
     if(stmDMAHandles[1][4] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[1][4]);
+        HAL_DMA_IRQHandler(stmDMAHandles[1][4].hdma);
     }
 }
 #elif defined(DMA1_Channel7)
 void DMA1_Ch4_7_DMAMUX_OVR_IRQHandler(void)
 {
     if(stmDMAHandles[0][3] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3].hdma);
     }
     if(stmDMAHandles[0][4] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4].hdma);
     }
     if(stmDMAHandles[0][5] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][5]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][5].hdma);
     }
     if(stmDMAHandles[0][6] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][6]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][6].hdma);
     }
 }
 #else
 void DMA1_Ch4_5_DMAMUX_OVR_IRQHandler(void)
 {
     if(stmDMAHandles[0][3] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][3]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][3].hdma);
     }
     if(stmDMAHandles[0][4] != NULL) {
-        HAL_DMA_IRQHandler(stmDMAHandles[0][4]);
+        HAL_DMA_IRQHandler(stmDMAHandles[0][4].hdma);
     }
 }
 #endif
