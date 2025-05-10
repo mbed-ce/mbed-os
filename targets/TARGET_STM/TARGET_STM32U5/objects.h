@@ -28,6 +28,8 @@
 #include "stm32u5xx_ll_rcc.h"
 
 #include "stm_dma_info.h"
+#include "cmsis_os.h"
+#include "cmsis_os2.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -107,6 +109,7 @@ struct can_s {
 
 struct qspi_s {
     OSPI_HandleTypeDef handle;
+    IRQn_Type qspiIRQ;
     QSPIName qspi;
     PinName io0;
     PinName io1;
@@ -114,12 +117,14 @@ struct qspi_s {
     PinName io3;
     PinName sclk;
     PinName ssel;
-    IRQn_Type qspiIRQ;
     bool dmaInitialized;
+    osSemaphoreId_t semaphoreId;
+    osRtxSemaphore_t semaphoreMem;
 };
 
 struct ospi_s {
     OSPI_HandleTypeDef handle;
+    IRQn_Type ospiIRQ;
     OSPIName ospi;
     PinName io0;
     PinName io1;
@@ -132,8 +137,9 @@ struct ospi_s {
     PinName sclk;
     PinName ssel;
     PinName dqs;
-    IRQn_Type ospiIRQ;
     bool dmaInitialized;
+    osSemaphoreId_t semaphoreId;
+    osRtxSemaphore_t semaphoreMem;
 };
 
 #ifdef __cplusplus

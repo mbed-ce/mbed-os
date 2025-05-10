@@ -976,10 +976,33 @@ DMAHandlePointer stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t directio
         dmaHandle->Init.Priority = MDMA_PRIORITY_HIGH;
         dmaHandle->Init.Endianness = MDMA_LITTLE_ENDIANNESS_PRESERVE;
 
-        dmaHandle->Init.SourceInc = periphInc ? MDMA_SRC_INC_BYTE: MDMA_SRC_INC_DISABLE;
-        dmaHandle->Init.DestinationInc = memInc ? MDMA_DEST_INC_BYTE: MDMA_DEST_INC_DISABLE;
-        switch(periphDataAlignment)
+        if(direction == DMA_MEMORY_TO_PERIPH || direction == DMA_MEMORY_TO_MEMORY)
         {
+            // Source is memory
+            dmaHandle->Init.SourceInc = memInc ? MDMA_SRC_INC_BYTE: MDMA_SRC_INC_DISABLE;
+
+            switch(memDataAlignment) {
+                case 8:
+                    dmaHandle->Init.SourceDataSize = MDMA_SRC_DATASIZE_DOUBLEWORD;
+                    break;
+                case 4:
+                    dmaHandle->Init.SourceDataSize = MDMA_SRC_DATASIZE_WORD;
+                    break;
+                case 2:
+                    dmaHandle->Init.SourceDataSize = MDMA_SRC_DATASIZE_HALFWORD;
+                    break;
+                case 1:
+                default:
+                    dmaHandle->Init.SourceDataSize = MDMA_SRC_DATASIZE_BYTE;
+                    break;
+
+            }
+        }
+        else {
+            // Source is a peripheral
+        dmaHandle->Init.SourceInc = periphInc ? MDMA_SRC_INC_BYTE: MDMA_SRC_INC_DISABLE;
+
+            switch(periphDataAlignment) {
         case 8:
             dmaHandle->Init.SourceDataSize = MDMA_SRC_DATASIZE_DOUBLEWORD;
             break;
@@ -990,11 +1013,19 @@ DMAHandlePointer stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t directio
             dmaHandle->Init.SourceDataSize = MDMA_SRC_DATASIZE_HALFWORD;
             break;
         case 1:
+                default:
             dmaHandle->Init.SourceDataSize = MDMA_SRC_DATASIZE_BYTE;
             break;
+
         }
-        switch(memDataAlignment)
+        }
+
+        if(direction == DMA_PERIPH_TO_MEMORY || direction == DMA_MEMORY_TO_MEMORY)
         {
+            // Destination is memory
+            dmaHandle->Init.DestinationInc = memInc ? MDMA_DEST_INC_BYTE: MDMA_DEST_INC_DISABLE;
+
+            switch(memDataAlignment) {
             case 8:
             dmaHandle->Init.DestDataSize = MDMA_DEST_DATASIZE_DOUBLEWORD;
             break;
@@ -1005,8 +1036,32 @@ DMAHandlePointer stm_init_dma_link(const DMALinkInfo *dmaLink, uint32_t directio
             dmaHandle->Init.DestDataSize = MDMA_DEST_DATASIZE_HALFWORD;
             break;
         case 1:
+                default:
             dmaHandle->Init.DestDataSize = MDMA_DEST_DATASIZE_BYTE;
             break;
+
+            }
+        }
+        else {
+            // Destination is a peripheral
+            dmaHandle->Init.DestinationInc = periphInc ? MDMA_DEST_INC_BYTE: MDMA_DEST_INC_DISABLE;
+
+            switch(periphDataAlignment) {
+                case 8:
+                    dmaHandle->Init.DestDataSize = MDMA_DEST_DATASIZE_DOUBLEWORD;
+                    break;
+                case 4:
+                    dmaHandle->Init.DestDataSize = MDMA_DEST_DATASIZE_WORD;
+                    break;
+                case 2:
+                    dmaHandle->Init.DestDataSize = MDMA_DEST_DATASIZE_HALFWORD;
+                    break;
+                case 1:
+                default:
+                    dmaHandle->Init.DestDataSize = MDMA_DEST_DATASIZE_BYTE;
+                    break;
+
+            }
         }
         dmaHandle->Init.DataAlignment = MDMA_DATAALIGN_PACKENABLE;
         dmaHandle->Init.BufferTransferLength = 64;
