@@ -32,8 +32,10 @@
 #include "stm32h7xx_ll_system.h"
 
 #include "stm_dma_info.h"
+#if MBED_CONF_RTOS_PRESENT
 #include "cmsis_os.h"
 #include "cmsis_os2.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,8 +102,10 @@ struct qspi_s {
     PinName sclk;
     PinName ssel;
     bool dmaInitialized;
+#if MBED_CONF_RTOS_PRESENT
     osSemaphoreId_t semaphoreId;
     osRtxSemaphore_t semaphoreMem;
+#endif
 };
 #endif
 
@@ -122,8 +126,10 @@ struct ospi_s {
     PinName ssel;
     PinName dqs;
     bool dmaInitialized;
+#if MBED_CONF_RTOS_PRESENT
     osSemaphoreId_t semaphoreId;
     osRtxSemaphore_t semaphoreMem;
+#endif
 };
 #endif
 

@@ -63,6 +63,7 @@ void QUADSPI_IRQHandler()
     HAL_QSPI_IRQHandler(qspiHandle);
 }
 
+#if MBED_CONF_RTOS_PRESENT
 void HAL_QSPI_TxCpltCallback(QSPI_HandleTypeDef * handle)
 {
     osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
@@ -72,17 +73,22 @@ void HAL_QSPI_RxCpltCallback(QSPI_HandleTypeDef * handle)
 {
     osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
 }
+#endif
 
 void HAL_QSPI_ErrorCallback(QSPI_HandleTypeDef * handle)
 {
     handle->State = HAL_QSPI_STATE_ERROR;
+#if MBED_CONF_RTOS_PRESENT
     osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
+#endif
 }
 
 void HAL_QSPI_TimeOutCallback(QSPI_HandleTypeDef * handle)
 {
     handle->State = HAL_QSPI_STATE_ERROR;
+#if MBED_CONF_RTOS_PRESENT
     osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
+#endif
 }
 #endif
 
@@ -107,6 +113,7 @@ void OCTOSPI1_IRQHandler()
     HAL_OSPI_IRQHandler(ospiHandle1);
 }
 
+#if MBED_CONF_RTOS_PRESENT
 void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef * handle)
 {
     osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
@@ -116,17 +123,22 @@ void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef * handle)
 {
     osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
 }
+#endif
 
 void HAL_OSPI_ErrorCallback(OSPI_HandleTypeDef * handle)
 {
     handle->State = HAL_OSPI_STATE_ERROR;
+#if MBED_CONF_RTOS_PRESENT
     osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
+#endif
 }
 
 void HAL_OSPI_TimeOutCallback(OSPI_HandleTypeDef * handle)
 {
     handle->State = HAL_OSPI_STATE_ERROR;
+#if MBED_CONF_RTOS_PRESENT
     osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
+#endif
 }
 #endif
 
@@ -515,10 +527,12 @@ static void qspi_init_dma(struct qspi_s * obj)
         __HAL_LINKDMA(&obj->handle, hdma, *dmaHandle.hdma);
 #endif
         obj->dmaInitialized = true;
+#if MBED_CONF_RTOS_PRESENT
         osSemaphoreAttr_t attr = { 0 };
         attr.cb_mem = &obj->semaphoreMem;
         attr.cb_size = sizeof(osRtxSemaphore_t);
         obj->semaphoreId = osSemaphoreNew(1, 0, &attr);
+#endif
     }
 }
 
@@ -711,10 +725,12 @@ static void qspi_init_dma(struct qspi_s * obj)
         __HAL_LINKDMA(&obj->handle, hdma, *dmaHandle.hdma);
 #endif
         obj->dmaInitialized = true;
+#if MBED_CONF_RTOS_PRESENT
         osSemaphoreAttr_t attr = { 0 };
         attr.cb_mem = &obj->semaphoreMem;
         attr.cb_size = sizeof(osRtxSemaphore_t);
         obj->semaphoreId = osSemaphoreNew(1, 0, &attr);
+#endif
     }
 }
 
@@ -889,8 +905,10 @@ qspi_status_t qspi_free(qspi_t *obj)
         DMALinkInfo const *dmaLink = &QSPIDMALinks[0];
         stm_free_dma_link(dmaLink);
 
+#if MBED_CONF_RTOS_PRESENT
         // Free semaphore
         osSemaphoreRelease(obj->semaphoreId);
+#endif
     }
 
     if (HAL_QSPI_DeInit(&obj->handle) != HAL_OK) {
@@ -1029,7 +1047,11 @@ qspi_status_t qspi_write(qspi_t *obj, const qspi_command_t *command, const void 
             }
             else {
                 // wait until transfer complete or timeout
+#if MBED_CONF_RTOS_PRESENT
                 osSemaphoreAcquire(obj->semaphoreId, HAL_OSPI_TIMEOUT_DEFAULT_VALUE);
+#else
+                while(obj->handle.State == HAL_OSPI_STATE_BUSY_TX);
+#endif
                 if(obj->handle.State != HAL_OSPI_STATE_READY) {
                     status = QSPI_STATUS_ERROR;
                     obj->handle.State = HAL_OSPI_STATE_READY;
@@ -1078,7 +1100,11 @@ qspi_status_t qspi_write(qspi_t *obj, const qspi_command_t *command, const void 
             }
             else {
                 // wait until transfer complete or timeout
+#if MBED_CONF_RTOS_PRESENT
                 osSemaphoreAcquire(obj->semaphoreId, HAL_QSPI_TIMEOUT_DEFAULT_VALUE);
+#else
+                while(obj->handle.State == HAL_QSPI_STATE_BUSY_INDIRECT_TX);
+#endif
                 if(obj->handle.State != HAL_QSPI_STATE_READY) {
                     status = QSPI_STATUS_ERROR;
                     obj->handle.State = HAL_QSPI_STATE_READY;
@@ -1166,7 +1192,11 @@ qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, 
             }
             else {
                 // wait until transfer complete or timeout
+#if MBED_CONF_RTOS_PRESENT
                 osSemaphoreAcquire(obj->semaphoreId, HAL_OSPI_TIMEOUT_DEFAULT_VALUE);
+#else
+                while(obj->handle.State == HAL_OSPI_STATE_BUSY_RX);
+#endif
                 if(obj->handle.State != HAL_OSPI_STATE_READY) {
                     status = QSPI_STATUS_ERROR;
                     obj->handle.State = HAL_OSPI_STATE_READY;
@@ -1208,7 +1238,11 @@ qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, 
             }
             else {
                 // wait until transfer complete or timeout
+#if MBED_CONF_RTOS_PRESENT
                 osSemaphoreAcquire(obj->semaphoreId, HAL_OSPI_TIMEOUT_DEFAULT_VALUE);
+#else
+                while(obj->handle.State == HAL_OSPI_STATE_BUSY_RX);
+#endif
                 if(obj->handle.State != HAL_OSPI_STATE_READY) {
                     status = QSPI_STATUS_ERROR;
                     obj->handle.State = HAL_OSPI_STATE_READY;
@@ -1296,7 +1330,11 @@ qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, 
             }
             else {
                 // wait until transfer complete or timeout
+#if MBED_CONF_RTOS_PRESENT
                 osSemaphoreAcquire(obj->semaphoreId, HAL_QSPI_TIMEOUT_DEFAULT_VALUE);
+#else
+                while(obj->handle.State == HAL_QSPI_STATE_BUSY_INDIRECT_RX);
+#endif
                 if(obj->handle.State != HAL_QSPI_STATE_READY) {
                     status = QSPI_STATUS_ERROR;
                     obj->handle.State = HAL_QSPI_STATE_READY;
@@ -1338,7 +1376,11 @@ qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, 
             }
             else {
                 // wait until transfer complete or timeout
+#if MBED_CONF_RTOS_PRESENT
                 osSemaphoreAcquire(obj->semaphoreId, HAL_QSPI_TIMEOUT_DEFAULT_VALUE);
+#else
+                while(obj->handle.State == HAL_QSPI_STATE_BUSY_INDIRECT_RX);
+#endif
                 if(obj->handle.State != HAL_QSPI_STATE_READY) {
                     status = QSPI_STATUS_ERROR;
                     obj->handle.State = HAL_QSPI_STATE_READY;
