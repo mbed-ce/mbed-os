@@ -704,40 +704,33 @@ static void i2c_irq(i2c_t *obj)
     case 0x68:  // Slave Receive Arbitration Lost
         obj->i2c.slaveaddr_state = WriteAddressed;
         if ((obj->i2c.tran_ctrl & TRANCTRL_STARTED) && obj->i2c.tran_pos) {
-            if (obj->i2c.tran_pos < obj->i2c.tran_end) {
-
-                // Did we receive any data? If so, receive it (if there is space in the buffer) and update tran_pos
-                if (status == 0x80 || status == 0x88) {
-                    if (obj->i2c.tran_ctrl & TRANCTRL_RECVDATA) {
-                        if(obj->i2c.tran_pos < obj->i2c.tran_end)
-                        {
-                            *obj->i2c.tran_pos ++ = I2C_GET_DATA(i2c_base);
-                        }
-                        
-                        obj->i2c.tran_ctrl &= ~TRANCTRL_RECVDATA;
+            // Did we receive any data? If so, receive it (if there is space in the buffer) and update tran_pos
+            if (status == 0x80 || status == 0x88) {
+                if (obj->i2c.tran_ctrl & TRANCTRL_RECVDATA) {
+                    if(obj->i2c.tran_pos < obj->i2c.tran_end)
+                    {
+                        *obj->i2c.tran_pos ++ = I2C_GET_DATA(i2c_base);
                     }
+                    
+                    obj->i2c.tran_ctrl &= ~TRANCTRL_RECVDATA;
                 }
+            }
 
-                // Did we NACK this byte, ending the transaction? 
-                if (status == 0x88) {
-                    obj->i2c.slaveaddr_state = NoData;
-                    i2c_fsm_reset(obj, I2C_CTL0_SI_Msk | I2C_CTL0_AA_Msk);
+            // Did we NACK this byte, ending the transaction? 
+            if (status == 0x88) {
+                obj->i2c.slaveaddr_state = NoData;
+                i2c_fsm_reset(obj, I2C_CTL0_SI_Msk | I2C_CTL0_AA_Msk);
+            }
+            // Otherwise, tell the peripheral to receive the next byte
+            else {
+                uint32_t i2c_ctl = I2C_CTL0_SI_Msk | I2C_CTL0_AA_Msk;
+                if ((obj->i2c.tran_end - obj->i2c.tran_pos) == 1 &&
+                        obj->i2c.tran_ctrl & TRANCTRL_NAKLASTDATA) {
+                    // Last data
+                    i2c_ctl &= ~I2C_CTL0_AA_Msk;
                 }
-                // Otherwise, tell the peripheral to receive the next byte
-                else {
-                    uint32_t i2c_ctl = I2C_CTL0_SI_Msk | I2C_CTL0_AA_Msk;
-                    if ((obj->i2c.tran_end - obj->i2c.tran_pos) == 1 &&
-                            obj->i2c.tran_ctrl & TRANCTRL_NAKLASTDATA) {
-                        // Last data
-                        i2c_ctl &= ~I2C_CTL0_AA_Msk;
-                    }
-                    I2C_SET_CONTROL_REG(i2c_base, i2c_ctl);
-                    obj->i2c.tran_ctrl |= TRANCTRL_RECVDATA;
-                }
-            } else {
-                obj->i2c.tran_ctrl &= ~TRANCTRL_STARTED;
-                i2c_disable_int(obj);
-                break;
+                I2C_SET_CONTROL_REG(i2c_base, i2c_ctl);
+                obj->i2c.tran_ctrl |= TRANCTRL_RECVDATA;
             }
         } else {
             i2c_disable_int(obj);
