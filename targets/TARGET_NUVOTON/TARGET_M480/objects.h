@@ -87,6 +87,9 @@ struct spi_s {
     PinName pin_sclk;
     PinName pin_ssel;
 
+    // Current word size of the SPI
+    uint8_t word_size_bits;
+
     // Async transfer related fields
     DMAUsage    dma_usage;
     int         dma_chn_id_tx;

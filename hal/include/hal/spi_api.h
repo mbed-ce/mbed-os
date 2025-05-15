@@ -192,6 +192,10 @@ SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName mclk);
 
 /**
  * Fills the given spi_capabilities_t structure with the capabilities of the given peripheral.
+ * 
+ * @param ssel The CS pin being used, for checking the \c hw_cs_handle flag
+ * @param slave True to get capabilities for slave mode, false to get capabilities for master mode
+ * @param[out] cap Capabilities are returned here
  */
 void spi_get_capabilities(PinName ssel, bool slave, spi_capabilities_t *cap);
 
@@ -419,7 +423,7 @@ const PinMap *spi_slave_cs_pinmap(void);
  * @param[in] rx_length The number of bytes to receive
  * @param[in] bit_width The bit width of buffer words
  * @param[in] event     The logical OR of events to be registered
- * @param[in] handler   SPI interrupt handler
+ * @param[in] handler   SPI interrupt handler. This will point, through a bit of indirection, to \c SPI::irq_handler_asynch() for the correct SPI instance
  * @param[in] hint      A suggestion for how to use DMA with this transfer
  *
  * @return True if DMA was actually used for the transfer, false otherwise (if interrupts or another CPU-based
@@ -429,6 +433,10 @@ const PinMap *spi_slave_cs_pinmap(void);
  * after the transfer is complete.  If this function returns true, the driver layer will cache invalidate the Rx buffer under
  * the assumption that the data needs to be re-read from main memory.  Be careful, because if the read was not actually
  * done by DMA, and the rx data is in the CPU cache, this invalidation will corrupt it.
+ * 
+ * @note The application layer will always acquire the SPI peripheral first before calling this, including setting the frequency and the bit width. So,
+ *     the \c bit_width argument will never be different from the SPI's currently set bit width, and can actually be ignored.
+ *     TODO remove this argument entirely.
  */
 bool spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint8_t bit_width, uint32_t handler, uint32_t event, DMAUsage hint);
 

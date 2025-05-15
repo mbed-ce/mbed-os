@@ -127,6 +127,8 @@ typedef enum {
     SPI_5 = (int) NU_MODNAME(QSPI1_BASE, 5, 0),
 } SPIName;
 
+#define DEVICE_SPI_COUNT 6
+
 typedef enum {
     I2C_0 = (int) NU_MODNAME(I2C0_BASE, 0, 0),
     I2C_1 = (int) NU_MODNAME(I2C1_BASE, 1, 0),

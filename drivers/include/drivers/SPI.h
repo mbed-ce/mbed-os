@@ -179,9 +179,12 @@ const use_gpio_ssel_t use_gpio_ssel;
  * applies to receiving data, so be sure to check examples in the datasheet to determine what frame
  * size to use and whether byte swapping is needed when working with an external chip.</p>
  *
- * <p>Note: Some Mbed targets support frame sizes that are not standard integer sizes, e.g. 4 bits, 7 bits, or
- * 24 bits.  However, the behavior of these frame sizes is not well defined and may differ across targets
- * or across API calls (e.g. single-byte vs transaction vs async).  More work is needed to make these consistent.</p>
+ * \note Some Mbed targets support frame sizes that are not standard integer sizes, e.g. 4 bits, 7 bits, or
+ *     24 bits. However, the behavior of these frame sizes is currently not tested, and you may need to test what works or
+ *     inspect your target's SPI driver code. More work is needed to make these consistent. When available, using these frame sizes
+ *     requires writing each word to be transmitted into the next-largest C integer type. For example, to send 24-bit frames, you
+ *     would create an array of uint32_ts and write each 24-bit integer into its own uint32_t.
+ *     Then you would pass in the byte length of the array (number of frames * 4, NOT number of frames * 3) to the SPI driver.
  *
  * <h1>Asynchronous API</h1>
  * <p>On many processors, Mbed OS also supports asynchronous %SPI.  This feature allows you to run %SPI

@@ -20,6 +20,8 @@
 
 #if DEVICE_SPI
 
+#include <string.h>
+
 #include "cmsis.h"
 #include "pinmap.h"
 #include "PeripheralPins.h"
@@ -124,6 +126,23 @@ __STATIC_INLINE void SPI_DISABLE_SYNC(SPI_T *spi_base)
     while (spi_base->STATUS & SPI_STATUS_SPIENSTS_Msk);
 }
 
+/// Get the number of bytes of the Tx/Rx buffers that will be used to encode each word of data for the bus
+static uint8_t nu_spi_get_bytes_per_word(struct spi_s const * const nu_spi)
+{
+    if(nu_spi->word_size_bits <= 8)
+    {
+        return 1;
+    }
+    else if(nu_spi->word_size_bits <= 16)
+    {
+        return 2;
+    }
+    else
+    {
+        return 4;
+    }
+}
+
 #if DEVICE_SPI_ASYNCH
 static void spi_enable_vector_interrupt(spi_t *obj, uint32_t handler, uint8_t enable);
 static void spi_master_enable_interrupt(spi_t *obj, uint8_t enable);
@@ -133,7 +152,6 @@ static uint32_t spi_event_check(spi_t *obj);
 static void spi_enable_event(spi_t *obj, uint32_t event, uint8_t enable);
 static void spi_buffer_set(spi_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length);
 static void spi_check_dma_usage(DMAUsage *dma_usage, int *dma_ch_tx, int *dma_ch_rx);
-static uint8_t spi_get_data_width(spi_t *obj);
 static int spi_is_tx_complete(spi_t *obj);
 static int spi_is_rx_complete(spi_t *obj);
 static int spi_writeable(spi_t * obj);
@@ -156,6 +174,54 @@ static const struct nu_modinit_s spi_modinit_tab[] = {
 
     {NC, 0, 0, 0, 0, (IRQn_Type) 0, NULL}
 };
+
+SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName sclk) {
+    SPIName spi_mosi = (SPIName)pinmap_peripheral(mosi, PinMap_SPI_MOSI);
+    SPIName spi_miso = (SPIName)pinmap_peripheral(miso, PinMap_SPI_MISO);
+    SPIName spi_sclk = (SPIName)pinmap_peripheral(sclk, PinMap_SPI_SCLK);
+
+    SPIName spi_data = (SPIName)pinmap_merge(spi_mosi, spi_miso);
+    SPIName spi_per = (SPIName)pinmap_merge(spi_data, spi_sclk);
+
+    return spi_per;
+}
+
+void spi_get_capabilities(PinName ssel, bool slave, spi_capabilities_t *cap) {
+    if (slave) {
+        cap->minimum_frequency = 1;
+        cap->maximum_frequency = 48000000; // Per the datasheet, max slave SCLK freq is 48MHz
+        cap->word_length = 0xFFFFFF80; // Word lengths 32 bits through 8 bits
+        cap->support_slave_mode = false; // to be determined later based on ssel
+        cap->hw_cs_handle = false; // irrelevant in slave mode
+        cap->slave_delay_between_symbols_ns = 2500; // 2.5 us - TODO update, this is currently not used for anything
+        cap->clk_modes = 0x0f; // all clock modes
+        cap->tx_rx_buffers_equal_length = false; // rx/tx buffers can have different sizes
+        cap->async_mode = false;
+    } else {
+        cap->minimum_frequency = 375000; // Slowest clock is PCLK0/1 / 256
+        cap->maximum_frequency = 96000000; // With clock divider 1, SCLK = PCLK0/1 clock, which is 96MHz
+        cap->word_length = 0xFFFFFF80; // Word lengths 32 bits through 8 bits
+        cap->support_slave_mode = false; // to be determined later based on ssel
+        cap->hw_cs_handle = false; // to be determined later based on ssel
+        cap->slave_delay_between_symbols_ns = 0; // irrelevant in master mode
+        cap->clk_modes = 0x0f;  // all clock modes
+        cap->tx_rx_buffers_equal_length = false; // rx/tx buffers can have different sizes
+        cap->async_mode = true;
+    }
+
+    // check if given ssel pin is in the cs pinmap
+    const PinMap *cs_pins = spi_master_cs_pinmap();
+    while (cs_pins->pin != NC) {
+        if (cs_pins->pin == ssel) {
+#if DEVICE_SPISLAVE
+            cap->support_slave_mode = true;
+#endif
+            cap->hw_cs_handle = true;
+            break;
+        }
+        cs_pins++;
+    }
+}
 
 void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel)
 {
@@ -261,6 +327,8 @@ void spi_format(spi_t *obj, int bits, int mode, int slave)
 
     SPI_DISABLE_SYNC(spi_base);
 
+    obj->spi.word_size_bits = bits;
+
     if (spi_is_qspi(obj)) {
         QSPI_Open((QSPI_T *) spi_base,
                   slave ? QSPI_SLAVE : QSPI_MASTER,
@@ -351,17 +419,34 @@ int spi_master_write(spi_t *obj, int value)
 
 int spi_master_block_write(spi_t *obj, const char *tx_buffer, int tx_length,
                            char *rx_buffer, int rx_length, char write_fill) {
-    int total = (tx_length > rx_length) ? tx_length : rx_length;
 
-    for (int i = 0; i < total; i++) {
-        char out = (i < tx_length) ? tx_buffer[i] : write_fill;
-        char in = spi_master_write(obj, out);
-        if (i < rx_length) {
-            rx_buffer[i] = in;
+    // Length is passed in bytes so we need to convert to words
+    const uint8_t word_size_bytes = nu_spi_get_bytes_per_word(&obj->spi);
+    MBED_ASSERT(tx_length % word_size_bytes == 0);
+    MBED_ASSERT(rx_length % word_size_bytes == 0);
+
+    const int tx_words = tx_length / word_size_bytes;
+    const int rx_words = rx_length / word_size_bytes;
+    const int total_words = (tx_words > rx_words) ? tx_words : rx_words;
+    
+    for (int word_idx = 0; word_idx < total_words; word_idx++) {
+
+        int out = 0;
+        if(word_idx >= tx_length){
+            // Use fill char
+            memset(&out, write_fill, word_size_bytes);
+        }
+        else{
+            memcpy(&out, tx_buffer + (word_idx * word_size_bytes), word_size_bytes);
+        }
+        
+        int in = spi_master_write(obj, out);
+        if (word_idx < rx_words) {
+            memcpy(rx_buffer + (word_idx * word_size_bytes), &in, word_size_bytes);
         }
     }
 
-    return total;
+    return total_words * word_size_bytes;
 }
 
 const PinMap *spi_master_mosi_pinmap()
@@ -442,15 +527,18 @@ void spi_slave_write(spi_t *obj, int value)
 bool spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint8_t bit_width, uint32_t handler, uint32_t event, DMAUsage hint)
 {
     SPI_T *spi_base = (SPI_T *) NU_MODBASE(obj->spi.spi);
-    SPI_SET_DATA_WIDTH(spi_base, bit_width);
+
+    // Make sure Tx and Rx lengths are sane
+    const uint8_t word_size_bytes = nu_spi_get_bytes_per_word(&obj->spi);
+    MBED_ASSERT(tx_length % word_size_bytes == 0);
+    MBED_ASSERT(rx_length % word_size_bytes == 0);
 
     obj->spi.dma_usage = hint;
     spi_check_dma_usage(&obj->spi.dma_usage, &obj->spi.dma_chn_id_tx, &obj->spi.dma_chn_id_rx);
-    uint32_t data_width = spi_get_data_width(obj);
     // Conditions to go DMA way:
     // (1) No DMA support for non-8 multiple data width.
     // (2) tx length >= rx length. Otherwise, as tx DMA is done, no bus activity for remaining rx.
-    if ((data_width % 8) ||
+    if (((obj->spi.word_size_bits % 8) != 0) ||
             (tx_length < rx_length)) {
         obj->spi.dma_usage = DMA_USAGE_NEVER;
         dma_channel_free(obj->spi.dma_chn_id_tx);
@@ -490,8 +578,8 @@ bool spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx,
                              0); // Scatter-gather descriptor address
         PDMA_SetTransferCnt(pdma_base,
                             obj->spi.dma_chn_id_tx,
-                            (data_width == 8) ? PDMA_WIDTH_8 : (data_width == 16) ? PDMA_WIDTH_16 : PDMA_WIDTH_32,
-                            tx_length);
+                            (word_size_bytes == 1) ? PDMA_WIDTH_8 : (word_size_bytes == 2) ? PDMA_WIDTH_16 : PDMA_WIDTH_32,
+                            tx_length / word_size_bytes);
         PDMA_SetTransferAddr(pdma_base,
                              obj->spi.dma_chn_id_tx,
                              (uint32_t) tx,  // NOTE:
@@ -519,8 +607,8 @@ bool spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx,
                              0); // Scatter-gather descriptor address
         PDMA_SetTransferCnt(pdma_base,
                             obj->spi.dma_chn_id_rx,
-                            (data_width == 8) ? PDMA_WIDTH_8 : (data_width == 16) ? PDMA_WIDTH_16 : PDMA_WIDTH_32,
-                            rx_length);
+                            (word_size_bytes == 1) ? PDMA_WIDTH_8 : (word_size_bytes == 2) ? PDMA_WIDTH_16 : PDMA_WIDTH_32,
+                            rx_length / word_size_bytes);
         PDMA_SetTransferAddr(pdma_base,
                              obj->spi.dma_chn_id_rx,
                              (uint32_t) &spi_base->RX,   // Source address
@@ -747,9 +835,7 @@ static uint32_t spi_event_check(spi_t *obj)
 static uint32_t spi_master_write_asynch(spi_t *obj, uint32_t tx_limit)
 {
     uint32_t n_words = 0;
-    uint8_t data_width = spi_get_data_width(obj);
-    uint8_t bytes_per_word = (data_width + 7) / 8;
-    uint8_t *tx = (uint8_t *)(obj->tx_buff.buffer) + bytes_per_word * obj->tx_buff.pos;
+    const uint8_t word_size_bytes = nu_spi_get_bytes_per_word(&obj->spi);
     SPI_T *spi_base = (SPI_T *) NU_MODBASE(obj->spi.spi);
 
     while (obj->spi.txrx_rmn && spi_writeable(obj)) {
@@ -757,25 +843,23 @@ static uint32_t spi_master_write_asynch(spi_t *obj, uint32_t tx_limit)
             // Transmit dummy as transmit buffer is empty
             SPI_WRITE_TX(spi_base, 0);
         } else {
-            switch (bytes_per_word) {
+            uint8_t *tx = (uint8_t *)(obj->tx_buff.buffer) + obj->tx_buff.pos;
+            switch (word_size_bytes) {
             case 4:
                 SPI_WRITE_TX(spi_base, nu_get32_le(tx));
-                tx += 4;
                 break;
             case 2:
                 SPI_WRITE_TX(spi_base, nu_get16_le(tx));
-                tx += 2;
                 break;
             case 1:
-                SPI_WRITE_TX(spi_base, *((uint8_t *) tx));
-                tx += 1;
+                SPI_WRITE_TX(spi_base, *tx);
                 break;
             }
 
-            obj->tx_buff.pos ++;
+            obj->tx_buff.pos += word_size_bytes;
         }
         n_words ++;
-        obj->spi.txrx_rmn --;
+        obj->spi.txrx_rmn -= word_size_bytes;
     }
 
     //Return the number of words that have been sent
@@ -796,9 +880,8 @@ static uint32_t spi_master_write_asynch(spi_t *obj, uint32_t tx_limit)
 static uint32_t spi_master_read_asynch(spi_t *obj)
 {
     uint32_t n_words = 0;
-    uint8_t data_width = spi_get_data_width(obj);
-    uint8_t bytes_per_word = (data_width + 7) / 8;
-    uint8_t *rx = (uint8_t *)(obj->rx_buff.buffer) + bytes_per_word * obj->rx_buff.pos;
+    const uint8_t word_size_bytes = nu_spi_get_bytes_per_word(&obj->spi);
+    
     SPI_T *spi_base = (SPI_T *) NU_MODBASE(obj->spi.spi);
 
     while (spi_readable(obj)) {
@@ -806,25 +889,24 @@ static uint32_t spi_master_read_asynch(spi_t *obj)
             // Disregard as receive buffer is full
             SPI_READ_RX(spi_base);
         } else {
-            switch (bytes_per_word) {
+            uint8_t *rx = (uint8_t *)(obj->rx_buff.buffer) + obj->rx_buff.pos;
+            switch (word_size_bytes) {
             case 4: {
                 uint32_t val = SPI_READ_RX(spi_base);
                 nu_set32_le(rx, val);
-                rx += 4;
                 break;
             }
             case 2: {
                 uint16_t val = SPI_READ_RX(spi_base);
                 nu_set16_le(rx, val);
-                rx += 2;
                 break;
             }
             case 1:
-                *rx ++ = SPI_READ_RX(spi_base);
+                *rx = SPI_READ_RX(spi_base);
                 break;
             }
 
-            obj->rx_buff.pos ++;
+            obj->rx_buff.pos += word_size_bytes;
         }
         n_words ++;
     }
@@ -838,11 +920,11 @@ static void spi_buffer_set(spi_t *obj, const void *tx, size_t tx_length, void *r
     obj->tx_buff.buffer = (void *) tx;
     obj->tx_buff.length = tx_length;
     obj->tx_buff.pos = 0;
-    obj->tx_buff.width = spi_get_data_width(obj);
+    obj->tx_buff.width = nu_spi_get_bytes_per_word(&obj->spi) * 8;
     obj->rx_buff.buffer = rx;
     obj->rx_buff.length = rx_length;
     obj->rx_buff.pos = 0;
-    obj->rx_buff.width = spi_get_data_width(obj);
+    obj->rx_buff.width = nu_spi_get_bytes_per_word(&obj->spi) * 8;
 }
 
 static void spi_check_dma_usage(DMAUsage *dma_usage, int *dma_ch_tx, int *dma_ch_rx)
@@ -866,18 +948,6 @@ static void spi_check_dma_usage(DMAUsage *dma_usage, int *dma_ch_tx, int *dma_ch
         dma_channel_free(*dma_ch_rx);
         *dma_ch_rx = DMA_ERROR_OUT_OF_CHANNELS;
     }
-}
-
-static uint8_t spi_get_data_width(spi_t *obj)
-{
-    SPI_T *spi_base = (SPI_T *) NU_MODBASE(obj->spi.spi);
-
-    uint32_t data_width = ((spi_base->CTL & SPI_CTL_DWIDTH_Msk) >> SPI_CTL_DWIDTH_Pos);
-    if (data_width == 0) {
-        data_width = 32;
-    }
-
-    return data_width;
 }
 
 static int spi_is_tx_complete(spi_t *obj)
@@ -948,7 +1018,7 @@ static uint32_t spi_fifo_depth(spi_t *obj)
         return 8;
     }
 
-    return (spi_get_data_width(obj) <= 16) ? 8 : 4;
+    return (obj->spi.word_size_bits <= 16) ? 8 : 4;
 }
 
 #endif
