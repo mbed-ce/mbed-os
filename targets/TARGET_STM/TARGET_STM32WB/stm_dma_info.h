@@ -40,5 +40,10 @@ static const DMALinkInfo SPIRxDMALinks[] = {
 #endif
 };
 
+static const DMALinkInfo QSPIDMALinks[] = {
+#if defined(QUADSPI)
+        {1, 5, DMA_REQUEST_QUADSPI},
+#endif
+};
 
 #endif //MBED_OS_STM_DMA_INFO_H

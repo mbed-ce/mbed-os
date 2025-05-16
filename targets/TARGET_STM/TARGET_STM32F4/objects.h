@@ -28,6 +28,12 @@
 #include "stm32f4xx_ll_rtc.h"
 #include "stm32f4xx_ll_rcc.h"
 
+#include "stm_dma_info.h"
+#if MBED_CONF_RTOS_PRESENT
+#include "cmsis_os.h"
+#include "cmsis_os2.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -150,6 +156,11 @@ struct qspi_s {
     PinName io3;
     PinName sclk;
     PinName ssel;
+    bool dmaInitialized;
+#if MBED_CONF_RTOS_PRESENT
+    osSemaphoreId_t semaphoreId;
+    osRtxSemaphore_t semaphoreMem;
+#endif
 };
 #endif
 

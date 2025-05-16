@@ -28,6 +28,13 @@
 #define MAX_DMA_CHANNELS_PER_CONTROLLER 8
 
 // Count DMA controllers
+#ifdef MDMA
+// For STM32H7, MDMA has 16 channels, while DMA1, DMA2 and BDMA all have 8 channels
+#define NUM_DMA_CONTROLLERS 5
+#define MAX_MDMA_CHANNELS 16
+#define BDMA_IDX 3
+#define MDMA_IDX 4
+#else
 #ifdef DMA1
 #ifdef DMA2
 #define NUM_DMA_CONTROLLERS 2
@@ -36,6 +43,7 @@
 #endif
 #else
 #define NUM_DMA_CONTROLLERS 0
+#endif
 #endif
 
 // Provide an alias so that code can always use the v2 name for this structure

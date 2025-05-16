@@ -69,19 +69,46 @@ typedef struct DMALinkInfo {
 #endif
 } DMALinkInfo;
 
+typedef union DMAInstancePointer {
+    DMA_TypeDef *dma;
+#ifdef BDMA
+    BDMA_TypeDef *bdma;
+#endif
+#ifdef MDMA
+    MDMA_TypeDef *mdma;
+#endif
+} DMAInstancePointer;
+
+typedef union DMAHandlePointer {
+    DMA_HandleTypeDef *hdma;
+#ifdef MDMA
+    MDMA_HandleTypeDef *hmdma;
+#endif
+} DMAHandlePointer;
+
+typedef union DMAChannelPointer {
+    DMA_Channel_TypeDef *channel;
+#ifdef BDMA
+    BDMA_Channel_TypeDef *bchannel;
+#endif
+#ifdef MDMA
+    MDMA_Channel_TypeDef *mchannel;
+#endif
+} DMAChannelPointer;
+
 /**
  * @brief Get the DMA instance for a DMA link
  *
  * @param dmaLink DMA instance
  */
-DMA_TypeDef * stm_get_dma_instance(DMALinkInfo const * dmaLink);
+DMAInstancePointer stm_get_dma_instance(DMALinkInfo const * dmaLink);
 
 /**
  * @brief Get the DMA channel instance for a DMA link
  *
  * @param dmaLink DMA link instance
  */
-DMA_Channel_TypeDef * stm_get_dma_channel(DMALinkInfo const * dmaLink);
+DMAChannelPointer stm_get_dma_channel(DMALinkInfo const * dmaLink);
 
 /**
  * @brief Get the interrupt number for a DMA link
@@ -99,7 +126,7 @@ IRQn_Type stm_get_dma_irqn(const DMALinkInfo *dmaLink);
  * @return true if the handle is stored successfully
  * @return false if handle is not NULL and the DMA channel used by the link has already been used
  */
-bool stm_set_dma_handle_for_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef *handle);
+bool stm_set_dma_handle_for_link(DMALinkInfo const * dmaLink, DMAHandlePointer handle);
 
 /**
  * @brief Get the handle of a DMA link
@@ -109,7 +136,7 @@ bool stm_set_dma_handle_for_link(DMALinkInfo const * dmaLink, DMA_HandleTypeDef 
  * @return Pointer to DMA handle
  * @return NULL if the DMA channel used by the link is not allocated
  */
-DMA_HandleTypeDef * stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink);
+DMAHandlePointer stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink);
 
 /**
  * @brief Initialize a DMA link for use.
@@ -128,7 +155,7 @@ DMA_HandleTypeDef * stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink);
  * @return Pointer to DMA handle allocated by this module.
  * @return NULL if the DMA channel used by the link has already been allocated by something else.
  */
-DMA_HandleTypeDef * stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t direction, bool periphInc, bool memInc, uint8_t periphDataAlignment, uint8_t memDataAlignment, uint32_t mode);
+DMAHandlePointer stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t direction, bool periphInc, bool memInc, uint8_t periphDataAlignment, uint8_t memDataAlignment, uint32_t mode);
 
 /**
  * @brief Free a DMA link.

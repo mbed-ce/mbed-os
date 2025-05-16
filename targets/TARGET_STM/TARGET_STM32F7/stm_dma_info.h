@@ -48,4 +48,9 @@ static const DMALinkInfo SPIRxDMALinks[] = {
         {2, 6, 1}, // SPI6 Rx is DMA2 Stream 6 Channel 1
 };
 
+/// Mapping from QSPI index to DMA link info
+static const DMALinkInfo QSPIDMALinks[] = {
+        {2, 7, 3}, // QUADSPI is DMA2 Stream 7 Channel 3
+};
+
 #endif //MBED_OS_STM_DMA_INFO_H
