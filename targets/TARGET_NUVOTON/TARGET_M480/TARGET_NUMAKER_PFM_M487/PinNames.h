@@ -43,42 +43,34 @@ typedef enum {
     PH_0    = NU_PINNAME(7, 0), PH_1, PH_2, PH_3, PH_4, PH_5, PH_6, PH_7, PH_8, PH_9, PH_10, PH_11,
 
     // Arduino UNO naming
-    A0 = PB_6,
-    A1 = PB_7,
-    A2 = PB_8,
-    A3 = PB_9,
-    A4 = PB_0,
-    A5 = PB_1,
+    ARDUINO_UNO_A0 = PB_6,
+    ARDUINO_UNO_A1 = PB_7,
+    ARDUINO_UNO_A2 = PB_8,
+    ARDUINO_UNO_A3 = PB_9,
+    ARDUINO_UNO_A4 = PB_0,
+    ARDUINO_UNO_A5 = PB_1,
 
-    D0 = PB_2,
-    D1 = PB_3,
-    D2 = PC_9,
-    D3 = PC_10,
-    D4 = PC_11,
-    D5 = PC_12,
-    D6 = PE_4,
-    D7 = PE_5,
-    D8 = PA_5,
-    D9 = PA_4,
-    D10 = PA_3,
-    D11 = PA_0,
-    D12 = PA_1,
-    D13 = PA_2,
-    D14 = PG_1,
-    D15 = PG_0,
+    ARDUINO_UNO_D0 = PB_2,
+    ARDUINO_UNO_D1 = PB_3,
+    ARDUINO_UNO_D2 = PC_9,
+    ARDUINO_UNO_D3 = PC_10,
+    ARDUINO_UNO_D4 = PC_11,
+    ARDUINO_UNO_D5 = PC_12,
+    ARDUINO_UNO_D6 = PE_4,
+    ARDUINO_UNO_D7 = PE_5,
+    ARDUINO_UNO_D8 = PA_5,
+    ARDUINO_UNO_D9 = PA_4,
+    ARDUINO_UNO_D10 = PA_3,
+    ARDUINO_UNO_D11 = PA_0,
+    ARDUINO_UNO_D12 = PA_1,
+    ARDUINO_UNO_D13 = PA_2,
+    ARDUINO_UNO_D14 = PG_1,
+    ARDUINO_UNO_D15 = PG_0,
 
     // Note: board-specific
     // UART naming
-#if defined(MBED_CONF_TARGET_USB_UART_TX)
     CONSOLE_TX           = MBED_CONF_TARGET_USB_UART_TX,
-#else
-    CONSOLE_TX           = NC,
-#endif
-#if defined(MBED_CONF_TARGET_USB_UART_RX)
     CONSOLE_RX           = MBED_CONF_TARGET_USB_UART_RX,
-#else
-    CONSOLE_RX           = NC,
-#endif
 #if defined(MBED_CONF_TARGET_STDIO_UART_TX)
     STDIO_UART_TX   = MBED_CONF_TARGET_STDIO_UART_TX,
 #else
@@ -89,32 +81,20 @@ typedef enum {
 #else
     STDIO_UART_RX   = CONSOLE_RX,
 #endif
-    SERIAL_TX = D10,
-    SERIAL_RX = D13,
-
-    // I2C naming
-    I2C_SCL = D15,
-    I2C_SDA = D14,
-
-    // LED naming
-    LED_RED = PH_0,
-    LED_YELLOW = PH_1,
-    LED_GREEN = PH_2,
-    LED1 = LED_RED,
-    LED2 = LED_YELLOW,
-    LED3 = LED_GREEN,
-    LED4 = LED1,    // No real LED. Just for passing ATS.
-
-    // Button naming
-    SW2 = PG_15,
-    SW3 = PF_11,
-    BUTTON1 = SW2,
-    BUTTON2 = SW3,
 
     // Force PinName to 32-bit required by NU_PINNAME_BIND(...)
     FORCE_ENUM_PINNAME_32BIT = 0x7FFFFFFF,
 
 } PinName;
+
+// LEDs
+#define LED1 PH_0 // Red LED
+#define LED2 PH_1 // Yellow LED
+#define LED3 PH_2 // Green LED
+
+// Buttons
+#define BUTTON1 PG_15
+#define BUTTON2 PF_11
 
 #ifdef __cplusplus
 }

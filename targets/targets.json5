@@ -8300,6 +8300,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "spim-ccm-enable": 1,
             "network-default-interface-type": "ETHERNET"
         },
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
         "image_url": "https://os.mbed.com/media/cache/platforms/NuMaker-PFM-M487.png.250x250_q85.png"
     },
     "NUMAKER_IOT_M487": {

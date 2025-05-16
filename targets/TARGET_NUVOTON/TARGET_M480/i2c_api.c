@@ -313,7 +313,7 @@ int i2c_slave_receive(i2c_t *obj)
 
 int i2c_slave_read(i2c_t *obj, char *data, int length)
 {
-    return i2c_do_tran(obj, data, length, 1, 1);
+    return i2c_do_tran(obj, data, length, 1, 0);
 }
 
 int i2c_slave_write(i2c_t *obj, const char *data, int length)
@@ -691,7 +691,6 @@ static void i2c_irq(i2c_t *obj)
         }
         obj->i2c.slaveaddr_state = ReadAddressed;
         break;
-    //case 0xA0:  // Slave Transmit Repeat Start or Stop
     case 0xC0:  // Slave Transmit Data NACK
     case 0xC8:  // Slave Transmit Last Data ACK
         obj->i2c.slaveaddr_state = NoData;
@@ -705,40 +704,46 @@ static void i2c_irq(i2c_t *obj)
     case 0x68:  // Slave Receive Arbitration Lost
         obj->i2c.slaveaddr_state = WriteAddressed;
         if ((obj->i2c.tran_ctrl & TRANCTRL_STARTED) && obj->i2c.tran_pos) {
-            if (obj->i2c.tran_pos < obj->i2c.tran_end) {
-                if (status == 0x80 || status == 0x88) {
-                    if (obj->i2c.tran_ctrl & TRANCTRL_RECVDATA) {
+            // Did we receive any data? If so, receive it (if there is space in the buffer) and update tran_pos
+            if (status == 0x80 || status == 0x88) {
+                if (obj->i2c.tran_ctrl & TRANCTRL_RECVDATA) {
+                    if(obj->i2c.tran_pos < obj->i2c.tran_end)
+                    {
                         *obj->i2c.tran_pos ++ = I2C_GET_DATA(i2c_base);
-                        obj->i2c.tran_ctrl &= ~TRANCTRL_RECVDATA;
                     }
+                    
+                    obj->i2c.tran_ctrl &= ~TRANCTRL_RECVDATA;
                 }
+            }
 
-                if (status == 0x88) {
-                    obj->i2c.slaveaddr_state = NoData;
-                    i2c_fsm_reset(obj, I2C_CTL0_SI_Msk | I2C_CTL0_AA_Msk);
-                } else if (obj->i2c.tran_pos == obj->i2c.tran_end) {
-                    obj->i2c.tran_ctrl &= ~TRANCTRL_STARTED;
-                    i2c_disable_int(obj);
-                } else {
-                    uint32_t i2c_ctl = I2C_CTL0_SI_Msk | I2C_CTL0_AA_Msk;
-                    if ((obj->i2c.tran_end - obj->i2c.tran_pos) == 1 &&
-                            obj->i2c.tran_ctrl & TRANCTRL_NAKLASTDATA) {
-                        // Last data
-                        i2c_ctl &= ~I2C_CTL0_AA_Msk;
-                    }
-                    I2C_SET_CONTROL_REG(i2c_base, i2c_ctl);
-                    obj->i2c.tran_ctrl |= TRANCTRL_RECVDATA;
+            // Did we NACK this byte, ending the transaction? 
+            if (status == 0x88) {
+                obj->i2c.slaveaddr_state = NoData;
+                i2c_fsm_reset(obj, I2C_CTL0_SI_Msk | I2C_CTL0_AA_Msk);
+            }
+            // Otherwise, tell the peripheral to receive the next byte
+            else {
+                uint32_t i2c_ctl = I2C_CTL0_SI_Msk | I2C_CTL0_AA_Msk;
+                if ((obj->i2c.tran_end - obj->i2c.tran_pos) == 1 &&
+                        obj->i2c.tran_ctrl & TRANCTRL_NAKLASTDATA) {
+                    // Last data
+                    i2c_ctl &= ~I2C_CTL0_AA_Msk;
                 }
-            } else {
-                obj->i2c.tran_ctrl &= ~TRANCTRL_STARTED;
-                i2c_disable_int(obj);
-                break;
+                I2C_SET_CONTROL_REG(i2c_base, i2c_ctl);
+                obj->i2c.tran_ctrl |= TRANCTRL_RECVDATA;
             }
         } else {
             i2c_disable_int(obj);
         }
         break;
-    //case 0xA0:  // Slave Receive Repeat Start or Stop
+
+    case 0xA0:  // Slave Operation Complete
+        // Master sent STOP condition, go back to idle state and end the operation
+        obj->i2c.slaveaddr_state = NoData;
+        i2c_fsm_reset(obj, I2C_CTL0_SI_Msk | I2C_CTL0_AA_Msk);
+        obj->i2c.tran_ctrl &= ~TRANCTRL_STARTED;
+        i2c_disable_int(obj);
+        break;
 
     // GC mode
     //case 0xA0:  // GC mode Repeat Start or Stop
@@ -903,6 +908,7 @@ uint32_t i2c_irq_handler_asynch(i2c_t *obj)
             uint8_t *rx = (uint8_t *) obj->rx_buff.buffer;
             rx[obj->rx_buff.pos ++] = I2C_GET_DATA(((I2C_T *) NU_MODBASE(obj->i2c.i2c)));
         }
+        // fall through
     case 0x40:  // Master Receive Address ACK
         I2C_SET_CONTROL_REG(i2c_base, I2C_CTL0_SI_Msk | ((obj->rx_buff.pos != obj->rx_buff.length - 1) ? I2C_CTL0_AA_Msk : 0));
         break;
@@ -915,11 +921,15 @@ uint32_t i2c_irq_handler_asynch(i2c_t *obj)
         break;
 
     case 0x58:  // Master Receive Data NACK
+
+        // We get here after the last byte was transferred in an async read. Save it into the buffer
+        // and end the transaction.
         if (obj->rx_buff.buffer && obj->rx_buff.pos < obj->rx_buff.length) {
             uint8_t *rx = (uint8_t *) obj->rx_buff.buffer;
             rx[obj->rx_buff.pos ++] = I2C_GET_DATA(((I2C_T *) NU_MODBASE(obj->i2c.i2c)));
         }
-        I2C_SET_CONTROL_REG(i2c_base, I2C_CTL0_STA_Msk | I2C_CTL0_SI_Msk);
+        I2C_SET_CONTROL_REG(i2c_base, I2C_CTL0_STO_Msk | I2C_CTL0_SI_Msk);
+        event = I2C_EVENT_TRANSFER_COMPLETE;
         break;
 
     case 0x00:  // Bus error
