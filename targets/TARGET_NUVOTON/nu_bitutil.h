@@ -34,12 +34,14 @@ __STATIC_INLINE int nu_clo(uint32_t x)
     return nu_clz(~x);
 }
 
+// Count Trailing Zeroes in an integer
 __STATIC_INLINE int nu_ctz(uint32_t x)
 {
     int c = __CLZ(x & -x);
     return x ? 31 - c : c;
 }
 
+// Count Trailing Ones in an integer
 __STATIC_INLINE int nu_cto(uint32_t x)
 {
     return nu_ctz(~x);

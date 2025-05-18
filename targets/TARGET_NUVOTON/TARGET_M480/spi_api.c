@@ -143,6 +143,48 @@ static uint8_t nu_spi_get_bytes_per_word(struct spi_s const * const nu_spi)
     }
 }
 
+// Set the DMA usage of this SPI instance.
+// Allocates or deallocates channels as necessary.
+// If no DMA channels are available, sets DMA usage to DMA_USAGE_NEVER
+static void nu_spi_set_dma_usage(struct spi_s * const spi, DMAUsage new_dma_usage)
+{
+    if(new_dma_usage == DMA_USAGE_NEVER)
+    {
+        if(spi->dma_usage != DMA_USAGE_NEVER)
+        {
+            // Free channels
+            dma_channel_free(spi->dma_chn_id_tx);
+            spi->dma_chn_id_tx = DMA_ERROR_OUT_OF_CHANNELS;
+            dma_channel_free(spi->dma_chn_id_rx);
+            spi->dma_chn_id_rx = DMA_ERROR_OUT_OF_CHANNELS;
+        }
+    }
+    else
+    {
+        // Temporary or permanent DMA usage
+        if(spi->dma_usage == DMA_USAGE_NEVER)
+        {
+            // Need to allocate channels
+            spi->dma_chn_id_tx = dma_channel_allocate(DMA_CAP_NONE);
+            if(spi->dma_chn_id_tx == DMA_ERROR_OUT_OF_CHANNELS)
+            {
+                new_dma_usage = DMA_USAGE_NEVER;
+            }
+            else
+            {
+                spi->dma_chn_id_rx = dma_channel_allocate(DMA_CAP_NONE);
+                if(spi->dma_chn_id_rx == DMA_ERROR_OUT_OF_CHANNELS)
+                {
+                    new_dma_usage = DMA_USAGE_NEVER;
+                    dma_channel_free(spi->dma_chn_id_tx);
+                }
+            }
+        }
+    }
+
+    spi->dma_usage = new_dma_usage;
+}
+
 #if DEVICE_SPI_ASYNCH
 static void spi_enable_vector_interrupt(spi_t *obj, uint32_t handler, uint8_t enable);
 static void spi_master_enable_interrupt(spi_t *obj, uint8_t enable);
@@ -259,10 +301,8 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
     SYS_ResetModule(modinit->rsetidx);
 
 #if DEVICE_SPI_ASYNCH
-    obj->spi.dma_usage = DMA_USAGE_NEVER;
-    obj->spi.event = 0;
-    obj->spi.dma_chn_id_tx = DMA_ERROR_OUT_OF_CHANNELS;
-    obj->spi.dma_chn_id_rx = DMA_ERROR_OUT_OF_CHANNELS;
+    // Note: We don't want to touch the DMA usage here, because either this is a completely new SPI and the DMA usage is already set to 0 (NEVER),
+    // or it's a re-initialization of an existing SPI and we can allow it to keep its existing DMA settings.
     
     /* NOTE: We use vector to judge if asynchronous transfer is on-going (spi_active).
      *       At initial time, asynchronous transfer is not on-going and so vector must
@@ -278,14 +318,8 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
 void spi_free(spi_t *obj)
 {
 #if DEVICE_SPI_ASYNCH
-    if (obj->spi.dma_chn_id_tx != DMA_ERROR_OUT_OF_CHANNELS) {
-        dma_channel_free(obj->spi.dma_chn_id_tx);
-        obj->spi.dma_chn_id_tx = DMA_ERROR_OUT_OF_CHANNELS;
-    }
-    if (obj->spi.dma_chn_id_rx != DMA_ERROR_OUT_OF_CHANNELS) {
-        dma_channel_free(obj->spi.dma_chn_id_rx);
-        obj->spi.dma_chn_id_rx = DMA_ERROR_OUT_OF_CHANNELS;
-    }
+    // Free DMA channels
+    nu_spi_set_dma_usage(&obj->spi, DMA_USAGE_NEVER);
 #endif
 
     if (spi_is_qspi(obj)) {
@@ -533,19 +567,16 @@ bool spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx,
     MBED_ASSERT(tx_length % word_size_bytes == 0);
     MBED_ASSERT(rx_length % word_size_bytes == 0);
 
-    obj->spi.dma_usage = hint;
-    spi_check_dma_usage(&obj->spi.dma_usage, &obj->spi.dma_chn_id_tx, &obj->spi.dma_chn_id_rx);
     // Conditions to go DMA way:
     // (1) No DMA support for non-8 multiple data width.
     // (2) tx length >= rx length. Otherwise, as tx DMA is done, no bus activity for remaining rx.
     if (((obj->spi.word_size_bits % 8) != 0) ||
             (tx_length < rx_length)) {
-        obj->spi.dma_usage = DMA_USAGE_NEVER;
-        dma_channel_free(obj->spi.dma_chn_id_tx);
-        obj->spi.dma_chn_id_tx = DMA_ERROR_OUT_OF_CHANNELS;
-        dma_channel_free(obj->spi.dma_chn_id_rx);
-        obj->spi.dma_chn_id_rx = DMA_ERROR_OUT_OF_CHANNELS;
+        hint = DMA_USAGE_NEVER;
     }
+
+    // Set DMA usage, allocating or releasing DMA channels
+    nu_spi_set_dma_usage(&obj->spi, hint);
 
     // SPI IRQ is necessary for both interrupt way and DMA way
     spi_enable_event(obj, event, 1);
@@ -689,6 +720,12 @@ void spi_abort_asynch(spi_t *obj)
             pdma_base->CHCTL &= ~(1 << obj->spi.dma_chn_id_rx);
         }
         SPI_DISABLE_RX_PDMA(((SPI_T *) NU_MODBASE(obj->spi.spi)));
+
+        // If DMA was temporary, free its channels
+        if(obj->spi.dma_usage == DMA_USAGE_TEMPORARY_ALLOCATED || obj->spi.dma_usage == DMA_USAGE_OPPORTUNISTIC)
+        {
+            nu_spi_set_dma_usage(&obj->spi, DMA_USAGE_NEVER);
+        }
     }
 
     // Necessary for both interrupt way and DMA way
@@ -925,29 +962,6 @@ static void spi_buffer_set(spi_t *obj, const void *tx, size_t tx_length, void *r
     obj->rx_buff.length = rx_length;
     obj->rx_buff.pos = 0;
     obj->rx_buff.width = nu_spi_get_bytes_per_word(&obj->spi) * 8;
-}
-
-static void spi_check_dma_usage(DMAUsage *dma_usage, int *dma_ch_tx, int *dma_ch_rx)
-{
-    if (*dma_usage != DMA_USAGE_NEVER) {
-        if (*dma_ch_tx == DMA_ERROR_OUT_OF_CHANNELS) {
-            *dma_ch_tx = dma_channel_allocate(DMA_CAP_NONE);
-        }
-        if (*dma_ch_rx == DMA_ERROR_OUT_OF_CHANNELS) {
-            *dma_ch_rx = dma_channel_allocate(DMA_CAP_NONE);
-        }
-
-        if (*dma_ch_tx == DMA_ERROR_OUT_OF_CHANNELS || *dma_ch_rx == DMA_ERROR_OUT_OF_CHANNELS) {
-            *dma_usage = DMA_USAGE_NEVER;
-        }
-    }
-
-    if (*dma_usage == DMA_USAGE_NEVER) {
-        dma_channel_free(*dma_ch_tx);
-        *dma_ch_tx = DMA_ERROR_OUT_OF_CHANNELS;
-        dma_channel_free(*dma_ch_rx);
-        *dma_ch_rx = DMA_ERROR_OUT_OF_CHANNELS;
-    }
 }
 
 static int spi_is_tx_complete(spi_t *obj)

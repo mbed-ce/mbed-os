@@ -30,7 +30,7 @@
  * @brief Enumeration of possible DMA usage hints
  */
 typedef enum {
-    DMA_USAGE_NEVER, ///< Never use DMA
+    DMA_USAGE_NEVER = 0, ///< Never use DMA
     DMA_USAGE_OPPORTUNISTIC, ///< Use DMA if possible but deallocate DMA resources when not being used.
     DMA_USAGE_ALWAYS, ///< Always use DMA when possible
     DMA_USAGE_TEMPORARY_ALLOCATED, // Seems to be used as an internal state indicator for "we need to deallocate these channels."

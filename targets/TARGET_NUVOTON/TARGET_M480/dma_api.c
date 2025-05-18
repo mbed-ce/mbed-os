@@ -84,6 +84,19 @@ int dma_channel_allocate(uint32_t capabilities)
 
 int dma_channel_free(int channelid)
 {
+    PDMA_T * pdma = dma_modbase();
+
+    // Make sure channel is disabled
+    pdma->CHCTL &= ~(1 << channelid);  // Enable this DMA channel
+
+    // Also clear the request source for a channel in case still enabled.
+    // This allows this request source to be assigned to a different channel later.
+    PDMA_SetTransferMode(pdma,
+                        channelid,
+                        PDMA_MEM, // No peripheral
+                        0,  // Scatter-gather disabled
+                        0); // Scatter-gather descriptor address
+
     if (channelid != DMA_ERROR_OUT_OF_CHANNELS) {
         dma_chn_mask &= ~(1 << channelid);
     }
