@@ -71,15 +71,16 @@ namespace IP101G {
 
 }
 
-namespace DP83848 {
+namespace DP8384X {
 
-    /// Driver for the  DP83848 PHY
+    /// Driver for the  DP8384X PHY
     /// Datasheet: https://www.ti.com/lit/ds/symlink/dp83848c.pdf
+    ///            https://www.ti.com/lit/ds/symlink/dp83849i.pdf
     /// @{
 
     inline constexpr GenericEthPhy::Config DefaultConfig = {
         .OUI = 0x80017,
-        .model_min = 0x09, // DP83848VV
+        .model_min = 0x09, // DP83848VV, DP83849I
         .model_max = 0x0A, // DP83848C/I/VYB/YB
         .address = 1, // Address set via PHYAD[0] strap.
     };
