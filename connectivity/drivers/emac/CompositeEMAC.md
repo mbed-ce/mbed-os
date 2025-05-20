@@ -63,12 +63,12 @@ Unlike the MAC driver and the DMA, the PHY driver does not need to be subclassed
 
 ```json5
 "MY_TARGET": {
-    "nsapi.emac-phy-model": "LAN8742",
+    "nsapi.emac-phy-model": "LAN87XX",
     "nsapi.emac-phy-mdio-address": 0
 }
 ```
 
-This will work out of the box, as long as `LAN8742` names a PHY driver defined in PhyDrivers.cpp. Individual PHY models will generally need their own drivers, since often PHYs have errata that need to be worked around or need other configuration that isn't defined in the standard. However, GenericEthPhy allows implementing the absolute minimum amount of logic per-phy as possible!
+This will work out of the box, as long as `LAN87XX` names a PHY driver defined in PhyDrivers.cpp. Individual PHY models will generally need their own drivers, since often PHYs have errata that need to be worked around or need other configuration that isn't defined in the standard. However, GenericEthPhy allows implementing the absolute minimum amount of logic per-phy as possible!
 
 Since user boards may want to use a different ethernet PHY, the driver can be customized in an application by overriding the `mbed::get_eth_phy_driver` weak function to return a different driver class. This might look something like
 

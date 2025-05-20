@@ -113,7 +113,7 @@
         },
         "MCU_STM32": {
             // First-party STM32 boards generally use a LAN8742 PHY at MDIO address 0
-            "nsapi.emac-phy-model": "LAN8742",
+            "nsapi.emac-phy-model": "LAN87XX",
             "nsapi.emac-phy-mdio-address": 0
         },
         "MCU_M480": {

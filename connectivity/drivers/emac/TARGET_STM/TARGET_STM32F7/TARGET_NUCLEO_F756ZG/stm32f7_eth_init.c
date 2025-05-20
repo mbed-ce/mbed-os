@@ -35,6 +35,8 @@
 
 void EthInitPinmappings(void)
 {
+    GPIO_InitTypeDef GPIO_InitStructure;
+
     /* Enable GPIOs clocks */
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();

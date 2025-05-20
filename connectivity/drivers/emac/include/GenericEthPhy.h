@@ -85,9 +85,10 @@ public:
         /// 24-bit OUI of the organization that produced the ethernet PHY.
         uint32_t OUI;
 
-        /// 5-bit model number of the phy. This plus the OUI is used to verify that the
+        /// Range of 5-bit model number of the phy. This plus the OUI is used to verify that the
         /// chip in hardware matches what's expected.
-        uint8_t model;
+        uint8_t model_min;
+        uint8_t model_max;
 
         /// MDIO address of the phy chip.
         /// NOTE: 0 is *supposed* to be reserved as the general call address but lots of phy chips use
