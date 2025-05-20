@@ -61,14 +61,14 @@ CompositeEMAC::ErrCode GenericEthPhy::init() {
 
     if(actualID1 == expectedID1 && (actualID2 & expectedID2Mask) >= expectedID2Min && (actualID2 & expectedID2Mask) <= expectedID2Max) {
         // OK
-        tr_info("Detected ethernet PHY at MDIO addr %" PRIu8 " with OUI 0x%" PRIx32 ", model 0x%" PRIx8 ", and revision number %" PRIu8, config.address, config.OUI, config.model, actualID2 % 0xF);
+        tr_info("Detected ethernet PHY at MDIO addr %" PRIu8 " with OUI 0x%" PRIx32 ", model 0x%" PRIx8 ", and revision number %" PRIu8, config.address, config.OUI, (actualID2 >> 4) & 0x3F, actualID2 % 0xF);
     }
     else if(actualID1 == std::numeric_limits<uint16_t>::max() && actualID2 == std::numeric_limits<uint16_t>::max()) {
         tr_error("Got all 0xFFs when reading Ethernet PHY. Since MDIO is an open drain bus, this means the phy is not connected or not responding.");
         return CompositeEMAC::ErrCode::PHY_NOT_RESPONDING;
     }
     else {
-        tr_error("Ethernet phy model number verification mismatch. Expected PHYIDR1 = %" PRIu16 ", PHYIDR2 = %" PRIu16 ", got PHYIDR1 = %" PRIu16 ", PHYIDR2 = %" PRIu16 " [note: bottom 4 bits of PHYIDR2 ignored]", expectedID1, expectedID2, actualID1, actualID2);
+        tr_error("Ethernet phy model number verification mismatch. Expected PHYIDR1 = %" PRIu16 ", PHYIDR2 = %" PRIu16 "-%" PRIu16 ", got PHYIDR1 = %" PRIu16 ", PHYIDR2 = %" PRIu16 " [note: bottom 4 bits of PHYIDR2 ignored]", expectedID1, expectedID2Min, expectedID2Max, actualID1, actualID2);
         return CompositeEMAC::ErrCode::PHY_NOT_RESPONDING;
     }
 
