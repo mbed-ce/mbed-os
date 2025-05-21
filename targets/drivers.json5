@@ -74,8 +74,8 @@
             "friendly_name": "STMod Cellular Modules"
         },
         "COMPONENT_GEMALTO_CINTERION": {
-            "description": "Gemalto Cinterion family of cellular modules (ELS61, BGS2, EMS31, and EHS5-E are supported)",
-            "friendly_name": "Gemalto Cinterion"
+            "description": "Telit Cinterion (formerly Thales Cinterion, formerly Gemalto Cinterion) family of cellular modules (TX62, ELS61, BGS2, EMS31, and EHS5-E are supported)",
+            "friendly_name": "Telit/Thales/Gemalto Cinterion"
         },
         "COMPONENT_GENERIC_AT3GPP": {
             "description": "Generic cellular module supporting 3GPP AT command set",
