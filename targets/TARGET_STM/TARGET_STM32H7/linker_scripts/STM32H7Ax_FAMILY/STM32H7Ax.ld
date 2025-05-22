@@ -34,8 +34,8 @@ MEMORY
 {
     FLASH       (rx)  : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START, LENGTH = MBED_CONFIGURED_ROM_BANK_IROM1_SIZE
     SRAM_DTC   (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_DTC_START + MBED_VECTTABLE_RAM_SIZE, LENGTH = MBED_RAM_BANK_SRAM_DTC_SIZE - MBED_VECTTABLE_RAM_SIZE
-    SRAM       (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_AHB_START, LENGTH = MBED_RAM_BANK_SRAM_AHB_SIZE
-    SRAM_AXI   (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_AXI_START, LENGTH = MBED_RAM_BANK_SRAM_AXI_SIZE
+    SRAM_AHB   (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_AHB_START, LENGTH = MBED_RAM_BANK_SRAM_AHB_SIZE
+    SRAM       (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_AXI_START, LENGTH = MBED_RAM_BANK_SRAM_AXI_SIZE
     SRAM_D3    (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_D3_START, LENGTH = MBED_RAM_BANK_SRAM_D3_SIZE
     SRAM_ITC   (xrw)  : ORIGIN = MBED_RAM_BANK_SRAM_ITC_START, LENGTH = MBED_RAM_BANK_SRAM_ITC_SIZE
 }
@@ -112,7 +112,7 @@ SECTIONS
 
     __etext = .;
     _sidata = .;
-    
+
     .data : AT (__etext)
     {
         __data_start__ = .;
@@ -160,7 +160,7 @@ SECTIONS
         . = ALIGN(32);
         __uninitialized_end = .;
     } > SRAM
-    
+
     .bss :
     {
         . = ALIGN(8);
@@ -211,11 +211,11 @@ SECTIONS
         __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
     } > SRAM_D3
 
-    /* Use SRAM_AXI as additional heap */
+    /* Use SRAM_AHB as additional heap */
     .heap (NOLOAD):
     {
         PROVIDE(__mbed_sbrk_start = .);
-        . += (ORIGIN(SRAM_AXI) + LENGTH(SRAM_AXI) - .);
+        . += (ORIGIN(SRAM_AHB) + LENGTH(SRAM_AHB) - .);
         PROVIDE(__mbed_krbs_start = .);
-    } > SRAM_AXI
+    } > SRAM_AHB
 }
