@@ -1128,6 +1128,7 @@ qspi_status_t qspi_write(qspi_t *obj, const qspi_command_t *command, const void 
 }
 #endif /* OCTOSPI */
 
+#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
 static void split_buffer_by_cacheline(void *buffer, const size_t *length, size_t *pre_aligned_size, size_t *aligned_size, size_t *post_aligned_size)
 {
     *pre_aligned_size = 0;
@@ -1158,6 +1159,7 @@ static void split_buffer_by_cacheline(void *buffer, const size_t *length, size_t
         }
     }
 }
+#endif
 
 
 #if defined(OCTOSPI1)
