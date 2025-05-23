@@ -193,7 +193,7 @@ static uint32_t spi_master_read_asynch(spi_t *obj);
 static uint32_t spi_event_check(spi_t *obj);
 static void spi_enable_event(spi_t *obj, uint32_t event, uint8_t enable);
 static void spi_buffer_set(spi_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length);
-static void spi_check_dma_usage(DMAUsage *dma_usage, int *dma_ch_tx, int *dma_ch_rx);
+static void nu_spi_set_dma_usage(struct spi_s * const spi, DMAUsage new_dma_usage);
 static int spi_is_tx_complete(spi_t *obj);
 static int spi_is_rx_complete(spi_t *obj);
 static int spi_writeable(spi_t * obj);
@@ -578,7 +578,12 @@ bool spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx,
     // Set DMA usage, allocating or releasing DMA channels
     nu_spi_set_dma_usage(&obj->spi, hint);
 
-    // SPI IRQ is necessary for both interrupt way and DMA way
+    // SPI IRQ is necessary for both interrupt way and DMA way.
+    // However, if we are using DMA then overflows can happen if Tx length > Rx length, so ignore them
+    if(obj->spi.dma_usage != DMA_USAGE_NEVER)
+    {
+        event &= ~(SPI_EVENT_RX_OVERFLOW);
+    }
     spi_enable_event(obj, event, 1);
     spi_buffer_set(obj, tx, tx_length, rx, rx_length);
 
@@ -737,6 +742,21 @@ void spi_abort_asynch(spi_t *obj)
 
     SPI_ClearRxFIFO(spi_base);
     SPI_ClearTxFIFO(spi_base);
+
+    // Clear any events which may have been triggered by the transfer or the abort
+    if (spi_base->STATUS & SPI_STATUS_RXOVIF_Msk) {
+        spi_base->STATUS = SPI_STATUS_RXOVIF_Msk;
+    }
+
+    // Receive Time-Out
+    if (spi_base->STATUS & SPI_STATUS_RXTOIF_Msk) {
+        spi_base->STATUS = SPI_STATUS_RXTOIF_Msk;
+    }
+
+    // Transmit FIFO Under-Run
+    if (spi_base->STATUS & SPI_STATUS_TXUFIF_Msk) {
+        spi_base->STATUS = SPI_STATUS_TXUFIF_Msk;
+    }
 }
 
 /**
@@ -754,7 +774,7 @@ uint32_t spi_irq_handler_asynch(spi_t *obj)
         spi_abort_asynch(obj);
     }
 
-    return (obj->spi.event & event) | ((event & SPI_EVENT_COMPLETE) ? SPI_EVENT_INTERNAL_TRANSFER_COMPLETE : 0);
+    return (obj->spi.event_mask & event) | ((event & SPI_EVENT_COMPLETE) ? SPI_EVENT_INTERNAL_TRANSFER_COMPLETE : 0);
 }
 
 uint8_t spi_active(spi_t *obj)
@@ -789,8 +809,8 @@ static int spi_readable(spi_t * obj)
 
 static void spi_enable_event(spi_t *obj, uint32_t event, uint8_t enable)
 {
-    obj->spi.event &= ~SPI_EVENT_ALL;
-    obj->spi.event |= (event & SPI_EVENT_ALL);
+    obj->spi.event_mask &= ~SPI_EVENT_ALL;
+    obj->spi.event_mask |= (event & SPI_EVENT_ALL);
     if (event & SPI_EVENT_RX_OVERFLOW) {
         SPI_EnableInt((SPI_T *) NU_MODBASE(obj->spi.spi), SPI_FIFO_RXOV_INT_MASK);
     }
@@ -841,21 +861,11 @@ static uint32_t spi_event_check(spi_t *obj)
 
     // Receive FIFO Overrun
     if (spi_base->STATUS & SPI_STATUS_RXOVIF_Msk) {
-        spi_base->STATUS = SPI_STATUS_RXOVIF_Msk;
-        // In case of tx length > rx length on DMA way
-        if (obj->spi.dma_usage == DMA_USAGE_NEVER) {
-            event |= SPI_EVENT_RX_OVERFLOW;
-        }
+        event |= SPI_EVENT_RX_OVERFLOW;
     }
 
-    // Receive Time-Out
-    if (spi_base->STATUS & SPI_STATUS_RXTOIF_Msk) {
-        spi_base->STATUS = SPI_STATUS_RXTOIF_Msk;
-        // Not using this IF. Just clear it.
-    }
     // Transmit FIFO Under-Run
     if (spi_base->STATUS & SPI_STATUS_TXUFIF_Msk) {
-        spi_base->STATUS = SPI_STATUS_TXUFIF_Msk;
         event |= SPI_EVENT_ERROR;
     }
 
