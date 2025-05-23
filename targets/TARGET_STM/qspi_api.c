@@ -42,6 +42,11 @@
 /* hence 2^(31+1), then FLASH_SIZE_DEFAULT = 1<<31 */
 #define QSPI_FLASH_SIZE_DEFAULT 0x80000000
 
+/* Minimum number of bytes to be transferred using DMA, when DCACHE is not available */
+/* When less than 32 bytes of data is transferred at a time, using DMA may actually be slower than polling */
+/* When DACHE is available, DMA will be used when the buffer contains at least one cache-aligned block */
+#define QSPI_DMA_THRESHOLD_BYTES 32
+
 #if defined(QUADSPI)
 static QSPI_HandleTypeDef * qspiHandle; // Handle of whatever QSPI structure is used for QUADSPI
 
@@ -1031,7 +1036,7 @@ qspi_status_t qspi_write(qspi_t *obj, const qspi_command_t *command, const void 
         tr_error("HAL_OSPI_Command error");
         status = QSPI_STATUS_ERROR;
     } else {
-        if(st_command.NbData >= 32) {
+        if(st_command.NbData >= QSPI_DMA_THRESHOLD_BYTES) {
             qspi_init_dma(obj);
             NVIC_ClearPendingIRQ(obj->qspiIRQ);
             NVIC_SetPriority(obj->qspiIRQ, 1);
@@ -1085,7 +1090,7 @@ qspi_status_t qspi_write(qspi_t *obj, const qspi_command_t *command, const void 
     if (HAL_QSPI_Command(&obj->handle, &st_command, HAL_QSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) {
         status = QSPI_STATUS_ERROR;
     } else {
-        if(st_command.NbData >= 32) {
+        if(st_command.NbData >= QSPI_DMA_THRESHOLD_BYTES) {
             qspi_init_dma(obj);
             NVIC_ClearPendingIRQ(QUADSPI_IRQn);
             NVIC_SetPriority(QUADSPI_IRQn, 1);
@@ -1123,6 +1128,37 @@ qspi_status_t qspi_write(qspi_t *obj, const qspi_command_t *command, const void 
 }
 #endif /* OCTOSPI */
 
+static void split_buffer_by_cacheline(void *buffer, const size_t *length, size_t *pre_aligned_size, size_t *aligned_size, size_t *post_aligned_size)
+{
+    *pre_aligned_size = 0;
+    *aligned_size = 0;
+    *post_aligned_size = 0;
+    if(*length < __SCB_DCACHE_LINE_SIZE)
+    {
+        *pre_aligned_size = *length;
+    }
+    else
+    {
+        size_t address_remainder = (size_t) buffer % __SCB_DCACHE_LINE_SIZE;
+        if(address_remainder == 0)
+        {
+            *aligned_size = *length & ~(__SCB_DCACHE_LINE_SIZE - 1);
+            *post_aligned_size = *length - *aligned_size;
+        }
+        else
+        {
+            *pre_aligned_size = __SCB_DCACHE_LINE_SIZE - address_remainder;
+            *aligned_size = (*length - *pre_aligned_size) & ~(__SCB_DCACHE_LINE_SIZE - 1);
+            *post_aligned_size = *length - *pre_aligned_size - *aligned_size;
+        }
+        if(*aligned_size == 0)
+        {
+            *pre_aligned_size = *length;
+            *post_aligned_size = 0;
+        }
+    }
+}
+
 
 #if defined(OCTOSPI1)
 qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, size_t *length)
@@ -1134,31 +1170,8 @@ qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, 
     }
 
 #if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
-    size_t pre_aligned_size = 0, aligned_size = 0, post_aligned_size = 0;
-    if(*length < __SCB_DCACHE_LINE_SIZE)
-    {
-        pre_aligned_size = *length;
-    }
-    else
-    {
-        size_t address_remainder = (size_t) data % __SCB_DCACHE_LINE_SIZE;
-        if(address_remainder == 0)
-        {
-            aligned_size = *length & ~(__SCB_DCACHE_LINE_SIZE - 1);
-            post_aligned_size = *length - aligned_size;
-        }
-        else
-        {
-            pre_aligned_size = __SCB_DCACHE_LINE_SIZE - address_remainder;
-            aligned_size = (*length - pre_aligned_size) & ~(__SCB_DCACHE_LINE_SIZE - 1);
-            post_aligned_size = *length - pre_aligned_size - aligned_size;
-        }
-        if(aligned_size == 0)
-        {
-            pre_aligned_size = *length;
-            post_aligned_size = 0;
-        }
-    }
+    size_t pre_aligned_size, aligned_size, post_aligned_size;
+    split_buffer_by_cacheline(data, length, &pre_aligned_size, &aligned_size, &post_aligned_size);
     if(pre_aligned_size > 0)
     {
         st_command.NbData = pre_aligned_size;
@@ -1227,7 +1240,7 @@ qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, 
         tr_error("HAL_OSPI_Command error");
         status = QSPI_STATUS_ERROR;
     } else {
-        if(st_command.NbData >= 32) {
+        if(st_command.NbData >= QSPI_DMA_THRESHOLD_BYTES) {
             qspi_init_dma(obj);
             NVIC_ClearPendingIRQ(obj->qspiIRQ);
             NVIC_SetPriority(obj->qspiIRQ, 1);
@@ -1272,31 +1285,8 @@ qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, 
     }
 
 #if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
-    size_t pre_aligned_size = 0, aligned_size = 0, post_aligned_size = 0;
-    if(*length < __SCB_DCACHE_LINE_SIZE)
-    {
-        pre_aligned_size = *length;
-    }
-    else
-    {
-        size_t address_remainder = (size_t) data % __SCB_DCACHE_LINE_SIZE;
-        if(address_remainder == 0)
-        {
-            aligned_size = *length & ~(__SCB_DCACHE_LINE_SIZE - 1);
-            post_aligned_size = *length - aligned_size;
-        }
-        else
-        {
-            pre_aligned_size = __SCB_DCACHE_LINE_SIZE - address_remainder;
-            aligned_size = (*length - pre_aligned_size) & ~(__SCB_DCACHE_LINE_SIZE - 1);
-            post_aligned_size = *length - pre_aligned_size - aligned_size;
-        }
-        if(aligned_size == 0)
-        {
-            pre_aligned_size = *length;
-            post_aligned_size = 0;
-        }
-    }
+    size_t pre_aligned_size, aligned_size, post_aligned_size;
+    split_buffer_by_cacheline(data, length, &pre_aligned_size, &aligned_size, &post_aligned_size);
     if(pre_aligned_size > 0)
     {
         st_command.NbData = pre_aligned_size;
@@ -1365,7 +1355,7 @@ qspi_status_t qspi_read(qspi_t *obj, const qspi_command_t *command, void *data, 
         tr_error("HAL_QSPI_Command error");
         status = QSPI_STATUS_ERROR;
     } else {
-        if(st_command.NbData >= 32) {
+        if(st_command.NbData >= QSPI_DMA_THRESHOLD_BYTES) {
             qspi_init_dma(obj);
             NVIC_ClearPendingIRQ(QUADSPI_IRQn);
             NVIC_SetPriority(QUADSPI_IRQn, 1);

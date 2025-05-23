@@ -156,7 +156,7 @@ extern "C" DWORD get_fattime(void)
 extern "C" void *ff_memalloc(UINT size)
 {
 #if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
-    return aligned_alloc(32U, size);
+    return aligned_alloc(__SCB_DCACHE_LINE_SIZE, size);
 #else
     return malloc(size);
 #endif
