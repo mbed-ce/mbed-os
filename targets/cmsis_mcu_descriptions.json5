@@ -9381,7 +9381,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 0x20000,
+                "size": 0x200000,
                 "start": 0x08000000,
                 "startup": true
             },
@@ -9650,7 +9650,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 0x20000,
+                "size": 0x200000,
                 "start": 0x08000000,
                 "startup": true
             },
@@ -11621,7 +11621,7 @@
         ],
         "sub_family": "STM32L562",
         "vendor": "STMicroelectronics:13"
-    },    
+    },
 	"STM32U083RCTx": {
         "algorithms": [
             {
