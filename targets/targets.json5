@@ -3060,7 +3060,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32G4A1xx"
         ]
     },
-	
+
     // STM32H5 Targets -------------------------------------------------------------------------------------------------
 	"MCU_STM32H5": {
         "inherits": [
@@ -3104,14 +3104,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "MPU",
             "ANALOGOUT",
-            "SPI_32BIT_WORDS"
+            "SPI_32BIT_WORDS",
+            "TRNG"
         ],
         "device_has_remove": [
             "FLASH",
-            "LPTICKER",
             "CAN",
-			"SERIAL_FC",
-            "WATCHDOG"
+			"SERIAL_FC"
         ],
         "is_mcu_family_target": true
     },
@@ -3193,7 +3192,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "STM32H563ZITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF274337.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
-	
+
     // STM32H7 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32H7": {
         "inherits": [
@@ -3435,7 +3434,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32H745ZITx"
     },
-	
+
 	// These targets contain the extra bits to add to the MCU_STM32H745xI target to set it for the
 	// CM4 or CM7 core.
     "MCU_STM32H745xI_CM4": {
@@ -4894,7 +4893,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF273876.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
-  
+
     // STM32U5 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32U5": {
         "inherits": [
