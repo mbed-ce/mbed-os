@@ -87,7 +87,7 @@ int dma_channel_free(int channelid)
     PDMA_T * pdma = dma_modbase();
 
     // Make sure channel is disabled
-    pdma->CHCTL &= ~(1 << channelid);  // Enable this DMA channel
+    pdma->CHCTL &= ~(1 << channelid);
 
     // Also clear the request source for a channel in case still enabled.
     // This allows this request source to be assigned to a different channel later.
