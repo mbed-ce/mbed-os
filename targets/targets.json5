@@ -9654,7 +9654,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": ["FAMILY_Apollo3"],
         "macros_add": ["AM_PACKAGE_BGA", "MBED_TICKLESS"],
         "device_name": "AMA3B1KK-KBR",
-        "is_mcu_family_target": true
+        "is_mcu_family_target": true,
+        "memory_bank_config": {
+            // Leave room for the SparkFun SVL bootloader in flash
+            "IROM1": {
+                "start": 0x10000,
+                "size": 0xF0000
+            }
+        }
     },
     "SFE_ARTEMIS": { // AKA SparkFun RedBoard Artemis
         "inherits": ["AMA3B1KK"],
