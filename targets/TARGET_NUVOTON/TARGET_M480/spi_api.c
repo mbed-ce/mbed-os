@@ -1004,6 +1004,7 @@ static void spi_dma_handler_tx(uint32_t id, uint32_t event_dma)
     MBED_ASSERT(modinit->modname == (int) obj->spi.spi);
 
     void (*vec)(void) = (void (*)(void)) NVIC_GetVector(modinit->irq_n);
+    MBED_ASSERT(vec != NULL);
     vec();
 }
 
@@ -1027,6 +1028,7 @@ static void spi_dma_handler_rx(uint32_t id, uint32_t event_dma)
     MBED_ASSERT(modinit->modname == (int) obj->spi.spi);
 
     void (*vec)(void) = (void (*)(void)) NVIC_GetVector(modinit->irq_n);
+    MBED_ASSERT(vec != NULL);
     vec();
 }
 

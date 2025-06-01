@@ -427,7 +427,7 @@ void SPI::abort_all_transfers()
 
 int SPI::set_dma_usage(DMAUsage usage)
 {
-    if (spi_active(&_peripheral->spi)) {
+    if (_peripheral->initialized && spi_active(&_peripheral->spi)) {
         return -1;
     }
     _usage = usage;
