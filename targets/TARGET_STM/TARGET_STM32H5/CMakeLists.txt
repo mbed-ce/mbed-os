@@ -17,6 +17,7 @@ target_sources(mbed-stm32h5
     serial_device.c
     spi_api.c
     pwmout_device.c
+    cache.c
 )
 
 target_include_directories(mbed-stm32h5
