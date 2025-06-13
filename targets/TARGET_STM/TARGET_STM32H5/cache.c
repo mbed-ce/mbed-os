@@ -29,7 +29,7 @@ void Cache_Init()
     /* Disable MPU before perloading and config update */
     HAL_MPU_Disable();
 
-    /* Configurate 0x00000000-0x08FFF7FF as Read Only, Executable and Cacheable */
+    /* Configure 0x00000000-0x08FFF7FF as Read Only, Executable and Cacheable */
     region.Enable           = MPU_REGION_ENABLE;
     region.Number           = MPU_REGION_NUMBER0;
     region.AttributesIndex  = MPU_ATTRIBUTES_NUMBER0;
@@ -45,7 +45,7 @@ void Cache_Init()
     attr.Attributes         = INNER_OUTER(MPU_NOT_CACHEABLE);
     HAL_MPU_ConfigMemoryAttributes(&attr);
 
-    /* Configurate 0x08FFF800-0X0FFFFFFF as Read Only, Not Executable and Non-cacheable */
+    /* Configure 0x08FFF800-0X0FFFFFFF as Read Only, Not Executable and Non-cacheable */
     region.Enable           = MPU_REGION_ENABLE;
     region.Number           = MPU_REGION_NUMBER5;
     region.AttributesIndex  = MPU_ATTRIBUTES_NUMBER5;
