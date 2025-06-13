@@ -274,9 +274,6 @@ MBED_WEAK uint8_t SetSysClock_PLL_MSI(void)
         return 0; // FAIL
     }
 
-    HAL_ICACHE_ConfigAssociativityMode(ICACHE_1WAY);
-    HAL_ICACHE_Enable();
-
     return 1; // OK
 }
 #endif /* ((CLOCK_SOURCE) & USE_PLL_MSI) */

@@ -26,6 +26,7 @@ target_sources(mbed-stm32u5
         i2c_device.c
         serial_device.c
         spi_api.c
+        cache.c
 )
 
 target_link_libraries(mbed-stm32u5 INTERFACE mbed-stm mbed-stm32u5cube-fw)

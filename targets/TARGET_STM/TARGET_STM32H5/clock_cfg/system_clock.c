@@ -16,7 +16,7 @@
 /**
   * This file configures the system clock as follows:
   *--------------------------------------------------------------------
-  * System clock source   | 1- USE_PLL_HSE_EXTC 
+  * System clock source   | 1- USE_PLL_HSE_EXTC
   *                       | 2- USE_PLL_HSE_XTAL
   *                       | 3- USE_PLL_HSI (internal 64 MHz clock)
   *--------------------------------------------------------------------
@@ -108,7 +108,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 #endif
 if(HSE_VALUE % 2000000 == 0)
 {
-    RCC_OscInitStruct.PLL.PLLM = HSE_VALUE / 2000000; // Divide down input clock to 2MHz 
+    RCC_OscInitStruct.PLL.PLLM = HSE_VALUE / 2000000; // Divide down input clock to 2MHz
     RCC_OscInitStruct.PLL.PLLN = 250; // Multiply up to 500MHz VCO clock
     RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1_VCIRANGE_1;
 }

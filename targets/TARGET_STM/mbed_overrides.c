@@ -85,6 +85,31 @@ MBED_WEAK void TargetBSP_Init(void)
     /** Do nothing */
 }
 
+/**
+ * @brief Enable cache if the target CPU has cache
+ *
+ * @note The default implementation works on STM32F7/H7 series with L1 cache.
+ * This declaration is weak so it may be overridden for other STM32 series
+ *
+ * @param None
+ * @retval None
+ */
+MBED_WEAK void Cache_Init(void)
+{
+#if defined(__ICACHE_PRESENT) /* STM32F7/H7 */
+    // This function can be called either during cold boot or during
+    // application boot after bootloader has been executed.
+    // In case the bootloader has already enabled the cache,
+    // is is needed to not enable it again.
+    if ((SCB->CCR & (uint32_t)SCB_CCR_IC_Msk) == 0) { // If ICache is disabled
+        SCB_EnableICache();
+    }
+    if ((SCB->CCR & (uint32_t)SCB_CCR_DC_Msk) == 0) { // If DCache is disabled
+        SCB_EnableDCache();
+    }
+#endif /* __ICACHE_PRESENT */
+}
+
 #ifndef MBED_DEBUG
 #if MBED_CONF_TARGET_GPIO_RESET_AT_INIT
 void GPIO_Full_Init(void)
@@ -160,18 +185,7 @@ void GPIO_Full_Init(void)
 // This function is called after RAM initialization and before main.
 void mbed_sdk_init()
 {
-#if defined(__ICACHE_PRESENT) /* STM32F7 */
-    // The mbed_sdk_init can be called either during cold boot or during
-    // application boot after bootloader has been executed.
-    // In case the bootloader has already enabled the cache,
-    // is is needed to not enable it again.
-    if ((SCB->CCR & (uint32_t)SCB_CCR_IC_Msk) == 0) { // If ICache is disabled
-        SCB_EnableICache();
-    }
-    if ((SCB->CCR & (uint32_t)SCB_CCR_DC_Msk) == 0) { // If DCache is disabled
-        SCB_EnableDCache();
-    }
-#endif /* __ICACHE_PRESENT */
+    Cache_Init();
 
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
     /* HW semaphore Clock enable*/
