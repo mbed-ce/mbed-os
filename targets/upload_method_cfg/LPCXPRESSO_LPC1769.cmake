@@ -1,4 +1,4 @@
-# Mbed OS upload method configuration file for target LPC1768.
+# Mbed OS upload method configuration file for target Embedded Artists LPCXPRESSO_LPC1768.
 # To change any of these parameters from their default values, set them in your build script between where you
 # include app.cmake and where you add mbed os as a subdirectory.
 
@@ -7,7 +7,7 @@
 
 # General config parameters
 # -------------------------------------------------------------
-set(UPLOAD_METHOD_DEFAULT MBED)
+set(UPLOAD_METHOD_DEFAULT PYOCD)
 
 # Config options for MBED
 # -------------------------------------------------------------
@@ -22,14 +22,14 @@ set(MBED_RESET_BAUDRATE 115200)
 # https://github.com/pyocd/pyOCD/issues/745
 # https://github.com/pyocd/pyOCD/issues/1124
 
-#set(PYOCD_UPLOAD_ENABLED TRUE)
-#set(PYOCD_TARGET_NAME LPC1768)
-#set(PYOCD_CLOCK_SPEED 4000k)
+set(PYOCD_UPLOAD_ENABLED TRUE)
+set(PYOCD_TARGET_NAME LPC1768)
+set(PYOCD_CLOCK_SPEED 4000k)
 
 # Config options for OPENOCD
 # -------------------------------------------------------------
 
-# One note about OpenOCD for LPC1768:
+# One note about OpenOCD for LPC176:
 # If you issue a "monitor reset" command, GDB will think that the program is halted, but it actually will have
 # resumed.  So, issue a "c" command after "monitor reset" to get things synchronized again.
 
@@ -44,4 +44,12 @@ set(OPENOCD_VERSION_RANGE 0.10...<0.13)
 # Config options for LINKSERVER
 # -------------------------------------------------------------
 set(LINKSERVER_UPLOAD_ENABLED TRUE)
-set(LINKSERVER_DEVICE LPC1768)
+set(LINKSERVER_DEVICE LPC1769)
+
+# Config options for JLINK
+# -------------------------------------------------------------
+set(JLINK_UPLOAD_ENABLED TRUE)
+set(JLINK_CPU_NAME LPC1769)
+set(JLINK_CLOCK_SPEED 4000)
+set(JLINK_UPLOAD_INTERFACE SWD)
+
