@@ -1,0 +1,26 @@
+var classppp__service =
+[
+    [ "ppp_link_input_cb_t", "classppp__service.html#ada6bf383578141db4f98c345102d97bf", null ],
+    [ "ppp_link_state_change_cb_t", "classppp__service.html#a9bffcb3be6ec1c5ec92b9892ea1c592f", null ],
+    [ "get_mtu_size", "classppp__service.html#adec2af1b4883cb70876ec30b1dd8e416", null ],
+    [ "get_align_preference", "classppp__service.html#a5d0dc4b7b9670cbb67433d88f4d25e5b", null ],
+    [ "get_ifname", "classppp__service.html#ac611553fdf8a561c3d8be9e2e51459a5", null ],
+    [ "link_out", "classppp__service.html#a6e805d8f5534734740af2de415f63aca", null ],
+    [ "power_up", "classppp__service.html#a1bbcaccba273c6f06f139f66840e1111", null ],
+    [ "power_down", "classppp__service.html#a5b0c4f9b5fff4c0e8ca255540a71b7f1", null ],
+    [ "set_link_input_cb", "classppp__service.html#a12e1175dbbdaa214eadd37c6ffc62903", null ],
+    [ "set_link_state_cb", "classppp__service.html#a36c2cbe36e519020581f30d968a2662b", null ],
+    [ "set_memory_manager", "classppp__service.html#ac641d3e92631e32f7718577b9d6cf332", null ],
+    [ "set_stream", "classppp__service.html#ae2d4862fdd3d337424dae4d0a9f3b2ad", null ],
+    [ "set_ip_stack", "classppp__service.html#a6ae94a400f55b44259bf57008f2f6285", null ],
+    [ "set_credentials", "classppp__service.html#ae481bd174dc684a520604cfbf7f617e9", null ],
+    [ "get_ip_address", "classppp__service.html#a9f3c6ba704e39d40edab6fff487c370a", null ],
+    [ "get_netmask", "classppp__service.html#a3be8dad063940dadee8b2ca18e8d6018", null ],
+    [ "get_gateway", "classppp__service.html#ae826207dce41d300f601b8f71d819c16", null ],
+    [ "get_dns_server", "classppp__service.html#af2fe7e3740851f67e1cac3d83cb28fbe", null ],
+    [ "link_state", "classppp__service.html#a9eb8e0c087947443c58904de4535c69b", null ],
+    [ "link_input", "classppp__service.html#a38b5edd7515916f1150129f705371c91", null ],
+    [ "event_queue_get", "classppp__service.html#a4d402ff51afebb82c1e5f61666920e06", null ],
+    [ "resource_lock", "classppp__service.html#a00e4ba9680c1ba3a1aa143e5e9adf073", null ],
+    [ "resource_unlock", "classppp__service.html#a492009c8194d19089c41d105efa147b0", null ]
+];
