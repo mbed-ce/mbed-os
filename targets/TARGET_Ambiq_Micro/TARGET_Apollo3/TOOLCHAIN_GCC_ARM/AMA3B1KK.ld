@@ -27,6 +27,8 @@
     #define MBED_CONF_TARGET_BOOT_STACK_SIZE 0x400
 #endif
 
+#include "../device/cmsis_nvic.h"
+
 ENTRY(Reset_Handler)
 
 MEMORY
@@ -92,6 +94,13 @@ SECTIONS
   __exidx_end = .;
 
   __etext = ALIGN(8);
+
+  /* Reserve space for vector table in RAM at runtime */
+  .ram_vectors (NOLOAD):
+  {
+    FILL(0);
+    . += NVIC_NUM_VECTORS*4;
+  } > RAM
 
   .data : AT (__etext)
   {
