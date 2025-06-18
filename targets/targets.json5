@@ -3109,6 +3109,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_has_remove": [
             "FLASH",
+            "LPTICKER",
             "CAN",
 			"SERIAL_FC"
         ],

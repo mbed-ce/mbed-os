@@ -266,7 +266,7 @@ void lp_ticker_init(void)
 #if defined (LPTIM_ACTIVEEDGE_FALLING)
     LptimHandle.Init.Trigger.ActiveEdge = LPTIM_ACTIVEEDGE_FALLING;
 #endif
-#if defined(TARGET_STM32U5) || defined(TARGET_STM32H5) || defined(TARGET_STM32U0)
+#if defined(TARGET_STM32U5) || defined(TARGET_STM32U0)
     LptimHandle.Init.Period = 0xFFFF;
 #endif
 #if defined (LPTIM_TRIGSAMPLETIME_DIRECTTRANSITION)
