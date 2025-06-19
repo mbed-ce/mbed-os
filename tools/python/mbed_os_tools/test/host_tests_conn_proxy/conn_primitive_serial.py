@@ -109,7 +109,7 @@ class SerialConnectorPrimitive(ConnectorPrimitive):
         self.logger.prn_inf("wait for it...")
         return result
 
-    def read(self, count):
+    def read(self, count) -> bytes:
         """! Read data from serial port RX buffer """
         # TIMEOUT: Since read is called in a loop, wait for self.timeout period before calling serial.read(). See
         # comment on serial.Serial() call above about timeout.
