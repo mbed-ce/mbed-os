@@ -235,15 +235,24 @@ uint32_t (us_ticker_read)(void);
 
 /** Set interrupt for specified timestamp
  *
- * @param timestamp The time in ticks to be set
+ * @param timestamp The time in ticks to be set. Guaranteed to be between 0 and 2^bits-1, where bits is
+ *    the number of bits returned by us_ticker_get_info()
  *
- * @note no special handling needs to be done for times in the past
- * as the common timer code will detect this and call
- * us_ticker_fire_interrupt() if this is the case
+ * @note If \c timestamp is less than the current time read by the ticker, then the intention is to set an
+ *    interrupt for once the ticker rolls over and reaches this time.
  *
- * @note calling this function with timestamp of more than the supported
- * number of bits returned by ::us_ticker_get_info results in undefined
+ * @note Upper level Mbed OS code is responsible for ensuring that if we try to set a wake-up for a time
+ *    in the past, \c us_ticker_fire_interrupt() is called instead. It will also ensure that if
+ *    we want to wake up far in the future, we will instead set a wakeup for about (rollover period/2) ticks
+ *    in the future, then reschedule the timer for the correct time.
+ *
+ * Calling this function with timestamp of more than the supported
+ * number of bits returned by ::lp_ticker_get_info results in undefined
  * behavior.
+ *
+ * If the timer interrupt is pending when this function is called (e.g. due to the ticker being set,
+ * but the interrupt being disabled before it could fire), this function shall clear the pending interrupt
+ * before reenabling and setting it to prevent a spurious execution of the interrupt.
  *
  * Pseudo Code:
  * @code

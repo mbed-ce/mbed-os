@@ -45,6 +45,12 @@ void lp_ticker_init(void)
         lp_ticker_disable_interrupt();
         return;
     }
+
+    // Configure two timers:
+    // - The "time keeper" timer, which maintains the 16-bit lp ticker counter and counts continuously
+    // - The "int counter" timer, which is only activated when an interrupt is set and counts up to the
+    //   desired compare value for the interrupt
+
     am_hal_ctimer_int_register(LP_TICKER_AM_HAL_CTIMER_CMPR_INT, lp_ticker_irq_handler);
     am_hal_ctimer_config_single(LP_TICKER_AM_HAL_CTIMER_NUMBER,
                                 LP_TICKER_AM_HAL_CTIMER_SEGMENT_TIME_KEEPER,
@@ -76,17 +82,24 @@ uint32_t lp_ticker_read()
 
 void lp_ticker_set_interrupt(timestamp_t timestamp)
 {
-    am_hal_ctimer_int_enable(LP_TICKER_AM_HAL_CTIMER_CMPR_INT);
+    // Reset timer count back to 0 and hold it there
     am_hal_ctimer_clear(LP_TICKER_AM_HAL_CTIMER_NUMBER, LP_TICKER_AM_HAL_CTIMER_SEGMENT_INT_COUNTER);
-    // am_hal_ctimer_config_single(LP_TICKER_AM_HAL_CTIMER_NUMBER,
-    //                             LP_TICKER_AM_HAL_CTIMER_SEGMENT_INT_COUNTER,
-    //                             (LP_TICKER_AM_HAL_CTIMER_INT_COUNTER_FN | LP_TICKER_AM_HAL_CTIMER_SRC | AM_HAL_CTIMER_INT_ENABLE | CTIMER_CTRL0_TMRA0IE1_Msk));
-    am_hal_ctimer_start(LP_TICKER_AM_HAL_CTIMER_NUMBER, LP_TICKER_AM_HAL_CTIMER_SEGMENT_INT_COUNTER);
-    uint32_t delta = (uint32_t)timestamp - lp_ticker_read();
+
+    // Clear compare if it fired previously
+    am_hal_ctimer_int_clear(LP_TICKER_AM_HAL_CTIMER_CMPR_INT);
+
+    // Figure out how long to sleep, accounting for rollover.
+    // Example: if current count is 65536 and timestamp is 1, then we should sleep for 2 ticks
+    const uint16_t delta = (uint16_t)timestamp - (uint16_t)lp_ticker_read();
+
+
     am_hal_ctimer_compare_set(LP_TICKER_AM_HAL_CTIMER_NUMBER,
                               LP_TICKER_AM_HAL_CTIMER_SEGMENT_INT_COUNTER,
                               LP_TICKER_AM_HAL_CTIMER_CMPR_REG,
                               (uint32_t)delta);
+
+    am_hal_ctimer_start(LP_TICKER_AM_HAL_CTIMER_NUMBER, LP_TICKER_AM_HAL_CTIMER_SEGMENT_INT_COUNTER);
+    am_hal_ctimer_int_enable(LP_TICKER_AM_HAL_CTIMER_CMPR_INT);
 }
 
 void lp_ticker_fire_interrupt(void)

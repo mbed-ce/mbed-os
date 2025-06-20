@@ -275,7 +275,6 @@ def conn_process(event_queue, dut_event_queue, config: dict[str, Any]):
 
                 if sync_uuid_discovered:
                     event_queue.put((key, value, timestamp))
-                    logger.prn_inf("found KV pair in stream: {{%s;%s}}, queued..."% (key, value))
                 else:
                     if key == '__sync':
                         if value in sync_uuid_list:
@@ -289,7 +288,7 @@ def conn_process(event_queue, dut_event_queue, config: dict[str, Any]):
                             connector.reset()
                             loop_timer = time()
                     else:
-                        logger.prn_wrn("found KV pair in stream: {{%s;%s}}, ignoring..."% (key, value))
+                        logger.prn_wrn("found KV pair in stream before sync: {{%s;%s}}, ignoring..."% (key, value))
 
         if not sync_uuid_discovered:
             # Resending __sync after 'sync_timeout' secs (default 1 sec)

@@ -3,7 +3,9 @@
 # include mbed_toolchain_setup and where you add mbed-os as a subdirectory.
 
 # Notes:
-# 1. Support for this device exists in PyOCD main branch but has not been released yet (as of Jun 2025).
+# 1. This board does not have an onboard debugger. You must use an external debugger, e.g. a PicoProbe
+#    or J-Link, if you wish to debug code.
+# 2. Support for this device exists in PyOCD main branch but has not been released yet (as of Jun 2025).
 #   To use PyOCD, you need to manually install it from the git repository by running (inside the Mbed OS venv):
 #   pip install git+https://github.com/pyocd/pyOCD.git
 

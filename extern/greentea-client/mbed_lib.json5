@@ -11,7 +11,7 @@
   },
 
   // Per-target overrides
-  "target_overides": {
+  "target_overrides": {
     "AMA3B1KK": {
       // These boards have the serial port DTR line tied to the MCU reset, so the MCU will restart when
       // the serial port is opened. It appears that if there is serial port activity within 200ms of opening the port
