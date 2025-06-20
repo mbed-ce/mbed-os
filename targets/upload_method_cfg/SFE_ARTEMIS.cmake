@@ -1,4 +1,4 @@
-# Mbed OS upload method configuration file for target NUMAKER_PFM_M487.
+# Mbed OS upload method configuration file for target SFE_ARTEMIS.
 # To change any of these parameters from their default values, set them in your build script between where you
 # include mbed_toolchain_setup and where you add mbed-os as a subdirectory.
 
