@@ -16,3 +16,10 @@ set(UPLOAD_METHOD_DEFAULT NONE)
 set(PYOCD_UPLOAD_ENABLED TRUE)
 set(PYOCD_TARGET_NAME ama3b1kk_kbr)
 set(PYOCD_CLOCK_SPEED 4000k)
+
+# Config options for JLINK
+# -------------------------------------------------------------
+set(JLINK_UPLOAD_ENABLED TRUE)
+set(JLINK_CPU_NAME AMA3B1KK-KBR)
+set(JLINK_CLOCK_SPEED 4000)
+set(JLINK_UPLOAD_INTERFACE SWD)
