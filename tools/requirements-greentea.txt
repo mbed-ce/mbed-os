@@ -1,3 +1,5 @@
+## Additional requirements to install into the Mbed environment when running Greentea tests
+
 # For USB Device host tests
 hidapi>=0.7.99
 pyusb>=1.2.0

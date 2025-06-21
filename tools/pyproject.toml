@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mbed-ce-tools"
+version = "0.0.1"
+description = 'Tools for building and testing Mbed OS Community Edition'
+requires-python = ">=3.8"
+license = "Apache-2.0"
+dependencies = [
+    # memap dependencies ---------------------------------------------------------------------
+    "intelhex>=2.3.0,<3.0.0",
+
+    # 3.12.0 both added HRuleStyle and deprecated the old constants in one single release :/
+    "prettytable>=2.0,<3.12.0; python_version < '3.9'",
+    "prettytable>=3.12.0; python_version >= '3.9'",
+
+    # mbed_tools dependencies ----------------------------------------------------------------
+    "jinja2>=2.11.3",
+    "python-dotenv",
+    "Click>=7.1",
+    "GitPython",
+    "tqdm",
+    "tabulate",
+    "requests>=2.20",
+    "typing-extensions",
+    "pyserial",
+    "appdirs",
+    "pyjson5>=1.6",
+    "humanize>=4.9.0",
+
+    # Needed for downloading CMSIS MCU descriptions
+    "cmsis-pack-manager>=0.5.0",
+
+    # USB device detection on Mac
+    "pywin32; platform_system=='Windows'",
+
+    # USB device detection on Linux
+    "psutil; platform_system=='Linux'",
+    "pyudev; platform_system=='Linux'",
+
+    # USB device detection on Mac
+    "beautifulsoup4; sys_platform == 'darwin'",
+    "lxml; sys_platform == 'darwin'",
+
+    # mbed_os_tools.test dependencies ---------------------------------------------------------
+    "junit-xml>=1.0",
+    "lockfile",
+    "colorama",
+
+    # needed for signing secure images --------------------------------------------------------
+    "cryptography",
+    "cbor",
+    "cysecuretools~=6.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["python"]
+
+[project.scripts]
+memap = "memap.memap:main"
