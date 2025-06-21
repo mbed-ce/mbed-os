@@ -169,19 +169,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3-venv
 
-      -
-        name: install dependencies
+      - name: Install Python packages
         run: |
           python3 -m venv venv
           source venv/bin/activate
-          pip install -r tools/requirements.txt
-          pip install -r tools/python/python_tests/requirements.txt
+          pip install -e ./tools[unit-tests]
 
-      -
-        name: Python Tests
+      - name: Python Tests
         run: |
           source venv/bin/activate
-          cd tools/python
+          cd tools
           ./run_python_tests.sh
 
   check-cmsis-mcu-descriptions-matches-target-list:
@@ -195,18 +192,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y python3-venv
 
-      - name: install dependencies
+      - name: Install Python packages
         run: |
           python3 -m venv venv
           source venv/bin/activate
-          pip install -r tools/requirements.txt
+          pip install -e ./tools
 
       - name: Verify that cmsis_mcu_descriptions.json5 is in sync with targets.json5
         run: |
           source venv/bin/activate
           cd tools/python
-          python -m mbed_tools.cli.main cmsis-mcu-descr find-unused
-          python -m mbed_tools.cli.main cmsis-mcu-descr check-missing
+          mbed-tools cmsis-mcu-descr find-unused
+          mbed-tools cmsis-mcu-descr check-missing
 
 
   pin-validation:
