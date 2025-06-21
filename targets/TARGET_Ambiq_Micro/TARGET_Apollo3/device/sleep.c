@@ -24,5 +24,15 @@ void hal_sleep(void)
 
 void hal_deepsleep(void)
 {
+  // To pass Mbed unit tests, the us ticker is required to be off when in deep sleep.
+  // Ideally all of the high speed clocks should be off, but the datasheet is not very helpful
+  // about how to accomplish this. I *think* the HFRC oscillator can only be turned off by
+  // finding every peripheral using it and disabling the peripheral or changing it to a different
+  // clock source. Implementing this, though, might be a bit tough. For now we at least turn off
+  // the STIMER clock and freeze the value.
+  am_hal_stimer_config(AM_HAL_STIMER_CFG_FREEZE);
+
   am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
+
+  am_hal_stimer_config(US_TICKER_FREQ);
 }

@@ -19,6 +19,7 @@
 #include "greentea-client/test_env.h"
 #include "unity.h"
 #include "utest.h"
+#include <cinttypes>
 #include "ticker_api_tests.h"
 #include "hal/us_ticker_api.h"
 #include "hal/lp_ticker_api.h"
@@ -266,6 +267,37 @@ void ticker_interrupt_test(void)
     TEST_ASSERT_MESSAGE(run_count >= 3, "At least 3 sub test cases must be executed");
 }
 
+/* Test that we can disable the ticker interrupt and it will not fire. */
+void ticker_disable_test()
+{
+    intFlag = 0;
+
+    const uint32_t ticksFor100us = lroundf(intf->get_info()->frequency * .0001f);
+
+    // Set an interrupt for 100us in the future, then disable it immediately
+    intf->set_interrupt(intf->read() + ticksFor100us);
+    intf->disable_interrupt();
+
+    // Verify that it does not fire
+    wait_us(200);
+    TEST_ASSERT_EQUAL_INT(0, intFlag);
+
+    // Now reset the interrupt again.
+    intf->set_interrupt(intf->read() + ticksFor100us);
+
+    // Should not have fired yet
+    TEST_ASSERT_EQUAL_INT_MESSAGE(0, intFlag, "Ticker fired during set_interrupt() while disabled! Check that set_interrupt() function clears pending timer compare.");
+
+    // Still not yet
+    wait_us(20);
+    TEST_ASSERT_EQUAL_INT(0, intFlag);
+
+    // NOW it should have fired
+    wait_us(170);
+    TEST_ASSERT_EQUAL_INT(1, intFlag);
+}
+
+
 /* Test that ticker interrupt is not triggered when ticker_set_interrupt */
 void ticker_past_test(void)
 {
@@ -339,6 +371,9 @@ void ticker_overflow_test(void)
      */
     const uint32_t max_count = (1 << p_ticker_info->bits) - 1;
     const uint32_t required_time_sec = (max_count / p_ticker_info->frequency);
+    printf("This test is estimated to take about %" PRIu32 " seconds.\n", required_time_sec);
+
+    intFlag = 0;
 
     if (required_time_sec > 30 && !FORCE_OVERFLOW_TEST) {
         TEST_ASSERT_TRUE(true);
@@ -346,7 +381,11 @@ void ticker_overflow_test(void)
         return;
     }
 
-    intFlag = 0;
+    // Set an interrupt for slightly after the counter rolls over. We will make sure later that this
+    // fires at the appropriate time.
+    const float isrTimeAfterOverflow = 0.001f; // sec
+    const uint32_t isrTicksAfterOverflow = lroundf(p_ticker_info->frequency * isrTimeAfterOverflow);
+    intf->set_interrupt(isrTicksAfterOverflow);
 
     /* Wait for max count. */
     while (intf->read() >= (max_count - ticker_overflow_delta2) &&
@@ -359,17 +398,22 @@ void ticker_overflow_test(void)
 
     const uint32_t after_overflow = intf->read();
 
+    // Interrupt should NOT have fired yet
+    TEST_ASSERT_EQUAL_INT(0, intFlag);
+
     /* Now we are just after overflow. Wait a while assuming that ticker still counts. */
-    while (intf->read() < TICKER_100_TICKS) {
+    while (intf->read() < isrTicksAfterOverflow + TICKER_DELTA) {
         /* Just wait. */
     }
 
     const uint32_t next_after_overflow = intf->read();
 
-    /* Check that after the overflow ticker continue count. */
+    // Interrupt should now have fired
+    TEST_ASSERT_EQUAL_INT(1, intFlag);
+
+    /* Check that after the overflow ticker continues to count. */
     TEST_ASSERT(after_overflow <= ticker_overflow_delta1);
-    TEST_ASSERT(next_after_overflow >= TICKER_100_TICKS);
-    TEST_ASSERT_EQUAL(0, intFlag);
+    TEST_ASSERT(next_after_overflow >= (isrTicksAfterOverflow + TICKER_DELTA));
 
     const uint32_t tick_count = intf->read();
 
@@ -381,7 +425,7 @@ void ticker_overflow_test(void)
         /* Just wait. */
     }
 
-    TEST_ASSERT_EQUAL(1, intFlag);
+    TEST_ASSERT_EQUAL(2, intFlag);
 }
 
 /* Test that the ticker increments by one on each tick. */
@@ -606,6 +650,7 @@ Case cases[] = {
     Case("Microsecond ticker init is safe to call repeatedly", us_ticker_setup, ticker_init_test, us_ticker_teardown),
     Case("Microsecond ticker info test", us_ticker_setup, ticker_info_test, us_ticker_teardown),
     Case("Microsecond ticker interrupt test", us_ticker_setup, ticker_interrupt_test, us_ticker_teardown),
+    Case("Microsecond ticker disable test", us_ticker_setup, ticker_disable_test, us_ticker_teardown),
     Case("Microsecond ticker past interrupt test", us_ticker_setup, ticker_past_test, us_ticker_teardown),
     Case("Microsecond ticker reschedule test", us_ticker_setup, ticker_repeat_reschedule_test, us_ticker_teardown),
     Case("Microsecond ticker fire interrupt", us_ticker_setup, ticker_fire_now_test, us_ticker_teardown),
@@ -616,6 +661,7 @@ Case cases[] = {
     Case("lp ticker init is safe to call repeatedly", lp_ticker_setup, ticker_init_test, lp_ticker_teardown),
     Case("lp ticker info test", lp_ticker_setup, ticker_info_test, lp_ticker_teardown),
     Case("lp ticker interrupt test", lp_ticker_setup, ticker_interrupt_test, lp_ticker_teardown),
+    Case("lp ticker disable test", lp_ticker_setup, ticker_disable_test, lp_ticker_teardown),
     Case("lp ticker past interrupt test", lp_ticker_setup, ticker_past_test, lp_ticker_teardown),
     Case("lp ticker reschedule test", lp_ticker_setup, ticker_repeat_reschedule_test, lp_ticker_teardown),
     Case("lp ticker fire interrupt", lp_ticker_setup, ticker_fire_now_test, lp_ticker_teardown),

@@ -23,7 +23,6 @@
 
 #include "am_mcu_apollo.h"
 #include "lp_ticker_defines.h"
-volatile bool someFlagThatGetSetinISR = false;
 
 void am_ctimer_isr(void)
 {

@@ -25,6 +25,7 @@ command line tool instead.
 import importlib
 import sys
 from argparse import ArgumentParser, SUPPRESS
+from typing import Any
 from . import host_tests_plugins
 from .host_tests_registry import HostRegistry  # noqa: F401
 from .host_tests import BaseHostTest, event_callback  # noqa: F401
@@ -46,7 +47,7 @@ def get_plugin_caps(methods=None):
     return result
 
 
-def init_host_test_cli_params():
+def init_host_test_cli_params() -> Any:
     """! Function creates CLI parser object and returns populated options object.
     @return Function returns 'options' object returned from OptionParser class
     @details Options object later can be used to populate host test selector script.
@@ -100,6 +101,15 @@ def init_host_test_cli_params():
         type=int,
         help="Define delay in seconds between __sync packet (Default is 5 seconds)",
         metavar="SYNC_TIMEOUT",
+    )
+
+    parser.add_argument(
+        "--sync-predelay",
+        dest="sync_predelay",
+        default=0,
+        type=float,
+        help="Wait this amount of time (in floating point seconds) after opening the serial port before sending sync.",
+        metavar="SYNC_PREDELAY",
     )
 
     parser.add_argument(

@@ -13,19 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
+from typing import Any
 import re
 import sys
 import uuid
-from time import time
+from time import time, sleep
 from ..host_tests_logger import HtrunLogger
 from .conn_primitive_serial import SerialConnectorPrimitive
 from .conn_primitive_remote import RemoteConnectorPrimitive
 from .conn_primitive_fastmodel import FastmodelConnectorPrimitive
+from queue import Empty as QueueEmpty # Queue here refers to the module, not a class
 
-if (sys.version_info > (3, 0)):
-    from queue import Empty as QueueEmpty # Queue here refers to the module, not a class
-else:
-    from Queue import Empty as QueueEmpty
 
 class KiViBufferWalker():
     """! Simple auxiliary class used to walk through a buffer and search for KV tokens """
@@ -35,14 +35,16 @@ class KiViBufferWalker():
         self.kvl = []
         self.re_kv = re.compile(self.KIVI_REGEX)
 
-    def append(self, payload):
+    def append(self, payload: bytes):
         """! Append stream buffer with payload and process. Returns non-KV strings"""
         logger = HtrunLogger('CONN')
         try:
             self.buff += payload.decode('utf-8')
         except UnicodeDecodeError:
-            logger.prn_wrn("UnicodeDecodeError encountered!")
-            self.buff += payload.decode('utf-8','ignore')
+            decoded_payload = payload.decode('utf-8','ignore')
+            logger.prn_wrn(f"UnicodeDecodeError encountered! Raw bytes were {payload!r} and they decoded to \"{decoded_payload}\"")
+            self.buff += decoded_payload
+
         lines = self.buff.split('\n')
         self.buff = lines[-1]   # remaining
         lines.pop(-1)
@@ -64,9 +66,12 @@ class KiViBufferWalker():
                 if len(after) > 0:
                     # not a K,V pair part
                     discarded.append(after)
+                logger.prn_inf("found KV pair in stream: {{%s;%s}}, queued..."% (key, value))
             else:
                 # not a K,V pair
                 discarded.append(line)
+                logger.prn_rxd(line)
+
         return discarded
 
     def search(self):
@@ -121,7 +126,7 @@ def conn_primitive_factory(conn_resource, config, event_queue, logger):
     return connector
 
 
-def conn_process(event_queue, dut_event_queue, config):
+def conn_process(event_queue, dut_event_queue, config: dict[str, Any]):
 
     def __notify_conn_lost():
         error_msg = connector.error()
@@ -143,11 +148,19 @@ def conn_process(event_queue, dut_event_queue, config):
     # Configuration of conn_opriocess behaviour
     sync_behavior = int(config.get('sync_behavior', 1))
     sync_timeout = config.get('sync_timeout', 1.0)
+    sync_predelay: float = config["sync_predelay"]
     conn_resource = config.get('conn_resource', 'serial')
-    last_sync = False
+    syncs_sent = 0
 
     # Create connector instance with proper configuration
     connector = conn_primitive_factory(conn_resource, config, event_queue, logger)
+
+    # If requested, wait after opening serial port (done in conn_primitive_factory()) but before sending
+    # sync word. This is needed for certain targets (e.g. Ambiq Apollo3) which get reset when the port is opened
+    # and then need time to boot up.
+    if sync_predelay > 0:
+        logger.prn_inf(f"Pre-sync delay for {sync_predelay:.02f} sec...")
+        sleep(sync_predelay)
 
     # If the connector failed, stop the process now
     if not connector.connected():
@@ -164,7 +177,7 @@ def conn_process(event_queue, dut_event_queue, config):
     # We will ignore all kv pairs before we get sync back
     sync_uuid_discovered = False
 
-    def __send_sync(timeout=None):
+    def __send_sync(timeout=None) -> str | None:
         sync_uuid = str(uuid.uuid4())
         # Handshake, we will send {{sync;UUID}} preamble and wait for mirrored reply
         if timeout:
@@ -203,7 +216,7 @@ def conn_process(event_queue, dut_event_queue, config):
 
         if sync_uuid:
             sync_uuid_list.append(sync_uuid)
-            sync_behavior -= 1
+            syncs_sent += 1
         else:
             __notify_conn_lost()
             return 0
@@ -217,7 +230,7 @@ def conn_process(event_queue, dut_event_queue, config):
         sync_uuid = __send_sync()
         if sync_uuid:
             sync_uuid_list.append(sync_uuid)
-            sync_behavior -= 1
+            syncs_sent += 1
         else:
             __notify_conn_lost()
             return 0
@@ -256,14 +269,12 @@ def conn_process(event_queue, dut_event_queue, config):
             # Stream data stream KV parsing
             print_lines = kv_buffer.append(data)
             for line in print_lines:
-                logger.prn_rxd(line)
                 event_queue.put(('__rxd_line', line, time()))
             while kv_buffer.search():
                 key, value, timestamp = kv_buffer.pop_kv()
 
                 if sync_uuid_discovered:
                     event_queue.put((key, value, timestamp))
-                    logger.prn_inf("found KV pair in stream: {{%s;%s}}, queued..."% (key, value))
                 else:
                     if key == '__sync':
                         if value in sync_uuid_list:
@@ -277,34 +288,31 @@ def conn_process(event_queue, dut_event_queue, config):
                             connector.reset()
                             loop_timer = time()
                     else:
-                        logger.prn_wrn("found KV pair in stream: {{%s;%s}}, ignoring..."% (key, value))
+                        logger.prn_wrn("found KV pair in stream before sync: {{%s;%s}}, ignoring..."% (key, value))
 
         if not sync_uuid_discovered:
             # Resending __sync after 'sync_timeout' secs (default 1 sec)
-            # to target platform. If 'sync_behavior' counter is != 0 we
+            # to target platform. If 'syncs_remaining' is less than 'sync_behavior' we
             # will continue to send __sync packets to target platform.
-            # If we specify 'sync_behavior' < 0 we will send 'forever'
-            # (or until we get reply)
+            # Or if 'sync_behavior' < 0 we will send 'forever' (or until we get reply)
 
-            if sync_behavior != 0:
-                time_to_sync_again = time() - loop_timer
-                if time_to_sync_again > sync_timeout:
+            time_to_sync_again = time() - loop_timer
+            if time_to_sync_again > sync_timeout:
+                if sync_behavior < 0 or (sync_behavior > 0 and syncs_sent < sync_behavior):
+                    # No response to sync but sync can be retried
                     sync_uuid = __send_sync(timeout=time_to_sync_again)
 
                     if sync_uuid:
                         sync_uuid_list.append(sync_uuid)
-                        sync_behavior -= 1
+                        syncs_sent += 1
                         loop_timer = time()
-                        #Sync behavior will be zero and if last sync fails we should report connection
-                        #lost
-                        if sync_behavior == 0:
-                            last_sync = True
                     else:
                         __notify_conn_lost()
                         break
-            elif last_sync == True:
-                #SYNC lost connection event : Device not responding, send sync failed
-                __notify_sync_failed()
-                break
+
+                else:
+                    # No response, connection failed
+                    __notify_sync_failed()
+                    break
 
     return 0

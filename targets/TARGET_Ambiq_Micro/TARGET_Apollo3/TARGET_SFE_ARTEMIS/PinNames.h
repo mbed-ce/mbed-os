@@ -74,29 +74,6 @@ typedef enum
     A8 = D8,
     A9 = D9,
     A10 = D10,
-    
-    // LEDs
-    LED_BLUE = AM_BSP_GPIO_LED_BLUE,
-
-    // mbed original LED naming
-    LED1 = AM_BSP_GPIO_LED0,
-    LED2 = A5,
-
-    // LED naming by digital pin number
-    LED13 = AM_BSP_GPIO_LED13,
-
-    // I2C
-    I2C_SCL = AM_BSP_QWIIC_I2C_SCL_PIN,
-    I2C_SDA = AM_BSP_QWIIC_I2C_SDA_PIN,
-
-    // Qwiic
-    QWIIC_SCL = I2C_SCL,
-    QWIIC_SDA = I2C_SDA,
-
-    // SPI
-    SPI_CLK = AM_BSP_PRIM_SPI_CLK_PIN,
-    SPI_SDO = AM_BSP_PRIM_SPI_SDO_PIN,
-    SPI_SDI = AM_BSP_PRIM_SPI_SDI_PIN,
 
     // UART
     SERIAL_TX = AM_BSP_PRIM_UART_TX_PIN,
@@ -110,6 +87,20 @@ typedef enum
     // Not connected
     NC = NC_VAL
 } PinName;
+
+// LEDs
+#define LED1 D13 // Blue LED
+
+// I2C bus
+#define I2C_SCL D15
+#define I2C_SDA D14
+#define QWIIC_SCL I2C_SCL
+#define QWIIC_SDA I2C_SDA
+
+// SPI bus
+#define SPI_CLK D13
+#define SPI_SDO D11
+#define SPI_SDI D12
 
 #if defined(MBED_CONF_TARGET_STDIO_UART_TX)
 #define STDIO_UART_TX MBED_CONF_TARGET_STDIO_UART_TX

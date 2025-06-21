@@ -21,6 +21,8 @@
  * SOFTWARE.
  */
 
+#include "mbed-target-config.h"
+
 #if DEVICE_SERIAL
 
 #include "serial_api.h"
@@ -121,9 +123,9 @@ void uart_configure_pin_function(PinName pin, UARTName uart, const PinMap *map);
 void serial_init(serial_t *obj, PinName tx, PinName rx)
 {
     // determine the UART to use
-    UARTName uart_tx = (UARTName)pinmap_peripheral(tx, serial_tx_pinmap());
-    UARTName uart_rx = (UARTName)pinmap_peripheral(rx, serial_rx_pinmap());
-    UARTName uart = (UARTName)pinmap_merge(uart_tx, uart_rx);
+    uint32_t uart_tx = pinmap_peripheral(tx, serial_tx_pinmap());
+    uint32_t uart_rx = pinmap_peripheral(rx, serial_rx_pinmap());
+    uint32_t uart = pinmap_merge(uart_tx, uart_rx);
     MBED_ASSERT((int)uart != NC);
     obj->serial.uart_control = &ap3_uart_control[uart];
     obj->serial.uart_control->inst = uart;

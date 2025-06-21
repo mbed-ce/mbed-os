@@ -263,6 +263,9 @@ void Reset_Handler(void)
           "isb\n");
 #endif
 
+    // Clear PRIMASK if set by the bootloader (it seems to leave this set)
+    __set_PRIMASK(0);
+
     // // Start mbed boot sequence https://os.mbed.com/docs/mbed-os/v5.15/reference/bootstrap.html
     // SystemInit();
     // _start();

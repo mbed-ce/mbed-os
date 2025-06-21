@@ -119,6 +119,11 @@ function(mbed_greentea_add_test)
         list(APPEND MBED_HTRUN_ARGUMENTS --skip-reset)
     endif()
 
+    # Forward sync predelay argument to htrun
+    if("${MBED_CONFIG_DEFINITIONS}" MATCHES "MBED_CONF_GREENTEA_CLIENT_SYNC_PREDELAY=([^;]+)")
+        list(APPEND MBED_HTRUN_ARGUMENTS --sync-predelay ${CMAKE_MATCH_1})
+    endif()
+
     if(DEFINED MBED_GREENTEA_EXTRA_HTRUN_ARGUMENTS)
         list(APPEND MBED_HTRUN_ARGUMENTS ${MBED_GREENTEA_EXTRA_HTRUN_ARGUMENTS})
     endif()

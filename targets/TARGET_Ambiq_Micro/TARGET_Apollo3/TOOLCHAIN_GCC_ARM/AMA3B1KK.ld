@@ -22,23 +22,19 @@
  */
 /* stack: dynamic */
 /* heap: dynamic */
-#define MBED_APP_START 0x0000C000
-#define MBED_APP_LENGTH 0x000F4000
-#define MBED_RAM_START 0x10000000
-#define MBED_RAM_SIZE   384K
-#define MBED_BOOT_STACK_SIZE 0x400
-#define MBED_RAM0_START MBED_RAM_START
-#define MBED_RAM0_SIZE  0x100
-#define MBED_RAM1_START (MBED_RAM0_START + MBED_RAM0_SIZE)
-#define MBED_RAM1_SIZE  (MBED_RAM_SIZE - (MBED_RAM0_SIZE))
+
+#if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
+    #define MBED_CONF_TARGET_BOOT_STACK_SIZE 0x400
+#endif
+
+#include "../device/cmsis_nvic.h"
 
 ENTRY(Reset_Handler)
 
 MEMORY
 {
-  FLASH (rx) : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_LENGTH /*Modified from 0xC000 to work with SparkFun SVL*/
-  RAM_NVIC (rwx) : ORIGIN = MBED_RAM0_START, LENGTH = MBED_RAM0_SIZE
-  RAM (rwx)      : ORIGIN = MBED_RAM1_START, LENGTH = MBED_RAM1_SIZE
+  FLASH (rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START, LENGTH = MBED_CONFIGURED_ROM_BANK_IROM1_SIZE
+  RAM (rwx)  : ORIGIN = MBED_RAM_BANK_IRAM1_START, LENGTH = MBED_RAM_BANK_IRAM1_SIZE
 }
 
 SECTIONS
@@ -99,50 +95,57 @@ SECTIONS
 
   __etext = ALIGN(8);
 
-    .data : AT (__etext)
-    {
-        __data_start__ = .;
-        *(.data*)
+  /* Reserve space for vector table in RAM at runtime */
+  .ram_vectors (NOLOAD):
+  {
+    FILL(0);
+    . += NVIC_NUM_VECTORS*4;
+  } > RAM
 
-        . = ALIGN(8);
-        /* preinit data */
-        PROVIDE_HIDDEN (__preinit_array_start = .);
-        KEEP(*(.preinit_array))
-        PROVIDE_HIDDEN (__preinit_array_end = .);
+  .data : AT (__etext)
+  {
+      __data_start__ = .;
+      *(.data*)
 
-        . = ALIGN(8);
-        /* init data */
-        PROVIDE_HIDDEN (__init_array_start = .);
-        KEEP(*(SORT(.init_array.*)))
-        KEEP(*(.init_array))
-        PROVIDE_HIDDEN (__init_array_end = .);
+      . = ALIGN(8);
+      /* preinit data */
+      PROVIDE_HIDDEN (__preinit_array_start = .);
+      KEEP(*(.preinit_array))
+      PROVIDE_HIDDEN (__preinit_array_end = .);
 
-        . = ALIGN(8);
-        /* finit data */
-        PROVIDE_HIDDEN (__fini_array_start = .);
-        KEEP(*(SORT(.fini_array.*)))
-        KEEP(*(.fini_array))
-        PROVIDE_HIDDEN (__fini_array_end = .);
+      . = ALIGN(8);
+      /* init data */
+      PROVIDE_HIDDEN (__init_array_start = .);
+      KEEP(*(SORT(.init_array.*)))
+      KEEP(*(.init_array))
+      PROVIDE_HIDDEN (__init_array_end = .);
 
-        KEEP(*(.jcr*))
-        . = ALIGN(8);
-        /* All data end */
-        __data_end__ = .;
+      . = ALIGN(8);
+      /* finit data */
+      PROVIDE_HIDDEN (__fini_array_start = .);
+      KEEP(*(SORT(.fini_array.*)))
+      KEEP(*(.fini_array))
+      PROVIDE_HIDDEN (__fini_array_end = .);
 
-    } > RAM
+      KEEP(*(.jcr*))
+      . = ALIGN(8);
+      /* All data end */
+      __data_end__ = .;
 
-        /* Uninitialized data section
-     * This region is not initialized by the C/C++ library and can be used to
-     * store state across soft reboots. */
-    .uninitialized (NOLOAD):
-    {
-        . = ALIGN(32);
-        __uninitialized_start = .;
-        *(.uninitialized)
-        KEEP(*(.keep.uninitialized))
-        . = ALIGN(32);
-        __uninitialized_end = .;
-    } > RAM
+  } > RAM
+
+  /* Uninitialized data section
+   * This region is not initialized by the C/C++ library and can be used to
+   * store state across soft reboots. */
+  .uninitialized (NOLOAD):
+  {
+      . = ALIGN(32);
+      __uninitialized_start = .;
+      *(.uninitialized)
+      KEEP(*(.keep.uninitialized))
+      . = ALIGN(32);
+      __uninitialized_end = .;
+  } > RAM
 
 
   /* bss: zero-initialized symbols */
@@ -160,6 +163,8 @@ SECTIONS
     __bss_end__ = .;
   } > RAM
 
+  ASSERT(__bss_end__ <= ORIGIN(RAM) + LENGTH(RAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE, "Size of globals + stack exceeds size of SRAM!")
+
   /* heap: RAM memory that can be dynamically allocated in the upward direction (increasing memory addresses) */
   /* _sheap is used to identify the beginning of available dynamic memory */
   .heap (NOLOAD):
@@ -168,7 +173,7 @@ SECTIONS
     __end__ = .;
     PROVIDE( end = . );
     _sheap = .;
-    . = ORIGIN(RAM) + LENGTH(RAM) - MBED_BOOT_STACK_SIZE-8;
+    . = ORIGIN(RAM) + LENGTH(RAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
     __HeapLimit = .;
   } >RAM
 
@@ -185,7 +190,7 @@ SECTIONS
   /* Set stack top to end of RAM, and stack limit move down by
     * size of stack_dummy section*/
   __StackTop = ORIGIN(RAM) + LENGTH(RAM)-8;
-  __StackLimit = __StackTop - MBED_BOOT_STACK_SIZE;
+  __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
   PROVIDE(__stack = __StackTop);
   PROVIDE(_sstack = __StackTop);
 }

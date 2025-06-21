@@ -159,6 +159,7 @@ void us_ticker_set_interrupt(timestamp_t timestamp)
             break;
     }
 
+    us_ticker_clear_interrupt();
     am_hal_stimer_int_enable(US_TICKER_STIMER_INT_COMPARE);
     timestamp_t now = (timestamp_t)am_hal_stimer_counter_get();
     am_hal_stimer_compare_delta_set(instance, (timestamp - now));

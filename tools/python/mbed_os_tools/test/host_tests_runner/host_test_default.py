@@ -176,7 +176,8 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             "image_path" : self.mbed.image_path,
             "skip_reset": self.options.skip_reset,
             "tags" : self.options.tag_filters,
-            "sync_timeout": self.options.sync_timeout
+            "sync_timeout": self.options.sync_timeout,
+            "sync_predelay": self.options.sync_predelay,
         }
 
         if self.options.global_resource_mgr:
@@ -332,8 +333,9 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                         self.logger.prn_inf("sync KV found, uuid=%s, timestamp=%f"% (str(value), timestamp))
                     elif key == '__notify_sync_failed':
                         # This event is sent by conn_process, SYNC failed
-                        self.logger.prn_err(value)
-                        self.logger.prn_wrn("stopped to consume events due to %s event"% key)
+                        self.logger.prn_err("stopped consuming events due to %s event"% key)
+                        if value is not None:
+                            self.logger.prn_err(value)
                         callbacks_consume = False
                         result = self.RESULT_SYNC_FAILED
                         event_queue.put(('__exit_event_queue', 0, time()))
