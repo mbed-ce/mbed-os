@@ -642,7 +642,7 @@ utest::v1::status_t lp_ticker_teardown(const Case *const source, const size_t pa
 
 utest::v1::status_t test_setup(const size_t number_of_cases)
 {
-    GREENTEA_SETUP(120, "default_auto");
+    GREENTEA_SETUP(80, "default_auto");
     return verbose_test_setup_handler(number_of_cases);
 }
 

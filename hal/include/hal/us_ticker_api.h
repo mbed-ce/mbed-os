@@ -278,7 +278,12 @@ void us_ticker_set_interrupt(timestamp_t timestamp);
  */
 void us_ticker_disable_interrupt(void);
 
-/** Clear us ticker interrupt
+/**
+ * @brief Clear the us ticker interrupt.
+ *
+ * This is required to be called from the interrupt handler to stop the interrupt handler
+ * from being executed again after it returns. This does not do anything if called before the interrupt
+ * fires (e.g. it doesn't cancel the interrupt if it's set in the future).
  *
  * Pseudo Code:
  * @code
