@@ -14,7 +14,7 @@ jobs:
         # Note: pip>=20.3 is needed to install dependencies of cysecuretools
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install -r tools/requirements.txt
+          python3 -m pip install -e ./tools
 
       # Note: For this CI job we use MBED_CREATE_PYTHON_VENV=FALSE so that we can make sure
       # this mode works.

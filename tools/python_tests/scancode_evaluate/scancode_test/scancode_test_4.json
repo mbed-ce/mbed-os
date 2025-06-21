@@ -24,7 +24,7 @@
   ],
   "files":[
      {
-        "path":"tools/python/python_tests/scancode_evaluate/scancode_test/test3.h",
+        "path":"tools/python_tests/scancode_evaluate/scancode_test/test3.h",
         "type":"file",
         "licenses":[
            {
