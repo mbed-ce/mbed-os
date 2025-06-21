@@ -14,9 +14,8 @@ set(MBEDHTRUN_ARGS --skip-flashing @MBED_HTRUN_ARGUMENTS@) # filled in by config
 
 # Print out command
 string(REPLACE ";" " " MBEDHTRUN_ARGS_FOR_DISPLAY "${MBEDHTRUN_ARGS}")
-message("Executing: @Python3_EXECUTABLE@ -m mbed_host_tests.mbedhtrun ${MBEDHTRUN_ARGS_FOR_DISPLAY}")
+message("Executing: mbedhtrun ${MBEDHTRUN_ARGS_FOR_DISPLAY}")
 
 execute_process(
-	COMMAND @Python3_EXECUTABLE@ -m mbed_host_tests.mbedhtrun ${MBEDHTRUN_ARGS}
-	WORKING_DIRECTORY "@mbed-os_SOURCE_DIR@/tools/python"
+	COMMAND mbedhtrun ${MBEDHTRUN_ARGS}
 	COMMAND_ERROR_IS_FATAL ANY)

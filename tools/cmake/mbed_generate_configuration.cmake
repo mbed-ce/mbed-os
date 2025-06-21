@@ -82,8 +82,7 @@ if(MBED_NEED_TO_RECONFIGURE)
     # Make sure an old config file doesn't stick around
     file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake)
 
-    set(MBEDTOOLS_CONFIGURE_COMMAND ${Python3_EXECUTABLE}
-        -m mbed_tools.cli.main
+    set(MBEDTOOLS_CONFIGURE_COMMAND mbed-tools
         -v -v # without at least -v, warnings (e.g. "you have tried to override a nonexistent parameter") do not get printed
         configure
         -t GCC_ARM # GCC_ARM is currently the only supported toolchain
@@ -96,7 +95,6 @@ if(MBED_NEED_TO_RECONFIGURE)
 
     execute_process(
         COMMAND ${MBEDTOOLS_CONFIGURE_COMMAND}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../python
         RESULT_VARIABLE MBEDTOOLS_CONFIGURE_RESULT
         OUTPUT_VARIABLE MBEDTOOLS_CONFIGURE_OUTPUT
         ERROR_VARIABLE MBEDTOOLS_CONFIGURE_ERROR_OUTPUT
@@ -106,7 +104,7 @@ if(MBED_NEED_TO_RECONFIGURE)
 
     if((NOT MBEDTOOLS_CONFIGURE_RESULT EQUAL 0) OR (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake))
         string(JOIN " " MBEDTOOLS_COMMAND_SPC_SEP ${MBEDTOOLS_CONFIGURE_COMMAND})
-        message(FATAL_ERROR "mbedtools configure failed!  Cannot build this project.  Command was cd ${CMAKE_CURRENT_LIST_DIR}/../python && ${MBEDTOOLS_COMMAND_SPC_SEP}")
+        message(FATAL_ERROR "mbedtools configure failed!  Cannot build this project. Command was ${MBEDTOOLS_COMMAND_SPC_SEP} [note that you need to activate the Mbed OS virtualenv to run this command]")
     endif()
 
 endif()

@@ -84,7 +84,7 @@ if(MBED_CREATE_PYTHON_VENV)
             COMMAND_ERROR_IS_FATAL ANY
         )
         execute_process(
-            COMMAND ${Python3_EXECUTABLE} -m pip install ${MBED_CE_TOOLS_BASE_DIR}
+            COMMAND ${Python3_EXECUTABLE} -m pip install -e ${MBED_CE_TOOLS_BASE_DIR}
             COMMAND_ERROR_IS_FATAL ANY
         )
 
@@ -106,6 +106,6 @@ else()
     check_python_package(mbed_tools.cli.cmsis_mcu_descr HAVE_MBED_CE_TOOLS)
 
     if(NOT HAVE_MBED_CE_TOOLS)
-        message(FATAL_ERROR "Did not detect the Mbed CE Python tools installed into the python interpreter ${Python3_EXECUTABLE}. Install them with a command like: ${Python3_EXECUTABLE} -m pip install ${MBED_CE_TOOLS_BASE_DIR}")
+        message(FATAL_ERROR "Did not detect the Mbed CE Python tools installed into the python interpreter ${Python3_EXECUTABLE}. Install them with a command like: ${Python3_EXECUTABLE} -m pip install -e ${MBED_CE_TOOLS_BASE_DIR}")
     endif()
 endif()

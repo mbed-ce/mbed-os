@@ -55,8 +55,32 @@ dependencies = [
     "cysecuretools~=6.0",
 ]
 
+[project.optional-dependencies]
+unit-tests = [
+    "pytest",
+    "factory_boy",
+    "requests-mock",
+    "mock",
+    "coverage",
+
+    # Even though beautifulsoup4 and lxml are only used by the mac version
+    # of mbed ls tools, they're needed on all platforms for its unit test.
+    "beautifulsoup4",
+    "lxml"
+]
+
 [tool.hatch.build.targets.wheel]
-packages = ["python"]
+packages = [
+    "python/mbed_host_tests",
+    "python/mbed_lstools",
+    "python/mbed_os_tools",
+    "python/mbed_tools",
+    "python/memap",
+    "python/scancode_evaluate",
+]
 
 [project.scripts]
+mbedhtrun = "mbed_host_tests.mbedhtrun:main"
+mbedls = "mbed_lstools.main:mbedls_main"
+mbed-tools = "mbed_tools.cli.main:cli"
 memap = "memap.memap:main"

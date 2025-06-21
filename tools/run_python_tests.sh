@@ -7,7 +7,10 @@
 
 # Script which executes Python tests for each Python package and generates coverage information.
 # This is executed by the GitHub Actions CI build but also can be run locally.
-# Make sure to install python_tests/requirements.txt before running the tests!
+
+# Make sure to install the unit tests requirements before running this command, via a command like:
+# $ cd mbed-os # and also activate venv if desired
+# $ pip install ./tools[unit-tests]
 
 set -e
 
