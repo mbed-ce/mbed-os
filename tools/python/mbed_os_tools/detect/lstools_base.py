@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import re
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from io import open
 from json import load
 from os import listdir
@@ -28,7 +28,6 @@ from .platform_database import (
     LOCAL_PLATFORM_DATABASE,
     LOCAL_MOCKS_DATABASE,
 )
-from future.utils import with_metaclass
 
 mbedls_root_logger = logging.getLogger("mbedls")
 mbedls_root_logger.setLevel(logging.WARNING)
@@ -57,7 +56,7 @@ class FSInteraction(object):
     Never = 3
 
 
-class MbedLsToolsBase(with_metaclass(ABCMeta, object)):
+class MbedLsToolsBase(ABC):
     """ Base class for mbed-lstools, defines mbed-ls tools interface for
     mbed-enabled devices detection for various hosts
     """
