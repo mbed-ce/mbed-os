@@ -65,12 +65,12 @@ function(mbed_generate_map_file target)
         TARGET
             ${target}
         POST_BUILD
-        COMMAND ${Python3_EXECUTABLE} -m memap.memap
-            -t ${MBED_TOOLCHAIN} ${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map 
+        COMMAND ${memap}
+            -t ${MBED_TOOLCHAIN} ${target}${CMAKE_EXECUTABLE_SUFFIX}.map
             --depth ${MBED_MEMAP_DEPTH}
             ${MEMORY_BANKS_ARG}
         WORKING_DIRECTORY
-			${mbed-os_SOURCE_DIR}/tools/python
+            ${CMAKE_CURRENT_BINARY_DIR}
     )
 
     # generate json file
@@ -79,14 +79,14 @@ function(mbed_generate_map_file target)
             TARGET
                 ${target}
             POST_BUILD
-            COMMAND ${Python3_EXECUTABLE} -m memap.memap
-            -t ${MBED_TOOLCHAIN} ${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map 
+            COMMAND ${memap}
+            -t ${MBED_TOOLCHAIN} ${target}${CMAKE_EXECUTABLE_SUFFIX}.map
             --depth ${MBED_MEMAP_DEPTH} 
             -e json
-            -o ${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.memmap.json
+            -o ${target}${CMAKE_EXECUTABLE_SUFFIX}.memmap.json
             ${MEMORY_BANKS_ARG}
             WORKING_DIRECTORY
-			    ${mbed-os_SOURCE_DIR}/tools/python
+                ${CMAKE_CURRENT_BINARY_DIR}
     )
     endif()
 
@@ -96,14 +96,14 @@ function(mbed_generate_map_file target)
             TARGET
                 ${target}
             POST_BUILD
-            COMMAND ${Python3_EXECUTABLE} -m memap.memap
-            -t ${MBED_TOOLCHAIN} ${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map 
+            COMMAND ${memap}
+            -t ${MBED_TOOLCHAIN} ${target}${CMAKE_EXECUTABLE_SUFFIX}.map
             --depth ${MBED_MEMAP_DEPTH} 
             -e html
-            -o ${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.memmap.html
+            -o ${target}${CMAKE_EXECUTABLE_SUFFIX}.memmap.html
             ${MEMORY_BANKS_ARG}
             WORKING_DIRECTORY
-			    ${mbed-os_SOURCE_DIR}/tools/python
+                ${CMAKE_CURRENT_BINARY_DIR}
     )
     endif()
 endfunction()
