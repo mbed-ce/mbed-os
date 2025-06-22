@@ -164,6 +164,8 @@ function(mbed_check_or_install_python_package FOUND_VAR PACKAGE_IMPORT_NAME PACK
                 # Redo the check to confirm it's installed
                 check_python_package(${PACKAGE_IMPORT_NAME} ${FOUND_VAR})
             endif()
+        else()
+            message(WARNING "Mbed: ${PACKAGE_IMPORT_NAME} cannot be installed because the Mbed virtualenv is not being used. Please install ${PACKAGE_INSTALL_CONSTRAINT} into Mbed's Python interpeter manually.")
         endif()
     endif()
 endfunction(mbed_check_or_install_python_package)
