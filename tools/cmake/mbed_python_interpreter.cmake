@@ -97,8 +97,10 @@ if(MBED_CREATE_PYTHON_VENV)
         file(TOUCH ${VENV_STAMP_FILE})
     endif()
 
-    # We always have the memap deps with the venv
-    set(HAVE_MEMAP_DEPS TRUE)
+    # When using the venv, scripts will always be installed to the directory where Python itself is installed
+    # (venv\Scripts on Windows, venv/bin on Linux/Mac)
+    get_filename_component(PYTHON3_INTERP_DIR ${Python3_EXECUTABLE} DIRECTORY)
+    set(PYTHON_SCRIPT_LOC_HINTS ${PYTHON3_INTERP_DIR})
 
 else()
 
@@ -113,25 +115,26 @@ else()
     if(NOT HAVE_MBED_CE_TOOLS)
         message(FATAL_ERROR "Did not detect the Mbed CE Python tools installed into the python interpreter ${Python3_EXECUTABLE}. Install them with a command like: ${Python3_EXECUTABLE} -m pip install -e ${MBED_CE_TOOLS_BASE_DIR}")
     endif()
-endif()
 
-get_filename_component(PYTHON3_INTERP_DIR ${Python3_EXECUTABLE} DIRECTORY)
+    # For now, don't supply any hints and assume that the script install dir is correctly on PATH
+    set(PYTHON_SCRIPT_LOC_HINTS)
+endif()
 
 # Find scripts provided by the Python package
 find_program(mbed_tools
     NAMES mbed-tools
-    HINTS ${PYTHON3_INTERP_DIR}
+    HINTS ${PYTHON_SCRIPT_LOC_HINTS}
     DOC "Path to mbed-tools Python script."
     REQUIRED)
 
 find_program(mbedhtrun
     NAMES mbedhtrun
-    HINTS ${PYTHON3_INTERP_DIR}
+    HINTS ${PYTHON_SCRIPT_LOC_HINTS}
     DOC "Path to mbedhtrun Python script."
     REQUIRED)
 
 find_program(memap
         NAMES memap
-        HINTS ${PYTHON3_INTERP_DIR}
+        HINTS ${PYTHON_SCRIPT_LOC_HINTS}
         DOC "Path to memap Python script."
         REQUIRED)

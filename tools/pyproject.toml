@@ -49,6 +49,9 @@ dependencies = [
     "lockfile",
     "colorama",
 
+    # mbed_os_tools.detect dependencies -------------------------------------------------------
+    "fasteners",
+
     # needed for signing secure images --------------------------------------------------------
     "cryptography",
     "cbor",

@@ -15,6 +15,9 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install -e ./tools
+          
+          # Remove mbed-tools package that comes with the docker image, it conflicts with the one we want to install
+          python3 -m pip uninstall mbed-tools
 
       # Note: For this CI job we use MBED_CREATE_PYTHON_VENV=FALSE so that we can make sure
       # this mode works.
