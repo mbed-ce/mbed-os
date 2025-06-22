@@ -54,8 +54,7 @@ dependencies = [
 
     # needed for signing secure images --------------------------------------------------------
     "cryptography",
-    "cbor",
-    "cysecuretools~=6.0",
+    "cbor"
 ]
 
 [project.optional-dependencies]
