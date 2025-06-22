@@ -98,6 +98,9 @@ static void _can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz
         return;
     }
 
+    /*  Store frequency to be restored in case of reset */
+    obj->hz = hz;
+
     // Select PLL1Q as source of FDCAN clock
     RCC_PeriphCLKInitTypeDef RCC_PeriphClkInit;
 #if (defined RCC_PERIPHCLK_FDCAN1)
@@ -105,7 +108,11 @@ static void _can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz
     RCC_PeriphClkInit.Fdcan1ClockSelection = RCC_FDCAN1CLKSOURCE_PLL1;
 #else
     RCC_PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_FDCAN;
+#if (defined RCC_FDCANCLKSOURCE_PLL1Q)
+    RCC_PeriphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL1Q;
+#else
     RCC_PeriphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PLL;
+#endif
 #endif
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
     while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID)) {
@@ -418,7 +425,10 @@ int can_write(can_t *obj, CAN_Message msg, int cc)
     }
 
     TxHeader.TxFrameType = FDCAN_DATA_FRAME;
-    TxHeader.DataLength = msg.len << 16;
+    TxHeader.DataLength = msg.len;
+#if defined(TARGET_STM32L5) || defined(TARGET_STM32G0) || defined(TARGET_STM32G4)
+    TxHeader.DataLength <<= 16;
+#endif
     TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
     TxHeader.BitRateSwitch = FDCAN_BRS_OFF;
     TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
@@ -454,8 +464,10 @@ int can_read(can_t *obj, CAN_Message *msg, int handle)
     }
     msg->id   = RxHeader.Identifier;
     msg->type = (RxHeader.RxFrameType == FDCAN_DATA_FRAME) ? CANData : CANRemote;
-    msg->len  = RxHeader.DataLength >> 16; // see FDCAN_data_length_code value
-
+    msg->len  = RxHeader.DataLength;
+#if defined(TARGET_STM32L5) || defined(TARGET_STM32G0) || defined(TARGET_STM32G4)
+    msg->len >>= 16;
+#endif
     return 1;
 }
 

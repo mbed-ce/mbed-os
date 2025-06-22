@@ -3105,12 +3105,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "ANALOGOUT",
             "SPI_32BIT_WORDS",
-            "TRNG"
+            "TRNG",
+            "FLASH",
+            "CAN",
+            "CRC"
         ],
         "device_has_remove": [
-            "FLASH",
             "LPTICKER",
-            "CAN",
 			"SERIAL_FC"
         ],
         "is_mcu_family_target": true

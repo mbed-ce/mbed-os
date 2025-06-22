@@ -18,6 +18,7 @@ target_sources(mbed-stm32h5
     spi_api.c
     pwmout_device.c
     cache.c
+    flash_api.c
 )
 
 target_include_directories(mbed-stm32h5
