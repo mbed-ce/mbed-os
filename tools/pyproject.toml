@@ -19,7 +19,7 @@ dependencies = [
     # mbed_tools dependencies ----------------------------------------------------------------
     "jinja2>=2.11.3",
     "python-dotenv",
-    "Click>=7.1",
+    "Click>=8.0", # Need at least this version for pathlib.Path support
     "GitPython",
     "tqdm",
     "tabulate",
