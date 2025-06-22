@@ -19,6 +19,9 @@ jobs:
           python3 -m pip uninstall -y mbed-tools
           
           python3 -m pip install -e ./tools
+          
+          # Also install cysecuretools which is not installed automatically
+          python3 -m pip install 'cysecuretools~=6.0'
 
       # Note: For this CI job we use MBED_CREATE_PYTHON_VENV=FALSE so that we can make sure
       # this mode works.
