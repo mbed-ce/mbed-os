@@ -58,6 +58,7 @@ if(MBED_CREATE_PYTHON_VENV)
     elseif(NOT ("${Python3_EXECUTABLE}" MATCHES "${MBED_VENV_LOCATION}"))
         # Alternately if we think we have the venv but FindPython didn't use it, that likely means it's
         # missing or corrupted and we need to recreate it
+        message(STATUS "Python venv deleted or unusable. Recreating using system Python...")
         set(NEED_TO_CREATE_VENV TRUE)
         set(NEED_TO_INSTALL_PACKAGES TRUE)
     elseif("${MBED_PYPROJECT_TOML_LOCATION}" IS_NEWER_THAN "${VENV_STAMP_FILE}")
