@@ -19,8 +19,6 @@ jobs:
           python3 -m pip uninstall -y mbed-tools
           
           python3 -m pip install -e ./tools
-          
-          python -c "import os, site; print(os.path.join(site.USER_BASE, 'Scripts' if os.name == 'nt' else 'bin'))"
 
       # Note: For this CI job we use MBED_CREATE_PYTHON_VENV=FALSE so that we can make sure
       # this mode works.
