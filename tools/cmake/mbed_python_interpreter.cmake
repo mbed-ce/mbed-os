@@ -41,7 +41,12 @@ if(MBED_CREATE_PYTHON_VENV)
         unset(_Python3_INTERPRETER_PROPERTIES CACHE)
         unset(_Python3_INTERPRETER_SIGNATURE CACHE)
         set (Python3_FIND_VIRTUALENV STANDARD)
+        unset(ENV{VIRTUAL_ENV})
         find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+        # Reset venv configuration as above
+        set(Python3_FIND_VIRTUALENV FIRST)
+        set(ENV{VIRTUAL_ENV} ${MBED_VENV_LOCATION})
 
         set(NEED_TO_CREATE_VENV TRUE)
         set(NEED_TO_INSTALL_PACKAGES TRUE)
@@ -102,10 +107,31 @@ else()
 
     # The cmsis_mcu_descr module was written from scratch by Mbed CE.
     # So, this check will ensure that the user has installed the Mbed CE version of mbed_tools
-    # and not the PyPI version (which we cannot do anything with because it's owned by ARM)
+    # and not the PyPI version (which we cannot update because it's owned by ARM)
     check_python_package(mbed_tools.cli.cmsis_mcu_descr HAVE_MBED_CE_TOOLS)
 
     if(NOT HAVE_MBED_CE_TOOLS)
         message(FATAL_ERROR "Did not detect the Mbed CE Python tools installed into the python interpreter ${Python3_EXECUTABLE}. Install them with a command like: ${Python3_EXECUTABLE} -m pip install -e ${MBED_CE_TOOLS_BASE_DIR}")
     endif()
 endif()
+
+get_filename_component(PYTHON3_INTERP_DIR ${Python3_EXECUTABLE} DIRECTORY)
+
+# Find scripts provided by the Python package
+find_program(mbed_tools
+    NAMES mbed-tools
+    HINTS ${PYTHON3_INTERP_DIR}
+    DOC "Path to mbed-tools Python script."
+    REQUIRED)
+
+find_program(mbedhtrun
+    NAMES mbedhtrun
+    HINTS ${PYTHON3_INTERP_DIR}
+    DOC "Path to mbedhtrun Python script."
+    REQUIRED)
+
+find_program(memap
+        NAMES memap
+        HINTS ${PYTHON3_INTERP_DIR}
+        DOC "Path to memap Python script."
+        REQUIRED)
