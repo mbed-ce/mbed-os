@@ -4,6 +4,8 @@
 # CMake script to find the Python interpreter and either install or find
 # Mbed's dependencies.
 
+include(CheckPythonPackage)
+
 option(MBED_CREATE_PYTHON_VENV "If true, Mbed OS will create its own virtual environment (venv) and install its Python packages there.  This removes the need to manually install Python packages." TRUE)
 
 get_filename_component(MBED_CE_TOOLS_BASE_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
@@ -105,7 +107,6 @@ if(MBED_CREATE_PYTHON_VENV)
 else()
 
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
-    include(CheckPythonPackage)
 
     # The cmsis_mcu_descr module was written from scratch by Mbed CE.
     # So, this check will ensure that the user has installed the Mbed CE version of mbed_tools
@@ -134,7 +135,34 @@ find_program(mbedhtrun
     REQUIRED)
 
 find_program(memap
-        NAMES memap
-        HINTS ${PYTHON_SCRIPT_LOC_HINTS}
-        DOC "Path to memap Python script."
-        REQUIRED)
+    NAMES memap
+    HINTS ${PYTHON_SCRIPT_LOC_HINTS}
+    DOC "Path to memap Python script."
+    REQUIRED)
+
+#
+# Utility function to check for a Python package with the given import name.
+# If the package is not found and the Mbed venv is in use,
+# then the package will be installed by passing PACKAGE_INSTALL_CONSTRAINT to Pip.
+# If the install fails or the venv is not being used, FOUND_VAR will be set to false.
+#
+function(mbed_check_or_install_python_package FOUND_VAR PACKAGE_IMPORT_NAME PACKAGE_INSTALL_CONSTRAINT)
+    check_python_package(${PACKAGE_IMPORT_NAME} ${FOUND_VAR})
+
+    if(NOT ${FOUND_VAR})
+        # If we are using the Mbed venv, we can install the package automatically.
+        if(MBED_CREATE_PYTHON_VENV)
+            message(STATUS "Mbed: Installing ${PACKAGE_INSTALL_CONSTRAINT} into Mbed's Python virtualenv")
+            execute_process(
+                    COMMAND ${Python3_EXECUTABLE} -m pip install ${PACKAGE_INSTALL_CONSTRAINT}
+                    RESULT_VARIABLE PIP_INSTALL_RESULT
+            )
+            if(NOT PIP_INSTALL_RESULT EQUAL 0)
+                message(WARNING "Installation of ${PACKAGE_INSTALL_CONSTRAINT} via pip failed.")
+            else()
+                # Redo the check to confirm it's installed
+                check_python_package(${PACKAGE_IMPORT_NAME} ${FOUND_VAR})
+            endif()
+        endif()
+    endif()
+endfunction(mbed_check_or_install_python_package)

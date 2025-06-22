@@ -9,10 +9,13 @@
 
 set(UPLOAD_SUPPORTS_DEBUG TRUE)
 
-### Check if upload method can be enabled on this machine
-include(CheckPythonPackage)
-check_python_package(pyocd HAVE_PYOCD)
-set(UPLOAD_PYOCD_FOUND ${HAVE_PYOCD})
+### Find PyOCD package
+
+# Use the Git version so that we get Ambiq Apollo3 support (as that was not included in the latest release
+# before PyOCD development stopped, as of Jun 2025)
+mbed_check_or_install_python_package(HAVE_PYTHON_PYOCD pyocd git+https://github.com/pyocd/pyOCD.git)
+
+set(UPLOAD_PYOCD_FOUND ${HAVE_PYTHON_PYOCD})
 
 ### Function to generate upload target
 set(PYOCD_PROBE_ARGS "" CACHE INTERNAL "" FORCE)
