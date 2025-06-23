@@ -19,7 +19,6 @@
 #if DEVICE_FLASH
 #include "mbed_assert.h"
 #include "cmsis.h"
-#include "stdio.h"
 
 /**
   * @brief  Gets the bank of a given address
@@ -94,12 +93,12 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
         return -1;
     }
 
-    if (HAL_ICACHE_Disable() != HAL_OK)
-    {
+    if (HAL_FLASH_Unlock() != HAL_OK) {
         return -1;
     }
 
-    if (HAL_FLASH_Unlock() != HAL_OK) {
+    if (HAL_ICACHE_Disable() != HAL_OK)
+    {
         return -1;
     }
 
@@ -115,23 +114,18 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
     EraseInitStruct.Sector      = GetSector(address);
     EraseInitStruct.NbSectors   = 1;
 
-    /* Note: If an erase operation in Flash memory also concerns data in the data or instruction cache,
-     you have to make sure that these data are rewritten before they are accessed during code
-     execution. If this cannot be done safely, it is recommended to flush the caches by setting the
-     DCRST and ICRST bits in the FLASH_CR register. */
-
     if (HAL_FLASHEx_Erase(&EraseInitStruct, &PAGEError) != HAL_OK) {
         status = -1;
     }
 
     core_util_critical_section_exit();
 
-    if (HAL_FLASH_Lock() != HAL_OK) {
+    if (HAL_ICACHE_Enable() != HAL_OK)
+    {
         return -1;
     }
 
-    if (HAL_ICACHE_Enable() != HAL_OK)
-    {
+    if (HAL_FLASH_Lock() != HAL_OK) {
         return -1;
     }
 
@@ -164,12 +158,12 @@ int32_t flash_program_page(flash_t *obj, uint32_t address,
         return -1;
     }
 
-    if (HAL_ICACHE_Disable() != HAL_OK)
-    {
+    if (HAL_FLASH_Unlock() != HAL_OK) {
         return -1;
     }
 
-    if (HAL_FLASH_Unlock() != HAL_OK) {
+    if (HAL_ICACHE_Disable() != HAL_OK)
+    {
         return -1;
     }
 
@@ -179,42 +173,23 @@ int32_t flash_program_page(flash_t *obj, uint32_t address,
     /* Program the user Flash area word by word */
     StartAddress = address;
 
-    /*  HW needs an aligned address to program flash, which data
-     *  parameters doesn't ensure  */
-    if ((uint32_t) data % 16 != 0) {
-        volatile uint64_t data128[2];
-        while ((address < (StartAddress + size)) && (status == 0)) {
-            for (uint8_t i = 0; i < 16; i++) {
-                *(((uint8_t *) data128) + i) = *(data + i);
-            }
-
-            if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, address, (uint32_t) data128)
-                    == HAL_OK) {
-                address = address + 16;
-                data = data + 16;
-            } else {
-                status = -1;
-            }
+    while ((address < (StartAddress + size)) && (status == 0)) {
+        if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, address,
+                                (uint32_t) data)
+                == HAL_OK) {
+            address = address + 16;
+            data = data + 16;
+        } else {
+            status = -1;
         }
-    } else { /*  case where data is aligned, so let's avoid any copy */
-        while ((address < (StartAddress + size)) && (status == 0)) {
-            if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, address,
-                                  (uint32_t) data)
-                    == HAL_OK) {
-                address = address + 16;
-                data = data + 16;
-            } else {
-                status = -1;
-            }
-        }
-    }
-
-    if (HAL_FLASH_Lock() != HAL_OK) {
-        return -1;
     }
 
     if (HAL_ICACHE_Enable() != HAL_OK)
     {
+        return -1;
+    }
+
+    if (HAL_FLASH_Lock() != HAL_OK) {
         return -1;
     }
 
