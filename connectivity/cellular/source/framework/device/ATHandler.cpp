@@ -46,7 +46,7 @@ using namespace std::chrono_literals;
 #define PROCESS_URC_TIME 20ms
 
 // Suppress logging of very big packet payloads, maxlen is approximate due to write/read are cached
-#define DEBUG_MAXLEN 60
+#define DEBUG_MAXLEN 120
 #define DEBUG_END_MARK "..\r"
 
 const char *mbed::OK = "OK\r\n";
@@ -697,6 +697,11 @@ ssize_t ATHandler::read_hex_string(char *buf, size_t size)
     return buf_idx;
 }
 
+int32_t ATHandler::get_last_read_error() const
+{
+    return _last_read_error;
+}
+
 int32_t ATHandler::read_int()
 {
     if (!ok_to_proceed() || !_stop_tag ||  _stop_tag->found) {
@@ -711,9 +716,11 @@ int32_t ATHandler::read_int()
     errno = 0;
     long result = std::strtol(buff, NULL, 10);
     if ((result == LONG_MIN || result == LONG_MAX) && errno == ERANGE) {
+        _last_read_error = result;
         return -1; // overflow/underflow
     }
     if (result < 0) {
+        _last_read_error = result;
         return -1; // negative values are unsupported
     }
     if (*buff == '\0') {
