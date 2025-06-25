@@ -80,6 +80,7 @@ packages = [
     "python/mbed_tools",
     "python/memap",
     "python/scancode_evaluate",
+    "python/ambiq_svl"
 ]
 
 [project.scripts]
@@ -87,3 +88,4 @@ mbedhtrun = "mbed_host_tests.mbedhtrun:main"
 mbedls = "mbed_lstools.main:mbedls_main"
 mbed-tools = "mbed_tools.cli.main:cli"
 memap = "memap.memap:main"
+ambiq_svl = "ambiq_svl.svl:cli"
