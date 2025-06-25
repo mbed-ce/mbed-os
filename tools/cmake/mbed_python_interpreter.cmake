@@ -126,19 +126,25 @@ endif()
 find_program(mbed_tools
     NAMES mbed-tools
     HINTS ${PYTHON_SCRIPT_LOC_HINTS}
-    DOC "Path to mbed-tools Python script."
+    DOC "Path to mbed-tools Python script. This script is part of the mbed-ce-tools python package."
     REQUIRED)
 
 find_program(mbedhtrun
     NAMES mbedhtrun
     HINTS ${PYTHON_SCRIPT_LOC_HINTS}
-    DOC "Path to mbedhtrun Python script."
+    DOC "Path to mbedhtrun Python script. This script is part of the mbed-ce-tools python package."
     REQUIRED)
 
 find_program(memap
     NAMES memap
     HINTS ${PYTHON_SCRIPT_LOC_HINTS}
-    DOC "Path to memap Python script."
+    DOC "Path to memap Python script. This script is part of the mbed-ce-tools python package."
+    REQUIRED)
+
+find_program(ambiq_svl
+    NAMES ambiq_svl
+    HINTS ${PYTHON_SCRIPT_LOC_HINTS}
+    DOC "Path to ambiq_svl Python script. This script is part of the mbed-ce-tools python package."
     REQUIRED)
 
 #
