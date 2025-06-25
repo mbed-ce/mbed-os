@@ -7,7 +7,7 @@
 ### Unlike some other bootloader-based upload methods, the SparkFun setup is able to reset the
 ### MCU into bootloader without needing any buttons to be pressed on the board!
 # This method creates the following options:
-# AMBIQ_SVL_SERIAL_PORT - Serial port to connect to the SVL bootloader over, e.g. 'COM20' or '/dev/ttyACM0'
+# AMBIQ_SVL_SERIAL_PORT - Serial port to connect to the SVL bootloader over, e.g. 'COM20' or '/dev/ttyUSB0'
 # This method creates the following parameters:
 # AMBIQ_SVL_UPLOAD_BAUD - Baudrate to upload at. Defaults to 115200 baud.
 
