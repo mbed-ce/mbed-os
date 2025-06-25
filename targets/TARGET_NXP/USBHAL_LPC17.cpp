@@ -16,7 +16,7 @@
  */
 
 #if defined(DEVICE_USBDEVICE) && DEVICE_USBDEVICE && \
-    (defined(TARGET_LPC1768) || defined(TARGET_LPC2368) || defined(TARGET_LPC2460))
+    (defined(TARGET_LPC17XX))
 
 #include "USBEndpoints_LPC17_LPC23.h"
 #include "USBPhyHw.h"
