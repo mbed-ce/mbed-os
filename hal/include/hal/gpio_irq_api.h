@@ -49,6 +49,7 @@ typedef void (*gpio_irq_handler)(uintptr_t context, gpio_irq_event event);
  * # Defined behavior
  * * ::gpio_irq_init initializes the GPIO IRQ pin
  * * ::gpio_irq_init attaches the interrupt handler
+ * * ::gpio_irq_init enables the IRQ
  * * ::gpio_irq_free releases the GPIO IRQ pin
  * * ::gpio_irq_set enables/disables pin IRQ event
  * * ::gpio_irq_enable enables GPIO IRQ
