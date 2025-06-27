@@ -31,6 +31,7 @@ extern "C"
 {
 #endif
 
+static void ap3_gpio_update_int_en(gpio_irq_t *obj);
 uint32_t ap3_gpio_enable_interrupts(uint32_t ui32Pin, am_hal_gpio_intdir_e eIntDir);
 /** GPIO IRQ HAL structure. gpio_irq_s is declared in the target's HAL
 */
@@ -70,20 +71,19 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uintpt
     //grab the correct irq control object
     ap3_gpio_irq_control_t *control = &gpio_irq_control[pin];
 
-    //Register locally
+    // Register locally
     control->pad = pin;
     control->handler = handler;
     control->id = context;
     control->events = IRQ_NONE;
 
-    //Attach to object
+    // Attach to object
     obj->control = control;
 
-    //Make sure the interrupt is set to none to reflect the new events value
-    ap3_gpio_enable_interrupts(control->pad, AM_HAL_GPIO_PIN_INTDIR_NONE);
+    // Start with the IRQ "enabled", but don't actually enable it till something is attached
+    obj->irq_requested_enabled = true;
 
-    //Enable GPIO IRQ's in the NVIC
-    gpio_irq_enable(obj);
+    // Make sure the GPIO IRQ is enabled in NVIC
     NVIC_SetVector((IRQn_Type)GPIO_IRQn, (uint32_t)am_gpio_isr);
     NVIC_EnableIRQ((IRQn_Type)GPIO_IRQn);
     return 0;
@@ -99,7 +99,18 @@ void am_gpio_isr(void)
         if (gpio_int_mask & 0x0000000000000001) {
             am_hal_gpio_interrupt_clear(AM_HAL_GPIO_BIT(pinNum));
             ap3_gpio_irq_control_t irq_ctrl = gpio_irq_control[pinNum];
-            ((gpio_irq_handler)irq_ctrl.handler)(irq_ctrl.id, irq_ctrl.events);
+
+            uint8_t event = irq_ctrl.events;
+            if(event == (IRQ_RISE | IRQ_FALL))
+            {
+                // This pin is configured for both rise and fall events. However, this MCU does not have separate
+                // status registers for tracking rising/falling interrupts.
+                // So, read the pin to figure out which interrupt happened. It's not totally foolproof but
+                // it should work in most cases.
+                event = am_hal_gpio_input_read(irq_ctrl.pad) ? IRQ_RISE : IRQ_FALL;
+            }
+
+            ((gpio_irq_handler)irq_ctrl.handler)(irq_ctrl.id, event);
         }
         gpio_int_mask >>= 1;
         pinNum++;
@@ -112,6 +123,8 @@ void am_gpio_isr(void)
 */
 void gpio_irq_free(gpio_irq_t *obj)
 {
+    // Make sure interrupt can't trigger
+    gpio_irq_disable(obj);
 }
 
 /** Enable/disable pin IRQ event
@@ -121,20 +134,21 @@ void gpio_irq_free(gpio_irq_t *obj)
 * @param enable The enable flag
 */
 void gpio_irq_set(gpio_irq_t *obj, gpio_irq_event event, uint32_t enable)
-{
-    //Clear state
-    obj->control->events &= (~event);
+{    
     if (enable) {
-        //Reset if enabled
         obj->control->events |= event;
     }
+    else {
+        obj->control->events &= ~event;
+    }
 
-    // Map enabled events to a value the reflects the ambiq hal/register values
+    // Map enabled events to a value the reflects the ambiq hal/register values.
+    // Note that we don't want to actually set INTDIR_NONE, because this disables reading the pin (!!)
+    // So instead, if asked to disable the IRQ, we leave LO2HIGH interrupt enabled in the PINCFG register but
+    // don't enable the interrupt for this pin in the register
     am_hal_gpio_intdir_e ap3_int_dir = 0x00;
     switch (obj->control->events) {
         case IRQ_NONE:
-            ap3_int_dir = AM_HAL_GPIO_PIN_INTDIR_NONE;
-            break;
         case IRQ_RISE:
             ap3_int_dir = AM_HAL_GPIO_PIN_INTDIR_LO2HI;
             break;
@@ -146,7 +160,17 @@ void gpio_irq_set(gpio_irq_t *obj, gpio_irq_event event, uint32_t enable)
             break;
     }
 
+    // If switching to NONE, disable the IRQ first
+    if(obj->control->events == IRQ_NONE) {
+        ap3_gpio_update_int_en(obj);
+    }
+
     ap3_gpio_enable_interrupts(obj->control->pad, ap3_int_dir);
+
+    // Otherwise enable IRQ now
+    if(obj->control->events != IRQ_NONE) {
+        ap3_gpio_update_int_en(obj);
+    }
 }
 
 /** Enable GPIO IRQ
@@ -156,8 +180,8 @@ void gpio_irq_set(gpio_irq_t *obj, gpio_irq_event event, uint32_t enable)
 */
 void gpio_irq_enable(gpio_irq_t *obj)
 {
-    am_hal_gpio_interrupt_clear(AM_HAL_GPIO_BIT(obj->control->pad));
-    am_hal_gpio_interrupt_enable(AM_HAL_GPIO_BIT(obj->control->pad));
+    obj->irq_requested_enabled = true;
+    ap3_gpio_update_int_en(obj);
 }
 
 /** Disable GPIO IRQ
@@ -167,11 +191,27 @@ void gpio_irq_enable(gpio_irq_t *obj)
 */
 void gpio_irq_disable(gpio_irq_t *obj)
 {
-    am_hal_gpio_interrupt_clear(AM_HAL_GPIO_BIT(obj->control->pad));
-    am_hal_gpio_interrupt_disable(AM_HAL_GPIO_BIT(obj->control->pad));
+    obj->irq_requested_enabled = false;
+    ap3_gpio_update_int_en(obj);
 }
 
 /**@}*/
+
+// Based on the enabled events and irq_requested_enabled, enable or disable the IRQ
+static void ap3_gpio_update_int_en(gpio_irq_t *obj)
+{
+    if(obj->irq_requested_enabled && obj->control->events != IRQ_NONE) {
+        // Enable!
+        am_hal_gpio_interrupt_clear(AM_HAL_GPIO_BIT(obj->control->pad));
+        am_hal_gpio_interrupt_enable(AM_HAL_GPIO_BIT(obj->control->pad));
+    }
+    else {
+        // Disable
+        am_hal_gpio_interrupt_disable(AM_HAL_GPIO_BIT(obj->control->pad));
+    }
+}
+
+
 uint32_t ap3_gpio_enable_interrupts(uint32_t ui32Pin, am_hal_gpio_intdir_e eIntDir)
 {
     uint32_t ui32Padreg, ui32AltPadCfg, ui32GPCfg;
@@ -208,7 +248,8 @@ uint32_t ap3_gpio_enable_interrupts(uint32_t ui32Pin, am_hal_gpio_intdir_e eIntD
 
     ui32GPCfgShft = ((ui32Pin & 0x7) << 2);
 
-    ui32GPCfgAddr = AM_REGADDR(GPIO, CFGA) + ((ui32Pin >> 1) & ~0x3);
+    // 8 pins per register, and each register is 32 bits wide
+    ui32GPCfgAddr = AM_REGADDR(GPIO, CFGA) + (ui32Pin / 8) * sizeof(uint32_t);
 
     ui32GPCfgClearMask = ~((uint32_t)0xF << ui32GPCfgShft);
 

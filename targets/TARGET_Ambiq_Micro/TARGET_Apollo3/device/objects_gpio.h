@@ -27,6 +27,8 @@
 #include "am_hal_gpio.h"
 #include "PinNames.h"
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -124,6 +126,7 @@ typedef struct ap3_gpio_irq_control_t {
 
 typedef struct gpio_irq_s {
     ap3_gpio_irq_control_t *control;
+    bool irq_requested_enabled;
 } gpio_irq_s;
 
 #define AP3_PINCFG_FUNCSEL_GPIO 3

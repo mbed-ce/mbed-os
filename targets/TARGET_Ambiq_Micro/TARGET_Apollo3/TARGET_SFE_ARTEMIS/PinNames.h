@@ -39,41 +39,56 @@ extern "C"
 typedef enum
 {
     // Digital naming
-    D0 = 25,
-    D1 = 24,
-    D2 = 35,
-    D3 = 4,
-    D4 = 22,
-    D5 = 23,
-    D6 = 27,
-    D7 = 28,
-    D8 = 32,
-    D9 = 12,
-    D10 = 13,
-    D11 = 7,
-    D12 = 6,
-    D13 = 5,
-    D14 = 40,
-    D15 = 39,
-    D16 = 29,
-    D17 = 11,
-    D18 = 34,
-    D19 = 33,
-    D20 = 16,
-    D21 = 31,
+    p0 = 25,
+    p1 = 24,
+    p2 = 35,
+    p3 = 4,
+    p4 = 22,
+    p5 = 23,
+    p6 = 27,
+    p7 = 28,
+    p8 = 32,
+    p9 = 12,
+    p10 = 13,
+    p11 = 7,
+    p12 = 6,
+    p13 = 5,
+    p14 = 40,
+    p15 = 39,
+    p16 = 29,
+    p17 = 11,
+    p18 = 34,
+    p19 = 33,
+    p20 = 16,
+    p21 = 31,
 
-    // Analog naming
-    A0 = D16,
-    A1 = D17,
-    A2 = D18,
-    A3 = D19,
-    A4 = D20,
-    A5 = D21,
-    A6 = D2,
-    // A7 = ??
-    A8 = D8,
-    A9 = D9,
-    A10 = D10,
+#ifdef TARGET_FF_ARDUINO_UNO
+    // Arduino form factor pins
+    ARDUINO_UNO_D0 = p0,
+    ARDUINO_UNO_D1 = p1,
+    ARDUINO_UNO_D2 = p2,
+    ARDUINO_UNO_D3 = p3,
+    ARDUINO_UNO_D4 = p4,
+    ARDUINO_UNO_D5 = p5,
+    ARDUINO_UNO_D6 = p6,
+    ARDUINO_UNO_D7 = p7,
+    ARDUINO_UNO_D8 = p8,
+    ARDUINO_UNO_D9 = p9,
+    ARDUINO_UNO_D10 = p10,
+    ARDUINO_UNO_D11 = p11,
+    ARDUINO_UNO_D12 = p12,
+    ARDUINO_UNO_D13 = p13,
+    ARDUINO_UNO_D14 = p14,
+    ARDUINO_UNO_D15 = p15,
+
+    ARDUINO_UNO_A0 = p16,
+    ARDUINO_UNO_A1 = p17,
+    ARDUINO_UNO_A2 = p18,
+    ARDUINO_UNO_A3 = p19,
+    ARDUINO_UNO_A4 = p20,
+    ARDUINO_UNO_A5 = p21,
+    ARDUINO_UNO_A6 = p2,
+#endif
 
     // UART
     SERIAL_TX = AM_BSP_PRIM_UART_TX_PIN,
@@ -81,26 +96,25 @@ typedef enum
     CONSOLE_TX = SERIAL_TX,
     CONSOLE_RX = SERIAL_RX,
 
-    SERIAL1_TX = D1,
-    SERIAL1_RX = D0,
+    SERIAL1_TX = p1,
+    SERIAL1_RX = p0,
 
     // Not connected
     NC = NC_VAL
 } PinName;
 
 // LEDs
-#define LED1 D13 // Blue LED
+#define LED1 p13 // Blue LED
 
 // I2C bus
-#define I2C_SCL D15
-#define I2C_SDA D14
+// note: I2C_SCL and I2C_SDA defines are provided by the FF_ARDUINO_UNO header
 #define QWIIC_SCL I2C_SCL
 #define QWIIC_SDA I2C_SDA
 
 // SPI bus
-#define SPI_CLK D13
-#define SPI_SDO D11
-#define SPI_SDI D12
+#define SPI_CLK p13
+#define SPI_SDO p11
+#define SPI_SDI p12
 
 #if defined(MBED_CONF_TARGET_STDIO_UART_TX)
 #define STDIO_UART_TX MBED_CONF_TARGET_STDIO_UART_TX

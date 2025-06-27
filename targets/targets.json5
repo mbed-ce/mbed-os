@@ -9728,7 +9728,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "SFE_ARTEMIS": { // AKA SparkFun RedBoard Artemis
         "inherits": ["AMA3B1KK"],
-        "image_url": "https://cdn.sparkfun.com/r/455-455/assets/parts/1/4/0/1/9/15444-SparkFun_RedBoard_Artemis-01.jpg"
+        "image_url": "https://cdn.sparkfun.com/r/455-455/assets/parts/1/4/0/1/9/15444-SparkFun_RedBoard_Artemis-01.jpg",
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ]
     },
     "SFE_ARTEMIS_ATP": { // AKA SparkFun RedBoard Artemis ATP
         "inherits": ["AMA3B1KK"],
