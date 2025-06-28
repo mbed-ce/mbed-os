@@ -29,6 +29,8 @@ jobs:
         # detection output format: https://github.com/nexB/scancode-toolkit/releases/tag/v32.0.0
         # Need to update Mbed's scripts for the new format.
         run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-dev libxslt1-dev
           pip install -U "scancode-toolkit<32.0" "click>=7,<8"
 
       - 
