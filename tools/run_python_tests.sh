@@ -13,6 +13,7 @@
 # $ pip install ./tools[unit-tests]
 
 set -e
+cd "$(dirname "$0")"
 
 PYTHON=python
 
