@@ -10,7 +10,7 @@
 
 # Make sure to install the unit tests requirements before running this command, via a command like:
 # $ cd mbed-os # and also activate venv if desired
-# $ pip install ./tools[unit-tests]
+# $ pip install -e ./tools[unit-tests]
 
 set -e
 cd "$(dirname "$0")"
