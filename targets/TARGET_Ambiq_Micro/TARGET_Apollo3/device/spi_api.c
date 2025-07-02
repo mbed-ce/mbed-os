@@ -70,8 +70,8 @@ void spi_get_capabilities(PinName ssel, bool slave, spi_capabilities_t *cap)
     cap->word_length = 0x00000080;
     cap->slave_delay_between_symbols_ns = 0;
     cap->clk_modes = 0x0F;
-    cap->support_slave_mode = (iom_ssel == IOM_ANY) ? true : false;
-    cap->hw_cs_handle = false;
+    cap->support_slave_mode = false;
+    cap->hw_cs_handle = iom_ssel == IOM_ANY;
     cap->async_mode = false;
     cap->tx_rx_buffers_equal_length = false;
 }

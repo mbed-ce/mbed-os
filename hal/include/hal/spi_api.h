@@ -276,10 +276,14 @@ int  spi_master_write(spi_t *obj, int value);
  *
  *  The total number of bytes sent and received will be the maximum of
  *  tx_length and rx_length. The bytes written will be padded with the
- *  value 0xff.
+ *  write fill value.
  *
  * Note: Even if the word size / bits per frame is not 8, \c rx_length and \c tx_length
  * still give lengths in bytes of input data, not numbers of words.
+ * 
+ * Note: If \c tx_rx_buffers_equal_length is true in the capabilities structure, then either \c rx_length and \c tx_length
+ * must be the same, or one of them will be zero. If this is not the case than the HAL implementation should
+ * return an error.
  *
  * @param[in] obj        The SPI peripheral to use for sending
  * @param[in] tx_buffer  Pointer to the byte-array of data to write to the device
@@ -432,7 +436,7 @@ const PinMap *spi_slave_cs_pinmap(void);
  * @note On MCUs with a data cache, the return value is used to determine if a cache invalidation needs to be done
  * after the transfer is complete.  If this function returns true, the driver layer will cache invalidate the Rx buffer under
  * the assumption that the data needs to be re-read from main memory.  Be careful, because if the read was not actually
- * done by DMA, and the rx data is in the CPU cache, this invalidation will corrupt it.
+ * done by DMA, and the rx data is in the CPU cache and NOT main memory, this invalidation will corrupt it.
  *
  * @note The application layer will always acquire the SPI peripheral first before calling this, including setting the frequency and the bit width. So,
  *     the \c bit_width argument will never be different from the SPI's currently set bit width, and can actually be ignored.
