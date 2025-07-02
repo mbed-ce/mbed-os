@@ -46,6 +46,9 @@ typedef enum {
     IOM_ANY
 } IOMName;
 
+// Each IOM can be used as an SPI
+#define DEVICE_SPI_COUNT 6
+
 typedef IOMName SPIName;
 typedef IOMName I2CName;
 

@@ -38,7 +38,6 @@ extern "C"
 
 typedef enum
 {
-    // Digital naming
     p0 = 25,
     p1 = 24,
     p2 = 35,
@@ -98,6 +97,9 @@ typedef enum
 
     SERIAL1_TX = p1,
     SERIAL1_RX = p0,
+
+    // Not a real pin on the device, but can be passed to AnalogIn to read the internal temperature sensor
+    ADC_TEMP = 0x10000,
 
     // Not connected
     NC = NC_VAL

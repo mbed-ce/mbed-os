@@ -21,19 +21,12 @@
 #include "am_bsp.h"
 #include "am_util.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "objects_flash.h"
 #include "objects_gpio.h"
 #include "objects_uart.h"
 #include "objects_iom.h"
 #include "objects_spi.h"
 #include "objects_i2c.h"
-
-#ifdef __cplusplus
-}
-#endif
+#include "objects_adc.h"
 
 #endif

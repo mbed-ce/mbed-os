@@ -17,6 +17,9 @@
 #include "PeripheralPins.h"
 #include "PeripheralPinConfigs.h"
 
+#include "am_hal_adc.h"
+#include "objects.h"
+
 /************RTC***************/
 const PinMap PinMap_RTC[] = {
     {NC, 0, 0},
@@ -24,6 +27,17 @@ const PinMap PinMap_RTC[] = {
 
 /************ADC***************/
 const PinMap PinMap_ADC[] = {
+    {11, ADC0_2, AM_HAL_PIN_11_ADCSE2},
+    {12, ADC0_9, AM_HAL_PIN_12_ADCD0NSE9},
+    {13, ADC0_8, AM_HAL_PIN_13_ADCD0PSE8},
+    {16, ADC0_0, AM_HAL_PIN_16_ADCSE0},
+    {29, ADC0_1, AM_HAL_PIN_29_ADCSE1},
+    {31, ADC0_3, AM_HAL_PIN_31_ADCSE3},
+    {32, ADC0_4, AM_HAL_PIN_32_ADCSE4},
+    {33, ADC0_5, AM_HAL_PIN_33_ADCSE5},
+    {34, ADC0_6, AM_HAL_PIN_34_ADCSE6},
+    {35, ADC0_7, AM_HAL_PIN_35_ADCSE7},
+    {ADC_TEMP, ADC0_TEMP, 0},
     {NC, NC, 0}
 };
 
