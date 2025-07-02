@@ -38,56 +38,85 @@ extern "C"
 
 typedef enum
 {
-    // Digital naming
-    p0 = 25,
-    p1 = 24,
-    p2 = 35,
-    p3 = 4,
-    p4 = 22,
-    p5 = 23,
-    p6 = 27,
-    p7 = 28,
-    p8 = 32,
-    p9 = 12,
-    p10 = 13,
-    p11 = 7,
-    p12 = 6,
-    p13 = 5,
-    p14 = 40,
-    p15 = 39,
-    p16 = 29,
-    p17 = 11,
-    p18 = 34,
-    p19 = 33,
-    p20 = 16,
-    p21 = 31,
+    // Apollo3 I/O pins - CSP and BGA packages
+    IO_0 = 0,
+    IO_1 = 1,
+    IO_2 = 2,
+    IO_3 = 3,
+    IO_4 = 4,
+    IO_5 = 5,
+    IO_6 = 6,
+    IO_7 = 7,
+    IO_8 = 8,
+    IO_9 = 9,
+    IO_10 = 10,
+    IO_11 = 11,
+    IO_12 = 12,
+    IO_13 = 13,
+    IO_14 = 14,
+    IO_15 = 15,
+    IO_16 = 16,
+    IO_17 = 17,
+    IO_18 = 18,
+    IO_19 = 19,
+    IO_20 = 20,
+    IO_21 = 21,
+    IO_22 = 22,
+    IO_23 = 23,
+    IO_24 = 24,
+    IO_25 = 25,
+    IO_26 = 26,
+    IO_27 = 27,
+    IO_28 = 28,
+    IO_29 = 29,
+    IO_39 = 39,
+    IO_40 = 40,
+    IO_41 = 41,
+    IO_44 = 44,
+    IO_47 = 47,
+    IO_48 = 48,
+    IO_49 = 49,
+
+    // Apollo3 I/O pins - BGA package only
+    IO_30 = 30,
+    IO_31 = 31,
+    IO_32 = 32,
+    IO_33 = 33,
+    IO_34 = 34,
+    IO_35 = 35,
+    IO_36 = 36,
+    IO_37 = 37,
+    IO_38 = 38,
+    IO_42 = 42,
+    IO_43 = 43,
+    IO_45 = 45,
+    IO_46 = 46,
 
 #ifdef TARGET_FF_ARDUINO_UNO
     // Arduino form factor pins
-    ARDUINO_UNO_D0 = p0,
-    ARDUINO_UNO_D1 = p1,
-    ARDUINO_UNO_D2 = p2,
-    ARDUINO_UNO_D3 = p3,
-    ARDUINO_UNO_D4 = p4,
-    ARDUINO_UNO_D5 = p5,
-    ARDUINO_UNO_D6 = p6,
-    ARDUINO_UNO_D7 = p7,
-    ARDUINO_UNO_D8 = p8,
-    ARDUINO_UNO_D9 = p9,
-    ARDUINO_UNO_D10 = p10,
-    ARDUINO_UNO_D11 = p11,
-    ARDUINO_UNO_D12 = p12,
-    ARDUINO_UNO_D13 = p13,
-    ARDUINO_UNO_D14 = p14,
-    ARDUINO_UNO_D15 = p15,
+    ARDUINO_UNO_D0 = IO_25,
+    ARDUINO_UNO_D1 = IO_24,
+    ARDUINO_UNO_D2 = IO_35,
+    ARDUINO_UNO_D3 = IO_4,
+    ARDUINO_UNO_D4 = IO_22,
+    ARDUINO_UNO_D5 = IO_23,
+    ARDUINO_UNO_D6 = IO_27,
+    ARDUINO_UNO_D7 = IO_28,
+    ARDUINO_UNO_D8 = IO_32,
+    ARDUINO_UNO_D9 = IO_12,
+    ARDUINO_UNO_D10 = IO_13,
+    ARDUINO_UNO_D11 = IO_7,
+    ARDUINO_UNO_D12 = IO_6,
+    ARDUINO_UNO_D13 = IO_5,
+    ARDUINO_UNO_D14 = IO_40,
+    ARDUINO_UNO_D15 = IO_39,
 
-    ARDUINO_UNO_A0 = p16,
-    ARDUINO_UNO_A1 = p17,
-    ARDUINO_UNO_A2 = p18,
-    ARDUINO_UNO_A3 = p19,
-    ARDUINO_UNO_A4 = p20,
-    ARDUINO_UNO_A5 = p21,
-    ARDUINO_UNO_A6 = p2,
+    ARDUINO_UNO_A0 = IO_29,
+    ARDUINO_UNO_A1 = IO_11,
+    ARDUINO_UNO_A2 = IO_34,
+    ARDUINO_UNO_A3 = IO_33,
+    ARDUINO_UNO_A4 = IO_16,
+    ARDUINO_UNO_A5 = IO_31,
 #endif
 
     // UART
@@ -96,15 +125,15 @@ typedef enum
     CONSOLE_TX = SERIAL_TX,
     CONSOLE_RX = SERIAL_RX,
 
-    SERIAL1_TX = p1,
-    SERIAL1_RX = p0,
+    SERIAL1_TX = IO_24,
+    SERIAL1_RX = IO_25,
 
     // Not connected
     NC = NC_VAL
 } PinName;
 
 // LEDs
-#define LED1 p13 // Blue LED
+#define LED1 IO_5 // Blue LED
 
 // I2C bus
 // note: I2C_SCL and I2C_SDA defines are provided by the FF_ARDUINO_UNO header
@@ -112,9 +141,9 @@ typedef enum
 #define QWIIC_SDA I2C_SDA
 
 // SPI bus
-#define SPI_CLK p13
-#define SPI_SDO p11
-#define SPI_SDI p12
+#define SPI_SCLK IO_5
+#define SPI_MOSI IO_7
+#define SPI_MISO IO_6
 
 #if defined(MBED_CONF_TARGET_STDIO_UART_TX)
 #define STDIO_UART_TX MBED_CONF_TARGET_STDIO_UART_TX
