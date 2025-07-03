@@ -38,32 +38,86 @@ extern "C"
 
 typedef enum
 {
+    // Apollo3 I/O pins - CSP and BGA packages
+    IO_0 = 0,
+    IO_1 = 1,
+    IO_2 = 2,
+    IO_3 = 3,
+    IO_4 = 4,
+    IO_5 = 5,
+    IO_6 = 6,
+    IO_7 = 7,
+    IO_8 = 8,
+    IO_9 = 9,
+    IO_10 = 10,
+    IO_11 = 11,
+    IO_12 = 12,
+    IO_13 = 13,
+    IO_14 = 14,
+    IO_15 = 15,
+    IO_16 = 16,
+    IO_17 = 17,
+    IO_18 = 18,
+    IO_19 = 19,
+    IO_20 = 20,
+    IO_21 = 21,
+    IO_22 = 22,
+    IO_23 = 23,
+    IO_24 = 24,
+    IO_25 = 25,
+    IO_26 = 26,
+    IO_27 = 27,
+    IO_28 = 28,
+    IO_29 = 29,
+    IO_39 = 39,
+    IO_40 = 40,
+    IO_41 = 41,
+    IO_44 = 44,
+    IO_47 = 47,
+    IO_48 = 48,
+    IO_49 = 49,
+
+    // Apollo3 I/O pins - BGA package only
+    IO_30 = 30,
+    IO_31 = 31,
+    IO_32 = 32,
+    IO_33 = 33,
+    IO_34 = 34,
+    IO_35 = 35,
+    IO_36 = 36,
+    IO_37 = 37,
+    IO_38 = 38,
+    IO_42 = 42,
+    IO_43 = 43,
+    IO_45 = 45,
+    IO_46 = 46,
+
     // Digital naming
-    D0 = 25,
-    D1 = 24,
-    D2 = 44,
-    D3 = 35,
-    D4 = 4,
-    D5 = 22,
-    D6 = 23,
-    D7 = 27,
-    D8 = 28,
-    D9 = 32,
-    D10 = 14,
-    D11 = 7,
-    D12 = 6,
-    D13 = 5,
-    D14 = 40,
-    D15 = 39,
-    D16 = 43,
-    D17 = 42,
-    D18 = 26,
-    D19 = 33,
-    D20 = 13,
-    D21 = 11,
-    D22 = 29,
-    D23 = 12,
-    D24 = 31,
+    D0 = IO_25,
+    D1 = IO_24,
+    D2 = IO_44,
+    D3 = IO_35,
+    D4 = IO_4,
+    D5 = IO_22,
+    D6 = IO_23,
+    D7 = IO_27,
+    D8 = IO_28,
+    D9 = IO_32,
+    D10 = IO_14,
+    D11 = IO_7,
+    D12 = IO_6,
+    D13 = IO_5,
+    D14 = IO_40,
+    D15 = IO_39,
+    D16 = IO_43,
+    D17 = IO_42,
+    D18 = IO_26,
+    D19 = IO_33,
+    D20 = IO_13,
+    D21 = IO_11,
+    D22 = IO_29,
+    D23 = IO_12,
+    D24 = IO_31,
 
     // Analog naming
     A0 = D19,
@@ -73,29 +127,6 @@ typedef enum
     A4 = D23,
     A5 = D24,
     A6 = D3,
-
-    //BUTTONs
-    SW1 = AM_BSP_GPIO_BUTTON0,
-    
-    // LEDs
-    LED_BLUE = AM_BSP_GPIO_LED_BLUE,
-
-    // mbed original LED naming
-    LED1 = AM_BSP_GPIO_LED0,
-    LED2 = D2,
-
-    // I2C
-    I2C_SCL = AM_BSP_QWIIC_I2C_SCL_PIN,
-    I2C_SDA = AM_BSP_QWIIC_I2C_SDA_PIN,
-
-    // Qwiic
-    QWIIC_SCL = I2C_SCL,
-    QWIIC_SDA = I2C_SDA,
-
-    // SPI
-    SPI_CLK = AM_BSP_PRIM_SPI_CLK_PIN,
-    SPI_SDO = AM_BSP_PRIM_SPI_SDO_PIN,
-    SPI_SDI = AM_BSP_PRIM_SPI_SDI_PIN,
 
     // UART
     SERIAL_TX = AM_BSP_PRIM_UART_TX_PIN,
@@ -109,6 +140,24 @@ typedef enum
     // Not connected
     NC = NC_VAL
 } PinName;
+
+// LEDs
+#define LED1 IO_26 // Blue LED
+
+// Buttons
+#define BUTTON1 IO_14
+
+// I2C bus
+#define I2C_SCL IO_39
+#define I2C_SDA IO_40
+
+#define QWIIC_SCL I2C_SCL
+#define QWIIC_SDA I2C_SDA
+
+// SPI bus
+#define SPI_SCLK IO_5
+#define SPI_MOSI IO_7
+#define SPI_MISO IO_6
 
 #if defined(MBED_CONF_TARGET_STDIO_UART_TX)
 #define STDIO_UART_TX MBED_CONF_TARGET_STDIO_UART_TX
