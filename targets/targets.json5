@@ -9695,6 +9695,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SLEEP",
             "ITM",
             "ANALOGIN",
+            "PWMOUT"
         ],
         "macros": [
             "CORDIO_ZERO_COPY_HCI",

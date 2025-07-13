@@ -51,6 +51,7 @@ target_sources(mbed-apollo3
         device/us_ticker.c
         device/itm_api.c
         device/analogin_api.c
+        device/pwmout_api.c
 
         sdk/CMSIS/AmbiqMicro/Source/system_apollo3.c
 

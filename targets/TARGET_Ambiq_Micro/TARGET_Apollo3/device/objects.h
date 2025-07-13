@@ -28,5 +28,6 @@
 #include "objects_spi.h"
 #include "objects_i2c.h"
 #include "objects_adc.h"
+#include "objects_pwm.h"
 
 #endif
