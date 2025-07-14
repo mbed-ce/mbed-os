@@ -2822,7 +2822,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32G0B1xx"
         ],
         "device_has_add": [
-            "ANALOGOUT"
+            "ANALOGOUT",
+            "CAN",
+            "CAN_FD"
         ]
     },
     "NUCLEO_G0B1RE": {
@@ -2902,6 +2904,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SERIAL_ASYNCH",
             "TRNG",
             "CAN",
+            "CAN_FD",
             "CRC"
         ],
         "is_mcu_family_target": true
@@ -3108,6 +3111,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TRNG",
             "FLASH",
             "CAN",
+            "CAN_FD",
             "CRC"
         ],
         "device_has_remove": [
@@ -3251,6 +3255,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CAN_FD",
             "CRC",
             "TRNG",
             "FLASH",
@@ -4739,6 +4744,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CAN_FD",
             "CRC",
             "FLASH",
             "MPU",
@@ -4941,6 +4947,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "ANALOGOUT",
             "CAN",
+            "CAN_FD",
             "CRC",
             "FLASH",
             "MPU",

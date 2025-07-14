@@ -106,6 +106,7 @@ struct can_s {
     FDCAN_HandleTypeDef CanHandle;
     int index;
     int hz;
+    int data_hz;
 };
 #endif
 

@@ -30,10 +30,14 @@ CAN::CAN(PinName rd, PinName td) : _can(), _irq()
     can_irq_init(&_can, (&CAN::_irq_handler), reinterpret_cast<uintptr_t>(this));
 }
 
-CAN::CAN(PinName rd, PinName td, int hz) : _can(), _irq()
+CAN::CAN(PinName rd, PinName td, int hz, int data_hz) : _can(), _irq()
 {
     // No lock needed in constructor
+#ifdef DEVICE_CAN_FD
+    canfd_init_freq(&_can, rd, td, hz, data_hz);
+#else
     can_init_freq(&_can, rd, td, hz);
+#endif
     can_irq_init(&_can, (&CAN::_irq_handler), reinterpret_cast<uintptr_t>(this));
 }
 
@@ -44,10 +48,14 @@ CAN::CAN(const can_pinmap_t &pinmap) : _can(), _irq()
     can_irq_init(&_can, (&CAN::_irq_handler), reinterpret_cast<uintptr_t>(this));
 }
 
-CAN::CAN(const can_pinmap_t &pinmap, int hz) : _can(), _irq()
+CAN::CAN(const can_pinmap_t &pinmap, int hz, int data_hz) : _can(), _irq()
 {
     // No lock needed in constructor
+#ifdef DEVICE_CAN_FD
+    canfd_init_freq_direct(&_can, &pinmap, hz, data_hz);
+#else
     can_init_freq_direct(&_can, &pinmap, hz);
+#endif
     can_irq_init(&_can, (&CAN::_irq_handler), reinterpret_cast<uintptr_t>(this));
 }
 
@@ -63,10 +71,14 @@ CAN::~CAN()
     can_free(&_can);
 }
 
-int CAN::frequency(int f)
+int CAN::frequency(int f, int data_f)
 {
     lock();
+#ifdef DEVICE_CAN_FD
+    int ret = canfd_frequency(&_can, f, data_f);
+#else
     int ret = can_frequency(&_can, f);
+#endif
     unlock();
     return ret;
 }
@@ -89,6 +101,29 @@ int CAN::read(CANMessage &msg, int handle)
     unlock();
     return ret;
 }
+
+#ifdef DEVICE_CAN_FD
+
+int CAN::write(CANFDMessage msg)
+{
+    lock();
+    int ret = canfd_write(&_can, msg, 0);
+    unlock();
+    return ret;
+}
+
+int CAN::read(CANFDMessage &msg, int handle)
+{
+    lock();
+    int ret = canfd_read(&_can, &msg, handle);
+    if (msg.len > 64) {
+        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_CAN, MBED_ERROR_CODE_READ_FAILED), "Read tried to write more than 64 bytes");
+    }
+    unlock();
+    return ret;
+}
+
+#endif
 
 void CAN::reset()
 {
