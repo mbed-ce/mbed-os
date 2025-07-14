@@ -140,7 +140,7 @@ public:
     }
 };
 
-#ifdef DEVICE_CAN_FD
+#if DEVICE_CAN_FD
 
 /** CANFDMessage class
  *

@@ -67,6 +67,26 @@ struct CAN_Message {
 };
 typedef struct CAN_Message CAN_Message;
 
+#if DEVICE_CAN_FD
+
+/**
+ *
+ * \struct  CAN_Message
+ *
+ * \brief   Holder for single CAN message.
+ *
+**/
+struct CANFD_Message {
+    unsigned int   id;                 // 29 bit identifier
+    unsigned char  data[64];            // Data field
+    unsigned char  len;                // Length of data field in bytes
+    CANFormat      format;             // Format ::CANFormat
+    CANType        type;               // Type ::CANType
+};
+typedef struct CANFD_Message CANFD_Message;
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif

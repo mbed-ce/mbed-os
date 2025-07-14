@@ -33,7 +33,7 @@ CAN::CAN(PinName rd, PinName td) : _can(), _irq()
 CAN::CAN(PinName rd, PinName td, int hz, int data_hz) : _can(), _irq()
 {
     // No lock needed in constructor
-#ifdef DEVICE_CAN_FD
+#if DEVICE_CAN_FD
     canfd_init_freq(&_can, rd, td, hz, data_hz);
 #else
     can_init_freq(&_can, rd, td, hz);
@@ -51,7 +51,7 @@ CAN::CAN(const can_pinmap_t &pinmap) : _can(), _irq()
 CAN::CAN(const can_pinmap_t &pinmap, int hz, int data_hz) : _can(), _irq()
 {
     // No lock needed in constructor
-#ifdef DEVICE_CAN_FD
+#if DEVICE_CAN_FD
     canfd_init_freq_direct(&_can, &pinmap, hz, data_hz);
 #else
     can_init_freq_direct(&_can, &pinmap, hz);
@@ -74,7 +74,7 @@ CAN::~CAN()
 int CAN::frequency(int f, int data_f)
 {
     lock();
-#ifdef DEVICE_CAN_FD
+#if DEVICE_CAN_FD
     int ret = canfd_frequency(&_can, f, data_f);
 #else
     int ret = can_frequency(&_can, f);
@@ -102,7 +102,7 @@ int CAN::read(CANMessage &msg, int handle)
     return ret;
 }
 
-#ifdef DEVICE_CAN_FD
+#if DEVICE_CAN_FD
 
 int CAN::write(CANFDMessage msg)
 {

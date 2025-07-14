@@ -148,7 +148,7 @@ public:
      */
     int read(CANMessage &msg, int handle = 0);
 
-#ifdef DEVICE_CAN_FD
+#if DEVICE_CAN_FD
 
     /** Write a CANFDMessage to the bus.
      *

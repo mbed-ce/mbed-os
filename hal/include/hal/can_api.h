@@ -87,6 +87,14 @@ unsigned char can_rderror(can_t *obj);
 unsigned char can_tderror(can_t *obj);
 void          can_monitor(can_t *obj, int silent);
 
+#if DEVICE_CAN_FD
+void          canfd_init_freq(can_t *obj, PinName rd, PinName td, int hz, int data_hz);
+void          canfd_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz, int data_hz);
+int           canfd_frequency(can_t *obj, int hz, int data_hz);
+int           canfd_write(can_t *obj, CANFD_Message, int cc);
+int           canfd_read(can_t *obj, CANFD_Message *msg, int handle);
+#endif
+
 /** Get the pins that support CAN RD
  *
  * Return a PinMap array of pins that support CAN RD. The
