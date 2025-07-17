@@ -121,7 +121,7 @@ uint8_t SetSysClock_PLL_MSI(void)
 {
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-    
+
     /* Configure LSE Drive Capability */
     __HAL_RCC_PWR_CLK_ENABLE();
     __HAL_RCC_SYSCFG_CLK_ENABLE();
@@ -191,6 +191,9 @@ uint8_t SetSysClock_PLL_MSI(void)
         return 0; // FAIL
     }
 #endif
+
+    /* Enable MSI Auto calibration */
+    HAL_RCCEx_EnableMSIPLLMode();
 
     return 1; // OK
 }

@@ -98,7 +98,7 @@ MBED_WEAK void SetSysClock(void)
 
 // Output clock on MCO pin(PA8) for debugging purpose
 #if DEBUG_MCO == 1
-    HAL_RCC_MCOConfig(RCC_MCO, RCC_MCOSOURCE_SYSCLK, RCC_MCO_NODIV); // 160 MHz 
+    HAL_RCC_MCOConfig(RCC_MCO, RCC_MCOSOURCE_SYSCLK, RCC_MCO_NODIV); // 160 MHz
 #endif
 
 // Output clock on LSCO pin(PA2) for debugging purpose
@@ -121,7 +121,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 #if DEVICE_USBDEVICE
     RCC_PeriphCLKInitTypeDef RCC_PeriphClkInit = {0};
 #endif /* DEVICE_USBDEVICE */
-    
+
     /* GPIO Ports Clock Enable */
     __HAL_RCC_GPIOH_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -176,7 +176,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;           // 160 MHz
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;           // 160 MHz
     RCC_ClkInitStruct.APB3CLKDivider = RCC_HCLK_DIV1;           // 160 MHz
-    
+
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK) {
         return 0; // FAIL
     }
@@ -273,6 +273,12 @@ MBED_WEAK uint8_t SetSysClock_PLL_MSI(void)
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
         return 0; // FAIL
     }
+
+    /** Enable MSI Auto calibration
+     */
+    HAL_RCCEx_EnableMSIPLLModeSelection(RCC_MSIKPLL_MODE_SEL);
+    HAL_RCCEx_EnableMSIPLLMode();
+    HAL_RCCEx_EnableMSIPLLFastStartup();
 
     return 1; // OK
 }

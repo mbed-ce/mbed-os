@@ -670,10 +670,10 @@ int can_read(can_t *obj, CAN_Message *msg, int handle)
     }
     msg->id   = RxHeader.Identifier;
     msg->type = (RxHeader.RxFrameType == FDCAN_DATA_FRAME) ? CANData : CANRemote;
-    msg->len  = RxHeader.DataLength;
 #if defined(TARGET_STM32L5) || defined(TARGET_STM32G0) || defined(TARGET_STM32G4)
-    msg->len >>= 16;
+    RxHeader.DataLength >>= 16;
 #endif
+    msg->len  = RxHeader.DataLength;
     return 1;
 }
 
@@ -698,10 +698,10 @@ int canfd_read(can_t *obj, CANFD_Message *msg, int handle)
     }
     msg->id   = RxHeader.Identifier;
     msg->type = (RxHeader.RxFrameType == FDCAN_DATA_FRAME) ? CANData : CANRemote;
-    msg->len  = RxHeader.DataLength;
 #if defined(TARGET_STM32L5) || defined(TARGET_STM32G0) || defined(TARGET_STM32G4)
-    msg->len >>= 16;
+    RxHeader.DataLength >>= 16;
 #endif
+    msg->len  = RxHeader.DataLength;
     switch(msg->len) { // see FDCAN_data_length_code value
         case 9:
             msg->len = 12;

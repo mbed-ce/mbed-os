@@ -27,12 +27,12 @@
   * It is used for all STM32H7 family microcontrollers with a top speed of 280MHz.
   * The input clock from the external oscillator may be any frequency evenly divisible by
   * 5MHz or 2MHz, and must be between 4MHz and 50MHz.
-  * 
+  *
   * Note that 280MHz is the "overdrive" mode and is basically an overclock.  It is only supported
   * under certain conditions (LDO in use) and cannot be used over the full temperature range.
   * For industrial applications it is recommended to disable overdrive.  Overdrive can be enabled/
   * disabled via the "target.enable-overdrive-mode" option in mbed_app.json.
-  * 
+  *
 **/
 
 #include "stm32h7xx.h"
@@ -160,9 +160,9 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     RCC_OscInitStruct.PLL.PLLP = 2;   // PLLCLK = SYSCLK = 280/225 MHz
 
 #if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
-    RCC_OscInitStruct.PLL.PLLQ = 56;  // PLL1Q used for FDCAN = 10 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 7;  // PLL1Q used for FDCAN = 80 MHz
 #else
-    RCC_OscInitStruct.PLL.PLLQ = 45;  // PLL1Q used for FDCAN = 10 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 5;  // PLL1Q used for FDCAN = 90 MHz
 #endif
 
     RCC_OscInitStruct.PLL.PLLR = 2;
@@ -234,11 +234,11 @@ uint8_t SetSysClock_PLL_HSI(void)
     RCC_OscInitStruct.PLL.PLLP = 2;   // PLLCLK = SYSCLK = 280/225 MHz
 
 #if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
-    RCC_OscInitStruct.PLL.PLLQ = 56;  // PLL1Q used for FDCAN = 10 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 7;  // PLL1Q used for FDCAN = 80 MHz
 #else
-    RCC_OscInitStruct.PLL.PLLQ = 45;  // PLL1Q used for FDCAN = 10 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 5;  // PLL1Q used for FDCAN = 90 MHz
 #endif
-    
+
     RCC_OscInitStruct.PLL.PLLR = 2;
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE; // PLL1 VCO clock is between 128 and 560 MHz
     RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_1; // PLL1 input clock is between 2 and 4 MHz

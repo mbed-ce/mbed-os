@@ -219,6 +219,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_MSI(void)
      */
     HAL_RCCEx_EnableMSIPLLModeSelection(RCC_MSIKPLL_MODE_SEL);
     HAL_RCCEx_EnableMSIPLLMode();
+    HAL_RCCEx_EnableMSIPLLFastStartup();
 
     return 1; // OK
 }

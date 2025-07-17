@@ -167,6 +167,12 @@ MBED_WEAK uint8_t SetSysClock_PLL_MSI(void)
         return 0; // FAIL
     }
 
+    /** Enable MSI Auto calibration
+     */
+    HAL_RCCEx_EnableMSIPLLModeSelection(RCC_MSIKPLL_MODE_SEL);
+    HAL_RCCEx_EnableMSIPLLMode();
+    HAL_RCCEx_EnableMSIPLLFastStartup();
+
     return 1; // OK
 }
 #endif /* ((CLOCK_SOURCE) & USE_PLL_MSI) */
