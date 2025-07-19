@@ -83,18 +83,24 @@ typedef enum {
 } PWMName;
 
 // Get the CTIMER number of a PWM
-#define APOLLO3_PWMNAME_GET_CTIMER(pwmName) (pwmName >> 2)
+#define APOLLO3_PWMNAME_GET_CTIMER(pwm_name) (pwm_name >> 2)
 
 // Convert from PWM name to AM_HAL_CTIMER_TIMERA/AM_HAL_CTIMER_TIMERB macro
-#define APOLLO3_PWMNAME_GET_SEGMENT(pwmName) (pwmName & 0b10 ? AM_HAL_CTIMER_TIMERB : AM_HAL_CTIMER_TIMERA)
+#define APOLLO3_PWMNAME_GET_SEGMENT(pwm_name) (pwm_name & 0b10 ? AM_HAL_CTIMER_TIMERB : AM_HAL_CTIMER_TIMERA)
 
 // Convert from PWM name to AM_HAL_CTIMER_OUTPUT_NORMAL/AM_HAL_CTIMER_OUTPUT_SECONDARY enum value
-#define APOLLO3_PWMNAME_GET_OUTPUT(pwmName) (pwmName & 0b1 ? AM_HAL_CTIMER_OUTPUT_SECONDARY : AM_HAL_CTIMER_OUTPUT_NORMAL)
+#define APOLLO3_PWMNAME_GET_OUTPUT(pwm_name) (pwm_name & 0b1 ? AM_HAL_CTIMER_OUTPUT_SECONDARY : AM_HAL_CTIMER_OUTPUT_NORMAL)
 
 struct pwmout_s
 {
     // PWM name that this channel is using
-    PWMName pwmName;
+    PWMName pwm_name;
+
+    // Clock period configured on this PWM, in floating point seconds
+    float clock_period;
+
+    // Number of counts that the PWM output will make before a new PWM cycle starts
+    uint32_t top_count;
 };
 
 #ifdef __cplusplus
