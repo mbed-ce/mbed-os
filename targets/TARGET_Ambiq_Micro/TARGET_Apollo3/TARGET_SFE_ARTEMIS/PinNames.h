@@ -143,11 +143,6 @@ typedef enum
 #define QWIIC_SCL I2C_SCL
 #define QWIIC_SDA I2C_SDA
 
-// SPI bus
-#define SPI_SCLK IO_5
-#define SPI_MOSI IO_7
-#define SPI_MISO IO_6
-
 #if defined(MBED_CONF_TARGET_STDIO_UART_TX)
 #define STDIO_UART_TX MBED_CONF_TARGET_STDIO_UART_TX
 #else

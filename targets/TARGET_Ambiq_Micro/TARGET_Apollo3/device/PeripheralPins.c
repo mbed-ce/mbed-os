@@ -271,7 +271,7 @@ const PinMap PinMap_SPI_SSEL[] = {
 // can actually map to one of 6 different PWM module outputs. However, there are as many PWM module
 // outputs as there are pins, so we don't need to use this just to give every pin its own PWM output.
 // For now, we always use the first possible option (Output Selection 2 in Table 814).
-const PinMap PinMap_PWM[] = {
+const PinMap PinMap_PWM_OUT[] = {
     {IO_12, CTIMER_A0_OUT1, AM_HAL_PIN_12_CTIM0},
     {IO_25, CTIMER_A0_OUT2, AM_HAL_PIN_25_CTIM1},
     {IO_13, CTIMER_B0_OUT1, AM_HAL_PIN_13_CTIM2},

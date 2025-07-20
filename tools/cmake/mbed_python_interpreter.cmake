@@ -38,7 +38,8 @@ if(MBED_CREATE_PYTHON_VENV)
         message(STATUS "Python venv deleted or unusable. Recreating using system Python...")
 
         # Launch a new search for Python3
-        unset(Python3_EXECUTABLE)
+        unset(Python3_EXECUTABLE CACHE)
+        unset(Python_EXECUTABLE CACHE)
         unset(_Python3_EXECUTABLE CACHE)
         unset(_Python3_INTERPRETER_PROPERTIES CACHE)
         unset(_Python3_INTERPRETER_SIGNATURE CACHE)

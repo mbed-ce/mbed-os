@@ -42,7 +42,7 @@ typedef struct pwmout_s pwmout_t;
  * * ::pwmout_write sets the output duty-cycle in range <0.0f, 1.0f>
  * * ::pwmout_read returns the current float-point output duty-cycle in range <0.0f, 1.0f>
  * * ::pwmout_period sets the PWM period specified in seconds, keeping the duty cycle the same
- * * ::pwmout_period_ms sets the PWM period specified in miliseconds, keeping the duty cycle the same
+ * * ::pwmout_period_ms sets the PWM period specified in milliseconds, keeping the duty cycle the same
  * * ::pwmout_period_us sets the PWM period specified in microseconds, keeping the duty cycle the same
  * * ::pwmout_read_period_us reads the PWM period specified in microseconds
  * * ::pwmout_pulsewidth sets the PWM pulsewidth specified in seconds, keeping the period the same
@@ -84,7 +84,11 @@ void pwmout_init_direct(pwmout_t *obj, const PinMap *pinmap);
  */
 void pwmout_init(pwmout_t *obj, PinName pin);
 
-/** Deinitialize the pwmout object
+/**
+ * @brief Deinitialize the pwmout object
+ *
+ * After this function is called, the PWM output must stop generating edges.
+ * The logic level is not specified -- it may be left high, low, or tristated.
  *
  * @param obj The pwmout object
  */

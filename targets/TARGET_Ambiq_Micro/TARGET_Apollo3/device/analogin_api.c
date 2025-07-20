@@ -153,8 +153,9 @@ uint16_t analogin_read_u16(analogin_t *obj)
 
 float analogin_read(analogin_t *obj)
 {
-    /* Read the raw 12-Bit value from the ADC. */
-    float analog_in_raw = (float)analogin_read_u16(obj);
+    /* Read the raw 14-Bit value from the ADC. */
+    uint16_t analog_in_raw = readAnalogIn(obj);
+
     /* Convert it to a voltage value. */
     return (analog_in_raw * ADC_CONVERSION_FACTOR);
 }

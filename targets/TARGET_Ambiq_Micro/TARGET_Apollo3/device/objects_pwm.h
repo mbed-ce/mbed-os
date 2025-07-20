@@ -101,6 +101,10 @@ struct pwmout_s
 
     // Number of counts that the PWM output will make before a new PWM cycle starts
     uint32_t top_count;
+
+    // Number of counts that the PWM output will stay on for.
+    // Zero = full off, top_count = full on
+    uint32_t on_counts;
 };
 
 #ifdef __cplusplus
