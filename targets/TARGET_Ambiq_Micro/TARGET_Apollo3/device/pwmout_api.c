@@ -30,7 +30,7 @@
 
 // Change to 1 to enable debug prints of what's being calculated.
 // Must comment out the critical section calls in PwmOut to use.
-#define APOLLO3_PWMOUT_DEBUG 1
+#define APOLLO3_PWMOUT_DEBUG 0
 
 #if APOLLO3_PWMOUT_DEBUG
 #include <stdio.h>

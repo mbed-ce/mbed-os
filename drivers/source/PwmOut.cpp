@@ -57,74 +57,74 @@ PwmOut::~PwmOut()
 
 void PwmOut::write(float value)
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     pwmout_write(&_pwm, value);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 float PwmOut::read()
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     float val = pwmout_read(&_pwm);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
     return val;
 }
 
 void PwmOut::period(float seconds)
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     pwmout_period(&_pwm, seconds);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 void PwmOut::period_ms(int ms)
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     pwmout_period_ms(&_pwm, ms);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 void PwmOut::period_us(int us)
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     pwmout_period_us(&_pwm, us);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 int PwmOut::read_period_us()
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     auto val = pwmout_read_period_us(&_pwm);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
     return val;
 }
 
 void PwmOut::pulsewidth(float seconds)
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     pwmout_pulsewidth(&_pwm, seconds);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 void PwmOut::pulsewidth_ms(int ms)
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     pwmout_pulsewidth_ms(&_pwm, ms);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 void PwmOut::pulsewidth_us(int us)
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     pwmout_pulsewidth_us(&_pwm, us);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 int PwmOut::read_pulsewidth_us()
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     auto val = pwmout_read_pulsewidth_us(&_pwm);
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
     return val;
 }
 
@@ -135,24 +135,24 @@ int PwmOut::read_pulsewitdth_us()
 
 void PwmOut::suspend()
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     if (_initialized) {
         _duty_cycle = PwmOut::read();
         _period_us = PwmOut::read_period_us();
         PwmOut::deinit();
     }
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 void PwmOut::resume()
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
     if (!_initialized) {
         PwmOut::init();
         PwmOut::period_us(_period_us);
         PwmOut::write(_duty_cycle);
     }
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 void PwmOut::lock_deep_sleep()
@@ -183,7 +183,7 @@ void PwmOut::_call_pwmout_init(PwmOut *thisPtr)
 
 void PwmOut::init()
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
 
     if (!_initialized) {
 
@@ -194,12 +194,12 @@ void PwmOut::init()
         _initialized = true;
     }
 
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 void PwmOut::deinit()
 {
-    //core_util_critical_section_enter();
+    core_util_critical_section_enter();
 
     if (_initialized) {
         pwmout_free(&_pwm);
@@ -207,7 +207,7 @@ void PwmOut::deinit()
         _initialized = false;
     }
 
-    //core_util_critical_section_exit();
+    core_util_critical_section_exit();
 }
 
 } // namespace mbed
