@@ -93,8 +93,14 @@ typedef enum {
 
 struct pwmout_s
 {
+    // Pin that the channel is on
+    PinName pin;
+
     // PWM name that this channel is using
     PWMName pwm_name;
+
+    // True iff the pin is connected to the PWM timer
+    bool pin_is_connected_to_pwm;
 
     // Clock period configured on this PWM, in floating point seconds
     float clock_period;

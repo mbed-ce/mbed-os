@@ -25,6 +25,7 @@
 #include "mbed_assert.h"
 #include <mbed_error.h>
 
+#include <string.h>
 #include <math.h>
 
 // Change to 1 to enable debug prints of what's being calculated.
@@ -89,14 +90,9 @@ void pwmout_init(pwmout_t *obj, PinName pin)
     const PWMName pwmName = pinmap_peripheral(pin, PinMap_PWM_OUT);
 
     /* Populate PWM object with values. */
+    memset(obj, 0, sizeof(pwmout_t));
     obj->pwm_name = pwmName;
-
-    // Configure the pin
-    am_hal_ctimer_output_config(APOLLO3_PWMNAME_GET_CTIMER(pwmName),
-                                APOLLO3_PWMNAME_GET_SEGMENT(pwmName),
-                                pin,
-                                APOLLO3_PWMNAME_GET_OUTPUT(pwmName),
-                                AM_HAL_GPIO_PIN_DRIVESTRENGTH_12MA);
+    obj->pin = pin;
 }
 
 void pwmout_free(pwmout_t *obj)
@@ -116,29 +112,53 @@ void pwmout_write(pwmout_t *obj, float percent)
     // Calculate how many counts out of top_count we should be on
     obj->on_counts = lroundf(percent * obj->top_count);
 
-    // Set new period value. Note that:
-    // - We have to set the top count and the on count at the same time
-    // - The HW adds 1 to the programmed values, so we have to subtract 1 when passing them in
-    if(APOLLO3_PWMNAME_GET_OUTPUT(obj->pwm_name) == AM_HAL_CTIMER_OUTPUT_NORMAL) {
-        am_hal_ctimer_period_set(APOLLO3_PWMNAME_GET_CTIMER(obj->pwm_name),
-            APOLLO3_PWMNAME_GET_SEGMENT(obj->pwm_name),
-            obj->top_count - 1,
-            obj->on_counts - 1);
-    }
-    else {
-        am_hal_ctimer_aux_period_set(APOLLO3_PWMNAME_GET_CTIMER(obj->pwm_name),
-            APOLLO3_PWMNAME_GET_SEGMENT(obj->pwm_name),
-            obj->top_count - 1,
-            obj->on_counts - 1);
-    }
-
 #if APOLLO3_PWMOUT_DEBUG
     printf("obj->on_counts: %" PRIu32 "\n", obj->on_counts);
 #endif
 
-    // Start timer if not running
-    am_hal_ctimer_start(APOLLO3_PWMNAME_GET_CTIMER(obj->pwm_name),
-        APOLLO3_PWMNAME_GET_SEGMENT(obj->pwm_name));
+    // If we want 0% or 100% duty cycle, we need to do that by connecting the pin to forceed 0 or forced 1
+    if (obj->on_counts == 0 || obj->on_counts == obj->top_count) {
+        am_hal_ctimer_stop(APOLLO3_PWMNAME_GET_CTIMER(obj->pwm_name),
+            APOLLO3_PWMNAME_GET_SEGMENT(obj->pwm_name));
+        am_hal_ctimer_output_config(APOLLO3_PWMNAME_GET_CTIMER(obj->pwm_name),
+                                APOLLO3_PWMNAME_GET_SEGMENT(obj->pwm_name),
+                                obj->pin,
+                                obj->on_counts == 0 ? AM_HAL_CTIMER_OUTPUT_FORCE0 : AM_HAL_CTIMER_OUTPUT_FORCE1,
+                                AM_HAL_GPIO_PIN_DRIVESTRENGTH_12MA);
+        obj->pin_is_connected_to_pwm = false;
+    }
+    else {
+
+        // If the pin is not connected to the PWM timer, set that up
+        if (!obj->pin_is_connected_to_pwm) {
+            am_hal_ctimer_output_config(APOLLO3_PWMNAME_GET_CTIMER(obj->pwm_name),
+                APOLLO3_PWMNAME_GET_SEGMENT(obj->pwm_name),
+                obj->pin,
+                APOLLO3_PWMNAME_GET_OUTPUT(obj->pwm_name),
+                AM_HAL_GPIO_PIN_DRIVESTRENGTH_12MA);
+            obj->pin_is_connected_to_pwm = true;
+        }
+
+        // Set new period value. Note that:
+        // - We have to set the top count and the on count at the same time
+        // - The HW adds 1 to the programmed values, so we have to subtract 1 when passing them in
+        if(APOLLO3_PWMNAME_GET_OUTPUT(obj->pwm_name) == AM_HAL_CTIMER_OUTPUT_NORMAL) {
+            am_hal_ctimer_period_set(APOLLO3_PWMNAME_GET_CTIMER(obj->pwm_name),
+                APOLLO3_PWMNAME_GET_SEGMENT(obj->pwm_name),
+                obj->top_count - 1,
+                obj->on_counts - 1);
+        }
+        else {
+            am_hal_ctimer_aux_period_set(APOLLO3_PWMNAME_GET_CTIMER(obj->pwm_name),
+                APOLLO3_PWMNAME_GET_SEGMENT(obj->pwm_name),
+                obj->top_count - 1,
+                obj->on_counts - 1);
+        }
+
+        // Start timer if not running
+        am_hal_ctimer_start(APOLLO3_PWMNAME_GET_CTIMER(obj->pwm_name),
+            APOLLO3_PWMNAME_GET_SEGMENT(obj->pwm_name));
+    }
 }
 
 float pwmout_read(pwmout_t *obj)
@@ -210,7 +230,7 @@ void pwmout_period_us(pwmout_t *obj, int period)
 int pwmout_read_period_us(pwmout_t *obj)
 {
     MBED_ASSERT(obj != NULL);
-    return lroundf(1000000 * obj->top_count * obj->clock_period);
+    return lroundf(1e6f * obj->top_count * obj->clock_period);
 }
 
 void pwmout_pulsewidth(pwmout_t *obj, float pulse)
