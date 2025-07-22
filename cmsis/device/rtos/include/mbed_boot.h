@@ -19,6 +19,8 @@
 
 #include "mbed_toolchain.h"
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -37,7 +37,7 @@ const PinMap PinMap_ADC[] = {
     {33, ADC0_5, AM_HAL_PIN_33_ADCSE5},
     {34, ADC0_6, AM_HAL_PIN_34_ADCSE6},
     {35, ADC0_7, AM_HAL_PIN_35_ADCSE7},
-    {ADC_TEMP, ADC0_TEMP, 0},
+    {INT_TEMP_SENSOR, ADC0_TEMP, 0},
     {NC, NC, 0}
 };
 
@@ -299,14 +299,16 @@ const PinMap PinMap_PWM_OUT[] = {
     {IO_46, CTIMER_A6_OUT1, AM_HAL_PIN_46_CTIM24},
     {IO_47, CTIMER_B6_OUT1, AM_HAL_PIN_47_CTIM26},
     {IO_35, CTIMER_B6_OUT2, AM_HAL_PIN_35_CTIM27},
-    {IO_48, CTIMER_A7_OUT1, AM_HAL_PIN_48_CTIM28},
-    {IO_49, CTIMER_B7_OUT1, AM_HAL_PIN_49_CTIM30},
-    {IO_11, CTIMER_B7_OUT2, AM_HAL_PIN_11_CTIM31},
 
-    // Note: These two are slightly different as they use PWM output selections 6 and 7 instead of 2.
-    // However, the AM HAL handles that distinction internally so we don't need to do anything different.
+    // Different from normal mapping since output selection 2 doesn't give a unique timer on this pin
     {IO_39, CTIMER_A6_OUT2, AM_HAL_PIN_39_CTIM25},
-    {IO_37, CTIMER_A7_OUT2, AM_HAL_PIN_37_CTIM29},
+
+    // For these last four, we have to duplicate other timers, as CTIMER_x7 is
+    // used for the us ticker.
+    {IO_48, CTIMER_A3_OUT1, AM_HAL_PIN_48_CTIM28},
+    {IO_37, CTIMER_A3_OUT2, AM_HAL_PIN_37_CTIM29},
+    {IO_49, CTIMER_B3_OUT1, AM_HAL_PIN_49_CTIM30},
+    {IO_11, CTIMER_B3_OUT2, AM_HAL_PIN_11_CTIM31},
 
     {NC, NC, 0}
 };

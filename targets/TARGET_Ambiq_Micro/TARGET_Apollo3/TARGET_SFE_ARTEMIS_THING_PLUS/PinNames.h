@@ -138,7 +138,7 @@ typedef enum
     SERIAL1_RX = D0,
 
     // Not a real pin on the device, but can be passed to AnalogIn to read the internal temperature sensor
-    ADC_TEMP = 0x10000,
+    INT_TEMP_SENSOR = 0x10000,
 
     // Not connected
     NC = NC_VAL

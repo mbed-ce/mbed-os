@@ -45,6 +45,11 @@ struct analogin_s
     am_hal_adc_slot_chan_e slot;
 };
 
+// Opaque handle to the ADC peripheral. This is needed to
+// use certain AM HAL calls from user code. This will be initialized
+// the first time that any AnalogIn is initialized.
+extern void* am_adc_handle;
+
 #ifdef __cplusplus
 }
 #endif

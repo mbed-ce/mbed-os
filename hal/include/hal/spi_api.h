@@ -280,7 +280,7 @@ int  spi_master_write(spi_t *obj, int value);
  *
  * Note: Even if the word size / bits per frame is not 8, \c rx_length and \c tx_length
  * still give lengths in bytes of input data, not numbers of words.
- * 
+ *
  * Note: If \c tx_rx_buffers_equal_length is true in the capabilities structure, then either \c rx_length and \c tx_length
  * must be the same, or one of them will be zero. If this is not the case than the HAL implementation should
  * return an error.

@@ -11,9 +11,8 @@ set(UPLOAD_SUPPORTS_DEBUG TRUE)
 
 ### Find PyOCD package
 
-# Use the Git version so that we get Ambiq Apollo3 support (as that was not included in the latest release
-# before PyOCD development stopped, as of Jun 2025)
-mbed_check_or_install_python_package(HAVE_PYTHON_PYOCD pyocd git+https://github.com/pyocd/pyOCD.git)
+# Use >=0.37 so that we get Ambiq Apollo3 support
+mbed_check_or_install_python_package(HAVE_PYTHON_PYOCD pyocd pyocd>=0.37)
 
 set(UPLOAD_PYOCD_FOUND ${HAVE_PYTHON_PYOCD})
 

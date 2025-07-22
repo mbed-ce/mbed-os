@@ -45,7 +45,7 @@ struct pwm_clock_freq {
 // Table of options for PWM clock source vs clock frequency, in decreasing order of clock frequency
 // Note that the Apollo3 uses a fixed external oscillator frequency, so this is possible to define statically.
 // There are three oscillators available, each of which can be used for PWM:
-// - HFRC - internal high freq RC oscillator, 48MHz +-3.5%
+// - HFRC - internal high freq RC oscillator, 48MHz +-3.5% uncalibrated, but better with auto-calibration.
 // - XT - external crystal, 32.768kHz, likely 50ppm or better tolerance
 // - LFRC - internal low freq RC oscillator, 1.024kHz +-32% (no that's not a typo!)
 // This means we have quite a wide range of base clock frequencies available, though period accuracy will be pretty

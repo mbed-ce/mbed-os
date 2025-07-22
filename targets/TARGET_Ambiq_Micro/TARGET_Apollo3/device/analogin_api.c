@@ -23,7 +23,7 @@
 
 #include "am_hal_adc.h"
 
-static void* g_ADCHandle;
+void* am_adc_handle = NULL;
 
 // ADC constants
 #define ADC_RESOLUTION_SEL AM_HAL_ADC_SLOT_14BIT
@@ -36,19 +36,19 @@ static uint32_t powerControlADC(bool on){
     uint32_t status = AM_HAL_STATUS_SUCCESS;
 
     if(on){
-        status = am_hal_adc_initialize(0, &g_ADCHandle);
+        status = am_hal_adc_initialize(0, &am_adc_handle);
         if(status != AM_HAL_STATUS_SUCCESS){ return status; }
 
-        status = am_hal_adc_power_control(g_ADCHandle, AM_HAL_SYSCTRL_WAKE, false);
+        status = am_hal_adc_power_control(am_adc_handle, AM_HAL_SYSCTRL_WAKE, false);
         if(status != AM_HAL_STATUS_SUCCESS){ return status; }
     }else{
-        status = am_hal_adc_disable(g_ADCHandle);
+        status = am_hal_adc_disable(am_adc_handle);
         if(status != AM_HAL_STATUS_SUCCESS){ return status; }
 
         status = am_hal_pwrctrl_periph_disable(AM_HAL_PWRCTRL_PERIPH_ADC);
         if(status != AM_HAL_STATUS_SUCCESS){ return status; }
 
-        status = am_hal_adc_deinitialize(g_ADCHandle);
+        status = am_hal_adc_deinitialize(am_adc_handle);
         if(status != AM_HAL_STATUS_SUCCESS){ return status; }
     }
 
@@ -71,7 +71,7 @@ static uint32_t initializeADC( void ){
     ADCConfig.ePowerMode = AM_HAL_ADC_LPMODE0;
     ADCConfig.eRepeat = AM_HAL_ADC_SINGLE_SCAN;
 
-    return am_hal_adc_configure(g_ADCHandle, &ADCConfig);
+    return am_hal_adc_configure(am_adc_handle, &ADCConfig);
 }
 
 
@@ -110,11 +110,11 @@ static void ap3_config_channel(am_hal_adc_slot_chan_e channel){
     ADCSlotConfig.bWindowCompare = false;
     ADCSlotConfig.bEnabled = true;
 
-    MBED_ASSERT(am_hal_adc_disable(g_ADCHandle) == AM_HAL_STATUS_SUCCESS);
+    MBED_ASSERT(am_hal_adc_disable(am_adc_handle) == AM_HAL_STATUS_SUCCESS);
 
-    MBED_ASSERT(am_hal_adc_configure_slot(g_ADCHandle, 0, &ADCSlotConfig) == AM_HAL_STATUS_SUCCESS);
+    MBED_ASSERT(am_hal_adc_configure_slot(am_adc_handle, 0, &ADCSlotConfig) == AM_HAL_STATUS_SUCCESS);
 
-    MBED_ASSERT(am_hal_adc_enable(g_ADCHandle) == AM_HAL_STATUS_SUCCESS);
+    MBED_ASSERT(am_hal_adc_enable(am_adc_handle) == AM_HAL_STATUS_SUCCESS);
 }
 
 // Read an analog in channel as a 14-bit number
@@ -125,20 +125,20 @@ static uint16_t readAnalogIn(analogin_t *obj)
 
     // Clear any set interrupt flags
     uint32_t intStatus;
-    am_hal_adc_interrupt_status(g_ADCHandle, &intStatus, false);
-    MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_interrupt_clear(g_ADCHandle, intStatus));
+    am_hal_adc_interrupt_status(am_adc_handle, &intStatus, false);
+    MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_interrupt_clear(am_adc_handle, intStatus));
 
     // Issue SW trigger
-    am_hal_adc_sw_trigger(g_ADCHandle);
+    am_hal_adc_sw_trigger(am_adc_handle);
 
     do { // Wait for conversion complete interrupt
-        MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_interrupt_status(g_ADCHandle, &intStatus, false));
+        MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_interrupt_status(am_adc_handle, &intStatus, false));
     } while(!(intStatus & AM_HAL_ADC_INT_CNVCMP));
-    MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_interrupt_clear(g_ADCHandle, intStatus));
+    MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_interrupt_clear(am_adc_handle, intStatus));
 
     uint32_t numSamplesToRead = 1;
     am_hal_adc_sample_t sample;
-    MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_samples_read(g_ADCHandle, false, NULL, &numSamplesToRead, &sample));
+    MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_samples_read(am_adc_handle, false, NULL, &numSamplesToRead, &sample));
 
     return sample.ui32Sample;
 }
