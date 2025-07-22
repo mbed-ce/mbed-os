@@ -265,10 +265,13 @@ __WEAK void hal_deepsleep(void)
     /* We've seen unstable PLL CLK configuration when DEEP SLEEP exits just few µs after being entered
     *  So we need to force clock init out of Deep Sleep.
     *  This init has been split into 2 separate functions so that the involved structures are not allocated on the stack in parallel.
-    *  This will reduce the maximum stack usage in case on non-optimized / debug compilers settings
+    *  This will reduce the maximum stack usage in case on non-optimized / debug compilers settings.
+    *  This is very slow on STM32U5 (up to 6ms), so we disable it on that family of devices.
     */
+#ifndef TARGET_STM32U5
     ForceOscOutofDeepSleep();
     ForcePeriphOutofDeepSleep();
+#endif
     SetSysClock();
 #endif
 
