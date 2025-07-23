@@ -10,6 +10,6 @@ target_include_directories(mbed-arch-pro
         .
 )
 
-target_link_libraries(mbed-arch-pro INTERFACE mbed-lpc176x)
+target_link_libraries(mbed-arch-pro INTERFACE mbed-lpc17xx)
 
 mbed_post_build_lpc_patch_vtable("ARCH_PRO")
