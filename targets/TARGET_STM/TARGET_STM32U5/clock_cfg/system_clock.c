@@ -135,16 +135,13 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
         RCC_OscInitStruct.HSEState            = RCC_HSE_BYPASS; // External clock on OSC_IN
     }
     RCC_OscInitStruct.HSI48State            = RCC_HSI48_ON;
-#if (HSE_VALUE % 5000000) == 0UL
     RCC_OscInitStruct.PLL.PLLState          = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource         = RCC_PLLSOURCE_HSE;
     RCC_OscInitStruct.PLL.PLLMBOOST         = RCC_PLLMBOOST_DIV1;
+#if (HSE_VALUE % 5000000) == 0UL
     RCC_OscInitStruct.PLL.PLLM              = HSE_VALUE/ 5000000; // VCO input clock = 5 MHz
     RCC_OscInitStruct.PLL.PLLN              = 32; // VCO output clock = 160 MHz (5 MHz * 32)
 #elif (HSE_VALUE % 4000000) == 0UL
-    RCC_OscInitStruct.PLL.PLLState          = RCC_PLL_ON;
-    RCC_OscInitStruct.PLL.PLLSource         = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLMBOOST         = RCC_PLLMBOOST_DIV1;
     RCC_OscInitStruct.PLL.PLLM              = HSE_VALUE/ 4000000; // VCO input clock = 4 MHz
     RCC_OscInitStruct.PLL.PLLN              = 40; // VCO output clock = 160 MHz (4 MHz * 40)
 #else
