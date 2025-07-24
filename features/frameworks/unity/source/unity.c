@@ -1240,6 +1240,7 @@ void UnitySkipPrint(const char* msg, const UNITY_LINE_TYPE line)
       UNITY_OUTPUT_CHAR(' ');
       UnityPrint(msg);
     }
+    UNITY_OUTPUT_CHAR('\n');
 }
 
 /*-----------------------------------------------*/

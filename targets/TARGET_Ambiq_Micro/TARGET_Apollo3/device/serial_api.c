@@ -26,6 +26,7 @@
 #if DEVICE_SERIAL
 
 #include "serial_api.h"
+#include "mbed_wait_api.h"
 
 #include "mbed_assert.h"
 #include "PeripheralPins.h"
@@ -142,7 +143,8 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
         obj->serial.uart_control->cfg.ui32RxBufferSize = 0;
         obj->serial.uart_control->cfg.ui32TxBufferSize = 0;
 
-        obj->serial.uart_control->cfg.ui32FifoLevels = AM_HAL_UART_RX_FIFO_7_8;
+        // Mbed expects an interrupt whenever we have at least one char in the Rx FIFO.
+        obj->serial.uart_control->cfg.ui32FifoLevels = AM_HAL_UART_RX_FIFO_1_8;
 
         // start UART instance
         MBED_ASSERT(am_hal_uart_initialize(uart, &(obj->serial.uart_control->handle)) == AM_HAL_STATUS_SUCCESS);
@@ -244,6 +246,7 @@ void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
                 break;
         }
         // NVIC_SetVector(uart_irqs[obj->serial.index], vector);
+        NVIC_ClearPendingIRQ((IRQn_Type)(UART0_IRQn + obj->serial.uart_control->inst));
         NVIC_EnableIRQ((IRQn_Type)(UART0_IRQn + obj->serial.uart_control->inst));
     } else { // disable
         switch (irq) {
@@ -275,6 +278,20 @@ int serial_getc(serial_t *obj)
 
     do {
         am_hal_uart_transfer(obj->serial.uart_control->handle, &am_hal_uart_xfer_read_single);
+
+        // Seeing very odd behavior with this uart, where digital glitches on the line can cause the
+        // framing error bit to set and then cause at least some of the data within the Rx FIFO to be
+        // deleted. This causes an infinite hang, as Mbed requires serial_getc() to return a character
+        // if serial_readable() returns true. This UART is not well documented, so unable to say if this
+        // is an errata or some sort of odd design choice.
+        // To avoid this, if we did not get any data and the framing error bit is set, simply clear the flag
+        // and return an arbitrary character. This is a little awkward but prevents a hard-to-debug hang.
+        if(bytes_read == 0 && UARTn(obj->serial.uart_control->inst)->RSR_b.FESTAT)
+        {
+            UARTn(obj->serial.uart_control->inst)->RSR_b.FESTAT = 0;
+            return 'x';
+        }
+
     } while (bytes_read == 0);
 
     return (int)rx_c;
@@ -371,6 +388,8 @@ const PinMap *serial_rts_pinmap(void)
     return PinMap_UART_RTS;
 }
 #endif
+
+static volatile uint32_t foo = 0;
 
 static inline void uart_irq(uint32_t instance)
 {
