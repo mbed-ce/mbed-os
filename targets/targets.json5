@@ -3594,7 +3594,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         // DISCO_H747I's attributes.
         "inherits": [
             "MCU_STM32H747xI_CM7",
-            "DISCO_H747"
+            "DISCO_H747I"
         ]
     },
     "DISCO_H747I_CM4": {

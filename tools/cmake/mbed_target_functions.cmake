@@ -187,9 +187,7 @@ function(mbed_set_post_build target)
         mbed_post_build_function(${target})
     endif()
 
-    if(HAVE_MEMAP_DEPS)
-        mbed_generate_map_file(${target})
-    endif()
+    mbed_generate_map_file(${target})
 
     # Give chance to adjust MBED_UPLOAD_LAUNCH_COMMANDS or MBED_UPLOAD_RESTART_COMMANDS
     # for debug launch
