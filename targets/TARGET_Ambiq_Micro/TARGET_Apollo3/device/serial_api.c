@@ -360,21 +360,6 @@ void serial_pinout_tx(PinName tx)
     MBED_ASSERT(0);
 }
 
-#if DEVICE_SERIAL_FC
-
-void serial_set_flow_control(serial_t *obj, FlowControl type, PinName rxflow, PinName txflow)
-{
-    // todo:
-    MBED_ASSERT(0);
-}
-
-void serial_set_flow_control_direct(serial_t *obj, FlowControl type, const serial_fc_pinmap_t *pinmap)
-{
-    // todo:
-    MBED_ASSERT(0);
-}
-#endif
-
 const PinMap *serial_tx_pinmap(void)
 {
     return PinMap_UART_TX;
@@ -384,21 +369,6 @@ const PinMap *serial_rx_pinmap(void)
 {
     return PinMap_UART_RX;
 }
-
-#if DEVICE_SERIAL_FC
-
-const PinMap *serial_cts_pinmap(void)
-{
-    return PinMap_UART_CTS;
-}
-
-const PinMap *serial_rts_pinmap(void)
-{
-    return PinMap_UART_RTS;
-}
-#endif
-
-static volatile uint32_t foo = 0;
 
 static inline void uart_irq(uint32_t instance)
 {
