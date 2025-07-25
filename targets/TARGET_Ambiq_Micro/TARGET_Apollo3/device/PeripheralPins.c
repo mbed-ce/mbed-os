@@ -312,3 +312,68 @@ const PinMap PinMap_PWM_OUT[] = {
 
     {NC, NC, 0}
 };
+
+/************ GPIO ***************/
+
+// Note that this is only used for testing, so that the test knows what are valid GPIO pins.
+// It's not used in normal usage.
+// Also, only the "pin" field is significant here. Other fields are don't cares.
+
+const PinMap PinMap_GPIO[] = {
+    {IO_0, 0, 0},
+    {IO_1, 0, 0},
+    {IO_2, 0, 0},
+    {IO_3, 0, 0},
+    {IO_4, 0, 0},
+    {IO_5, 0, 0},
+    {IO_6, 0, 0},
+    {IO_7, 0, 0},
+    {IO_8, 0, 0},
+    {IO_9, 0, 0},
+    {IO_10, 0, 0},
+    {IO_11, 0, 0},
+    {IO_12, 0, 0},
+    {IO_13, 0, 0},
+    {IO_14, 0, 0},
+    {IO_15, 0, 0},
+    {IO_16, 0, 0},
+    {IO_17, 0, 0},
+    {IO_18, 0, 0},
+    {IO_19, 0, 0},
+    {IO_20, 0, 0},
+    {IO_21, 0, 0},
+    {IO_22, 0, 0},
+    {IO_23, 0, 0},
+    {IO_24, 0, 0},
+    {IO_25, 0, 0},
+    {IO_26, 0, 0},
+    {IO_27, 0, 0},
+    {IO_28, 0, 0},
+    {IO_29, 0, 0},
+    {IO_39, 0, 0},
+    {IO_40, 0, 0},
+    {IO_41, 0, 0},
+    {IO_44, 0, 0},
+    {IO_47, 0, 0},
+    {IO_48, 0, 0},
+    {IO_49, 0, 0},
+
+    // Apollo3 I/O pins - BGA package only
+    {IO_30, 0, 0},
+    {IO_31, 0, 0},
+    {IO_32, 0, 0},
+    {IO_33, 0, 0},
+    {IO_34, 0, 0},
+    {IO_35, 0, 0},
+    {IO_36, 0, 0},
+    {IO_37, 0, 0},
+    {IO_38, 0, 0},
+    {IO_42, 0, 0},
+    {IO_43, 0, 0},
+    {IO_45, 0, 0},
+    {IO_46, 0, 0},
+
+    {NC, NC, 0}
+};
+
+

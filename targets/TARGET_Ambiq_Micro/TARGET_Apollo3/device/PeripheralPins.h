@@ -23,6 +23,7 @@
 #include "pinmap.h"
 #include "PeripheralNames.h"
 
+
 //*** I2C ***
 #if DEVICE_I2C
 extern const PinMap PinMap_I2C_SDA[];
@@ -69,5 +70,7 @@ extern const PinMap PinMap_QSPI_DATA1[];
 extern const PinMap PinMap_QSPI_DATA2[];
 extern const PinMap PinMap_QSPI_DATA3[];
 #endif
+
+extern const PinMap PinMap_GPIO[];
 
 #endif

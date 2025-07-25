@@ -23,6 +23,7 @@
 
 #include "mbed_assert.h"
 #include "gpio_api.h"
+#include "PeripheralPins.h"
 
 /** Set the given pin as GPIO
  *
@@ -224,6 +225,5 @@ int gpio_read(gpio_t *obj)
  */
 const PinMap *gpio_pinmap(void)
 {
-    MBED_ASSERT(false);
-    return NULL;
+    return PinMap_GPIO;
 }
