@@ -292,6 +292,15 @@ int serial_getc(serial_t *obj)
             return 'x';
         }
 
+        // Similar to above but with the overflow flag. Without this logic we can hang when receiving
+        // at 921600 baud. Oddly, the overflow flag in RSR does not seem to be reliable, but the overflow
+        // flag in IES seems to be. Not sure why this UART has two overflow flags in the first place, smh...
+        if(bytes_read == 0 && UARTn(obj->serial.uart_control->inst)->IES_b.OERIS)
+        {
+            UARTn(obj->serial.uart_control->inst)->IEC_b.OEIC = 1;
+            return 'x';
+        }
+
     } while (bytes_read == 0);
 
     return (int)rx_c;

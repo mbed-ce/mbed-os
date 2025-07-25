@@ -62,9 +62,11 @@ class KiViBufferWalker():
                 before = line[:pos]
                 after = line[pos + len(match):]
                 if len(before) > 0:
+                    logger.prn_rxd(before)
                     discarded.append(before)
                 if len(after) > 0:
                     # not a K,V pair part
+                    logger.prn_rxd(after)
                     discarded.append(after)
                 logger.prn_inf("found KV pair in stream: {{%s;%s}}, queued..."% (key, value))
             else:
