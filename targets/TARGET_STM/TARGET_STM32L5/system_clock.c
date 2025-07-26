@@ -193,7 +193,9 @@ uint8_t SetSysClock_PLL_MSI(void)
 #endif
 
     /* Enable MSI Auto calibration */
+#if MBED_CONF_TARGET_LSE_AVAILABLE
     HAL_RCCEx_EnableMSIPLLMode();
+#endif
 
     return 1; // OK
 }

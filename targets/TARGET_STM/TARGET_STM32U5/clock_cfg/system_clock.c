@@ -119,10 +119,11 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
-    /* GPIO Ports Clock Enable */
-    __HAL_RCC_GPIOH_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_PWR_CLK_ENABLE();
+#if defined(UCPD1)
+    HAL_PWREx_DisableUCPDDeadBattery(); /* Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral */
+#endif
+    HAL_PWREx_EnableVddA();
     if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK) {
         return 0; // FAIL
     }
@@ -190,6 +191,9 @@ uint8_t SetSysClock_PLL_HSI(void)
     RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
     __HAL_RCC_PWR_CLK_ENABLE();
+#if defined(UCPD1)
+    HAL_PWREx_DisableUCPDDeadBattery(); /* Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral */
+#endif
     HAL_PWREx_EnableVddA();
     HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
 

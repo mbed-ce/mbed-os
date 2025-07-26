@@ -36,6 +36,7 @@ CAN::CAN(PinName rd, PinName td, int hz, int data_hz) : _can(), _irq()
 #if DEVICE_CAN_FD
     canfd_init_freq(&_can, rd, td, hz, data_hz);
 #else
+    MBED_ASSERT(data_hz == 0);
     can_init_freq(&_can, rd, td, hz);
 #endif
     can_irq_init(&_can, (&CAN::_irq_handler), reinterpret_cast<uintptr_t>(this));
@@ -54,6 +55,7 @@ CAN::CAN(const can_pinmap_t &pinmap, int hz, int data_hz) : _can(), _irq()
 #if DEVICE_CAN_FD
     canfd_init_freq_direct(&_can, &pinmap, hz, data_hz);
 #else
+    MBED_ASSERT(data_hz == 0);
     can_init_freq_direct(&_can, &pinmap, hz);
 #endif
     can_irq_init(&_can, (&CAN::_irq_handler), reinterpret_cast<uintptr_t>(this));
@@ -77,6 +79,7 @@ int CAN::frequency(int f, int data_f)
 #if DEVICE_CAN_FD
     int ret = canfd_frequency(&_can, f, data_f);
 #else
+    MBED_ASSERT(data_f == 0);
     int ret = can_frequency(&_can, f);
 #endif
     unlock();

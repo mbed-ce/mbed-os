@@ -44,8 +44,6 @@ class CAN;
  */
 
 /** CANMessage class
- *
- * @note Synchronization level: Thread safe
  */
 class CANMessage : public CAN_Message {
 
@@ -143,8 +141,6 @@ public:
 #if DEVICE_CAN_FD
 
 /** CANFDMessage class
- *
- * @note Synchronization level: Thread safe
  */
 class CANFDMessage : public CANFD_Message {
 

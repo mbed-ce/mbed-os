@@ -23,6 +23,7 @@
 #include "pinmap.h"
 #include "PeripheralPins.h"
 #include "mbed_error.h"
+#include <memory.h>
 
 // Some STM32G4 series (and others) have 3 FDCAN devices
 // while others have 2
@@ -632,7 +633,7 @@ int canfd_write(can_t *obj, CANFD_Message msg, int cc)
             TxHeader.DataLength = FDCAN_DLC_BYTES_64;
             break;
         default:
-            error("Invalid message length for can_write\n");
+            error("Invalid message length for canfd_write\n");
             return 0;
     }
     TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
@@ -658,7 +659,8 @@ int can_read(can_t *obj, CAN_Message *msg, int handle)
     }
 
     FDCAN_RxHeaderTypeDef RxHeader = {0};
-    if (HAL_FDCAN_GetRxMessage(&obj->CanHandle, FDCAN_RX_FIFO0, &RxHeader, msg->data) != HAL_OK) {
+    unsigned char data[64];
+    if (HAL_FDCAN_GetRxMessage(&obj->CanHandle, FDCAN_RX_FIFO0, &RxHeader, data) != HAL_OK) {
         error("HAL_FDCAN_GetRxMessage error\n"); // Should not occur as previous HAL_FDCAN_GetRxFifoFillLevel call reported some data
         return 0;
     }
@@ -674,6 +676,12 @@ int can_read(can_t *obj, CAN_Message *msg, int handle)
     RxHeader.DataLength >>= 16;
 #endif
     msg->len  = RxHeader.DataLength;
+    if(msg->len > 8)
+    {
+        error("can_read unexpectedly received a FD frame\n");
+        return 0;
+    }
+    memcpy(msg->data, data, msg->len);
     return 1;
 }
 

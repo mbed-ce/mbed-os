@@ -4922,6 +4922,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "USE_PLL_MSI",
                 "macro_name": "CLOCK_SOURCE"
             },
+            "hse_value": {
+                "help": "HSE default value is 16MHz in stm32u5xx_hal_conf.h",
+                "value": "16000000",
+                "macro_name": "HSE_VALUE"
+            },
             "lpticker_lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
