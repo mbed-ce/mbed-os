@@ -18,6 +18,7 @@ target_include_directories(mbed-stm32u5
 
 target_sources(mbed-stm32u5
     INTERFACE
+        clock_cfg/system_clock.c
         analogin_device.c
         analogout_device.c
         flash_api.c

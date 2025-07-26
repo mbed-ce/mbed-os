@@ -75,6 +75,15 @@ struct analogin_s {
     uint8_t channel;
 };
 
+#if DEVICE_CAN
+struct can_s {
+    FDCAN_HandleTypeDef CanHandle;
+    int index;
+    int hz;
+    int data_hz;
+};
+#endif
+
 #include "gpio_object.h"
 
 #if DEVICE_ANALOGOUT

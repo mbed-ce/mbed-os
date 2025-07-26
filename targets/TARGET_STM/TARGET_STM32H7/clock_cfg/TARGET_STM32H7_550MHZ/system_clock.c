@@ -32,12 +32,12 @@
   * It is used for all STM32H7 family microcontrollers with a top speed of 550MHz.
   * The input clock from the external oscillator may be any frequency evenly divisible by
   * 5MHz or 2MHz, and must be between 4MHz and 50MHz.
-  * 
+  *
   * Note that 550MHz is the "overdrive" mode and is basically an overclock.  It is only supported
   * under certain conditions (LDO in use) and cannot be used over the full temperature range.
   * For industrial applications it is recommended to disable overdrive. Overdrive can be enabled/
   * disabled via the "target.enable-overdrive-mode" option in mbed_app.json.
-  * 
+  *
 **/
 
 #include "stm32h7xx.h"
@@ -167,10 +167,10 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 
 #if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE; // PLL1 VCO clock is between 192 and 836 MHz
-    RCC_OscInitStruct.PLL.PLLQ = 55;  // PLL1Q used for FDCAN = 10 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 5;  // PLL1Q used for FDCAN = 110 MHz
 #else
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOMEDIUM; // PLL1 VCO clock is between 150 and 420 MHz
-    RCC_OscInitStruct.PLL.PLLQ = 40;  // PLL1Q used for FDCAN = 10 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 5;  // PLL1Q used for FDCAN = 80 MHz
 #endif
 
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
@@ -244,15 +244,15 @@ uint8_t SetSysClock_PLL_HSI(void)
 
 #if MBED_CONF_TARGET_ENABLE_OVERDRIVE_MODE
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE; // PLL1 VCO clock is between 192 and 836 MHz
-    RCC_OscInitStruct.PLL.PLLQ = 55;  // PLL1Q used for FDCAN = 10 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 5;  // PLL1Q used for FDCAN = 110 MHz
 #else
     RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOMEDIUM; // PLL1 VCO clock is between 150 and 420 MHz
-    RCC_OscInitStruct.PLL.PLLQ = 40;  // PLL1Q used for FDCAN = 10 MHz
+    RCC_OscInitStruct.PLL.PLLQ = 5;  // PLL1Q used for FDCAN = 80 MHz
 #endif
 
     RCC_OscInitStruct.PLL.PLLR = 2;    // 275 MHz
     RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_1; // PLL1 input clock is between 2 and 4 MHz
-    
+
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         return 0; // FAIL
     }

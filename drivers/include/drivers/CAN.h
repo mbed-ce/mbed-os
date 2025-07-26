@@ -94,8 +94,9 @@ public:
       * @param rd the read pin
       * @param td the transmit pin
       * @param hz the bus frequency in hertz
+      * @param data_hz the data frequency in hertz(CAN FD only)
       */
-    CAN(PinName rd, PinName td, int hz);
+    CAN(PinName rd, PinName td, int hz, int data_hz = 0);
 
     /** Initialize CAN interface
       *
@@ -108,8 +109,9 @@ public:
       *
       * @param pinmap reference to structure which holds static pinmap
       * @param hz the bus frequency in hertz
+      * @param data_hz the data frequency in hertz(CAN FD only)
       */
-    CAN(const can_pinmap_t &pinmap, int hz);
+    CAN(const can_pinmap_t &pinmap, int hz, int data_hz = 0);
     CAN(const can_pinmap_t &&, int) = delete; // prevent passing of temporary objects
 
     virtual ~CAN();
@@ -117,12 +119,13 @@ public:
     /** Set the frequency of the CAN interface
      *
      *  @param hz The bus frequency in hertz
+      * @param data_hz the data frequency in hertz(CAN FD only)
      *
      *  @returns
      *    1 if successful,
      *    0 otherwise
      */
-    int frequency(int hz);
+    int frequency(int hz, int data_hz = 0);
 
     /** Write a CANMessage to the bus.
      *
@@ -144,6 +147,31 @@ public:
      *    1 if message arrived
      */
     int read(CANMessage &msg, int handle = 0);
+
+#if DEVICE_CAN_FD
+
+    /** Write a CANFDMessage to the bus.
+     *
+     *  @param msg The CANFDMessage to write.
+     *
+     *  @returns
+     *    0 if write failed,
+     *    1 if write was successful
+     */
+    int write(CANFDMessage msg);
+
+    /** Read a CANFDMessage from the bus.
+     *
+     *  @param msg A CANFDMessage to read to.
+     *  @param handle message filter handle (0 for any message)
+     *
+     *  @returns
+     *    0 if no message arrived,
+     *    1 if message arrived
+     */
+    int read(CANFDMessage &msg, int handle = 0);
+
+#endif
 
     /** Reset CAN interface.
      *

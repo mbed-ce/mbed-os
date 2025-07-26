@@ -44,8 +44,6 @@ class CAN;
  */
 
 /** CANMessage class
- *
- * @note Synchronization level: Thread safe
  */
 class CANMessage : public CAN_Message {
 
@@ -139,6 +137,105 @@ public:
         return !(*this == b);
     }
 };
+
+#if DEVICE_CAN_FD
+
+/** CANFDMessage class
+ */
+class CANFDMessage : public CANFD_Message {
+
+public:
+    /** Creates empty CANFD message.
+     */
+    CANFDMessage() : CANFD_Message()
+    {
+        len    = 64U;
+        type   = CANData;
+        format = CANStandard;
+        id     = 0U;
+        memset(data, 0, 64);
+    }
+
+    /** Creates CANFD message with specific content.
+     *
+     *  @param _id      Message ID
+     *  @param _data    Mesaage Data
+     *  @param _len     Message Data length
+     *  @param _type    Type of Data: Use enum CANType for valid parameter values
+     *  @param _format  Data Format: Use enum CANFormat for valid parameter values
+     */
+    CANFDMessage(unsigned int _id, const unsigned char *_data, unsigned char _len = 64, CANType _type = CANData, CANFormat _format = CANStandard)
+    {
+        len    = (_len > 64) ? 64 : _len;
+        type   = _type;
+        format = _format;
+        id     = _id;
+        memcpy(data, _data, len);
+    }
+
+
+    /** Creates CANFD message with specific content.
+     *
+     *  @param _id      Message ID
+     *  @param _data    Mesaage Data
+     *  @param _len     Message Data length
+     *  @param _type    Type of Data: Use enum CANType for valid parameter values
+     *  @param _format  Data Format: Use enum CANFormat for valid parameter values
+     */
+    CANFDMessage(unsigned int _id, const char *_data, unsigned char _len = 64, CANType _type = CANData, CANFormat _format = CANStandard)
+    {
+        len    = (_len > 64) ? 64 : _len;
+        type   = _type;
+        format = _format;
+        id     = _id;
+        memcpy(data, _data, len);
+    }
+
+    /** Creates CANFD remote message.
+     *
+     *  @param _id      Message ID
+     *  @param _format  Data Format: Use enum CANType for valid parameter values
+     */
+    CANFDMessage(unsigned int _id, CANFormat _format = CANStandard)
+    {
+        len    = 0;
+        type   = CANRemote;
+        format = _format;
+        id     = _id;
+        memset(data, 0, 64);
+    }
+
+    /**
+     * "Deep" comparison operator (ie: compare value of each data member)
+     */
+    bool operator ==(const CANFDMessage &b) const
+    {
+        if (id != b.id) {
+            return false;
+        }
+        if (len != b.len) {
+            return false;
+        }
+        if (format != b.format) {
+            return false;
+        }
+        if (type != b.type) {
+            return false;
+        }
+        if (memcmp(data, b.data, len) != 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    bool operator !=(const CANFDMessage &b) const
+    {
+        return !(*this == b);
+    }
+};
+
+#endif
 
 /** @}*/
 
