@@ -352,8 +352,9 @@ int can_frequency(can_t *obj, int f) {
     }
 }
 
-int can_write(can_t *obj, CAN_Message msg, int cc) {
+int can_write(can_t *obj, CAN_Message msg) {
     unsigned int CANStatus;
+    int cc = 0;
     CANMsg m;
 
     can_enable(obj);

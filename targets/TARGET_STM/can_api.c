@@ -76,6 +76,64 @@ int can_internal_init(can_t *obj)
     return 1;
 }
 
+/** Get the nominal phase clock prescaler and the number of time quantums for the specified frequency
+ */
+static uint32_t get_canfd_nominal_prescaler(int f, uint32_t *ntq_out)
+{
+#if (defined TARGET_STM32H7)
+    // STM32H7 doesn't support yet HAL_RCCEx_GetPeriphCLKFreq for FDCAN
+    PLL1_ClocksTypeDef pll1_clocks;
+    HAL_RCCEx_GetPLL1ClockFreq(&pll1_clocks);
+    uint32_t ntq = pll1_clocks.PLL1_Q_Frequency / (uint32_t)f;
+#else
+#if (defined RCC_PERIPHCLK_FDCAN1)
+    uint32_t ntq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1) / (uint32_t)f;
+#else
+    uint32_t ntq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN) / (uint32_t)f;
+#endif
+#endif
+    uint32_t nominalPrescaler = 1;
+    // !When the sample point should be lower than 50%, this must be changed to
+    // !IS_FDCAN_NOMINAL_TSEG2(ntq/nominalPrescaler), since
+    // NTSEG2 and SJW max values are lower. For now the sample point is fix @75%
+    while (!IS_FDCAN_NOMINAL_TSEG1(ntq / nominalPrescaler)) {
+        nominalPrescaler ++;
+        if (!IS_FDCAN_NOMINAL_PRESCALER(nominalPrescaler)) {
+            error("Could not determine good nominalPrescaler. Bad clock value\n");
+        }
+    }
+    *ntq_out = ntq / nominalPrescaler;
+    return nominalPrescaler;
+}
+
+/** Get the data phase clock prescaler and the number of time quantums for the specified frequency
+ */
+static uint32_t get_canfd_data_prescaler(int data_f, uint32_t *ntq_out)
+{
+#if (defined TARGET_STM32H7)
+    // STM32H7 doesn't support yet HAL_RCCEx_GetPeriphCLKFreq for FDCAN
+    PLL1_ClocksTypeDef pll1_clocks;
+    HAL_RCCEx_GetPLL1ClockFreq(&pll1_clocks);
+    uint32_t ntq_data = pll1_clocks.PLL1_Q_Frequency / (uint32_t)data_f;
+#elif (defined RCC_PERIPHCLK_FDCAN1)
+    uint32_t ntq_data = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1) / (uint32_t)data_f;
+#else
+    uint32_t ntq_data = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN) / (uint32_t)data_f;
+#endif
+    uint32_t dataPrescaler = 1;
+    // !When the sample point should be lower than 50%, this must be changed to
+    // !IS_FDCAN_NOMINAL_TSEG2(ntq/nominalPrescaler), since
+    // NTSEG2 and SJW max values are lower. For now the sample point is fix @70%
+    while (!IS_FDCAN_DATA_TSEG1(ntq_data / dataPrescaler)) {
+        dataPrescaler ++;
+        if (!IS_FDCAN_DATA_PRESCALER(dataPrescaler)) {
+            error("Could not determine good dataPrescaler. Bad clock value\n");
+        }
+    }
+    *ntq_out = ntq_data / dataPrescaler;
+    return dataPrescaler;
+}
+
 #if STATIC_PINMAP_READY
 #define CANFD_INIT_FREQ_DIRECT canfd_init_freq_direct
 void canfd_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz)
@@ -160,64 +218,28 @@ static void _canfd_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int 
     Synchronization_Jump_width | 9 tq           | <nsjw> = <nts2>
     */
 
-    // !Attention Not all bitrates can be covered with all fdcan-core-clk values. When a clk
-    // does not work for the desired bitrate, change system_clock settings for FDCAN_CLK
-    // (default FDCAN_CLK is PLLQ)
-#if (defined TARGET_STM32H7)
-    // STM32H7 doesn't support yet HAL_RCCEx_GetPeriphCLKFreq for FDCAN
-    // We use PLL1.Q clock right now so get its frequency
-    PLL1_ClocksTypeDef pll1_clocks;
-    HAL_RCCEx_GetPLL1ClockFreq(&pll1_clocks);
-    uint32_t ntq = pll1_clocks.PLL1_Q_Frequency / (uint32_t)hz;
-#else
-#if (defined RCC_PERIPHCLK_FDCAN1)
-    uint32_t ntq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1) / (uint32_t)hz;
-#else
-    uint32_t ntq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN) / (uint32_t)hz;
-#endif
-#endif
-
-    uint32_t nominalPrescaler = 1;
-    uint32_t dataPrescaler = 1;
-    // !When the sample point should be lower than 50%, this must be changed to
-    // !IS_FDCAN_NOMINAL_TSEG2(ntq/nominalPrescaler), since
-    // NTSEG2 and SJW max values are lower. For now the sample point is fix @75%
-    while (!IS_FDCAN_NOMINAL_TSEG1(ntq / nominalPrescaler)) {
-        nominalPrescaler ++;
-        if (!IS_FDCAN_NOMINAL_PRESCALER(nominalPrescaler)) {
-            error("Could not determine good nominalPrescaler. Bad clock value\n");
-        }
-    }
-    ntq = ntq / nominalPrescaler;
+    /* See can_init_freq function for calculation details
+     *
+     * !Attention Not all bitrates can be covered with all fdcan-core-clk values. When a clk
+     * does not work for the desired bitrate, change system_clock settings for FDCAN_CLK
+     * (default FDCAN_CLK is PLLQ)
+     */
+    uint32_t ntq = 0;
+    uint32_t nominalPrescaler = get_canfd_nominal_prescaler(hz, &ntq);
     uint32_t ntq_data = ntq;
-
+    uint32_t dataPrescaler = nominalPrescaler;
     if(data_hz == 0)
     {
         obj->CanHandle.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
-        dataPrescaler = nominalPrescaler;
     }
     else if(data_hz == hz)
     {
         obj->CanHandle.Init.FrameFormat = FDCAN_FRAME_FD_NO_BRS;
-        dataPrescaler = nominalPrescaler;
     }
     else
     {
         obj->CanHandle.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
-#if (defined TARGET_STM32H7)
-        ntq_data = pll1_clocks.PLL1_Q_Frequency / (uint32_t)data_hz;
-#elif (defined RCC_PERIPHCLK_FDCAN1)
-        ntq_data = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1) / (uint32_t)data_hz;
-#else
-        ntq_data = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN) / (uint32_t)data_hz;
-#endif
-        while (!IS_FDCAN_DATA_TSEG1(ntq_data / dataPrescaler)) {
-            dataPrescaler ++;
-            if (!IS_FDCAN_DATA_PRESCALER(dataPrescaler)) {
-                error("Could not determine good dataPrescaler. Bad clock value\n");
-            }
-        }
-        ntq_data = ntq_data / dataPrescaler;
+        dataPrescaler = get_canfd_data_prescaler(data_hz, &ntq_data);
     }
     obj->CanHandle.Init.Mode = FDCAN_MODE_NORMAL;
     obj->CanHandle.Init.AutoRetransmission = ENABLE;
@@ -413,7 +435,6 @@ void can_reset(can_t *obj)
     HAL_FDCAN_ResetTimestampCounter(&obj->CanHandle);
 }
 
-
 int canfd_frequency(can_t *obj, int f, int data_f)
 {
     if (HAL_FDCAN_Stop(&obj->CanHandle) != HAL_OK) {
@@ -430,60 +451,22 @@ int canfd_frequency(can_t *obj, int f, int data_f)
      * does not work for the desired bitrate, change system_clock settings for FDCAN_CLK
      * (default FDCAN_CLK is PLLQ)
      */
-#if (defined TARGET_STM32H7)
-    // STM32H7 doesn't support yet HAL_RCCEx_GetPeriphCLKFreq for FDCAN
-    PLL1_ClocksTypeDef pll1_clocks;
-    HAL_RCCEx_GetPLL1ClockFreq(&pll1_clocks);
-    uint32_t ntq = pll1_clocks.PLL1_Q_Frequency / (uint32_t)f;
-#else
-#if (defined RCC_PERIPHCLK_FDCAN1)
-    uint32_t ntq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1) / (uint32_t)f;
-#else
-    uint32_t ntq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN) / (uint32_t)f;
-#endif
-#endif
-
-    uint32_t nominalPrescaler = 1;
-    uint32_t dataPrescaler = 1;
-    // !When the sample point should be lower than 50%, this must be changed to
-    // !IS_FDCAN_NOMINAL_TSEG2(ntq/nominalPrescaler), since
-    // NTSEG2 and SJW max values are lower. For now the sample point is fix @75%
-    while (!IS_FDCAN_NOMINAL_TSEG1(ntq / nominalPrescaler)) {
-        nominalPrescaler ++;
-        if (!IS_FDCAN_NOMINAL_PRESCALER(nominalPrescaler)) {
-            error("Could not determine good nominalPrescaler. Bad clock value\n");
-        }
-    }
-    ntq = ntq / nominalPrescaler;
+    uint32_t ntq = 0;
+    uint32_t nominalPrescaler = get_canfd_nominal_prescaler(f, &ntq);
     uint32_t ntq_data = ntq;
-
+    uint32_t dataPrescaler = nominalPrescaler;
     if(data_f == 0)
     {
         obj->CanHandle.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
-        dataPrescaler = nominalPrescaler;
     }
     else if(data_f == f)
     {
         obj->CanHandle.Init.FrameFormat = FDCAN_FRAME_FD_NO_BRS;
-        dataPrescaler = nominalPrescaler;
     }
     else
     {
         obj->CanHandle.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
-#if (defined TARGET_STM32H7)
-        ntq_data = pll1_clocks.PLL1_Q_Frequency / (uint32_t)data_f;
-#elif (defined RCC_PERIPHCLK_FDCAN1)
-        ntq_data = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1) / (uint32_t)data_f;
-#else
-        ntq_data = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN) / (uint32_t)data_f;
-#endif
-        while (!IS_FDCAN_DATA_TSEG1(ntq_data / dataPrescaler)) {
-            dataPrescaler ++;
-            if (!IS_FDCAN_DATA_PRESCALER(dataPrescaler)) {
-                error("Could not determine good dataPrescaler. Bad clock value\n");
-            }
-        }
-        ntq_data = ntq_data / dataPrescaler;
+        dataPrescaler = get_canfd_data_prescaler(data_f, &ntq_data);
     }
     obj->CanHandle.Init.Mode = FDCAN_MODE_NORMAL;
     obj->CanHandle.Init.AutoRetransmission = ENABLE;
@@ -548,11 +531,9 @@ int can_filter(can_t *obj, uint32_t id, uint32_t mask, CANFormat format, int32_t
 }
 
 
-int can_write(can_t *obj, CAN_Message msg, int cc)
+int can_write(can_t *obj, CAN_Message msg)
 {
     FDCAN_TxHeaderTypeDef TxHeader = {0};
-
-    UNUSED(cc);
 
     // Configure Tx buffer message
     TxHeader.Identifier = msg.id;
@@ -581,11 +562,9 @@ int can_write(can_t *obj, CAN_Message msg, int cc)
     return 1;
 }
 
-int canfd_write(can_t *obj, CANFD_Message msg, int cc)
+int canfd_write(can_t *obj, CANFD_Message msg)
 {
     FDCAN_TxHeaderTypeDef TxHeader = {0};
-
-    UNUSED(cc);
 
     // Configure Tx buffer message
     TxHeader.Identifier = msg.id;
@@ -1270,7 +1249,7 @@ int can_frequency(can_t *obj, int f)
     return status;
 }
 
-int can_write(can_t *obj, CAN_Message msg, int cc)
+int can_write(can_t *obj, CAN_Message msg)
 {
     uint32_t  transmitmailbox = CAN_TXSTATUS_NOMAILBOX;
     CAN_TypeDef *can = obj->CanHandle.Instance;

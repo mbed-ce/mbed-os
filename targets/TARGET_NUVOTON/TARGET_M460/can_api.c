@@ -476,11 +476,8 @@ void can_irq_set(can_t *obj, CanIrqType irq, uint32_t enable)
     }
 }
 
-int can_write(can_t *obj, CAN_Message msg, int cc)
+int can_write(can_t *obj, CAN_Message msg)
 {
-    /* Unused */
-    (void) cc;
-
     const struct nu_modinit_s *modinit = get_modinit(obj->can, can_modinit_tab);
     MBED_ASSERT(modinit != NULL);
     MBED_ASSERT(modinit->modname == (int) obj->can);

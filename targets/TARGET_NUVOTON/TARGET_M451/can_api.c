@@ -231,11 +231,8 @@ void can_irq_set(can_t *obj, CanIrqType irq, uint32_t enable)
     
 }
 
-int can_write(can_t *obj, CAN_Message msg, int cc)
+int can_write(can_t *obj, CAN_Message msg)
 {
-    /* Unused */
-    (void) cc;
-
     STR_CANMSG_T CMsg;
     
     CMsg.IdType = (uint32_t)msg.format;

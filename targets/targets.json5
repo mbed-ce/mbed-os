@@ -4923,7 +4923,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "macro_name": "CLOCK_SOURCE"
             },
             "hse_value": {
-                "help": "HSE default value is 16MHz in stm32u5xx_hal_conf.h",
+                "help": "HSE default value is 16MHz in stm32u5xx_hal_conf.h, The valid value range is between 4MHz and 50MHz",
                 "value": "16000000",
                 "macro_name": "HSE_VALUE"
             },

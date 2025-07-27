@@ -216,7 +216,7 @@ void can_irq_set(can_t *obj, CanIrqType irq, uint32_t enable)
     
 }
 
-int can_write(can_t *obj, CAN_Message msg, int cc)
+int can_write(can_t *obj, CAN_Message msg)
 {
     STR_CANMSG_T CMsg;
     
@@ -226,7 +226,7 @@ int can_write(can_t *obj, CAN_Message msg, int cc)
     CMsg.DLC = msg.len;
     memcpy((void *)&CMsg.Data[0],(const void *)&msg.data[0], (unsigned int)8);
 
-    return CAN_Transmit((CAN_T *)NU_MODBASE(obj->can), cc, &CMsg);
+    return CAN_Transmit((CAN_T *)NU_MODBASE(obj->can), 0, &CMsg);
 }
 
 int can_read(can_t *obj, CAN_Message *msg, int handle)

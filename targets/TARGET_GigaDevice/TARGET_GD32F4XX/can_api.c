@@ -411,7 +411,7 @@ void can_irq_set(can_t *obj, CanIrqType type, uint32_t enable)
  *    0 if write failed,
  *    1 if write was successful
  */
-int can_write(can_t *obj, CAN_Message msg, int cc)
+int can_write(can_t *obj, CAN_Message msg)
 {
     can_trasnmit_message_struct transmit_message;
     uint32_t i;

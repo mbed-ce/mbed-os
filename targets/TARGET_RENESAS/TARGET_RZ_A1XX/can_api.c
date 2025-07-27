@@ -628,7 +628,7 @@ void can_reset(can_t *obj) {
     can_reconfigure_channel();
 }
 
-int can_write(can_t *obj, CAN_Message msg, int cc) {
+int can_write(can_t *obj, CAN_Message msg) {
     __IO uint32_t *dmy_sts;
     __IO uint32_t *dmy_cfsts;
     __IO uint32_t *dmy_cfid;

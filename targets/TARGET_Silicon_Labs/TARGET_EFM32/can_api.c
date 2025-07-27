@@ -163,7 +163,7 @@ int can_frequency(can_t *obj, int f)
     return 0;
 }
 
-int can_write(can_t *obj, CAN_Message msg, int cc)
+int can_write(can_t *obj, CAN_Message msg)
 {
     CAN_MessageObject_TypeDef message;
 
