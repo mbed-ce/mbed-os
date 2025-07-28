@@ -78,20 +78,9 @@ int can_internal_init(can_t *obj)
 
 /** Get the nominal phase clock prescaler and the number of time quantums for the specified frequency
  */
-static uint32_t get_canfd_nominal_prescaler(int f, uint32_t *ntq_out)
+static uint32_t get_canfd_nominal_prescaler(uint32_t input_f, int f, uint32_t *ntq_out)
 {
-#if (defined TARGET_STM32H7)
-    // STM32H7 doesn't support yet HAL_RCCEx_GetPeriphCLKFreq for FDCAN
-    PLL1_ClocksTypeDef pll1_clocks;
-    HAL_RCCEx_GetPLL1ClockFreq(&pll1_clocks);
-    uint32_t ntq = pll1_clocks.PLL1_Q_Frequency / (uint32_t)f;
-#else
-#if (defined RCC_PERIPHCLK_FDCAN1)
-    uint32_t ntq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1) / (uint32_t)f;
-#else
-    uint32_t ntq = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN) / (uint32_t)f;
-#endif
-#endif
+    uint32_t ntq = input_f / (uint32_t)f;
     uint32_t nominalPrescaler = 1;
     // !When the sample point should be lower than 50%, this must be changed to
     // !IS_FDCAN_NOMINAL_TSEG2(ntq/nominalPrescaler), since
@@ -108,21 +97,12 @@ static uint32_t get_canfd_nominal_prescaler(int f, uint32_t *ntq_out)
 
 /** Get the data phase clock prescaler and the number of time quantums for the specified frequency
  */
-static uint32_t get_canfd_data_prescaler(int data_f, uint32_t *ntq_out)
+static uint32_t get_canfd_data_prescaler(uint32_t input_f, int data_f, uint32_t *ntq_out)
 {
-#if (defined TARGET_STM32H7)
-    // STM32H7 doesn't support yet HAL_RCCEx_GetPeriphCLKFreq for FDCAN
-    PLL1_ClocksTypeDef pll1_clocks;
-    HAL_RCCEx_GetPLL1ClockFreq(&pll1_clocks);
-    uint32_t ntq_data = pll1_clocks.PLL1_Q_Frequency / (uint32_t)data_f;
-#elif (defined RCC_PERIPHCLK_FDCAN1)
-    uint32_t ntq_data = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1) / (uint32_t)data_f;
-#else
-    uint32_t ntq_data = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN) / (uint32_t)data_f;
-#endif
+    uint32_t ntq_data = input_f / (uint32_t)data_f;
     uint32_t dataPrescaler = 1;
     // !When the sample point should be lower than 50%, this must be changed to
-    // !IS_FDCAN_NOMINAL_TSEG2(ntq/nominalPrescaler), since
+    // !IS_FDCAN_DATA_TSEG2(ntq_data/dataPrescaler), since
     // NTSEG2 and SJW max values are lower. For now the sample point is fix @70%
     while (!IS_FDCAN_DATA_TSEG1(ntq_data / dataPrescaler)) {
         dataPrescaler ++;
@@ -224,8 +204,20 @@ static void _canfd_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int 
      * does not work for the desired bitrate, change system_clock settings for FDCAN_CLK
      * (default FDCAN_CLK is PLLQ)
      */
+#if (defined TARGET_STM32H7)
+    // STM32H7 doesn't support yet HAL_RCCEx_GetPeriphCLKFreq for FDCAN
+    PLL1_ClocksTypeDef pll1_clocks;
+    HAL_RCCEx_GetPLL1ClockFreq(&pll1_clocks);
+    uint32_t input_hz = pll1_clocks.PLL1_Q_Frequency;
+#else
+#if (defined RCC_PERIPHCLK_FDCAN1)
+    uint32_t input_hz = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1);
+#else
+    uint32_t input_hz = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN);
+#endif
+#endif
     uint32_t ntq = 0;
-    uint32_t nominalPrescaler = get_canfd_nominal_prescaler(hz, &ntq);
+    uint32_t nominalPrescaler = get_canfd_nominal_prescaler(input_hz, hz, &ntq);
     uint32_t ntq_data = ntq;
     uint32_t dataPrescaler = nominalPrescaler;
     if(data_hz == 0)
@@ -239,7 +231,7 @@ static void _canfd_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int 
     else
     {
         obj->CanHandle.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
-        dataPrescaler = get_canfd_data_prescaler(data_hz, &ntq_data);
+        dataPrescaler = get_canfd_data_prescaler(input_hz, data_hz, &ntq_data);
     }
     obj->CanHandle.Init.Mode = FDCAN_MODE_NORMAL;
     obj->CanHandle.Init.AutoRetransmission = ENABLE;
@@ -451,8 +443,20 @@ int canfd_frequency(can_t *obj, int f, int data_f)
      * does not work for the desired bitrate, change system_clock settings for FDCAN_CLK
      * (default FDCAN_CLK is PLLQ)
      */
+#if (defined TARGET_STM32H7)
+    // STM32H7 doesn't support yet HAL_RCCEx_GetPeriphCLKFreq for FDCAN
+    PLL1_ClocksTypeDef pll1_clocks;
+    HAL_RCCEx_GetPLL1ClockFreq(&pll1_clocks);
+    uint32_t input_f = pll1_clocks.PLL1_Q_Frequency;
+#else
+#if (defined RCC_PERIPHCLK_FDCAN1)
+    uint32_t input_f = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN1);
+#else
+    uint32_t input_f = HAL_RCCEx_GetPeriphCLKFreq(RCC_PERIPHCLK_FDCAN);
+#endif
+#endif
     uint32_t ntq = 0;
-    uint32_t nominalPrescaler = get_canfd_nominal_prescaler(f, &ntq);
+    uint32_t nominalPrescaler = get_canfd_nominal_prescaler(input_f, f, &ntq);
     uint32_t ntq_data = ntq;
     uint32_t dataPrescaler = nominalPrescaler;
     if(data_f == 0)
@@ -466,7 +470,7 @@ int canfd_frequency(can_t *obj, int f, int data_f)
     else
     {
         obj->CanHandle.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
-        dataPrescaler = get_canfd_data_prescaler(data_f, &ntq_data);
+        dataPrescaler = get_canfd_data_prescaler(input_f, data_f, &ntq_data);
     }
     obj->CanHandle.Init.Mode = FDCAN_MODE_NORMAL;
     obj->CanHandle.Init.AutoRetransmission = ENABLE;
