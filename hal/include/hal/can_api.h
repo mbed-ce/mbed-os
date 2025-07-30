@@ -84,42 +84,48 @@ void can_init(can_t *obj, PinName rd, PinName td);
  */
 void can_init_direct(can_t *obj, const can_pinmap_t *pinmap);
 
+#if DEVICE_CAN_FD
 /** Initialize the CAN peripheral. It sets the default parameters for CAN
  *  peripheral, and configures its specifieds pins.
  *
  * @param obj CAN object
  * @param rd The CAN RD pin name
  * @param td The CAN TD pin name
-#ifdef DEVICE_CAN_FD
  * @param hz The bus frequency in classical CAN mode, or nominal phase frequency in CAN FD mode
  * @param data_hz The data phase frequency in CAN FD mode, the CAN object is put into Classical CAN mode if this parameter is zero
-#else
- * @param hz The bus frequency
-#endif
  */
-void can_init_freq(can_t *obj, PinName rd, PinName td, int hz
-#ifdef DEVICE_CAN_FD
-                   , int data_hz
-#endif
-                  );
+void can_init_freq(can_t *obj, PinName rd, PinName td, int hz, int data_hz);
 
 /** Initialize the CAN peripheral. It sets the default parameters for CAN
  *  peripheral, and configures its specifieds pins.
  *
  * @param obj CAN object
  * @param pinmap pointer to structure which holds static pinmap
-#ifdef DEVICE_CAN_FD
  * @param hz The bus frequency in classical CAN mode, or nominal phase frequency in CAN FD mode
  * @param data_hz The data phase frequency in CAN FD mode, the CAN object is put into Classical CAN mode if this parameter is zero
-#else
- * @param hz The bus frequency
-#endif
  */
-void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz
-#ifdef DEVICE_CAN_FD
-                          , int data_hz
+void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz, int data_hz);
+
+#else
+/** Initialize the CAN peripheral. It sets the default parameters for CAN
+ *  peripheral, and configures its specifieds pins.
+ *
+ * @param obj CAN object
+ * @param rd The CAN RD pin name
+ * @param td The CAN TD pin name
+ * @param hz The bus frequency
+ */
+void can_init_freq(can_t *obj, PinName rd, PinName td, int hz);
+
+/** Initialize the CAN peripheral. It sets the default parameters for CAN
+ *  peripheral, and configures its specifieds pins.
+ *
+ * @param obj CAN object
+ * @param pinmap pointer to structure which holds static pinmap
+ * @param hz The bus frequency
+ */
+void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz);
 #endif
-                         );
 
 /** Release the CAN peripheral, not currently invoked. It requires further
  *  resource management.
@@ -128,21 +134,23 @@ void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz
  */
 void can_free(can_t *obj);
 
+#if DEVICE_CAN_FD
 /** Configure the CAN bus frequency
  *
  * @param obj The CAN object
-#ifdef DEVICE_CAN_FD
  * @param hz The bus frequency in classical CAN mode, or nominal phase frequency in CAN FD mode
  * @param data_hz The data phase frequency in CAN FD mode, the CAN object is put into Classical CAN mode if this parameter is zero
-#else
- * @param hz The bus frequency
-#endif
  */
-int can_frequency(can_t *obj, int hz
-#ifdef DEVICE_CAN_FD
-                  , int data_hz
+int can_frequency(can_t *obj, int hz, int data_hz);
+
+#else
+/** Configure the CAN bus frequency
+ *
+ * @param obj The CAN object
+ * @param hz The bus frequency
+ */
+int can_frequency(can_t *obj, int hz);
 #endif
-                 );
 
 /** Initialize the CAN IRQ handler
  *
