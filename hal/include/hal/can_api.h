@@ -74,7 +74,7 @@ typedef struct can_s can_t;
  * @param rd The CAN RD pin name
  * @param td The CAN TD pin name
  */
-void          can_init(can_t *obj, PinName rd, PinName td);
+void can_init(can_t *obj, PinName rd, PinName td);
 
 /** Initialize the CAN peripheral. It sets the default parameters for CAN
  *  peripheral, and configures its specifieds pins.
@@ -82,7 +82,7 @@ void          can_init(can_t *obj, PinName rd, PinName td);
  * @param obj The CAN object
  * @param pinmap pointer to structure which holds static pinmap
  */
-void          can_init_direct(can_t *obj, const can_pinmap_t *pinmap);
+void can_init_direct(can_t *obj, const can_pinmap_t *pinmap);
 
 /** Initialize the CAN peripheral. It sets the default parameters for CAN
  *  peripheral, and configures its specifieds pins.
@@ -90,32 +90,47 @@ void          can_init_direct(can_t *obj, const can_pinmap_t *pinmap);
  * @param obj CAN object
  * @param rd The CAN RD pin name
  * @param td The CAN TD pin name
- * @param hz The bus frequency
+ * @param hz The bus frequency in classical CAN mode, or nominal phase frequency in CAN FD mode
+ * @param data_hz The data phase frequency in CAN FD mode, the CAN object is put into Classical CAN mode if this parameter is zero
  */
-void          can_init_freq(can_t *obj, PinName rd, PinName td, int hz);
+void can_init_freq(can_t *obj, PinName rd, PinName td, int hz
+#ifdef DEVICE_CAN_FD
+    , int data_hz
+#endif
+    );
 
 /** Initialize the CAN peripheral. It sets the default parameters for CAN
  *  peripheral, and configures its specifieds pins.
  *
  * @param obj CAN object
  * @param pinmap pointer to structure which holds static pinmap
- * @param hz The bus frequency
+ * @param hz The bus frequency in classical CAN mode, or nominal phase frequency in CAN FD mode
+ * @param data_hz The data phase frequency in CAN FD mode, the CAN object is put into Classical CAN mode if this parameter is zero
  */
-void          can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz);
+void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz
+#ifdef DEVICE_CAN_FD
+    , int data_hz
+#endif
+    );
 
 /** Release the CAN peripheral, not currently invoked. It requires further
  *  resource management.
  *
  * @param obj The CAN object
  */
-void          can_free(can_t *obj);
+void can_free(can_t *obj);
 
 /** Configure the CAN bus frequency
  *
  * @param obj The CAN object
- * @param hz The bus frequency
+ * @param hz The bus frequency in classical CAN mode, or nominal phase frequency in CAN FD mode
+ * @param data_hz The data phase frequency in CAN FD mode, the CAN object is put into Classical CAN mode if this parameter is zero
  */
-int           can_frequency(can_t *obj, int hz);
+int can_frequency(can_t *obj, int hz
+#ifdef DEVICE_CAN_FD
+    , int data_hz
+#endif
+    );
 
 /** Initialize the CAN IRQ handler
  *
@@ -123,13 +138,13 @@ int           can_frequency(can_t *obj, int hz);
  * @param handler The handler to be attached to CAN IRQ
  * @param context The context to be passed back to the handler (context != 0, 0 is reserved)
  */
-void          can_irq_init(can_t *obj, can_irq_handler handler, uintptr_t context);
+void can_irq_init(can_t *obj, can_irq_handler handler, uintptr_t context);
 
-/** Release the CAN object
+/** Remove the CAN IRQ handler
  *
  * @param obj The CAN object
  */
-void          can_irq_free(can_t *obj);
+void can_irq_free(can_t *obj);
 
 /** Enable/disable the CAN IRQ event
  *
@@ -137,7 +152,7 @@ void          can_irq_free(can_t *obj);
  * @param irq    The CAN IRQ event
  * @param enable The enable flag
  */
-void          can_irq_set(can_t *obj, CanIrqType irq, uint32_t enable);
+void can_irq_set(can_t *obj, CanIrqType irq, uint32_t enable);
 
 /** Write a CAN message to the bus.
  *
@@ -147,7 +162,7 @@ void          can_irq_set(can_t *obj, CanIrqType irq, uint32_t enable);
  * @return 0 if write failed,
  *    1 if write was successful
  */
-int           can_write(can_t *obj, CAN_Message msg);
+int can_write(can_t *obj, CAN_Message msg);
 
 /** Read a CAN message from the bus.
  *
@@ -158,7 +173,7 @@ int           can_write(can_t *obj, CAN_Message msg);
  * @return 0 if no message arrived,
  *         1 if message arrived
  */
-int           can_read(can_t *obj, CAN_Message *msg, int handle);
+int can_read(can_t *obj, CAN_Message *msg, int handle);
 
 /** Change CAN operation to the specified mode.
  *
@@ -168,7 +183,7 @@ int           can_read(can_t *obj, CAN_Message *msg, int handle);
  * @return 0 if mode change failed or unsupported,
  *   1 if mode change was successful
  */
-int           can_mode(can_t *obj, CanMode mode);
+int can_mode(can_t *obj, CanMode mode);
 
 /** Filter out incomming messages.
  *
@@ -181,7 +196,7 @@ int           can_mode(can_t *obj, CanMode mode);
  * @return 0 if filter change failed or unsupported,
  *    new filter handle if successful
  */
-int           can_filter(can_t *obj, uint32_t id, uint32_t mask, CANFormat format, int32_t handle);
+int can_filter(can_t *obj, uint32_t id, uint32_t mask, CANFormat format, int32_t handle);
 
 /** Reset CAN interface.
  *
@@ -189,7 +204,7 @@ int           can_filter(can_t *obj, uint32_t id, uint32_t mask, CANFormat forma
  *
  * To use after error overflow.
  */
-void          can_reset(can_t *obj);
+void can_reset(can_t *obj);
 
 /**  Detects read errors - Used to detect read overflow errors.
  *
@@ -210,38 +225,9 @@ unsigned char can_tderror(can_t *obj);
  * @param obj CAN object
  * @param silent boolean indicating whether to go into silent mode or not.
  */
-void          can_monitor(can_t *obj, int silent);
+void can_monitor(can_t *obj, int silent);
 
 #if DEVICE_CAN_FD
-/** Initialize the CAN FD peripheral. It sets the default parameters for CAN FD
- *  peripheral, and configures its specifieds pins.
- *
- * @param obj CAN object
- * @param rd The CAN RD pin name
- * @param td The CAN TD pin name
- * @param hz The bus frequency of nominal phase
- * @param data_hz The bus frequency of data phase, the CAN object is put into Classical CAN mode if this parameter is zero
- */
-void          canfd_init_freq(can_t *obj, PinName rd, PinName td, int hz, int data_hz);
-
-/** Initialize the CAN FD peripheral. It sets the default parameters for CAN FD
- *  peripheral, and configures its specifieds pins.
- *
- * @param obj CAN object
- * @param pinmap pointer to structure which holds static pinmap
- * @param hz The bus frequency of nominal phase
- * @param data_hz The bus frequency of data phase, the CAN object is put into Classical CAN mode if this parameter is zero
- */
-void          canfd_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz, int data_hz);
-
-/** Configure the CAN FD bus frequency
- *
- * @param obj The CAN object
- * @param hz The bus frequency of nominal phase
- * @param data_hz The bus frequency of data phase, the CAN object is put into Classical CAN mode if this parameter is zero
- */
-int           canfd_frequency(can_t *obj, int hz, int data_hz);
-
 /** Write a CAN FD Message to the bus.
  *
  * @param obj    The CAN object
@@ -250,7 +236,7 @@ int           canfd_frequency(can_t *obj, int hz, int data_hz);
  * @return 0 if write failed,
  *    1 if write was successful
  */
-int           canfd_write(can_t *obj, CANFD_Message msg);
+int canfd_write(can_t *obj, CANFD_Message msg);
 
 /** Read a Classical CAN or CAN FD Message from the bus.
  *
@@ -261,7 +247,7 @@ int           canfd_write(can_t *obj, CANFD_Message msg);
  * @return 0 if no message arrived,
  *         1 if message arrived
  */
-int           canfd_read(can_t *obj, CANFD_Message *msg, int handle);
+int canfd_read(can_t *obj, CANFD_Message *msg, int handle);
 #endif
 
 /** Get the pins that support CAN RD

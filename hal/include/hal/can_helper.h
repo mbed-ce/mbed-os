@@ -59,11 +59,11 @@ typedef enum CANType CANType;
  *
 **/
 struct CAN_Message {
-    unsigned int   id;                 // 29 bit identifier
-    unsigned char  data[8];            // Data field
-    unsigned char  len;                // Length of data field in bytes
-    CANFormat      format;             // Format ::CANFormat
-    CANType        type;               // Type ::CANType
+    unsigned int   id;                 ///< 29 bit identifier
+    unsigned char  data[8];            ///< Data field
+    unsigned char  len;                ///< Length of data field in bytes
+    CANFormat      format;             ///< Format ::CANFormat
+    CANType        type;               ///< Type ::CANType
 };
 typedef struct CAN_Message CAN_Message;
 
@@ -77,11 +77,11 @@ typedef struct CAN_Message CAN_Message;
  *
 **/
 struct CANFD_Message {
-    unsigned int   id;                 // 29 bit identifier
-    unsigned char  data[64];            // Data field
-    unsigned char  len;                // Length of data field in bytes
-    CANFormat      format;             // Format ::CANFormat
-    CANType        type;               // Type ::CANType
+    unsigned int   id;                 ///< 29 bit identifier
+    unsigned char  data[64];           ///< Data field
+    unsigned char  len;                ///< Length of data field in bytes
+    CANFormat      format;             ///< Format ::CANFormat
+    CANType        type;               ///< Type ::CANType
 };
 typedef struct CANFD_Message CANFD_Message;
 

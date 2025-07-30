@@ -74,6 +74,17 @@ MBED_WEAK void serial_set_flow_control_direct(serial_t *obj, FlowControl type, c
 #endif
 
 #if DEVICE_CAN
+#if DEVICE_CAN_FD
+MBED_WEAK void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz, int data_hz)
+{
+    can_init_freq(obj, pinmap->rd_pin, pinmap->td_pin, hz, data_hz);
+}
+
+MBED_WEAK void can_init_direct(can_t *obj, const can_pinmap_t *pinmap)
+{
+    can_init(obj, pinmap->rd_pin, pinmap->td_pin);
+}
+#else
 MBED_WEAK void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz)
 {
     can_init_freq(obj, pinmap->rd_pin, pinmap->td_pin, hz);
@@ -83,7 +94,7 @@ MBED_WEAK void can_init_direct(can_t *obj, const can_pinmap_t *pinmap)
 {
     can_init(obj, pinmap->rd_pin, pinmap->td_pin);
 }
-
+#endif
 #endif
 
 #if DEVICE_QSPI

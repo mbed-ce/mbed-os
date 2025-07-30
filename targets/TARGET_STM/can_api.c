@@ -115,11 +115,11 @@ static uint32_t get_canfd_data_prescaler(uint32_t input_f, int data_f, uint32_t 
 }
 
 #if STATIC_PINMAP_READY
-#define CANFD_INIT_FREQ_DIRECT canfd_init_freq_direct
-void canfd_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz)
+#define CAN_INIT_FREQ_DIRECT can_init_freq_direct
+void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz, int data_hz)
 #else
-#define CANFD_INIT_FREQ_DIRECT _canfd_init_freq_direct
-static void _canfd_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz, int data_hz)
+#define CAN_INIT_FREQ_DIRECT _can_init_freq_direct
+static void _can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz, int data_hz)
 #endif
 {
     MBED_ASSERT((int)pinmap->peripheral != NC);
@@ -301,24 +301,13 @@ static void _canfd_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int 
     can_internal_init(obj);
 }
 
-#if STATIC_PINMAP_READY
-#define CAN_INIT_FREQ_DIRECT can_init_freq_direct
-void can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz)
-#else
-#define CAN_INIT_FREQ_DIRECT _can_init_freq_direct
-static void _can_init_freq_direct(can_t *obj, const can_pinmap_t *pinmap, int hz)
-#endif
-{
-    CANFD_INIT_FREQ_DIRECT(obj, pinmap, hz, 0);
-}
-
 void can_init_direct(can_t *obj, const can_pinmap_t *pinmap)
 {
     /* default frequency is 100 kHz */
-    CAN_INIT_FREQ_DIRECT(obj, pinmap, 100000);
+    can_init_freq_direct(obj, pinmap, 100000, 0);
 }
 
-void canfd_init_freq(can_t *obj, PinName rd, PinName td, int hz, int data_hz)
+void can_init_freq(can_t *obj, PinName rd, PinName td, int hz, int data_hz)
 {
     CANName can_rd = (CANName)pinmap_peripheral(rd, PinMap_CAN_RD);
     CANName can_td = (CANName)pinmap_peripheral(td, PinMap_CAN_TD);
@@ -329,17 +318,12 @@ void canfd_init_freq(can_t *obj, PinName rd, PinName td, int hz, int data_hz)
 
     const can_pinmap_t static_pinmap = {peripheral, rd, function_rd, td, function_td};
 
-    CANFD_INIT_FREQ_DIRECT(obj, &static_pinmap, hz, data_hz);
-}
-
-void can_init_freq(can_t *obj, PinName rd, PinName td, int hz)
-{
-    canfd_init_freq(obj, rd, td, hz, 0);
+    CAN_INIT_FREQ_DIRECT(obj, &static_pinmap, hz, data_hz);
 }
 
 void can_init(can_t *obj, PinName rd, PinName td)
 {
-    can_init_freq(obj, rd, td, 100000);
+    can_init_freq(obj, rd, td, 100000, 0);
 }
 
 void can_irq_init(can_t *obj, can_irq_handler handler, uintptr_t context)
@@ -427,7 +411,7 @@ void can_reset(can_t *obj)
     HAL_FDCAN_ResetTimestampCounter(&obj->CanHandle);
 }
 
-int canfd_frequency(can_t *obj, int f, int data_f)
+int can_frequency(can_t *obj, int f, int data_f)
 {
     if (HAL_FDCAN_Stop(&obj->CanHandle) != HAL_OK) {
         error("HAL_FDCAN_Stop error\n");
@@ -486,11 +470,6 @@ int canfd_frequency(can_t *obj, int f, int data_f)
     obj->CanHandle.Init.DataSyncJumpWidth = obj->CanHandle.Init.DataTimeSeg2;
 
     return can_internal_init(obj);
-}
-
-int can_frequency(can_t *obj, int f)
-{
-    return canfd_frequency(obj, f, 0);
 }
 
 /** Filter out incoming messages

@@ -34,7 +34,7 @@ CAN::CAN(PinName rd, PinName td, int hz, int data_hz) : _can(), _irq()
 {
     // No lock needed in constructor
 #if DEVICE_CAN_FD
-    canfd_init_freq(&_can, rd, td, hz, data_hz);
+    can_init_freq(&_can, rd, td, hz, data_hz);
 #else
     MBED_ASSERT(data_hz == 0);
     can_init_freq(&_can, rd, td, hz);
@@ -53,7 +53,7 @@ CAN::CAN(const can_pinmap_t &pinmap, int hz, int data_hz) : _can(), _irq()
 {
     // No lock needed in constructor
 #if DEVICE_CAN_FD
-    canfd_init_freq_direct(&_can, &pinmap, hz, data_hz);
+    can_init_freq_direct(&_can, &pinmap, hz, data_hz);
 #else
     MBED_ASSERT(data_hz == 0);
     can_init_freq_direct(&_can, &pinmap, hz);
@@ -77,7 +77,7 @@ int CAN::frequency(int f, int data_f)
 {
     lock();
 #if DEVICE_CAN_FD
-    int ret = canfd_frequency(&_can, f, data_f);
+    int ret = can_frequency(&_can, f, data_f);
 #else
     MBED_ASSERT(data_f == 0);
     int ret = can_frequency(&_can, f);
