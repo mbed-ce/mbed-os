@@ -2305,6 +2305,7 @@ PREDEFINED             = DOXYGEN_ONLY \
                          DEVICE_ANALOGIN \
                          DEVICE_ANALOGOUT \
                          DEVICE_CAN \
+                         DEVICE_CAN_FD \
                          DEVICE_CRC \
                          DEVICE_EMAC \
                          DEVICE_FLASH \
