@@ -456,6 +456,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "us-ticker-timer": {
                 "help": "Chooses which timer (0-3) to use for us_ticker.c",
                 "value": 3
+            },
+            "lpc17xx-xtal-freq": {
+                help: "Frequency of external crystal or clock source connected to the XTAL pins. Frequency in MHz must be an integer factor of 24 (e.g. 12MHz, 6MHz, and 1MHz are OK but 5MHz is not).",
+                value: 12000000
+            },
+            "lpc17xx-core-clk-120mhz": {
+                help: "If true, the core will be clocked at 120MHz. Otherwise, it will be clocked at 96MHz. This is only officially supported with LPC1759/69 chips, but can work with others as an overclock.",
+                value: false
             }
         },
         "overrides": {
@@ -494,7 +502,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "image_url": "https://os.mbed.com/media/cache/platforms/LPC1768.jpg.250x250_q85.jpg"
     },
-    "LPCXPRESSO_LPC1769": {
+    "LPCXPRESSO_LPC1769": { // AKA LPCXpresso LPC1769. CMSIS-DAP version (OM13085UL) should also work.
         "inherits": [
             "MCU_LPC17XX"
         ],
@@ -504,7 +512,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LOCALFILESYSTEM"
         ],
         "overrides": {
-            "default-adc-vref": 3.3 // Vref is 3.3V
+            "default-adc-vref": 3.3, // Vref is 3.3V
+            "lpc17xx-core-clk-120mhz": true
         },
         "image_url": "https://www.embeddedartists.com/wp-content/uploads/2018/06/lpc1769_xpr_540x333-540x333.png"
     },

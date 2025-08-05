@@ -25,6 +25,7 @@
 
 #include <stdint.h>
 #include "LPC17xx.h"
+#include "mbed-target-config.h"
 
 
 /** @addtogroup LPC17xx_System
@@ -297,19 +298,27 @@
 #define CLKSRCSEL_Val         0x00000001
 #define PLL0_SETUP            1
 
-#ifdef MCB1700
-#    define PLL0CFG_Val           0x00050063
-#    define PLL1_SETUP            1
-#    define PLL1CFG_Val           0x00000023
-#    define CCLKCFG_Val           0x00000003
-#    define USBCLKCFG_Val         0x00000000
+// If in 120MHz mode, clock the PLL at 480MHz as this is the only frequency that can give us both 120MHz for the core
+// and 48MHz for USB.
+#ifdef MBED_CONF_TARGET_LPC17XX_CORE_CLK_120MHZ
+     // Multiplier for PLL0. Example: if MBED_CONF_TARGET_LPC17XX_XTAL_FREQ is 6MHz, this will be 40
+#    define PLL0_MULTIPLIER       (240000000/MBED_CONF_TARGET_LPC17XX_XTAL_FREQ)
+#    define PLL0CFG_Val           (PLL0_MULTIPLIER-1) // PLL0 clock = <input clock> * <PLL0 multiplier> * 2 / 1 = 480MHz
+#    define CCLKCFG_Val           0x00000003 // CPU clock = PLL0 clock / 4 = 120MHz
+
+#    define USBCLKCFG_Val         0x00000009 // USB clock = PLL0 clock / 10 = 48MHz
 #else
-#    define PLL0CFG_Val           0x0000000B
-#    define PLL1_SETUP            0
-#    define PLL1CFG_Val           0x00000000
-#    define CCLKCFG_Val           0x00000002
-#    define USBCLKCFG_Val         0x00000005
+     // Multiplier for PLL0. Example: if MBED_CONF_TARGET_LPC17XX_XTAL_FREQ is 6MHz, this will be 24
+#    define PLL0_MULTIPLIER       (144000000/MBED_CONF_TARGET_LPC17XX_XTAL_FREQ)
+#    define PLL0CFG_Val           (PLL0_MULTIPLIER-1) // PLL0 clock = <input clock> * <PLL0 multiplier> * 2 / 1 = 288MHz
+#    define CCLKCFG_Val           0x00000002 // CPU clock = PLL0 clock / 3 = 96MHz
+
+#    define USBCLKCFG_Val         0x00000005 // USB clock = PLL0 clock / 6 = 48MHz
 #endif
+
+// Don't enable PLL1. It is much more limited in input frequency and only acceps 10-24MHz.
+#define PLL1_SETUP            0
+#define PLL1CFG_Val           0x00000000
 
 #define PCLKSEL0_Val          0x00000000
 #define PCLKSEL1_Val          0x00000000
@@ -402,8 +411,7 @@
 /*----------------------------------------------------------------------------
   Define clocks
  *----------------------------------------------------------------------------*/
-#define XTAL        (12000000UL)        /* Oscillator frequency               */
-#define OSC_CLK     (      XTAL)        /* Main oscillator frequency          */
+#define OSC_CLK     MBED_CONF_TARGET_LPC17XX_XTAL_FREQ        /* Main oscillator frequency          */
 #define RTC_CLK     (   32000UL)        /* RTC oscillator frequency           */
 #define IRC_OSC     ( 4000000UL)        /* Internal RC oscillator frequency   */
 
