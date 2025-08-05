@@ -300,7 +300,7 @@
 
 // If in 120MHz mode, clock the PLL at 480MHz as this is the only frequency that can give us both 120MHz for the core
 // and 48MHz for USB.
-#ifdef MBED_CONF_TARGET_LPC17XX_CORE_CLK_120MHZ
+#if MBED_CONF_TARGET_LPC17XX_CORE_CLK_120MHZ
      // Multiplier for PLL0. Example: if MBED_CONF_TARGET_LPC17XX_XTAL_FREQ is 6MHz, this will be 40
 #    define PLL0_MULTIPLIER       (240000000/MBED_CONF_TARGET_LPC17XX_XTAL_FREQ)
 #    define PLL0CFG_Val           (PLL0_MULTIPLIER-1) // PLL0 clock = <input clock> * <PLL0 multiplier> * 2 / 1 = 480MHz
