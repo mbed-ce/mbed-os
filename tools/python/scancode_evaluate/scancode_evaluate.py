@@ -100,6 +100,8 @@ def has_exempted_spdx_identifier(scanned_file_content):
             return True
         if spdx_find_result[0] == "LicenseRef-PBL":
             return True
+        if spdx_find_result[0] == "LicenseRef-scancode-arm-cortex-mx":
+            return True
         else:
             return False
     else:

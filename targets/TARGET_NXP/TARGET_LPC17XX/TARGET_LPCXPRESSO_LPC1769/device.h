@@ -1,7 +1,8 @@
 // The 'features' section in 'target.json' is now used to create the device's hardware preprocessor switches.
 // Check the 'features' section of the target description in 'targets.json' for more details.
+
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2025 Johannes Stratmann
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,22 +20,8 @@
 #ifndef MBED_DEVICE_H
 #define MBED_DEVICE_H
 
-
-
-
-
-
-
-
-
-
-
 #define DEVICE_ID_LENGTH       32
 #define DEVICE_MAC_OFFSET      20
-
-
-
-
 
 #include "objects.h"
 

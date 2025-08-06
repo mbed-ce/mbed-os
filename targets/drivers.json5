@@ -246,6 +246,10 @@
             "description": "Controller Area Network (CAN) peripheral driver",
             "friendly_name": "CAN"
         },
+        "DEVICE_CAN_FD": {
+            "description": "CAN Flexible Datarate (FD) support in CAN driver",
+            "friendly_name": "CAN FD"
+        },
         // mystery ARM feature, used only on reference designs (SPI related?)
         "DEVICE_CLCD": {
             "description": "",

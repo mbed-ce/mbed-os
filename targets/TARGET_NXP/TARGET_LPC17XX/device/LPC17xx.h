@@ -21,6 +21,8 @@
  * ARM SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR
  * CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
  *
+ * SPDX-License-Identifier: LicenseRef-scancode-arm-cortex-mx
+ *
  ******************************************************************************/
 
 
