@@ -278,8 +278,9 @@ void ticker_disable_test()
     intf->set_interrupt(intf->read() + ticksFor100us);
     intf->disable_interrupt();
 
-    // Verify that it does not fire
-    wait_us(200);
+    // Verify that it does not fire. Note that we cannot use wait_us here as it uses the us ticker
+    // which is currently suspended.
+    wait_ns(200000);
     TEST_ASSERT_EQUAL_INT(0, intFlag);
 
     // Now reset the interrupt again.
@@ -289,11 +290,11 @@ void ticker_disable_test()
     TEST_ASSERT_EQUAL_INT_MESSAGE(0, intFlag, "Ticker fired during set_interrupt() while disabled! Check that set_interrupt() function clears pending timer compare.");
 
     // Still not yet
-    wait_us(20);
+    wait_ns(20000);
     TEST_ASSERT_EQUAL_INT(0, intFlag);
 
     // NOW it should have fired
-    wait_us(170);
+    wait_ns(170000);
     TEST_ASSERT_EQUAL_INT(1, intFlag);
 }
 
