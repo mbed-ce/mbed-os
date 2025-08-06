@@ -49,7 +49,3 @@ target_sources(mbed-lpc17xx
 target_link_libraries(mbed-lpc17xx INTERFACE mbed-nxp)
 
 mbed_set_linker_script(mbed-lpc17xx ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
-
-# mbed_set_linker_script(mbed-arch-pro ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
-# mbed_set_linker_script(mbed-lpc1768 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
-# mbed_set_linker_script(mbed-lpcxpresso-lpc1769 ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})

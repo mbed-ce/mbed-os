@@ -163,13 +163,7 @@
         "Freescale": {
             "mem-size": 33270
         },
-        "LPC1768": {
-            "mem-size": 16362
-        },
-        "LPCXPRESSO_LPC1769": {
-            "mem-size": 16362
-        },
-        "ARCH_PRO": {
+        "MCU_LPC17XX": {
             "mem-size": 16362
         },
         "LPC546XX": {
