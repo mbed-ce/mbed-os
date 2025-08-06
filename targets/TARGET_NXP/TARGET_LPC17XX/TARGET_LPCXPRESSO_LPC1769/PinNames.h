@@ -45,7 +45,9 @@ typedef enum {
     P3_0, P3_1, P3_2, P3_3, P3_4, P3_5, P3_6, P3_7, P3_8, P3_9, P3_10, P3_11, P3_12, P3_13, P3_14, P3_15, P3_16, P3_17, P3_18, P3_19, P3_20, P3_21, P3_22, P3_23, P3_24, P3_25, P3_26, P3_27, P3_28, P3_29, P3_30, P3_31,
     P4_0, P4_1, P4_2, P4_3, P4_4, P4_5, P4_6, P4_7, P4_8, P4_9, P4_10, P4_11, P4_12, P4_13, P4_14, P4_15, P4_16, P4_17, P4_18, P4_19, P4_20, P4_21, P4_22, P4_23, P4_24, P4_25, P4_26, P4_27, P4_28, P4_29, P4_30, P4_31,
 
-    // mbed DIP Pin Names
+    // mbed DIP Pin Names.
+    // Note that this board is compatible with the Mbed DIP form factor, though it also has additional headers
+    // for pins that aren't broken out on the Mbed LPC1768.
     p5 = P0_9,
     p6 = P0_8,
     p7 = P0_7,
@@ -76,31 +78,6 @@ typedef enum {
     CONSOLE_TX = P0_2,
     CONSOLE_RX = P0_3,
 
-    // Arch Pro Pin Names
-    D0 = P4_29,
-    D1 = P4_28,
-    D2 = P0_4,
-    D3 = P0_5,
-    D4 = P2_2,
-    D5 = P2_3,
-    D6 = P2_4,
-    D7 = P2_5,
-    D8 = P0_0,
-    D9 = P0_1,
-    D10 = P0_6,
-    D11 = P0_9,
-    D12 = P0_8,
-    D13 = P0_7,
-    D14 = P0_27,
-    D15 = P0_28,
-
-    A0 = P0_23,
-    A1 = P0_24,
-    A2 = P0_25,
-    A3 = P0_26,
-    A4 = P1_30,
-    A5 = P1_31,
-
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
@@ -108,7 +85,7 @@ typedef enum {
 // Standard buttons and LEDs
 #define LED1 P0_22  // LED1 RGB red
 #define LED2 P3_26  // LED1 RGB blue
-#define LED3 P2_25  // LED1 RGB green
+#define LED3 P3_25  // LED1 RGB green
 
 #define LED_RED   LED1
 #define LED_BLUE  LED2
