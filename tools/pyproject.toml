@@ -72,6 +72,11 @@ unit-tests = [
     "lxml"
 ]
 
+platformio = [
+    "SCons",
+    "platformio"
+]
+
 [tool.hatch.build.targets.wheel]
 packages = [
     "python/mbed_host_tests",
