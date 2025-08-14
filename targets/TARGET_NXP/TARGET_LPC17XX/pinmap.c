@@ -35,16 +35,23 @@ void pin_mode(PinName pin, PinMode mode) {
     uint32_t pin_number = (uint32_t)pin - (uint32_t)P0_0;
     int index = pin_number >> 5;
     int offset = pin_number & 0x1F;
-    uint32_t drain = ((uint32_t) mode & (uint32_t) OpenDrain) >> 2;
+    bool open_drain = (uint32_t) mode & (uint32_t) OpenDrain;
     
-    PINCONARRAY->PINMODE_OD[index] &= ~(drain << offset);
-    PINCONARRAY->PINMODE_OD[index] |= drain << offset;
-    
-    if (!drain) {
-        index = pin_number >> 4;
-        offset = (pin_number & 0xF) << 1;
-        
-        PINCONARRAY->PINMODE[index] &= ~(0x3 << offset);
-        PINCONARRAY->PINMODE[index] |= (uint32_t)mode << offset;
+    if(open_drain) {
+        PINCONARRAY->PINMODE_OD[index] |= 1 << offset;
     }
+    else {
+        PINCONARRAY->PINMODE_OD[index] &= ~(1 << offset);
+    }
+    
+    // Even if open drain mode is active, the normal pinmode is still used when the open drain pin is outputting a 1.
+    // So, always set the PINMODE register.
+    const uint8_t pinmode_sel_msk = 0x3;
+    uint8_t mode_no_drain = mode & pinmode_sel_msk;
+    
+    index = pin_number >> 4;
+    offset = (pin_number & 0xF) << 1;
+    
+    PINCONARRAY->PINMODE[index] &= ~(pinmode_sel_msk << offset);
+    PINCONARRAY->PINMODE[index] |= mode_no_drain << offset;
 }

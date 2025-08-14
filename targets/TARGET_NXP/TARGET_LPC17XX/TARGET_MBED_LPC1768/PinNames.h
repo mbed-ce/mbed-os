@@ -122,12 +122,18 @@ typedef enum {
 #define I2C_SDA I2C_SDA2
 
 typedef enum {
-    PullUp = 0,
-    PullDown = 3,
-    PullNone = 2,
-    Repeater = 1,
-    OpenDrain = 4,
-    PullDefault = PullDown
+    PullUp = 0, ///< Pull up to VDD with internal resistor of between 59kOhm and 333kOhm. This is the default mode.
+    PullDown = 3, ///< Pull down to GND with internal resistor of between 33kOhm and 500kOhm.
+    PullNone = 2, ///< High impedance, no pull up or pull down
+    Repeater = 1, ///< AKA "keeper" mode. This keeps the pin in the current logic level state (high or low) to prevent it from floating
+
+    OpenDrain = 4,///< Open drain mode with pull-up (default)
+    OpenDrainPullUp = OpenDrain,
+    OpenDrainPullDown = OpenDrain | PullDown, ///< Open-drain mode with pull down
+    OpenDrainNoPull = OpenDrain | PullNone, ///< Open-drain mode with no pullup/pulldown
+    OpenDrainRepeater = OpenDrain | PullNone, ///< Open-drain mode with repeater/keeper
+
+    PullDefault = PullUp
 } PinMode;
 
 // version of PINCON_TypeDef using register arrays
