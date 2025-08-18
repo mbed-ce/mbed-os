@@ -43,78 +43,29 @@ typedef enum {
     PIN_DIR_ELEMENTS
 } PinDirection;
 
-enum sPinMode {
-    sPowerSwNone = 0x00,
-    sPowerSwVDD,
-    sPowerSwVSS,
-    sPullNone,
-    sPullUp,
-    sPullDown,
-    sPullUp1K5,
-    sPullUp6K,
-    sPullUp12K,
-    sPullUp24K,
-    sDriveStrength2mA,
-    sDriveStrength4mA,
-    sDriveStrength8mA,
-    sDriveStrength12mA,
-    sOutDisable,
-    sOutPushPull,
-    sOutOpenDrain,
-    sOutTristate,
-    sInAuto,
-    sInNone,
-    sInEnable,
-    sReadPin,
-    sReadZero,
-
-    sPinModeElements
-};
-
-#define PinModeEntry(e) e = (1 << s##e)
-
 typedef enum {
-    PinModeEntry(PowerSwNone),
-    PinModeEntry(PowerSwVDD),
-    PinModeEntry(PowerSwVSS),
-    PowerSwDefault = PowerSwNone,
 
-    PinModeEntry(PullNone),
-    PinModeEntry(PullUp),
-    PinModeEntry(PullDown),
-    PinModeEntry(PullUp1K5),
-    PinModeEntry(PullUp6K),
-    PinModeEntry(PullUp12K),
-    PinModeEntry(PullUp24K),
-    PullDefault = PullNone,
+    PullNone = 0,
 
-    PinModeEntry(DriveStrength2mA),
-    PinModeEntry(DriveStrength4mA),
-    PinModeEntry(DriveStrength8mA),
-    PinModeEntry(DriveStrength12mA),
-    DriveStrengthDefault = DriveStrength12mA,
+    // Supported on all IOs except IO 20. Actual resistance 13-27kOhm
+    PullUp = 1 << 0,
 
-    PinModeEntry(OutDisable),
-    PinModeEntry(OutPushPull),
-    PinModeEntry(OutOpenDrain),
-    PinModeEntry(OutTristate),
-    OutDefault = OutPushPull,
+    // Only supported on IO 20, Actual resistance 26-40kOhm
+    PullDown = 1 << 1,
 
-    PinModeEntry(InAuto),
-    PinModeEntry(InNone),
-    PinModeEntry(InEnable),
-    InDefault = InEnable,
+    OpenDrain = 1 << 2,
+    OpenDrainPullUp = OpenDrain | PullUp, ///< Open-drain mode with pull up
+    OpenDrainPullDown = OpenDrain | PullDown, ///< Open-drain mode with pull down
+    OpenDrainNoPull = OpenDrain, ///< Open-drain mode with no pullup/pulldown
 
-    PinModeEntry(ReadPin),
-    PinModeEntry(ReadZero),
-    ReadDefault = ReadPin,
-
-    PinModeEntry(PinModeElements)
+    PullDefault = PullNone
 } PinMode;
 
 typedef struct _gpio_t {
     ap3_gpio_pad_t pad;
     am_hal_gpio_pincfg_t cfg;
+    bool openDrain;
+    bool isOutput;
 } gpio_t;
 
 typedef struct ap3_gpio_irq_control_t {

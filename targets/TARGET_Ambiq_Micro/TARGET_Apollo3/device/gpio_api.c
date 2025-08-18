@@ -25,6 +25,8 @@
 #include "gpio_api.h"
 #include "PeripheralPins.h"
 
+#include <string.h>
+
 /** Set the given pin as GPIO
  *
  * @param pin The pin to be set as GPIO
@@ -55,6 +57,7 @@ int gpio_is_connected(const gpio_t *obj)
 void gpio_init(gpio_t *obj, PinName pin)
 {
     MBED_ASSERT(obj != NULL);
+    memset(obj, 0, sizeof(gpio_t));
     obj->pad = (ap3_uart_pad_t)pin;
     return;
 }
@@ -66,94 +69,50 @@ void gpio_init(gpio_t *obj, PinName pin)
 void gpio_mode(gpio_t *obj, PinMode mode)
 {
     MBED_ASSERT(gpio_is_connected(obj));
-    MBED_ASSERT(mode < (PinMode)PinModeElements);
     am_hal_gpio_pincfg_allow_t pinConfigBools = {0};
 
     obj->cfg.uFuncSel = AP3_PINCFG_FUNCSEL_GPIO; // gpio
 
-    if (mode & (PinMode)PowerSwNone) {
-        obj->cfg.ePowerSw = AM_HAL_GPIO_PIN_POWERSW_NONE;
-        pinConfigBools.ePowerSw = true;
-    }
-    if (mode & (PinMode)PowerSwVDD) {
-        obj->cfg.ePowerSw = AM_HAL_GPIO_PIN_POWERSW_VDD;
-        pinConfigBools.ePowerSw = true;
-    }
-    if (mode & (PinMode)PowerSwVSS) {
-        obj->cfg.ePowerSw = AM_HAL_GPIO_PIN_POWERSW_VSS;
-        pinConfigBools.ePowerSw = true;
-    }
+    // Configure pull-up or pull-down
+    pinConfigBools.ePullup = true;
 
-    if (mode & (PinMode)PullNone) {
+    if(!(mode & OpenDrain) && obj->isOutput) {
+        // Push-pull output, do not allow pullup
         obj->cfg.ePullup = AM_HAL_GPIO_PIN_PULLUP_NONE;
-        pinConfigBools.ePullup = true;
     }
-    if (mode & (PinMode)PullUp) {
-        obj->cfg.ePullup = AM_HAL_GPIO_PIN_PULLUP_WEAK;
-        pinConfigBools.ePullup = true;
+    else if (mode & (PinMode)PullUp) {
+        MBED_ASSERT(obj->pad != IO_20); // pullup not supported on IO 20
+
+        if(obj->pad == IO_0 || obj->pad == IO_1 || obj->pad == IO_5 || obj->pad == IO_6 || obj->pad == IO_8 
+            || obj->pad == IO_9 || obj->pad == IO_25 || obj->pad == IO_27 || obj->pad == IO_39 || 
+            obj->pad == IO_40 || obj->pad == IO_42 || obj->pad == IO_43 || obj->pad == IO_48 || obj->pad == IO_49) {
+            // These pads (with I2C support) need a different constant to get the same resistance
+            obj->cfg.ePullup = AM_HAL_GPIO_PIN_PULLUP_24K;
+        }
+        else{
+            obj->cfg.ePullup = AM_HAL_GPIO_PIN_PULLUP_WEAK;
+        }
     }
-    if (mode & (PinMode)PullDown) {
+    else if (mode & (PinMode)PullDown) {
+        MBED_ASSERT(obj->pad == IO_20); // pulldown only supported on IO 20
         obj->cfg.ePullup = AM_HAL_GPIO_PIN_PULLDOWN;
-        pinConfigBools.ePullup = true;
+    }
+    else {
+        obj->cfg.ePullup = AM_HAL_GPIO_PIN_PULLUP_NONE;
     }
 
-    if (mode & (PinMode)DriveStrength2mA) {
-        obj->cfg.eDriveStrength = AM_HAL_GPIO_PIN_DRIVESTRENGTH_2MA;
-        pinConfigBools.eDriveStrength = true;
+    // Configure output type
+    obj->openDrain = mode & OpenDrain;
+    pinConfigBools.eGPOutcfg = true;
+    if(obj->isOutput) {
+        obj->cfg.eGPOutcfg = obj->openDrain ? AM_HAL_GPIO_PIN_OUTCFG_OPENDRAIN : AM_HAL_GPIO_PIN_OUTCFG_PUSHPULL;
     }
-    if (mode & (PinMode)DriveStrength4mA) {
-        obj->cfg.eDriveStrength = AM_HAL_GPIO_PIN_DRIVESTRENGTH_4MA;
-        pinConfigBools.eDriveStrength = true;
-    }
-    if (mode & (PinMode)DriveStrength8mA) {
-        obj->cfg.eDriveStrength = AM_HAL_GPIO_PIN_DRIVESTRENGTH_8MA;
-        pinConfigBools.eDriveStrength = true;
-    }
-    if (mode & (PinMode)DriveStrength12mA) {
-        obj->cfg.eDriveStrength = AM_HAL_GPIO_PIN_DRIVESTRENGTH_12MA;
-        pinConfigBools.eDriveStrength = true;
-    }
-
-    if (mode & (PinMode)OutDisable) {
+    else {
         obj->cfg.eGPOutcfg = AM_HAL_GPIO_PIN_OUTCFG_DISABLE;
-        pinConfigBools.eGPOutcfg = true;
-    }
-    if (mode & (PinMode)OutPushPull) {
-        obj->cfg.eGPOutcfg = AM_HAL_GPIO_PIN_OUTCFG_PUSHPULL;
-        pinConfigBools.eGPOutcfg = true;
-    }
-    if (mode & (PinMode)OutOpenDrain) {
-        obj->cfg.eGPOutcfg = AM_HAL_GPIO_PIN_OUTCFG_OPENDRAIN;
-        pinConfigBools.eGPOutcfg = true;
-    }
-    if (mode & (PinMode)OutTristate) {
-        obj->cfg.eGPOutcfg = AM_HAL_GPIO_PIN_OUTCFG_TRISTATE;
-        pinConfigBools.eGPOutcfg = true;
     }
 
-    if (mode & (PinMode)InAuto) {
-        obj->cfg.eGPInput = AM_HAL_GPIO_PIN_INPUT_AUTO;
-        pinConfigBools.eGPInput = true;
-    }
-    if (mode & (PinMode)InNone) {
-        obj->cfg.eGPInput = AM_HAL_GPIO_PIN_INPUT_NONE;
-        pinConfigBools.eGPInput = true;
-    }
-    if (mode & (PinMode)InEnable) {
-        obj->cfg.eGPInput = AM_HAL_GPIO_PIN_INPUT_ENABLE;
-        pinConfigBools.eGPInput = true;
-    }
 
-    if (mode & (PinMode)ReadPin) {
-        obj->cfg.eGPRdZero = AM_HAL_GPIO_PIN_RDZERO_READPIN;
-        pinConfigBools.eGPRdZero = true;
-    }
-    if (mode & (PinMode)ReadZero) {
-        obj->cfg.eGPRdZero = AM_HAL_GPIO_PIN_RDZERO_ZERO;
-        pinConfigBools.eGPRdZero = true;
-    }
-
-    ap3_hal_gpio_pinconfig_partial((uint32_t)(obj->pad), obj->cfg, pinConfigBools); //padRegMsk.byte, GPConfigMsk.byte, padAltCfgMsk.byte); // apply configuration
+    MBED_ASSERT(ap3_hal_gpio_pinconfig_partial((uint32_t)(obj->pad), obj->cfg, pinConfigBools) == AM_HAL_STATUS_SUCCESS);
 }
 
 /** Set the pin direction
@@ -167,23 +126,33 @@ void gpio_dir(gpio_t *obj, PinDirection direction)
     MBED_ASSERT(direction < (PinDirection)PIN_DIR_ELEMENTS);
     am_hal_gpio_pincfg_allow_t pinConfigBools= {0};
 
+    // Always enable the input on the pin, so that we can read it if it is open drain.
+    pinConfigBools.eGPInput = true;
+    pinConfigBools.eGPRdZero = true;
+    obj->cfg.eGPInput = AM_HAL_GPIO_PIN_INPUT_ENABLE;
+    obj->cfg.eGPRdZero = AM_HAL_GPIO_PIN_RDZERO_READPIN;
+
     if (direction == (PinDirection)PIN_INPUT) {
-        obj->cfg.eGPInput = AM_HAL_GPIO_PIN_INPUT_ENABLE;
-        pinConfigBools.eGPInput = true;
+        obj->isOutput = false;
         obj->cfg.eGPOutcfg = AM_HAL_GPIO_PIN_OUTCFG_DISABLE;
         pinConfigBools.eGPOutcfg = true;
     } else if (direction == (PinDirection)PIN_OUTPUT) {
-        obj->cfg.eGPOutcfg = AM_HAL_GPIO_PIN_OUTCFG_PUSHPULL;
+        obj->isOutput = true;
+        obj->cfg.eGPOutcfg = obj->openDrain ? AM_HAL_GPIO_PIN_OUTCFG_OPENDRAIN : AM_HAL_GPIO_PIN_OUTCFG_PUSHPULL;
         pinConfigBools.eGPOutcfg = true;
         obj->cfg.eDriveStrength = AM_HAL_GPIO_PIN_DRIVESTRENGTH_12MA;
         pinConfigBools.eDriveStrength = true;
-        obj->cfg.eGPInput = AM_HAL_GPIO_PIN_INPUT_NONE;
-        pinConfigBools.eGPInput = true;
+
+        // Clear any configured pullup if set to open-drain
+        if(!obj->openDrain) {
+            pinConfigBools.ePullup = true;
+            obj->cfg.ePullup = AM_HAL_GPIO_PIN_PULLUP_NONE;
+        }
     } else {
         MBED_ASSERT(false);
     }
 
-    ap3_hal_gpio_pinconfig_partial((uint32_t)(obj->pad), obj->cfg, pinConfigBools); //padRegMsk.byte, GPConfigMsk.byte, padAltCfgMsk.byte); // apply configuration
+    ap3_hal_gpio_pinconfig_partial((uint32_t)(obj->pad), obj->cfg, pinConfigBools);
 }
 
 /** Set the output value
@@ -205,12 +174,8 @@ void gpio_write(gpio_t *obj, int value)
 int gpio_read(gpio_t *obj)
 {
     MBED_ASSERT(gpio_is_connected(obj));
-    uint32_t ui32BaseAddr = (obj->pad) / 8;
-    uint32_t ui32BaseShift = (((obj->pad) % 8) * 4) + 1;
-    uint8_t output = ((AM_REGVAL(&GPIO->CFGA + ui32BaseAddr) >> ui32BaseShift) & 0x03);
 
-    return (output) ? (int)am_hal_gpio_output_read(obj->pad) : (int)am_hal_gpio_input_read(obj->pad);
-    return 0;
+    return am_hal_gpio_input_read(obj->pad);
 }
 
 /** Get the pins that support all GPIO tests
