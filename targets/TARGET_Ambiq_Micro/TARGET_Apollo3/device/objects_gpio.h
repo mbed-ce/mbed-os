@@ -64,8 +64,8 @@ typedef enum {
 typedef struct _gpio_t {
     ap3_gpio_pad_t pad;
     am_hal_gpio_pincfg_t cfg;
-    bool openDrain;
-    bool isOutput;
+    bool openDrain; ///< Whether the pin is configured open drain as of the last gpio_mode() call
+    bool isOutput; ///< Whether the pin is configured as an output as of the last gpio_dir() call
 } gpio_t;
 
 typedef struct ap3_gpio_irq_control_t {

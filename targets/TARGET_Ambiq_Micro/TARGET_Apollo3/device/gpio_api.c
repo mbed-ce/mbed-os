@@ -25,8 +25,6 @@
 #include "gpio_api.h"
 #include "PeripheralPins.h"
 
-#include <string.h>
-
 /** Set the given pin as GPIO
  *
  * @param pin The pin to be set as GPIO
