@@ -57,7 +57,6 @@ int gpio_is_connected(const gpio_t *obj)
 void gpio_init(gpio_t *obj, PinName pin)
 {
     MBED_ASSERT(obj != NULL);
-    memset(obj, 0, sizeof(gpio_t));
     obj->pad = (ap3_uart_pad_t)pin;
     return;
 }

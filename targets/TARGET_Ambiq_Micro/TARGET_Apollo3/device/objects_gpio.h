@@ -54,9 +54,9 @@ typedef enum {
     PullDown = 1 << 1,
 
     OpenDrain = 1 << 2,
-    OpenDrainPullUp = OpenDrain | PullUp, ///< Open-drain mode with pull up
-    OpenDrainPullDown = OpenDrain | PullDown, ///< Open-drain mode with pull down
-    OpenDrainNoPull = OpenDrain, ///< Open-drain mode with no pullup/pulldown
+    OpenDrainPullUp = OpenDrain | PullUp, ///< Open-drain mode with pull up. Supported on all IOs except IO 20.
+    OpenDrainPullDown = OpenDrain | PullDown, ///< Open-drain mode with pull down. Only supported on IO 20.
+    OpenDrainNoPull = OpenDrain, ///< Open-drain mode with no pullup/pulldown. Supported on all IOs.
 
     PullDefault = PullNone
 } PinMode;

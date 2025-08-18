@@ -31,6 +31,7 @@ WEAK MBED_NORETURN void mbed_die(void)
 
 #ifdef LED1
     gpio_t led_err;
+    memset(&led_err, 0, sizeof(gpio_t));
     gpio_init_out(&led_err, LED1);
 #endif
 
