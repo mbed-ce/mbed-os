@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['data_0',['data',['../group__accel__aead.html',1,'Hardware-Accelerated Authenticated Encryption with Additional Data'],['../group__se__aead.html',1,'Secure Element Authenticated Encryption with Additional Data']]],
+  ['data_20aead_1',['Authenticated encryption with associated data (AEAD)',['../group__aead.html',1,'']]],
+  ['database_2',['Object Identifier Database',['../group__mbedtls__oid__module.html',1,'']]],
+  ['debug_3',['Debug',['../group__mbedtls__debug__module.html',1,'']]],
+  ['debug_20functions_4',['Debug functions',['../group__platform__debug.html',1,'']]],
+  ['deepsleeplock_20functions_5',['DeepSleepLock functions',['../group__platform___deep_sleep_lock.html',1,'']]],
+  ['derivation_6',['Key derivation',['../group__derivation.html',1,'']]],
+  ['derivation_20and_20agreement_7',['Secure Element Key Derivation and Agreement',['../group__driver__derivation.html',1,'']]],
+  ['derivation_20and_20pseudorandom_20generation_8',['Key derivation and pseudorandom generation',['../group__key__derivation.html',1,'']]],
+  ['des_9',['DES',['../group__mbedtls__des__module.html',1,'']]],
+  ['device_20core_10',['USB Device Core',['../group__usb__device__core.html',1,'']]],
+  ['device_20key_11',['Device Key',['../group__device-key.html',1,'']]],
+  ['diffie_20hellman_12',['Elliptic Curve Diffie-Hellman',['../group__mbedtls__ecdh__module.html',1,'']]],
+  ['diffie_20hellman_20merkle_13',['Diffie-Hellman-Merkle',['../group__mbedtls__dhm__module.html',1,'']]],
+  ['digest_20md_14',['Message Digest (MD)',['../group__mbedtls__md__module.html',1,'']]],
+  ['digests_15',['digests',['../group__driver__digest.html',1,'Hardware-Accelerated Message Digests'],['../group__hash.html',1,'Message digests']]],
+  ['digitalin_20class_16',['DigitalIn class',['../group__drivers___digital_in.html',1,'']]],
+  ['digitalinout_20class_17',['DigitalInOut class',['../group__drivers___digital_in_out.html',1,'']]],
+  ['digitalout_20class_18',['DigitalOut class',['../group__drivers___digital_out.html',1,'']]],
+  ['dirhandle_20functions_19',['DirHandle functions',['../group__platform___dir_handle.html',1,'']]],
+  ['driver_20initialization_20',['Secure element driver initialization',['../group__se__init.html',1,'']]],
+  ['driver_20registration_21',['Secure element driver registration',['../group__se__registration.html',1,'']]],
+  ['drivers_22',['drivers',['../group__drivers-public-api.html',1,'Drivers'],['../group__drivers-internal-api.html',1,'Drivers']]]
+];
