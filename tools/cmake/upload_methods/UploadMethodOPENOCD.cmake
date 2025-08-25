@@ -78,6 +78,11 @@ set(UPLOAD_LAUNCH_COMMANDS
 	# Increase remote timeout to 30 sec in case programming takes a long time
 	"set remotetimeout 30"
 
+	# Tell GDB to allow reads to any region of memory, ignoring the memory map sent by the GDB server.
+	# This is needed because often the GDB server's memory map doesn't include peripheral memory, so
+	# the user can't inspect peripheral registers.
+	"set mem inaccessible-by-default off"
+
 	"load"
 	"tbreak main"
 	"monitor reset halt"
