@@ -23,7 +23,6 @@
 
 #include "iom_api.h"
 #include "mbed_assert.h"
-#include "device.h"
 
 void iom_init(iom_t *obj)
 {
@@ -33,10 +32,10 @@ void iom_init(iom_t *obj)
         iom_deinit(obj);
     }
 
-    MBED_CHECK_AM3_HAL_CALL(am_hal_iom_initialize(obj->iom.inst, &obj->iom.handle));
-    MBED_CHECK_AM3_HAL_CALL(am_hal_iom_power_ctrl(obj->iom.handle, AM_HAL_SYSCTRL_WAKE, false));
-    MBED_CHECK_AM3_HAL_CALL(am_hal_iom_configure(obj->iom.handle, &obj->iom.cfg));
-    MBED_CHECK_AM3_HAL_CALL(am_hal_iom_enable(obj->iom.handle));
+    MBED_CHECK_AM_HAL_CALL(am_hal_iom_initialize(obj->iom.inst, &obj->iom.handle));
+    MBED_CHECK_AM_HAL_CALL(am_hal_iom_power_ctrl(obj->iom.handle, AM_HAL_SYSCTRL_WAKE, false));
+    MBED_CHECK_AM_HAL_CALL(am_hal_iom_configure(obj->iom.handle, &obj->iom.cfg));
+    MBED_CHECK_AM_HAL_CALL(am_hal_iom_enable(obj->iom.handle));
 
     // this merely configures the internal peripheral - the desired pins still need to be configured
 }
@@ -49,9 +48,9 @@ void iom_deinit(iom_t *obj)
         return;
     }
 
-    MBED_CHECK_AM3_HAL_CALL(am_hal_iom_disable(obj->iom.handle));
-    MBED_CHECK_AM3_HAL_CALL(am_hal_iom_power_ctrl(obj->iom.handle, AM_HAL_SYSCTRL_DEEPSLEEP, false));
-    MBED_CHECK_AM3_HAL_CALL(am_hal_iom_uninitialize(obj->iom.handle));
+    MBED_CHECK_AM_HAL_CALL(am_hal_iom_disable(obj->iom.handle));
+    MBED_CHECK_AM_HAL_CALL(am_hal_iom_power_ctrl(obj->iom.handle, AM_HAL_SYSCTRL_DEEPSLEEP, false));
+    MBED_CHECK_AM_HAL_CALL(am_hal_iom_uninitialize(obj->iom.handle));
 
     obj->iom.handle = NULL;
 }

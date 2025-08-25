@@ -27,14 +27,14 @@
 #include "mbed_critical.h"
 #include "extensions.h"
 #include "am_mcu_apollo.h"
-#include "device.h"
+#include "objects.h"
 
 void pin_config(PinName pin, am_hal_gpio_pincfg_t pincfg)
 {
     if (pin == (PinName)NC) {
         return;
     }
-    MBED_CHECK_AM3_HAL_CALL(am_hal_gpio_pinconfig(pin, pincfg));
+    MBED_CHECK_AM_HAL_CALL(am_hal_gpio_pinconfig(pin, pincfg));
 }
 
 void pinmap_config(PinName pin, const PinMap *map)

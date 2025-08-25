@@ -39,11 +39,5 @@
 #include "objects.h"
 #include "extensions.h"
 #include "us_ticker_defines.h"
-#include "mbed_error.h"
-
-#define MBED_CHECK_AM3_HAL_CALL(call) \
-    if((call) != AM_HAL_STATUS_SUCCESS) { \
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_INVALID_OPERATION), "AM3 HAL Call Failed!"); \
-    }
 
 #endif
