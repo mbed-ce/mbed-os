@@ -110,11 +110,11 @@ static void ap3_config_channel(am_hal_adc_slot_chan_e channel){
     ADCSlotConfig.bWindowCompare = false;
     ADCSlotConfig.bEnabled = true;
 
-    MBED_ASSERT(am_hal_adc_disable(am_adc_handle) == AM_HAL_STATUS_SUCCESS);
+    MBED_CHECK_AM_HAL_CALL(am_hal_adc_disable(am_adc_handle));
 
-    MBED_ASSERT(am_hal_adc_configure_slot(am_adc_handle, 0, &ADCSlotConfig) == AM_HAL_STATUS_SUCCESS);
+    MBED_CHECK_AM_HAL_CALL(am_hal_adc_configure_slot(am_adc_handle, 0, &ADCSlotConfig));
 
-    MBED_ASSERT(am_hal_adc_enable(am_adc_handle) == AM_HAL_STATUS_SUCCESS);
+    MBED_CHECK_AM_HAL_CALL(am_hal_adc_enable(am_adc_handle));
 }
 
 // Read an analog in channel as a 14-bit number
@@ -126,19 +126,19 @@ static uint16_t readAnalogIn(analogin_t *obj)
     // Clear any set interrupt flags
     uint32_t intStatus;
     am_hal_adc_interrupt_status(am_adc_handle, &intStatus, false);
-    MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_interrupt_clear(am_adc_handle, intStatus));
+    MBED_CHECK_AM_HAL_CALL(am_hal_adc_interrupt_clear(am_adc_handle, intStatus));
 
     // Issue SW trigger
     am_hal_adc_sw_trigger(am_adc_handle);
 
     do { // Wait for conversion complete interrupt
-        MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_interrupt_status(am_adc_handle, &intStatus, false));
+        MBED_CHECK_AM_HAL_CALL(am_hal_adc_interrupt_status(am_adc_handle, &intStatus, false));
     } while(!(intStatus & AM_HAL_ADC_INT_CNVCMP));
-    MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_interrupt_clear(am_adc_handle, intStatus));
+    MBED_CHECK_AM_HAL_CALL(am_hal_adc_interrupt_clear(am_adc_handle, intStatus));
 
     uint32_t numSamplesToRead = 1;
     am_hal_adc_sample_t sample;
-    MBED_ASSERT(AM_HAL_STATUS_SUCCESS == am_hal_adc_samples_read(am_adc_handle, false, NULL, &numSamplesToRead, &sample));
+    MBED_CHECK_AM_HAL_CALL(am_hal_adc_samples_read(am_adc_handle, false, NULL, &numSamplesToRead, &sample));
 
     return sample.ui32Sample;
 }

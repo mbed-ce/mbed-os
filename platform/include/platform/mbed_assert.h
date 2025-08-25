@@ -50,7 +50,8 @@ MBED_NORETURN void mbed_assert_internal(const char *expr, const char *file, int 
  *  Declare runtime assertions: results in runtime error if condition is false
  *
  *  @note
- *  Use of MBED_ASSERT is limited to Debug and Develop builds.
+ *  Use of MBED_ASSERT is limited to Debug and Develop builds. Code inside an MBED_ASSERT block
+ *  will not be executed at all in Release builds.
  *
  *  @code
  *

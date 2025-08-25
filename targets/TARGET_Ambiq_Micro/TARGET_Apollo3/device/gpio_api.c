@@ -109,7 +109,7 @@ void gpio_mode(gpio_t *obj, PinMode mode)
     }
 
 
-    MBED_ASSERT(ap3_hal_gpio_pinconfig_partial((uint32_t)(obj->pad), obj->cfg, pinConfigBools) == AM_HAL_STATUS_SUCCESS);
+    MBED_CHECK_AM_HAL_CALL(ap3_hal_gpio_pinconfig_partial((uint32_t)(obj->pad), obj->cfg, pinConfigBools));
 }
 
 /** Set the pin direction
