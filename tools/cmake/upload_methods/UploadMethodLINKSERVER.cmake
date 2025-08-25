@@ -66,10 +66,9 @@ set(UPLOAD_LAUNCH_COMMANDS
 	"break main"
 	"monitor reset"
 
-	# Workaround for LinkServer supplying incomplete memory information to GDB
-	# (in particular, seems to be missing the peripheral memory space and external RAM).
-	# Without this command, GDB will block the user from accessing values in any of these
-	# memory spaces.
+	# Tell GDB to allow reads to any region of memory, ignoring the memory map sent by the GDB server.
+	# This is needed because often the GDB server's memory map doesn't include peripheral memory, so
+	# the user can't inspect peripheral registers.
 	"set mem inaccessible-by-default off"
 )
 set(UPLOAD_RESTART_COMMANDS

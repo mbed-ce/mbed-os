@@ -49,6 +49,12 @@ set(UPLOAD_LAUNCH_COMMANDS
 	"monitor halt"
 	"monitor reset"
 	"load"
+
+	# Tell GDB to allow reads to any region of memory, ignoring the memory map sent by the GDB server.
+	# This is needed because often the GDB server's memory map doesn't include peripheral memory, so
+	# the user can't inspect peripheral registers.
+	"set mem inaccessible-by-default off"
+
 	"tbreak main"
 	"monitor reset"
 )

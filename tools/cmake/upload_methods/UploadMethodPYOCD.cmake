@@ -60,6 +60,11 @@ set(UPLOAD_LAUNCH_COMMANDS
 "load"
 "tbreak main"
 
+# Tell GDB to allow reads to any region of memory, ignoring the memory map sent by the GDB server.
+# This is needed because often the GDB server's memory map doesn't include peripheral memory, so
+# the user can't inspect peripheral registers.
+"set mem inaccessible-by-default off"
+
 # It appears the device under debug must be halted after UPLOAD_LAUNCH_COMMANDS,
 # or debugger will become abnormal.
 "monitor reset halt"
