@@ -23,6 +23,7 @@
 
 #include "iom_api.h"
 #include "mbed_assert.h"
+#include "objects.h"
 
 void iom_init(iom_t *obj)
 {
