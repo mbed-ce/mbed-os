@@ -63,6 +63,8 @@ jobs:
             profile: full
           - target: DISCO_L562QE
             profile: full
+          - target: NUCLEO_U083RC
+            profile: baremetal
           - target: B_U585I_IOT02A
             profile: full
           - target: NUCLEO_WB55RG
