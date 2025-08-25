@@ -98,8 +98,10 @@ __WEAK void ForceOscOutofDeepSleep(void)
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
     RCC_OscInitStruct.MSIState = RCC_MSI_ON;
     RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
-#if defined RCC_MSIRANGE_11
-    RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11; // Highest freq, 48MHz range
+#if defined (TARGET_STM32U5)
+    RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_0; // Highest freq for U5, 48MHz range
+#elif defined (RCC_MSIRANGE_11)
+    RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11; // Highest freq for L4/L5, 48MHz range
 #else
     RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6; // 4MHz range
 #endif
