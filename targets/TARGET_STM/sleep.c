@@ -109,7 +109,7 @@ __WEAK void ForceOscOutofDeepSleep(void)
 #else /* defined RCC_SYSCLKSOURCE_MSI */
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
     RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-    RCC_OscInitStruct.HSICalibrationValue = 16;
+    RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
 #endif /* defined RCC_SYSCLKSOURCE_MSI */
 
