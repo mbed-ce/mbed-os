@@ -34,6 +34,7 @@
 #endif /* OCTOSPI1 */
 
 #include "stm_dma_info.h"
+#include "xspi_compat.h"
 
 // activate / de-activate extra debug
 #define qspi_api_c_debug 0
@@ -195,9 +196,14 @@ qspi_status_t qspi_prepare_command(const qspi_command_t *command, OSPI_RegularCm
 {
     debug_if(qspi_api_c_debug, "qspi_prepare_command In: instruction.value %x dummy_count %x address.bus_width %x address.disabled %x address.value %x address.size %x\n",
              command->instruction.value, command->dummy_count, command->address.bus_width, command->address.disabled, command->address.value, command->address.size);
-
+#if defined(HAL_OSPI_DUALQUAD_DISABLE)
     st_command->FlashId = HAL_OSPI_FLASH_ID_1;
-
+#endif
+#if defined(QSPI_OSPIM_IOPORT_HIGH)
+    st_command->IOSelect = HAL_XSPI_SELECT_IO_7_4;
+#else
+    st_command->IOSelect = HAL_XSPI_SELECT_IO_3_0;
+#endif
     if (command->instruction.disabled == true) {
         st_command->InstructionMode = HAL_OSPI_INSTRUCTION_NONE;
         st_command->Instruction = 0;
@@ -528,8 +534,21 @@ static void qspi_init_dma(struct qspi_s * obj)
         }
 #if defined(MDMA)
         __HAL_LINKDMA(&obj->handle, hmdma, *dmaHandle.hmdma);
+#elif defined(TARGET_STM32H5)
+        __HAL_LINKDMA(&obj->handle, hdmarx, *dmaHandle.hdma);
 #else
         __HAL_LINKDMA(&obj->handle, hdma, *dmaHandle.hdma);
+#endif
+#if defined(TARGET_STM32H5)
+        // STM32H5 has only one OCTOSPI instance, but it requires separate DMA channels for RX and TX
+        DMALinkInfo const *dmaLinkTX = &OSPIDMALinks[1];
+        // Initialize DMA channel
+        DMAHandlePointer dmaHandleTX = stm_init_dma_link(dmaLinkTX, DMA_MEMORY_TO_PERIPH, false, true, 1, 1, DMA_NORMAL);
+        if(dmaHandleTX.hdma == NULL)
+        {
+            mbed_error(MBED_ERROR_ALREADY_IN_USE, "DMA channel already used by something else!", 0, MBED_FILENAME, __LINE__);
+        }
+        __HAL_LINKDMA(&obj->handle, hdmatx, *dmaHandleTX.hdma);
 #endif
         obj->dmaInitialized = true;
 #if MBED_CONF_RTOS_PRESENT
@@ -555,7 +574,10 @@ static qspi_status_t _qspi_init_direct(qspi_t *obj, const qspi_pinmap_t *pinmap,
     obj->handle.State = HAL_OSPI_STATE_RESET;
 
     // Set default OCTOSPI handle values
+#if defined(HAL_OSPI_DUALQUAD_DISABLE)
     obj->handle.Init.DualQuad = HAL_OSPI_DUALQUAD_DISABLE;
+#endif
+    obj->handle.Init.MemoryMode = HAL_XSPI_SINGLE_MEM;
 #if defined(TARGET_MX25LM51245G)
     obj->handle.Init.MemoryType = HAL_OSPI_MEMTYPE_MACRONIX; // Read sequence in DTR mode: D1-D0-D3-D2
 #else
@@ -869,6 +891,10 @@ qspi_status_t qspi_free(qspi_t *obj)
         dmaLink = &OSPIDMALinks[0];
 #endif
         stm_free_dma_link(dmaLink);
+#if defined(STM32H5)
+        // Free TX DMA handle for STM32H5
+        stm_free_dma_link(&OSPIDMALinks[1]);
+#endif
     }
 
     if (HAL_OSPI_DeInit(&obj->handle) != HAL_OK) {

@@ -175,6 +175,12 @@ typedef enum {
 
 #if defined OCTOSPI1_R_BASE
 typedef enum {
+    QSPI_1 = (int)OCTOSPI1_R_BASE,
+} QSPIName;
+#endif
+
+#if defined OCTOSPI1_R_BASE
+typedef enum {
     OSPI_1 = (int)OCTOSPI1_R_BASE,
 } OSPIName;
 #endif

@@ -26,10 +26,19 @@
 #ifndef MBED_OS_STM_DMA_IP_V3_H
 #define MBED_OS_STM_DMA_IP_V3_H
 
-// Devices with DMA IP v3 have at most 16 channels per controller.
+#if defined(TARGET_STM32H5)
+// STM32H5 have 2 GPDMA controllers each with 8 channels
+#define MAX_DMA_CHANNELS_PER_CONTROLLER 8
+
+#define NUM_DMA_CONTROLLERS 2
+
+#else
+// Other devices with DMA IP v3 have at most 16 channels per controller.
 #define MAX_DMA_CHANNELS_PER_CONTROLLER 16
 
 #define NUM_DMA_CONTROLLERS 1
+
+#endif
 
 // Currently all known IPv3 devices have source selection
 #define STM_DEVICE_HAS_DMA_SOURCE_SELECTION 1
