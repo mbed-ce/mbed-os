@@ -356,6 +356,63 @@ typedef enum {
     SYS_PWR_WKUP7 = PD_2,
     SYS_PWR_WKUP8 = PD_3,
 
+    /**** STMOD+ pins ****/
+    STMOD_1  = PF_6,
+    STMOD_2  = PF_9,
+    STMOD_3  = PF_8,
+    STMOD_4  = PF_7,
+//  STMOD_5 is connected to GND
+//  STMOD_6 is connected to +5V
+    STMOD_7  = PB_6,
+    STMOD_8  = PH_8,
+    STMOD_9  = PH_7,
+    STMOD_10 = PB_7,
+    STMOD_11 = PH_9,
+    STMOD_12 = PH_6,
+    STMOD_13 = PF_11,
+    STMOD_14 = PH_12,
+//  STMOD_15 is connected to +5V
+//  STMOD_16 is connected to GND
+    STMOD_17 = PF_3,
+    STMOD_18 = PB_12,
+    STMOD_19 = PH_4,
+    STMOD_20 = PH_5,
+
+    /**** PMOD pins ****/
+    PMOD_1  = STMOD_1,
+    PMOD_2  = STMOD_2,
+    PMOD_3  = STMOD_3,
+    PMOD_4  = STMOD_4,
+//  PMOD_5 is connected to GND
+//  PMOD_6 is connected to +3V3
+    PMOD_7  = STMOD_11,
+    PMOD_8  = STMOD_12,
+//  PMOD_9 is not connected
+//  PMOD_10 is not connected
+//  PMOD_11 is connected to GND
+//  PMOD_12 is connected to +3V3
+
+    /**** OSPI FLASH pins ****/
+    OSPI_FLASH1_IO0 = PB_1,
+    OSPI_FLASH1_IO1 = PD_12,
+    OSPI_FLASH1_IO2 = PC_2,
+    OSPI_FLASH1_IO3 = PD_13,
+    OSPI_FLASH1_IO4 = PH_2,
+    OSPI_FLASH1_IO5 = PH_3,
+    OSPI_FLASH1_IO6 = PG_9,
+    OSPI_FLASH1_IO7 = PC_0,
+    OSPI_FLASH1_DQS = PB_2,
+    OSPI_FLASH1_SCK = PF_10,
+    OSPI_FLASH1_CSN = PG_6,
+
+    /**** QSPI FLASH pins ****/
+    QSPI_FLASH1_IO0 = OSPI_FLASH1_IO0,
+    QSPI_FLASH1_IO1 = OSPI_FLASH1_IO1,
+    QSPI_FLASH1_IO2 = OSPI_FLASH1_IO2,
+    QSPI_FLASH1_IO3 = OSPI_FLASH1_IO3,
+    QSPI_FLASH1_SCK = OSPI_FLASH1_SCK,
+    QSPI_FLASH1_CSN = OSPI_FLASH1_CSN,
+
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;

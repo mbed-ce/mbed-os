@@ -199,10 +199,12 @@ qspi_status_t qspi_prepare_command(const qspi_command_t *command, OSPI_RegularCm
 #if defined(HAL_OSPI_DUALQUAD_DISABLE)
     st_command->FlashId = HAL_OSPI_FLASH_ID_1;
 #endif
+#if defined(HAL_XSPI_MODULE_ENABLED)
 #if defined(QSPI_OSPIM_IOPORT_HIGH)
     st_command->IOSelect = HAL_XSPI_SELECT_IO_7_4;
 #else
     st_command->IOSelect = HAL_XSPI_SELECT_IO_3_0;
+#endif
 #endif
     if (command->instruction.disabled == true) {
         st_command->InstructionMode = HAL_OSPI_INSTRUCTION_NONE;
@@ -577,7 +579,9 @@ static qspi_status_t _qspi_init_direct(qspi_t *obj, const qspi_pinmap_t *pinmap,
 #if defined(HAL_OSPI_DUALQUAD_DISABLE)
     obj->handle.Init.DualQuad = HAL_OSPI_DUALQUAD_DISABLE;
 #endif
+#if defined(HAL_XSPI_MODULE_ENABLED)
     obj->handle.Init.MemoryMode = HAL_XSPI_SINGLE_MEM;
+#endif
 #if defined(TARGET_MX25LM51245G)
     obj->handle.Init.MemoryType = HAL_OSPI_MEMTYPE_MACRONIX; // Read sequence in DTR mode: D1-D0-D3-D2
 #else

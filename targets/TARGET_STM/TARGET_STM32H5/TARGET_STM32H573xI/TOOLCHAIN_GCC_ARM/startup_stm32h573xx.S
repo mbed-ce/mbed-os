@@ -175,7 +175,7 @@ g_pfnVectors:
 	.word	GPDMA1_Channel6_IRQHandler
 	.word	GPDMA1_Channel7_IRQHandler
 	.word	IWDG_IRQHandler
-	.word	0
+	.word	SAES_IRQHandler
 	.word	ADC1_IRQHandler
 	.word	DAC1_IRQHandler
 	.word	FDCAN1_IT0_IRQHandler
@@ -254,10 +254,10 @@ g_pfnVectors:
  	.word   FMAC_IRQHandler
 	.word	DTS_IRQHandler
 	.word	RNG_IRQHandler
-	.word	0
-	.word	0
+	.word	OTFDEC1_IRQHandler
+	.word	AES_IRQHandler
 	.word	HASH_IRQHandler
-	.word	0
+	.word	PKA_IRQHandler
 	.word	CEC_IRQHandler
 	.word	TIM12_IRQHandler
 	.word	TIM13_IRQHandler
@@ -416,6 +416,9 @@ g_pfnVectors:
 
 	.weak	IWDG_IRQHandler
 	.thumb_set IWDG_IRQHandler,Default_Handler
+
+	.weak	SAES_IRQHandler
+	.thumb_set SAES_IRQHandler,Default_Handler
 
 	.weak	ADC1_IRQHandler
 	.thumb_set ADC1_IRQHandler,Default_Handler
@@ -651,8 +654,17 @@ g_pfnVectors:
 	.weak	RNG_IRQHandler
 	.thumb_set RNG_IRQHandler,Default_Handler
 
+	.weak	OTFDEC1_IRQHandler
+	.thumb_set OTFDEC1_IRQHandler,Default_Handler
+
+	.weak	AES_IRQHandler
+	.thumb_set AES_IRQHandler,Default_Handler
+
 	.weak	HASH_IRQHandler
 	.thumb_set HASH_IRQHandler,Default_Handler
+
+	.weak	PKA_IRQHandler
+	.thumb_set PKA_IRQHandler,Default_Handler
 
 	.weak	CEC_IRQHandler
 	.thumb_set CEC_IRQHandler,Default_Handler

@@ -29,6 +29,9 @@
 
 #define TRACE_GROUP "STOS"
 
+#include "stm_dma_info.h"
+#include "xspi_compat.h"
+
 // activate / de-activate debug
 #define ospi_api_c_debug 0
 
@@ -58,8 +61,12 @@ ospi_status_t ospi_prepare_command(const ospi_command_t *command, OSPI_RegularCm
     debug_if(ospi_api_c_debug, "ospi_prepare_command In: instruction.value %x dummy_count %u address.bus_width %x address.disabled %x address.value %x address.size %x\n",
              command->instruction.value, command->dummy_count, command->address.bus_width, command->address.disabled, command->address.value, command->address.size);
 
+#if defined(HAL_OSPI_DUALQUAD_DISABLE)
     st_command->FlashId = HAL_OSPI_FLASH_ID_1;
-
+#endif
+#if defined(HAL_XSPI_MODULE_ENABLED)
+    st_command->IOSelect = HAL_XSPI_SELECT_IO_7_0;
+#endif
     if (command->instruction.disabled == true) {
         st_command->InstructionMode = HAL_OSPI_INSTRUCTION_NONE;
         st_command->Instruction = 0;
@@ -243,12 +250,17 @@ static ospi_status_t _ospi_init_direct(ospi_t *obj, const ospi_pinmap_t *pinmap,
     obj->handle.State = HAL_OSPI_STATE_RESET;
 
     // Set default OCTOSPI handle values
+#if defined(HAL_OSPI_DUALQUAD_DISABLE)
     obj->handle.Init.DualQuad = HAL_OSPI_DUALQUAD_DISABLE;
-//#if defined(TARGET_MX25LM512451G)
-//   obj->handle.Init.MemoryType = HAL_OSPI_MEMTYPE_MACRONIX; // Read sequence in DTR mode: D1-D0-D3-D2
-//#else
+#endif
+#if defined(HAL_XSPI_MODULE_ENABLED)
+    obj->handle.Init.MemoryMode = HAL_XSPI_SINGLE_MEM;
+#endif
+#if defined(TARGET_MX25LM51245G)
+    obj->handle.Init.MemoryType = HAL_OSPI_MEMTYPE_MACRONIX; // Read sequence in DTR mode: D1-D0-D3-D2
+#else
     obj->handle.Init.MemoryType = HAL_OSPI_MEMTYPE_MICRON;   // Read sequence in DTR mode: D0-D1-D2-D3
-//#endif
+#endif
     obj->handle.Init.ClockPrescaler = 4; // default value, will be overwritten in ospi_frequency
     obj->handle.Init.FifoThreshold = 4;
     obj->handle.Init.SampleShifting = HAL_OSPI_SAMPLE_SHIFTING_NONE;
@@ -264,7 +276,7 @@ static ospi_status_t _ospi_init_direct(ospi_t *obj, const ospi_pinmap_t *pinmap,
 #if defined(HAL_OSPI_DELAY_BLOCK_USED)
     obj->handle.Init.DelayBlockBypass = HAL_OSPI_DELAY_BLOCK_USED;
 #endif
-#if defined(TARGET_STM32L5) || defined(TARGET_STM32U5)
+#if defined(TARGET_STM32L5) || defined(TARGET_STM32U5) || defined(TARGET_STM32H5)
     obj->handle.Init.Refresh = 0;
 #endif
 #if defined(OCTOSPI_DCR3_MAXTRAN)
