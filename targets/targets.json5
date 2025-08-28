@@ -3188,7 +3188,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "network-default-interface-type": "ETHERNET"
         },
         "device_has_add": [
-            "EMAC"
+            "EMAC",
+            "USBDEVICE"
         ]
     },
 	"NUCLEO_H563ZI": {
@@ -3228,7 +3229,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "network-default-interface-type": "ETHERNET"
         },
         "device_has_add": [
-            "EMAC"
+            "EMAC",
+            "USBDEVICE"
         ]
     },
 	"DISCO_H573I": {
