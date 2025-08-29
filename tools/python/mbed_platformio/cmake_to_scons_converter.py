@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from SCons.Environment import Base as Environment
 import pathlib
+import click
 
 def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
     def _normalize_define(define_string):
@@ -33,7 +34,10 @@ def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
 
     return result
 
-def prepare_build_envs(config: dict, default_env: Environment, debug_allowed=True):
+def prepare_build_envs(config: dict, default_env: Environment, debug_allowed=True) -> list[Environment]:
+    """
+    Creates the Scons Environment(s) needed to build the source files in a CMake target
+    """
     build_envs = []
     target_compile_groups = config.get("compileGroups", [])
     if not target_compile_groups:
@@ -76,6 +80,9 @@ def prepare_build_envs(config: dict, default_env: Environment, debug_allowed=Tru
 def compile_source_files(
         config: dict, default_env: Environment, project_src_dir: pathlib.Path, prepend_dir: pathlib.Path | None=None, debug_allowed=True
 ):
+    """
+    Generates SCons rules to compile the source files in a target
+    """
     build_envs = prepare_build_envs(config, default_env, debug_allowed)
     objects = []
     for source in config.get("sources", []):
@@ -117,3 +124,65 @@ def build_library(
     return default_env.Library(
         target=str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name), source=lib_objects
     )
+
+def extract_flags(target_json: dict) -> dict[str, list[str]]:
+    """
+    Returns a dictionary with flags for SCons based on a given CMake target
+    """
+    def _extract_flags(target_json: dict) -> dict[str, list[str]]:
+        flags = {}
+        for cg in target_json["compileGroups"]:
+            flags[cg["language"]] = []
+            for ccfragment in cg["compileCommandFragments"]:
+                fragment = ccfragment.get("fragment", "").strip("\" ")
+                if not fragment or fragment.startswith("-D"):
+                    continue
+                flags[cg["language"]].extend(
+                    click.parser.split_arg_string(fragment.strip())
+                )
+
+        return flags
+
+    default_flags = _extract_flags(target_json)
+
+    # Flags are sorted because CMake randomly populates build flags in code model
+    return {
+        "ASPPFLAGS": default_flags.get("ASM"),
+        "CFLAGS": default_flags.get("C"),
+        "CXXFLAGS": default_flags.get("CXX"),
+    }
+
+
+def extract_includes(target_json: dict) -> dict[str, list[str]]:
+    """
+    Extract the includes from a CMake target and return an SCons-style dict
+    """
+    plain_includes = []
+    sys_includes = []
+    cg = target_json["compileGroups"][0]
+    for inc in cg.get("includes", []):
+        inc_path = inc["path"]
+        if inc.get("isSystem", False):
+            sys_includes.append(inc_path)
+        else:
+            plain_includes.append(inc_path)
+
+    return {"plain_includes": plain_includes, "sys_includes": sys_includes}
+
+def extract_link_args(target_json: dict) -> dict[str, list[str]]:
+    """
+    Extract the linker flags from a CMake target and return an SCons-style dict
+    """
+
+    link_args = {"LINKFLAGS": []}
+
+    for f in target_json.get("link", {}).get("commandFragments", []):
+        fragment = f.get("fragment", "").strip()
+        fragment_role = f.get("role", "").strip()
+        if not fragment or not fragment_role:
+            continue
+        args = click.parser.split_arg_string(fragment)
+        if fragment_role == "flags":
+            link_args["LINKFLAGS"].extend(args)
+
+    return link_args

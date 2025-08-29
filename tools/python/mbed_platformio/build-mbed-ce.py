@@ -30,7 +30,7 @@ CMAKE_API_DIR = BUILD_DIR / ".cmake" / "api" / "v1"
 CMAKE_API_QUERY_DIR = CMAKE_API_DIR / "query"
 CMAKE_API_REPLY_DIR = CMAKE_API_DIR / "reply"
 
-PROJECT_CMAKELISTS_TXT = PROJECT_DIR / "CMakeLists.txt"
+PROJECT_CMAKELISTS_TXT = FRAMEWORK_DIR  / "tools" / "python" / "mbed_platformio" / "CMakeLists.txt"
 PROJECT_MBED_APP_JSON5 = PROJECT_DIR / "mbed_app.json5"
 
 # Add mbed-os/tools/python dir to PYTHONPATH so we can import from it.
@@ -38,7 +38,7 @@ PROJECT_MBED_APP_JSON5 = PROJECT_DIR / "mbed_app.json5"
 sys.path.append(str(FRAMEWORK_DIR / "tools" / "python"))
 
 from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
-from mbed_platformio.cmake_to_scons_converter import build_library
+from mbed_platformio.cmake_to_scons_converter import build_library, extract_defines, extract_flags, extract_includes, extract_link_args
 
 def get_mbed_target():
     board_type = env.subst("$BOARD")
@@ -54,28 +54,11 @@ def is_proper_mbed_ce_project():
         path.is_file()
         for path in (
             PROJECT_MBED_APP_JSON5,
-            PROJECT_CMAKELISTS_TXT
         )
     )
 
 def create_default_project_files():
     print("Mbed CE: Creating default project files")
-    if not PROJECT_CMAKELISTS_TXT.exists():
-        PROJECT_CMAKELISTS_TXT.write_text(
-""" # Default CMakeLists.txt for Mbed CE, created by PlatformIO
-cmake_minimum_required(VERSION 3.19)
-cmake_policy(VERSION 3.19...3.22)
-
-set(MBED_APP_JSON_PATH mbed_app.json5)
-
-include(${PLATFORMIO_MBED_OS_PATH}/tools/cmake/mbed_toolchain_setup.cmake)
-project(PlatformIOMbedProject
-    LANGUAGES C CXX ASM)
-include(mbed_project_setup)
-
-add_subdirectory(${PLATFORMIO_MBED_OS_PATH} mbed-os)
-""")
-
     if not PROJECT_MBED_APP_JSON5.exists():
         PROJECT_MBED_APP_JSON5.write_text(
 """
@@ -101,19 +84,21 @@ def is_cmake_reconfigure_required():
     ]
     ninja_buildfile = BUILD_DIR / "build.ninja"
 
-    if not CMAKE_API_REPLY_DIR.is_dir() or not not any(CMAKE_API_REPLY_DIR.iterdir()):
-        return True
     if not cmake_cache_file.exists():
+        print("Mbed CE: Reconfigure required because CMake cache does not exist")
+        return True
+    if not CMAKE_API_REPLY_DIR.is_dir() or not any(CMAKE_API_REPLY_DIR.iterdir()):
+        print("Mbed CE: Reconfigure required because CMake API reply dir is missing")
         return True
     if not ninja_buildfile.exists():
+        print("Mbed CE: Reconfigure required because Ninja buildfile does not exist")
         return True
 
     cache_file_mtime = cmake_cache_file.stat().st_mtime
-    if any(
-            f.stat().st_mtime > cache_file_mtime
-            for f in cmake_config_files
-    ):
-        return True
+    for file in cmake_config_files:
+        if file.stat().st_mtime > cache_file_mtime:
+            print(f"Mbed CE: Reconfigure required because {file.name} was modified")
+            return True
 
     return False
 
@@ -151,6 +136,10 @@ def get_cmake_code_model(cmake_args=None) -> dict:
     if is_cmake_reconfigure_required():
         print("Mbed CE: Configuring CMake build system...")
         run_cmake(cmake_args)
+
+        # Seems like CMake doesn't update the timestamp on the cache file if nothing actually changed.
+        # Ensure that the timestamp is updated so we won't reconfigure next time.
+        (BUILD_DIR / "CMakeCache.txt").touch()
 
     if not CMAKE_API_REPLY_DIR.is_dir() or not any(CMAKE_API_REPLY_DIR.iterdir()):
         sys.stderr.write("Error: Couldn't find CMake API response file\n")
@@ -233,11 +222,13 @@ def build_components(
             env, v["config"], project_src_dir, prepend_dir, debug_allowed
         )
 
+def get_app_defines(app_config: dict):
+    return extract_defines(app_config["compileGroups"][0])
 
 project_codemodel = get_cmake_code_model(
     [
         "-S",
-        PROJECT_DIR,
+        PROJECT_CMAKELISTS_TXT.parent,
         "-B",
         BUILD_DIR,
         "-G",
@@ -260,9 +251,6 @@ env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", str(project_ld_script))
 print("Reading CMake configuration...")
 target_configs = load_target_configurations(project_codemodel)
 
-
-
-
 framework_components_map = get_components_map(
     target_configs,
     ["STATIC_LIBRARY", "OBJECT_LIBRARY"],
@@ -271,12 +259,17 @@ framework_components_map = get_components_map(
 
 build_components(env, framework_components_map, PROJECT_DIR)
 
-# project_config = target_configs.get(project_target_name, {})
-# default_config = target_configs.get(default_config_name, {})
-# project_defines = get_app_defines(project_config)
-# project_flags = get_app_flags(project_config, default_config)
-# link_args = extract_link_args(elf_config)
-# app_includes = get_app_includes(elf_config)
+mbed_os_lib_target_json = target_configs.get("mbed-os", {})
+app_target_json = target_configs.get("PIODummyExecutable", {})
+project_defines = get_app_defines(app_target_json)
+project_flags = extract_flags(app_target_json)
+link_args = extract_link_args(app_target_json)
+app_includes = extract_includes(app_target_json)
+print(f"link_args={link_args!r}")
+
+# The CMake build system adds a flag in mbed_set_post_build() to output a map file.
+# We need to do that here.
+link_args["LINKFLAGS"].append(f"-Wl,-Map={str(BUILD_DIR / 'firmware.map')}")
 
 #
 # Process main parts of the framework
@@ -305,11 +298,11 @@ build_components(env, framework_components_map, PROJECT_DIR)
 # Main environment configuration
 #
 
-# project_flags.update(link_args)
-#env.MergeFlags(project_flags)
+project_flags.update(link_args)
+env.MergeFlags(project_flags)
 env.Prepend(
-    #CPPPATH=app_includes["plain_includes"],
-    #CPPDEFINES=project_defines,
+    CPPPATH=app_includes["plain_includes"],
+    CPPDEFINES=project_defines,
     #LINKFLAGS=extra_flags,
     #LIBS=libs
 )
