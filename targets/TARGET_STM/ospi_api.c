@@ -264,7 +264,11 @@ static ospi_status_t _ospi_init_direct(ospi_t *obj, const ospi_pinmap_t *pinmap,
     obj->handle.Init.ClockPrescaler = 4; // default value, will be overwritten in ospi_frequency
     obj->handle.Init.FifoThreshold = 4;
     obj->handle.Init.SampleShifting = HAL_OSPI_SAMPLE_SHIFTING_NONE;
+#if defined(HAL_XSPI_MODULE_ENABLED)
+    obj->handle.Init.DeviceSize = HAL_XSPI_SIZE_32GB;
+#else
     obj->handle.Init.DeviceSize = 32;
+#endif
     obj->handle.Init.ChipSelectHighTime = 3;
     obj->handle.Init.FreeRunningClock = HAL_OSPI_FREERUNCLK_DISABLE;
 #if defined(HAL_OSPI_WRAP_NOT_SUPPORTED)
