@@ -99,7 +99,11 @@ void HAL_QSPI_TimeOutCallback(QSPI_HandleTypeDef * handle)
 #endif
 
 #if defined(OCTOSPI1)
-static OSPI_HandleTypeDef * ospiHandle1;
+
+// Stored pointer inside OSPI handle is qspi_s*
+#define QSPI_POINTER_FLAG 1
+
+OSPI_HandleTypeDef * ospiHandle1;
 
 // Store the qspi_s * inside an OSPI handle, for later retrieval in callbacks
 static inline void store_qspi_pointer(OSPI_HandleTypeDef * ospiHandle, struct qspi_s * qspis) {
@@ -107,11 +111,17 @@ static inline void store_qspi_pointer(OSPI_HandleTypeDef * ospiHandle, struct qs
     // in callbacks.  However, there are some variables in the Init struct that are never accessed after HAL_OSPI_Init().
     // So, we can reuse those to store our pointer.
     ospiHandle->Init.ChipSelectHighTime = (uint32_t)qspis;
+    ospiHandle->Init.FreeRunningClock = QSPI_POINTER_FLAG;
 }
 
 // Get qspi_s * from OSPI_HandleTypeDef
 static inline struct qspi_s * get_qspi_pointer(OSPI_HandleTypeDef * ospiHandle) {
     return (struct qspi_s *) ospiHandle->Init.ChipSelectHighTime;
+}
+
+// Get ospi_s * from OSPI_HandleTypeDef
+static inline struct ospi_s * get_ospi_pointer(OSPI_HandleTypeDef * ospiHandle) {
+    return (struct ospi_s *) ospiHandle->Init.ChipSelectHighTime;
 }
 
 void OCTOSPI1_IRQHandler()
@@ -120,14 +130,20 @@ void OCTOSPI1_IRQHandler()
 }
 
 #if MBED_CONF_RTOS_PRESENT
+static inline osSemaphoreId_t get_semaphore_id(OSPI_HandleTypeDef * handle) {
+    osSemaphoreId_t semaphoreId = handle->Init.FreeRunningClock == QSPI_POINTER_FLAG ?
+        get_qspi_pointer(handle)->semaphoreId: get_ospi_pointer(handle)->semaphoreId;
+        return semaphoreId;
+}
+
 void HAL_OSPI_TxCpltCallback(OSPI_HandleTypeDef * handle)
 {
-    osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
+    osSemaphoreRelease(get_semaphore_id(handle));
 }
 
 void HAL_OSPI_RxCpltCallback(OSPI_HandleTypeDef * handle)
 {
-    osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
+    osSemaphoreRelease(get_semaphore_id(handle));
 }
 #endif
 
@@ -135,7 +151,7 @@ void HAL_OSPI_ErrorCallback(OSPI_HandleTypeDef * handle)
 {
     handle->State = HAL_OSPI_STATE_ERROR;
 #if MBED_CONF_RTOS_PRESENT
-    osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
+    osSemaphoreRelease(get_semaphore_id(handle));
 #endif
 }
 
@@ -143,13 +159,13 @@ void HAL_OSPI_TimeOutCallback(OSPI_HandleTypeDef * handle)
 {
     handle->State = HAL_OSPI_STATE_ERROR;
 #if MBED_CONF_RTOS_PRESENT
-    osSemaphoreRelease(get_qspi_pointer(handle)->semaphoreId);
+    osSemaphoreRelease(get_semaphore_id(handle));
 #endif
 }
 #endif
 
 #if defined(OCTOSPI2)
-static OSPI_HandleTypeDef * ospiHandle2;
+OSPI_HandleTypeDef * ospiHandle2;
 
 void OCTOSPI2_IRQHandler()
 {
@@ -986,6 +1002,7 @@ qspi_status_t qspi_frequency(qspi_t *obj, int hz)
 
     // Reset flag used by store_qspi_pointer()
     obj->handle.Init.ChipSelectHighTime = 3;
+    obj->handle.Init.FreeRunningClock = HAL_OSPI_FREERUNCLK_DISABLE;
 
     /* HCLK drives QSPI. QSPI clock depends on prescaler value:
     *  0: Freq = HCLK
