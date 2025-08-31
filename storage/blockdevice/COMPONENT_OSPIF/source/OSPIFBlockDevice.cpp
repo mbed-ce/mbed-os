@@ -1367,17 +1367,17 @@ int OSPIFBlockDevice::_soft_reset()
         case OSPIF_DIERCT_SOFT_RESET:
             // Issue instruction 0xF0 to reset the device
             ospi_status = _ospi_send_general_command(0xF0, OSPI_NO_ADDRESS_COMMAND, // Send reset instruction
-                                                                NULL, 0, NULL, 0);
+                                                     NULL, 0, NULL, 0);
             status = (ospi_status == OSPI_STATUS_OK) ? OSPIF_BD_ERROR_OK : OSPIF_BD_ERROR_PARSING_FAILED;
             break;
         case OSPIF_ENABLE_AND_SOFT_RESET:
             // Issue instruction 66h to enable resets on the device
             // Then issue instruction 99h to reset the device
             ospi_status = _ospi_send_general_command(0x66, OSPI_NO_ADDRESS_COMMAND, // Send reset enable instruction
-                                                                NULL, 0, NULL, 0);
+                                                     NULL, 0, NULL, 0);
             if (ospi_status == OSPI_STATUS_OK) {
                 ospi_status = _ospi_send_general_command(0x99, OSPI_NO_ADDRESS_COMMAND, // Send reset instruction
-                                                        NULL, 0, NULL, 0);
+                                                         NULL, 0, NULL, 0);
             }
             status = (ospi_status == OSPI_STATUS_OK) ? OSPIF_BD_ERROR_OK : OSPIF_BD_ERROR_PARSING_FAILED;
             break;
@@ -1394,7 +1394,7 @@ int OSPIFBlockDevice::_soft_reset()
         _data_width = OSPI_CFG_BUS_SINGLE;
 
         _ospi.configure_format(_inst_width, _inst_size, _address_width, _address_size, OSPI_CFG_BUS_SINGLE,
-                                0, _data_width, _dummy_cycles);
+                               0, _data_width, _dummy_cycles);
 
         if (false == _is_mem_ready()) {
             tr_error("Device not ready, reset failed");

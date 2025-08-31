@@ -81,7 +81,7 @@ ospi_status_t ospi_prepare_command(const ospi_command_t *command, OSPI_RegularCm
 #if defined(HAL_OSPI_DUALQUAD_DISABLE)
     st_command->FlashId = HAL_OSPI_FLASH_ID_1;
 #endif
-#if defined(HAL_XSPI_MODULE_ENABLED)
+#if defined(HAL_XSPI_MODULE_ENABLED) && !defined(TARGET_STM32U5)
     st_command->IOSelect = HAL_XSPI_SELECT_IO_7_0;
 #endif
     if (command->instruction.disabled == true) {
@@ -325,7 +325,7 @@ static ospi_status_t _ospi_init_direct(ospi_t *obj, const ospi_pinmap_t *pinmap,
 #if defined(HAL_OSPI_DUALQUAD_DISABLE)
     obj->handle.Init.DualQuad = HAL_OSPI_DUALQUAD_DISABLE;
 #endif
-#if defined(HAL_XSPI_MODULE_ENABLED)
+#if defined(HAL_XSPI_MODULE_ENABLED) && !defined(TARGET_STM32U5)
     obj->handle.Init.MemoryMode = HAL_XSPI_SINGLE_MEM;
 #endif
 #if defined(TARGET_MX25LM51245G)
@@ -336,7 +336,7 @@ static ospi_status_t _ospi_init_direct(ospi_t *obj, const ospi_pinmap_t *pinmap,
     obj->handle.Init.ClockPrescaler = 4; // default value, will be overwritten in ospi_frequency
     obj->handle.Init.FifoThreshold = 4;
     obj->handle.Init.SampleShifting = HAL_OSPI_SAMPLE_SHIFTING_NONE;
-#if defined(HAL_XSPI_MODULE_ENABLED)
+#if defined(HAL_XSPI_MODULE_ENABLED) && !defined(TARGET_STM32U5)
     obj->handle.Init.DeviceSize = HAL_XSPI_SIZE_32GB;
 #else
     obj->handle.Init.DeviceSize = 32;

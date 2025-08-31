@@ -33,7 +33,7 @@
 
 // XSPI compatibility layer: emulate XSPI API as OSPI API
 
-#if defined(HAL_XSPI_MODULE_ENABLED)
+#if defined(HAL_XSPI_MODULE_ENABLED) && !defined(TARGET_STM32U5)
 
 // Types
 #define OSPI_HandleTypeDef XSPI_HandleTypeDef

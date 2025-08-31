@@ -474,11 +474,12 @@ private:
     uint8_t _dummy_cycles; //Number of Dummy cycles required by Current Bus Mode
     ospi_bus_width_t _data_width; //Bus width for Data phase
 
-    ospif_soft_reset_mode _soft_reset_mode; // Soft Reset mode
-
     uint32_t _init_ref_count;
     bool _is_initialized;
-#ifdef MX_FLASH_SUPPORT_RWW
+
+    ospif_soft_reset_mode _soft_reset_mode; // Soft Reset mode
+
+    #ifdef MX_FLASH_SUPPORT_RWW
     enum wait_flag {
         NOT_STARTED,         // no wait is started
         WRITE_WAIT_STARTED,  // write wait is started
