@@ -479,7 +479,7 @@ private:
 
     ospif_soft_reset_mode _soft_reset_mode; // Soft Reset mode
 
-    #ifdef MX_FLASH_SUPPORT_RWW
+#ifdef MX_FLASH_SUPPORT_RWW
     enum wait_flag {
         NOT_STARTED,         // no wait is started
         WRITE_WAIT_STARTED,  // write wait is started

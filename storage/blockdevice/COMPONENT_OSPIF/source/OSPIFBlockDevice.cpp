@@ -1360,7 +1360,7 @@ int OSPIFBlockDevice::_soft_reset()
     int status = OSPIF_BD_ERROR_OK;
     ospi_status_t ospi_status = OSPI_STATUS_OK;
 
-    switch(_soft_reset_mode) {
+    switch (_soft_reset_mode) {
         case OSPIF_SOFT_RESET_UNSUPPORTED:
             status = OSPIF_BD_ERROR_PARSING_FAILED;
             break;
