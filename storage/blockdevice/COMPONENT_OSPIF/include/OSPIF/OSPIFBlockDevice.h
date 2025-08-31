@@ -104,6 +104,16 @@ enum ospif_polarity_mode {
     OSPIF_POLARITY_MODE_1      /* CPOL=1, CPHA=1 */
 };
 
+/** Enum ospif soft reset modes
+ *
+ *  @enum ospif_soft_reset_mode
+ */
+enum ospif_soft_reset_mode {
+    OSPIF_SOFT_RESET_UNSUPPORTED = 0, /* Soft reset not supported */
+    OSPIF_DIERCT_SOFT_RESET,          /* Direct soft reset mode */
+    OSPIF_ENABLE_AND_SOFT_RESET       /* Enable and soft reset mode */
+};
+
 #define OSPIF_MAX_ACTIVE_FLASH_DEVICES 10
 
 /** BlockDevice for SFDP based flash devices over OSPI bus
@@ -389,6 +399,9 @@ private:
     // Enable Quad mode if supported (1-1-4, 1-4-4, 4-4-4 bus modes)
     int _sfdp_set_quad_enabled(uint8_t *basic_param_table_ptr);
 
+    // Perform soft reset if supported - returns error if soft reset is not supported
+    int _soft_reset();
+
     // Enable QPI mode (4-4-4)
     int _sfdp_set_qpi_enabled(uint8_t *basic_param_table_ptr);
 
@@ -460,6 +473,8 @@ private:
     bool _alt_enabled; //Whether alt is enabled
     uint8_t _dummy_cycles; //Number of Dummy cycles required by Current Bus Mode
     ospi_bus_width_t _data_width; //Bus width for Data phase
+
+    ospif_soft_reset_mode _soft_reset_mode; // Soft Reset mode
 
     uint32_t _init_ref_count;
     bool _is_initialized;
