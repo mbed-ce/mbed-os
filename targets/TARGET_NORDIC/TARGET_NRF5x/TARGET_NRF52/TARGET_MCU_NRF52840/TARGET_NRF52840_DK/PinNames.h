@@ -159,16 +159,6 @@ typedef enum {
     p45 = P1_13,
     p46 = P1_14,
     p47 = P1_15,
-    
-    LED1    = p13,
-    LED2    = p14,
-    LED3    = p15,
-    LED4    = p16,
-
-    BUTTON1 = p11,
-    BUTTON2 = p12,
-    BUTTON3 = p24,
-    BUTTON4 = p25,
 
     RX_PIN_NUMBER  = p8,
     TX_PIN_NUMBER  = p6,
@@ -191,69 +181,81 @@ typedef enum {
     STDIO_UART_CTS = CTS_PIN_NUMBER,
     STDIO_UART_RTS = RTS_PIN_NUMBER,
 
-    SPI_PSELMOSI0 = P1_13,
-    SPI_PSELMISO0 = P1_14,
-    SPI_PSELSS0   = P1_12,
-    SPI_PSELSCK0  = P1_15,
+    ARDUINO_UNO_D0 = P1_1,
+    ARDUINO_UNO_D1 = P1_2,
+    ARDUINO_UNO_D2 = P1_3,
+    ARDUINO_UNO_D3 = P1_4,
+    ARDUINO_UNO_D4 = P1_5,
+    ARDUINO_UNO_D5 = P1_6,
+    ARDUINO_UNO_D6 = P1_7,
+    ARDUINO_UNO_D7 = P1_8,
 
-    SPI_PSELMOSI1 = P1_2,
-    SPI_PSELMISO1 = P1_3,
-    SPI_PSELSS1   = P1_1,
-    SPI_PSELSCK1  = P1_4,
+    ARDUINO_UNO_D8  = P1_10,
+    ARDUINO_UNO_D9  = P1_11,
+    ARDUINO_UNO_D10 = P1_12,
+    ARDUINO_UNO_D11 = P1_13,
+    ARDUINO_UNO_D12 = P1_14,
+    ARDUINO_UNO_D13 = P1_15,
 
-    SPIS_PSELMOSI = P1_2,
-    SPIS_PSELMISO = P1_3,
-    SPIS_PSELSS   = P1_1,
-    SPIS_PSELSCK  = P1_4,
+    ARDUINO_UNO_D14 = p26,
+    ARDUINO_UNO_D15 = p27,
 
-    I2C_SDA0 = p26,
-    I2C_SCL0 = p27,
-
-    D0 = P1_1,
-    D1 = P1_2,
-    D2 = P1_3,
-    D3 = P1_4,
-    D4 = P1_5,
-    D5 = P1_6,
-    D6 = P1_7,
-    D7 = P1_8,
-
-    D8  = P1_10,
-    D9  = P1_11,
-    D10 = P1_12,
-    D11 = P1_13,
-    D12 = P1_14,
-    D13 = P1_15,
-
-    D14 = p26,
-    D15 = p27,
-
-    A0 = p3,
-    A1 = p4,
-    A2 = p28,
-    A3 = p29,
-    A4 = p30,
-    A5 = p31,
-
-    /**** QSPI pins ****/
-    QSPI1_IO0 = P0_20,
-    QSPI1_IO1 = P0_21,
-    QSPI1_IO2 = P0_22,
-    QSPI1_IO3 = P0_23,
-    QSPI1_SCK = P0_19,
-    QSPI1_CSN = P0_17,
-
-    /**** QSPI FLASH pins ****/
-    QSPI_FLASH1_IO0 = QSPI1_IO0,
-    QSPI_FLASH1_IO1 = QSPI1_IO1,
-    QSPI_FLASH1_IO2 = QSPI1_IO2,
-    QSPI_FLASH1_IO3 = QSPI1_IO3,
-    QSPI_FLASH1_SCK = QSPI1_SCK,
-    QSPI_FLASH1_CSN = QSPI1_CSN,
+    ARDUINO_UNO_A0 = p3,
+    ARDUINO_UNO_A1 = p4,
+    ARDUINO_UNO_A2 = p28,
+    ARDUINO_UNO_A3 = p29,
+    ARDUINO_UNO_A4 = p30,
+    ARDUINO_UNO_A5 = p31,
 
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
+
+// LEDs and buttons
+#define LED1 p13
+#define LED2 p14
+#define LED3 p15
+#define LED4 p16
+
+#define BUTTON1 p11
+#define BUTTON2 p12
+#define BUTTON3 p24
+#define BUTTON4 p25
+
+// Busses
+#define I2C_SDA0 p26
+#define I2C_SCL0 p27
+
+#define SPI_PSELMOSI0 P1_13
+#define SPI_PSELMISO0 P1_14
+#define SPI_PSELSS0   P1_12
+#define SPI_PSELSCK0  P1_15
+
+#define SPI_PSELMOSI1 P1_2
+#define SPI_PSELMISO1 P1_3
+#define SPI_PSELSS1   P1_1
+#define SPI_PSELSCK1  P1_4
+
+#define SPIS_PSELMOSI P1_2
+#define SPIS_PSELMISO P1_3
+#define SPIS_PSELSS   P1_1
+#define SPIS_PSELSCK  P1_4
+
+/**** QSPI pins ****/
+#define QSPI1_IO0 P0_20
+#define QSPI1_IO1 P0_21
+#define QSPI1_IO2 P0_22
+#define QSPI1_IO3 P0_23
+#define QSPI1_SCK P0_19
+#define QSPI1_CSN P0_17
+
+/**** QSPI FLASH pins ****/
+#define QSPI_FLASH1_IO0 QSPI1_IO0
+#define QSPI_FLASH1_IO1 QSPI1_IO1
+#define QSPI_FLASH1_IO2 QSPI1_IO2
+#define QSPI_FLASH1_IO3 QSPI1_IO3
+#define QSPI_FLASH1_SCK QSPI1_SCK
+#define QSPI_FLASH1_CSN QSPI1_CSN
 
 typedef enum {
     PullNone = 0,

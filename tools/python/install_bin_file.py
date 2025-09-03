@@ -62,11 +62,22 @@ if target_name.upper().endswith('_CM4') or target_name.upper().endswith('_CM7'):
 targets = get_detected_targets()
 if targets:
     for _target in targets:
+
         if _target['name'] is None:
-            continue
-        elif _target['name'].upper() == target_name.upper():
-            if target_uid is None or _target['uid'] == target_uid:
+            if target_uid is not None and _target['uid'] == target_uid:
+                # If we have an exact UID match and we don't know the name, then assume that
+                # the UID is correct.
                 all_connected.append(_target)
+        else:
+            if _target['name'].upper() == target_name.upper():
+                if target_uid is None or _target['uid'] == target_uid:
+                    # Name matches, UID either matches or was not specified
+                    all_connected.append(_target)
+
+if len(all_connected) == 0 and len(targets) == 1 and targets[0]['name'] is None:
+    # Special case: if we only have one board connected to the system, then assume it's the one
+    # we want even if we could not detect its name.
+    all_connected.append(targets[0])
 
 if len(all_connected) == 0:
     error_lines = ["The target board you compiled for is not connected to your system.",

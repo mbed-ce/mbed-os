@@ -7472,7 +7472,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "NRF52840_DK": {
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "inherits": [
             "MCU_NRF52840"
@@ -7491,6 +7491,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "supported_application_profiles": [
             "full", "bare-metal"
+        ],
+        "components_add": [
+            "QSPIF"
         ],
         "image_url": "https://www.nordicsemi.com/-/media/Images/Products/DevKits/nRF52-Series/nRF52840-DK/nRF52840-DK/nRF52840-DK-prod-page.png?h=750&iar=0&mw=350&w=350&hash=3DB140F6AE70CAE159FD911D8E6E9109"
     },
