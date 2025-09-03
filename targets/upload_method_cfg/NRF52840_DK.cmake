@@ -11,11 +11,14 @@
 # 3. To use this device with PyOCD you need to install the J-Link software package on your system.
 # 4. As of Sep 2025, PyOCD can flash but cannot reliably debug. Getting 'cannot read register
 #    ipsr because core #0 is not halted'.
+# 5. This upload method configuration reflects version 3 of the DK board, which uses an nRF5340 MCU and does
+#    not have DAPLink firmware available, only J-Link OB. The older version would have had better support for OpenOCD,
+#    Mbed, and PyOCD upload methods but does not seem to be available any more.
 
 
 # General config parameters
 # -------------------------------------------------------------
-set(UPLOAD_METHOD_DEFAULT MBED)
+set(UPLOAD_METHOD_DEFAULT JLINK)
 
 # Config options for MBED
 # -------------------------------------------------------------

@@ -74,9 +74,9 @@ if targets:
                     # Name matches, UID either matches or was not specified
                     all_connected.append(_target)
 
-if len(all_connected) == 0 and len(targets) == 1 and targets[0]['name'] is None:
-    # Special case: if we only have one board connected to the system, then assume it's the one
-    # we want even if we could not detect its name.
+if len(all_connected) == 0 and len(targets) == 1 and targets[0]['name'] is None and target_uid is None:
+    # Special case: if we only have one board connected to the system and we aren't filtering by UID, then
+    # assume it's the one we want even if we could not detect its name.
     all_connected.append(targets[0])
 
 if len(all_connected) == 0:
