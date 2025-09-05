@@ -922,7 +922,7 @@ static volatile int epComplete = 0;
 #define USBD_GET_EP_MAX_PAYLOAD(ep)       *((__IO uint32_t *) ((uint32_t)&USBD->EPAMPS + (uint32_t)(ep*0x28)))
 #define USBD_GET_EP_DATA_COUNT(ep)        *((__IO uint32_t *) ((uint32_t)&USBD->EPADATCNT + (uint32_t)(ep*0x28)))
 #define USBD_SET_EP_SHORT_PACKET(ep)      *((__IO uint32_t *) ((uint32_t)&USBD->EPARSPCTL + (uint32_t)(ep*0x28))) = ((*((__IO uint32_t *)((uint32_t)&USBD->EPARSPCTL+(uint32_t)(ep*0x28))) & 0x10) | 0x40)
-#define USBD_SET_EP_ZERO_PACKET(ep)       *((__IO uint32_t *) ((uint32_t)&USBD->EPARSPCTL + (uint32_t)(ep*0x28))) = (*((__IO uint32_t *)((uint32_t)&USBD->EPARSPCTL+(uint32_t)(ep*0x28))) & 0x10)
+#define USBD_SET_EP_ZERO_PACKET(ep)       *((__IO uint32_t *) ((uint32_t)&USBD->EPARSPCTL + (uint32_t)(ep*0x28))) = ((*((__IO uint32_t *)((uint32_t)&USBD->EPARSPCTL+(uint32_t)(ep*0x28))) & 0x10) | 0x20)
 #define USBD_CONFIG_EP_MODE(ep, mode)     *((__IO uint32_t *) ((uint32_t)&USBD->EPARSPCTL + (uint32_t)(ep*0x28))) = ((*((__IO uint32_t *)((uint32_t)&USBD->EPARSPCTL+(uint32_t)(ep*0x28))) & ~USBD_EPRSPCTL_MODE_Msk) | mode)
 #define USBD_SET_EP_BUF_FLUSH(ep)         *((__IO uint32_t *) ((uint32_t)&USBD->EPARSPCTL + (uint32_t)(ep*0x28))) = USBD_EPRSPCTL_FLUSH_Msk
 #define USBD_GET_EP_INT_EN(ep)            *((__IO uint32_t *) ((uint32_t)&USBD->EPAINTEN  + (uint32_t)(ep*0x28)))
