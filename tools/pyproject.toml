@@ -71,6 +71,13 @@ unit-tests = [
     "beautifulsoup4",
     "lxml"
 ]
+greentea = [
+    ## Additional requirements to install into the Mbed environment when running Greentea tests
+    # For USB Device host tests
+    "hidapi>=0.7.99",
+    "pyusb>=1.2.0",
+    "wmi>=1.5; platform_system == 'Windows'",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = [
