@@ -92,10 +92,19 @@ if(MBED_CREATE_PYTHON_VENV)
             COMMAND ${Python3_EXECUTABLE} -m pip install --upgrade pip
             COMMAND_ERROR_IS_FATAL ANY
         )
-        execute_process(
-            COMMAND ${Python3_EXECUTABLE} -m pip install -e ${MBED_CE_TOOLS_BASE_DIR}
-            COMMAND_ERROR_IS_FATAL ANY
-        )
+        if(MBED_BUILD_GREENTEA_TESTS)
+            # Install basic and greentea dependencies
+            execute_process(
+                COMMAND ${Python3_EXECUTABLE} -m pip install -e "${MBED_CE_TOOLS_BASE_DIR}[greentea]"
+                COMMAND_ERROR_IS_FATAL ANY
+            )
+        else()
+            # Install only basic dependencies
+            execute_process(
+                COMMAND ${Python3_EXECUTABLE} -m pip install -e "${MBED_CE_TOOLS_BASE_DIR}"
+                COMMAND_ERROR_IS_FATAL ANY
+            )
+        endif()
 
         message(STATUS "Mbed: venv created successfully")
         file(TOUCH ${VENV_STAMP_FILE})
