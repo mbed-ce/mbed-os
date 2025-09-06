@@ -4,6 +4,8 @@ Functions for converting build system information from the CMake File API into S
 
 from __future__ import annotations
 
+import collections
+
 from SCons.Environment import Base as Environment
 import pathlib
 import click
@@ -34,15 +36,15 @@ def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
 
     return result
 
-def prepare_build_envs(config: dict, default_env: Environment, debug_allowed=True) -> list[Environment]:
+def prepare_build_envs(target_json: dict, default_env: Environment, debug_allowed=True) -> list[Environment]:
     """
     Creates the Scons Environment(s) needed to build the source files in a CMake target
     """
     build_envs = []
-    target_compile_groups = config.get("compileGroups", [])
+    target_compile_groups = target_json.get("compileGroups", [])
     if not target_compile_groups:
         print("Warning! The `%s` component doesn't register any source files. "
-              "Check if sources are set in component's CMakeLists.txt!" % config["name"]
+              "Check if sources are set in component's CMakeLists.txt!" % target_json["name"]
               )
 
     is_build_type_debug = "debug" in default_env.GetBuildType() and debug_allowed
@@ -57,16 +59,10 @@ def prepare_build_envs(config: dict, default_env: Environment, debug_allowed=Tru
                 includes.append(inc_path)
 
         defines = extract_defines(cg)
-        compile_commands = cg.get("compileCommandFragments", [])
+        flags = extract_flags(target_json)
         build_env = default_env.Clone()
         build_env.SetOption("implicit_cache", 1)
-        for cc in compile_commands:
-            build_flags = cc.get("fragment", "").strip("\" ")
-            if not build_flags.startswith("-D"):
-                parsed_flags = build_env.ParseFlags(build_flags)
-                build_env.AppendUnique(**parsed_flags)
-                if cg.get("language", "") == "ASM":
-                    build_env.AppendUnique(ASPPFLAGS=parsed_flags.get("CCFLAGS", []))
+        build_env.MergeFlags(flags)
         build_env.AppendUnique(CPPDEFINES=defines, CPPPATH=includes)
         if sys_includes:
             build_env.Append(CCFLAGS=[("-isystem", inc) for inc in sys_includes])
@@ -121,29 +117,34 @@ def build_library(
     lib_objects = compile_source_files(
         lib_config, default_env, project_src_dir, prepend_dir, debug_allowed
     )
+
+    #print(f"Created build rule for " + str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name))
+
     return default_env.Library(
         target=str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name), source=lib_objects
     )
+
+def _get_flags_for_compile_group(compile_group_json: dict) -> list[str]:
+    """
+    Extract the flags from a CMake compile group.
+    """
+    flags = []
+    for ccfragment in compile_group_json["compileCommandFragments"]:
+        fragment = ccfragment.get("fragment", "").strip("\" ")
+        if not fragment or fragment.startswith("-D"):
+            continue
+        flags.extend(
+            click.parser.split_arg_string(fragment.strip())
+        )
+    return flags
 
 def extract_flags(target_json: dict) -> dict[str, list[str]]:
     """
     Returns a dictionary with flags for SCons based on a given CMake target
     """
-    def _extract_flags(target_json: dict) -> dict[str, list[str]]:
-        flags = {}
-        for cg in target_json["compileGroups"]:
-            flags[cg["language"]] = []
-            for ccfragment in cg["compileCommandFragments"]:
-                fragment = ccfragment.get("fragment", "").strip("\" ")
-                if not fragment or fragment.startswith("-D"):
-                    continue
-                flags[cg["language"]].extend(
-                    click.parser.split_arg_string(fragment.strip())
-                )
-
-        return flags
-
-    default_flags = _extract_flags(target_json)
+    default_flags = collections.defaultdict(list)
+    for cg in target_json["compileGroups"]:
+        default_flags[cg["language"]].extend(_get_flags_for_compile_group(cg))
 
     # Flags are sorted because CMake randomly populates build flags in code model
     return {
