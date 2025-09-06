@@ -335,7 +335,7 @@ void USBPhyHw::init(USBPhyEvents *events)
     __HAL_RCC_PWR_CLK_ENABLE();
 #endif
 
-#if !defined(TARGET_STM32WB)
+#if !defined(TARGET_STM32WB) && !defined(TARGET_STM32H5)
     __HAL_RCC_SYSCFG_CLK_ENABLE();
 #endif
 

@@ -3188,7 +3188,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "network-default-interface-type": "ETHERNET"
         },
         "device_has_add": [
-            "EMAC"
+            "EMAC",
+            "USBDEVICE"
         ]
     },
 	"NUCLEO_H563ZI": {
@@ -3211,6 +3212,60 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32H563ZITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF274337.en.feature-description-include-personalized-no-cpn-medium.jpg"
+    },
+	"MCU_STM32H573xI": {
+        "inherits": [
+            "MCU_STM32H5"
+        ],
+        "public": false,
+        "core": "Cortex-M33",
+        "extra_labels_add": [
+            "STM32H573xI"
+        ],
+        "macros_add": [
+            "STM32H573xx"
+        ],
+        "overrides": {
+            "network-default-interface-type": "ETHERNET"
+        },
+        "device_has_add": [
+            "EMAC",
+            "USBDEVICE"
+        ]
+    },
+	"DISCO_H573I": {
+        "inherits": [
+            "MCU_STM32H573xI"
+        ],
+        "overrides": {
+            "hse_value": 25000000,
+            "lse_available":  1,
+            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
+
+            // ADC reference voltage is same as MCU VDD.
+            // MCU VDD defaults to 3.3V though can be changed to 1.8V based on JP2 setting.
+            "default-adc-vref": 3.3
+        },
+        "supported_form_factors": [
+            "ARDUINO_UNO",
+            "STMOD",
+            "PMOD"
+        ],
+        "components_add": [
+            "OSPIF"
+        ],
+        "extra_labels_add": [
+            "MX25LM51245G"
+        ],
+        "detect_code": [
+            "0831"
+        ],
+        "device_has_add": [
+            "QSPI",
+            "OSPI"
+        ],
+        "device_name": "STM32H573IIKxQ",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF272542.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
 
     // STM32H7 Targets -------------------------------------------------------------------------------------------------

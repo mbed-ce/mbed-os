@@ -4,6 +4,7 @@
 add_subdirectory(STM32Cube_FW EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32H503xB EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32H563xI EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_STM32H573xI EXCLUDE_FROM_ALL)
 
 add_library(mbed-stm32h5 INTERFACE)
 
