@@ -221,6 +221,7 @@ def build_components(
 def get_app_defines(app_config: dict):
     return extract_defines(app_config["compileGroups"][0])
 
+build_type = "Debug" if ("debug" in env.GetBuildType()) else "Release"
 project_codemodel = get_cmake_code_model(
     [
         "-S",
@@ -230,6 +231,7 @@ project_codemodel = get_cmake_code_model(
         "-G",
         "Ninja",
         "-DCMAKE_MAKE_PROGRAM=" + str(pathlib.Path(platform.get_package_dir("tool-ninja")) / "ninja"),
+        "-DCMAKE_BUILD_TYPE=" + build_type,
         "-DPLATFORMIO_MBED_OS_PATH=" + str(FRAMEWORK_DIR),
         "-DMBED_TARGET=" + get_mbed_target(),
         "-DUPLOAD_METHOD=NONE", # Disable Mbed CE upload method system as PlatformIO has its own
