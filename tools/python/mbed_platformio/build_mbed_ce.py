@@ -289,7 +289,7 @@ whole_archive = env.Command('$PROJECT_DIR/-Wl,--whole-archive', [], '')
 no_whole_archive = env.Command('$PROJECT_DIR/-Wl,--no-whole-archive', [], '')
 
 # Add the Mbed OS archive and the link flags at the end of the linker command line after all the app source files
-env.Append(PIOAPPENDBUILDFILES=[whole_archive, "$BUILD_DIR\\mbed-os\\libmbed-os.a", no_whole_archive])
+env.Append(PIO_FRAMEWORK_APPEND_OBJS=[whole_archive, "$BUILD_DIR\\mbed-os\\libmbed-os.a", no_whole_archive])
 
 #
 # Main environment configuration
