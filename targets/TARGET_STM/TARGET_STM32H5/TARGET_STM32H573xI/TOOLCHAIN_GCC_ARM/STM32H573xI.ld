@@ -34,15 +34,6 @@
 
 #include "../cmsis_nvic.h"
 
-
-#if !defined(MBED_APP_START)
-  #define MBED_APP_START  MBED_ROM_START
-#endif
-
-#if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE  MBED_ROM_SIZE
-#endif
-
 M_CRASH_DATA_RAM_SIZE = 0x100;
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
@@ -51,14 +42,15 @@ M_CRASH_DATA_RAM_SIZE = 0x100;
     #define MBED_CONF_TARGET_BOOT_STACK_SIZE  0x400
 #endif
 
-/* Round up VECTORS_SIZE to 8 bytes */
-#define VECTORS_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
+/* Round up MBED_VECTTABLE_RAM_SIZE to 8 bytes */
+#define MBED_VECTTABLE_RAM_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
 
 /* Memories definition */
 MEMORY
 {
-    RAM     (xrw)    : ORIGIN = (MBED_RAM_START + VECTORS_SIZE),  LENGTH = (MBED_RAM_SIZE - VECTORS_SIZE)
-    FLASH    (rx)    : ORIGIN = MBED_APP_START,   LENGTH = MBED_APP_SIZE
+    RAM     (xrw)    : ORIGIN = MBED_CONFIGURED_RAM_BANK_SRAM1_2_3_START + MBED_VECTTABLE_RAM_SIZE,  LENGTH = MBED_CONFIGURED_RAM_BANK_SRAM1_2_3_SIZE - MBED_VECTTABLE_RAM_SIZE
+    FLASH    (rx)    : ORIGIN = MBED_CONFIGURED_ROM_BANK_Flash_START,   LENGTH = MBED_CONFIGURED_ROM_BANK_Flash_SIZE
+    SRAM_BKUP (rw)   : ORIGIN = MBED_CONFIGURED_RAM_BANK_SRAM_BKUP_START,   LENGTH = MBED_CONFIGURED_RAM_BANK_SRAM_BKUP_SIZE
 }
 
 /* Entry Point */
@@ -120,7 +112,7 @@ SECTIONS
         . = ALIGN(8);
         __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
     } > RAM
-    
+
     .data : AT (__etext)
     {
         __data_start__ = .;
@@ -155,7 +147,7 @@ SECTIONS
         _edata = .;
 
     } > RAM
-    
+
     .bss :
     {
         . = ALIGN(8);
