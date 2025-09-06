@@ -3,6 +3,9 @@ PlatformIO build file for Mbed OS Community Edition.
 
 This script acts as an SCons buildfile which gets configuration from PlatformIO, configures Mbed (if needed),
 and returns information about the configuration to the PIO build system.
+
+Copyright (c) 2025 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
 """
 from __future__ import annotations
 

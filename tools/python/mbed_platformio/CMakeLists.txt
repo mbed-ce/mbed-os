@@ -14,7 +14,7 @@ include(mbed_project_setup)
 
 add_subdirectory(${PLATFORMIO_MBED_OS_PATH} mbed-os)
 
-# Dummy executable. Not built, but needed to get the linker flags via the CMake file API
+# Dummy executable. Not built, but needed to get the compile and linker flags via the CMake file API
 add_executable(PIODummyExecutable
     dummy_source_file.c
     dummy_source_file.cpp

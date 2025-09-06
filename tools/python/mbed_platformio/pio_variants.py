@@ -1,6 +1,11 @@
+"""
+Maps PIO variant name to Mbed target name, in the situation where the Mbed target name is different
+from the uppercased version of the variant name
 
-# Maps PIO variant name to Mbed target name, in the situation where the Mbed target name is different
-# from the uppercased version of the variant name
+Copyright (c) 2025 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
+"""
+
 PIO_VARIANT_TO_MBED_TARGET = {
     "seeedArchPro": "ARCH_PRO",
     "seeedArchMax": "ARCH_MAX",

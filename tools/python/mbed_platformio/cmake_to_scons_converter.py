@@ -1,5 +1,8 @@
 """
 Functions for converting build system information from the CMake File API into SCons build targets.
+
+Copyright (c) 2025 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
 """
 
 from __future__ import annotations
