@@ -31,13 +31,19 @@ CMAKE_API_REPLY_DIR = CMAKE_API_DIR / "reply"
 
 PROJECT_CMAKELISTS_TXT = FRAMEWORK_DIR  / "tools" / "python" / "mbed_platformio" / "CMakeLists.txt"
 PROJECT_MBED_APP_JSON5 = PROJECT_DIR / "mbed_app.json5"
+PROJECT_TARGET_CONFIG_H = BUILD_DIR / "mbed-os" / "generated-headers" / "mbed-target-config.h"
+
+CMAKE_BUILD_TYPE = "Debug" if ("debug" in env.GetBuildType()) else "Release"
+
+NINJA_PATH = pathlib.Path(platform.get_package_dir("tool-ninja")) / "ninja"
+CMAKE_PATH = pathlib.Path(platform.get_package_dir("tool-cmake")) / "bin" / "cmake"
 
 # Add mbed-os/tools/python dir to PYTHONPATH so we can import from it.
 # This script is run by SCons so it does not have access to any other Python modules by default.
 sys.path.append(str(FRAMEWORK_DIR / "tools" / "python"))
 
 from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
-from mbed_platformio.cmake_to_scons_converter import build_library, extract_defines, extract_flags, extract_includes, extract_link_args
+from mbed_platformio.cmake_to_scons_converter import build_library, extract_defines, extract_flags, extract_includes, extract_link_args, find_included_files
 
 def get_mbed_target():
     board_type = env.subst("$BOARD")
@@ -64,7 +70,7 @@ def create_default_project_files():
 {
    "target_overrides": {
       "*": {
-         "platform.stdio-baud-rate": 115200,
+         "platform.stdio-baud-rate": 9600, // matches PlatformIO default
          "platform.stdio-buffered-serial": 1,
 
          // Uncomment to use mbed-baremetal instead of mbed-os
@@ -91,6 +97,11 @@ def is_cmake_reconfigure_required():
         return True
     if not ninja_buildfile.exists():
         print("Mbed CE: Reconfigure required because Ninja buildfile does not exist")
+        return True
+
+    # If the JSON files have 'Debug' in their names that means this project was previously configured as Debug.
+    if not any(CMAKE_API_REPLY_DIR.glob(f"directory-*{CMAKE_BUILD_TYPE}*.json")):
+        print("Mbed CE: Reconfigure required because build type (debug / release) changed.")
         return True
 
     cache_file_mtime = cmake_cache_file.stat().st_mtime
@@ -127,7 +138,7 @@ def get_cmake_code_model(cmake_args: list) -> dict:
 
     if is_cmake_reconfigure_required():
         print("Mbed CE: Configuring CMake build system...")
-        cmake_command = [str(pathlib.Path(platform.get_package_dir("tool-cmake")) / "bin" / "cmake"), *cmake_args]
+        cmake_command = [str(CMAKE_PATH), *cmake_args]
         run_tool(cmake_command)
 
         # Seems like CMake doesn't update the timestamp on the cache file if nothing actually changed.
@@ -211,17 +222,16 @@ def get_components_map(target_configs: dict, target_types: list[str], ignore_com
 
 
 def build_components(
-        env: Environment, components_map: dict, project_src_dir: pathlib.Path, prepend_dir: pathlib.Path | None = None, debug_allowed=True
+        env: Environment, components_map: dict, project_src_dir: pathlib.Path
 ):
     for k, v in components_map.items():
         components_map[k]["lib"] = build_library(
-            env, v["config"], project_src_dir, prepend_dir, debug_allowed
+            env, v["config"], project_src_dir, FRAMEWORK_DIR, pathlib.Path("$BUILD_DIR/mbed-os")
         )
 
 def get_app_defines(app_config: dict):
     return extract_defines(app_config["compileGroups"][0])
 
-build_type = "Debug" if ("debug" in env.GetBuildType()) else "Release"
 project_codemodel = get_cmake_code_model(
     [
         "-S",
@@ -230,9 +240,10 @@ project_codemodel = get_cmake_code_model(
         BUILD_DIR,
         "-G",
         "Ninja",
-        "-DCMAKE_MAKE_PROGRAM=" + str(pathlib.Path(platform.get_package_dir("tool-ninja")) / "ninja"),
-        "-DCMAKE_BUILD_TYPE=" + build_type,
-        "-DPLATFORMIO_MBED_OS_PATH=" + str(FRAMEWORK_DIR),
+        "-DCMAKE_MAKE_PROGRAM=" + str(NINJA_PATH.as_posix()), # Note: CMake prefers to be passed paths with forward slashes, so use as_posix()
+        "-DCMAKE_BUILD_TYPE=" + CMAKE_BUILD_TYPE,
+        "-DPLATFORMIO_MBED_OS_PATH=" + str(FRAMEWORK_DIR.as_posix()),
+        "-DPLATFORMIO_PROJECT_PATH=" + str(PROJECT_DIR.as_posix()),
         "-DMBED_TARGET=" + get_mbed_target(),
         "-DUPLOAD_METHOD=NONE", # Disable Mbed CE upload method system as PlatformIO has its own
     ]
@@ -286,6 +297,10 @@ env.Prepend(
     CPPPATH=app_includes["plain_includes"],
     CPPDEFINES=project_defines,
 )
+
+# Set up a dependency between all application source files and mbed-target-config.h.
+# This ensures that the app will be recompiled if the header changes.
+env.Append(PIO_EXTRA_APP_SOURCE_DEPS=find_included_files(env))
 
 # Run Ninja to produce the linker script.
 # Note that this seems to execute CMake, causing the code model query to be re-done.

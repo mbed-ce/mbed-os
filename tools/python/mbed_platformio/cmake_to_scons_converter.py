@@ -36,7 +36,7 @@ def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
 
     return result
 
-def prepare_build_envs(target_json: dict, default_env: Environment, debug_allowed=True) -> list[Environment]:
+def prepare_build_envs(target_json: dict, default_env: Environment) -> list[Environment]:
     """
     Creates the Scons Environment(s) needed to build the source files in a CMake target
     """
@@ -47,7 +47,6 @@ def prepare_build_envs(target_json: dict, default_env: Environment, debug_allowe
               "Check if sources are set in component's CMakeLists.txt!" % target_json["name"]
               )
 
-    is_build_type_debug = "debug" in default_env.GetBuildType() and debug_allowed
     for cg in target_compile_groups:
         includes = []
         sys_includes = []
@@ -67,55 +66,59 @@ def prepare_build_envs(target_json: dict, default_env: Environment, debug_allowe
         if sys_includes:
             build_env.Append(CCFLAGS=[("-isystem", inc) for inc in sys_includes])
         build_env.ProcessUnFlags(default_env.get("BUILD_UNFLAGS"))
-        if is_build_type_debug:
-            build_env.ConfigureDebugFlags()
         build_envs.append(build_env)
 
     return build_envs
 
 def compile_source_files(
-        config: dict, default_env: Environment, project_src_dir: pathlib.Path, prepend_dir: pathlib.Path | None=None, debug_allowed=True
-):
+        config: dict, default_env: Environment, project_src_dir: pathlib.Path, framework_dir: pathlib.Path, framework_obj_dir: pathlib.Path) -> list:
     """
-    Generates SCons rules to compile the source files in a target
+    Generates SCons rules to compile the source files in a target.
+    Returns list of object files to build.
+
+    :param framework_dir: Path to the Mbed CE framework source
+    :param framework_obj_dir: Path to the directory where object files for Mbed CE will be saved.
     """
-    build_envs = prepare_build_envs(config, default_env, debug_allowed)
+    build_envs = prepare_build_envs(config, default_env)
     objects = []
     for source in config.get("sources", []):
         if source["path"].endswith(".rule"):
             continue
         compile_group_idx = source.get("compileGroupIndex")
         if compile_group_idx is not None:
+
+            # Get absolute path to source, resolving relative to source dir if needed
             src_path = pathlib.Path(source.get("path"))
             if not src_path.is_absolute():
-                # For cases when sources are located near CMakeLists.txt
                 src_path = project_src_dir / src_path
 
-            obj_dir = pathlib.Path("$BUILD_DIR") / (prepend_dir or "")
-            if not pathlib.Path(source["path"]).is_absolute():
-                obj_path = obj_dir / source["path"]
+            # Figure out object path
+            if src_path.is_relative_to(project_src_dir):
+                obj_path = (pathlib.Path("$BUILD_DIR") / src_path.relative_to(project_src_dir)).with_suffix(".o")
+            elif src_path.is_relative_to(framework_dir):
+                obj_path = (framework_obj_dir / src_path.relative_to(framework_dir)).with_suffix(".o")
             else:
-                obj_path = obj_dir / src_path.name
+                raise RuntimeError(f"Source path {src_path!s} outside of project source dir and framework dir, don't know where to save object file!")
 
+            env = build_envs[compile_group_idx]
 
-            objects.append(
-                build_envs[compile_group_idx].StaticObject(
-                    target=str(obj_path.with_suffix(".o")),
-                    source=str(src_path.resolve()),
-                )
-            )
+            objects.append(env.StaticObject(target=str(obj_path), source=str(src_path)))
+
+            # SCons isn't smart enough to add a dependency based on the "-include" compiler flag, so
+            # manually add one.
+            for included_file in find_included_files(env):
+                env.Depends(str(obj_path), included_file)
+
 
     return objects
 
 def build_library(
-        default_env: Environment, lib_config: dict, project_src_dir: pathlib.Path, prepend_dir: pathlib.Path | None=None, debug_allowed=True
+        default_env: Environment, lib_config: dict, project_src_dir: pathlib.Path, framework_dir: pathlib.Path, framework_obj_dir: pathlib.Path
 ):
     lib_name = lib_config["nameOnDisk"]
     lib_path = lib_config["paths"]["build"]
-    if prepend_dir:
-        lib_path = prepend_dir / lib_path
     lib_objects = compile_source_files(
-        lib_config, default_env, project_src_dir, prepend_dir, debug_allowed
+        lib_config, default_env, project_src_dir, framework_dir, framework_obj_dir
     )
 
     #print(f"Created build rule for " + str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name))
@@ -153,6 +156,17 @@ def extract_flags(target_json: dict) -> dict[str, list[str]]:
         "CXXFLAGS": default_flags.get("CXX"),
     }
 
+def find_included_files(environment: Environment) -> set[str]:
+    """
+    Process a list of flags produced by extract_flags() to find files manually included by '-include'
+    """
+    result = set()
+    for flag_var in ["CFLAGS", "CXXFLAGS", "CCFLAGS"]:
+        language_flags = environment.get(flag_var)
+        for index in range(0, len(language_flags)):
+            if language_flags[index] == "-include" and index < len(language_flags) - 1:
+                result.add(language_flags[index + 1])
+    return result
 
 def extract_includes(target_json: dict) -> dict[str, list[str]]:
     """

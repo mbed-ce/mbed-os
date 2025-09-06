@@ -11,6 +11,30 @@
 
 set(MBED_NEED_TO_RECONFIGURE FALSE)
 
+# Check that path variables (MBED_APP_JSON_PATH, CUSTOM_TARGETS_JSON_PATH) are valid and set
+# vars (HAS_CUSTOM_TARGETS_JSON, HAS_MBED_APP_JSON) based on whether they exist.
+# Also, convert all relative paths to absolute paths, rooted at CMAKE_SOURCE_DIR.
+# This makes sure that they are interpreted the same way everywhere.
+foreach(json_var_name MBED_APP_JSON CUSTOM_TARGETS_JSON)
+
+    if("${${json_var_name}_PATH}" STREQUAL "")
+        set(HAS_${json_var_name} FALSE)
+    else()
+        get_filename_component(${json_var_name}_PATH "${${json_var_name}_PATH}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
+        if(NOT EXISTS ${${json_var_name}_PATH} OR IS_DIRECTORY ${${json_var_name}_PATH})
+            message(FATAL_ERROR "${json_var_name}_PATH value of ${${json_var_name}_PATH} is not a valid file!")
+        endif()
+        set(HAS_${json_var_name} TRUE)
+    endif()
+endforeach()
+
+if("${CUSTOM_TARGETS_JSON_PATH}" STREQUAL "")
+    set(HAS_CUSTOM_TARGETS_JSON FALSE)
+else()
+    set(HAS_CUSTOM_TARGETS_JSON TRUE)
+    get_filename_component(CUSTOM_TARGETS_JSON_PATH "${CUSTOM_TARGETS_JSON_PATH}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
+endif()
+
 # First, verify that MBED_TARGET has not changed
 if(DEFINED MBED_INTERNAL_LAST_MBED_TARGET)
     if(NOT "${MBED_INTERNAL_LAST_MBED_TARGET}" STREQUAL "${MBED_TARGET}")
@@ -42,8 +66,18 @@ endif()
 if(NOT MBED_NEED_TO_RECONFIGURE)
     file(TIMESTAMP ${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake MBED_CONFIG_CMAKE_TIMESTAMP "%s" UTC)
 
+    set(MBED_APP_JSON_FOUND FALSE)
+    set(CUSTOM_TARGETS_JSON_FOUND FALSE)
+
     foreach(CONFIG_JSON ${MBED_CONFIG_JSON_SOURCE_FILES})
         get_filename_component(CONFIG_JSON_ABSPATH ${CONFIG_JSON} ABSOLUTE)
+
+        if(CONFIG_JSON_ABSPATH STREQUAL MBED_APP_JSON_PATH)
+            set(MBED_APP_JSON_FOUND TRUE)
+        endif()
+        if(CONFIG_JSON_ABSPATH STREQUAL CUSTOM_TARGETS_JSON_PATH)
+            set(CUSTOM_TARGETS_JSON_FOUND TRUE)
+        endif()
 
         if(NOT EXISTS ${CONFIG_JSON_ABSPATH})
             message(STATUS "Mbed: ${CONFIG_JSON} deleted or renamed, regenerating configs...")
@@ -60,20 +94,28 @@ if(NOT MBED_NEED_TO_RECONFIGURE)
     endforeach()
 endif()
 
-# Convert all relative paths to absolute paths, rooted at CMAKE_SOURCE_DIR.
-# This makes sure that they are interpreted the same way everywhere.
-get_filename_component(MBED_APP_JSON_PATH "${MBED_APP_JSON_PATH}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
-get_filename_component(CUSTOM_TARGETS_JSON_PATH "${CUSTOM_TARGETS_JSON_PATH}" ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
+if(NOT MBED_NEED_TO_RECONFIGURE)
+    # Corner case: if we previously had not set an mbed_app.json and now we do, we need to detect that
+    # and reconfigure.
+    if(HAS_MBED_APP_JSON AND NOT MBED_APP_JSON_FOUND)
+        message(STATUS "Mbed: mbed_app.json added/moved, regenerating configs...")
+        set(MBED_NEED_TO_RECONFIGURE TRUE)
+    endif()
+    if(HAS_CUSTOM_TARGETS_JSON AND NOT CUSTOM_TARGETS_JSON_FOUND)
+        message(STATUS "Mbed: custom_targets.json added/moved, regenerating configs...")
+        set(MBED_NEED_TO_RECONFIGURE TRUE)
+    endif()
+endif()
 
 if(MBED_NEED_TO_RECONFIGURE)
     # Generate mbed_config.cmake for this target
-    if(EXISTS "${MBED_APP_JSON_PATH}" AND (NOT IS_DIRECTORY "${MBED_APP_JSON_PATH}"))
+    if(HAS_MBED_APP_JSON)
         set(APP_CONFIG_ARGUMENT --app-config "${MBED_APP_JSON_PATH}")
     else()
         set(APP_CONFIG_ARGUMENT "")
     endif()
 
-    if(EXISTS "${CUSTOM_TARGETS_JSON_PATH}" AND (NOT IS_DIRECTORY "${CUSTOM_TARGETS_JSON_PATH}"))
+    if(HAS_CUSTOM_TARGETS_JSON)
         set(CUSTOM_TARGET_ARGUMENT --custom-targets-json "${CUSTOM_TARGETS_JSON_PATH}")
     else()
         set(CUSTOM_TARGET_ARGUMENT "")
