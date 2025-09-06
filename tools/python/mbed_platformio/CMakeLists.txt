@@ -6,7 +6,6 @@ cmake_minimum_required(VERSION 3.19)
 cmake_policy(VERSION 3.19...3.22)
 
 set(MBED_APP_JSON_PATH ${PLATFORMIO_PROJECT_PATH}/mbed_app.json5)
-message("MBED_APP_JSON_PATH = ${MBED_APP_JSON_PATH}")
 
 include(${PLATFORMIO_MBED_OS_PATH}/tools/cmake/mbed_toolchain_setup.cmake)
 project(PlatformIOMbedProject
