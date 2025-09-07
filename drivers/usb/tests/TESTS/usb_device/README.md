@@ -1,12 +1,8 @@
 # Testing the Mbed OS USB device
 
 ## Setup
-Before running tests, please make sure to install all the
-required Python modules.
-
-```
-pip install -r mbed-os/tools/requirements-ci-build.txt
-```
+> [!NOTE]  
+> all required Python modules are instaled into the Python virtual enviroment (venv) automatically with first build of Greentea.
 
 Additional, platform-specific setup is described below.
 See also [Known issues](#known-issues).
