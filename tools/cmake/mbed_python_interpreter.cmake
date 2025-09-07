@@ -19,6 +19,9 @@ if(MBED_CREATE_PYTHON_VENV)
     set(VENV_STAMP_FILE ${MBED_VENV_LOCATION}/mbed-venv.stamp)
     set(MBED_PYPROJECT_TOML_LOCATION "${MBED_CE_TOOLS_BASE_DIR}/pyproject.toml")
 
+    # a separate stamp file to track whether greentea dependencies 
+    set(GT_STAMP_FILE ${MBED_VENV_LOCATION}/mbed-gt.stamp)
+
     # Make it so modifying pyproject.toml will trigger a reconfigure
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${MBED_PYPROJECT_TOML_LOCATION})
 
@@ -66,6 +69,11 @@ if(MBED_CREATE_PYTHON_VENV)
         set(NEED_TO_INSTALL_PACKAGES TRUE)
     endif()
 
+    # If greentea tests are being built, we need to ensure greentea dependencies are installed
+    if(MBED_BUILD_GREENTEA_TESTS AND NOT EXISTS "${GT_STAMP_FILE}")
+        set(NEED_TO_INSTALL_PACKAGES TRUE)
+    endif()   
+
     if(NEED_TO_CREATE_VENV)
         # Create venv.
         # Using approach from here: https://discourse.cmake.org/t/possible-to-create-a-python-virtual-env-from-cmake-and-then-find-it-with-findpython3/1132/2
@@ -92,14 +100,16 @@ if(MBED_CREATE_PYTHON_VENV)
             COMMAND ${Python3_EXECUTABLE} -m pip install --upgrade pip
             COMMAND_ERROR_IS_FATAL ANY
         )
+
+        #
         if(MBED_BUILD_GREENTEA_TESTS)
-            # Install basic and greentea dependencies
+            # Enable the extra dependencies for the GT
             execute_process(
                 COMMAND ${Python3_EXECUTABLE} -m pip install -e "${MBED_CE_TOOLS_BASE_DIR}[greentea]"
                 COMMAND_ERROR_IS_FATAL ANY
             )
         else()
-            # Install only basic dependencies
+             # The dependencies for regular build
             execute_process(
                 COMMAND ${Python3_EXECUTABLE} -m pip install -e "${MBED_CE_TOOLS_BASE_DIR}"
                 COMMAND_ERROR_IS_FATAL ANY
@@ -108,6 +118,11 @@ if(MBED_CREATE_PYTHON_VENV)
 
         message(STATUS "Mbed: venv created successfully")
         file(TOUCH ${VENV_STAMP_FILE})
+        if(MBED_BUILD_GREENTEA_TESTS)
+            # If greentea tests are being built, we need create a greentea stamp file
+            file(TOUCH ${GT_STAMP_FILE})
+        endif()
+        
     endif()
 
     # When using the venv, scripts will always be installed to the directory where Python itself is installed
