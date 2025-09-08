@@ -23,6 +23,7 @@ target_sources(mbed-klxx
         rtc_api.c
         sleep.c
         us_ticker.c
+        clk_freqs.c
 )
 
 target_link_libraries(mbed-klxx INTERFACE mbed-freescale)

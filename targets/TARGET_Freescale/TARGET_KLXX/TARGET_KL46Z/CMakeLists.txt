@@ -25,7 +25,6 @@ target_sources(mbed-kl46z
         mbed_overrides.c
         serial_api.c
         spi_api.c
-        clk_freqs.c
 
         device/system_MKL46Z4.c
         ${STARTUP_FILE}
