@@ -187,12 +187,12 @@ def extract_includes(target_json: dict) -> dict[str, list[str]]:
 
     return {"plain_includes": plain_includes, "sys_includes": sys_includes}
 
-def extract_link_args(target_json: dict) -> dict[str, list[str]]:
+def extract_link_args(target_json: dict) -> list[str]:
     """
-    Extract the linker flags from a CMake target and return an SCons-style dict
+    Extract the linker flags from a CMake target
     """
 
-    link_args = {"LINKFLAGS": []}
+    result = []
 
     for f in target_json.get("link", {}).get("commandFragments", []):
         fragment = f.get("fragment", "").strip()
@@ -201,6 +201,6 @@ def extract_link_args(target_json: dict) -> dict[str, list[str]]:
             continue
         args = click.parser.split_arg_string(fragment)
         if fragment_role == "flags":
-            link_args["LINKFLAGS"].extend(args)
+            result.extend(args)
 
-    return link_args
+    return result

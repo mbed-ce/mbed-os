@@ -235,6 +235,8 @@ def build_components(
 def get_app_defines(app_config: dict):
     return extract_defines(app_config["compileGroups"][0])
 
+## CMake configuration -------------------------------------------------------------------------------------------------
+
 project_codemodel = get_cmake_code_model(
     [
         "-S",
@@ -266,44 +268,46 @@ framework_components_map = get_components_map(
     [],
 )
 
+## Convert targets & flags from CMake to SCons -------------------------------------------------------------------------
+
 build_components(env, framework_components_map, PROJECT_DIR)
 
 mbed_os_lib_target_json = target_configs.get("mbed-os", {})
 app_target_json = target_configs.get("PIODummyExecutable", {})
 project_defines = get_app_defines(app_target_json)
 project_flags = extract_flags(app_target_json)
-link_args = extract_link_args(app_target_json)
 app_includes = extract_includes(app_target_json)
+
+## Linker flags --------------------------------------------------------------------------------------------------------
+
+# Link the main Mbed OS library using -Wl,--whole-archive. This is needed for the resolution of weak symbols
+# within this archive.
+link_args = ["-Wl,--whole-archive", "$BUILD_DIR\\mbed-os\\libmbed-os.a", "-Wl,--no-whole-archive"]
+env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", "$BUILD_DIR\\mbed-os\\libmbed-os.a")
+
+# Get other linker flags from Mbed. We want these to appear after the application objects and Mbed libraries
+# because they contain the C/C++ library link flags.
+link_args.extend(extract_link_args(app_target_json))
 
 # The CMake build system adds a flag in mbed_set_post_build() to output a map file.
 # We need to do that here.
 map_file = BUILD_DIR / 'firmware.map'
-link_args["LINKFLAGS"].append(f"-Wl,-Map={str(map_file)}")
+link_args.append(f"-Wl,-Map={str(map_file)}")
 
-# Link the main Mbed OS library using -Wl,--whole-archive. This is needed for the resolution of weak symbols
-# within this archive. I found this workaround here on the mailing list:
-# https://scons-users.scons.narkive.com/noJni4Ut/workaround-support-for-wl-whole-archive
-# However, for some reason SCons need to think that the flag is "in the source dir" or it appends a path
-# to the build dir before it. So, I added the $PROJECT_DIR part.
-whole_archive = env.Command('$PROJECT_DIR/-Wl,--whole-archive', [], '')
-no_whole_archive = env.Command('$PROJECT_DIR/-Wl,--no-whole-archive', [], '')
+## Build environment configuration -------------------------------------------------------------------------------------
 
-# Add the Mbed OS archive and the link flags at the end of the linker command line after all the app source files
-env.Append(PIO_EXTRA_APP_OBJS=[whole_archive, "$BUILD_DIR\\mbed-os\\libmbed-os.a", no_whole_archive])
-
-#
-# Main environment configuration
-#
-project_flags.update(link_args)
 env.MergeFlags(project_flags)
 env.Prepend(
     CPPPATH=app_includes["plain_includes"],
     CPPDEFINES=project_defines,
 )
+env.Append(_LIBFLAGS=link_args)
 
 # Set up a dependency between all application source files and mbed-target-config.h.
 # This ensures that the app will be recompiled if the header changes.
 env.Append(PIO_EXTRA_APP_SOURCE_DEPS=find_included_files(env))
+
+## Linker script -------------------------------------------------------------------------------------------------------
 
 # Run Ninja to produce the linker script.
 # Note that this seems to execute CMake, causing the code model query to be re-done.
