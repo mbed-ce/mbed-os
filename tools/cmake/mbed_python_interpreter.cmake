@@ -19,7 +19,7 @@ if(MBED_CREATE_PYTHON_VENV)
     set(VENV_STAMP_FILE ${MBED_VENV_LOCATION}/mbed-venv.stamp)
     set(MBED_PYPROJECT_TOML_LOCATION "${MBED_CE_TOOLS_BASE_DIR}/pyproject.toml")
 
-    # a separate stamp file to track whether greentea dependencies 
+    # a separate stamp file to track whether greentea dependencies have been installed
     set(GT_STAMP_FILE ${MBED_VENV_LOCATION}/mbed-gt.stamp)
 
     # Make it so modifying pyproject.toml will trigger a reconfigure
