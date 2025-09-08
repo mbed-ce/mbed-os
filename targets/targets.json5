@@ -4915,7 +4915,106 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF273876.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
-
+    // STM32U3 Targets -------------------------------------------------------------------------------------------------
+    "MCU_STM32U3": {
+        "inherits": [
+            "MCU_STM32"
+        ],
+        "public": false,
+        "core": "Cortex-M33",
+        "extra_labels_add": [
+            "STM32U3"
+        ],
+        "macros_add": [
+            "MBED_TICKLESS"
+        ],
+        "config": {
+            "clock_source": {
+                "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
+                "value": "USE_PLL_HSI",
+                "macro_name": "CLOCK_SOURCE"
+            },
+            "lse_drive_load_level": {
+                "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
+                "value": "RCC_LSEDRIVE_LOW"
+            },
+            "lpticker_lptim": {
+                "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
+                "value": 1
+            },
+            "i2c_timing_value_algo": {
+                "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
+                "value": false
+            },
+            "usb_speed": {
+                "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
+                "value": "USE_USB_NO_OTG"
+            }
+        },
+        "overrides": {
+            "lpticker_delay_ticks": 0
+        },
+        "device_has_add": [
+            //"CRC",
+            //"FLASH",
+            "MPU",
+            //"ANALOGOUT",
+            //"TRNG",
+            //"USBDEVICE" // TODO
+        ],
+        "device_has_remove": [
+            "LPTICKER",
+            "RTC",
+            "ANALOGIN",
+            "I2C",
+            "I2CSLAVE",
+            "I2C_ASYNCH",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "SERIAL",
+            "SERIAL_FC",
+            "SLEEP",
+            "SPI",
+            "SPISLAVE",
+            "SPI_ASYNCH",
+            "WATCHDOG",
+            "RESET_REASON"
+        ],
+        "is_mcu_family_target": true
+    },
+    "MCU_STM32U385xG": {
+        "inherits": [
+            "MCU_STM32U3"
+        ],
+        "public": false,
+        "extra_labels_add": [
+            "STM32U385xG"
+        ],
+        "macros_add": [
+            "STM32U385xx"
+        ]
+    },
+    "NUCLEO_U385RG_Q": {
+        "inherits": [
+            "MCU_STM32U385xG"
+        ],
+		 "overrides": {
+            "clock_source": "USE_PLL_HSI",
+            "lse_available":  1,
+            "default-adc-vref": 3.3
+        },
+        "supported_form_factors": [
+            //"ARDUINO_UNO"
+        ],
+        //"device_name": "STM32U385RGTx",
+        "detect_code": [
+            "0889"
+        ],
+        "image_url": ""
+    },
     // STM32U5 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32U5": {
         "inherits": [
