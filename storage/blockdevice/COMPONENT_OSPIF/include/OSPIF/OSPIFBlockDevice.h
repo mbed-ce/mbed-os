@@ -104,16 +104,6 @@ enum ospif_polarity_mode {
     OSPIF_POLARITY_MODE_1      /* CPOL=1, CPHA=1 */
 };
 
-/** Enum ospif soft reset modes
- *
- *  @enum ospif_soft_reset_mode
- */
-enum ospif_soft_reset_mode {
-    OSPIF_SOFT_RESET_UNSUPPORTED = 0, /* Soft reset not supported */
-    OSPIF_DIERCT_SOFT_RESET,          /* Direct soft reset mode */
-    OSPIF_ENABLE_AND_SOFT_RESET       /* Enable and soft reset mode */
-};
-
 #define OSPIF_MAX_ACTIVE_FLASH_DEVICES 10
 
 /** BlockDevice for SFDP based flash devices over OSPI bus
@@ -416,6 +406,12 @@ private:
     enum ospif_clear_protection_method_t {
         OSPIF_BP_ULBPR,    // Issue global protection unlock instruction
         OSPIF_BP_CLEAR_SR, // Clear protection bits in status register 1
+    };
+
+    enum ospif_soft_reset_mode {
+        OSPIF_SOFT_RESET_UNSUPPORTED = 0, // Soft reset not supported
+        OSPIF_DIRECT_SOFT_RESET,          // Direct soft reset mode
+        OSPIF_ENABLE_AND_SOFT_RESET       // Enable and soft reset mode
     };
 
     // OSPI Driver Object

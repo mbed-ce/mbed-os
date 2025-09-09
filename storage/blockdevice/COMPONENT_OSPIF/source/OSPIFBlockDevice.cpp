@@ -1334,7 +1334,7 @@ int OSPIFBlockDevice::_sfdp_detect_reset_protocol_and_reset(uint8_t *basic_param
 #endif
 
 #if !MBED_CONF_OSPIF_ENABLE_AND_RESET     // i.e. direct reset, or determined from SFDP
-        _soft_reset_mode = OSPIF_DIERCT_SOFT_RESET;
+        _soft_reset_mode = OSPIF_DIRECT_SOFT_RESET;
 #endif
 
 #if RESET_SEQUENCE_FROM_SFDP
@@ -1348,6 +1348,7 @@ int OSPIFBlockDevice::_sfdp_detect_reset_protocol_and_reset(uint8_t *basic_param
 #if RESET_SEQUENCE_FROM_SFDP
     } else {
         // Soft reset either is not supported or requires direct control over data lines
+        tr_error("Failed to determine soft reset sequence. If your device has a legacy SFDP table, please manually set enable-and-reset or direct-reset.");
         _soft_reset_mode = OSPIF_SOFT_RESET_UNSUPPORTED;
     }
 #endif
@@ -1364,7 +1365,7 @@ int OSPIFBlockDevice::_soft_reset()
         case OSPIF_SOFT_RESET_UNSUPPORTED:
             status = OSPIF_BD_ERROR_PARSING_FAILED;
             break;
-        case OSPIF_DIERCT_SOFT_RESET:
+        case OSPIF_DIRECT_SOFT_RESET:
             // Issue instruction 0xF0 to reset the device
             ospi_status = _ospi_send_general_command(0xF0, OSPI_NO_ADDRESS_COMMAND, // Send reset instruction
                                                      NULL, 0, NULL, 0);

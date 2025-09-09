@@ -34,8 +34,8 @@
 
 /**
  * Override HAL Eth Init function.
- * 
- * Note: This was copied from HAL_ETH_MspInit() in a project for the NUCLEO-H563ZI in STM32CubeIDE
+ *
+ * Note: This was copied from HAL_ETH_MspInit() in a project for the DISCO-H573I in STM32CubeIDE
  */
 void EthInitPinmappings(void)
 {
