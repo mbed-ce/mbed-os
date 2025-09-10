@@ -57,9 +57,11 @@ static const DMALinkInfo SPIRxDMALinks[] = {
 };
 
 /// Mapping from OSPI index to DMA link info
+#ifdef OCTOSPI1
 static const DMALinkInfo OSPIDMALinks[] = {
         {2, 4, GPDMA2_REQUEST_OCTOSPI1},
         {2, 5, GPDMA2_REQUEST_OCTOSPI1},
 };
+#endif
 
 #endif //MBED_OS_STM_DMA_INFO_H

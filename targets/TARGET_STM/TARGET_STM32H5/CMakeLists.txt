@@ -28,3 +28,6 @@ target_include_directories(mbed-stm32h5
 )
 
 target_link_libraries(mbed-stm32h5 INTERFACE mbed-stm mbed-stm32h5cube-fw)
+
+# Add linker scripts
+add_subdirectory(linker_scripts)

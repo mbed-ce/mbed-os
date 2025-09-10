@@ -45,7 +45,7 @@
 
 /* Minimum number of bytes to be transferred using DMA, when DCACHE is not available */
 /* When less than 32 bytes of data is transferred at a time, using DMA may actually be slower than polling */
-/* When DACHE is available, DMA will be used when the buffer contains at least one cache-aligned block */
+/* When DCACHE is available, DMA will be used when the buffer contains at least one cache-aligned block */
 #define QSPI_DMA_THRESHOLD_BYTES 32
 
 #if defined(QUADSPI)
