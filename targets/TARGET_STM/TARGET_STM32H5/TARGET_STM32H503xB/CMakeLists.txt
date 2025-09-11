@@ -23,6 +23,4 @@ target_include_directories(mbed-stm32h503xb
         .
 )
 
-mbed_set_linker_script(mbed-stm32h503xb ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
-
 target_link_libraries(mbed-stm32h503xb INTERFACE mbed-stm32h5)

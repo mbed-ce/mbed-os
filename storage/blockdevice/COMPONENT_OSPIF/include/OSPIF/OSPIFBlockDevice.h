@@ -389,6 +389,9 @@ private:
     // Enable Quad mode if supported (1-1-4, 1-4-4, 4-4-4 bus modes)
     int _sfdp_set_quad_enabled(uint8_t *basic_param_table_ptr);
 
+    // Perform soft reset if supported - returns error if soft reset is not supported
+    int _soft_reset();
+
     // Enable QPI mode (4-4-4)
     int _sfdp_set_qpi_enabled(uint8_t *basic_param_table_ptr);
 
@@ -403,6 +406,12 @@ private:
     enum ospif_clear_protection_method_t {
         OSPIF_BP_ULBPR,    // Issue global protection unlock instruction
         OSPIF_BP_CLEAR_SR, // Clear protection bits in status register 1
+    };
+
+    enum ospif_soft_reset_mode {
+        OSPIF_SOFT_RESET_UNSUPPORTED = 0, // Soft reset not supported
+        OSPIF_DIRECT_SOFT_RESET,          // Direct soft reset mode
+        OSPIF_ENABLE_AND_SOFT_RESET       // Enable and soft reset mode
     };
 
     // OSPI Driver Object
@@ -463,6 +472,9 @@ private:
 
     uint32_t _init_ref_count;
     bool _is_initialized;
+
+    ospif_soft_reset_mode _soft_reset_mode; // Soft Reset mode
+
 #ifdef MX_FLASH_SUPPORT_RWW
     enum wait_flag {
         NOT_STARTED,         // no wait is started

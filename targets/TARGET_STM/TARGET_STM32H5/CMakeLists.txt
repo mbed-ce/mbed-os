@@ -4,6 +4,7 @@
 add_subdirectory(STM32Cube_FW EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32H503xB EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32H563xI EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_STM32H573xI EXCLUDE_FROM_ALL)
 
 add_library(mbed-stm32h5 INTERFACE)
 
@@ -27,3 +28,6 @@ target_include_directories(mbed-stm32h5
 )
 
 target_link_libraries(mbed-stm32h5 INTERFACE mbed-stm mbed-stm32h5cube-fw)
+
+# Add linker scripts
+add_subdirectory(linker_scripts)

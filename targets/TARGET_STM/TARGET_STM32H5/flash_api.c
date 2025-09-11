@@ -93,12 +93,12 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
         return -1;
     }
 
-    if (HAL_FLASH_Unlock() != HAL_OK) {
+    if (HAL_ICACHE_Disable() != HAL_OK)
+    {
         return -1;
     }
 
-    if (HAL_ICACHE_Disable() != HAL_OK)
-    {
+    if (HAL_FLASH_Unlock() != HAL_OK) {
         return -1;
     }
 
@@ -106,6 +106,10 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
 
     /* Clear error programming flags */
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ALL_ERRORS);
+
+    /* Increase Flash latency while programming
+     * Refer to STM32H562xx/563xx/573xx errata sheet, section 2.2.9 for more details */
+    __HAL_FLASH_SET_LATENCY(6);
 
     /* MBED HAL erases 1 page  / sector at a time */
     /* Fill EraseInit structure*/
@@ -118,14 +122,17 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
         status = -1;
     }
 
+    /* Restore normal Flash latency */
+    __HAL_FLASH_SET_LATENCY(5);
+
     core_util_critical_section_exit();
 
-    if (HAL_ICACHE_Enable() != HAL_OK)
-    {
+    if (HAL_FLASH_Lock() != HAL_OK) {
         return -1;
     }
 
-    if (HAL_FLASH_Lock() != HAL_OK) {
+    if (HAL_ICACHE_Enable() != HAL_OK)
+    {
         return -1;
     }
 
@@ -158,17 +165,21 @@ int32_t flash_program_page(flash_t *obj, uint32_t address,
         return -1;
     }
 
-    if (HAL_FLASH_Unlock() != HAL_OK) {
-        return -1;
-    }
-
     if (HAL_ICACHE_Disable() != HAL_OK)
     {
         return -1;
     }
 
+    if (HAL_FLASH_Unlock() != HAL_OK) {
+        return -1;
+    }
+
     /* Clear error programming flags */
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ALL_ERRORS);
+
+    /* Increase Flash latency while programming
+     * Refer to STM32H562xx/563xx/573xx errata sheet, section 2.2.9 for more details */
+    __HAL_FLASH_SET_LATENCY(6);
 
     /* Program the user Flash area word by word */
     StartAddress = address;
@@ -184,12 +195,15 @@ int32_t flash_program_page(flash_t *obj, uint32_t address,
         }
     }
 
-    if (HAL_ICACHE_Enable() != HAL_OK)
-    {
+    /* Restore normal Flash latency */
+    __HAL_FLASH_SET_LATENCY(5);
+
+    if (HAL_FLASH_Lock() != HAL_OK) {
         return -1;
     }
 
-    if (HAL_FLASH_Lock() != HAL_OK) {
+    if (HAL_ICACHE_Enable() != HAL_OK)
+    {
         return -1;
     }
 

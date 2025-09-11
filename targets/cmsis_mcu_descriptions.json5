@@ -7974,6 +7974,105 @@
         "sub_family": "STM32H563",
         "vendor": "STMicroelectronics:13"
     },
+    "STM32H573IIKxQ": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H5xx_2M_0800.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 2097152,
+                "start": 134217728,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H5xx_2M_0C00.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 2097152,
+                "start": 201326592,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32H5 Series",
+        "from_pack": {
+            "pack": "STM32H5xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "2.0.0"
+        },
+        "memories": {
+            "Flash": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 2097152,
+                "start": 134217728,
+                "startup": true
+            },
+            // Combined SRAMs 1, 2, and 3
+            "SRAM1_2_3": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 0xA0000, // 640 kiB
+                "start": 0x20000000,
+                "startup": false
+            },
+            // Backup SRAM. This is mentioned in the datasheet but neither the reference manual nor the CMSIS pack
+            // gives its address...
+            // Got this info from a forum post: https://community.st.com/t5/stm32-mcus-products/backup-sram-on-stm32h563/td-p/580633
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x40036400,
+                "startup": false
+            }
+        },
+        "name": "STM32H573IIKxQ",
+        "processors": [
+            {
+                "address": null,
+                "ap": 1,
+                "apid": null,
+                "core": "CortexM33",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32H573.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32H573",
+        "vendor": "STMicroelectronics:13"
+    },
     "STM32H723ZGTx": {
         "algorithms": [
             {

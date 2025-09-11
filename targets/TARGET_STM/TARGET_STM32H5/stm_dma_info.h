@@ -33,10 +33,10 @@ static const DMALinkInfo SPITxDMALinks[] = {
         ,{1, 6, GPDMA1_REQUEST_SPI4_TX}
 #endif
 #if defined (SPI5)
-        ,{2, 0, GPDMA1_REQUEST_SPI5_TX}
+        ,{2, 0, GPDMA2_REQUEST_SPI5_TX}
 #endif
 #if defined (SPI6)
-        ,{2, 2, GPDMA1_REQUEST_SPI6_TX}
+        ,{2, 2, GPDMA2_REQUEST_SPI6_TX}
 #endif
 };
 
@@ -49,13 +49,19 @@ static const DMALinkInfo SPIRxDMALinks[] = {
         ,{1, 7, GPDMA1_REQUEST_SPI4_RX}
 #endif
 #if defined (SPI5)
-        ,{2, 1, GPDMA1_REQUEST_SPI5_RX}
+        ,{2, 1, GPDMA2_REQUEST_SPI5_RX}
 #endif
 #if defined (SPI6)
-        ,{2, 3, GPDMA1_REQUEST_SPI6_RX}
+        ,{2, 3, GPDMA2_REQUEST_SPI6_RX}
 #endif
 };
 
-
+/// Mapping from OSPI index to DMA link info
+#ifdef OCTOSPI1
+static const DMALinkInfo OSPIDMALinks[] = {
+        {2, 4, GPDMA2_REQUEST_OCTOSPI1},
+        {2, 5, GPDMA2_REQUEST_OCTOSPI1},
+};
+#endif
 
 #endif //MBED_OS_STM_DMA_INFO_H

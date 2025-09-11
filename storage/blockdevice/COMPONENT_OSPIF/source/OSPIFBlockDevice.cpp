@@ -201,7 +201,8 @@ OSPIFBlockDevice::OSPIFBlockDevice(PinName io0, PinName io1, PinName io2, PinNam
                                    int clock_mode, int freq)
     : _ospi(io0, io1, io2, io3, io4, io5, io6, io7, sclk, csel, dqs, clock_mode), _csel(csel), _freq(freq),
       _init_ref_count(0),
-      _is_initialized(false)
+      _is_initialized(false),
+      _soft_reset_mode(OSPIF_SOFT_RESET_UNSUPPORTED)
 {
     _unique_device_status = add_new_csel_instance(csel);
 
@@ -389,14 +390,7 @@ int OSPIFBlockDevice::deinit()
     _wait_flag = NOT_STARTED;
 #endif
 
-    change_mode(OSPIF_OPI_MODE_SPI);
-
-    // Disable Device for Writing
-    ospi_status_t status = _ospi_send_general_command(OSPIF_INST_WRDI, OSPI_NO_ADDRESS_COMMAND, NULL, 0, NULL, 0);
-    if (status != OSPI_STATUS_OK)  {
-        tr_error("Write Disable failed");
-        result = OSPIF_BD_ERROR_DEVICE_ERROR;
-    }
+    result = _soft_reset();
 
     _is_initialized = false;
 
@@ -746,10 +740,6 @@ int OSPIFBlockDevice::change_mode(int mode)
                 tr_error(" Writing Config Register2 Failed");
                 return -1;
             }
-
-            // Configure BUS Mode to 1_1_1
-            _ospi.configure_format(OSPI_CFG_BUS_SINGLE, OSPI_CFG_INST_SIZE_8, OSPI_CFG_BUS_SINGLE, OSPI_CFG_ADDR_SIZE_32,
-                                   OSPI_CFG_BUS_SINGLE, 0, OSPI_CFG_BUS_SINGLE, 0);
         }
 
         _ospi.configure_format(OSPI_CFG_BUS_SINGLE, OSPI_CFG_INST_SIZE_8, OSPI_CFG_BUS_SINGLE, OSPI_CFG_ADDR_SIZE_32,
@@ -793,15 +783,11 @@ int OSPIFBlockDevice::change_mode(int mode)
 
             if (OSPI_STATUS_OK == _ospi_send_general_command(OSPIF_INST_WRCR2, OSPIF_CR2_OPI_EN_ADDR, &config_reg2,
                                                              1, NULL, 0)) {
-                tr_debug("OPI mode enable - Writing Config Register2 Success: value = 0x%x", config_reg2);
+                tr_debug("OPI mode disable - Writing Config Register2 Success: value = 0x%x", config_reg2);
             } else {
-                tr_error("OPI mode enable - Writing Config Register2 failed");
+                tr_error("OPI mode disable - Writing Config Register2 failed");
                 return -1;
             }
-
-            // Configure  BUS Mode to 1_1_1
-            _ospi.configure_format(OSPI_CFG_BUS_SINGLE, OSPI_CFG_INST_SIZE_8, OSPI_CFG_BUS_SINGLE, OSPI_CFG_ADDR_SIZE_32,
-                                   OSPI_CFG_BUS_SINGLE, 0, OSPI_CFG_BUS_SINGLE, 0);
         }
 
         _ospi.configure_format(OSPI_CFG_BUS_SINGLE, OSPI_CFG_INST_SIZE_8, OSPI_CFG_BUS_SINGLE, OSPI_CFG_ADDR_SIZE_32,
@@ -834,32 +820,8 @@ int OSPIFBlockDevice::change_mode(int mode)
         _ospi.configure_format(_inst_width, _inst_size, _address_width, _address_size, OSPI_CFG_BUS_SINGLE,
                                0, _data_width, 0);
     } else if (mode == OSPIF_OPI_MODE_SPI) {
-        // Write new Status Register Setup
-        if (_set_write_enable() != 0) {
-            tr_error("Write Enabe failed");
-            return -1;
-        }
-
-        config_reg2 = 0x00;
-
-        if (OSPI_STATUS_OK == _ospi_send_general_command(OSPIF_INST_WRCR2, OSPIF_CR2_OPI_EN_ADDR, &config_reg2,
-                                                         1, NULL, 0)) {
-            tr_debug("OPI mode enable - Writing Config Register2 Success: value = 0x%x", config_reg2);
-        } else {
-            tr_error("OPI mode enable - Writing Config Register2 failed");
-            return -1;
-        }
-        _read_instruction = OSPIF_INST_READ_4B;
-        _dummy_cycles = 0;
-
-        _inst_width = OSPI_CFG_BUS_SINGLE;
-        _inst_size = OSPI_CFG_INST_SIZE_8;
-        _address_width = OSPI_CFG_BUS_SINGLE;
-        _address_size = OSPI_CFG_ADDR_SIZE_32;
-        _data_width = OSPI_CFG_BUS_SINGLE;
-
-        _ospi.configure_format(_inst_width, _inst_size, _address_width, _address_size, OSPI_CFG_BUS_SINGLE,
-                               0, _data_width, _dummy_cycles);
+        // Perform a soft reset to switch to SPI mode as suggested by Copilot
+        status = _soft_reset();
     }
     return status;
 }
@@ -1364,8 +1326,6 @@ int OSPIFBlockDevice::_sfdp_detect_and_enable_4byte_addressing(uint8_t *basic_pa
 
 int OSPIFBlockDevice::_sfdp_detect_reset_protocol_and_reset(uint8_t *basic_param_table_ptr)
 {
-    int status = OSPIF_BD_ERROR_OK;
-
 #if RESET_SEQUENCE_FROM_SFDP
     uint8_t examined_byte = basic_param_table_ptr[OSPIF_BASIC_PARAM_TABLE_SOFT_RESET_BYTE];
 
@@ -1374,10 +1334,7 @@ int OSPIFBlockDevice::_sfdp_detect_reset_protocol_and_reset(uint8_t *basic_param
 #endif
 
 #if !MBED_CONF_OSPIF_ENABLE_AND_RESET     // i.e. direct reset, or determined from SFDP
-        // Issue instruction 0xF0 to reset the device
-        ospi_status_t ospi_status = _ospi_send_general_command(0xF0, OSPI_NO_ADDRESS_COMMAND, // Send reset instruction
-                                                               NULL, 0, NULL, 0);
-        status = (ospi_status == OSPI_STATUS_OK) ? OSPIF_BD_ERROR_OK : OSPIF_BD_ERROR_PARSING_FAILED;
+        _soft_reset_mode = OSPIF_DIRECT_SOFT_RESET;
 #endif
 
 #if RESET_SEQUENCE_FROM_SFDP
@@ -1385,27 +1342,61 @@ int OSPIFBlockDevice::_sfdp_detect_reset_protocol_and_reset(uint8_t *basic_param
 #endif
 
 #if !MBED_CONF_OSPIF_DIRECT_RESET    // i.e. enable and reset, or determined from SFDP
-        // Issue instruction 66h to enable resets on the device
-        // Then issue instruction 99h to reset the device
-        ospi_status_t ospi_status = _ospi_send_general_command(0x66, OSPI_NO_ADDRESS_COMMAND, // Send reset enable instruction
-                                                               NULL, 0, NULL, 0);
-        if (ospi_status == OSPI_STATUS_OK) {
-            ospi_status = _ospi_send_general_command(0x99, OSPI_NO_ADDRESS_COMMAND, // Send reset instruction
-                                                     NULL, 0, NULL, 0);
-        }
-        status = (ospi_status == OSPI_STATUS_OK) ? OSPIF_BD_ERROR_OK : OSPIF_BD_ERROR_PARSING_FAILED;
+        _soft_reset_mode = OSPIF_ENABLE_AND_SOFT_RESET;
 #endif
 
 #if RESET_SEQUENCE_FROM_SFDP
     } else {
         // Soft reset either is not supported or requires direct control over data lines
         tr_error("Failed to determine soft reset sequence. If your device has a legacy SFDP table, please manually set enable-and-reset or direct-reset.");
-
-        status = OSPIF_BD_ERROR_PARSING_FAILED;
+        _soft_reset_mode = OSPIF_SOFT_RESET_UNSUPPORTED;
     }
 #endif
 
+    return _soft_reset();
+}
+
+int OSPIFBlockDevice::_soft_reset()
+{
+    int status = OSPIF_BD_ERROR_OK;
+    ospi_status_t ospi_status = OSPI_STATUS_OK;
+
+    switch (_soft_reset_mode) {
+        case OSPIF_SOFT_RESET_UNSUPPORTED:
+            status = OSPIF_BD_ERROR_PARSING_FAILED;
+            break;
+        case OSPIF_DIRECT_SOFT_RESET:
+            // Issue instruction 0xF0 to reset the device
+            ospi_status = _ospi_send_general_command(0xF0, OSPI_NO_ADDRESS_COMMAND, // Send reset instruction
+                                                     NULL, 0, NULL, 0);
+            status = (ospi_status == OSPI_STATUS_OK) ? OSPIF_BD_ERROR_OK : OSPIF_BD_ERROR_PARSING_FAILED;
+            break;
+        case OSPIF_ENABLE_AND_SOFT_RESET:
+            // Issue instruction 66h to enable resets on the device
+            // Then issue instruction 99h to reset the device
+            ospi_status = _ospi_send_general_command(0x66, OSPI_NO_ADDRESS_COMMAND, // Send reset enable instruction
+                                                     NULL, 0, NULL, 0);
+            if (ospi_status == OSPI_STATUS_OK) {
+                ospi_status = _ospi_send_general_command(0x99, OSPI_NO_ADDRESS_COMMAND, // Send reset instruction
+                                                         NULL, 0, NULL, 0);
+            }
+            status = (ospi_status == OSPI_STATUS_OK) ? OSPIF_BD_ERROR_OK : OSPIF_BD_ERROR_PARSING_FAILED;
+            break;
+    }
     if (status == OSPIF_BD_ERROR_OK) {
+        // Set SPI format after soft reset
+        _read_instruction = OSPIF_INST_READ_4B;
+        _dummy_cycles = 0;
+
+        _inst_width = OSPI_CFG_BUS_SINGLE;
+        _inst_size = OSPI_CFG_INST_SIZE_8;
+        _address_width = OSPI_CFG_BUS_SINGLE;
+        _address_size = OSPI_CFG_ADDR_SIZE_32;
+        _data_width = OSPI_CFG_BUS_SINGLE;
+
+        _ospi.configure_format(_inst_width, _inst_size, _address_width, _address_size, OSPI_CFG_BUS_SINGLE,
+                               0, _data_width, _dummy_cycles);
+
         if (false == _is_mem_ready()) {
             tr_error("Device not ready, reset failed");
             status = OSPIF_BD_ERROR_READY_FAILED;

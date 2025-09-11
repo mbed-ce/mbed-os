@@ -159,6 +159,9 @@ else // Divisible by 5MHz
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         return 0; // FAIL
     }
+
+    /* Enable VDDUSB */
+    HAL_PWREx_EnableVddUSB();
 #endif /* DEVICE_USBDEVICE */
 
     return 1; // OK
@@ -229,6 +232,9 @@ uint8_t SetSysClock_PLL_HSI(void)
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         return 0; // FAIL
     }
+
+    /* Enable VDDUSB */
+    HAL_PWREx_EnableVddUSB();
 #endif /* DEVICE_USBDEVICE */
 
     return 1; // OK
