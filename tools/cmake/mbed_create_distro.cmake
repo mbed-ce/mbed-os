@@ -142,7 +142,7 @@ function(mbed_extract_flags NAME) # ARGN: modules...
 			foreach(SUBMODULE ${SUBMODULES})
 				if(NOT "${SUBMODULE}" MATCHES "::@") # remove CMake internal CMAKE_DIRECTORY_ID_SEP markers
 					# Remove LINK_ONLY genexes from target_link_libraries(... PRIVATE).  We can ignore things wrapped in these
-					# because they will already have been handled by the target_link_libraries earlier on.
+					# because they are for private dependencies.
 					if(NOT "${SUBMODULE}" MATCHES "\\$<LINK_ONLY:.*>")
 						if(NOT ${SUBMODULE} IN_LIST COMPLETED_MODULES)
 							list(APPEND REMAINING_MODULES ${SUBMODULE})

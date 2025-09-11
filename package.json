@@ -1,0 +1,17 @@
+{
+  "name": "framework-mbed-ce",
+  "version": "6.99.0",
+  "title": "Mbed OS Community Edition",
+  "description": "Mbed CE is a platform operating system designed for the internet of things",
+  "keywords": [
+    "framework",
+    "os",
+    "arm",
+    "hal"
+  ],
+  "homepage": "http://mbed-ce.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbed-ce/mbed-os"
+  }
+}
