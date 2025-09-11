@@ -107,7 +107,8 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
     /* Clear error programming flags */
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ALL_ERRORS);
 
-    /* Increase Flash latency while programming */
+    /* Increase Flash latency while programming
+     * Refer to STM32H562xx/563xx/573xx errata sheet, section 2.2.9 for more details */
     __HAL_FLASH_SET_LATENCY(6);
 
     /* MBED HAL erases 1 page  / sector at a time */
@@ -176,7 +177,8 @@ int32_t flash_program_page(flash_t *obj, uint32_t address,
     /* Clear error programming flags */
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ALL_ERRORS);
 
-    /* Increase Flash latency while programming */
+    /* Increase Flash latency while programming
+     * Refer to STM32H562xx/563xx/573xx errata sheet, section 2.2.9 for more details */
     __HAL_FLASH_SET_LATENCY(6);
 
     /* Program the user Flash area word by word */
