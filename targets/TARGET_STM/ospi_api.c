@@ -640,7 +640,7 @@ ospi_status_t ospi_write(ospi_t *obj, const ospi_command_t *command, const void 
             NVIC_SetPriority(obj->ospiIRQ, 1);
             NVIC_EnableIRQ(obj->ospiIRQ);
 #if defined(__DCACHE_PRESENT)
-            // For chips with a cache (e.g. Cortex-M7), we need to evict the Tx fill data from cache to main memory.
+            // For chips with a cache (e.g. Cortex-M7), we need to evict the Tx data from cache to main memory.
             // This ensures that the DMA controller can see the most up-to-date copy of the data.
             SCB_CleanDCache_by_Addr((volatile void *)data, *length);
 #endif
