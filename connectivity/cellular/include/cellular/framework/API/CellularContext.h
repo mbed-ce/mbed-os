@@ -41,6 +41,12 @@ namespace mbed {
  * @{
  */
 
+/// Radio Access Technology type
+enum RadioAccessTechnologyType {
+    CATM1, ///< LTE CAT-M or LTE-M
+    CATNB  ///< NB-IoT (Narrowband IoT)
+};
+
 /// CellularContext is CellularInterface/NetworkInterface with extensions for cellular connectivity
 class CellularContext : public CellularInterface {
 
@@ -158,6 +164,7 @@ public: // from NetworkInterface
     virtual nsapi_error_t connect(const char *sim_pin, const char *apn = 0, const char *uname = 0,
                                   const char *pwd = 0) = 0;
     virtual void set_credentials(const char *apn, const char *uname = 0, const char *pwd = 0) = 0;
+    virtual void set_access_technology(RadioAccessTechnologyType rat = CATM1) = 0;
     virtual bool is_connected() = 0;
 
     /** Same as NetworkInterface::get_default_instance()

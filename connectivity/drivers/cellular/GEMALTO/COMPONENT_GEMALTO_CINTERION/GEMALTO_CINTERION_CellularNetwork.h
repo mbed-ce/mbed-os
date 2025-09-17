@@ -14,27 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef GEMALTO_CINTERION_CELLULARCONTEXT_H_
-#define GEMALTO_CINTERION_CELLULARCONTEXT_H_
+#ifndef GEMALTO_CINTERION_CELLULARNETWORK_H_
+#define GEMALTO_CINTERION_CELLULARNETWORK_H_
 
-#include "AT_CellularContext.h"
+#include "AT_CellularNetwork.h"
+#include "GEMALTO_CINTERION.h"
 
 namespace mbed {
 
-class GEMALTO_CINTERION_CellularContext: public AT_CellularContext {
+class GEMALTO_CINTERION_CellularNetwork: public AT_CellularNetwork {
+    const GEMALTO_CINTERION::Module _module;
 public:
-    GEMALTO_CINTERION_CellularContext(ATHandler &at, CellularDevice *device, const char *apn, bool cp_req = false, bool nonip_req = false);
-    virtual ~GEMALTO_CINTERION_CellularContext();
+    GEMALTO_CINTERION_CellularNetwork(ATHandler &at, AT_CellularDevice &device, GEMALTO_CINTERION::Module module):
+    AT_CellularNetwork(at, device),
+    _module(module)
+    {}
+    
+    virtual nsapi_error_t set_attach()
+    {
+        if (_module == GEMALTO_CINTERION::ModuleTX62) {
+            return NSAPI_ERROR_OK;
+        }
+        return AT_CellularNetwork::set_attach();
+    }
 
 protected:
-#if !NSAPI_PPP_AVAILABLE
-    virtual NetworkStack *get_stack();
-#endif // NSAPI_PPP_AVAILABLE
-    nsapi_error_t do_user_authentication() override;
-    void enable_access_technology() override;
-    bool get_context() override;
 };
 
 } /* namespace mbed */
 
-#endif // GEMALTO_CINTERION_CELLULARCONTEXT_H_
+#endif // GEMALTO_CINTERION_CELLULARNETWORK_H_
