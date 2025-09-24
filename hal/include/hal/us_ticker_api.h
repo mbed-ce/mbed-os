@@ -233,7 +233,8 @@ void us_ticker_free(void);
 // note: parenthesis around the function name make sure this isn't replaced by the us_ticker_read() macro version.
 uint32_t (us_ticker_read)(void);
 
-/** Set interrupt for specified timestamp
+/**
+ * @brief Set interrupt to fire at specified timestamp.
  *
  * @param timestamp The time in ticks to be set. Guaranteed to be between 0 and 2^bits-1, where bits is
  *    the number of bits returned by us_ticker_get_info()
@@ -247,7 +248,7 @@ uint32_t (us_ticker_read)(void);
  *    in the future, then reschedule the timer for the correct time.
  *
  * Calling this function with timestamp of more than the supported
- * number of bits returned by ::lp_ticker_get_info results in undefined
+ * number of bits returned by ::us_ticker_get_info results in undefined
  * behavior.
  *
  * If the timer interrupt is pending when this function is called (e.g. due to the ticker being set,
@@ -258,6 +259,7 @@ uint32_t (us_ticker_read)(void);
  * @code
  * void us_ticker_set_interrupt(timestamp_t timestamp)
  * {
+ *     us_ticker_clear_interrupt();
  *     TIMER_COMPARE = timestamp;
  *     TIMER_CTRL |= TIMER_CTRL_COMPARE_ENABLE_Msk;
  * }
@@ -281,8 +283,8 @@ void us_ticker_disable_interrupt(void);
 /**
  * @brief Clear the us ticker interrupt.
  *
- * This is required to be called from the interrupt handler to stop the interrupt handler
- * from being executed again after it returns. This does not do anything if called before the interrupt
+ * This is called from Mbed's interrupt handler and should clear the interrupt flag in the peripheral to stop
+ * the interrupt from being executed again after it returns. This does not do anything if called before the interrupt
  * fires (e.g. it doesn't cancel the interrupt if it's set in the future).
  *
  * Pseudo Code:

@@ -164,10 +164,12 @@ const ticker_info_t *lp_ticker_get_info(void)
 #define LP_TIMER_WIDTH    32
 
 //******************************************************************************
+
+static bool already_initialized = false;
+
 void lp_ticker_init(void)
 {    
     mxc_tmr_cfg_t cfg;
-    unsigned int count;
 
     cfg.pres    = LP_TIMER_PRESCALE;   
     cfg.mode    = TMR_MODE_COMPARE;        
@@ -177,36 +179,38 @@ void lp_ticker_init(void)
     cfg.pol     = 0;                  
 
     // Disable and deconfigure
-    MXC_TMR_Shutdown(LP_TIMER);
-    MXC_TMR_ClearFlags(LP_TIMER);
+    uint32_t prevCount = 0;
+    if (already_initialized) {
+        MXC_TMR_Shutdown(LP_TIMER);
+        MXC_TMR_ClearFlags(LP_TIMER);
 
-    count = MXC_TMR_GetCount(LP_TIMER);
+        prevCount = MXC_TMR_GetCount(LP_TIMER);
+    }
 
     // Configure and enable
     MXC_TMR_Init(LP_TIMER, &cfg, 0);
     MXC_TMR_EnableWakeup(LP_TIMER, &cfg);
-    MXC_TMR_SetCount(LP_TIMER, count);
+    MXC_TMR_SetCount(LP_TIMER, prevCount);
 
     // Enable interrupts
-    MXC_TMR_EnableInt(LP_TIMER);
     NVIC_SetVector(LP_TIMER_IRQn, (uint32_t)lp_ticker_irq_handler);
     NVIC_EnableIRQ(LP_TIMER_IRQn);
 
-#if MBED_CONF_TARGET_LP_TICKER_TIMER == 0
-    MXC_GCR->pm |= MXC_F_GCR_PM_LPTMR0_WE;
-#elif MBED_CONF_TARGET_LP_TICKER_TIMER == 1
-    MXC_GCR->pm |= MXC_F_GCR_PM_LPTMR1_WE;
-#endif
-
+    // Make sure ERTCO oscillator stays enabled in low-power mode
     MXC_PWRSEQ->lpcn |= MXC_F_PWRSEQ_LPCN_ERTCO_EN;
 
+    // Enable wakeup from sleep via LP timer
     MXC_LP_EnableTimerWakeup(LP_TIMER);
+
     MXC_TMR_Start(LP_TIMER);
+
+    already_initialized = true;
 }
 
 //******************************************************************************
 void lp_ticker_free(void)
 {
+    NVIC_DisableIRQ(LP_TIMER_IRQn);
     MXC_TMR_Shutdown(LP_TIMER);
 }
 
@@ -227,13 +231,15 @@ uint32_t lp_ticker_read(void)
 void lp_ticker_set_interrupt(timestamp_t timestamp)
 {
     //MXC_TMR_SetCompare(LP_TIMER, (timestamp) ? timestamp : 1);
+    lp_ticker_clear_interrupt();
+    MXC_TMR_EnableInt(LP_TIMER);
     LP_TIMER->cmp = timestamp ? timestamp : 1;
 }
 
 //******************************************************************************
 void lp_ticker_disable_interrupt(void)
 {
-    NVIC_DisableIRQ(LP_TIMER_IRQn);
+    MXC_TMR_DisableInt(LP_TIMER);
 }
 
 //******************************************************************************

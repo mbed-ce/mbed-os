@@ -271,30 +271,29 @@ void ticker_interrupt_test(void)
 void ticker_disable_test()
 {
     intFlag = 0;
+    const uint32_t ticksFor1ms = lroundf(intf->get_info()->frequency * .001f);
 
-    const uint32_t ticksFor100us = lroundf(intf->get_info()->frequency * .0001f);
-
-    // Set an interrupt for 100us in the future, then disable it immediately
-    intf->set_interrupt(intf->read() + ticksFor100us);
+    // Set an interrupt for 1ms in the future, then disable it immediately
+    intf->set_interrupt(intf->read() + ticksFor1ms);
     intf->disable_interrupt();
 
     // Verify that it does not fire. Note that we cannot use wait_us here as it uses the us ticker
     // which is currently suspended.
-    wait_ns(200000);
+    wait_ns(2000000);
     TEST_ASSERT_EQUAL_INT(0, intFlag);
 
     // Now reset the interrupt again.
-    intf->set_interrupt(intf->read() + ticksFor100us);
+    intf->set_interrupt(intf->read() + ticksFor1ms);
 
     // Should not have fired yet
     TEST_ASSERT_EQUAL_INT_MESSAGE(0, intFlag, "Ticker fired during set_interrupt() while disabled! Check that set_interrupt() function clears pending timer compare.");
 
     // Still not yet
-    wait_ns(20000);
+    wait_ns(200000);
     TEST_ASSERT_EQUAL_INT(0, intFlag);
 
     // NOW it should have fired
-    wait_ns(170000);
+    wait_ns(1700000);
     TEST_ASSERT_EQUAL_INT(1, intFlag);
 }
 

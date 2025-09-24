@@ -57,40 +57,47 @@
 
 
 //******************************************************************************
+
+static bool already_initialized = false;
+
 void us_ticker_init(void)
 {
     mxc_tmr_cfg_t cfg;
-    unsigned int count;
 
     cfg.pres    = US_TIMER_PRESCALE;   
     cfg.mode    = TMR_MODE_COMPARE;        
     cfg.bitMode = TMR_BIT_MODE_32;  
     cfg.clock   = MXC_TMR_APB_CLK;        
     cfg.cmp_cnt = 0;//MXC_TMR_GetCompare(US_TIMER);              
-    cfg.pol     = 0;                  
+    cfg.pol     = 0;
 
-    // Disable and deconfigure
-    MXC_TMR_Shutdown(US_TIMER);
-    MXC_TMR_ClearFlags(US_TIMER);
+    uint32_t prevCount = 0;
+    if (already_initialized) {
+        // Disable and deconfigure
+        MXC_TMR_DisableInt(US_TIMER);
+        MXC_TMR_Shutdown(US_TIMER);
+        MXC_TMR_ClearFlags(US_TIMER);
 
-    count = MXC_TMR_GetCount(US_TIMER);
+        prevCount = MXC_TMR_GetCount(US_TIMER);
+    }
 
     // Configure and enable
     MXC_TMR_Init(US_TIMER, &cfg, 0);
-    MXC_TMR_SetCount(US_TIMER, count);
+    MXC_TMR_SetCount(US_TIMER, prevCount);
     MXC_TMR_Start(US_TIMER);
-
-    MXC_TMR_EnableInt(US_TIMER);
 
     // Enable interrupts
     NVIC_SetVector(US_TIMER_IRQn, (uint32_t)us_ticker_irq_handler);
     NVIC_EnableIRQ(US_TIMER_IRQn);
+
+    already_initialized = true;
 }
 
 //******************************************************************************
 void us_ticker_free(void)
 {
     MXC_TMR_Shutdown(US_TIMER);
+    NVIC_DisableIRQ(US_TIMER_IRQn);
 }
 
 //******************************************************************************
@@ -103,7 +110,9 @@ uint32_t us_ticker_read(void)
 //******************************************************************************
 void us_ticker_set_interrupt(timestamp_t timestamp)
 {
+    us_ticker_clear_interrupt();
     MXC_TMR_SetCompare(US_TIMER, (timestamp) ? timestamp : 1);
+    MXC_TMR_EnableInt(US_TIMER);
 }
 
 //******************************************************************************
@@ -115,7 +124,7 @@ void us_ticker_fire_interrupt(void)
 //******************************************************************************
 void us_ticker_disable_interrupt(void)
 {
-    NVIC_DisableIRQ(US_TIMER_IRQn);
+    MXC_TMR_DisableInt(US_TIMER);
 }
 
 //******************************************************************************

@@ -38,17 +38,14 @@
 #endif
 
 STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
+M_CRASH_DATA_RAM_SIZE = 0x100;
 
 #define VECTORS_SIZE           (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8) 
 
 MEMORY
 {
-    FLASH (rx)   : ORIGIN = MBED_APP_START, LENGTH = MBED_APP_SIZE
-    RAM   (rwx)  : ORIGIN = (MBED_RAM_START + VECTORS_SIZE), LENGTH = MBED_RAM_SIZE - VECTORS_SIZE
-    RAM_0 (rwx)  : ORIGIN = 0x20000000, LENGTH = 0x4000
-    RAM_1 (rwx)  : ORIGIN = 0x20004000, LENGTH = 0x4000
-    RAM_2 (rwx)  : ORIGIN = 0x20008000, LENGTH = 0x8000
-    RAM_3 (rwx)  : ORIGIN = 0x20010000, LENGTH = 0x8000
+    FLASH (rx)   : ORIGIN = MBED_CONFIGURED_ROM_START, LENGTH = MBED_CONFIGURED_ROM_SIZE
+    RAM   (rwx)  : ORIGIN = MBED_RAM_BANK_IRAM1_START, LENGTH = MBED_RAM_BANK_IRAM1_SIZE
 }
 
 
@@ -82,6 +79,12 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
+    /* Space for interrupt vectors in RAM */
+    .ram_vector (NOLOAD):
+    {
+        . += VECTORS_SIZE;
+    } > RAM
+
     .text :
     {
         KEEP(*(.isr_vector))

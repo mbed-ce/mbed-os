@@ -214,13 +214,13 @@ SECTIONS
 
 #if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
   /* Stick the crash data ram at the start of sram_l */
-  .crash_data_ram : ALIGN(8)
+  .crash_data_ram (NOLOAD): ALIGN(8)
   {
     __CRASH_DATA_RAM__ = .;
     __CRASH_DATA_RAM_START__ = .; /* Create a global symbol at data start */
     KEEP(*(.keep.crash_data_ram))
-    *(.m_crash_data_ram)     /* This is a user defined section */
     . += M_CRASH_DATA_RAM_SIZE;
+    *(.m_crash_data_ram)     /* This is a user defined section */
     . = ALIGN(8);
     __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
   } > m_sram_l :sram_l

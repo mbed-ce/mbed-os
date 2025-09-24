@@ -6937,7 +6937,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "small"
             ]
         },
-        "device_name": "MAX32670"
+        "device_name": "MAX32670",
+        "is_mcu_family_target": true
     },
     "MAX32670EVKIT": {
         "inherits": [
