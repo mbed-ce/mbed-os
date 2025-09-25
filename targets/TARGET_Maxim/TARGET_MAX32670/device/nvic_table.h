@@ -41,23 +41,6 @@
 #ifndef _NVIC_TABLE_H
 #define _NVIC_TABLE_H
 
-#if !defined(MBED_APP_START)
-   #define MBED_APP_START 0x10000000
-#endif
-
-#if !defined(MBED_APP_SIZE)
-   #define MBED_APP_SIZE  (0x60000 - 0x2000)  // 384KB-8KB
-#endif
-
-#if !defined(MBED_RAM_START)
-#define MBED_RAM_START  0x20000000
-#endif
-
-#if !defined(MBED_RAM_SIZE)
-#define MBED_RAM_SIZE  0x28000  // 160 KB
-#endif
-
 #define NVIC_NUM_VECTORS        (16 + 100) // MXC_IRQ_COUNT
-#define NVIC_RAM_VECTOR_ADDRESS MBED_RAM_START    // Vectors positioned at start of RAM
 
 #endif /* _NVIC_TABLE_H */

@@ -38,7 +38,6 @@
 #endif
 
 STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
-M_CRASH_DATA_RAM_SIZE = 0x100;
 
 #define VECTORS_SIZE           (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8) 
 
@@ -55,6 +54,7 @@ MEMORY
  *   Reset_Handler : Entry of reset handler
  * 
  * It defines following symbols, which code can use without definition:
+ *   __VECTOR_RAM
  *   __exidx_start
  *   __exidx_end
  *   __etext
@@ -82,6 +82,7 @@ SECTIONS
     /* Space for interrupt vectors in RAM */
     .ram_vector (NOLOAD):
     {
+        __VECTOR_RAM = .;
         . += VECTORS_SIZE;
     } > RAM
 

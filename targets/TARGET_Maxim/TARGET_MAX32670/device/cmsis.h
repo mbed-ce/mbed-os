@@ -37,5 +37,9 @@
 #include "max32670.h"
 #include "nvic_table.h"
 
+// Vectors positioned at start of RAM by linker script
+extern uint32_t __VECTOR_RAM[];
+#define NVIC_RAM_VECTOR_ADDRESS __VECTOR_RAM
+
 #endif
 
