@@ -104,6 +104,10 @@ list(APPEND CMAKE_MODULE_PATH
 add_subdirectory(extern)
 
 if(MBED_IS_STANDALONE)
+
+    # Always print output on test failure
+    list(APPEND CMAKE_CTEST_ARGUMENTS --output-on-failure)
+
     include(CTest)
 
     if((NOT MBED_BUILD_GREENTEA_TESTS) AND MBED_ENABLE_TESTING)

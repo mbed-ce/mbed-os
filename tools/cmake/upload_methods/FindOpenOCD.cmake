@@ -7,7 +7,6 @@
 #
 # This module defines:
 # OpenOCD - full path to OpenOCD executable
-# OpenOCD_SCRIPT_DIR - Path containing OpenOCD scripts
 # OpenOCD_FOUND - whether or not the OpenOCD executable was found
 
 set(OpenOCD_PATHS "")
@@ -28,35 +27,28 @@ endif()
 
 find_program(OpenOCD NAMES openocd PATHS ${OpenOCD_PATHS} DOC "Path to the openocd executable")
 
-# guess a script dir based on the executable path
-set(OpenOCD_SCRIPT_DIR_HINTS "")
-if(EXISTS ${OpenOCD})
-    get_filename_component(OpenOCD_EXECUTABLE_DIR ${OpenOCD} DIRECTORY)
-
-    # on Windows it's in ../scripts, on Linux it's in ../share/openocd/scripts
-    set(OpenOCD_SCRIPT_DIR_HINTS HINTS ${OpenOCD_EXECUTABLE_DIR}/../scripts ${OpenOCD_EXECUTABLE_DIR}/../share/openocd/scripts)
-endif()
-
-find_path(OpenOCD_SCRIPT_DIR
-    NAMES interface/cmsis-dap.cfg
-    ${OpenOCD_SCRIPT_DIR_HINTS}
-    PATHS /usr/share/openocd/scripts/
-    DOC "Path to OpenOCD scripts folder.  Should contain interface/cmsis-dap.cfg.")
-
 if(OpenOCD AND EXISTS "${OpenOCD}")
-    # Detect version (it writes to stderr)
+    # Detect version. Most versions write to stderr but some (Infineon OpenOCD) write to stdout
     execute_process(COMMAND ${OpenOCD} --version
-        ERROR_VARIABLE OpenOCD_VERSION_OUTPUT)
+        ERROR_VARIABLE OpenOCD_VERSION_ERROR_OUTPUT
+        OUTPUT_VARIABLE OpenOCD_VERSION_OUTPUT
+        COMMAND_ERROR_IS_FATAL ANY)
 
     # Use a regex to grab the version number
-    string(REGEX MATCH "Open On-Chip Debugger ([^ ]+)" OpenOCD_VERSION_UNUSED_MATCH "${OpenOCD_VERSION_OUTPUT}")
-    set(OpenOCD_VERSION ${CMAKE_MATCH_1})
+    if("${OpenOCD_VERSION_ERROR_OUTPUT}" MATCHES "Open On-Chip Debugger ([^ ]+)")
+        set(OpenOCD_VERSION ${CMAKE_MATCH_1})
+    elseif("${OpenOCD_VERSION_OUTPUT}" MATCHES "Open On-Chip Debugger ([^ ]+)")
+        set(OpenOCD_VERSION ${CMAKE_MATCH_1})
+    else()
+        message(WARNING "Unable to determine OpenOCD version")
+    endif()
+
 endif()
 
 find_package_handle_standard_args(OpenOCD
     HANDLE_VERSION_RANGE
     FOUND_VAR OpenOCD_FOUND
     VERSION_VAR OpenOCD_VERSION
-    REQUIRED_VARS OpenOCD OpenOCD_SCRIPT_DIR)
+    REQUIRED_VARS OpenOCD)
 
 

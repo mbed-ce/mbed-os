@@ -3,11 +3,15 @@
 # include mbed_toolchain_setup and where you add mbed os as a subdirectory.
 
 # Notes:
-# 1. The KitProg programmer on this board boots up in KitProg mode. To enable mass storage device mode, press the
+# 1. The KitProg3 programmer on this board boots up in KitProg mode. To enable mass storage device mode, press the
 #    button labeled "MODE" near the USB port to switch to DAPLink mode. The MBED and PYOCD upload methods need
 #    the board to be in DAPLink mode (which is deprecated by Infineon).
 # 2. Mbed upload method seems VERY slow on this board (takes like 1 minute to flash!).
-# 3. PyOCD is tested working with no issues noted.
+# 3. PyOCD is tested working correctly in DAPLink mode. In KitProg mode it can flash but debugging does
+#    not appear to work correctly.
+# 4. Infineon's fork of OpenOCD must be used to program this device as they have not yet upstreamed their
+#    changes. This can be downloaded from here: https://github.com/Infineon/openocd/releases
+#    Then configure CMake to use it with `-DOpenOCD=/path/to/infineon/openocd`
 
 # General config parameters
 # -------------------------------------------------------------
@@ -25,4 +29,11 @@ set(MBED_RESET_BAUDRATE 115200)
 set(PYOCD_UPLOAD_ENABLED TRUE)
 set(PYOCD_TARGET_NAME cy8c6xx5)
 set(PYOCD_CLOCK_SPEED 4000k)
-set(PYOCD_GDB_CLIENT_CORE_INDEX 1)
+set(PYOCD_PRIMARY_CORE_INDEX 1)
+
+# Config options for OpenOCD
+# -------------------------------------------------------------
+
+set(OPENOCD_UPLOAD_ENABLED TRUE)
+set(OPENOCD_CHIP_CONFIG_COMMANDS
+        -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/infineon_psoc62_c8cxx5.cfg)

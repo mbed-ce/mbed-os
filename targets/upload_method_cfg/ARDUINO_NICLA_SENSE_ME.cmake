@@ -22,6 +22,6 @@ set(PYOCD_CLOCK_SPEED 4000k)
 
 set(OPENOCD_UPLOAD_ENABLED TRUE)
 set(OPENOCD_CHIP_CONFIG_COMMANDS
-    -f ${OpenOCD_SCRIPT_DIR}/interface/cmsis-dap.cfg
+    -f interface/cmsis-dap.cfg
 	-c "transport select swd"
-	-f ${OpenOCD_SCRIPT_DIR}/target/nrf52.cfg)
+	-f target/nrf52.cfg)

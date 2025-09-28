@@ -6,6 +6,7 @@
 # PYOCD_TARGET_NAME - Name of your processor as passed to the -t option of pyOCD. This is usually the full or partial model number.
 # PYOCD_CLOCK_SPEED - Clock speed of the JTAG or SWD connection. Default is in Hz, but can use k and M suffixes for MHz and GHz
 # PYOCD_EXTRA_OPTIONS - Extra options to pass to the pyocd 'flash' and 'gdbserver' commands.
+# PYOCD_PRIMARY_CORE_INDEX - For multicore targets, this gives the index of the "primary" core that GDB should connect to.
 
 set(UPLOAD_SUPPORTS_DEBUG TRUE)
 
@@ -50,10 +51,10 @@ endfunction(gen_upload_target)
 # you tell it to only debug one core via passing an option like `--core 1`.
 # So, since the IDE will always be connecting on MBED_GDB_PORT, we have to decrease the port number passed to
 # PyOCD according to the core index we want to connect to.
-if(NOT DEFINED PYOCD_GDB_CLIENT_CORE_INDEX)
-	set(PYOCD_GDB_CLIENT_CORE_INDEX 0)
+if(NOT DEFINED PYOCD_PRIMARY_CORE_INDEX)
+	set(PYOCD_PRIMARY_CORE_INDEX 0)
 endif()
-math(EXPR PYOCD_GDB_PORT "${MBED_GDB_PORT} - ${PYOCD_GDB_CLIENT_CORE_INDEX}")
+math(EXPR PYOCD_GDB_PORT "${MBED_GDB_PORT} - ${PYOCD_PRIMARY_CORE_INDEX}")
 
 set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	${Python3_EXECUTABLE}
@@ -65,6 +66,10 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	-f ${PYOCD_CLOCK_SPEED}
 	-p ${PYOCD_GDB_PORT}
 	${PYOCD_EXTRA_OPTIONS})
+
+if(NOT PYOCD_PRIMARY_CORE_INDEX EQUAL 0)
+	list(APPEND UPLOAD_GDBSERVER_DEBUG_COMMAND -Oprimary_core=${PYOCD_PRIMARY_CORE_INDEX})
+endif()
 
 # Reference: https://github.com/Marus/cortex-debug/blob/056c03f01e008828e6527c571ef5c9adaf64083f/src/pyocd.ts#L40
 set(UPLOAD_LAUNCH_COMMANDS

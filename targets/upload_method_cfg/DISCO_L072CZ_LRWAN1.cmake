@@ -37,7 +37,7 @@ set(PYOCD_CLOCK_SPEED 4000k)
 
 set(OPENOCD_UPLOAD_ENABLED TRUE)
 set(OPENOCD_CHIP_CONFIG_COMMANDS
--f ${OpenOCD_SCRIPT_DIR}/board/st_nucleo_l073rz.cfg)
+-f board/st_nucleo_l073rz.cfg)
 
 # Config options for STM32Cube
 # -------------------------------------------------------------
