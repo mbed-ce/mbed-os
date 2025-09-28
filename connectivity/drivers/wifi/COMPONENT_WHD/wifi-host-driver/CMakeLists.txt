@@ -119,6 +119,13 @@ target_sources(mbed-wifi
         src/bus_protocols/whd_bus_spi_protocol.c
 )
 
+if("TARGET_CY_EXTERNAL_WIFI_FW" IN_LIST MBED_TARGET_DEFINITIONS)
+	# For Cypress targets, add additional resource driver for external wifi firmware
+	target_sources(mbed-wifi PRIVATE
+		resources/resource_imp/cy_ext_wifi_fw_resources.c)
+	target_link_libraries(mbed-wifi PUBLIC mbed-cy-external-wifi-fw)
+endif()
+
 target_compile_definitions(mbed-wifi
     PUBLIC
         MBED_CONF_CY_PSOC6_WHD_PRESENT=1

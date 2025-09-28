@@ -1,6 +1,6 @@
 # Mbed OS upload method configuration file for target MAX32670EVKIT.
 # To change any of these parameters from their default values, set them in your build script between where you
-# include app.cmake and where you add mbed os as a subdirectory.
+# include mbed_toolchain_setup and where you add mbed os as a subdirectory.
 
 # Notes:
 # 1. For the MBED upload method to work, you may need to update the DAPLink firmware as described here:

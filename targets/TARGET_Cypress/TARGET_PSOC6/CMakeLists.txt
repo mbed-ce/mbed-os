@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(COMPONENT_SCL EXCLUDE_FROM_ALL)
+add_subdirectory(ext-wifi-fw EXCLUDE_FROM_ALL)
 
 add_library(mbed-cat1a INTERFACE)
 

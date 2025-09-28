@@ -27,6 +27,7 @@
 #define CY_RESERVED_REGION_BLOCK_DEVICE_H
 
 #include "mbed.h"
+#include "BlockDevice.h"
 
 /**
  * Block device for working via an underlying block device without altering

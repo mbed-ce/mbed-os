@@ -1,6 +1,6 @@
 # Mbed OS upload method configuration file for target MIMXRT1050_EVK.
 # To change any of these parameters from their default values, set them in your build script between where you
-# include app.cmake and where you add mbed os as a subdirectory.
+# include mbed_toolchain_setup and where you add mbed os as a subdirectory.
 
 # 1. Most debuggers cannot connect to this CPU after it does an NVIC system reset.  See Mbed CE bug #83.
 #      However, a workaround has been implemented for PyOCD.

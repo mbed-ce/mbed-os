@@ -1,6 +1,6 @@
 # Mbed OS upload method configuration file for target FF_LPC546XX.
 # To change any of these parameters from their default values, set them in your build script between where you
-# include app.cmake and where you add mbed os as a subdirectory.
+# include mbed_toolchain_setup and where you add mbed os as a subdirectory.
 #
 # Notes:
 # 1. PyOCD support for this device requires installing a pack:

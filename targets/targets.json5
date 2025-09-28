@@ -9087,8 +9087,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "forced_reset_timeout": 5,
         "overrides": {
             "deep-sleep-latency": "CY_CFG_PWR_DEEPSLEEP_LATENCY"
-        },
-        "is_mcu_family_target": true
+        }
     },
     "MCU_PSOC6_M4": {
         "inherits": [
@@ -9113,6 +9112,18 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "full", "bare-metal"
         ]
     },
+    "MCU_PSOC62_CM4": {
+        "inherits": [
+            "MCU_PSOC6_M4"
+        ],
+        "is_mcu_family_target": true
+    },
+    "MCU_PSOC64_CM4": {
+        "inherits": [
+            "MCU_PSOC6_M4"
+        ],
+        "is_mcu_family_target": true
+    },
     "CY_EXTERNAL_WIFI_FW": {
         "public": false,
         "macros_add": [
@@ -9124,7 +9135,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "CY8CPROTO_062_4343W": {
         "inherits": [
-            "MCU_PSOC6_M4"
+            "MCU_PSOC62_CM4"
         ],
         "features": [
             "BLE"
@@ -9173,7 +9184,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "CY8CKIT_062S2_43012": {
         "inherits": [
-            "MCU_PSOC6_M4"
+            "MCU_PSOC62_CM4"
         ],
         "features": [
             "BLE"
@@ -9218,7 +9229,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "CY8CPROTO_062S3_4343W": {
         "inherits": [
-            "MCU_PSOC6_M4",
+            "MCU_PSOC62_CM4",
             "CY_EXTERNAL_WIFI_FW"
         ],
         "features": [
@@ -9261,7 +9272,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "CY8CKIT_062_WIFI_BT": { // AKA PSoC 6 WiFi-BT Pioneer Kit
         "inherits": [
-            "MCU_PSOC6_M4"
+            "MCU_PSOC62_CM4"
         ],
         "features": [
             "BLE"
@@ -9313,7 +9324,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "CY8CKIT_062_BLE": { // AKA PSoC 6 BLE Pioneer Kit
         "inherits": [
-            "MCU_PSOC6_M4"
+            "MCU_PSOC62_CM4"
         ],
         "device_has_remove": [
             "USBDEVICE"
@@ -9352,7 +9363,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "CYW9P62S1_43438EVB_01": { // AKA CYW9P62S1-43438EVB-01 PSoC 62S1 Wi-Fi BT Pioneer Kit
         "inherits": [
-            "MCU_PSOC6_M4"
+            "MCU_PSOC62_CM4"
         ],
         "features": [
             "BLE"
@@ -9406,7 +9417,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "CYW9P62S1_43012EVB_01": { // AKA CYW9P62S1-43012EVB-01 PSoC 62S1 Wi-Fi BT Pioneer Kit
         "inherits": [
-            "MCU_PSOC6_M4"
+            "MCU_PSOC62_CM4"
         ],
         "features": [
             "BLE"
@@ -9453,7 +9464,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "CY8CKIT064B0S2_4343W": { // AKA CY8CKIT-064B0S2-4343W PSoC 64 Secure Boot Wi-Fi BT Pioneer Kit
         "inherits": [
-            "MCU_PSOC6_M4"
+            "MCU_PSOC64_CM4"
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
@@ -9507,7 +9518,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "CYTFM_064B0S2_4343W": { // Same as
         "inherits": [
-            "MCU_PSOC6_M4"
+            "MCU_PSOC64_CM4"
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"

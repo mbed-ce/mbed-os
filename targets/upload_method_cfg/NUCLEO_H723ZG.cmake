@@ -1,6 +1,6 @@
 # Mbed OS upload method configuration file for target NUCLEO_H723ZG.
 # To change any of these parameters from their default values, set them in your build script between where you
-# include app.cmake and where you add mbed os as a subdirectory.
+# include mbed_toolchain_setup and where you add mbed os as a subdirectory.
 
 # Notes:
 # 1. To use this target with PyOCD, you need to install a pack: `pyocd pack install STM32H723ZGTx`.

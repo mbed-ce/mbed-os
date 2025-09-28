@@ -1,6 +1,6 @@
 # Mbed OS upload method configuration file for target LPC1768.
 # To change any of these parameters from their default values, set them in your build script between where you
-# include app.cmake and where you add mbed os as a subdirectory.
+# include mbed_toolchain_setup and where you add mbed os as a subdirectory.
 
 # Notes:
 # 1. LPC1768 is supposed to be supported by LinkServer, and I am able to get through flashing it, but it errors out at the end.

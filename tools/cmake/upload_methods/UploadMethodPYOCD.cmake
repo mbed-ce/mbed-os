@@ -43,6 +43,18 @@ function(gen_upload_target TARGET_NAME BINARY_FILE)
 endfunction(gen_upload_target)
 
 ### Commands to run the debug server.
+
+# PyOCD has some rather odd behavior where if the MCU has multiple asymmetric cores, it will increment the
+# GDB server port for each core -- e.g. core 0 will have its GDB server started on the passed port number,
+# and core 1 will have its GDB server started on the passed port number plus one. This happens *even if*
+# you tell it to only debug one core via passing an option like `--core 1`.
+# So, since the IDE will always be connecting on MBED_GDB_PORT, we have to decrease the port number passed to
+# PyOCD according to the core index we want to connect to.
+if(NOT DEFINED PYOCD_GDB_CLIENT_CORE_INDEX)
+	set(PYOCD_GDB_CLIENT_CORE_INDEX 0)
+endif()
+math(EXPR PYOCD_GDB_PORT "${MBED_GDB_PORT} - ${PYOCD_GDB_CLIENT_CORE_INDEX}")
+
 set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	${Python3_EXECUTABLE}
 	-m pyocd
@@ -51,7 +63,7 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	-t ${PYOCD_TARGET_NAME}
 	${PYOCD_PROBE_ARGS}
 	-f ${PYOCD_CLOCK_SPEED}
-	-p ${MBED_GDB_PORT}
+	-p ${PYOCD_GDB_PORT}
 	${PYOCD_EXTRA_OPTIONS})
 
 # Reference: https://github.com/Marus/cortex-debug/blob/056c03f01e008828e6527c571ef5c9adaf64083f/src/pyocd.ts#L40

@@ -4,7 +4,7 @@
 # another SWD debugger like a Pitaya-Link.
 
 # To change any of these parameters from their default values, set them in your build script between where you
-# include app.cmake and where you add mbed os as a subdirectory.
+# include mbed_toolchain_setup and where you add mbed os as a subdirectory.
 
 # General config parameters
 # -------------------------------------------------------------

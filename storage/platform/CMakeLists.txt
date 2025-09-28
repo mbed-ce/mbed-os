@@ -14,6 +14,11 @@ list(APPEND mbed-storage-libs
     mbed-storage-littlefs-v2
 )
 
+if("TARGET_CY_EXTERNAL_WIFI_FW" IN_LIST MBED_TARGET_DEFINITIONS)
+    # On some Cypress PSOC6 targets, the external wifi fw library provides the definition of BlockDevice::get_default_instance()
+    target_link_libraries(mbed-storage PUBLIC mbed-cy-external-wifi-fw)
+endif()
+
 if("COMPONENT_DATAFLASH=1" IN_LIST MBED_TARGET_DEFINITIONS)
     list(APPEND mbed-storage-libs mbed-storage-dataflash)
 endif()

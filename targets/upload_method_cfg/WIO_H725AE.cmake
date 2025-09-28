@@ -1,6 +1,6 @@
 # Mbed OS upload method configuration file for target WIO_H725AE
 # To change any of these parameters from their default values, set them in your build script between where you
-# include app.cmake and where you add mbed os as a subdirectory.
+# include mbed_toolchain_setup and where you add mbed os as a subdirectory.
 
 # Notes:
 # 1. Keep in mind the WIO_H725AE does not contain any on-board debugger, so all upload methods counts with external debugger, usually ST-Link.
