@@ -41,19 +41,32 @@ endif()
 
 function(gen_upload_target TARGET_NAME BINARY_FILE)
 
+	# If given a hex file, the hex file already contains the correct offset to program at, so don't pass
+	# that to OpenOCD
+	if(BINARY_FILE MATCHES ".hex$")
+		set(UPLOAD_ADDRESS_ARG "")
+	else()
+		set(UPLOAD_ADDRESS_ARG ${MBED_UPLOAD_BASE_ADDR})
+	endif()
+
 	add_custom_target(flash-${TARGET_NAME}
 		COMMENT "Flashing ${TARGET_NAME} with OpenOCD..."
 		COMMAND ${OpenOCD}
 		${OPENOCD_CHIP_CONFIG_COMMANDS}
 		${OPENOCD_ADAPTER_SERIAL_COMMAND}
 		-c "gdb_port disabled" # Don't start a GDB server when just programming
-		-c "program ${BINARY_FILE} ${MBED_UPLOAD_BASE_ADDR} reset exit"
+		-c "program ${BINARY_FILE} ${UPLOAD_ADDRESS_ARG} reset exit"
 		VERBATIM
 		USES_TERMINAL)
 
 endfunction(gen_upload_target)
 
 ### Commands to run the debug server.
+
+# Like PyOCD, OpenOCD will start a GDB server for each core, so we need to offset the port number
+# down by the core index we want to connect to
+math(EXPR OPENOCD_GDB_PORT "${MBED_GDB_PORT} - ${MBED_DEBUG_CORE_INDEX}")
+
 set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	${OpenOCD}
 	${OPENOCD_CHIP_CONFIG_COMMANDS}
@@ -61,7 +74,7 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	# Shut down OpenOCD when GDB disconnects.
 	# see https://github.com/Marus/cortex-debug/issues/371#issuecomment-999727626
 	-c "[target current] configure -event gdb-detach {shutdown}"
-	-c "gdb_port ${MBED_GDB_PORT}")
+	-c "gdb_port ${OPENOCD_GDB_PORT}")
 
 # request extended-remote GDB sessions
 set(UPLOAD_WANTS_EXTENDED_REMOTE TRUE)

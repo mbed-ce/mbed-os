@@ -94,6 +94,11 @@ if(NOT DEFINED MBED_UPLOAD_BASE_ADDR OR "${MBED_UPLOAD_BASE_ADDR}" STREQUAL "")
 	endif()
 endif()
 
+## Debug core index
+if(NOT DEFINED MBED_DEBUG_CORE_INDEX)
+	set(MBED_DEBUG_CORE_INDEX 0)
+endif()
+
 # ----------------------------------------------
 # Load the upload method.
 # Upload methods are expected to refer to the following variables:

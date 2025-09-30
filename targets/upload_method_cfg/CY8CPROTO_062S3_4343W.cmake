@@ -1,4 +1,4 @@
-# Mbed OS upload method configuration file for target B_U585_IOT02A.
+# Mbed OS upload method configuration file for target CY8CPROTO_062S3_4343W.
 # To change any of these parameters from their default values, set them in your build script between where you
 # include mbed_toolchain_setup and where you add mbed os as a subdirectory.
 
@@ -17,6 +17,9 @@
 # -------------------------------------------------------------
 set(UPLOAD_METHOD_DEFAULT MBED)
 
+# Generally we are only interested in the CM4 core which is index 1
+set(MBED_DEBUG_CORE_INDEX 1)
+
 # Config options for MBED
 # -------------------------------------------------------------
 
@@ -29,7 +32,6 @@ set(MBED_RESET_BAUDRATE 115200)
 set(PYOCD_UPLOAD_ENABLED TRUE)
 set(PYOCD_TARGET_NAME cy8c6xx5)
 set(PYOCD_CLOCK_SPEED 4000k)
-set(PYOCD_PRIMARY_CORE_INDEX 1)
 
 # Config options for OpenOCD
 # -------------------------------------------------------------
