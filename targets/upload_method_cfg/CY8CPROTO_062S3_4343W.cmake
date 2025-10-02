@@ -12,6 +12,9 @@
 # 4. Infineon's fork of OpenOCD must be used to program this device as they have not yet upstreamed their
 #    changes. This can be downloaded from here: https://github.com/Infineon/openocd/releases
 #    Then configure CMake to use it with `-DOpenOCD=/path/to/infineon/openocd`
+# 5. If using the wi-fi module on this board, you need to flash the wi-fi module firmware to the QSPI flash.
+#    This is done automatically via Infineon's OpenOCD scripts when flashing any project that uses wifi with OpenOCD.
+#    Flashing via other methods will likely not work for wifi projects.
 
 # General config parameters
 # -------------------------------------------------------------
@@ -38,4 +41,11 @@ set(PYOCD_CLOCK_SPEED 4000k)
 
 set(OPENOCD_UPLOAD_ENABLED TRUE)
 set(OPENOCD_CHIP_CONFIG_COMMANDS
+        -s ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/CY8CPROTO_062S3_4343W
         -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/infineon_psoc62_c8cxx5.cfg)
+
+# Seems like a regular 'monitor reset' does not work correctly for this chip. This is the command sequence
+# used by ModusToolbox IDE.
+set(OPENOCD_GDB_RESET_SEQUENCE
+    "monitor reset run"
+    "monitor psoc6 reset_halt sysresetreq")

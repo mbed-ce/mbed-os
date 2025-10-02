@@ -8,42 +8,28 @@
 #    bootloader or TF-M enabled which need to post-build process images.
 # 2. "load <app>.bin" is not considered because GDB load command
 #    doesn't support binary format.
-#
-# NOTE: Place at the very start so that it can override by the below loaded
-#       upload method if need be.
-function(mbed_adjust_upload_debug_commands target)
-    # MBED_UPLOAD_LAUNCH_COMMANDS_BAK = first version of MBED_UPLOAD_LAUNCH_COMMANDS
-    if(DEFINED MBED_UPLOAD_LAUNCH_COMMANDS_BAK)
-        # Need first version for fresh adjust
-        set(MBED_UPLOAD_LAUNCH_COMMANDS ${MBED_UPLOAD_LAUNCH_COMMANDS_BAK})
-    elseif(DEFINED MBED_UPLOAD_LAUNCH_COMMANDS)
-        # No FORCE for saving first version only
-        set(MBED_UPLOAD_LAUNCH_COMMANDS_BAK ${MBED_UPLOAD_LAUNCH_COMMANDS} CACHE INTERNAL "")
-    else()
-        return()
-    endif()
+function(mbed_get_upload_launch_commands_for target result_var)
+
+	set(${result_var} ${MBED_UPLOAD_LAUNCH_COMMANDS})
 
     # GDB load command in MBED_UPLOAD_LAUNCH_COMMANDS?
     list(FIND MBED_UPLOAD_LAUNCH_COMMANDS "load" LOAD_INDEX)
-    if(${LOAD_INDEX} LESS "0")
-        return()
+    if(${LOAD_INDEX} GREATER_EQUAL 0)
+		# <app>.hex for debug launch load
+		set(HEX_FILE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.hex)
+
+		# "load" -> "load <app>.hex"
+		#
+		# GDB load command doesn't support binary format. Ignore OUTPUT_EXT
+		# and fix to Intel Hex format.
+		#
+		# NOTE: The <app>.hex file name needs to be quoted (\") to pass along
+		#       to gdb correctly.
+		list(TRANSFORM ${result_var} APPEND " \"${HEX_FILE}\"" AT ${LOAD_INDEX})
     endif()
 
-    # <app>.hex for debug launch load
-    set(HEX_FILE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.hex)
-
-    # "load" -> "load <app>.hex"
-    #
-    # GDB load command doesn't support binary format. Ignore OUTPUT_EXT
-    # and fix to Intel Hex format.
-    #
-    # NOTE: The <app>.hex file name needs to be quoted (\") to pass along
-    #       to gdb correctly.
-    list(TRANSFORM MBED_UPLOAD_LAUNCH_COMMANDS APPEND " \"${HEX_FILE}\"" AT ${LOAD_INDEX})
-
-    # Update MBED_UPLOAD_LAUNCH_COMMANDS in cache
-    set(MBED_UPLOAD_LAUNCH_COMMANDS ${MBED_UPLOAD_LAUNCH_COMMANDS} CACHE INTERNAL "" FORCE)
-endfunction()
+	set(${result_var} ${${result_var}} PARENT_SCOPE)
+endfunction(mbed_get_upload_launch_commands_for)
 
 # ----------------------------------------------
 # Common upload method options

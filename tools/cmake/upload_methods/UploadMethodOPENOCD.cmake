@@ -9,6 +9,8 @@
 # This method creates the following options:
 # OPENOCD_VERSION_RANGE - Acceptable version range of OpenOCD.  This may be a single version, in which case it is treated as
 #   a minimum, or a versionMin...<versionMax constraint, e.g. 0.12...<0.13, to accept any 0.12.x version but not 0.13 or higher.
+# OPENOCD_GDB_RESET_SEQUENCE - Sequence of GDB commands that should be sent to cause a chip reset and halt.
+#   This is normally just 'monitor reset halt' but can vary depending on MCU.
 
 set(UPLOAD_SUPPORTS_DEBUG TRUE)
 
@@ -79,9 +81,13 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 # request extended-remote GDB sessions
 set(UPLOAD_WANTS_EXTENDED_REMOTE TRUE)
 
+if(NOT DEFINED OPENOCD_GDB_RESET_SEQUENCE)
+	set(OPENOCD_GDB_RESET_SEQUENCE "monitor reset halt")
+endif()
+
 # Reference: https://github.com/Marus/cortex-debug/blob/056c03f01e008828e6527c571ef5c9adaf64083f/src/openocd.ts#L100
 set(UPLOAD_LAUNCH_COMMANDS
-	"monitor reset halt"
+	${OPENOCD_GDB_RESET_SEQUENCE}
 
 	# For targets which support semihosting, prevent GDB from stopping when a semihosting event happens.
 	# AFAIK, semihosting is only used to communicate between the interface chip and the CPU; we never
@@ -98,10 +104,10 @@ set(UPLOAD_LAUNCH_COMMANDS
 
 	"load"
 	"tbreak main"
-	"monitor reset halt"
+	${OPENOCD_GDB_RESET_SEQUENCE}
 )
 set(UPLOAD_RESTART_COMMANDS
-	"monitor reset halt"
+	${OPENOCD_GDB_RESET_SEQUENCE}
 
 	# The following will force an sync between gdb and openocd
 	"monitor gdb_sync"
