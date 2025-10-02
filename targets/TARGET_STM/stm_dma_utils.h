@@ -125,7 +125,10 @@ void stm_unlock_dma_mutex();
  * @brief Find a free DMA channel for a DMA link with MBED_ANY_DMA_CHANNEL
  *
  * @param dmaLink DMA link instance with MBED_ANY_DMA_CHANNEL
- * @param freeDmaLink DMA link instance
+ * @param freeDmaLink DMA link instance with the actual DMA instance and channel indexes
+ *
+ * @return true if a free DMA channel is found
+ * @return false if a free DMA channel is not found
  */
 bool stm_find_free_dma_channel(DMALinkInfo const * dmaLink, DMALinkInfo * freeDmaLink);
 
@@ -192,11 +195,11 @@ DMAHandlePointer stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink);
 DMAHandlePointer stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t direction, bool periphInc, bool memInc, uint8_t periphDataAlignment, uint8_t memDataAlignment, uint32_t mode);
 
 /**
- * @brief Free a DMA link.
+ * @brief Free a DMA channel.
  *
  * This frees memory associated with it and unlocks the hardware DMA channel so that it can be used by somebody else.
  *
- * @param dmaLink DMA link ponter to free.
+ * @param handle pointer to the DMA channel handle to free.
  */
 void stm_free_dma_link(DMAHandlePointer *handle);
 
