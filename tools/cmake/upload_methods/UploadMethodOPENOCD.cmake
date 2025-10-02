@@ -73,9 +73,12 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	${OpenOCD}
 	${OPENOCD_CHIP_CONFIG_COMMANDS}
 	${OPENOCD_ADAPTER_SERIAL_COMMAND}
-	# Shut down OpenOCD when GDB disconnects.
+	# Shut down OpenOCD when GDB disconnects from the core being debugged.
 	# see https://github.com/Marus/cortex-debug/issues/371#issuecomment-999727626
-	-c "[target current] configure -event gdb-detach {shutdown}"
+	# However, we had to modify this a bit for multicore support.
+	# [target names] returns a list of all targets configured, and
+	# [lindex <list> <index>] gets an item from the list by index.
+	-c "[lindex [target names] ${MBED_DEBUG_CORE_INDEX}] configure -event gdb-detach {shutdown}"
 	-c "gdb_port ${OPENOCD_GDB_PORT}")
 
 # request extended-remote GDB sessions
@@ -102,7 +105,10 @@ set(UPLOAD_LAUNCH_COMMANDS
 	# the user can't inspect peripheral registers.
 	"set mem inaccessible-by-default off"
 
-	"load"
+	# OpenOCD provides the 'monitor program' command as an alternative to 'load'. Seems like it does basically the same thing, except
+	# that on certain devices (e.g. PSoC 62) it works while 'load' does not.
+	"monitor program"
+
 	"tbreak main"
 	${OPENOCD_GDB_RESET_SEQUENCE}
 )

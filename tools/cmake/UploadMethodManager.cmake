@@ -12,12 +12,13 @@ function(mbed_get_upload_launch_commands_for target result_var)
 
 	set(${result_var} ${MBED_UPLOAD_LAUNCH_COMMANDS})
 
+	# <app>.hex for debug launch load
+	set(HEX_FILE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.hex)
+
+
     # GDB load command in MBED_UPLOAD_LAUNCH_COMMANDS?
     list(FIND MBED_UPLOAD_LAUNCH_COMMANDS "load" LOAD_INDEX)
     if(${LOAD_INDEX} GREATER_EQUAL 0)
-		# <app>.hex for debug launch load
-		set(HEX_FILE ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>.hex)
-
 		# "load" -> "load <app>.hex"
 		#
 		# GDB load command doesn't support binary format. Ignore OUTPUT_EXT
@@ -26,6 +27,12 @@ function(mbed_get_upload_launch_commands_for target result_var)
 		# NOTE: The <app>.hex file name needs to be quoted (\") to pass along
 		#       to gdb correctly.
 		list(TRANSFORM ${result_var} APPEND " \"${HEX_FILE}\"" AT ${LOAD_INDEX})
+    endif()
+
+	# 'monitor program' command in MBED_UPLOAD_LAUNCH_COMMANDS?
+    list(FIND MBED_UPLOAD_LAUNCH_COMMANDS "monitor program" MON_PROG_INDEX)
+    if(${MON_PROG_INDEX} GREATER_EQUAL 0)
+		list(TRANSFORM ${result_var} APPEND " \"${HEX_FILE}\"" AT ${MON_PROG_INDEX})
     endif()
 
 	set(${result_var} ${${result_var}} PARENT_SCOPE)
