@@ -284,7 +284,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
 #if defined (RCC_SPI123CLKSOURCE_PLL)
         PeriphClkInit.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
 #elif defined (RCC_SPI1CLKSOURCE_SYSCLK)
-        PeriphClkInit.Spi1ClockSelection = RCC_SPI1CLKSOURCE_SYSCLK;   
+        PeriphClkInit.Spi1ClockSelection = RCC_SPI1CLKSOURCE_SYSCLK;
 #else
         PeriphClkInit.Spi1ClockSelection = RCC_SPI1CLKSOURCE_PLL1Q;
 #endif
@@ -311,7 +311,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
 #elif defined (RCC_SPI2CLKSOURCE_SYSCLK)
         PeriphClkInit.Spi2ClockSelection = RCC_SPI2CLKSOURCE_SYSCLK;
 #else
-        PeriphClkInit.Spi2ClockSelection = RCC_SPI2CLKSOURCE_PLL1Q; 
+        PeriphClkInit.Spi2ClockSelection = RCC_SPI2CLKSOURCE_PLL1Q;
 #endif
         if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
             error("HAL_RCCEx_PeriphCLKConfig\n");
@@ -526,7 +526,7 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
  */
 static void spi_init_tx_dma(struct spi_s * obj)
 {
-    if(!obj->txDMAInitialized)
+    if(obj->txDMAHandle.dmaIdx == 0)
     {
 #ifdef TARGET_MCU_STM32H7
         // For STM32H7, SPI6 does not support DMA through the normal mechanism -- it would require use of the BDMA
@@ -541,15 +541,14 @@ static void spi_init_tx_dma(struct spi_s * obj)
         DMALinkInfo const *dmaLink = &SPITxDMALinks[obj->spiIndex - 1];
 
         // Initialize DMA channel
-        DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_MEMORY_TO_PERIPH, false, true, 1, 1, DMA_NORMAL).hdma;
+        obj->txDMAHandle = stm_init_dma_link(dmaLink, DMA_MEMORY_TO_PERIPH, false, true, 1, 1, DMA_NORMAL);
 
-        if(dmaHandle == NULL)
+        if(obj->txDMAHandle.hdma == NULL)
         {
             mbed_error(MBED_ERROR_ALREADY_IN_USE, "Tx DMA channel already used by something else!", 0, MBED_FILENAME, __LINE__);
         }
 
-        __HAL_LINKDMA(&obj->handle, hdmatx, *dmaHandle);
-        obj->txDMAInitialized = true;
+        __HAL_LINKDMA(&obj->handle, hdmatx, *obj->txDMAHandle.hdma);
     }
 }
 
@@ -559,7 +558,7 @@ static void spi_init_tx_dma(struct spi_s * obj)
  */
 static void spi_init_rx_dma(struct spi_s * obj)
 {
-    if(!obj->rxDMAInitialized)
+    if(obj->rxDMAHandle.dmaIdx == 0)
     {
 #ifdef TARGET_MCU_STM32H7
         // For STM32H7, SPI6 does not support DMA through the normal mechanism -- it would require use of the BDMA
@@ -574,15 +573,14 @@ static void spi_init_rx_dma(struct spi_s * obj)
         DMALinkInfo const *dmaLink = &SPIRxDMALinks[obj->spiIndex - 1];
 
         // Initialize DMA channel
-        DMA_HandleTypeDef *dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1, DMA_NORMAL).hdma;
+        obj->rxDMAHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1, DMA_NORMAL);
 
-        if(dmaHandle == NULL)
+        if(obj->rxDMAHandle.hdma == NULL)
         {
             mbed_error(MBED_ERROR_ALREADY_IN_USE, "Rx DMA channel already used by something else!", 0, MBED_FILENAME, __LINE__);
         }
 
-        __HAL_LINKDMA(&obj->handle, hdmarx, *dmaHandle);
-        obj->rxDMAInitialized = true;
+        __HAL_LINKDMA(&obj->handle, hdmarx, *obj->rxDMAHandle.hdma);
     }
 }
 
@@ -597,15 +595,13 @@ void spi_free(spi_t *obj)
 
 #if STM32_SPI_CAPABILITY_DMA
     // Free DMA channels if allocated
-    if(spiobj->txDMAInitialized)
+    if(spiobj->txDMAHandle.dmaIdx != 0)
     {
-        stm_free_dma_link(&SPITxDMALinks[spiobj->spiIndex - 1]);
-        spiobj->txDMAInitialized = false;
+        stm_free_dma_link(&spiobj->txDMAHandle);
     }
-    if(spiobj->rxDMAInitialized)
+    if(spiobj->rxDMAHandle.dmaIdx != 0)
     {
-        stm_free_dma_link(&SPIRxDMALinks[spiobj->spiIndex - 1]);
-        spiobj->rxDMAInitialized = false;
+        stm_free_dma_link(&spiobj->rxDMAHandle);
     }
 #endif
 

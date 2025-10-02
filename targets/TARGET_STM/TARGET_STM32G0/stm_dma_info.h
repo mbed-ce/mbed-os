@@ -26,26 +26,16 @@
 
 /// Mapping from SPI index to DMA link info for Tx
 static const DMALinkInfo SPITxDMALinks[] = {
-        {1, 1, DMA_REQUEST_SPI1_TX},
-        {1, 3, DMA_REQUEST_SPI2_TX},
-#ifdef DMA2
-        // For better performance, on devices with DMA2 (STM32G0Bxx/Cxx), put SPI3 on DMA2
-        {2, 1, DMA_REQUEST_SPI3_TX}
-#else
-        {1, 5, DMA_REQUEST_SPI3_TX}
-#endif
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI1_TX},
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI2_TX},
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI3_TX}
 };
 
 /// Mapping from SPI index to DMA link info for Rx
 static const DMALinkInfo SPIRxDMALinks[] = {
-        {1, 2, DMA_REQUEST_SPI1_RX},
-        {1, 4, DMA_REQUEST_SPI2_RX},
-#ifdef DMA2
-        // For better performance, on devices with DMA2 (STM32G0Bxx/Cxx), put SPI3 on DMA2
-        {2, 2, DMA_REQUEST_SPI3_RX}
-#else
-        {1, 6, DMA_REQUEST_SPI3_RX}
-#endif
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI1_RX},
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI2_RX},
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI3_RX}
 };
 
 

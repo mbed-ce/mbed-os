@@ -46,8 +46,8 @@ struct spi_s {
 #endif
     uint8_t spiIndex; // Index of the SPI peripheral, from 1-6
 #if STM32_SPI_CAPABILITY_DMA
-    bool txDMAInitialized;
-    bool rxDMAInitialized;
+    DMAHandlePointer txDMAHandle;
+    DMAHandlePointer rxDMAHandle;
 #endif
 };
 

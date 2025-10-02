@@ -17,6 +17,7 @@
 #include "objects.h"
 #include "platform/mbed_error.h"
 #include "rtc_api_hal.h"
+#include "stm_dma_utils.h"
 
 int mbed_sdk_inited = 0;
 extern void SetSysClock(void);
@@ -307,6 +308,9 @@ void mbed_sdk_init()
     GPIO_Full_Init();
 #endif
 #endif
+
+    /* Initialize the mutex for DMA */
+    stm_init_dma_mutex();
 
     /* BSP initialization hook (external RAM, etc) */
     TargetBSP_Init();

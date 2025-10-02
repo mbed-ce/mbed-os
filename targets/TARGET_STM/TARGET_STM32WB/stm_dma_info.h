@@ -26,23 +26,23 @@
 
 /// Mapping from SPI index to DMA link info for Tx
 static const DMALinkInfo SPITxDMALinks[] = {
-        {1, 1, DMA_REQUEST_SPI1_TX},
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI1_TX},
 #ifdef SPI2
-        {1, 3, DMA_REQUEST_SPI2_TX}
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI2_TX}
 #endif
 };
 
 /// Mapping from SPI index to DMA link info for Rx
 static const DMALinkInfo SPIRxDMALinks[] = {
-        {1, 2, DMA_REQUEST_SPI1_RX},
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI1_RX},
 #ifdef SPI2
-        {1, 4, DMA_REQUEST_SPI2_RX}
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_SPI2_RX}
 #endif
 };
 
 static const DMALinkInfo QSPIDMALinks[] = {
 #if defined(QUADSPI)
-        {1, 5, DMA_REQUEST_QUADSPI},
+        {MBED_ANY_GPDMA_MODULE, MBED_ANY_DMA_CHANNEL, DMA_REQUEST_QUADSPI},
 #endif
 };
 
