@@ -8,14 +8,6 @@ target_link_libraries(mbed-cy-external-wifi-fw PUBLIC
     mbed-core-flags
     mbed-storage-qspif)
 
-target_compile_definitions(mbed-cy-external-wifi-fw
-    PUBLIC
-    "CY_ENABLE_XIP_PROGRAM"
-    "CY_STORAGE_WIFI_DATA=\".cy_xip\""
-    "CY_STORAGE_WIFI_DATA_OUTPUT=cy_xip"
-    "CY_EXT_WIFI_FW_STORAGE=QSPIF"
-)
-
 # Force linking of the cy_ext_wifi_fw_reserved_region_bd.o object file to correctly resolve weak symbols
 target_link_options(mbed-cy-external-wifi-fw
     INTERFACE
