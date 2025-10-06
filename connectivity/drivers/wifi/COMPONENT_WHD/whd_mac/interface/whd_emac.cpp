@@ -22,8 +22,6 @@
 
 #include "cmsis_os.h"
 #include "whd_emac.h"
-#include "lwip/etharp.h"
-#include "lwip/ethip6.h"
 #include "events/mbed_shared_queues.h"
 #include "whd_wlioctl.h"
 #include "whd_buffer_api.h"
@@ -31,6 +29,8 @@
 #include "cybsp_wifi.h"
 #include "emac_eapol.h"
 #include "cy_result.h"
+
+#include "WhdMemoryManagerInterface.h"
 
 #if defined(CY_EXT_WIFI_FW_STORAGE) && !MBED_CONF_TARGET_XIP_ENABLE
 #include "cy_ext_wifi_fw_reserved_region_bd.h"
@@ -122,11 +122,11 @@ bool WHD_EMAC::power_up()
                 reserved_region_bd->init();
 
                 extern whd_resource_source_t cy_ext_wifi_fw_resource_ops;
-                res = cybsp_wifi_init_primary_extended(&ifp /* OUT */, &cy_ext_wifi_fw_resource_ops, NULL, NULL);
+                res = cybsp_wifi_init_primary_extended(&ifp /* OUT */, &cy_ext_wifi_fw_resource_ops, &buffer_funcs.value(), NULL);
 
                 reserved_region_bd->deinit();
 #else
-                res = cybsp_wifi_init_primary(&ifp /* OUT */);
+                res = cybsp_wifi_init_primary_extended(&ifp /* OUT */, nullptr, &buffer_funcs.value(), nullptr);
 #endif /* defined(CY_EXT_WIFI_FW_STORAGE) && !MBED_CONF_TARGET_XIP_ENABLE */
             } else {
                 ifp = emac_other.ifp;
@@ -182,32 +182,45 @@ void WHD_EMAC::set_link_state_cb(emac_link_state_change_cb_t state_cb)
 
 void WHD_EMAC::set_memory_manager(EMACMemoryManager &mem_mngr)
 {
+    // Ignore if we are using the same memory manager already
+    if(&mem_mngr == memory_manager) {
+        return;
+    }
+
+    MBED_ASSERT(!powered_up);
     memory_manager = &mem_mngr;
+    buffer_funcs.emplace(getMbedWHDBufferFuncs(mem_mngr));
 }
 
 bool WHD_EMAC::link_out(emac_mem_buf_t *buf)
 {
-    uint16_t offset = 64;
-    whd_buffer_t buffer;
+    // Do we need to copy this buffer?
+    bool needToCopy = false;
 
-    uint16_t size = memory_manager->get_total_len(buf);
-
-    whd_result_t res = whd_host_buffer_get(drvp, &buffer, WHD_NETWORK_TX, size + offset, WHD_TRUE);
-    if (res != WHD_SUCCESS) {
-        memory_manager->free(buf);
-        return true;
+    // Does it contain multiple chained buffers?
+    if(memory_manager->get_next(buf) != nullptr) {
+        needToCopy = true;
     }
-    MBED_ASSERT(res == WHD_SUCCESS);
 
-    whd_buffer_add_remove_at_front(drvp, &buffer, offset);
+    // Does it contain enough header space at the start for us to use it?
+    if(!needToCopy) {
+        if(memory_manager->get_header_skip_size(buf) < MBED_CONF_CY_PSOC6_WHD_TX_BUFFER_HEADER_SPACE) {
+            needToCopy = true;
+        }
+    }
 
-    void *dest = whd_buffer_get_current_piece_data_pointer(drvp, buffer);
-    memory_manager->copy_from_buf(dest, size, buf);
+    if(needToCopy) {
+        buf = memory_manager->realloc_as_contiguous(buf, WHD_MEM_BUFFER_ALIGNMENT, MBED_CONF_CY_PSOC6_WHD_TX_BUFFER_HEADER_SPACE);
+
+        if(!buf) {
+            return false;
+        }
+    }
 
     if (activity_cb) {
         activity_cb(true);
     }
-    whd_network_send_ethernet_data(ifp, buffer);
+    whd_network_send_ethernet_data(ifp, buf);
     memory_manager->free(buf);
     return true;
 }
@@ -264,8 +277,6 @@ extern "C"
 
     void cy_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
     {
-        emac_mem_buf_t *mem_buf = NULL;
-
         WHD_EMAC &emac = WHD_EMAC::get_instance(ifp->role);
 
         if (!emac.powered_up || !emac.emac_link_input_cb) {
@@ -274,16 +285,12 @@ extern "C"
             return;
         }
 
-        uint8_t *data = whd_buffer_get_current_piece_data_pointer(emac.drvp, buffer);
-
-        uint16_t size = whd_buffer_get_current_piece_size(emac.drvp, buffer);
-
+        uint8_t const * const data = whd_buffer_get_current_piece_data_pointer(emac.drvp, buffer);
+        uint16_t const size = whd_buffer_get_current_piece_size(emac.drvp, buffer);
 
         if (size > WHD_ETHERNET_SIZE) {
 
-            uint16_t ethertype;
-
-            ethertype = (uint16_t)(data[12] << 8 | data[13]);
+            const uint16_t ethertype = (uint16_t)(data[12] << 8 | data[13]);
 
             if (ethertype == EAPOL_PACKET_TYPE) {
 
@@ -291,11 +298,10 @@ extern "C"
                 emac_receive_eapol_packet(ifp, buffer);
 
             } else {
-                mem_buf = buffer;
                 if (emac.activity_cb) {
                     emac.activity_cb(false);
                 }
-                emac.emac_link_input_cb(mem_buf);
+                emac.emac_link_input_cb(buffer);
             }
         }
     }

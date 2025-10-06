@@ -20,9 +20,6 @@
 #include <vector>
 #include "WhdSTAInterface.h"
 #include "nsapi.h"
-#include "lwipopts.h"
-#include "lwip/etharp.h"
-#include "lwip/ethip6.h"
 #include "rtos.h"
 #include "whd_emac.h"
 #include "whd_wifi_api.h"
@@ -263,6 +260,7 @@ nsapi_error_t WhdSTAInterface::connect()
 
     // initialize wiced, this is noop if already init
     if (!_whd_emac.powered_up) {
+        _whd_emac.set_memory_manager(_stack.get_memory_manager());
         if(!_whd_emac.power_up()) {
             return NSAPI_ERROR_DEVICE_ERROR;
         }

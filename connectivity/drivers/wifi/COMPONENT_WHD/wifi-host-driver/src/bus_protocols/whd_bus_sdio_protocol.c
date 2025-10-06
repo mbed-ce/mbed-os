@@ -699,6 +699,7 @@ whd_result_t whd_bus_sdio_read_frame(whd_driver_t whd_driver, whd_buffer_t *buff
             return WHD_SDIO_RX_FAIL;
         }
     }
+    whd_buffer_get_current_piece_data_pointer(whd_driver, *buffer);
     DELAYED_BUS_RELEASE_SCHEDULE(whd_driver, WHD_TRUE);
     return WHD_SUCCESS;
 }

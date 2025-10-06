@@ -118,15 +118,16 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_heap(uint32_t size, uint32_t align,
     CHECK_ASSERT(buf->buffer, "alloc_heap() no memory");
 
     buf->next = 0;
-    buf->ptr = static_cast<char *>(buf->buffer) + BUF_HEAD_SIZE;
+    buf->ptr = static_cast<uint8_t *>(buf->buffer) + BUF_HEAD_SIZE;
     buf->orig_len = size;
     buf->len = size;
     buf->first = true;
     buf->lifetime = Lifetime::HEAP_ALLOCATED;
+    buf->header_skip_amount = 0;
 
     if (opt & MEM_NO_ALIGN) {
         if (reinterpret_cast<uint32_t>(buf->ptr) % sizeof(uint16_t) == 0) {
-            buf->ptr = static_cast<char *>(buf->ptr) + 1;
+            buf->ptr = static_cast<uint8_t *>(buf->ptr) + 1;
         }
     } else if (align) {
         uint32_t remainder = reinterpret_cast<uint32_t>(buf->ptr) % align;
@@ -135,14 +136,14 @@ emac_mem_buf_t *EmacTestMemoryManager::alloc_heap(uint32_t size, uint32_t align,
             if (offset >= align) {
                 offset = align;
             }
-            buf->ptr = static_cast<char *>(buf->ptr) + offset;
+            buf->ptr = static_cast<uint8_t *>(buf->ptr) + offset;
         }
     }
 
-    char *buffer_head = static_cast<char *>(buf->ptr) - BUF_HEAD_SIZE;
+    uint8_t *buffer_head = static_cast<uint8_t *>(buf->ptr) - BUF_HEAD_SIZE;
     memcpy(buffer_head, BUF_HEAD, BUF_HEAD_SIZE);
 
-    char *buffer_tail = static_cast<char *>(buf->ptr) + buf->len;
+    uint8_t *buffer_tail = static_cast<uint8_t *>(buf->ptr) + buf->len;
     memcpy(buffer_tail, BUF_TAIL, BUF_TAIL_SIZE);
 
     // Scribble over the buffer contents with 'y' so it's totally obvious if someone uses it uninitialized.
@@ -277,12 +278,12 @@ void EmacTestMemoryManager::free(emac_mem_buf_t *buf)
             return;
         }
 
-        char *buffer_head = static_cast<char *>(mem_buf->ptr) - BUF_HEAD_SIZE;
+        uint8_t *buffer_head = static_cast<uint8_t *>(mem_buf->ptr) - BUF_HEAD_SIZE;
         if (memcmp(buffer_head, BUF_HEAD, BUF_HEAD_SIZE) != 0) {
             CHECK_ASSERT(0, "free(): %p head overwrite", mem_buf);
         }
 
-        char *buffer_tail = static_cast<char *>(mem_buf->ptr) + mem_buf->orig_len;
+        uint8_t *buffer_tail = static_cast<uint8_t *>(mem_buf->ptr) + mem_buf->orig_len;
         if (memcmp(buffer_tail, BUF_TAIL, BUF_TAIL_SIZE) != 0) {
             CHECK_ASSERT(0, "free(): %p tail overwrite", mem_buf);
         }
@@ -333,63 +334,10 @@ uint32_t EmacTestMemoryManager::get_total_len(const emac_mem_buf_t *buf) const
     uint32_t total_len = 0;
 
     for (emac_memory_t *mem_buf = (emac_memory_t *) buf; mem_buf != NULL; mem_buf = mem_buf->next) {
-        total_len += mem_buf->len;
+        total_len += mem_buf->len - mem_buf->header_skip_amount;
     }
 
     return total_len;
-}
-
-void EmacTestMemoryManager::copy(emac_mem_buf_t *to_buf, const emac_mem_buf_t *from_buf)
-{
-    validate_list();
-
-    if (!validate_ptr(to_buf)) {
-        CHECK_ASSERT(0, "copy(): %p invalid to buffer\n", to_buf);
-        return;
-    }
-
-    if (!validate_ptr(from_buf)) {
-        CHECK_ASSERT(0, "copy(): %p invalid from buffer\n", from_buf);
-        return;
-    }
-
-    if (get_total_len(to_buf) != get_total_len(from_buf)) {
-        CHECK_ASSERT(0, "copy(): %p to and %p from buffer total lengths not same\n", to_buf, from_buf);
-        return;
-    }
-
-    unsigned int to_buf_offset = 0;
-    unsigned int from_buf_offset = 0;
-
-    emac_memory_t *to_mem_buf = static_cast<emac_memory_t *>(to_buf);
-    const emac_memory_t *from_mem_buf = static_cast<const emac_memory_t *>(from_buf);
-
-    while (to_mem_buf && from_mem_buf) {
-        unsigned int buf_copy_len;
-
-        // Is there data in from buffer
-        buf_copy_len = from_mem_buf->len - from_buf_offset;
-        if (buf_copy_len == 0) {
-            from_mem_buf = from_mem_buf->next;
-            from_buf_offset = 0;
-            continue;
-        }
-
-        // Is there space left in to buffer
-        if (buf_copy_len > to_mem_buf->len - to_buf_offset) {
-            buf_copy_len = to_mem_buf->len - to_buf_offset;
-        }
-        if (buf_copy_len == 0) {
-            to_mem_buf = to_mem_buf->next;
-            to_buf_offset = 0;
-            continue;
-        }
-
-        // Copy data
-        memcpy(static_cast<char *>(to_mem_buf->ptr) + to_buf_offset, static_cast<const char *>(from_mem_buf->ptr) + from_buf_offset, buf_copy_len);
-        from_buf_offset += buf_copy_len;
-        to_buf_offset += buf_copy_len;
-    }
 }
 
 void EmacTestMemoryManager::cat(emac_mem_buf_t *to_buf, emac_mem_buf_t *cat_buf)
@@ -446,7 +394,7 @@ void *EmacTestMemoryManager::get_ptr(const emac_mem_buf_t *buf) const
     }
 
     const emac_memory_t *mem_buf = static_cast<const emac_memory_t *>(buf);
-    return mem_buf->ptr;
+    return mem_buf->ptr + mem_buf->header_skip_amount;
 }
 
 uint32_t EmacTestMemoryManager::get_len(const emac_mem_buf_t *buf) const
@@ -459,7 +407,7 @@ uint32_t EmacTestMemoryManager::get_len(const emac_mem_buf_t *buf) const
     }
 
     const emac_memory_t *mem_buf = static_cast<const emac_memory_t *>(buf);
-    return mem_buf->len;
+    return mem_buf->len - mem_buf->header_skip_amount;
 }
 
 void EmacTestMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
@@ -472,6 +420,9 @@ void EmacTestMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
     }
 
     emac_memory_t *mem_buf = static_cast<emac_memory_t *>(buf);
+
+    // get_len() subtracts the header size from the length, so to stay consistent we need to add it here.
+    len += mem_buf->header_skip_amount;
 
     if (len > mem_buf->orig_len) {
         CHECK_ASSERT(0, "set_len(): %p new length %i must be less or equal allocated size %i\n", buf, len, mem_buf->orig_len);
@@ -488,7 +439,36 @@ void EmacTestMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
 
 NetStackMemoryManager::Lifetime EmacTestMemoryManager::get_lifetime(const net_stack_mem_buf_t *buf) const
 {
+    if (!validate_ptr(buf)) {
+        CHECK_ASSERT(0, "get_lifetime(): %p invalid buffer\n", buf);
+    }
+
     return static_cast<emac_memory_t const *>(buf)->lifetime;
+}
+
+void EmacTestMemoryManager::skip_header_space(net_stack_mem_buf_t *buf, int32_t amount) {
+    if (!validate_ptr(buf)) {
+        CHECK_ASSERT(0, "skip_header_space(): %p invalid buffer\n", buf);
+    }
+
+    auto mem = static_cast<emac_memory_t *>(buf);
+
+    if(amount > 0) {
+        CHECK_ASSERT(amount + mem->header_skip_amount <= static_cast<int32_t>(mem->len), "skip_header_space(): header size cannot exceed len");
+    }
+    else {
+        CHECK_ASSERT(amount + mem->header_skip_amount > 0, "skip_header_space(): header size cannot go below 0");
+    }
+
+    mem->header_skip_amount += amount;
+}
+
+int32_t EmacTestMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf) {
+    if (!validate_ptr(buf)) {
+        CHECK_ASSERT(0, "get_header_skip_size(): %p invalid buffer\n", buf);
+    }
+
+    return static_cast<emac_memory_t const *>(buf)->header_skip_amount;
 }
 
 void EmacTestMemoryManager::set_alloc_unit(uint32_t alloc_unit)
@@ -590,12 +570,12 @@ void EmacTestMemoryManager::validate_list() const
     for (std::list<emac_memory_t *>::const_iterator it = m_mem_buffers.begin(); it != m_mem_buffers.end(); ++it) {
         mem_buf = static_cast<const emac_memory_t *>(*it);
 
-        char *buffer_head = static_cast<char *>(mem_buf->ptr) - BUF_HEAD_SIZE;
+        uint8_t *buffer_head = static_cast<uint8_t *>(mem_buf->ptr) - BUF_HEAD_SIZE;
         if (memcmp(buffer_head, BUF_HEAD, BUF_HEAD_SIZE) != 0) {
             CHECK_ASSERT(0, "validate_list(): %p head overwrite", mem_buf);
         }
 
-        char *buffer_tail = static_cast<char *>(mem_buf->ptr) + mem_buf->orig_len;
+        uint8_t *buffer_tail = static_cast<uint8_t *>(mem_buf->ptr) + mem_buf->orig_len;
         if (memcmp(buffer_tail, BUF_TAIL, BUF_TAIL_SIZE) != 0) {
             CHECK_ASSERT(0, "validate_list(): %p tail overwrite", mem_buf);
         }

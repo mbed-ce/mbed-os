@@ -55,6 +55,10 @@ typedef enum
  */
 struct whd_buffer_funcs
 {
+    /// Opaque pointer which should be passed as the first argument to each function.
+    /// Allows passing an instance pointer for a C++ class.
+    void* instance;
+
     /** Allocates a packet buffer
      *
      *  Implemented in the port layer interface which is specific to the
@@ -67,6 +71,7 @@ struct whd_buffer_funcs
      *  which includes the MTU, other other various header. Refer to whd_types.h
      *  to find the size of WHD_LINK_MTU
      *
+     *  @param instance Instance pointer as defined above.
      *  @param buffer      A pointer which receives the allocated packet buffer handle
      *  @param direction   Indicates transmit/receive direction that the packet buffer is
      *                     used for. This may be needed if tx/rx pools are separate.
@@ -76,7 +81,7 @@ struct whd_buffer_funcs
      *  @return            WHD_SUCCESS or error code
      *
      */
-    whd_result_t (*whd_host_buffer_get)(whd_buffer_t *buffer, whd_buffer_dir_t direction, unsigned short size,
+    whd_result_t (*whd_host_buffer_get)(void* instance, whd_buffer_t *buffer, whd_buffer_dir_t direction, unsigned short size,
                                         unsigned long timeout_ms);
 
     /** Releases a packet buffer
@@ -89,12 +94,13 @@ struct whd_buffer_funcs
      *  how the packet was allocated.
      *  Returns void since WHD cannot do anything about failures
      *
+     *  @param instance Instance pointer as defined above.
      *  @param buffer     The handle of the packet buffer to be released
      *  @param direction  Indicates transmit/receive direction that the packet buffer has
      *                     been used for. This might be needed if tx/rx pools are separate.
      *
      */
-    void (*whd_buffer_release)(whd_buffer_t buffer, whd_buffer_dir_t direction);
+    void (*whd_buffer_release)(void* instance, whd_buffer_t buffer, whd_buffer_dir_t direction);
 
     /** Retrieves the current pointer of a packet buffer
      *
@@ -104,11 +110,12 @@ struct whd_buffer_funcs
      *  front for additional headers, this function allows WHD to get
      *  the current 'front' location pointer.
      *
+     *  @param instance Instance pointer as defined above.
      *  @param buffer  The handle of the packet buffer whose pointer is to be retrieved
      *
      *  @return        The packet buffer's current pointer.
      */
-    uint8_t *(*whd_buffer_get_current_piece_data_pointer)(whd_buffer_t buffer);
+    uint8_t *(*whd_buffer_get_current_piece_data_pointer)(void* instance, whd_buffer_t buffer);
 
     /** Retrieves the size of a packet buffer
      *
@@ -119,11 +126,12 @@ struct whd_buffer_funcs
      *  will often be larger than the current size of the packet buffer data.
      *  This function allows WHD to retrieve the current size of a packet buffer's data.
      *
+     *  @param instance Instance pointer as defined above.
      *  @param buffer   The handle of the packet buffer whose size is to be retrieved
      *
      *  @return         The size of the packet buffer.
      */
-    uint16_t (*whd_buffer_get_current_piece_size)(whd_buffer_t buffer);
+    uint16_t (*whd_buffer_get_current_piece_size)(void* instance, whd_buffer_t buffer);
 
     /** Sets the current size of a WHD packet
      *
@@ -131,12 +139,13 @@ struct whd_buffer_funcs
      *  buffering scheme in use.
      *  This function sets the current length of a WHD packet buffer
      *
+     *  @param instance Instance pointer as defined above.
      *  @param buffer  The packet to be modified
      *  @param size    The new size of the packet buffer
      *
      *  @return        WHD_SUCCESS or error code
      */
-    whd_result_t (*whd_buffer_set_size)(whd_buffer_t buffer, unsigned short size);
+    whd_result_t (*whd_buffer_set_size)(void* instance, whd_buffer_t buffer, unsigned short size);
 
     /** Moves the current pointer of a packet buffer
      *
@@ -147,6 +156,7 @@ struct whd_buffer_funcs
      *  add headers to transmit packets, and so that the network stack does not see the internal WHD
      *  headers on received packets.
      *
+     *  @param instance Instance pointer as defined above.
      *  @param buffer             A pointer to the handle of the current packet buffer for which the
      *                            current pointer will be moved. On return this may contain a pointer
      *                            to a newly allocated packet buffer which has been daisy chained to
@@ -158,7 +168,7 @@ struct whd_buffer_funcs
      *
      *  @return                   WHD_SUCCESS or error code
      */
-    whd_result_t (*whd_buffer_add_remove_at_front)(whd_buffer_t *buffer, int32_t add_remove_amount);
+    whd_result_t (*whd_buffer_add_remove_at_front)(void* instance, whd_buffer_t *buffer, int32_t add_remove_amount);
 };
 /*  @} */
 
@@ -201,6 +211,9 @@ struct whd_netif_funcs
      */
     void (*whd_network_process_ethernet_data)(whd_interface_t ifp, whd_buffer_t buffer);
 };
+
+// Default global version of above function
+void cy_network_process_ethernet_data(whd_interface_t interface, whd_buffer_t buffer);
 
 /** To send an ethernet frame to WHD (called by the Network Stack)
  *

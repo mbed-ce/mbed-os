@@ -244,22 +244,15 @@ namespace mbed {
             // Step 2: Copy packet if needed
             if(needToCopy)
             {
-                auto * newBuf = memory_manager->alloc_heap(memory_manager->get_total_len(buf), 0);
-                if(newBuf == nullptr)
+                buf = memory_manager->realloc_as_contiguous(buf, 0);
+                if(buf == nullptr)
                 {
                     // No free memory, drop packet
                     return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
                 }
 
-                // We should have gotten just one contiguous buffer
-                MBED_ASSERT(memory_manager->get_next(newBuf) == nullptr);
                 packetDescsUsed = 1;
                 neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
-
-                // Copy data over
-                memory_manager->copy_from_buf(static_cast<uint8_t *>(memory_manager->get_ptr(newBuf)), memory_manager->get_len(newBuf), buf);
-                memory_manager->free(buf);
-                buf = newBuf;
             }
 
             tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",

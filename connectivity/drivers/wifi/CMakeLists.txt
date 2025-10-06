@@ -26,7 +26,7 @@ if("STM" IN_LIST MBED_TARGET_LABELS)
     add_subdirectory(TARGET_STM EXCLUDE_FROM_ALL)
 endif()
 
-if("WHD" IN_LIST MBED_TARGET_LABELS)
+if("COMPONENT_WHD=1" IN_LIST MBED_TARGET_DEFINITIONS)
 	create_mbed_wifi_target()
     add_subdirectory(COMPONENT_WHD EXCLUDE_FROM_ALL)
 endif()

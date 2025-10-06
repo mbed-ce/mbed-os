@@ -8,14 +8,7 @@ target_include_directories(mbed-wifi
 
 target_sources(mbed-wifi
     PRIVATE
-        cy_network_buffer.c
         cybsp_wifi.c
-)
-
-target_link_libraries(mbed-wifi
-    PUBLIC
-        mbed-lwipstack
-		mbed-core-flags
 )
 
 if("DEVICE_EMAC=1" IN_LIST MBED_TARGET_DEFINITIONS)
