@@ -94,7 +94,8 @@ struct qspi_s {
     PinName io3;
     PinName sclk;
     PinName ssel;
-    bool dmaInitialized;
+    DMAHandlePointer dmaHandle;
+    DMAHandlePointer dmaHandleTX;
 #if MBED_CONF_RTOS_PRESENT
     osSemaphoreId_t semaphoreId;
     osRtxSemaphore_t semaphoreMem;
@@ -118,7 +119,8 @@ struct ospi_s {
     PinName sclk;
     PinName ssel;
     PinName dqs;
-    bool dmaInitialized;
+    DMAHandlePointer dmaHandle;
+    DMAHandlePointer dmaHandleTX;
 #if MBED_CONF_RTOS_PRESENT
     osSemaphoreId_t semaphoreId;
     osRtxSemaphore_t semaphoreMem;

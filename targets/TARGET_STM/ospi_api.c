@@ -258,7 +258,7 @@ ospi_status_t ospi_prepare_command(const ospi_command_t *command, OSPI_RegularCm
  */
 static void ospi_init_dma(struct ospi_s * obj)
 {
-    if(!obj->dmaInitialized)
+    if(obj->dmaHandle.dmaIdx == 0)
     {
         // Get DMA handle
         DMALinkInfo const *dmaLink;
@@ -275,30 +275,29 @@ static void ospi_init_dma(struct ospi_s * obj)
         dmaLink = &OSPIDMALinks[0];
 #endif
         // Initialize DMA channel
-        DMAHandlePointer dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1, DMA_NORMAL);
-        if(dmaHandle.hdma == NULL)
+        obj->dmaHandle = stm_init_dma_link(dmaLink, DMA_PERIPH_TO_MEMORY, false, true, 1, 1, DMA_NORMAL);
+        if(obj->dmaHandle.hdma == NULL)
         {
             mbed_error(MBED_ERROR_ALREADY_IN_USE, "DMA channel already used by something else!", 0, MBED_FILENAME, __LINE__);
         }
 #if defined(MDMA)
-        __HAL_LINKDMA(&obj->handle, hmdma, *dmaHandle.hmdma);
+        __HAL_LINKDMA(&obj->handle, hmdma, *obj->dmaHandle.hmdma);
 #elif defined(TARGET_STM32H5)
-        __HAL_LINKDMA(&obj->handle, hdmarx, *dmaHandle.hdma);
+        __HAL_LINKDMA(&obj->handle, hdmarx, *obj->dmaHandle.hdma);
 #else
-        __HAL_LINKDMA(&obj->handle, hdma, *dmaHandle.hdma);
+        __HAL_LINKDMA(&obj->handle, hdma, *obj->dmaHandle.hdma);
 #endif
 #if defined(TARGET_STM32H5)
         // STM32H5 has only one OCTOSPI instance, but it requires separate DMA channels for RX and TX
         DMALinkInfo const *dmaLinkTX = &OSPIDMALinks[1];
         // Initialize DMA channel
-        DMAHandlePointer dmaHandleTX = stm_init_dma_link(dmaLinkTX, DMA_MEMORY_TO_PERIPH, false, true, 1, 1, DMA_NORMAL);
-        if(dmaHandleTX.hdma == NULL)
+        obj->dmaHandleTX = stm_init_dma_link(dmaLinkTX, DMA_MEMORY_TO_PERIPH, false, true, 1, 1, DMA_NORMAL);
+        if(obj->dmaHandleTX.hdma == NULL)
         {
             mbed_error(MBED_ERROR_ALREADY_IN_USE, "DMA channel already used by something else!", 0, MBED_FILENAME, __LINE__);
         }
-        __HAL_LINKDMA(&obj->handle, hdmatx, *dmaHandleTX.hdma);
+        __HAL_LINKDMA(&obj->handle, hdmatx, *obj->dmaHandleTX.hdma);
 #endif
-        obj->dmaInitialized = true;
 #if MBED_CONF_RTOS_PRESENT
         osSemaphoreAttr_t attr = { 0 };
         attr.cb_mem = &obj->semaphoreMem;
@@ -361,7 +360,7 @@ static ospi_status_t _ospi_init_direct(ospi_t *obj, const ospi_pinmap_t *pinmap,
 
     // tested all combinations, take first
     obj->ospi = pinmap->peripheral;
-    obj->dmaInitialized = false;
+    obj->dmaHandle.dmaIdx = 0;
 
 #if defined(OCTOSPI1)
     if (obj->ospi == OSPI_1) {
@@ -516,26 +515,12 @@ ospi_status_t ospi_free(ospi_t *obj)
 {
     tr_debug("ospi_free");
 
-    if(obj->dmaInitialized)
+    if(obj->dmaHandle.dmaIdx != 0)
     {
-        // Get DMA handle
-        DMALinkInfo const *dmaLink;
-#if defined(OCTOSPI2)
-        if(obj->ospi == (OSPIName) OSPI_1)
-        {
-            dmaLink = &OSPIDMALinks[0];
-        }
-        else
-        {
-            dmaLink = &OSPIDMALinks[1];
-        }
-#else
-        dmaLink = &OSPIDMALinks[0];
-#endif
-        stm_free_dma_link(dmaLink);
+        stm_free_dma_link(&obj->dmaHandle);
 #if defined(STM32H5)
         // Free TX DMA handle for STM32H5
-        stm_free_dma_link(&OSPIDMALinks[1]);
+        stm_free_dma_link(&obj->dmaHandleTX);
 #endif
     }
 
@@ -682,6 +667,7 @@ ospi_status_t ospi_read(ospi_t *obj, const ospi_command_t *command, void *data, 
     }
 
 #if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
+    extern void split_buffer_by_cacheline(void *buffer, const size_t *length, size_t *pre_aligned_size, size_t *aligned_size, size_t *post_aligned_size);
     size_t pre_aligned_size, aligned_size, post_aligned_size;
     split_buffer_by_cacheline(data, length, &pre_aligned_size, &aligned_size, &post_aligned_size);
     if(pre_aligned_size > 0)

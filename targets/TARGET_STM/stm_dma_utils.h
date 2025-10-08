@@ -46,6 +46,12 @@
 extern "C" {
 #endif
 
+// Any general-purpose DMA module (DMA1/DMA2 or GPDMA1/GPDMA2)
+#define MBED_ANY_GPDMA_MODULE 255
+
+// Any DMA channel
+#define MBED_ANY_DMA_CHANNEL 255
+
 /*
  * Structure containing info about a peripheral's link to the DMA controller.
  */
@@ -79,11 +85,15 @@ typedef union DMAInstancePointer {
 #endif
 } DMAInstancePointer;
 
-typedef union DMAHandlePointer {
-    DMA_HandleTypeDef *hdma;
+typedef struct {
+    uint8_t dmaIdx; // Index of the DMA module
+    uint8_t channelIdx; // Index of the channel
+    union {
+        DMA_HandleTypeDef *hdma; // General purpose DMA pointer
 #ifdef MDMA
-    MDMA_HandleTypeDef *hmdma;
+        MDMA_HandleTypeDef *hmdma; // STM32H7 MDMA pointer
 #endif
+    };
 } DMAHandlePointer;
 
 typedef union DMAChannelPointer {
@@ -97,9 +107,36 @@ typedef union DMAChannelPointer {
 } DMAChannelPointer;
 
 /**
+ * @brief Initialize the mutex for DMA
+ */
+void stm_init_dma_mutex();
+
+/**
+ * @brief Lock the mutex for DMA
+ */
+void stm_lock_dma_mutex();
+
+/**
+ * @brief Unlock the mutex for DMA
+ */
+void stm_unlock_dma_mutex();
+
+/**
+ * @brief Find a free DMA channel for a DMA link with MBED_ANY_DMA_CHANNEL
+ *
+ * @param dmaLink DMA link instance with MBED_ANY_DMA_CHANNEL
+ * @param freeDmaLink DMA link instance with the actual DMA instance and channel indexes
+ *
+ * @return true if a free DMA channel is found
+ * @return false if a free DMA channel is not found
+ */
+bool stm_find_free_dma_channel(DMALinkInfo const * dmaLink, DMALinkInfo * freeDmaLink);
+
+
+/**
  * @brief Get the DMA instance for a DMA link
  *
- * @param dmaLink DMA instance
+ * @param dmaLink DMA link instance
  */
 DMAInstancePointer stm_get_dma_instance(DMALinkInfo const * dmaLink);
 
@@ -158,13 +195,13 @@ DMAHandlePointer stm_get_dma_handle_for_link(DMALinkInfo const * dmaLink);
 DMAHandlePointer stm_init_dma_link(DMALinkInfo const * dmaLink, uint32_t direction, bool periphInc, bool memInc, uint8_t periphDataAlignment, uint8_t memDataAlignment, uint32_t mode);
 
 /**
- * @brief Free a DMA link.
+ * @brief Free a DMA channel.
  *
  * This frees memory associated with it and unlocks the hardware DMA channel so that it can be used by somebody else.
  *
- * @param dmaLink DMA link ponter to free.
+ * @param handle pointer to the DMA channel handle to free.
  */
-void stm_free_dma_link(DMALinkInfo const * dmaLink);
+void stm_free_dma_link(DMAHandlePointer *handle);
 
 #if defined(__cplusplus)
 }
