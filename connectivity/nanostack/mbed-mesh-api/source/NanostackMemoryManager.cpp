@@ -49,7 +49,7 @@ emac_mem_buf_t *NanostackMemoryManager::alloc_heap(uint32_t size, uint32_t align
                 offset = align;
             }
 
-            buf->payload = static_cast<char *>(buf->payload) + offset;
+            buf->payload = buf->payload + offset;
         }
     }
 
@@ -81,6 +81,8 @@ uint32_t NanostackMemoryManager::get_total_len(const emac_mem_buf_t *buf) const
         total += mem->len - mem->header_size; // note: header size can only legally be set on the first buffer
         mem = mem->next;
     }
+
+    return total;
 }
 
 void NanostackMemoryManager::cat(emac_mem_buf_t *to_buf, emac_mem_buf_t *cat_buf)
@@ -131,13 +133,17 @@ void NanostackMemoryManager::skip_header_space(net_stack_mem_buf_t *buf, int32_t
     auto * const mem = static_cast<ns_stack_mem_t *>(buf);
 
     if(amount > 0) {
-        MBED_ASSERT(amount + mem->header_size > mem->len); // header_size cannot exceed len
+        MBED_ASSERT(amount + static_cast<int32_t>(mem->header_size) < static_cast<int32_t>(mem->len)); // header_size cannot exceed len
     }
     else {
-        MBED_ASSERT(-1 * amount <= mem->header_size); // header_size cannot go below 0
+        MBED_ASSERT(-1 * amount <= static_cast<int32_t>(mem->header_size)); // header_size cannot go below 0
     }
 
     mem->header_size += amount;
+}
+
+int32_t NanostackMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf) {
+    return static_cast<ns_stack_mem_t *>(buf)->header_size;
 }
 
 void mbed_ns_heap_free_hook()

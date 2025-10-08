@@ -221,7 +221,6 @@ bool WHD_EMAC::link_out(emac_mem_buf_t *buf)
         activity_cb(true);
     }
     whd_network_send_ethernet_data(ifp, buf);
-    memory_manager->free(buf);
     return true;
 }
 

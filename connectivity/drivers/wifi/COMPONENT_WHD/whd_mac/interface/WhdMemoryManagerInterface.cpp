@@ -22,7 +22,8 @@
 
 // The WHD driver likes to use SDIO block mode for reads, meaning that an additional up-to 63 bytes can be stored at the
 // end of the buffer relative to its actual size. This means that this layer needs to allocate the buffers
-// with additional space at the end relative to what was asked for.
+// with additional space at the end relative to what was asked for, and then NOT report this space
+// when asked about a buffer's length
 constexpr size_t WHD_MEM_BUFFER_EXTRA_SPACE = 64;
 
 // Note: Implementations adapted from Infineon's code for LwIP
@@ -84,7 +85,7 @@ uint8_t * mbed_whd_buffer_get_current_piece_data_pointer(void *instance, whd_buf
 uint16_t mbed_whd_buffer_get_current_piece_size(void *instance, whd_buffer_t buffer) {
     MBED_ASSERT(buffer != nullptr);
     auto * const memoryManager = static_cast<NetStackMemoryManager *>(instance);
-    return memoryManager->get_len(buffer);
+    return memoryManager->get_len(buffer) - WHD_MEM_BUFFER_EXTRA_SPACE;
 }
 
 whd_result_t mbed_whd_buffer_set_size(void *instance, whd_buffer_t buffer, unsigned short size) {
@@ -94,8 +95,9 @@ whd_result_t mbed_whd_buffer_set_size(void *instance, whd_buffer_t buffer, unsig
     // Note that the example code has a rather confusing sanity check on size here. However, the Mbed
     // net stack memory manager interface doesn't provide a way to check the original size of a buffer,
     // so it's hard to port over properly.
-    // However, when we run this code in the EMAC test, the EmacTestMemoryManager will catch this type of issue.
-    memoryManager->set_len(buffer, size);
+    // However, when we run this code in the EMAC test, the EmacTestMemoryManager will catch any incorrect
+    // usage here
+    memoryManager->set_len(buffer, size + WHD_MEM_BUFFER_EXTRA_SPACE);
 
     return WHD_SUCCESS;
 }
@@ -105,7 +107,10 @@ whd_result_t mbed_whd_buffer_add_remove_at_front(void *instance, whd_buffer_t*bu
     auto * const memoryManager = static_cast<NetStackMemoryManager *>(instance);
 
     // Make sure we aren't trying to skip before the start of the buffer or after the end
-    if(add_remove_amount + memoryManager->get_header_skip_size(*buffer) < 0 || add_remove_amount > static_cast<int32_t>(memoryManager->get_len(*buffer))) {
+    if(add_remove_amount + memoryManager->get_header_skip_size(*buffer) < 0) {
+        return WHD_PMK_WRONG_LENGTH;
+    }
+    if(add_remove_amount > static_cast<int32_t>(memoryManager->get_len(*buffer) - WHD_MEM_BUFFER_EXTRA_SPACE)) {
         return WHD_PMK_WRONG_LENGTH;
     }
 
