@@ -219,6 +219,10 @@ bool WHD_EMAC::link_out(emac_mem_buf_t *buf)
 
     buf = memory_manager->realloc_heap(buf, WHD_MEM_BUFFER_ALIGNMENT, memory_manager->get_total_len(buf) + WHD_MEM_BUFFER_EXTRA_SPACE, MBED_CONF_CY_PSOC6_WHD_TX_BUFFER_HEADER_SPACE);
 
+    if(!buf) {
+        return false;
+    }
+
     if (activity_cb) {
         activity_cb(true);
     }

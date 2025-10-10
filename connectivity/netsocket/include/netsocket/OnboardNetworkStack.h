@@ -174,7 +174,7 @@ public:
     /**
      * @brief Get a reference to the memory manager used by this stack.
      */
-    virtual EMACMemoryManager & get_memory_manager() = 0;
+    virtual EMACMemoryManager &get_memory_manager() = 0;
 
     virtual nsapi_error_t add_ethernet_interface(EMAC &emac, bool default_if, Interface **interface_out, const uint8_t *mac_addr, NetworkInterface *user_network_interface = NULL)
 

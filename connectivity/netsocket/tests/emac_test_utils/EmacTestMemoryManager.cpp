@@ -446,24 +446,25 @@ NetStackMemoryManager::Lifetime EmacTestMemoryManager::get_lifetime(const net_st
     return static_cast<emac_memory_t const *>(buf)->lifetime;
 }
 
-void EmacTestMemoryManager::skip_header_space(net_stack_mem_buf_t *buf, int32_t amount) {
+void EmacTestMemoryManager::skip_header_space(net_stack_mem_buf_t *buf, int32_t amount)
+{
     if (!validate_ptr(buf)) {
         CHECK_ASSERT(0, "skip_header_space(): %p invalid buffer\n", buf);
     }
 
     auto mem = static_cast<emac_memory_t *>(buf);
 
-    if(amount > 0) {
+    if (amount > 0) {
         CHECK_ASSERT(amount + mem->header_skip_amount <= static_cast<int32_t>(mem->len), "skip_header_space(): header size cannot exceed len");
-    }
-    else {
+    } else {
         CHECK_ASSERT(amount + mem->header_skip_amount > 0, "skip_header_space(): header size cannot go below 0");
     }
 
     mem->header_skip_amount += amount;
 }
 
-int32_t EmacTestMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf) {
+int32_t EmacTestMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf)
+{
     if (!validate_ptr(buf)) {
         CHECK_ASSERT(0, "get_header_skip_size(): %p invalid buffer\n", buf);
     }

@@ -119,11 +119,13 @@ NetStackMemoryManager::Lifetime LWIPMemoryManager::get_lifetime(const net_stack_
     }
 }
 
-void LWIPMemoryManager::skip_header_space(net_stack_mem_buf_t * const buf, const int32_t amount) {
+void LWIPMemoryManager::skip_header_space(net_stack_mem_buf_t *const buf, const int32_t amount)
+{
     MBED_ASSERT(pbuf_header(static_cast<struct pbuf *>(buf), -amount) == 0);
 }
 
-int32_t LWIPMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf) {
+int32_t LWIPMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf)
+{
     return static_cast<struct pbuf *>(buf)->header_bytes_removed;
 }
 

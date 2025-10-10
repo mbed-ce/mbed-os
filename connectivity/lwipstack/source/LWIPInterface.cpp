@@ -442,13 +442,13 @@ nsapi_error_t LWIP::add_ethernet_interface(EMAC &emac, bool default_if, OnboardN
     interface->memory_manager = &memory_manager;
     interface->ppp_enabled = false;
 
-    if(user_network_interface != nullptr) {
+    if (user_network_interface != nullptr) {
         hostname = user_network_interface->get_hostname();
         if (hostname) {
             netif_set_hostname(&interface->netif, hostname);
         }
     }
-    
+
 #if (MBED_MAC_ADDRESS_SUM != MBED_MAC_ADDR_INTERFACE)
     netif->interface.hwaddr[0] = MBED_MAC_ADDR_0;
     netif->interface.hwaddr[1] = MBED_MAC_ADDR_1;

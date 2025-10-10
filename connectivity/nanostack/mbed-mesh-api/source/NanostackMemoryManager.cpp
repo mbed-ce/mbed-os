@@ -23,7 +23,7 @@
 
 struct ns_stack_mem_t {
     ns_stack_mem_t *next;
-    uint8_t * payload;
+    uint8_t *payload;
     uint32_t len; // Original requested length of buffer (not including extra space allocated for alignment, or header size)
     uint16_t header_size; // Number of header bytes being skipped
     uint8_t mem[];
@@ -129,20 +129,21 @@ NetStackMemoryManager::Lifetime NanostackMemoryManager::get_lifetime(const net_s
     return Lifetime::HEAP_ALLOCATED;
 }
 
-void NanostackMemoryManager::skip_header_space(net_stack_mem_buf_t *buf, int32_t amount) {
-    auto * const mem = static_cast<ns_stack_mem_t *>(buf);
+void NanostackMemoryManager::skip_header_space(net_stack_mem_buf_t *buf, int32_t amount)
+{
+    auto *const mem = static_cast<ns_stack_mem_t *>(buf);
 
-    if(amount > 0) {
+    if (amount > 0) {
         MBED_ASSERT(amount + static_cast<int32_t>(mem->header_size) < static_cast<int32_t>(mem->len)); // header_size cannot exceed len
-    }
-    else {
+    } else {
         MBED_ASSERT(-1 * amount <= static_cast<int32_t>(mem->header_size)); // header_size cannot go below 0
     }
 
     mem->header_size += amount;
 }
 
-int32_t NanostackMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf) {
+int32_t NanostackMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf)
+{
     return static_cast<ns_stack_mem_t *>(buf)->header_size;
 }
 

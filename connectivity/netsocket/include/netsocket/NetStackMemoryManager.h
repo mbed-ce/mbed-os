@@ -103,7 +103,7 @@ public:
      *
      * @return Pointer to new buffer, or nullptr if allocation failed.
      */
-    net_stack_mem_buf_t * realloc_heap(net_stack_mem_buf_t * orig_buf, uint32_t new_align, std::optional<uint32_t> new_len = std::nullopt, std::optional<uint16_t> new_header_skip_size = std::nullopt);
+    net_stack_mem_buf_t *realloc_heap(net_stack_mem_buf_t *orig_buf, uint32_t new_align, std::optional<uint32_t> new_len = std::nullopt, std::optional<uint16_t> new_header_skip_size = std::nullopt);
 
     /**
      * Get memory buffer pool allocation unit
@@ -286,7 +286,8 @@ public:
      * @param amount Amount of header space to skip. Negative values are allowed and cause
      *    previously skipped header space to be removed.
      */
-    inline void restore_header_space(net_stack_mem_buf_t *buf, const int32_t amount) {
+    inline void restore_header_space(net_stack_mem_buf_t *buf, const int32_t amount)
+    {
         skip_header_space(buf, -1 * amount);
     }
 
