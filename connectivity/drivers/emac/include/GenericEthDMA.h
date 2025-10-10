@@ -244,7 +244,7 @@ namespace mbed {
             // Step 2: Copy packet if needed
             if(needToCopy)
             {
-                buf = memory_manager->realloc_as_contiguous(buf, 0);
+                buf = memory_manager->realloc_heap(buf, 0);
                 if(buf == nullptr)
                 {
                     // No free memory, drop packet
