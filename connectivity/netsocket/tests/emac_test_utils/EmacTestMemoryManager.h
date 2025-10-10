@@ -30,7 +30,8 @@ typedef struct emac_memory {
     void *buffer;              /**< Pointer to allocated buffer */
     unsigned int orig_len;     /**< Original buffer length (set_len() does not change) */
     unsigned int len;          /**< Buffer length */
-    void *ptr;                 /**< Aligned pointer */
+    int header_skip_amount;    ///< Bytes being skiped for the header
+    uint8_t *ptr;                 /**< Aligned pointer */
     bool first;
     EMACMemoryManager::Lifetime lifetime;
 } emac_memory_t;
@@ -58,8 +59,6 @@ public:
 
     uint32_t get_total_len(const emac_mem_buf_t *buf) const override;
 
-    void copy(emac_mem_buf_t *to_buf, const emac_mem_buf_t *from_buf) override;
-
     void cat(emac_mem_buf_t *to_buf, emac_mem_buf_t *cat_buf) override;
 
     emac_mem_buf_t *get_next(const emac_mem_buf_t *buf) const override;
@@ -71,6 +70,10 @@ public:
     void set_len(emac_mem_buf_t *buf, uint32_t len) override;
 
     Lifetime get_lifetime(const net_stack_mem_buf_t *buf) const override;
+
+    void skip_header_space(net_stack_mem_buf_t *buf, int32_t amount) override;
+
+    int32_t get_header_skip_size(net_stack_mem_buf_t *buf) override;
 
     /**
      * Allocates memory buffer from the heap

@@ -202,6 +202,12 @@ struct pbuf {
   /** length of this buffer */
   u16_t len;
 
+  /**
+   * Current number of header bytes that have been removed (skipped) from the start of the buffer.
+   * Added by Mbed to implement memory manager functionality.
+   */
+  u16_t header_bytes_removed;
+
   /** a bit field indicating pbuf type and allocation sources
       (see PBUF_TYPE_FLAG_*, PBUF_ALLOC_FLAG_* and PBUF_TYPE_ALLOC_SRC_MASK)
     */

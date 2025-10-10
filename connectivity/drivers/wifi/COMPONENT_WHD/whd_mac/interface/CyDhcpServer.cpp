@@ -18,8 +18,9 @@
 #include "CyDhcpServer.h"
 #include "cy_utils.h"
 #include "Callback.h"
-#include "def.h"
 #include "whd_types.h"
+
+#include <machine/endian.h>
 
 #ifdef DHCP_EXTENSIVE_DEBUG
 extern "C" void dhcp_server_print_header_info(dhcp_packet_t *header, uint32_t datalen, const char *title);
@@ -143,7 +144,7 @@ static void addCommonOptions(dhcp_packet_t *dhcp, uint32_t &index, const uint32_
     /* Prepare the Web proxy auto discovery URL */
     char wpad_sample_url[] = "http://xxx.xxx.xxx.xxx/wpad.dat";
     char ip_str[16];
-    ipv4_to_string(ip_str, htonl(server_addr));
+    ipv4_to_string(ip_str, __htonl(server_addr));
     memcpy(&wpad_sample_url[7], &ip_str[0], 15);
 
     /* Server identifier */
@@ -151,13 +152,13 @@ static void addCommonOptions(dhcp_packet_t *dhcp, uint32_t &index, const uint32_
     /* Lease Time */
     addOption(dhcp, index, DHCP_LEASETIME_OPTION_CODE, static_cast<uint32_t>(0x00015180));
     /* Subnet Mask */
-    addOption(dhcp, index, DHCP_SUBNETMASK_OPTION_CODE, htonl(netmask));
+    addOption(dhcp, index, DHCP_SUBNETMASK_OPTION_CODE, __htonl(netmask));
     /* Web proxy auto discovery URL */
     addOption(dhcp, index, DHCP_WPAD_OPTION_CODE, (uint8_t *)&wpad_sample_url[0], strlen(wpad_sample_url));
     /* Router (gateway) */
-    addOption(dhcp, index, DHCP_ROUTER_OPTION_CODE, htonl(server_addr));
+    addOption(dhcp, index, DHCP_ROUTER_OPTION_CODE, __htonl(server_addr));
     /* DNS server */
-    addOption(dhcp, index, DHCP_DNS_SERVER_OPTION_CODE, htonl(server_addr));
+    addOption(dhcp, index, DHCP_DNS_SERVER_OPTION_CODE, __htonl(server_addr));
     /* Interface MTU */
     addOption(dhcp, index, DHCP_MTU_OPTION_CODE, static_cast<uint16_t>(WHD_PAYLOAD_MTU));
 }
@@ -167,7 +168,7 @@ static void sendPacket(UDPSocket *socket, dhcp_packet_t *dhcp, uint32_t size)
     nsapi_size_or_error_t err;
     uint32_t broadcast_ip = 0xFFFFFFFF;
     char string_addr[16];
-    ipv4_to_string(string_addr, htonl(broadcast_ip));
+    ipv4_to_string(string_addr, __htonl(broadcast_ip));
     SocketAddress sock_addr(string_addr, IP_PORT_DHCP_CLIENT);
 
     err = socket->sendto(sock_addr, reinterpret_cast<uint8_t *>(dhcp), size);
@@ -255,8 +256,8 @@ void CyDhcpServer::handleDiscover(dhcp_packet_t *dhcp)
     memset(&dhcp->Options[0], 0, DHCP_PACKET_SIZE - sizeof(dhcp_packet_t) + 3);
 
     dhcp->Opcode = BOOTP_OP_REPLY;
-    dhcp->YourIpAddr = htonl(client_ip.addrv4.addr);
-    dhcp->MagicCookie = htonl(static_cast<uint32_t>(DHCP_MSG_MAGIC_COOKIE));
+    dhcp->YourIpAddr = __htonl(client_ip.addrv4.addr);
+    dhcp->MagicCookie = __htonl(static_cast<uint32_t>(DHCP_MSG_MAGIC_COOKIE));
 
     /* Add options */
     index = 0;
@@ -292,7 +293,7 @@ void CyDhcpServer::handleRequest(dhcp_packet_t *dhcp)
     }
 
     /* Locate the requested address in the options and keep requested address */
-    req_ip.addrv4.addr = ntohl(*(uint32_t *)findOption(dhcp, DHCP_REQUESTED_IP_ADDRESS_OPTION_CODE));
+    req_ip.addrv4.addr = __ntohl(*(uint32_t *)findOption(dhcp, DHCP_REQUESTED_IP_ADDRESS_OPTION_CODE));
 
     memcpy(&client_mac, dhcp->ClientHwAddr, sizeof(client_mac));
     if (!lookupAddress(client_mac, client_ip)) {
@@ -304,7 +305,7 @@ void CyDhcpServer::handleRequest(dhcp_packet_t *dhcp)
     memset(&dhcp->Options[0], 0, DHCP_PACKET_SIZE - sizeof(dhcp_packet_t) + 3);
 
     dhcp->Opcode = BOOTP_OP_REPLY;
-    dhcp->MagicCookie = htonl(static_cast<uint32_t>(DHCP_MSG_MAGIC_COOKIE));
+    dhcp->MagicCookie = __htonl(static_cast<uint32_t>(DHCP_MSG_MAGIC_COOKIE));
 
     index = 0;
     /* Check if the requested IP address matches one we have assigned */
@@ -314,7 +315,7 @@ void CyDhcpServer::handleRequest(dhcp_packet_t *dhcp)
         addOption(dhcp, index, DHCP_SERVER_IDENTIFIER_OPTION_CODE, _server_addr.addrv4.addr);
         printf("\n\nDHCP_THREAD: %d REQUEST NAK\n", __LINE__);
     } else {
-        dhcp->YourIpAddr = htonl(client_ip.addrv4.addr);
+        dhcp->YourIpAddr = __htonl(client_ip.addrv4.addr);
 
         addOption(dhcp, index, DHCP_MESSAGETYPE_OPTION_CODE, static_cast<uint8_t>(DHCP_MSG_TYPE_ACK));
         addCommonOptions(dhcp, index, _server_addr.addrv4.addr, _netmask.addrv4.addr);

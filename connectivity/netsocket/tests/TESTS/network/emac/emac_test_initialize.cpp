@@ -49,13 +49,24 @@ void test_emac_initialize()
  */
 void test_emac_power_down_and_power_up()
 {
+    // If we are using a wi-fi interface, we need to disconnect from the network first
+#if MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI
+    TEST_ASSERT_EQUAL_INT(NSAPI_ERROR_OK, get_network_interface()->disconnect());
+#endif
+
     EmacTestNetworkStack::get_instance().get_emac()->power_down();
 
     // Note: Currently the EMAC does not deliver a link state change to down callback when powered down.
     // Might change that in the future but for now we need to deliver the callback manually.
     emac_if_link_state_change_cb(false);
 
+    // If using wi-fi, call connect which should auto-powerup the EMAC driver.
+    // Otherwise, manually power it up.
+#if MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == WIFI
+    TEST_ASSERT_EQUAL_INT(NSAPI_ERROR_OK, get_network_interface()->connect());
+#else
     TEST_ASSERT_TRUE(EmacTestNetworkStack::get_instance().get_emac()->power_up());
+#endif
 
     // Currently EMACs may expect set_hwaddr() to be called after power up as this API is not well defined.
     EmacTestNetworkStack::get_instance().get_emac()->set_hwaddr(EmacTestNetworkStack::get_instance().get_mac_addr());

@@ -48,6 +48,8 @@ extern "C" {
 #define CYBSP_RSLT_WIFI_SDIO_ENUM_TIMEOUT \
     (CY_RSLT_CREATE(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_BOARD_LIB_WHD_INTEGRATION, 1))
 
+
+
 /** Initializes the primary interface for the WiFi driver on the board. This sets up
  * the WHD interface to use the \ref group_bsp_network_buffer APIs and to communicate
  * over the SDIO interface on the board. This function does the following:<br>

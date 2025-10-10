@@ -87,6 +87,12 @@ public:
     /// Get the MAC address being used for the ethernet port
     unsigned char const *get_mac_addr() const;
 
+    /// Get the memory manager for the test stack
+    EmacTestMemoryManager &get_memory_manager() override
+    {
+        return EmacTestMemoryManager::get_instance();
+    }
+
 protected:
 
     nsapi_error_t socket_open(nsapi_socket_t *handle, nsapi_protocol_t proto) override;

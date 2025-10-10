@@ -83,6 +83,13 @@ void mbed_init(void)
     SCnSCB->ACTLR |= SCnSCB_ACTLR_DISDEFWBUF_Msk;
 #endif
 #endif
+
+    // If present, set the bits to enable memory / usage / bus faults.
+    // Otherwise these will all get escalated to hard faults.
+#ifdef SCB_SHCSR_MEMFAULTENA_Msk
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk | SCB_SHCSR_USGFAULTENA_Msk | SCB_SHCSR_BUSFAULTENA_Msk;
+#endif
+
     mbed_mpu_manager_init();
     mbed_cpy_nvic();
     mbed_sdk_init();
