@@ -49,7 +49,10 @@ public:
     typedef mbed::Callback<void (emac_mem_buf_t *buf)> emac_link_input_cb_t;
 
     /**
-     * Callback to be register with EMAC interface and to be called for link status changes
+     * Callback to be registered with EMAC interface and to be called for link status changes.
+     *
+     * Note that duplicate callbacks (i.e. this being called twice when the network comes up)
+     * are possible in some cases.
      *
      * <br>
      * \c up : Link status

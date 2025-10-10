@@ -26,6 +26,12 @@
 // Default to 4 byte alignment
 constexpr size_t WHD_MEM_BUFFER_ALIGNMENT = sizeof(uint32_t);
 
+// The WHD driver likes to use SDIO block mode for reads, meaning that an additional up-to 63 bytes can be stored at the
+// end of the buffer relative to its actual size. This means that this layer needs to allocate the buffers
+// with additional space at the end relative to what was asked for, and then NOT report this space
+// when asked about a buffer's length
+constexpr size_t WHD_MEM_BUFFER_EXTRA_SPACE = 64;
+
 // These functions interface the Cypress WHD driver with Mbed's memory manager interface.
 // For documentation on each function, see "struct whd_buffer_funcs" in whd_network_types.h
 

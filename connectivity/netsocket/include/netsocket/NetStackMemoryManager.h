@@ -18,6 +18,8 @@
 #ifndef NET_STACK_MEMORY_MANAGER_H
 #define NET_STACK_MEMORY_MANAGER_H
 
+#include <optional>
+
 /**
  * Network Stack interface memory manager
  *
@@ -96,27 +98,12 @@ public:
      *
      * @param orig_buf Original buffer. Will be freed whether or not the new buffer is allocated.
      * @param new_align Alignment to allocate the new buffer with
-     * @param new_header_skip_size Header skip amount to configure on the new buffer. Setting this to a nonzero
-     *    value will cause new space to be allocated.
+     * @param new_len If set, this length will be used instead of the buffer's original length
+     * @param new_header_skip_size If set, this header skip size will be set on the new buffer. If unset, no header skip will be set
      *
      * @return Pointer to new buffer, or nullptr if allocation failed.
      */
-    net_stack_mem_buf_t * realloc_as_contiguous(net_stack_mem_buf_t * orig_buf, uint32_t new_align, uint16_t new_header_skip_size = 0) {
-        auto * new_buf = alloc_heap(get_total_len(orig_buf) + new_header_skip_size, new_align);
-
-        if(!new_buf) {
-            free(orig_buf);
-            return nullptr;
-        }
-
-        // We should have gotten just one contiguous buffer
-        MBED_ASSERT(get_next(new_buf) == nullptr);
-
-        // Copy data over
-        copy_from_buf(get_ptr(new_buf), get_len(new_buf), orig_buf);
-        free(orig_buf);
-        return new_buf;
-    }
+    net_stack_mem_buf_t * realloc_heap(net_stack_mem_buf_t * orig_buf, uint32_t new_align, std::optional<uint32_t> new_len = std::nullopt, std::optional<uint16_t> new_header_skip_size = std::nullopt);
 
     /**
      * Get memory buffer pool allocation unit
@@ -176,6 +163,9 @@ public:
 
     /**
      * @brief Copy from a memory buffer chain to a raw buffer in memory.
+     *
+     * Header skip bytes are processed, so the copy will begin AFTER the header bytes of
+     * \c from_buf
      *
      * @param len       Data length
      * @param ptr       Pointer to data

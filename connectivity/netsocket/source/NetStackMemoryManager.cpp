@@ -17,6 +17,31 @@
 
 #include "NetStackMemoryManager.h"
 
+net_stack_mem_buf_t * NetStackMemoryManager::realloc_heap(net_stack_mem_buf_t * orig_buf, uint32_t new_align, std::optional<uint32_t> new_len, std::optional<uint16_t> new_header_skip_size) {
+
+    const uint32_t orig_buf_len = get_total_len(orig_buf);
+    const uint32_t new_total_len = new_len.value_or(orig_buf_len) + new_header_skip_size.value_or(0);
+    auto * new_buf = alloc_heap(new_total_len, new_align);
+
+    if(!new_buf) {
+        free(orig_buf);
+        return nullptr;
+    }
+
+    if(new_header_skip_size.has_value()) {
+        skip_header_space(new_buf, *new_header_skip_size);
+    }
+
+    // We should have gotten just one contiguous buffer
+    MBED_ASSERT(get_next(new_buf) == nullptr);
+
+    // Copy data over
+    const uint32_t len_to_copy = std::min(new_len.value_or(orig_buf_len), orig_buf_len);
+    copy_from_buf(get_ptr(new_buf), len_to_copy, orig_buf);
+    free(orig_buf);
+    return new_buf;
+}
+
 void NetStackMemoryManager::copy_to_buf(net_stack_mem_buf_t *to_buf, const void *ptr, uint32_t len)
 {
     while (to_buf && len) {

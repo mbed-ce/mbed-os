@@ -20,12 +20,6 @@
 #include <ThisThread.h>
 #include <Timer.h>
 
-// The WHD driver likes to use SDIO block mode for reads, meaning that an additional up-to 63 bytes can be stored at the
-// end of the buffer relative to its actual size. This means that this layer needs to allocate the buffers
-// with additional space at the end relative to what was asked for, and then NOT report this space
-// when asked about a buffer's length
-constexpr size_t WHD_MEM_BUFFER_EXTRA_SPACE = 64;
-
 // Note: Implementations adapted from Infineon's code for LwIP
 // https://github.com/Infineon/wifi-host-driver/blob/master/docs/html/cy_network_buffer.c
 

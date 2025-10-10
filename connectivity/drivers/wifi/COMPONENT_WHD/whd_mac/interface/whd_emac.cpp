@@ -87,7 +87,25 @@ void WHD_EMAC::remove_multicast_group(const uint8_t *addr)
 
 void WHD_EMAC::set_all_multicast(bool all)
 {
-    /* No-op at this stage */
+    // Sadly, the WHD wifi modules do not have a "pass all multicast" option. And extra sadly,
+    // nanostack does not track individual multicast subscriptions and just calls this function
+    // at bootup.
+    // So, we have to do an awful hack here of adding the "all systems" and "all routers" multicast
+    // addresses when this is enabled so that Nanostack's IPv6 stack can work. This is gross because
+    // it means subscribing to other multicast groups with Nanostack won't work, but it's the best
+    // we can do for now.
+
+    uint8_t ALL_SYSTEMS_MCAST_MAC[] = {0x33, 0x33, 0x00, 0x00, 0x00, 0x01};
+    uint8_t ALL_ROUTERS_MCAST_MAC[] = {0x33, 0x33, 0x00, 0x00, 0x00, 0x01};
+
+    if(all) {
+        add_multicast_group(ALL_SYSTEMS_MCAST_MAC);
+        add_multicast_group(ALL_ROUTERS_MCAST_MAC);
+    }
+    else {
+        remove_multicast_group(ALL_SYSTEMS_MCAST_MAC);
+        remove_multicast_group(ALL_ROUTERS_MCAST_MAC);
+    }
 }
 
 void WHD_EMAC::power_down()
@@ -194,32 +212,17 @@ void WHD_EMAC::set_memory_manager(EMACMemoryManager &mem_mngr)
 
 bool WHD_EMAC::link_out(emac_mem_buf_t *buf)
 {
-    // Do we need to copy this buffer?
-    bool needToCopy = false;
+    // Currently we always need to copy the buffer, because the driver needs both some header space before the buffer,
+    // and 64 bytes padding after the buffer. Currently there is no way to force the IP stack(s) to allocate
+    // extra space in this manner, so we can't implement 0-copy Tx. Note that LwIP does have
+    // PBUF_LINK_ENCAPSULATION_HLEN which does half of this but we are still missing the other half.
 
-    // Does it contain multiple chained buffers?
-    if(memory_manager->get_next(buf) != nullptr) {
-        needToCopy = true;
-    }
-
-    // Does it contain enough header space at the start for us to use it?
-    if(!needToCopy) {
-        if(memory_manager->get_header_skip_size(buf) < MBED_CONF_CY_PSOC6_WHD_TX_BUFFER_HEADER_SPACE) {
-            needToCopy = true;
-        }
-    }
-
-    if(needToCopy) {
-        buf = memory_manager->realloc_as_contiguous(buf, WHD_MEM_BUFFER_ALIGNMENT, MBED_CONF_CY_PSOC6_WHD_TX_BUFFER_HEADER_SPACE);
-
-        if(!buf) {
-            return false;
-        }
-    }
+    buf = memory_manager->realloc_heap(buf, WHD_MEM_BUFFER_ALIGNMENT, memory_manager->get_total_len(buf) + WHD_MEM_BUFFER_EXTRA_SPACE, MBED_CONF_CY_PSOC6_WHD_TX_BUFFER_HEADER_SPACE);
 
     if (activity_cb) {
         activity_cb(true);
     }
+
     whd_network_send_ethernet_data(ifp, buf);
     return true;
 }
@@ -300,6 +303,10 @@ extern "C"
                 if (emac.activity_cb) {
                     emac.activity_cb(false);
                 }
+
+                // The WHD layer allocates buffers with extra size used in SDIO reads. Trim off this size now.
+                emac.memory_manager->set_len(buffer, size);
+
                 emac.emac_link_input_cb(buffer);
             }
         }

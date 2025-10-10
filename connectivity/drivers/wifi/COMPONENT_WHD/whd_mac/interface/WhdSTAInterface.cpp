@@ -349,16 +349,21 @@ nsapi_error_t WhdSTAInterface::connect()
         return whd_toerror(res);
     }
 
-    if (whd_wifi_is_ready_to_transceive(_whd_emac.ifp) == WHD_SUCCESS) {
-        whd_emac_wifi_link_state_changed(_whd_emac.ifp, WHD_TRUE);
-    }
-
     // bring up
-    return _interface->bringup(_dhcp,
+    auto ret = _interface->bringup(_dhcp,
                                _ip_address[0] ? _ip_address : 0,
                                _netmask[0] ? _netmask : 0,
                                _gateway[0] ? _gateway : 0,
                                DEFAULT_STACK);
+
+    // There's a bit of a race condition here: many stacks attach a link state callback to the EMAC in their
+    // bringup() method, but the wifi may have already connected before we got here, meaning the callback never gets
+    // delivered. So, redeliver the link state callback now.
+    if (ret == NSAPI_ERROR_OK && whd_wifi_is_ready_to_transceive(_whd_emac.ifp) == WHD_SUCCESS) {
+        whd_emac_wifi_link_state_changed(_whd_emac.ifp, WHD_TRUE);
+    }
+
+    return ret;
 }
 
 void WhdSTAInterface::wifi_on()

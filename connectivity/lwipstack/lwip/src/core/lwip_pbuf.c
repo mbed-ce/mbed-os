@@ -337,7 +337,7 @@ pbuf_alloc_reference(void *payload, u16_t length, pbuf_type type)
                  (type == PBUF_ROM) ? "ROM" : "REF"));
     return NULL;
   }
-  pbuf_init_alloced_pbuf(p, payload, length, length, type, 0);
+  pbuf_init_alloced_pbuf(p, payload, 0, length, length, type, 0);
   return p;
 }
 
@@ -378,7 +378,7 @@ pbuf_alloced_custom(pbuf_layer l, u16_t length, pbuf_type type, struct pbuf_cust
   } else {
     payload = NULL;
   }
-  pbuf_init_alloced_pbuf(&p->pbuf, payload, length, length, type, PBUF_FLAG_IS_CUSTOM);
+  pbuf_init_alloced_pbuf(&p->pbuf, payload, 0, length, length, type, PBUF_FLAG_IS_CUSTOM);
   return &p->pbuf;
 }
 #endif /* LWIP_SUPPORT_CUSTOM_PBUF */

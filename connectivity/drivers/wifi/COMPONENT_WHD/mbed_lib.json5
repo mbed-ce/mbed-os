@@ -7,9 +7,4 @@
       "value": 64
     }
   },
-  "macros": [
-    // When using LwIP, this configures LwIP to allocate an additional the requested header size at the head of each network
-    // buffer. This prevents the network buffers from having to be reallocated when we pass them to the Wi-Fi driver.
-    "PBUF_LINK_ENCAPSULATION_HLEN=MBED_CONF_CY_PSOC6_WHD_TX_BUFFER_HEADER_SPACE"
-  ]
 }
