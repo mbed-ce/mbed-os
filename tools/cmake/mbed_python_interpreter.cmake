@@ -10,6 +10,11 @@ option(MBED_CREATE_PYTHON_VENV "If true, Mbed OS will create its own virtual env
 
 get_filename_component(MBED_CE_TOOLS_BASE_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
+# Tell CMake to prefer whichever python the "python3" or "python" commands point to
+# as long as it meets requirements.
+set(Python3_FIND_UNVERSIONED_NAMES FIRST)
+set(Python3_FIND_REGISTRY LAST)
+
 if(MBED_CREATE_PYTHON_VENV)
     # Use the venv.
 
