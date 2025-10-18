@@ -27,6 +27,7 @@
 #include "cmsis_os.h"
 #include "cmsis_os2.h"
 static osMutexId dmaMutex;
+static osRtxMutex_t dmaMutexMem;
 #endif
 
 // Array to store pointer to DMA handle for each DMA channel.
@@ -39,8 +40,8 @@ void stm_init_dma_mutex()
     osMutexAttr_t attr = {
         .name = "dma_mutex",
         .attr_bits = osMutexRecursive|osMutexPrioInherit,
-        .cb_mem = NULL,
-        .cb_size = 0
+        .cb_mem = &dmaMutexMem,
+        .cb_size = sizeof(osRtxMutex_t)
     };
     dmaMutex = osMutexNew(&attr);
 #endif
