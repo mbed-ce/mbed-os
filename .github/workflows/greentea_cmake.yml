@@ -120,12 +120,6 @@ jobs:
           - target: EV_COG_AD4050LZ
             profile: full
 
-          # GigaDevices MCUs
-          - target: GD32_F307VG
-            profile: full
-          - target: GD32_F450ZI
-            profile: full
-
           # SiLabs MCUs
           - target: EFM32GG11_STK3701
             profile: full
