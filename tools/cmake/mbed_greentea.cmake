@@ -79,6 +79,11 @@ function(mbed_greentea_add_test)
 
     add_executable(${MBED_GREENTEA_TEST_NAME})
 
+    # Many source directories have EXCLUDE_FROM_ALL enabled so that we don't compile
+    # optional libraries by default. However, if the tests are enabled, we always
+    # want to build them
+    set_property(TARGET ${MBED_GREENTEA_TEST_NAME} PROPERTY EXCLUDE_FROM_ALL FALSE)
+
     target_include_directories(${MBED_GREENTEA_TEST_NAME}
         PRIVATE
             .

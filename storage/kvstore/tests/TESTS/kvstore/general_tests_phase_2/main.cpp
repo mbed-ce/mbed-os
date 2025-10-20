@@ -97,8 +97,8 @@ static void kvstore_init()
     if (kv_setup == TDBStoreSet) {
 #if DEVICE_FLASH && !COMPONENT_SPIF && !COMPONENT_QSPIF && !COMPONENT_DATAFLASH && !COMPONENT_SD
         // TDBStore requires two areas of equal size
-        TEST_SKIP_UNLESS(MBED_CONF_TARGET_INTERNAL_FLASH_UNIFORM_SECTORS ||
-                         (MBED_CONF_FLASHIAP_BLOCK_DEVICE_SIZE != 0) && (MBED_CONF_FLASHIAP_BLOCK_DEVICE_BASE_ADDRESS != 0xFFFFFFFF))
+        TEST_SKIP_UNLESS(MBED_CONF_TARGET_INTERNAL_FLASH_UNIFORM_SECTORS);
+        TEST_SKIP_UNLESS(bd->get_erase_size() * 2 <= bd->size());
 #endif
         kvstore = new TDBStore(bd);
     }

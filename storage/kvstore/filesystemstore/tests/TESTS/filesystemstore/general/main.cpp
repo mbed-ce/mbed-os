@@ -26,6 +26,8 @@
 #include "utest.h"
 #include <stdlib.h>
 
+#include "SecureStore.h"
+
 #if !SECURESTORE_ENABLED
 #error [NOT_SUPPORTED] SecureStore need to be enabled for this test
 #else
@@ -448,7 +450,7 @@ void test_file_system_store_multi_threads()
     err = fsst->reset();
     TEST_ASSERT_EQUAL_ERROR_CODE(0, err);
 
-    thread_data_t thread_data[3];
+    thread_data_t thread_data[FSST_TEST_NUM_OF_THREADS];
 
     /* Thread Access Test Starts */
     rtos::Thread set_thread[FSST_TEST_NUM_OF_THREADS];

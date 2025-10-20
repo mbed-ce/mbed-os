@@ -507,7 +507,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "LPC1769",
         "components_add": [
-            "COMPONENT_I2CEE"
+            "I2CEE"
         ],
         "overrides": {
             "default-adc-vref": 3.3, // Vref is 3.3V
