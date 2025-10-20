@@ -1129,6 +1129,21 @@
         ]
     },
     {
+        "board_type": "LPC55S69_NS",
+        "board_name": "LPCXpresso55S69",
+        "product_code": "0236",
+        "target_type": "platform",
+        "slug": "LPCXpresso55S69",
+        "build_variant": [],
+        "mbed_os_support": [
+            "Mbed OS 5.14",
+            "Mbed OS 5.15"
+        ],
+        "mbed_enabled": [
+            "Baseline"
+        ]
+    },
+    {
         "board_type": "SDP_K1",
         "board_name": "SDP-K1",
         "product_code": "0604",
