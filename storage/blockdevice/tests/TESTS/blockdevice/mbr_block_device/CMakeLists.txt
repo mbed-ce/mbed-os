@@ -8,4 +8,5 @@ mbed_greentea_add_test(
         main.cpp
     TEST_REQUIRED_LIBS
         mbed-storage-blockdevice
+    NEEDED_RAM_KIB 10
 )
