@@ -85,7 +85,6 @@ static void kvstore_init()
 
     res = bd->init();
     TEST_ASSERT_EQUAL_ERROR_CODE(0, res);
-    int erase_val = bd->get_erase_value();
     // Clear out any stale data that might be left from a previous test
     // Multiply by 2 because SecureStore requires two underlying block devices of this size
     size_t bytes_to_erase = align_up(2 * PAGES_ESTIMATE * bd->get_program_size(), bd->get_erase_size());
@@ -157,8 +156,6 @@ static void kvstore_deinit()
     int res = 0;
 
     TEST_SKIP_UNLESS(kvstore != NULL);
-
-    int erase_val = bd->get_erase_value();
 
     res = kvstore->deinit();
     TEST_ASSERT_EQUAL_ERROR_CODE(MBED_SUCCESS, res);

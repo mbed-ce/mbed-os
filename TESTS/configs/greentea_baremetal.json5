@@ -24,12 +24,6 @@
         "mbed-trace.enable": true,
 
         // Disable colored traces in tests, as the test runner does not like the terminal control chars
-        "mbed-trace.default-config": "TRACE_ACTIVE_LEVEL_INFO | TRACE_CARRIAGE_RETURN",
-
-        // This allows use of Mbed TLS even on devices which do not have a cryptographic RNG.
-        // This option is used FOR TESTING ONLY as it prevents secure cryptography operation.
-        // If used in a real application, the application author is expected to provide overrides for reading & writing the seed:
-        // https://github.com/arduino/ArduinoCore-mbed/pull/445/files
-        "mbedtls.entropy-nv-seed": 1,
+        "mbed-trace.default-config": "TRACE_ACTIVE_LEVEL_INFO | TRACE_CARRIAGE_RETURN"
     }
 }

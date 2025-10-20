@@ -10,6 +10,7 @@ mbed_greentea_add_test(
         mbed-storage-kvstore-general_tests_phase_1
     TEST_SKIPPED
         ${TEST_SKIPPED}
+    MIN_FLASH_BYTES 140000
     TEST_SOURCES
         main.cpp
     TEST_REQUIRED_LIBS

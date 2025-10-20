@@ -13,6 +13,8 @@ set(MBED_GREENTEA_SERIAL_PORT "" CACHE STRING "Serial port name to talk to the M
 # HOST_TESTS_DIR - Path to the "host_tests" directory.  If a relative path is provided, it will be
 #    interpreted relative to the source directory.
 # TEST_SKIPPED - Reason if suite is skipped
+# NEEDED_FLASH_BYTES - Minimum flash size, in bytes, needed to run this test. Test will be skipped if flash
+#    size is known and is less than this.
 #
 # calling the macro:
 # if(some_condition)
@@ -31,6 +33,7 @@ set(MBED_GREENTEA_SERIAL_PORT "" CACHE STRING "Serial port name to talk to the M
 #         mbed-xyz
 #     HOST_TESTS_DIR
 #         ${CMAKE_CURRENT_LIST_DIR}/host_tests
+#     NEEDED_FLASH_BYTES 140000
 #     TEST_SKIPPED
 #         ${skip_reason}
 # )
@@ -40,6 +43,7 @@ function(mbed_greentea_add_test)
     set(singleValueArgs
         TEST_NAME
         TEST_SKIPPED
+        NEEDED_FLASH_BYTES
     )
     set(multipleValueArgs
         TEST_INCLUDE_DIRS
@@ -56,6 +60,14 @@ function(mbed_greentea_add_test)
 
     if("${MBED_GREENTEA_SERIAL_PORT}" STREQUAL "")
         message(FATAL_ERROR "Will not be able to run greentea tests without MBED_GREENTEA_SERIAL_PORT defined!")
+    endif()
+
+    if(NOT "${MBED_GREENTEA_NEEDED_FLASH_BYTES}" STREQUAL "")
+        if("${MBED_CONFIG_DEFINITIONS}" MATCHES "MBED_ROM_SIZE=((0x[0-9A-Fa-f]+)|([0-9]+))")
+            if(${CMAKE_MATCH_1} LESS ${MBED_GREENTEA_NEEDED_FLASH_BYTES})
+                set(MBED_GREENTEA_TEST_SKIPPED "Not enough flash space!")
+            endif()
+        endif()
     endif()
 
     # Add a "test-" prefix to help distinguish test targets in the target list
