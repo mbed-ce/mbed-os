@@ -5,6 +5,10 @@ if(NOT "DEVICE_TRNG=1" IN_LIST MBED_TARGET_DEFINITIONS)
     set(TEST_SKIPPED "This test requires TRNG support!")
 endif()
 
+if(NOT "DEVICE_FLASH=1" IN_LIST MBED_TARGET_DEFINITIONS)
+    set(TEST_SKIPPED "This test requires flash API support!")
+endif()
+
 mbed_greentea_add_test(
     TEST_NAME
         mbed-storage-kvstore-general_tests_phase_1
