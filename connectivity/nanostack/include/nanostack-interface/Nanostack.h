@@ -54,7 +54,7 @@ public:
     nsapi_error_t remove_ppp_interface(OnboardNetworkStack::Interface **interface_out) override;
 
     /// Get the memory manager for the Nanostack stack
-    NanostackMemoryManager &get_memory_manager()
+    NanostackMemoryManager &get_memory_manager() override
     {
         return memory_manager;
     }

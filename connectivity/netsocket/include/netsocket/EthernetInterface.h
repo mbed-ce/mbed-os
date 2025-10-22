@@ -22,7 +22,7 @@
 #include "EMACInterface.h"
 
 
-/** Implementation of the NetworkStack for an EMAC-based Ethernet driver.
+/** Implementation of NetworkInterface for an EMAC-based Ethernet driver.
  */
 class EthernetInterface : public EMACInterface, public EthInterface {
 public:

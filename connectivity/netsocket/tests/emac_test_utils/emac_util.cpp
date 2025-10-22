@@ -231,10 +231,12 @@ bool emac_if_update_reply_to_outgoing_msg(int receipt_number, int length, int in
                minimum frame length or sent length (in case frame has been converted to be longer than minimum
                length does not validate length)  */
             if (length != ETH_FRAME_MIN_LEN && length != ETH_FRAME_PADD_LEN && outgoing_msgs[outgoing_msg_index].length != length && length < ETH_FRAME_MIN_LEN) {
+                printf("Expected length %d, %d, or %d, actual %d\n", ETH_FRAME_MIN_LEN, ETH_FRAME_PADD_LEN, outgoing_msgs[outgoing_msg_index].length, length);
                 outgoing_msgs[outgoing_msg_index].flags |= INVALID_LENGTH;
             }
         } else {
             if (outgoing_msgs[outgoing_msg_index].length != length) {
+                printf("Expected length %d, actual %d\n", outgoing_msgs[outgoing_msg_index].length, length);
                 outgoing_msgs[outgoing_msg_index].flags |= INVALID_LENGTH;
             }
         }

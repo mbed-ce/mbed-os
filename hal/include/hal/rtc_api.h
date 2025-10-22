@@ -46,6 +46,9 @@ extern "C" {
  * - Verified by test rtc_write_read_test.
  * * The functions ::rtc_isenabled returns 1 if the RTC is counting and the time has been set,
  * 0 otherwise - Verified by test rtc_enabled_test.
+ * * ::rtc_read may be called before rtc_write. If the RTC time has not been set, this will return the
+ *    time since some arbitrary epoch. If the RTC time was set on a previous boot, this will return time
+ *    based on what was set then.
  *
  * # Undefined behaviour
  * * Calling any function other than ::rtc_init before the initialisation of the RTC
