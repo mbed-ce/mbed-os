@@ -121,7 +121,14 @@ NetStackMemoryManager::Lifetime LWIPMemoryManager::get_lifetime(const net_stack_
 
 void LWIPMemoryManager::skip_header_space(net_stack_mem_buf_t *const buf, const int32_t amount)
 {
-    MBED_ASSERT(pbuf_header(static_cast<struct pbuf *>(buf), -amount) == 0);
+    // Sanity check that we aren't making the header size negative
+    MBED_ASSERT(amount + static_cast<struct pbuf *>(buf)->header_bytes_removed >= 0);
+
+    // Note: With LwIP, the header direction is inverted: a negative value "hides headers in the payload",
+    // i.e. it increases the skip size.
+    // Also note that because have our own independant check on the skip amount, we can use pbuf_header_force().
+    // Otherwise, the normal pbuf_header() function cannot unskip header bytes for some types of pbufs.
+    MBED_ASSERT(pbuf_header_force(static_cast<struct pbuf *>(buf), -amount) == 0);
 }
 
 int32_t LWIPMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf)
