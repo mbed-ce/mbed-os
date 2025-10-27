@@ -93,7 +93,7 @@ def is_cmake_reconfigure_required():
     ninja_buildfile = BUILD_DIR / "build.ninja"
 
     if not cmake_cache_file.exists():
-        print(f"Mbed CE: Reconfigure required because CMake cache ({cmake_cache_file!s}) does not exist")
+        print(f"Mbed CE: Reconfigure required because CMake cache does not exist")
         return True
     if not CMAKE_API_REPLY_DIR.is_dir() or not any(CMAKE_API_REPLY_DIR.iterdir()):
         print("Mbed CE: Reconfigure required because CMake API reply dir is missing")
