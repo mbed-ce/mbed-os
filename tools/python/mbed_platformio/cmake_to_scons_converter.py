@@ -136,11 +136,11 @@ def _get_flags_for_compile_group(compile_group_json: dict) -> list[str]:
     """
     flags = []
     for ccfragment in compile_group_json["compileCommandFragments"]:
-        fragment = ccfragment.get("fragment", "").strip("\" ")
+        fragment = ccfragment.get("fragment", "").strip()
         if not fragment or fragment.startswith("-D"):
             continue
         flags.extend(
-            click.parser.split_arg_string(fragment.strip())
+            click.parser.split_arg_string(fragment)
         )
     return flags
 
