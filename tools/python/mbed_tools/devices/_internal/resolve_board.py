@@ -9,6 +9,7 @@ located on an "Mbed Enabled" device's USB MSD.
 
 For more information on the mbed-targets package visit https://github.com/ARMmbed/mbed-targets
 """
+
 import logging
 
 from typing import Optional

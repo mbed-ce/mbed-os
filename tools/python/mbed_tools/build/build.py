@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Configure and build a CMake project."""
+
 import logging
 import pathlib
 import subprocess

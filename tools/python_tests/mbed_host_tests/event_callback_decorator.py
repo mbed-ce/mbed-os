@@ -26,16 +26,16 @@ class TestEvenCallbackDecorator(unittest.TestCase):
 
     def test_event_callback_decorator(self):
         class Ht(BaseHostTest):
-
-            @event_callback('Hi')
+            @event_callback("Hi")
             def hi(self, key, value, timestamp):
-                print('hi')
+                print("hi")
 
-            @event_callback('Hello')
+            @event_callback("Hello")
             def hello(self, key, value, timestamp):
-                print('hello')
+                print("hello")
+
         h = Ht()
         h.setup()
         callbacks = h.get_callbacks()
-        self.assertIn('Hi', callbacks)
-        self.assertIn('Hello', callbacks)
+        self.assertIn("Hi", callbacks)
+        self.assertIn("Hello", callbacks)

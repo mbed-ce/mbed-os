@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Interface to the Board Database."""
+
 import json
 
 from dataclasses import asdict

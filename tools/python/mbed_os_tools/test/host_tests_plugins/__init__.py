@@ -39,8 +39,8 @@ from . import module_copy_ublox
 from . import module_reset_ublox
 from . import module_reset_mps2
 from . import module_copy_mps2
-#import module_copy_jn51xx
-#import module_reset_jn51xx
+# import module_copy_jn51xx
+# import module_reset_jn51xx
 
 
 # Plugin registry instance
@@ -64,10 +64,11 @@ HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_power_cycle_mbed.load_plugin())
 HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_reset_pyocd.load_plugin())
 HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_reset_ublox.load_plugin())
 HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_copy_ublox.load_plugin())
-#HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_copy_jn51xx.load_plugin())
-#HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_reset_jn51xx.load_plugin())
+# HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_copy_jn51xx.load_plugin())
+# HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_reset_jn51xx.load_plugin())
 
 # TODO: extend plugin loading to files with name module_*.py loaded ad-hoc
+
 
 ###############################################################################
 # Functional interface for host test plugin registry
@@ -81,6 +82,7 @@ def call_plugin(type, capability, *args, **kwargs):
     """
     return HOST_TEST_PLUGIN_REGISTRY.call_plugin(type, capability, *args, **kwargs)
 
+
 def get_plugin_caps(type):
     """! Get list of all capabilities for plugin family with the same type
     @param type Type of a plugin
@@ -88,13 +90,14 @@ def get_plugin_caps(type):
     """
     return HOST_TEST_PLUGIN_REGISTRY.get_plugin_caps(type)
 
+
 def get_plugin_info():
     """! Return plugins information
     @return Dictionary HOST_TEST_PLUGIN_REGISTRY
     """
     return HOST_TEST_PLUGIN_REGISTRY.get_dict()
 
+
 def print_plugin_info():
-    """! Prints plugins' information in user friendly way
-    """
+    """! Prints plugins' information in user friendly way"""
     print(HOST_TEST_PLUGIN_REGISTRY)

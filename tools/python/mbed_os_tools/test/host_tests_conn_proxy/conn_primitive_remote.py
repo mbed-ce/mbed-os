@@ -22,25 +22,21 @@ class RemoteConnectorPrimitive(ConnectorPrimitive):
     def __init__(self, name, config, importer=__import__):
         ConnectorPrimitive.__init__(self, name)
         self.config = config
-        self.target_id = self.config.get('target_id', None)
-        self.grm_host = config.get('grm_host', None)
-        self.grm_port = config.get('grm_port', None)
+        self.target_id = self.config.get("target_id", None)
+        self.grm_host = config.get("grm_host", None)
+        self.grm_port = config.get("grm_port", None)
         if self.grm_port:
             self.grm_port = int(self.grm_port)
-        self.grm_module = config.get('grm_module', 'unknown')
-        self.platform_name = config.get('platform_name', None)
-        self.baudrate = config.get('baudrate', DEFAULT_BAUD_RATE)
-        self.image_path = config.get('image_path', None)
-        self.forced_reset_timeout = config.get('forced_reset_timeout', 0)
-        self.allocate_requirements = {
-            "platform_name": self.platform_name,
-            "power_on": True,
-            "connected": True
-        }
+        self.grm_module = config.get("grm_module", "unknown")
+        self.platform_name = config.get("platform_name", None)
+        self.baudrate = config.get("baudrate", DEFAULT_BAUD_RATE)
+        self.image_path = config.get("image_path", None)
+        self.forced_reset_timeout = config.get("forced_reset_timeout", 0)
+        self.allocate_requirements = {"platform_name": self.platform_name, "power_on": True, "connected": True}
 
         if self.config.get("tags"):
             self.allocate_requirements["tags"] = {}
-            for tag in config["tags"].split(','):
+            for tag in config["tags"].split(","):
                 self.allocate_requirements["tags"][tag] = True
 
         # Global Resource Mgr tool-kit
@@ -52,7 +48,7 @@ class RemoteConnectorPrimitive(ConnectorPrimitive):
         self.__remote_init(importer)
 
     def __remote_init(self, importer):
-        """! Initialize DUT using GRM APIs """
+        """! Initialize DUT using GRM APIs"""
 
         # We want to load global resource manager module by name from command line (switch --grm)
         try:
@@ -63,8 +59,9 @@ class RemoteConnectorPrimitive(ConnectorPrimitive):
             self.remote_module = None
             return False
 
-        self.logger.prn_inf("remote resources initialization: remote(host=%s, port=%s)" %
-                            (self.grm_host, self.grm_port))
+        self.logger.prn_inf(
+            "remote resources initialization: remote(host=%s, port=%s)" % (self.grm_host, self.grm_port)
+        )
 
         # Connect to remote global resource manager
         self.client = self.remote_module.create(host=self.grm_host, port=self.grm_port)
@@ -93,7 +90,7 @@ class RemoteConnectorPrimitive(ConnectorPrimitive):
         return True
 
     def __remote_connect(self, baudrate=DEFAULT_BAUD_RATE):
-        """! Open remote connection to DUT """
+        """! Open remote connection to DUT"""
         self.logger.prn_inf("opening connection to platform at baudrate='%s'" % baudrate)
         if not self.selected_resource:
             raise Exception("remote resource not exists!")
@@ -114,7 +111,7 @@ class RemoteConnectorPrimitive(ConnectorPrimitive):
             self.logger.prn_err("RemoteConnectorPrimitive.disconnect() failed, reason: " + str(error))
 
     def __remote_reset(self, delay=0):
-        """! Use GRM remote API to reset DUT """
+        """! Use GRM remote API to reset DUT"""
         self.logger.prn_inf("remote resources reset...")
         if not self.selected_resource:
             raise Exception("remote resource not exists!")
@@ -127,11 +124,11 @@ class RemoteConnectorPrimitive(ConnectorPrimitive):
 
         # Post-reset sleep
         if delay:
-            self.logger.prn_inf("waiting %.2f sec after reset"% delay)
+            self.logger.prn_inf("waiting %.2f sec after reset" % delay)
             time.sleep(delay)
 
     def __remote_flashing(self, filename, forceflash=False):
-        """! Use GRM remote API to flash DUT """
+        """! Use GRM remote API to flash DUT"""
         self.logger.prn_inf("remote resources flashing with '%s'..." % filename)
         if not self.selected_resource:
             raise Exception("remote resource not exists!")
@@ -143,7 +140,7 @@ class RemoteConnectorPrimitive(ConnectorPrimitive):
             raise
 
     def read(self, count):
-        """! Read 'count' bytes of data from DUT """
+        """! Read 'count' bytes of data from DUT"""
         if not self.connected():
             raise Exception("remote resource not exists!")
         data = str()
@@ -154,7 +151,7 @@ class RemoteConnectorPrimitive(ConnectorPrimitive):
         return data
 
     def write(self, payload, log=False):
-        """! Write 'payload' to DUT """
+        """! Write 'payload' to DUT"""
         if self.connected():
             try:
                 self.selected_resource.write(payload)

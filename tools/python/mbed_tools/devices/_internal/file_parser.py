@@ -89,6 +89,7 @@ This can be found on connected J-Link devices. An example is shown below.
     </html>
 
 """
+
 import logging
 import pathlib
 import re

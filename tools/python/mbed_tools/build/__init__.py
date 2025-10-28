@@ -10,6 +10,7 @@ The functionality covered in this package includes the following:
 - Invocation of the build process for the command line tools and online build service.
 - Export of build instructions to third party command line tools and IDEs.
 """
+
 from mbed_tools.build.build import build_project, generate_build_system
 from mbed_tools.build.config import generate_config
 from mbed_tools.build.flash import flash_binary

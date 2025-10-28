@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Detect Mbed devices connected to host computer."""
+
 import platform
 from typing import Iterable
 

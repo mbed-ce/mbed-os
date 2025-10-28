@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Parses the Mbed configuration system and generates a CMake config script."""
+
 import pathlib
 
 from typing import Any, Tuple
@@ -37,9 +38,7 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> T
     targets_data = _load_raw_targets_data(program)
     target_build_attributes = get_target_by_name(target_name, targets_data)
     incorporate_memory_bank_data_from_cmsis(target_build_attributes, program)
-    config = assemble_config(
-        target_build_attributes, program
-    )
+    config = assemble_config(target_build_attributes, program)
 
     # Process memory banks and save JSON data for other tools (e.g. memap) to use
     memory_banks_json_content = process_memory_banks(config)
@@ -47,7 +46,9 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> T
     (program.files.cmake_build_dir / MEMORY_BANKS_JSON_FILE).write_text(json.dumps(memory_banks_json_content, indent=4))
 
     cmake_file_contents = render_mbed_config_cmake_template(
-        target_name=target_name, config=config, toolchain_name=toolchain,
+        target_name=target_name,
+        config=config,
+        toolchain_name=toolchain,
     )
     cmake_config_file_path = program.files.cmake_build_dir / CMAKE_CONFIG_FILE
     write_file(cmake_config_file_path, cmake_file_contents)

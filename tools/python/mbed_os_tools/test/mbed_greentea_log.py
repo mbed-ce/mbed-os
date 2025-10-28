@@ -17,6 +17,7 @@ from threading import Lock
 
 try:
     import colorama
+
     COLORAMA = True
 except ImportError:
     COLORAMA = False
@@ -26,6 +27,7 @@ class GreenTeaSimpleLockLogger(object):
     """! Simple locking printing mechanism
     @details We are using parallel testing
     """
+
     # Colors used by color(ama) terminal component
     DIM = str()
     BRIGHT = str()
@@ -36,8 +38,8 @@ class GreenTeaSimpleLockLogger(object):
     RESET = str()
 
     def __init__(self, colors=True, use_colorama=False):
-        self.use_colorama = colorama    # Should we try to use colorama
-        self.colorful(colors)           # Set and use colours for formatting
+        self.use_colorama = colorama  # Should we try to use colorama
+        self.colorful(colors)  # Set and use colours for formatting
 
         # Mutext used to protect logger prints
         # Usage:
@@ -52,8 +54,7 @@ class GreenTeaSimpleLockLogger(object):
                 colorama.init()
 
     def colorful(self, colors):
-        """! Enable/Disable colourful printing
-        """
+        """! Enable/Disable colourful printing"""
         self.colors = colors
         if self.colors:
             self.__set_colors()
@@ -61,8 +62,7 @@ class GreenTeaSimpleLockLogger(object):
             self.__clear_colors()
 
     def __set_colors(self):
-        """! Zeroes colours used for formatting
-        """
+        """! Zeroes colours used for formatting"""
         if self.use_colorama:
             self.DIM = colorama.Style.DIM
             self.BRIGHT = colorama.Style.BRIGHT
@@ -73,19 +73,17 @@ class GreenTeaSimpleLockLogger(object):
             self.RESET = colorama.Style.RESET_ALL
 
     def __clear_colors(self):
-        """! Zeroes colours used for formatting
-        """
+        """! Zeroes colours used for formatting"""
         self.DIM = str()
         self.BRIGHT = str()
         self.GREEN = str()
         self.RED = str()
         self.BLUE = str()
         self.YELLOW = str()
-        self.RESET =  str()
+        self.RESET = str()
 
     def __print(self, text):
-        """! Mutex protected print
-        """
+        """! Mutex protected print"""
         self.GREENTEA_LOG_MUTEX.acquire(1)
         print(text)
         self.GREENTEA_LOG_MUTEX.release()
@@ -106,7 +104,7 @@ class GreenTeaSimpleLockLogger(object):
         @param print_text Forces log function to print on screen (not only return message)
         @return Returns string with message
         """
-        result = "\t"*tab_count + text
+        result = "\t" * tab_count + text
         if print_text:
             self.__print(result)
         return result
@@ -136,7 +134,8 @@ class GreenTeaSimpleLockLogger(object):
         @return Returns string with additional BRIGHT color codes
         """
         if not text:
-            text = ''
+            text = ""
         return self.BLUE + self.BRIGHT + text + self.RESET
+
 
 gt_logger = GreenTeaSimpleLockLogger(use_colorama=COLORAMA)

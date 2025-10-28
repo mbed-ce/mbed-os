@@ -17,8 +17,8 @@ limitations under the License.
 
 import unittest
 
-class BasicTestCase(unittest.TestCase):
 
+class BasicTestCase(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -29,5 +29,6 @@ class BasicTestCase(unittest.TestCase):
         self.assertEqual(True, True)
         self.assertNotEqual(True, False)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

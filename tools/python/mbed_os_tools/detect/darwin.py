@@ -49,19 +49,19 @@ def _plist_from_popen(popen):
         except ExpatError:
             # Beautiful soup ensures the XML is properly formed after it is parsed
             # so that it can be used by other less lenient commands without problems
-            xml_representation = BeautifulSoup(out.decode('utf8'), 'xml')
+            xml_representation = BeautifulSoup(out.decode("utf8"), "xml")
 
             if not xml_representation.get_text():
                 # The output is not in the XML format
                 return loads(out)
-            return loads(xml_representation.decode().encode('utf8'))
+            return loads(xml_representation.decode().encode("utf8"))
     except ExpatError:
         return []
 
 
 def _find_TTY(obj):
-    """ Find the first tty (AKA IODialinDevice) that we can find in the
-        children of the specified object, or None if no tty is present.
+    """Find the first tty (AKA IODialinDevice) that we can find in the
+    children of the specified object, or None if no tty is present.
     """
     try:
         return obj["IODialinDevice"]
@@ -74,16 +74,12 @@ def _find_TTY(obj):
 
 
 def _prune(current, keys):
-    """ Reduce the amount of data we have to sift through to only
-        include the specified keys, and children that contain the
-        specified keys
+    """Reduce the amount of data we have to sift through to only
+    include the specified keys, and children that contain the
+    specified keys
     """
     pruned_current = {k: current[k] for k in keys if k in current}
-    pruned_children = list(
-        filter(
-            None, [_prune(c, keys) for c in current.get("IORegistryEntryChildren", [])]
-        )
-    )
+    pruned_children = list(filter(None, [_prune(c, keys) for c in current.get("IORegistryEntryChildren", [])]))
     keep_current = any(k in current for k in keys) or pruned_children
     if keep_current:
         if pruned_children:
@@ -94,14 +90,14 @@ def _prune(current, keys):
 
 
 def _dfs_usb_info(obj, parents):
-    """ Find all of the usb info that we can from this particular IORegistry
-        tree with depth first search (and searching the parent stack....)
+    """Find all of the usb info that we can from this particular IORegistry
+    tree with depth first search (and searching the parent stack....)
     """
     output = {}
     if (
-            "BSD Name" in obj
-            and obj["BSD Name"].startswith("disk")
-            and mbed_volume_name_match.search(obj["IORegistryEntryName"])
+        "BSD Name" in obj
+        and obj["BSD Name"].startswith("disk")
+        and mbed_volume_name_match.search(obj["IORegistryEntryName"])
     ):
         disk_id = obj["BSD Name"]
         usb_info = {"serial": None, "vendor_id": None, "product_id": None, "tty": None}
@@ -123,8 +119,7 @@ def _dfs_usb_info(obj, parents):
 
 
 class MbedLsToolsDarwin(MbedLsToolsBase):
-    """ mbed-enabled platform detection on Mac OS X
-    """
+    """mbed-enabled platform detection on Mac OS X"""
 
     def __init__(self, **kwargs):
         MbedLsToolsBase.__init__(self, **kwargs)
@@ -149,25 +144,18 @@ class MbedLsToolsDarwin(MbedLsToolsBase):
         ]
 
     def _mount_points(self):
-        """ Returns map {volume_id: mount_point} """
-        diskutil_ls = subprocess.Popen(
-            ["diskutil", "list", "-plist"], stdout=subprocess.PIPE
-        )
+        """Returns map {volume_id: mount_point}"""
+        diskutil_ls = subprocess.Popen(["diskutil", "list", "-plist"], stdout=subprocess.PIPE)
         disks = _plist_from_popen(diskutil_ls)
 
         if logger.isEnabledFor(DEBUG):
             import pprint
 
-            logger.debug(
-                "disks dict \n%s", pprint.PrettyPrinter(indent=2).pformat(disks)
-            )
-        return {
-            disk["DeviceIdentifier"]: disk.get("MountPoint", None)
-            for disk in disks["AllDisksAndPartitions"]
-        }
+            logger.debug("disks dict \n%s", pprint.PrettyPrinter(indent=2).pformat(disks))
+        return {disk["DeviceIdentifier"]: disk.get("MountPoint", None) for disk in disks["AllDisksAndPartitions"]}
 
     def _volumes(self):
-        """ returns a map {volume_id: {serial:, vendor_id:, product_id:, tty:}"""
+        """returns a map {volume_id: {serial:, vendor_id:, product_id:, tty:}"""
 
         # to find all the possible mbed volumes, we look for registry entries
         # under all possible USB tree which have a "BSD Name" that starts with

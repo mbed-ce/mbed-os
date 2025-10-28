@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Shared pytest functionality."""
+
 import platform
 import unittest
 

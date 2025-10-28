@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Defines the public API of the package."""
+
 import pathlib
 import logging
 

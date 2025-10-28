@@ -30,9 +30,7 @@ def load_ctest_testsuite(link_target, binary_type=".bin", verbose=False):
         try:
             with open(ctest_path) as ctest_file:
                 for line in ctest_file:
-                    line_parse = parse_ctesttestfile_line(
-                        link_target, binary_type, line, verbose=verbose
-                    )
+                    line_parse = parse_ctesttestfile_line(link_target, binary_type, line, verbose=verbose)
                     if line_parse:
                         test_case, test_case_path = line_parse
                         result[test_case] = test_case_path
@@ -63,7 +61,7 @@ def parse_ctesttestfile_line(link_target, binary_type, line, verbose=False):
     add_test(mbed-test-ticker "mbed-test-ticker")
     add_test(mbed-test-hello "mbed-test-hello")
     """
-    add_test_pattern = r'[adtesADTES_]{8}\([\w\d_-]+ \"([\w\d_-]+)\"'
+    add_test_pattern = r"[adtesADTES_]{8}\([\w\d_-]+ \"([\w\d_-]+)\""
     re_ptrn = re.compile(add_test_pattern)
     if line.lower().startswith("add_test"):
         m = re_ptrn.search(line)
@@ -84,11 +82,7 @@ def list_binaries_for_targets(build_dir="./build", verbose_footer=False):
     """
     dir = build_dir
     sub_dirs = (
-        [
-            os.path.join(dir, o)
-            for o in os.listdir(dir)
-            if os.path.isdir(os.path.join(dir, o))
-        ]
+        [os.path.join(dir, o) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir, o))]
         if os.path.exists(dir)
         else []
     )
@@ -117,10 +111,7 @@ def list_binaries_for_targets(build_dir="./build", verbose_footer=False):
         gt_logger.gt_log_warn("no tests found in current location")
 
     if verbose_footer:
-        print(
-            "\nExample: execute 'mbedgt -t TARGET_NAME -n TEST_NAME' to run "
-            "test TEST_NAME for target TARGET_NAME"
-        )
+        print("\nExample: execute 'mbedgt -t TARGET_NAME -n TEST_NAME' to run test TEST_NAME for target TARGET_NAME")
 
 
 def list_binaries_for_builds(test_spec, verbose_footer=False):
@@ -130,10 +121,7 @@ def list_binaries_for_builds(test_spec, verbose_footer=False):
     """
     test_builds = test_spec.get_test_builds()
     for tb in test_builds:
-        gt_logger.gt_log(
-            "available tests for build '%s', location '%s'"
-            % (tb.get_name(), tb.get_path())
-        )
+        gt_logger.gt_log("available tests for build '%s', location '%s'" % (tb.get_name(), tb.get_path()))
         for tc in sorted(tb.get_tests().keys()):
             gt_logger.gt_log_tab("test '%s'" % tc)
 

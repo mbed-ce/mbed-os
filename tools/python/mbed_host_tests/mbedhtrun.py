@@ -33,8 +33,9 @@ def main():
     result = 0
     cli_params = init_host_test_cli_params()
 
-    if cli_params.version:         # --version
-        import pkg_resources    # part of setuptools
+    if cli_params.version:  # --version
+        import pkg_resources  # part of setuptools
+
         version = pkg_resources.require("mbed-host-tests")[0].version
         print(version)
     elif cli_params.send_break_cmd:  # -b with -p PORT (and optional -r RESET_TYPE)
@@ -43,7 +44,7 @@ def main():
             disk=cli_params.disk,
             reset_type=cli_params.forced_reset_type,
             baudrate=cli_params.baud_rate,
-            verbose=cli_params.verbose
+            verbose=cli_params.verbose,
         )
     else:
         test_selector = DefaultTestSelector(cli_params)
@@ -62,5 +63,5 @@ def main():
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     exit(main())

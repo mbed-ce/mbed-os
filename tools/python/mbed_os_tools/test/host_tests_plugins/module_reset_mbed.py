@@ -18,13 +18,12 @@ from .host_test_plugins import HostTestPluginBase
 
 
 class HostTestPluginResetMethod_Mbed(HostTestPluginBase):
-
     # Plugin interface
-    name = 'HostTestPluginResetMethod_Mbed'
-    type = 'ResetMethod'
+    name = "HostTestPluginResetMethod_Mbed"
+    type = "ResetMethod"
     stable = True
-    capabilities = ['default']
-    required_parameters = ['serial']
+    capabilities = ["default"]
+    required_parameters = ["serial"]
 
     def __init__(self):
         """! ctor
@@ -50,13 +49,12 @@ class HostTestPluginResetMethod_Mbed(HostTestPluginBase):
             try:
                 serial.break_condition = False
             except Exception as e:
-                self.print_plugin_error("Error while doing 'serial.break_condition = False' : %s"% str(e))
+                self.print_plugin_error("Error while doing 'serial.break_condition = False' : %s" % str(e))
                 result = False
         return result
 
     def setup(self, *args, **kwargs):
-        """! Configure plugin, this function should be called before plugin execute() method is used.
-        """
+        """! Configure plugin, this function should be called before plugin execute() method is used."""
         return True
 
     def execute(self, capability, *args, **kwargs):
@@ -68,20 +66,19 @@ class HostTestPluginResetMethod_Mbed(HostTestPluginBase):
         @details Each capability e.g. may directly just call some command line program or execute building pythonic function
         @return Capability call return value
         """
-        if not kwargs['serial']:
+        if not kwargs["serial"]:
             self.print_plugin_error("Error: serial port not set (not opened?)")
             return False
 
         result = False
         if self.check_parameters(capability, *args, **kwargs) is True:
-            if kwargs['serial']:
-                if capability == 'default':
-                    serial = kwargs['serial']
+            if kwargs["serial"]:
+                if capability == "default":
+                    serial = kwargs["serial"]
                     result = self._safe_send_break(serial)
         return result
 
 
 def load_plugin():
-    """! Returns plugin available in this module
-    """
+    """! Returns plugin available in this module"""
     return HostTestPluginResetMethod_Mbed()

@@ -8,6 +8,7 @@ Accumulating attributes are both defined and can be added to and removed from fu
 The hierarchy is also slightly different to the other fields as it is determined as 'breadth-first' in
 multiple inheritance, so targets at a lower level will always take precedence over targets at a higher level.
 """
+
 import itertools
 from collections import deque
 from typing import Dict, List, Any, Deque
@@ -151,7 +152,6 @@ def _calculate_attribute_elements(
     """
     accumulator = starting_state
     for target in reversed(applicable_accumulation_order):
-
         add_modifier = f"{attribute_name}_add"
         if add_modifier in target:
             to_add = target[add_modifier]

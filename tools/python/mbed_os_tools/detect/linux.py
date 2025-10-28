@@ -36,12 +36,10 @@ def _readlink(link):
 
 
 class MbedLsToolsLinuxGeneric(MbedLsToolsBase):
-    """ mbed-enabled platform for Linux with udev
-    """
+    """mbed-enabled platform for Linux with udev"""
 
     def __init__(self, **kwargs):
-        """! ctor
-        """
+        """! ctor"""
         MbedLsToolsBase.__init__(self, **kwargs)
         self.nlp = re.compile(r"(pci|usb)-[0-9a-zA-Z:_-]*_(?P<usbid>[0-9a-zA-Z]*)-.*$")
         self.mmp = re.compile(r"(?P<dev>(/[^/ ]*)+) on (?P<dir>(/[^/ ]*)+) ")
@@ -73,9 +71,7 @@ class MbedLsToolsLinuxGeneric(MbedLsToolsBase):
         """
         dir = os.path.join("/dev", device_type, "by-id")
         if os.path.isdir(dir):
-            to_ret = dict(
-                self._hex_ids([os.path.join(dir, f) for f in os.listdir(dir)])
-            )
+            to_ret = dict(self._hex_ids([os.path.join(dir, f) for f in os.listdir(dir)]))
             logger.debug("Found %s devices by id %r", device_type, to_ret)
             return to_ret
         else:
@@ -133,15 +129,11 @@ class MbedLsToolsLinuxGeneric(MbedLsToolsBase):
                     end_index = index
 
             if end_index is None:
-                logger.debug(
-                    "Did not find suitable usb folder for usb info: %s", full_sysfs_path
-                )
+                logger.debug("Did not find suitable usb folder for usb info: %s", full_sysfs_path)
                 continue
 
             usb_info_rel_path = path_parts[: end_index + 1]
-            usb_info_path = os.path.join(
-                SYSFS_BLOCK_DEVICE_PATH, os.sep.join(usb_info_rel_path)
-            )
+            usb_info_path = os.path.join(SYSFS_BLOCK_DEVICE_PATH, os.sep.join(usb_info_rel_path))
 
             vendor_id = None
             product_id = None

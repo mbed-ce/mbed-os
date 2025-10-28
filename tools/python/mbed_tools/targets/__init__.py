@@ -20,6 +20,7 @@ Configuration
 
 For details about configuration of this module, look at `mbed_tools.targets.config`.
 """
+
 from mbed_tools.targets import exceptions
 from mbed_tools.targets.get_target import (
     get_target_by_name,

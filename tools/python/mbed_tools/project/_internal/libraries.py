@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Objects for library reference handling."""
+
 import logging
 
 from dataclasses import dataclass

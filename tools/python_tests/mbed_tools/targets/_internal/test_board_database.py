@@ -22,12 +22,12 @@ class TestGetOnlineBoardData:
         requests_mock.get(board_database._BOARD_API, status_code=401, text="Who are you?")
         with pytest.raises(board_database.BoardAPIError):
             board_database.get_online_board_data()
-        assert any(
-            x for x in caplog.records if x.levelno == logging.WARNING and "MBED_API_AUTH_TOKEN" in x.msg
-        ), "Auth token should be mentioned"
-        assert any(
-            x for x in caplog.records if x.levelno == logging.DEBUG and "Who are you?" in x.msg
-        ), "Message content should be in the debug message"
+        assert any(x for x in caplog.records if x.levelno == logging.WARNING and "MBED_API_AUTH_TOKEN" in x.msg), (
+            "Auth token should be mentioned"
+        )
+        assert any(x for x in caplog.records if x.levelno == logging.DEBUG and "Who are you?" in x.msg), (
+            "Message content should be in the debug message"
+        )
 
     def test_404(self, caplog, requests_mock):
         """Given a 404 error code, TargetAPIError is raised."""
@@ -35,12 +35,12 @@ class TestGetOnlineBoardData:
         requests_mock.get(board_database._BOARD_API, status_code=404, text="Not Found")
         with pytest.raises(board_database.BoardAPIError):
             board_database.get_online_board_data()
-        assert any(
-            x for x in caplog.records if x.levelno == logging.WARNING and "404" in x.msg
-        ), "HTTP status code should be mentioned"
-        assert any(
-            x for x in caplog.records if x.levelno == logging.DEBUG and "Not Found" in x.msg
-        ), "Message content should be in the debug message"
+        assert any(x for x in caplog.records if x.levelno == logging.WARNING and "404" in x.msg), (
+            "HTTP status code should be mentioned"
+        )
+        assert any(x for x in caplog.records if x.levelno == logging.DEBUG and "Not Found" in x.msg), (
+            "Message content should be in the debug message"
+        )
 
     def test_200_invalid_json(self, caplog, requests_mock):
         """Given a valid response but invalid json, JSONDecodeError is raised."""
@@ -48,12 +48,12 @@ class TestGetOnlineBoardData:
         requests_mock.get(board_database._BOARD_API, text="some text")
         with pytest.raises(board_database.ResponseJSONError):
             board_database.get_online_board_data()
-        assert any(
-            x for x in caplog.records if x.levelno == logging.WARNING and "Invalid JSON" in x.msg
-        ), "Invalid JSON should be mentioned"
-        assert any(
-            x for x in caplog.records if x.levelno == logging.DEBUG and "some text" in x.msg
-        ), "Message content should be in the debug message"
+        assert any(x for x in caplog.records if x.levelno == logging.WARNING and "Invalid JSON" in x.msg), (
+            "Invalid JSON should be mentioned"
+        )
+        assert any(x for x in caplog.records if x.levelno == logging.DEBUG and "some text" in x.msg), (
+            "Message content should be in the debug message"
+        )
 
     def test_200_no_data_field(self, caplog, requests_mock):
         """Given a valid response but no data field, ResponseJSONError is raised."""
@@ -61,12 +61,12 @@ class TestGetOnlineBoardData:
         requests_mock.get(board_database._BOARD_API, json={"notdata": [], "stillnotdata": {}})
         with pytest.raises(board_database.ResponseJSONError):
             board_database.get_online_board_data()
-        assert any(
-            x for x in caplog.records if x.levelno == logging.WARNING and "missing the 'data' field" in x.msg
-        ), "Data field should be mentioned"
-        assert any(
-            x for x in caplog.records if x.levelno == logging.DEBUG and "notdata, stillnotdata" in x.msg
-        ), "JSON keys from message should be in the debug message"
+        assert any(x for x in caplog.records if x.levelno == logging.WARNING and "missing the 'data' field" in x.msg), (
+            "Data field should be mentioned"
+        )
+        assert any(x for x in caplog.records if x.levelno == logging.DEBUG and "notdata, stillnotdata" in x.msg), (
+            "JSON keys from message should be in the debug message"
+        )
 
     def test_200_value_data(self, requests_mock):
         """Given a valid response, target data is set from the returned json."""

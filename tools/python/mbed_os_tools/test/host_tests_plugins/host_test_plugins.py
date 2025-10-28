@@ -27,8 +27,8 @@ from ..host_tests_logger import HtrunLogger
 
 
 class HostTestPluginBase:
-    """! Base class for all plugins used with host tests
-    """
+    """! Base class for all plugins used with host tests"""
+
     ###########################################################################
     # Interface:
     ###########################################################################
@@ -36,31 +36,29 @@ class HostTestPluginBase:
     ###########################################################################
     # Interface attributes defining plugin name, type etc.
     ###########################################################################
-    name = "HostTestPluginBase" # Plugin name, can be plugin class name
-    type = "BasePlugin"         # Plugin type: ResetMethod, CopyMethod etc.
-    capabilities = []           # Capabilities names: what plugin can achieve
-                                # (e.g. reset using some external command line tool)
-    required_parameters = []    # Parameters required for 'kwargs' in plugin APIs: e.g. self.execute()
-    stable = False              # Determine if plugin is stable and can be used
+    name = "HostTestPluginBase"  # Plugin name, can be plugin class name
+    type = "BasePlugin"  # Plugin type: ResetMethod, CopyMethod etc.
+    capabilities = []  # Capabilities names: what plugin can achieve
+    # (e.g. reset using some external command line tool)
+    required_parameters = []  # Parameters required for 'kwargs' in plugin APIs: e.g. self.execute()
+    stable = False  # Determine if plugin is stable and can be used
 
     def __init__(self):
-        """ ctor
-        """
+        """ctor"""
         # Setting Host Test Logger instance
         ht_loggers = {
-            'BasePlugin' : HtrunLogger('PLGN'),
-            'CopyMethod' : HtrunLogger('COPY'),
-            'ResetMethod' : HtrunLogger('REST'),
+            "BasePlugin": HtrunLogger("PLGN"),
+            "CopyMethod": HtrunLogger("COPY"),
+            "ResetMethod": HtrunLogger("REST"),
         }
-        self.plugin_logger = ht_loggers.get(self.type, ht_loggers['BasePlugin'])
+        self.plugin_logger = ht_loggers.get(self.type, ht_loggers["BasePlugin"])
 
     ###########################################################################
     # Interface methods
     ###########################################################################
 
     def setup(self, *args, **kwargs):
-        """ Configure plugin, this function should be called before plugin execute() method is used.
-        """
+        """Configure plugin, this function should be called before plugin execute() method is used."""
         return False
 
     def execute(self, capability, *args, **kwargs):
@@ -104,8 +102,7 @@ class HostTestPluginBase:
         return True
 
     def print_plugin_char(self, char):
-        """ Function prints char on stdout
-        """
+        """Function prints char on stdout"""
         stdout.write(char)
         stdout.flush()
         return True
@@ -127,41 +124,47 @@ class HostTestPluginBase:
 
             # Sometimes OSes take a long time to mount devices (up to one minute).
             # Current pooling time: 120x 500ms = 1 minute
-            self.print_plugin_info("Waiting up to %d sec for '%s' mount point (current is '%s')..."% (timeout, target_id, destination_disk))
+            self.print_plugin_info(
+                "Waiting up to %d sec for '%s' mount point (current is '%s')..."
+                % (timeout, target_id, destination_disk)
+            )
             timeout_step = 0.5
             timeout = int(timeout / timeout_step)
             for i in range(timeout):
                 # mbed_os_tools.detect.create() should be done inside the loop.
                 # Otherwise it will loop on same data.
                 mbeds = detect.create()
-                mbed_list = mbeds.list_mbeds() #list of mbeds present
+                mbed_list = mbeds.list_mbeds()  # list of mbeds present
                 # get first item in list with a matching target_id, if present
-                mbed_target = next((x for x in mbed_list if x['target_id']==target_id), None)
+                mbed_target = next((x for x in mbed_list if x["target_id"] == target_id), None)
 
                 if mbed_target is not None:
                     # Only assign if mount point is present and known (not None)
-                    if 'mount_point' in mbed_target and mbed_target['mount_point'] is not None:
-                        new_destination_disk = mbed_target['mount_point']
+                    if "mount_point" in mbed_target and mbed_target["mount_point"] is not None:
+                        new_destination_disk = mbed_target["mount_point"]
                         break
                 sleep(timeout_step)
 
             if new_destination_disk != destination_disk:
                 # Mount point changed, update to new mount point from mbed-ls
-                self.print_plugin_info("Mount point for '%s' changed from '%s' to '%s'..."% (target_id, destination_disk, new_destination_disk))
+                self.print_plugin_info(
+                    "Mount point for '%s' changed from '%s' to '%s'..."
+                    % (target_id, destination_disk, new_destination_disk)
+                )
                 destination_disk = new_destination_disk
 
         result = True
         # Check if mount point we've promoted to be valid one (by optional target_id check above)
         # Let's wait for 30 * loop_delay + init_delay max
         if not access(destination_disk, F_OK):
-            self.print_plugin_info("Waiting for mount point '%s' to be ready..."% destination_disk, NL=False)
+            self.print_plugin_info("Waiting for mount point '%s' to be ready..." % destination_disk, NL=False)
             sleep(init_delay)
             for i in range(30):
                 if access(destination_disk, F_OK):
                     result = True
                     break
                 sleep(loop_delay)
-                self.print_plugin_char('.')
+                self.print_plugin_char(".")
             else:
                 self.print_plugin_error("mount {} is not accessible ...".format(destination_disk))
                 result = False
@@ -181,23 +184,28 @@ class HostTestPluginBase:
         if target_id:
             # Sometimes OSes take a long time to mount devices (up to one minute).
             # Current pooling time: 120x 500ms = 1 minute
-            self.print_plugin_info("Waiting up to %d sec for '%s' serial port (current is '%s')..."% (timeout, target_id, serial_port))
+            self.print_plugin_info(
+                "Waiting up to %d sec for '%s' serial port (current is '%s')..." % (timeout, target_id, serial_port)
+            )
             timeout_step = 0.5
             timeout = int(timeout / timeout_step)
             for i in range(timeout):
                 # mbed_os_tools.detect.create() should be done inside the loop. Otherwise it will loop on same data.
                 mbeds = detect.create()
-                mbed_list = mbeds.list_mbeds() #list of mbeds present
+                mbed_list = mbeds.list_mbeds()  # list of mbeds present
                 # get first item in list with a matching target_id, if present
-                mbed_target = next((x for x in mbed_list if x['target_id']==target_id), None)
+                mbed_target = next((x for x in mbed_list if x["target_id"] == target_id), None)
 
                 if mbed_target is not None:
                     # Only assign if serial port is present and known (not None)
-                    if 'serial_port' in mbed_target and mbed_target['serial_port'] is not None:
-                        new_serial_port = mbed_target['serial_port']
+                    if "serial_port" in mbed_target and mbed_target["serial_port"] is not None:
+                        new_serial_port = mbed_target["serial_port"]
                         if new_serial_port != serial_port:
                             # Serial port changed, update to new serial port from mbed-ls
-                            self.print_plugin_info("Serial port for tid='%s' changed from '%s' to '%s'..." % (target_id, serial_port, new_serial_port))
+                            self.print_plugin_info(
+                                "Serial port for tid='%s' changed from '%s' to '%s'..."
+                                % (target_id, serial_port, new_serial_port)
+                            )
                         break
                 sleep(timeout_step)
         else:
@@ -217,11 +225,11 @@ class HostTestPluginBase:
             if parameter not in kwargs:
                 missing_parameters.append(parameter)
         if len(missing_parameters):
-            self.print_plugin_error("execute parameter(s) '%s' missing!"% (', '.join(missing_parameters)))
+            self.print_plugin_error("execute parameter(s) '%s' missing!" % (", ".join(missing_parameters)))
             return False
         return True
 
-    def run_command(self, cmd, shell=True, stdin = None):
+    def run_command(self, cmd, shell=True, stdin=None):
         """! Runs command from command line.
         @param cmd Command to execute
         @param shell True if shell command should be executed (eg. ls, ps)
@@ -233,11 +241,11 @@ class HostTestPluginBase:
         try:
             ret = call(cmd, shell=shell, stdin=stdin)
             if ret:
-                self.print_plugin_error("[ret=%d] Command: %s"% (int(ret), cmd))
+                self.print_plugin_error("[ret=%d] Command: %s" % (int(ret), cmd))
                 return False
         except Exception as e:
             result = False
-            self.print_plugin_error("[ret=%d] Command: %s"% (int(ret), cmd))
+            self.print_plugin_error("[ret=%d] Command: %s" % (int(ret), cmd))
             self.print_plugin_error(str(e))
         return result
 
@@ -245,11 +253,7 @@ class HostTestPluginBase:
         """! Returns information about host OS
         @return Returns tuple with information about OS and host platform
         """
-        result = (os.name,
-                  platform.system(),
-                  platform.release(),
-                  platform.version(),
-                  sys.platform)
+        result = (os.name, platform.system(), platform.release(), platform.version(), sys.platform)
         return result
 
     def mbed_os_support(self):
@@ -259,12 +263,12 @@ class HostTestPluginBase:
         """
         result = None
         os_info = self.mbed_os_info()
-        if (os_info[0] == 'nt' and os_info[1] == 'Windows'):
-            result = 'Windows7'
-        elif (os_info[0] == 'posix' and os_info[1] == 'Linux' and ('Ubuntu' in os_info[3])):
-            result = 'Ubuntu'
-        elif (os_info[0] == 'posix' and os_info[1] == 'Linux'):
-            result = 'LinuxGeneric'
-        elif (os_info[0] == 'posix' and os_info[1] == 'Darwin'):
-            result = 'Darwin'
+        if os_info[0] == "nt" and os_info[1] == "Windows":
+            result = "Windows7"
+        elif os_info[0] == "posix" and os_info[1] == "Linux" and ("Ubuntu" in os_info[3]):
+            result = "Ubuntu"
+        elif os_info[0] == "posix" and os_info[1] == "Linux":
+            result = "LinuxGeneric"
+        elif os_info[0] == "posix" and os_info[1] == "Darwin":
+            result = "Darwin"
         return result

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Command to list all Mbed enabled devices connected to the host computer."""
+
 import click
 import json
 from operator import attrgetter

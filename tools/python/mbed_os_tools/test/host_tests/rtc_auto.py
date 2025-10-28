@@ -17,6 +17,7 @@ import re
 from time import time, strftime, gmtime
 from .. import BaseHostTest
 
+
 class RTCTest(BaseHostTest):
     PATTERN_RTC_VALUE = r"\[(\d+)\] \[(\d+-\d+-\d+ \d+:\d+:\d+ [AaPpMm]{2})\]"
     re_detect_rtc_value = re.compile(PATTERN_RTC_VALUE)
@@ -35,9 +36,9 @@ class RTCTest(BaseHostTest):
         self.notify_complete()
 
     def setup(self):
-        self.register_callback('timestamp', self._callback_timestamp)
-        self.register_callback('rtc', self._callback_rtc)
-        self.register_callback('end', self._callback_end)
+        self.register_callback("timestamp", self._callback_timestamp)
+        self.register_callback("rtc", self._callback_rtc)
+        self.register_callback("end", self._callback_end)
 
     def result(self):
         def check_strftimes_format(t):

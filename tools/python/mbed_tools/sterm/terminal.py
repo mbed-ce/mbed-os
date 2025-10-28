@@ -12,6 +12,7 @@ The Mbed serial terminal makes the following modifications to the default Minite
 
 To start the terminal clients should call the "run" function, this is the entry point to the module.
 """
+
 from typing import Any
 
 from serial import Serial

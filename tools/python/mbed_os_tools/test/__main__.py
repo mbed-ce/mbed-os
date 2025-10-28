@@ -14,4 +14,5 @@
 # limitations under the License.
 
 from .mbed_greentea_cli import main
+
 main()

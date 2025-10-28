@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Progress bar for git operations."""
+
 import sys
 
 from typing import Optional, Any

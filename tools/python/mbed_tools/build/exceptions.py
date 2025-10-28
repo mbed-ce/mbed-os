@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Public exceptions raised by the package."""
+
 from mbed_tools.lib.exceptions import ToolsError
 
 

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Defines a generic Win32 component."""
+
 import logging
 from abc import ABC, abstractmethod
 from typing import List, Any, Generator, Optional, NamedTuple, cast

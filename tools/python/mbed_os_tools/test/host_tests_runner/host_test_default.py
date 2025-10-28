@@ -37,23 +37,24 @@ from .host_test import DefaultTestSelectorBase
 from ..host_tests_logger import HtrunLogger
 from ..host_tests_conn_proxy import conn_process
 from ..host_tests_toolbox.host_functional import handle_send_break_cmd
-if (sys.version_info > (3, 0)):
+
+if sys.version_info > (3, 0):
     from queue import Empty as QueueEmpty
 else:
     from Queue import Empty as QueueEmpty
 
 
 class DefaultTestSelector(DefaultTestSelectorBase):
-    """! Select default host_test supervision (replaced after auto detection) """
-    RESET_TYPE_SW_RST   = "software_reset"
-    RESET_TYPE_HW_RST   = "hardware_reset"
+    """! Select default host_test supervision (replaced after auto detection)"""
+
+    RESET_TYPE_SW_RST = "software_reset"
+    RESET_TYPE_HW_RST = "hardware_reset"
 
     def __init__(self, options):
-        """! ctor
-        """
+        """! ctor"""
         self.options = options
 
-        self.logger = HtrunLogger('HTST')
+        self.logger = HtrunLogger("HTST")
 
         self.registry = HostRegistry()
         self.registry.register_host_test("echo", EchoTest())
@@ -69,15 +70,13 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         if options:
             if options.enum_host_tests:
                 for path in options.enum_host_tests:
-                    self.registry.register_from_path(
-                        path, verbose=options.verbose
-                    )
+                    self.registry.register_from_path(path, verbose=options.verbose)
 
-            if options.list_reg_hts:    # --list option
+            if options.list_reg_hts:  # --list option
                 print(self.registry.table(options.verbose))
                 sys.exit(0)
 
-            if options.list_plugins:    # --plugins option
+            if options.list_plugins:  # --plugins option
                 host_tests_plugins.print_plugin_info()
                 sys.exit(0)
 
@@ -109,7 +108,7 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         result = False
         if obj_instance:
             result = True
-            self.logger.prn_inf("host test class: '%s'"% obj_instance.__class__)
+            self.logger.prn_inf("host test class: '%s'" % obj_instance.__class__)
 
             # Check if host test (obj_instance) is derived from mbed_os_tools.test.BaseHostTest()
             if not isinstance(obj_instance, BaseHostTest):
@@ -131,19 +130,17 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         @return Return self.TestResults.RESULT_* enum
         """
         result = None
-        timeout_duration = 10       # Default test case timeout
+        timeout_duration = 10  # Default test case timeout
         coverage_idle_timeout = 10  # Default coverage idle timeout
-        event_queue = Queue()       # Events from DUT to host
-        dut_event_queue = Queue()   # Events from host to DUT {k;v}
+        event_queue = Queue()  # Events from DUT to host
+        dut_event_queue = Queue()  # Events from host to DUT {k;v}
 
         def callback__notify_prn(key, value, timestamp):
-            """! Handles __norify_prn. Prints all lines in separate log line """
+            """! Handles __norify_prn. Prints all lines in separate log line"""
             for line in value.splitlines():
                 self.logger.prn_inf(line)
 
-        callbacks = {
-            "__notify_prn" : callback__notify_prn
-        }
+        callbacks = {"__notify_prn": callback__notify_prn}
 
         # if True we will allow host test to consume all events after test is finished
         callbacks_consume = True
@@ -158,24 +155,23 @@ class DefaultTestSelector(DefaultTestSelectorBase):
 
         self.logger.prn_inf("starting host test process...")
 
-
         # Create device info here as it may change after restart.
         config = {
-            "digest" : "serial",
-            "port" : self.mbed.port,
-            "baudrate" : self.mbed.serial_baud,
-            "mcu" : self.mbed.mcu,
-            "program_cycle_s" : self.options.program_cycle_s,
-            "reset_type" : self.options.forced_reset_type,
-            "target_id" : self.options.target_id,
-            "disk" : self.options.disk,
-            "polling_timeout" : self.options.polling_timeout,
-            "forced_reset_timeout" : self.options.forced_reset_timeout,
-            "sync_behavior" : self.options.sync_behavior,
-            "platform_name" : self.options.micro,
-            "image_path" : self.mbed.image_path,
+            "digest": "serial",
+            "port": self.mbed.port,
+            "baudrate": self.mbed.serial_baud,
+            "mcu": self.mbed.mcu,
+            "program_cycle_s": self.options.program_cycle_s,
+            "reset_type": self.options.forced_reset_type,
+            "target_id": self.options.target_id,
+            "disk": self.options.disk,
+            "polling_timeout": self.options.polling_timeout,
+            "forced_reset_timeout": self.options.forced_reset_timeout,
+            "sync_behavior": self.options.sync_behavior,
+            "platform_name": self.options.micro,
+            "image_path": self.mbed.image_path,
             "skip_reset": self.options.skip_reset,
-            "tags" : self.options.tag_filters,
+            "tags": self.options.tag_filters,
             "sync_timeout": self.options.sync_timeout,
             "sync_predelay": self.options.sync_predelay,
         }
@@ -186,11 +182,7 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             config.update(grm_config)
 
         if self.options.fast_model_connection:
-
-            config.update({
-                "conn_resource" : 'fmc',
-                "fm_config" : self.options.fast_model_connection
-            })
+            config.update({"conn_resource": "fmc", "fm_config": self.options.fast_model_connection})
 
         def start_conn_process():
             # DUT-host communication process
@@ -225,7 +217,7 @@ class DefaultTestSelector(DefaultTestSelectorBase):
 
                 # If coverage detected use idle loop
                 # Prevent breaking idle loop for __rxd_line (occurs between keys)
-                if key == '__coverage_start' or key == '__rxd_line':
+                if key == "__coverage_start" or key == "__rxd_line":
                     start_time = time()
 
                     # Perform callback
@@ -242,15 +234,16 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             # Global resource manager case as it may take a while for resource
             # to be available.
             (key, value, timestamp) = event_queue.get(
-                timeout=None if self.options.global_resource_mgr else self.options.process_start_timeout)
+                timeout=None if self.options.global_resource_mgr else self.options.process_start_timeout
+            )
 
-            if key == '__conn_process_start':
+            if key == "__conn_process_start":
                 conn_process_started = True
             else:
-                self.logger.prn_err("First expected event was '__conn_process_start', received '%s' instead"% key)
+                self.logger.prn_err("First expected event was '__conn_process_start', received '%s' instead" % key)
 
         except QueueEmpty:
-            self.logger.prn_err("Conn process failed to start in %f sec"% self.options.process_start_timeout)
+            self.logger.prn_err("Conn process failed to start in %f sec" % self.options.process_start_timeout)
 
         if not conn_process_started:
             p.terminate()
@@ -270,28 +263,28 @@ class DefaultTestSelector(DefaultTestSelectorBase):
 
                 # Write serial output to the file if specified in options.
                 if self.serial_output_file:
-                    if key == '__rxd_line':
+                    if key == "__rxd_line":
                         with open(self.serial_output_file, "a") as f:
                             f.write("%s\n" % value)
 
                 # In this mode we only check serial output against compare log.
                 if self.compare_log:
-                    if key == '__rxd_line':
+                    if key == "__rxd_line":
                         if self.match_log(value):
                             self.logger.prn_inf("Target log matches compare log!")
                             result = True
                             break
 
                 if consume_preamble_events:
-                    if key == '__timeout':
+                    if key == "__timeout":
                         # Override default timeout for this event queue
                         start_time = time()
-                        timeout_duration = int(value) # New timeout
-                        self.logger.prn_inf("setting timeout to: %d sec"% int(value))
-                    elif key == '__version':
+                        timeout_duration = int(value)  # New timeout
+                        self.logger.prn_inf("setting timeout to: %d sec" % int(value))
+                    elif key == "__version":
                         self.client_version = value
                         self.logger.prn_inf("DUT greentea-client version: " + self.client_version)
-                    elif key == '__host_test_name':
+                    elif key == "__host_test_name":
                         # Load dynamically requested host test
                         self.test_supervisor = self.registry.get_host_test(value)
 
@@ -313,7 +306,7 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                                     print(line)
                                 self.logger.prn_inf("==== Traceback end ====")
                                 result = self.RESULT_ERROR
-                                event_queue.put(('__exit_event_queue', 0, time()))
+                                event_queue.put(("__exit_event_queue", 0, time()))
 
                             self.logger.prn_inf("host test setup() call...")
                             if self.test_supervisor.get_callbacks():
@@ -321,44 +314,46 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                                 self.logger.prn_inf("CALLBACKs updated")
                             else:
                                 self.logger.prn_wrn("no CALLBACKs specified by host test")
-                            self.logger.prn_inf("host test detected: %s"% value)
+                            self.logger.prn_inf("host test detected: %s" % value)
                         else:
-                            self.logger.prn_err("host test not detected: %s"% value)
+                            self.logger.prn_err("host test not detected: %s" % value)
                             result = self.RESULT_ERROR
-                            event_queue.put(('__exit_event_queue', 0, time()))
+                            event_queue.put(("__exit_event_queue", 0, time()))
 
                         consume_preamble_events = False
-                    elif key == '__sync':
+                    elif key == "__sync":
                         # This is DUT-Host Test handshake event
-                        self.logger.prn_inf("sync KV found, uuid=%s, timestamp=%f"% (str(value), timestamp))
-                    elif key == '__notify_sync_failed':
+                        self.logger.prn_inf("sync KV found, uuid=%s, timestamp=%f" % (str(value), timestamp))
+                    elif key == "__notify_sync_failed":
                         # This event is sent by conn_process, SYNC failed
-                        self.logger.prn_err("stopped consuming events due to %s event"% key)
+                        self.logger.prn_err("stopped consuming events due to %s event" % key)
                         if value is not None:
                             self.logger.prn_err(value)
                         callbacks_consume = False
                         result = self.RESULT_SYNC_FAILED
-                        event_queue.put(('__exit_event_queue', 0, time()))
-                    elif key == '__notify_conn_lost':
+                        event_queue.put(("__exit_event_queue", 0, time()))
+                    elif key == "__notify_conn_lost":
                         # This event is sent by conn_process, DUT connection was lost
                         self.logger.prn_err(value)
-                        self.logger.prn_wrn("stopped to consume events due to %s event"% key)
+                        self.logger.prn_wrn("stopped to consume events due to %s event" % key)
                         callbacks_consume = False
                         result = self.RESULT_IO_SERIAL
-                        event_queue.put(('__exit_event_queue', 0, time()))
-                    elif key == '__exit_event_queue':
+                        event_queue.put(("__exit_event_queue", 0, time()))
+                    elif key == "__exit_event_queue":
                         # This event is sent by the host test indicating no more events expected
-                        self.logger.prn_inf("%s received"% (key))
+                        self.logger.prn_inf("%s received" % (key))
                         callbacks__exit_event_queue = True
                         break
-                    elif key.startswith('__'):
+                    elif key.startswith("__"):
                         # Consume other system level events
                         pass
                     else:
-                        self.logger.prn_err("orphan event in preamble phase: {{%s;%s}}, timestamp=%f"% (key, str(value), timestamp))
+                        self.logger.prn_err(
+                            "orphan event in preamble phase: {{%s;%s}}, timestamp=%f" % (key, str(value), timestamp)
+                        )
                 else:
                     # If coverage detected switch to idle loop
-                    if key == '__coverage_start':
+                    if key == "__coverage_start":
                         self.logger.prn_inf("starting coverage idle timeout loop...")
                         elapsed_time, (key, value, timestamp) = process_code_coverage(key, value, timestamp)
 
@@ -366,18 +361,18 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                         timeout_duration += elapsed_time
                         self.logger.prn_inf("exiting coverage idle timeout loop (elapsed_time: %.2f" % elapsed_time)
 
-                    if key == '__notify_complete':
+                    if key == "__notify_complete":
                         # This event is sent by Host Test, test result is in value
                         # or if value is None, value will be retrieved from HostTest.result() method
                         self.logger.prn_inf("%s(%s)" % (key, str(value)))
                         result = value
-                        event_queue.put(('__exit_event_queue', 0, time()))
-                    elif key == '__reset':
+                        event_queue.put(("__exit_event_queue", 0, time()))
+                    elif key == "__reset":
                         # This event only resets the dut, not the host test
-                        dut_event_queue.put(('__reset', True, time()))
-                    elif key == '__reset_dut':
+                        dut_event_queue.put(("__reset", True, time()))
+                    elif key == "__reset_dut":
                         # Disconnect to avoid connection lost event
-                        dut_event_queue.put(('__host_test_finished', True, time()))
+                        dut_event_queue.put(("__host_test_finished", True, time()))
                         p.join()
 
                         if value == DefaultTestSelector.RESET_TYPE_SW_RST:
@@ -388,43 +383,51 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                             # request hardware reset
                             self.mbed.hw_reset()
                         else:
-                            self.logger.prn_err("Invalid reset type (%s). Supported types [%s]." %
-                                                (value, ", ".join([DefaultTestSelector.RESET_TYPE_HW_RST,
-                                                                   DefaultTestSelector.RESET_TYPE_SW_RST])))
+                            self.logger.prn_err(
+                                "Invalid reset type (%s). Supported types [%s]."
+                                % (
+                                    value,
+                                    ", ".join(
+                                        [DefaultTestSelector.RESET_TYPE_HW_RST, DefaultTestSelector.RESET_TYPE_SW_RST]
+                                    ),
+                                )
+                            )
                             self.logger.prn_inf("Software reset will be performed.")
 
                         # connect to the device
                         p = start_conn_process()
-                    elif key == '__notify_conn_lost':
+                    elif key == "__notify_conn_lost":
                         # This event is sent by conn_process, DUT connection was lost
                         self.logger.prn_err(value)
-                        self.logger.prn_wrn("stopped to consume events due to %s event"% key)
+                        self.logger.prn_wrn("stopped to consume events due to %s event" % key)
                         callbacks_consume = False
                         result = self.RESULT_IO_SERIAL
-                        event_queue.put(('__exit_event_queue', 0, time()))
-                    elif key == '__exit':
+                        event_queue.put(("__exit_event_queue", 0, time()))
+                    elif key == "__exit":
                         # This event is sent by DUT, test suite exited
-                        self.logger.prn_inf("%s(%s)"% (key, str(value)))
+                        self.logger.prn_inf("%s(%s)" % (key, str(value)))
                         callbacks__exit = True
-                        event_queue.put(('__exit_event_queue', 0, time()))
-                    elif key == '__exit_event_queue':
+                        event_queue.put(("__exit_event_queue", 0, time()))
+                    elif key == "__exit_event_queue":
                         # This event is sent by the host test indicating no more events expected
-                        self.logger.prn_inf("%s received"% (key))
+                        self.logger.prn_inf("%s received" % (key))
                         callbacks__exit_event_queue = True
                         break
-                    elif key == '__timeout_set':
+                    elif key == "__timeout_set":
                         # Dynamic timeout set
-                        timeout_duration = int(value) # New timeout
-                        self.logger.prn_inf("setting timeout to: %d sec"% int(value))
-                    elif key == '__timeout_adjust':
+                        timeout_duration = int(value)  # New timeout
+                        self.logger.prn_inf("setting timeout to: %d sec" % int(value))
+                    elif key == "__timeout_adjust":
                         # Dynamic timeout adjust
-                        timeout_duration = timeout_duration + int(value) # adjust time
+                        timeout_duration = timeout_duration + int(value)  # adjust time
                         self.logger.prn_inf("adjusting timeout with %d sec (now %d)" % (int(value), timeout_duration))
                     elif key in callbacks:
                         # Handle callback
                         callbacks[key](key, value, timestamp)
                     else:
-                        self.logger.prn_err("orphan event in main phase: {{%s;%s}}, timestamp=%f"% (key, str(value), timestamp))
+                        self.logger.prn_err(
+                            "orphan event in main phase: {{%s;%s}}, timestamp=%f" % (key, str(value), timestamp)
+                        )
         except Exception:
             self.logger.prn_err("something went wrong in event main loop!")
             self.logger.prn_inf("==== Traceback start ====")
@@ -434,16 +437,18 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             result = self.RESULT_ERROR
 
         time_duration = time() - start_time
-        self.logger.prn_inf("test suite run finished after %.2f sec..."% time_duration)
+        self.logger.prn_inf("test suite run finished after %.2f sec..." % time_duration)
 
         if self.compare_log and result is None:
             if self.compare_log_idx < len(self.compare_log):
-                self.logger.prn_err("Expected output [%s] not received in log." % self.compare_log[self.compare_log_idx])
+                self.logger.prn_err(
+                    "Expected output [%s] not received in log." % self.compare_log[self.compare_log_idx]
+                )
 
         # Force conn_proxy process to return
-        dut_event_queue.put(('__host_test_finished', True, time()))
+        dut_event_queue.put(("__host_test_finished", True, time()))
         p.join()
-        self.logger.prn_inf("CONN exited with code: %s"% str(p.exitcode))
+        self.logger.prn_inf("CONN exited with code: %s" % str(p.exitcode))
 
         # Callbacks...
         self.logger.prn_inf("No events in queue" if event_queue.empty() else "Some events in queue")
@@ -464,27 +469,27 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                 except QueueEmpty:
                     break
 
-                if key == '__notify_complete':
+                if key == "__notify_complete":
                     # This event is sent by Host Test, test result is in value
                     # or if value is None, value will be retrieved from HostTest.result() method
-                    self.logger.prn_inf("%s(%s)"% (key, str(value)))
+                    self.logger.prn_inf("%s(%s)" % (key, str(value)))
                     result = value
-                elif key.startswith('__'):
+                elif key.startswith("__"):
                     # Consume other system level events
                     pass
                 elif key in callbacks:
                     callbacks[key](key, value, timestamp)
                 else:
-                    self.logger.prn_wrn(">>> orphan event: {{%s;%s}}, timestamp=%f"% (key, str(value), timestamp))
+                    self.logger.prn_wrn(">>> orphan event: {{%s;%s}}, timestamp=%f" % (key, str(value), timestamp))
             self.logger.prn_inf("stopped consuming events")
 
         if result is not None:  # We must compare here against None!
             # Here for example we've received some error code like IOERR_COPY
-            self.logger.prn_inf("host test result() call skipped, received: %s"% str(result))
+            self.logger.prn_inf("host test result() call skipped, received: %s" % str(result))
         else:
             if self.test_supervisor:
                 result = self.test_supervisor.result()
-            self.logger.prn_inf("host test result(): %s"% str(result))
+            self.logger.prn_inf("host test result(): %s" % str(result))
 
         if not callbacks__exit:
             self.logger.prn_wrn("missing __exit event from DUT")
@@ -492,10 +497,11 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         if not callbacks__exit_event_queue:
             self.logger.prn_wrn("missing __exit_event_queue event from host test")
 
-        #if not callbacks__exit_event_queue and not result:
+        # if not callbacks__exit_event_queue and not result:
         if not callbacks__exit_event_queue and result is None:
-            self.logger.prn_err("missing __exit_event_queue event from " + \
-                "host test and no result from host test, timeout...")
+            self.logger.prn_err(
+                "missing __exit_event_queue event from " + "host test and no result from host test, timeout..."
+            )
             result = self.RESULT_TIMEOUT
 
         self.logger.prn_inf("calling blocking teardown()")
@@ -546,11 +552,11 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                 result = test_result
 
             # This will be captured by Greentea
-            self.logger.prn_inf("{{result;%s}}"% result)
+            self.logger.prn_inf("{{result;%s}}" % result)
             return self.get_test_result_int(result)
 
         except KeyboardInterrupt:
-            return(-3)    # Keyboard interrupt
+            return -3  # Keyboard interrupt
 
     def match_log(self, line):
         """
@@ -573,8 +579,8 @@ class DefaultTestSelector(DefaultTestSelectorBase):
 
     @staticmethod
     def _parse_grm(grm_arg):
-        grm_module, leftover = grm_arg.split(':', 1)
-        parts = leftover.rsplit(':', 1)
+        grm_module, leftover = grm_arg.split(":", 1)
+        parts = leftover.rsplit(":", 1)
 
         try:
             grm_host, grm_port = parts
@@ -585,7 +591,7 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             grm_port = None
 
         return {
-            "grm_module" : grm_module,
-            "grm_host" : grm_host,
-            "grm_port" : grm_port,
+            "grm_module": grm_module,
+            "grm_host": grm_host,
+            "grm_port": grm_port,
         }

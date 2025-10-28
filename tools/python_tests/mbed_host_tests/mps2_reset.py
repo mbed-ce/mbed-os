@@ -22,8 +22,8 @@ import time
 
 from mbed_host_tests.host_tests_plugins.module_reset_mps2 import HostTestPluginResetMethod_MPS2
 
-class MPS2ResetTestCase(unittest.TestCase):
 
+class MPS2ResetTestCase(unittest.TestCase):
     def setUp(self):
         self.mps2_reset_plugin = HostTestPluginResetMethod_MPS2()
 
@@ -40,5 +40,6 @@ class MPS2ResetTestCase(unittest.TestCase):
         self.assertTrue("sync" in args[0])
         os.remove("reboot.txt")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

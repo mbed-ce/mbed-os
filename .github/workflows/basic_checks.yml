@@ -92,6 +92,11 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+
+      - name: Install Formatters
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install astyle aspell
     
       - name: UTF-8 Check
         run: |
@@ -185,29 +190,25 @@ jobs:
 
       - name: Python Tests
         run: |
-          source venv/bin/activate
           tools/run_python_tests.sh
 
   check-cmsis-mcu-descriptions-matches-target-list:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Install python3-venv
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-venv
+      # Set up the oldest python version that's currently still supported by Python (as of Fall 2025)
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.9'
 
       - name: Install Python packages
         run: |
-          python3 -m venv venv
-          source venv/bin/activate
           pip install -e ./tools
 
       - name: Verify that cmsis_mcu_descriptions.json5 is in sync with targets.json5
         run: |
-          source venv/bin/activate
           cd tools/python
           mbed-tools cmsis-mcu-descr find-unused
           mbed-tools cmsis-mcu-descr check-missing
@@ -220,7 +221,7 @@ jobs:
     steps:
       -
         name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 

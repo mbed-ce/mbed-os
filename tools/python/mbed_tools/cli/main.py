@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Main cli entry point."""
+
 import logging
 import sys
 
@@ -80,5 +81,5 @@ cli.add_command(import_, "import")
 cli.add_command(sterm, "sterm")
 cli.add_command(cmsis_mcu_descr)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()

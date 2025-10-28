@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Objects representing Mbed program and library data."""
+
 import json
 import logging
 
@@ -164,14 +165,19 @@ class MbedOS:
             raise ValueError(f"This MbedOS copy does not contain a {TARGETS_JSON_FILE_PATH} file.")
 
         if root_path.exists() and not cmsis_mcu_descriptions_json_file.exists():
-            raise ValueError(f"This MbedOS copy does not contain a "
-                             f"{CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH.name} file.")
+            raise ValueError(f"This MbedOS copy does not contain a {CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH.name} file.")
 
-        return cls(root=root_path, targets_json_file=targets_json_file,
-                   cmsis_mcu_descriptions_json_file=cmsis_mcu_descriptions_json_file)
+        return cls(
+            root=root_path,
+            targets_json_file=targets_json_file,
+            cmsis_mcu_descriptions_json_file=cmsis_mcu_descriptions_json_file,
+        )
 
     @classmethod
     def from_new(cls, root_path: Path) -> "MbedOS":
         """Create MbedOS from an empty or new directory."""
-        return cls(root=root_path, targets_json_file=root_path / TARGETS_JSON_FILE_PATH,
-                   cmsis_mcu_descriptions_json_file=root_path / CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH)
+        return cls(
+            root=root_path,
+            targets_json_file=root_path / TARGETS_JSON_FILE_PATH,
+            cmsis_mcu_descriptions_json_file=root_path / CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH,
+        )

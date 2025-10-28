@@ -15,8 +15,8 @@
 
 from .. import BaseHostTest
 
-class DevNullTest(BaseHostTest):
 
+class DevNullTest(BaseHostTest):
     __result = None
 
     def _callback_result(self, key, value, timestamp):

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Mbed Program abstraction layer."""
+
 import logging
 import pathlib
 
@@ -68,7 +69,11 @@ class MbedProgram:
 
     @classmethod
     def from_existing(
-        cls, dir_path: Path, build_dir: Path, mbed_os_path: Path = None, check_mbed_os: bool = True,
+        cls,
+        dir_path: Path,
+        build_dir: Path,
+        mbed_os_path: Path = None,
+        check_mbed_os: bool = True,
     ) -> "MbedProgram":
         """Create an MbedProgram from an existing program directory.
 

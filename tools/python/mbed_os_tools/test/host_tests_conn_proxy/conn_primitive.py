@@ -20,11 +20,11 @@ class ConnectorPrimitiveException(Exception):
     """
     Exception in connector primitive module.
     """
+
     pass
 
 
 class ConnectorPrimitive(object):
-
     def __init__(self, name):
         self.LAST_ERROR = None
         self.logger = HtrunLogger(name)
@@ -37,7 +37,7 @@ class ConnectorPrimitive(object):
         @return Returns buffer with K-V message sent to DUT on success, None on failure
         """
         # All Key-Value messages ends with newline character
-        kv_buff = "{{%s;%s}}"% (key, value) + '\n'
+        kv_buff = "{{%s;%s}}" % (key, value) + "\n"
 
         if self.write(kv_buff):
             self.logger.prn_txd(kv_buff.rstrip())
@@ -61,12 +61,11 @@ class ConnectorPrimitive(object):
         raise NotImplementedError
 
     def flush(self):
-        """! Flush read/write channels of DUT """
+        """! Flush read/write channels of DUT"""
         raise NotImplementedError
 
     def reset(self):
-        """! Reset the dut
-        """
+        """! Reset the dut"""
         raise NotImplementedError
 
     def connected(self):
@@ -82,6 +81,5 @@ class ConnectorPrimitive(object):
         return self.LAST_ERROR
 
     def finish(self):
-        """! Handle DUT dtor like (close resource) operations here
-        """
+        """! Handle DUT dtor like (close resource) operations here"""
         raise NotImplementedError

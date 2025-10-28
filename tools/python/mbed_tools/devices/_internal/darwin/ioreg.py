@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Interactions with `ioreg`."""
+
 import plistlib
 import subprocess
 from typing import Any, Dict, Iterable, List, Optional, cast

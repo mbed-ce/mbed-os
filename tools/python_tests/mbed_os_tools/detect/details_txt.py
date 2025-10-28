@@ -21,10 +21,8 @@ import logging
 from mbed_os_tools.detect.main import create
 
 
-
 class ParseMbedHTMTestCase(unittest.TestCase):
-    """ Unit tests checking HTML parsing code for 'mbed.htm' files
-    """
+    """Unit tests checking HTML parsing code for 'mbed.htm' files"""
 
     details_txt_0226 = """Version: 0226
 Build:   Aug 24 2015 17:06:30
@@ -59,13 +57,13 @@ Interface CRC: 0x26764ebf
         # Check parsing content
         result = self.mbeds._parse_details(lines)
         self.assertEqual(4, len(result))
-        self.assertIn('Version', result)
-        self.assertIn('Build', result)
-        self.assertIn('Git Commit SHA', result)
-        self.assertIn('Git Local mods', result)
+        self.assertIn("Version", result)
+        self.assertIn("Build", result)
+        self.assertIn("Git Commit SHA", result)
+        self.assertIn("Git Local mods", result)
 
         # Check for daplink_version
-        self.assertEqual(result['Version'], "0226")
+        self.assertEqual(result["Version"], "0226")
 
     def test_extended_daplink_txt_content(self):
         # Fetch lines from DETAILS.TXT
@@ -74,30 +72,30 @@ Interface CRC: 0x26764ebf
 
         # Check parsing content
         result = self.mbeds._parse_details(lines)
-        self.assertEqual(11, len(result))   # 12th would be comment
-        self.assertIn('Unique ID', result)
-        self.assertIn('HIF ID', result)
-        self.assertIn('Auto Reset', result)
-        self.assertIn('Automation allowed', result)
-        self.assertIn('Daplink Mode', result)
-        self.assertIn('Interface Version', result)
-        self.assertIn('Git SHA', result)
-        self.assertIn('Local Mods', result)
-        self.assertIn('USB Interfaces', result)
-        self.assertIn('Interface CRC', result)
+        self.assertEqual(11, len(result))  # 12th would be comment
+        self.assertIn("Unique ID", result)
+        self.assertIn("HIF ID", result)
+        self.assertIn("Auto Reset", result)
+        self.assertIn("Automation allowed", result)
+        self.assertIn("Daplink Mode", result)
+        self.assertIn("Interface Version", result)
+        self.assertIn("Git SHA", result)
+        self.assertIn("Local Mods", result)
+        self.assertIn("USB Interfaces", result)
+        self.assertIn("Interface CRC", result)
 
         # Check if we parsed comment line:
         # "# DAPLink Firmware - see https://mbed.com/daplink"
         for key in result:
             # Check if we parsed comment
-            self.assertFalse(key.startswith('#'))
+            self.assertFalse(key.startswith("#"))
             # Check if we parsed
-            self.assertFalse('https://mbed.com/daplink' in result[key])
+            self.assertFalse("https://mbed.com/daplink" in result[key])
 
         # Check for daplink_version
         # DAPlink <240 compatibility
-        self.assertEqual(result['Interface Version'], "0240")
-        self.assertEqual(result['Version'], "0240")
+        self.assertEqual(result["Interface Version"], "0240")
+        self.assertEqual(result["Version"], "0240")
 
     def test_(self):
         pass
@@ -105,5 +103,6 @@ Interface CRC: 0x26764ebf
     def test_(self):
         pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

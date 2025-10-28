@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Defines a Windows identifier."""
+
 from functools import total_ordering
 from typing import Any, Optional
 

@@ -40,7 +40,9 @@ class TestInitialiseProgram:
 
         program = from_new_set_target_toolchain(program_root)
 
-        assert program.files == MbedProgramFiles.from_existing(program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR)
+        assert program.files == MbedProgramFiles.from_existing(
+            program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR
+        )
 
     def test_from_new_local_dir_generates_valid_program_creating_directory_in_cwd(self, tmp_path):
         old_cwd = os.getcwd()
@@ -52,7 +54,9 @@ class TestInitialiseProgram:
 
             program = from_new_set_target_toolchain(program_root)
 
-            assert program.files == MbedProgramFiles.from_existing(program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR)
+            assert program.files == MbedProgramFiles.from_existing(
+                program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR
+            )
         finally:
             os.chdir(old_cwd)
 
@@ -64,7 +68,9 @@ class TestInitialiseProgram:
 
         program = from_new_set_target_toolchain(program_root)
 
-        assert program.files == MbedProgramFiles.from_existing(program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR)
+        assert program.files == MbedProgramFiles.from_existing(
+            program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR
+        )
 
     def test_from_existing_raises_if_path_is_not_a_program(self, tmp_path):
         fs_root = pathlib.Path(tmp_path, "foo")

@@ -29,13 +29,14 @@ def run_cli_command(cmd, shell=True, verbose=False):
         if ret:
             result = False
             if verbose:
-                print("mbedgt: [ret=%d] Command: %s"% (int(ret), cmd))
+                print("mbedgt: [ret=%d] Command: %s" % (int(ret), cmd))
     except OSError as e:
         result = False
         if verbose:
-            print("mbedgt: [ret=%d] Command: %s"% (int(ret), cmd))
+            print("mbedgt: [ret=%d] Command: %s" % (int(ret), cmd))
             print(str(e))
     return (result, ret)
+
 
 def run_cli_process(cmd):
     """! Runs command as a process and return stdout, stderr and ret code
@@ -46,7 +47,7 @@ def run_cli_process(cmd):
         p = Popen(cmd, stdout=PIPE, stderr=PIPE)
         _stdout, _stderr = p.communicate()
     except OSError as e:
-        print("mbedgt: Command: %s"% (cmd))
+        print("mbedgt: Command: %s" % (cmd))
         print(str(e))
         print("mbedgt: traceback...")
         print(e.child_traceback)

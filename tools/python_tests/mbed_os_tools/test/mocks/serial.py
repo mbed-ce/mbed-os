@@ -15,6 +15,7 @@
 
 from builtins import super
 
+
 class MockSerial(object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -27,7 +28,7 @@ class MockSerial(object):
         self._upstream_write_cb = None
 
     def read(self, count):
-        contents = self._rx_buffer[self._rx_counter:count]
+        contents = self._rx_buffer[self._rx_counter : count]
         self._rx_counter += len(contents)
         return contents
 

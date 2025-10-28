@@ -29,7 +29,6 @@ from .mbed_yotta_api import get_test_spec_from_yt_module
 from .tests_spec import TestSpec
 
 
-
 # Return codes for test script
 TEST_RESULT_OK = "OK"
 TEST_RESULT_FAIL = "FAIL"
@@ -45,40 +44,43 @@ TEST_RESULT_MBED_ASSERT = "MBED_ASSERT"
 TEST_RESULT_BUILD_FAILED = "BUILD_FAILED"
 TEST_RESULT_SYNC_FAILED = "SYNC_FAILED"
 
-TEST_RESULTS = [TEST_RESULT_OK,
-                TEST_RESULT_FAIL,
-                TEST_RESULT_ERROR,
-                TEST_RESULT_SKIPPED,
-                TEST_RESULT_UNDEF,
-                TEST_RESULT_IOERR_COPY,
-                TEST_RESULT_IOERR_DISK,
-                TEST_RESULT_IOERR_SERIAL,
-                TEST_RESULT_TIMEOUT,
-                TEST_RESULT_NO_IMAGE,
-                TEST_RESULT_MBED_ASSERT,
-                TEST_RESULT_BUILD_FAILED,
-                TEST_RESULT_SYNC_FAILED
-                ]
+TEST_RESULTS = [
+    TEST_RESULT_OK,
+    TEST_RESULT_FAIL,
+    TEST_RESULT_ERROR,
+    TEST_RESULT_SKIPPED,
+    TEST_RESULT_UNDEF,
+    TEST_RESULT_IOERR_COPY,
+    TEST_RESULT_IOERR_DISK,
+    TEST_RESULT_IOERR_SERIAL,
+    TEST_RESULT_TIMEOUT,
+    TEST_RESULT_NO_IMAGE,
+    TEST_RESULT_MBED_ASSERT,
+    TEST_RESULT_BUILD_FAILED,
+    TEST_RESULT_SYNC_FAILED,
+]
 
-TEST_RESULT_MAPPING = {"success" : TEST_RESULT_OK,
-                       "failure" : TEST_RESULT_FAIL,
-                       "error" : TEST_RESULT_ERROR,
-                       "skipped" : TEST_RESULT_SKIPPED,
-                       "end" : TEST_RESULT_UNDEF,
-                       "ioerr_copy" : TEST_RESULT_IOERR_COPY,
-                       "ioerr_disk" : TEST_RESULT_IOERR_DISK,
-                       "ioerr_serial" : TEST_RESULT_IOERR_SERIAL,
-                       "timeout" : TEST_RESULT_TIMEOUT,
-                       "no_image" : TEST_RESULT_NO_IMAGE,
-                       "mbed_assert" : TEST_RESULT_MBED_ASSERT,
-                       "build_failed" : TEST_RESULT_BUILD_FAILED,
-                       "sync_failed" : TEST_RESULT_SYNC_FAILED
-                       }
+TEST_RESULT_MAPPING = {
+    "success": TEST_RESULT_OK,
+    "failure": TEST_RESULT_FAIL,
+    "error": TEST_RESULT_ERROR,
+    "skipped": TEST_RESULT_SKIPPED,
+    "end": TEST_RESULT_UNDEF,
+    "ioerr_copy": TEST_RESULT_IOERR_COPY,
+    "ioerr_disk": TEST_RESULT_IOERR_DISK,
+    "ioerr_serial": TEST_RESULT_IOERR_SERIAL,
+    "timeout": TEST_RESULT_TIMEOUT,
+    "no_image": TEST_RESULT_NO_IMAGE,
+    "mbed_assert": TEST_RESULT_MBED_ASSERT,
+    "build_failed": TEST_RESULT_BUILD_FAILED,
+    "sync_failed": TEST_RESULT_SYNC_FAILED,
+}
 
 
 # This value is used to tell caller than run_host_test function failed while invoking mbedhtrun
 # Just a value greater than zero
 RUN_HOST_TEST_POPEN_ERROR = 1729
+
 
 def get_test_result(output):
     """! Parse test 'output' data
@@ -103,14 +105,13 @@ def run_command(cmd):
     @return Value returned by subprocess.Popen, if failed return None
     """
     try:
-        p = Popen(cmd,
-                  stdout=PIPE,
-                  stderr=STDOUT)
+        p = Popen(cmd, stdout=PIPE, stderr=STDOUT)
     except OSError as e:
         gt_logger.gt_log_err("run_host_test.run_command(%s) failed!" % str(cmd))
         gt_logger.gt_log_tab(str(e))
         return None
     return p
+
 
 def run_htrun(cmd, verbose):
     # detect overflow when running tests
@@ -121,9 +122,9 @@ def run_htrun(cmd, verbose):
         # int value > 0 notifies caller that starting of host test process failed
         return RUN_HOST_TEST_POPEN_ERROR
 
-    htrun_failure_line = re.compile(r'\[RXD\] (:\d+::FAIL: .*)')
+    htrun_failure_line = re.compile(r"\[RXD\] (:\d+::FAIL: .*)")
 
-    for line in iter(p.stdout.readline, b''):
+    for line in iter(p.stdout.readline, b""):
         decoded_line = line.decode("utf-8", "replace")
         htrun_output += decoded_line
         # When dumping output to file both \r and \n will be a new line
@@ -134,7 +135,7 @@ def run_htrun(cmd, verbose):
             gt_logger.gt_log_err(test_error.group(1))
 
         if verbose:
-            output = decoded_line.rstrip() + '\n'
+            output = decoded_line.rstrip() + "\n"
             try:
                 # Try to output decoded unicode. Should be fine in most Python 3
                 # environments.
@@ -154,24 +155,25 @@ def run_htrun(cmd, verbose):
     returncode = p.wait()
     return returncode, htrun_output
 
+
 def get_testcase_count_and_names(output):
-    """ Fetches from log utest events with test case count (__testcase_count) and test case names (__testcase_name)*
+    """Fetches from log utest events with test case count (__testcase_count) and test case names (__testcase_name)*
 
-        @details
-        Example test case count + names prints
-        [1467197417.34][HTST][INF] host test detected: default_auto
-        [1467197417.36][CONN][RXD] {{__testcase_count;2}}
-        [1467197417.36][CONN][INF] found KV pair in stream: {{__testcase_count;2}}, queued...
-        [1467197417.39][CONN][RXD] >>> Running 2 test cases...
-        [1467197417.43][CONN][RXD] {{__testcase_name;C strings: strtok}}
-        [1467197417.43][CONN][INF] found KV pair in stream: {{__testcase_name;C strings: strtok}}, queued...
-        [1467197417.47][CONN][RXD] {{__testcase_name;C strings: strpbrk}}
-        [1467197417.47][CONN][INF] found KV pair in stream: {{__testcase_name;C strings: strpbrk}}, queued...
-        [1467197417.52][CONN][RXD] >>> Running case #1: 'C strings: strtok'...
-        [1467197417.56][CONN][RXD] {{__testcase_start;C strings: strtok}}
-        [1467197417.56][CONN][INF] found KV pair in stream: {{__testcase_start;C strings: strtok}}, queued...
+    @details
+    Example test case count + names prints
+    [1467197417.34][HTST][INF] host test detected: default_auto
+    [1467197417.36][CONN][RXD] {{__testcase_count;2}}
+    [1467197417.36][CONN][INF] found KV pair in stream: {{__testcase_count;2}}, queued...
+    [1467197417.39][CONN][RXD] >>> Running 2 test cases...
+    [1467197417.43][CONN][RXD] {{__testcase_name;C strings: strtok}}
+    [1467197417.43][CONN][INF] found KV pair in stream: {{__testcase_name;C strings: strtok}}, queued...
+    [1467197417.47][CONN][RXD] {{__testcase_name;C strings: strpbrk}}
+    [1467197417.47][CONN][INF] found KV pair in stream: {{__testcase_name;C strings: strpbrk}}, queued...
+    [1467197417.52][CONN][RXD] >>> Running case #1: 'C strings: strtok'...
+    [1467197417.56][CONN][RXD] {{__testcase_start;C strings: strtok}}
+    [1467197417.56][CONN][INF] found KV pair in stream: {{__testcase_start;C strings: strtok}}, queued...
 
-        @return Tuple with (test case count, list of test case names in order of appearance)
+    @return Tuple with (test case count, list of test case names in order of appearance)
     """
     testcase_count = 0
     testcase_names = []
@@ -180,7 +182,6 @@ def get_testcase_count_and_names(output):
     re_tc_names = re.compile(r"^\[(\d+\.\d+)\]\[(\w+)\]\[(\w+)\].*\{\{(__testcase_name);([^;]+)\}\}")
 
     for line in output.splitlines():
-
         m = re_tc_names.search(line)
         if m:
             testcase_names.append(m.group(5))
@@ -192,20 +193,21 @@ def get_testcase_count_and_names(output):
 
     return (testcase_count, testcase_names)
 
+
 def get_testcase_utest(output, test_case_name):
-    """ Fetches from log all prints for given utest test case (from being print to end print)
+    """Fetches from log all prints for given utest test case (from being print to end print)
 
-        @details
-        Example test case prints
-        [1455553765.52][CONN][RXD] >>> Running case #1: 'Simple Test'...
-        [1455553765.52][CONN][RXD] {{__testcase_start;Simple Test}}
-        [1455553765.52][CONN][INF] found KV pair in stream: {{__testcase_start;Simple Test}}, queued...
-        [1455553765.58][CONN][RXD] Simple test called
-        [1455553765.58][CONN][RXD] {{__testcase_finish;Simple Test;1;0}}
-        [1455553765.58][CONN][INF] found KV pair in stream: {{__testcase_finish;Simple Test;1;0}}, queued...
-        [1455553765.70][CONN][RXD] >>> 'Simple Test': 1 passed, 0 failed
+    @details
+    Example test case prints
+    [1455553765.52][CONN][RXD] >>> Running case #1: 'Simple Test'...
+    [1455553765.52][CONN][RXD] {{__testcase_start;Simple Test}}
+    [1455553765.52][CONN][INF] found KV pair in stream: {{__testcase_start;Simple Test}}, queued...
+    [1455553765.58][CONN][RXD] Simple test called
+    [1455553765.58][CONN][RXD] {{__testcase_finish;Simple Test;1;0}}
+    [1455553765.58][CONN][INF] found KV pair in stream: {{__testcase_finish;Simple Test;1;0}}, queued...
+    [1455553765.70][CONN][RXD] >>> 'Simple Test': 1 passed, 0 failed
 
-        @return log lines between start and end test case print
+    @return log lines between start and end test case print
     """
 
     # Return string with all non-alphanumerics backslashed;
@@ -213,12 +215,15 @@ def get_testcase_utest(output, test_case_name):
     # string that may have regular expression metacharacters in it.
     escaped_test_case_name = re.escape(test_case_name)
 
-    re_tc_utest_log_start = re.compile(r"^\[(\d+\.\d+)\]\[(\w+)\]\[(\w+)\] >>> Running case #(\d)+: '(%s)'"% escaped_test_case_name)
-    re_tc_utest_log_finish = re.compile(r"^\[(\d+\.\d+)\]\[(\w+)\]\[(\w+)\] >>> '(%s)': (\d+) passed, (\d+) failed"% escaped_test_case_name)
+    re_tc_utest_log_start = re.compile(
+        r"^\[(\d+\.\d+)\]\[(\w+)\]\[(\w+)\] >>> Running case #(\d)+: '(%s)'" % escaped_test_case_name
+    )
+    re_tc_utest_log_finish = re.compile(
+        r"^\[(\d+\.\d+)\]\[(\w+)\]\[(\w+)\] >>> '(%s)': (\d+) passed, (\d+) failed" % escaped_test_case_name
+    )
 
     tc_log_lines = []
     for line in output.splitlines():
-
         # utest test case start string search
         m = re_tc_utest_log_start.search(line)
         if m:
@@ -237,6 +242,7 @@ def get_testcase_utest(output, test_case_name):
 
     return tc_log_lines
 
+
 def get_coverage_data(build_path, output):
     # Example GCOV output
     # [1456840876.73][CONN][RXD] {{__coverage_start;c:\Work\core-util/source/PoolAllocator.cpp.gcda;6164636772393034c2733f32...a33e...b9}}
@@ -251,18 +257,20 @@ def get_coverage_data(build_path, output):
                 coverage_dump_file(build_path, gcov_path, bin_gcov_payload)
             except Exception as e:
                 gt_logger.gt_log_err("error while handling GCOV data: " + str(e))
-            gt_logger.gt_log_tab("storing %d bytes in '%s'"% (len(bin_gcov_payload), gcov_path))
+            gt_logger.gt_log_tab("storing %d bytes in '%s'" % (len(bin_gcov_payload), gcov_path))
+
 
 def get_printable_string(unprintable_string):
     return "".join(filter(lambda x: x in string.printable, unprintable_string))
 
+
 def get_testcase_summary(output):
     """! Searches for test case summary
 
-        String to find:
-        [1459246276.95][CONN][INF] found KV pair in stream: {{__testcase_summary;7;1}}, queued...
+    String to find:
+    [1459246276.95][CONN][INF] found KV pair in stream: {{__testcase_summary;7;1}}, queued...
 
-        @return Tuple of (passed, failed) or None if no summary found
+    @return Tuple of (passed, failed) or None if no summary found
     """
     re_tc_summary = re.compile(r"^\[(\d+\.\d+)\][^\{]+\{\{(__testcase_summary);(\d+);(\d+)\}\}")
     for line in output.splitlines():
@@ -271,6 +279,7 @@ def get_testcase_summary(output):
             _, _, passes, failures = m.groups()
             return int(passes), int(failures)
     return None
+
 
 def get_testcase_result(output):
     result_test_cases = {}  # Test cases results
@@ -284,16 +293,16 @@ def get_testcase_result(output):
                 result_test_cases[testcase_id] = {}
 
             # Data collected when __testcase_start is fetched
-            result_test_cases[testcase_id]['time_start'] = float(timestamp)
-            result_test_cases[testcase_id]['utest_log'] = get_testcase_utest(output, testcase_id)
+            result_test_cases[testcase_id]["time_start"] = float(timestamp)
+            result_test_cases[testcase_id]["utest_log"] = get_testcase_utest(output, testcase_id)
 
             # Data collected when __testcase_finish is fetched
-            result_test_cases[testcase_id]['duration'] = 0.0
-            result_test_cases[testcase_id]['result_text'] = 'ERROR'
-            result_test_cases[testcase_id]['time_end'] = float(timestamp)
-            result_test_cases[testcase_id]['passed'] = 0
-            result_test_cases[testcase_id]['failed'] = 0
-            result_test_cases[testcase_id]['result'] = -4096
+            result_test_cases[testcase_id]["duration"] = 0.0
+            result_test_cases[testcase_id]["result_text"] = "ERROR"
+            result_test_cases[testcase_id]["time_end"] = float(timestamp)
+            result_test_cases[testcase_id]["passed"] = 0
+            result_test_cases[testcase_id]["failed"] = 0
+            result_test_cases[testcase_id]["result"] = -4096
             continue
 
         m = re_tc_finish.search(line)
@@ -303,32 +312,34 @@ def get_testcase_result(output):
             testcase_passed = int(testcase_passed)
             testcase_failed = int(testcase_failed)
 
-            testcase_result = 0 # OK case
+            testcase_result = 0  # OK case
             if testcase_failed != 0:
-                testcase_result = testcase_failed   # testcase_result > 0 is FAILure
+                testcase_result = testcase_failed  # testcase_result > 0 is FAILure
 
             if testcase_id not in result_test_cases:
                 result_test_cases[testcase_id] = {}
             # Setting some info about test case itself
-            result_test_cases[testcase_id]['duration'] = 0.0
-            result_test_cases[testcase_id]['result_text'] = 'OK'
-            result_test_cases[testcase_id]['time_end'] = float(timestamp)
-            result_test_cases[testcase_id]['passed'] = testcase_passed
-            result_test_cases[testcase_id]['failed'] = testcase_failed
-            result_test_cases[testcase_id]['result'] = testcase_result
+            result_test_cases[testcase_id]["duration"] = 0.0
+            result_test_cases[testcase_id]["result_text"] = "OK"
+            result_test_cases[testcase_id]["time_end"] = float(timestamp)
+            result_test_cases[testcase_id]["passed"] = testcase_passed
+            result_test_cases[testcase_id]["failed"] = testcase_failed
+            result_test_cases[testcase_id]["result"] = testcase_result
             # Assign human readable test case result
             if testcase_result > 0:
-                result_test_cases[testcase_id]['result_text'] = 'FAIL'
+                result_test_cases[testcase_id]["result_text"] = "FAIL"
             elif testcase_result < 0:
-                result_test_cases[testcase_id]['result_text'] = 'ERROR'
+                result_test_cases[testcase_id]["result_text"] = "ERROR"
 
-            if 'time_start' in result_test_cases[testcase_id]:
-                result_test_cases[testcase_id]['duration'] = result_test_cases[testcase_id]['time_end'] - result_test_cases[testcase_id]['time_start']
+            if "time_start" in result_test_cases[testcase_id]:
+                result_test_cases[testcase_id]["duration"] = (
+                    result_test_cases[testcase_id]["time_end"] - result_test_cases[testcase_id]["time_start"]
+                )
             else:
-                result_test_cases[testcase_id]['duration'] = 0.0
+                result_test_cases[testcase_id]["duration"] = 0.0
 
-            if 'utest_log' not in result_test_cases[testcase_id]:
-                result_test_cases[testcase_id]['utest_log'] = "__testcase_start tag not found."
+            if "utest_log" not in result_test_cases[testcase_id]:
+                result_test_cases[testcase_id]["utest_log"] = "__testcase_start tag not found."
 
     ### Adding missing test cases which were defined with __testcase_name
     # Get test case names reported by utest + test case names
@@ -339,26 +350,27 @@ def get_testcase_result(output):
         if testcase_id not in result_test_cases:
             result_test_cases[testcase_id] = {}
             # Data collected when __testcase_start is fetched
-            result_test_cases[testcase_id]['time_start'] = 0.0
-            result_test_cases[testcase_id]['utest_log'] = []
+            result_test_cases[testcase_id]["time_start"] = 0.0
+            result_test_cases[testcase_id]["utest_log"] = []
             # Data collected when __testcase_finish is fetched
-            result_test_cases[testcase_id]['duration'] = 0.0
-            result_test_cases[testcase_id]['result_text'] = 'SKIPPED'
-            result_test_cases[testcase_id]['time_end'] = 0.0
-            result_test_cases[testcase_id]['passed'] = 0
-            result_test_cases[testcase_id]['failed'] = 0
-            result_test_cases[testcase_id]['result'] = -8192
+            result_test_cases[testcase_id]["duration"] = 0.0
+            result_test_cases[testcase_id]["result_text"] = "SKIPPED"
+            result_test_cases[testcase_id]["time_end"] = 0.0
+            result_test_cases[testcase_id]["passed"] = 0
+            result_test_cases[testcase_id]["failed"] = 0
+            result_test_cases[testcase_id]["result"] = -8192
 
     return result_test_cases
+
 
 def get_memory_metrics(output):
     """! Searches for test case memory metrics
 
-        String to find:
-        [1477505660.40][CONN][INF] found KV pair in stream: {{max_heap_usage;2284}}, queued...
+    String to find:
+    [1477505660.40][CONN][INF] found KV pair in stream: {{max_heap_usage;2284}}, queued...
 
-        @return Tuple of (max heap usage, thread info list), where thread info list
-        is a list of dictionaries with format {entry, arg, max_stack, stack_size}
+    @return Tuple of (max heap usage, thread info list), where thread info list
+    is a list of dictionaries with format {entry, arg, max_stack, stack_size}
     """
     max_heap_usage = None
     reserved_heap = None
@@ -382,22 +394,23 @@ def get_memory_metrics(output):
             _, _, thread_entry_arg, thread_max_stack, thread_stack_size = m.groups()
             thread_max_stack = int(thread_max_stack)
             thread_stack_size = int(thread_stack_size)
-            thread_entry_arg_split = thread_entry_arg.split('-')
+            thread_entry_arg_split = thread_entry_arg.split("-")
             thread_entry = thread_entry_arg_split[0]
 
             thread_info[thread_entry_arg] = {
-                'entry': thread_entry,
-                'max_stack': thread_max_stack,
-                'stack_size': thread_stack_size
+                "entry": thread_entry,
+                "max_stack": thread_max_stack,
+                "stack_size": thread_stack_size,
             }
 
             if len(thread_entry_arg_split) > 1:
                 thread_arg = thread_entry_arg_split[1]
-                thread_info[thread_entry_arg]['arg'] = thread_arg
+                thread_info[thread_entry_arg]["arg"] = thread_arg
 
     thread_info_list = list(thread_info.values())
 
     return max_heap_usage, reserved_heap, thread_info_list
+
 
 def get_thread_with_max_stack_size(thread_stack_info):
     max_thread_stack_size = 0
@@ -405,45 +418,50 @@ def get_thread_with_max_stack_size(thread_stack_info):
     max_stack_usage_total = 0
     reserved_stack_total = 0
     for cur_thread_stack_info in thread_stack_info:
-        if cur_thread_stack_info['stack_size'] > max_thread_stack_size:
-            max_thread_stack_size = cur_thread_stack_info['stack_size']
+        if cur_thread_stack_info["stack_size"] > max_thread_stack_size:
+            max_thread_stack_size = cur_thread_stack_info["stack_size"]
             max_thread = cur_thread_stack_info
-        max_stack_usage_total += cur_thread_stack_info['max_stack']
-        reserved_stack_total += cur_thread_stack_info['stack_size']
-    max_thread['max_stack_usage_total'] = max_stack_usage_total
-    max_thread['reserved_stack_total'] = reserved_stack_total
+        max_stack_usage_total += cur_thread_stack_info["max_stack"]
+        reserved_stack_total += cur_thread_stack_info["stack_size"]
+    max_thread["max_stack_usage_total"] = max_stack_usage_total
+    max_thread["reserved_stack_total"] = reserved_stack_total
     return max_thread
 
-def get_thread_stack_info_summary(thread_stack_info):
 
+def get_thread_stack_info_summary(thread_stack_info):
     max_thread_info = get_thread_with_max_stack_size(thread_stack_info)
     summary = {
-        'max_stack_size': max_thread_info['stack_size'],
-        'max_stack_usage': max_thread_info['max_stack'],
-        'max_stack_usage_total': max_thread_info['max_stack_usage_total'],
-        'reserved_stack_total': max_thread_info['reserved_stack_total']
+        "max_stack_size": max_thread_info["stack_size"],
+        "max_stack_usage": max_thread_info["max_stack"],
+        "max_stack_usage_total": max_thread_info["max_stack_usage_total"],
+        "reserved_stack_total": max_thread_info["reserved_stack_total"],
     }
     return summary
 
-def log_mbed_devices_in_table(muts, cols = ['platform_name', 'platform_name_unique', 'serial_port', 'mount_point', 'target_id']):
+
+def log_mbed_devices_in_table(
+    muts, cols=["platform_name", "platform_name_unique", "serial_port", "mount_point", "target_id"]
+):
     """! Print table of muts using prettytable
     @param muts List of MUTs to print in table
     @param cols Columns used to for a table, required for each mut
     @return string with formatted prettytable
     """
     from prettytable import PrettyTable, HEADER
+
     pt = PrettyTable(cols, junction_char="|", hrules=HEADER)
     for col in cols:
         pt.align[col] = "l"
-    pt.padding_width = 1 # One space between column edges and contents (default)
+    pt.padding_width = 1  # One space between column edges and contents (default)
     row = []
     for mut in muts:
         for col in cols:
-            cell_val = mut[col] if col in mut else 'not detected'
+            cell_val = mut[col] if col in mut else "not detected"
             row.append(cell_val)
         pt.add_row(row)
         row = []
     return pt.get_string()
+
 
 def get_test_spec(opts):
     """! Closure encapsulating how we get test specification and load it from file of from yotta module
@@ -464,7 +482,12 @@ def get_test_spec(opts):
         @param path_to_scan Directory path used to recursively search for test_spec.json
         @result List of locations of test_spec.json
         """
-        return [os.path.join(dp, f) for dp, dn, filenames in os.walk(path_to_scan) for f in filenames if f == 'test_spec.json']
+        return [
+            os.path.join(dp, f)
+            for dp, dn, filenames in os.walk(path_to_scan)
+            for f in filenames
+            if f == "test_spec.json"
+        ]
 
     def merge_multiple_test_specifications_from_file_list(test_spec_file_name_list):
         """! For each file in test_spec_file_name_list merge all test specifications into one
@@ -474,25 +497,25 @@ def get_test_spec(opts):
 
         def copy_builds_between_test_specs(source, destination):
             """! Copies build key-value pairs between two test_spec dicts
-                @param source Source dictionary
-                @param destination Dictionary with will be applied with 'builds' key-values
-                @return Dictionary with merged source
+            @param source Source dictionary
+            @param destination Dictionary with will be applied with 'builds' key-values
+            @return Dictionary with merged source
             """
             result = destination.copy()
-            if 'builds' in source and 'builds' in destination:
-                for k in source['builds']:
-                    result['builds'][k] = source['builds'][k]
+            if "builds" in source and "builds" in destination:
+                for k in source["builds"]:
+                    result["builds"][k] = source["builds"][k]
             return result
 
         merged_test_spec = {}
         for test_spec_file in test_spec_file_name_list:
-            gt_logger.gt_log_tab("using '%s'"% test_spec_file)
+            gt_logger.gt_log_tab("using '%s'" % test_spec_file)
             try:
-                with open(test_spec_file, 'r') as f:
+                with open(test_spec_file, "r") as f:
                     test_spec_data = json.load(f)
                     merged_test_spec = copy_builds_between_test_specs(merged_test_spec, test_spec_data)
             except Exception as e:
-                gt_logger.gt_log_err("Unexpected error while processing '%s' test specification file"% test_spec_file)
+                gt_logger.gt_log_err("Unexpected error while processing '%s' test specification file" % test_spec_file)
                 gt_logger.gt_log_tab(str(e))
                 merged_test_spec = {}
 
@@ -503,30 +526,30 @@ def get_test_spec(opts):
     # Test specification look-up
     if opts.test_spec:
         # Loading test specification from command line specified file
-        gt_logger.gt_log("test specification file '%s' (specified with --test-spec option)"% opts.test_spec)
-    elif os.path.exists('test_spec.json'):
+        gt_logger.gt_log("test specification file '%s' (specified with --test-spec option)" % opts.test_spec)
+    elif os.path.exists("test_spec.json"):
         # Test specification file exists in current directory
         gt_logger.gt_log("using 'test_spec.json' from current directory!")
-        test_spec_file_name = 'test_spec.json'
-    elif 'BUILD' in os.listdir(os.getcwd()):
+        test_spec_file_name = "test_spec.json"
+    elif "BUILD" in os.listdir(os.getcwd()):
         # Checking 'BUILD' directory for test specifications
         # Using `os.listdir()` since it preserves case
-        test_spec_file_name_list = get_all_test_specs_from_build_dir('BUILD')
-    elif os.path.exists('.build'):
+        test_spec_file_name_list = get_all_test_specs_from_build_dir("BUILD")
+    elif os.path.exists(".build"):
         # Checking .build directory for test specifications
-        test_spec_file_name_list = get_all_test_specs_from_build_dir('.build')
-    elif os.path.exists('mbed-os') and 'BUILD' in os.listdir('mbed-os'):
+        test_spec_file_name_list = get_all_test_specs_from_build_dir(".build")
+    elif os.path.exists("mbed-os") and "BUILD" in os.listdir("mbed-os"):
         # Checking mbed-os/.build directory for test specifications
         # Using `os.listdir()` since it preserves case
-        test_spec_file_name_list = get_all_test_specs_from_build_dir(os.path.join(['mbed-os', 'BUILD']))
-    elif os.path.exists(os.path.join('mbed-os', '.build')):
+        test_spec_file_name_list = get_all_test_specs_from_build_dir(os.path.join(["mbed-os", "BUILD"]))
+    elif os.path.exists(os.path.join("mbed-os", ".build")):
         # Checking mbed-os/.build directory for test specifications
-        test_spec_file_name_list = get_all_test_specs_from_build_dir(os.path.join(['mbed-os', '.build']))
+        test_spec_file_name_list = get_all_test_specs_from_build_dir(os.path.join(["mbed-os", ".build"]))
 
     # Actual load and processing of test specification from sources
     if test_spec_file_name:
         # Test specification from command line (--test-spec) or default test_spec.json will be used
-        gt_logger.gt_log("using '%s' from current directory!"% test_spec_file_name)
+        gt_logger.gt_log("using '%s' from current directory!" % test_spec_file_name)
         test_spec = TestSpec(test_spec_file_name)
         if opts.list_binaries:
             list_binaries_for_builds(test_spec)
@@ -538,7 +561,7 @@ def get_test_spec(opts):
         if opts.list_binaries:
             list_binaries_for_builds(test_spec)
             return None, 0
-    elif os.path.exists('module.json'):
+    elif os.path.exists("module.json"):
         # If inside yotta module load module data and generate test spec
         gt_logger.gt_log("using 'module.json' from current directory!")
         if opts.list_binaries:
@@ -552,17 +575,19 @@ def get_test_spec(opts):
         return None, -1
     return test_spec, 0
 
+
 def get_test_build_properties(test_spec, test_build_name):
     result = dict()
     test_builds = test_spec.get_test_builds(filter_by_names=[test_build_name])
     if test_builds:
         test_build = test_builds[0]
-        result['name'] = test_build.get_name()
-        result['toolchain'] = test_build.get_toolchain()
-        result['target'] = test_build.get_platform()
+        result["name"] = test_build.get_name()
+        result["toolchain"] = test_build.get_toolchain()
+        result["target"] = test_build.get_platform()
         return result
     else:
         return None
+
 
 def parse_global_resource_mgr(global_resource_mgr):
     """! Parses --grm switch with global resource manager info
@@ -570,8 +595,8 @@ def parse_global_resource_mgr(global_resource_mgr):
     @return tuple wity four elements from GRM or None if error
     """
     try:
-        platform_name, module_name, leftover = global_resource_mgr.split(':', 2)
-        parts = leftover.rsplit(':', 1)
+        platform_name, module_name, leftover = global_resource_mgr.split(":", 2)
+        parts = leftover.rsplit(":", 1)
 
         try:
             ip_name, port_name = parts
@@ -585,12 +610,13 @@ def parse_global_resource_mgr(global_resource_mgr):
         return False
     return platform_name, module_name, ip_name, port_name
 
+
 def parse_fast_model_connection(fast_model_connection):
     """! Parses --fm switch with simulator resource manager info
     @details FVP_MPS2_M3:DEFAULT
     """
     try:
-        platform_name, config_name = fast_model_connection.split(':')
+        platform_name, config_name = fast_model_connection.split(":")
     except ValueError as e:
         return False
     return platform_name, config_name

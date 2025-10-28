@@ -17,7 +17,6 @@ limitations under the License.
 Author: Przemyslaw Wirkus <Przemyslaw.Wirkus@arm.com>
 """
 
-
 """! @package mbed-host-tests
 
 Flash, reset and  perform host supervised tests on mbed platforms.

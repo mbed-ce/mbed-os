@@ -15,8 +15,8 @@
 
 import re
 
+
 class MockMbedDevice(object):
-    
     KV_REGEX = re.compile("\{\{([\w\d_-]+);([^\}]+)\}\}")
 
     def __init__(self, serial):
@@ -46,8 +46,5 @@ class MockMbedDevice(object):
 
     def on_sync(self):
         self._serial.downstream_write(
-            "{{__timeout;15}}\r\n"
-            "{{__host_test_name;default_auto}}\r\n"
-            "{{end;success}}\n"
-            "{{__exit;0}}\r\n"
+            "{{__timeout;15}}\r\n{{__host_test_name;default_auto}}\r\n{{end;success}}\n{{__exit;0}}\r\n"
         )

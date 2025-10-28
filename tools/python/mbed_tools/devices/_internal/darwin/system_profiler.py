@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Interactions with `system_profiler`."""
+
 import plistlib
 import re
 import subprocess

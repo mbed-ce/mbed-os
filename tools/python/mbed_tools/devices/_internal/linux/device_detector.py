@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Defines a device detector for Linux."""
+
 import logging
 from pathlib import Path
 from typing import Tuple, List, Optional, cast

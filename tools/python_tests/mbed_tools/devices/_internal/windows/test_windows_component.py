@@ -48,7 +48,6 @@ class TestComponentDescriptor(TestCase):
         self.assertListEqual([name for name in ComponentDefinition._fields], get_test_class()().field_names)
 
     def test_set_values(self):
-
         a_component = get_test_class()()
         self.assertTrue(is_undefined_data_object(a_component.to_tuple()))
         valid_values = {k: generate_valid_values() for k in a_component.field_names}

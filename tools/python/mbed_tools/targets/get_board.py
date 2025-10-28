@@ -6,6 +6,7 @@
 
 An instance of `mbed_tools.targets.board.Board` can be retrieved by calling one of the public functions.
 """
+
 import logging
 from enum import Enum
 from typing import Callable

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Tests for project_data.py."""
+
 import pathlib
 import pytest
 
@@ -12,9 +13,13 @@ from mbed_tools.project._internal.project_data import (
     MbedProgramFiles,
     MbedOS,
     MAIN_CPP_FILE_NAME,
-    APP_CONFIG_FILE_NAME_JSON
+    APP_CONFIG_FILE_NAME_JSON,
 )
-from python_tests.mbed_tools.project.factories import make_mbed_lib_reference, make_mbed_program_files, make_mbed_os_files
+from python_tests.mbed_tools.project.factories import (
+    make_mbed_lib_reference,
+    make_mbed_program_files,
+    make_mbed_os_files,
+)
 
 
 class TestMbedProgramFiles:
@@ -74,7 +79,6 @@ class TestMbedProgramFiles:
         assert program.app_config_file.exists()
         assert program.mbed_os_ref.exists()
         assert program.cmakelists_file.exists()
-
 
 
 class TestMbedLibReference:

@@ -19,8 +19,8 @@ import unittest
 
 from mbed_host_tests.host_tests_registry import HostRegistry
 
-class BaseHostTestTestCase(unittest.TestCase):
 
+class BaseHostTestTestCase(unittest.TestCase):
     def setUp(self):
         self.HOSTREGISTRY = HostRegistry()
 
@@ -30,14 +30,15 @@ class BaseHostTestTestCase(unittest.TestCase):
     def test_host_test_has_setup_teardown_attribute(self):
         for ht_name in self.HOSTREGISTRY.HOST_TESTS:
             ht = self.HOSTREGISTRY.HOST_TESTS[ht_name]
-            self.assertTrue(hasattr(ht, 'setup'))
-            self.assertTrue(hasattr(ht, 'teardown'))
+            self.assertTrue(hasattr(ht, "setup"))
+            self.assertTrue(hasattr(ht, "teardown"))
 
     def test_host_test_has_no_rampUpDown_attribute(self):
         for ht_name in self.HOSTREGISTRY.HOST_TESTS:
             ht = self.HOSTREGISTRY.HOST_TESTS[ht_name]
-            self.assertFalse(hasattr(ht, 'rampUp'))
-            self.assertFalse(hasattr(ht, 'rampDown'))
+            self.assertFalse(hasattr(ht, "rampUp"))
+            self.assertFalse(hasattr(ht, "rampDown"))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

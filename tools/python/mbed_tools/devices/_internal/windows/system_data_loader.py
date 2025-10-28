@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Loads system data in parallel and all at once in order to improve performance."""
+
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Tuple, Dict, Generator, Optional, cast
 

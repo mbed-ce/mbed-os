@@ -19,34 +19,34 @@ from . import __version__
 
 
 class HostTestResults(object):
-    """! Test results set by host tests """
+    """! Test results set by host tests"""
 
     def enum(self, **enums):
-        return type('Enum', (), enums)
+        return type("Enum", (), enums)
 
     def __init__(self):
         self.TestResults = self.enum(
-            RESULT_SUCCESS = 'success',
-            RESULT_FAILURE = 'failure',
-            RESULT_ERROR = 'error',
-            RESULT_END = 'end',
-            RESULT_UNDEF = 'undefined',
-            RESULT_TIMEOUT = 'timeout',
-            RESULT_IOERR_COPY = "ioerr_copy",
-            RESULT_IOERR_DISK = "ioerr_disk",
-            RESULT_IO_SERIAL = 'ioerr_serial',
-            RESULT_NO_IMAGE = 'no_image',
-            RESULT_NOT_DETECTED = "not_detected",
-            RESULT_MBED_ASSERT = "mbed_assert",
-            RESULT_PASSIVE = "passive",
-            RESULT_BUILD_FAILED = 'build_failed',
-            RESULT_SYNC_FAILED = 'sync_failed'
+            RESULT_SUCCESS="success",
+            RESULT_FAILURE="failure",
+            RESULT_ERROR="error",
+            RESULT_END="end",
+            RESULT_UNDEF="undefined",
+            RESULT_TIMEOUT="timeout",
+            RESULT_IOERR_COPY="ioerr_copy",
+            RESULT_IOERR_DISK="ioerr_disk",
+            RESULT_IO_SERIAL="ioerr_serial",
+            RESULT_NO_IMAGE="no_image",
+            RESULT_NOT_DETECTED="not_detected",
+            RESULT_MBED_ASSERT="mbed_assert",
+            RESULT_PASSIVE="passive",
+            RESULT_BUILD_FAILED="build_failed",
+            RESULT_SYNC_FAILED="sync_failed",
         )
 
         # Magically creates attributes in this class corresponding
         # to RESULT_ elements in self.TestResults enum
         for attr in self.TestResults.__dict__:
-            if attr.startswith('RESULT_'):
+            if attr.startswith("RESULT_"):
                 setattr(self, attr, self.TestResults.__dict__[attr])
 
         # Indexes of this list define string->int mapping between
@@ -66,32 +66,31 @@ class HostTestResults(object):
             self.TestResults.RESULT_MBED_ASSERT,
             self.TestResults.RESULT_PASSIVE,
             self.TestResults.RESULT_BUILD_FAILED,
-            self.TestResults.RESULT_SYNC_FAILED
+            self.TestResults.RESULT_SYNC_FAILED,
         ]
 
     def get_test_result_int(self, test_result_str):
-        """! Maps test result string to unique integer """
+        """! Maps test result string to unique integer"""
         if test_result_str in self.TestResultsList:
             return self.TestResultsList.index(test_result_str)
         return -1
 
     def __getitem__(self, test_result_str):
-        """! Returns numerical result code """
+        """! Returns numerical result code"""
         return self.get_test_result_int(test_result_str)
 
 
 class Test(HostTestResults):
-    """ Base class for host test's test runner
-    """
+    """Base class for host test's test runner"""
+
     def __init__(self, options):
-        """ ctor
-        """
+        """ctor"""
         HostTestResults.__init__(self)
         self.mbed = Mbed(options)
 
     def run(self):
-        """ Test runner for host test. This function will start executing
-            test and forward test result via serial port to test suite
+        """Test runner for host test. This function will start executing
+        test and forward test result via serial port to test suite
         """
         pass
 
@@ -112,17 +111,15 @@ class Test(HostTestResults):
         """! Test result unified printing function
         @param result Should be a member of HostTestResults.RESULT_* enums
         """
-        self.notify("{{%s}}\n"% result)
-        self.notify("{{%s}}\n"% self.RESULT_END)
+        self.notify("{{%s}}\n" % result)
+        self.notify("{{%s}}\n" % self.RESULT_END)
 
     def finish(self):
-        """ dctor for this class, finishes tasks and closes resources
-        """
+        """dctor for this class, finishes tasks and closes resources"""
         pass
 
     def get_hello_string(self):
-        """ Hello string used as first print
-        """
+        """Hello string used as first print"""
         return "host test executor ver. " + __version__
 
 
@@ -130,5 +127,6 @@ class DefaultTestSelectorBase(Test):
     """! Test class with serial port initialization
     @details This is a base for other test selectors, initializes
     """
+
     def __init__(self, options):
         Test.__init__(self, options=options)

@@ -25,10 +25,9 @@ from mbed_host_tests.host_tests_plugins.host_test_plugins import HostTestPluginB
 
 
 class HostOSDetectionTestCase(unittest.TestCase):
-
     def setUp(self):
         self.plugin_base = HostTestPluginBase()
-        self.os_names = ['Windows7', 'Ubuntu', 'LinuxGeneric', 'Darwin']
+        self.os_names = ["Windows7", "Ubuntu", "LinuxGeneric", "Darwin"]
         self.re_float = re.compile("^\d+\.\d+$")
 
     def tearDown(self):
@@ -44,14 +43,10 @@ class HostOSDetectionTestCase(unittest.TestCase):
         self.assertIn(self.plugin_base.mbed_os_support(), self.os_names)
 
     def test_detect_os_support_ext(self):
-        os_info = (os.name,
-                   platform.system(),
-                   platform.release(),
-                   platform.version(),
-                   sys.platform)
+        os_info = (os.name, platform.system(), platform.release(), platform.version(), sys.platform)
 
         self.assertEqual(os_info, self.plugin_base.mbed_os_info())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

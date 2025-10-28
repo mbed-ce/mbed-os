@@ -20,36 +20,33 @@ from serial import Serial, SerialException
 from .. import host_tests_plugins, DEFAULT_BAUD_RATE
 
 
-def flash_dev(disk=None,
-              image_path=None,
-              copy_method='default',
-              port=None,
-              program_cycle_s=4):
+def flash_dev(disk=None, image_path=None, copy_method="default", port=None, program_cycle_s=4):
     """! Flash device using pythonic interface
     @param disk Switch -d <disk>
     @param image_path Switch -f <image_path>
     @param copy_method Switch -c <copy_method> (default: shell)
     @param port Switch -p <port>
     """
-    if copy_method == 'default':
-        copy_method = 'shell'
+    if copy_method == "default":
+        copy_method = "shell"
     result = False
-    result = host_tests_plugins.call_plugin('CopyMethod',
-                                            copy_method,
-                                            image_path=image_path,
-                                            serial=port,
-                                            destination_disk=disk)
+    result = host_tests_plugins.call_plugin(
+        "CopyMethod", copy_method, image_path=image_path, serial=port, destination_disk=disk
+    )
     sleep(program_cycle_s)
     return result
 
-def reset_dev(port=None,
-              disk=None,
-              reset_type='default',
-              reset_timeout=1,
-              serial_port=None,
-              baudrate=DEFAULT_BAUD_RATE,
-              timeout=1,
-              verbose=False):
+
+def reset_dev(
+    port=None,
+    disk=None,
+    reset_type="default",
+    reset_timeout=1,
+    serial_port=None,
+    baudrate=DEFAULT_BAUD_RATE,
+    timeout=1,
+    verbose=False,
+):
     """! Reset device using pythonic interface
     @param port Switch -p <port>
     @param disk Switch -d <disk>
@@ -66,10 +63,7 @@ def reset_dev(port=None,
     if not serial_port:
         try:
             with Serial(port, baudrate=baudrate, timeout=timeout) as serial_port:
-                result = host_tests_plugins.call_plugin('ResetMethod',
-                                                        reset_type,
-                                                        serial=serial_port,
-                                                        disk=disk)
+                result = host_tests_plugins.call_plugin("ResetMethod", reset_type, serial=serial_port, disk=disk)
             sleep(reset_timeout)
         except SerialException as e:
             if verbose:
@@ -77,19 +71,15 @@ def reset_dev(port=None,
             result = False
     return result
 
-def handle_send_break_cmd(port,
-                          disk,
-                          reset_type=None,
-                          baudrate=None,
-                          timeout=1,
-                          verbose=False):
+
+def handle_send_break_cmd(port, disk, reset_type=None, baudrate=None, timeout=1, verbose=False):
     """! Resets platforms and prints serial port output
-        @detail Mix with switch -r RESET_TYPE and -p PORT for versatility
+    @detail Mix with switch -r RESET_TYPE and -p PORT for versatility
     """
     if not reset_type:
-        reset_type = 'default'
+        reset_type = "default"
 
-    port_config = port.split(':')
+    port_config = port.split(":")
     if len(port_config) == 2:
         # -p COM4:115200
         port = port_config[0]
@@ -105,33 +95,37 @@ def handle_send_break_cmd(port,
         baudrate = DEFAULT_BAUD_RATE
 
     if verbose:
-        print("mbedhtrun: serial port configuration: %s:%s:%s"% (port, str(baudrate), str(timeout)))
+        print("mbedhtrun: serial port configuration: %s:%s:%s" % (port, str(baudrate), str(timeout)))
 
     try:
         serial_port = Serial(port, baudrate=baudrate, timeout=timeout)
     except Exception as e:
         print("mbedhtrun: %s" % (str(e)))
-        print(json.dumps({
-            "port" : port,
-            "disk" : disk,
-            "baudrate" : baudrate,
-            "timeout" : timeout,
-            "reset_type" : reset_type,
-            }, indent=4))
+        print(
+            json.dumps(
+                {
+                    "port": port,
+                    "disk": disk,
+                    "baudrate": baudrate,
+                    "timeout": timeout,
+                    "reset_type": reset_type,
+                },
+                indent=4,
+            )
+        )
         return False
 
     serial_port.flush()
     # Reset using one of the plugins
-    result = host_tests_plugins.call_plugin('ResetMethod', reset_type, serial=serial_port, disk=disk)
+    result = host_tests_plugins.call_plugin("ResetMethod", reset_type, serial=serial_port, disk=disk)
     if not result:
         print("mbedhtrun: reset plugin failed")
-        print(json.dumps({
-            "port" : port,
-            "disk" : disk,
-            "baudrate" : baudrate,
-            "timeout" : timeout,
-            "reset_type" : reset_type
-            }, indent=4))
+        print(
+            json.dumps(
+                {"port": port, "disk": disk, "baudrate": baudrate, "timeout": timeout, "reset_type": reset_type},
+                indent=4,
+            )
+        )
         return False
 
     print("mbedhtrun: serial dump started (use ctrl+c to break)")
@@ -139,7 +133,7 @@ def handle_send_break_cmd(port,
         while True:
             test_output = serial_port.read(512)
             if test_output:
-                sys.stdout.write('%s'% test_output)
+                sys.stdout.write("%s" % test_output)
             if "{end}" in test_output:
                 if verbose:
                     print()

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Data model definition for Device and ConnectedDevices."""
+
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Tuple, Optional, List

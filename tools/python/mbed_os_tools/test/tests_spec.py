@@ -43,9 +43,9 @@ class TestBinary(object):
         :param binary_type:
         :return:
         """
-        assert binary_type in TestBinary.SUPPORTED_BIN_TYPES, (
-            "Binary type %s not supported. Supported types [%s]"
-            % (binary_type, ", ".join(TestBinary.SUPPORTED_BIN_TYPES))
+        assert binary_type in TestBinary.SUPPORTED_BIN_TYPES, "Binary type %s not supported. Supported types [%s]" % (
+            binary_type,
+            ", ".join(TestBinary.SUPPORTED_BIN_TYPES),
         )
         self.__path = path
         self.__flash_method = binary_type
@@ -113,14 +113,12 @@ class Test(object):
         assert Test.KW_TEST_BINS in test_json, "Test spec should contain key `binaries`"
         for binary in test_json[Test.KW_TEST_BINS]:
             mandatory_keys = [TestBinary.KW_BIN_PATH]
-            assert set(mandatory_keys).issubset(
-                set(binary.keys())
-            ), "Binary spec should contain key [%s]" % ",".join(mandatory_keys)
+            assert set(mandatory_keys).issubset(set(binary.keys())), "Binary spec should contain key [%s]" % ",".join(
+                mandatory_keys
+            )
             fm = binary.get(TestBinary.KW_BIN_TYPE, self.__default_flash_method)
             assert fm is not None, "Binary type not specified in build and binary spec."
-            tb = TestBinary(binary[TestBinary.KW_BIN_PATH],
-                            fm,
-                            binary.get(TestBinary.KW_COMP_LOG))
+            tb = TestBinary(binary[TestBinary.KW_BIN_PATH], fm, binary.get(TestBinary.KW_COMP_LOG))
             self.__binaries_by_flash_method[fm] = tb
 
     def add_binary(self, path, binary_type, compare_log=None):
@@ -131,9 +129,7 @@ class Test(object):
         :param binary_type:
         :return:
         """
-        self.__binaries_by_flash_method[binary_type] = TestBinary(path,
-                                                                  binary_type,
-                                                                  compare_log)
+        self.__binaries_by_flash_method[binary_type] = TestBinary(path, binary_type, compare_log)
 
 
 class TestBuild(object):
@@ -149,9 +145,7 @@ class TestBuild(object):
     KW_TESTS = "tests"
     KW_BIN_TYPE = "binary_type"
 
-    def __init__(
-        self, name, platform, toolchain, baud_rate, base_path, default_flash_method=None
-    ):
+    def __init__(self, name, platform, toolchain, baud_rate, base_path, default_flash_method=None):
         """
         ctor.
 
@@ -226,9 +220,7 @@ class TestBuild(object):
         :param build_spec:
         :return:
         """
-        assert TestBuild.KW_TESTS in build_spec, (
-            "Build spec should contain key '%s'" % TestBuild.KW_TESTS
-        )
+        assert TestBuild.KW_TESTS in build_spec, "Build spec should contain key '%s'" % TestBuild.KW_TESTS
         for name, test_json in build_spec[TestBuild.KW_TESTS].items():
             test = Test(name, default_flash_method=self.__default_flash_method)
             test.parse(test_json)
@@ -288,9 +280,7 @@ class TestSpec(object):
         :param spec:
         :return:
         """
-        assert TestSpec.KW_BUILDS, (
-            "Test spec should contain key '%s'" % TestSpec.KW_BUILDS
-        )
+        assert TestSpec.KW_BUILDS, "Test spec should contain key '%s'" % TestSpec.KW_BUILDS
         for build_name, build in spec[TestSpec.KW_BUILDS].items():
             mandatory_keys = [
                 TestBuild.KW_PLATFORM,
@@ -299,8 +289,7 @@ class TestSpec(object):
                 TestBuild.KW_BUILD_BASE_PATH,
             ]
             assert set(mandatory_keys).issubset(set(build.keys())), (
-                "Build spec should contain keys [%s]. It has [%s]"
-                % (",".join(mandatory_keys), ",".join(build.keys()))
+                "Build spec should contain keys [%s]. It has [%s]" % (",".join(mandatory_keys), ",".join(build.keys()))
             )
             platform = build[TestBuild.KW_PLATFORM]
             toolchain = build[TestBuild.KW_TOOLCHAIN]

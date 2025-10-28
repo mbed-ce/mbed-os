@@ -76,9 +76,7 @@ def _get_cached_mounted_points():
     result = []
     try:
         # Open the registry key for mounted devices
-        mounted_devices_key = winreg.OpenKey(
-            winreg.HKEY_LOCAL_MACHINE, "SYSTEM\\MountedDevices"
-        )
+        mounted_devices_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SYSTEM\\MountedDevices")
         for v in _iter_vals(mounted_devices_key):
             # Valid entries have the following format: \\DosDevices\\D:
             if "DosDevices" not in v[0]:
@@ -95,9 +93,7 @@ def _get_cached_mounted_points():
                 continue
 
             mount_point = mount_point_match.group(1)
-            logger.debug(
-                "Mount point %s found for volume %s", mount_point, volume_string
-            )
+            logger.debug("Mount point %s found for volume %s", mount_point, volume_string)
 
             result.append({"mount_point": mount_point, "volume_string": volume_string})
     except OSError:
@@ -109,9 +105,7 @@ def _get_cached_mounted_points():
 def _get_disks():
     logger.debug("Fetching mounted devices from disk service registry entry")
     try:
-        disks_key = winreg.OpenKey(
-            winreg.HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\Disk\\Enum"
-        )
+        disks_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\Disk\\Enum")
         disk_strings = _get_values_with_numeric_keys(disks_key)
         return [v for v in disk_strings if _is_mbed_volume(v)]
     except OSError:
@@ -169,9 +163,7 @@ def _determine_valid_non_composite_devices(devices, target_id_usb_id_mount_point
                 "mount_point": target_id_usb_id_mount_point_map[target_id_usb_id],
             }
 
-            candidates[target_id_usb_id].update(
-                _vid_pid_path_to_usb_info(device["vid_pid_path"])
-            )
+            candidates[target_id_usb_id].update(_vid_pid_path_to_usb_info(device["vid_pid_path"]))
         except KeyError:
             pass
 
@@ -220,22 +212,19 @@ def _vid_pid_path_to_usb_info(vid_pid_path):
 
 
 def _iter_keys_as_str(key):
-    """! Iterate over subkeys of a key returning subkey as string
-    """
+    """! Iterate over subkeys of a key returning subkey as string"""
     for i in range(winreg.QueryInfoKey(key)[0]):
         yield winreg.EnumKey(key, i)
 
 
 def _iter_keys(key):
-    """! Iterate over subkeys of a key
-    """
+    """! Iterate over subkeys of a key"""
     for i in range(winreg.QueryInfoKey(key)[0]):
         yield winreg.OpenKey(key, winreg.EnumKey(key, i))
 
 
 def _iter_vals(key):
-    """! Iterate over values of a key
-    """
+    """! Iterate over values of a key"""
     logger.debug("_iter_vals %r", key)
     for i in range(winreg.QueryInfoKey(key)[1]):
         yield winreg.EnumValue(key, i)
@@ -246,8 +235,7 @@ class CompatibleIDsNotFoundException(Exception):
 
 
 class MbedLsToolsWin7(MbedLsToolsBase):
-    """ mbed-enabled platform detection for Windows
-    """
+    """mbed-enabled platform detection for Windows"""
 
     def __init__(self, **kwargs):
         MbedLsToolsBase.__init__(self, **kwargs)
@@ -276,9 +264,9 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                         )
                         continue
 
-                    target_id_usb_id_mount_point_map[
-                        target_id_usb_id_match.group(1)
-                    ] = cached_mount_point_info["mount_point"]
+                    target_id_usb_id_mount_point_map[target_id_usb_id_match.group(1)] = cached_mount_point_info[
+                        "mount_point"
+                    ]
                     disks.pop(index)
                     break
 
@@ -315,39 +303,27 @@ class MbedLsToolsWin7(MbedLsToolsBase):
 
         candidates = defaultdict(dict)
         candidates.update(
-            _determine_valid_non_composite_devices(
-                non_composite_devices, target_id_usb_id_mount_point_map
-            )
+            _determine_valid_non_composite_devices(non_composite_devices, target_id_usb_id_mount_point_map)
         )
         # Now we'll find all valid VID/PID and target ID combinations
-        target_id_usb_ids = set(target_id_usb_id_mount_point_map.keys()) - set(
-            candidates.keys()
-        )
+        target_id_usb_ids = set(target_id_usb_id_mount_point_map.keys()) - set(candidates.keys())
         vid_pid_entry_key_string_map = defaultdict(set)
 
         for device in composite_devices:
-            vid_pid_entry_key_string_map[device["vid_pid_path"]].add(
-                device["entry_key_string"]
-            )
+            vid_pid_entry_key_string_map[device["vid_pid_path"]].add(device["entry_key_string"])
 
         vid_pid_target_id_usb_id_map = defaultdict(dict)
         usb_key_string = "SYSTEM\\CurrentControlSet\\Enum\\USB"
         for vid_pid_path, entry_key_strings in vid_pid_entry_key_string_map.items():
             vid_pid_key_string = "%s\\%s" % (usb_key_string, vid_pid_path)
             try:
-                vid_pid_key = winreg.OpenKey(
-                    winreg.HKEY_LOCAL_MACHINE, vid_pid_key_string
-                )
-                target_id_usb_id_sub_keys = set(
-                    [k for k in _iter_keys_as_str(vid_pid_key)]
-                )
+                vid_pid_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, vid_pid_key_string)
+                target_id_usb_id_sub_keys = set([k for k in _iter_keys_as_str(vid_pid_key)])
             except OSError:
                 logger.debug('VID/PID "%s" not found', vid_pid_key_string)
                 continue
 
-            overlapping_target_id_usb_ids = target_id_usb_id_sub_keys.intersection(
-                set(target_id_usb_ids)
-            )
+            overlapping_target_id_usb_ids = target_id_usb_id_sub_keys.intersection(set(target_id_usb_ids))
             for target_id_usb_id in overlapping_target_id_usb_ids:
                 composite_device_key_string = "%s\\%s" % (
                     vid_pid_key_string,
@@ -359,16 +335,11 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                 is_prefix = False
 
                 try:
-                    new_entry_key_string, _ = winreg.QueryValueEx(
-                        composite_device_key, "ParentIdPrefix"
-                    )
+                    new_entry_key_string, _ = winreg.QueryValueEx(composite_device_key, "ParentIdPrefix")
 
-                    if any(
-                        e.startswith(new_entry_key_string) for e in entry_key_strings
-                    ):
+                    if any(e.startswith(new_entry_key_string) for e in entry_key_strings):
                         logger.debug(
-                            "Assigning new entry key string of %s to device %s, "
-                            "as found in ParentIdPrefix",
+                            "Assigning new entry key string of %s to device %s, as found in ParentIdPrefix",
                             new_entry_key_string,
                             target_id_usb_id,
                         )
@@ -376,8 +347,7 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                         is_prefix = True
                 except OSError:
                     logger.debug(
-                        'Device %s did not have a "ParentIdPrefix" key, '
-                        "sticking with %s as entry key string",
+                        'Device %s did not have a "ParentIdPrefix" key, sticking with %s as entry key string',
                         composite_device_key_string,
                         target_id_usb_id,
                     )
@@ -391,18 +361,14 @@ class MbedLsToolsWin7(MbedLsToolsBase):
             vid_pid_path,
             entry_key_string_target_id_usb_id_map,
         ) in vid_pid_target_id_usb_id_map.items():
-            for composite_device_subdevice_number in range(
-                MAX_COMPOSITE_DEVICE_SUBDEVICES
-            ):
+            for composite_device_subdevice_number in range(MAX_COMPOSITE_DEVICE_SUBDEVICES):
                 subdevice_type_key_string = "%s\\%s&MI_0%d" % (
                     usb_key_string,
                     vid_pid_path,
                     composite_device_subdevice_number,
                 )
                 try:
-                    subdevice_type_key = winreg.OpenKey(
-                        winreg.HKEY_LOCAL_MACHINE, subdevice_type_key_string
-                    )
+                    subdevice_type_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, subdevice_type_key_string)
                 except OSError:
                     logger.debug(
                         "Composite device subdevice key %s was not found, skipping",
@@ -426,13 +392,9 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                         prepared_entry_key_string,
                     )
                     try:
-                        subdevice_key = winreg.OpenKey(
-                            subdevice_type_key, prepared_entry_key_string
-                        )
+                        subdevice_key = winreg.OpenKey(subdevice_type_key, prepared_entry_key_string)
                     except OSError:
-                        logger.debug(
-                            "Sub-device %s not found, skipping", subdevice_key_string
-                        )
+                        logger.debug("Sub-device %s not found, skipping", subdevice_key_string)
                         continue
 
                     try:
@@ -445,38 +407,24 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                         continue
 
                     if capability == "msd":
-                        candidates[entry_data["target_id_usb_id"]][
-                            "mount_point"
-                        ] = target_id_usb_id_mount_point_map[
+                        candidates[entry_data["target_id_usb_id"]]["mount_point"] = target_id_usb_id_mount_point_map[
                             entry_data["target_id_usb_id"]
                         ]
-                        candidates[entry_data["target_id_usb_id"]].update(
-                            _vid_pid_path_to_usb_info(vid_pid_path)
-                        )
+                        candidates[entry_data["target_id_usb_id"]].update(_vid_pid_path_to_usb_info(vid_pid_path))
                     elif capability == "serial":
                         try:
-                            device_parameters_key = winreg.OpenKey(
-                                subdevice_key, "Device Parameters"
-                            )
+                            device_parameters_key = winreg.OpenKey(subdevice_key, "Device Parameters")
                         except OSError:
-                            logger.debug(
-                                'Key "Device Parameters" not under serial device entry'
-                            )
+                            logger.debug('Key "Device Parameters" not under serial device entry')
                             continue
 
                         try:
-                            candidates[entry_data["target_id_usb_id"]][
-                                "serial_port"
-                            ], _ = winreg.QueryValueEx(
+                            candidates[entry_data["target_id_usb_id"]]["serial_port"], _ = winreg.QueryValueEx(
                                 device_parameters_key, "PortName"
                             )
-                            candidates[entry_data["target_id_usb_id"]].update(
-                                _vid_pid_path_to_usb_info(vid_pid_path)
-                            )
+                            candidates[entry_data["target_id_usb_id"]].update(_vid_pid_path_to_usb_info(vid_pid_path))
                         except OSError:
-                            logger.debug(
-                                '"PortName" value not found under serial device entry'
-                            )
+                            logger.debug('"PortName" value not found under serial device entry')
                             continue
 
         final_candidates = []

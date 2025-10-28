@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 def export_to_file(file_name, payload):
     """! Simple file dump used to store reports on disk
     @param file_name Report file name (with path if needed)
@@ -21,7 +22,7 @@ def export_to_file(file_name, payload):
     """
     result = True
     try:
-        with open(file_name, 'w') as f:
+        with open(file_name, "w") as f:
             f.write(payload)
     except IOError as e:
         print("Exporting report to file failed: %s" % str(e))
@@ -34,6 +35,7 @@ def exporter_json(test_result_ext, test_suite_properties=None):
     @details This is a machine friendly format
     """
     import json
+
     for target in test_result_ext.values():
         for suite in target.values():
             try:
@@ -49,14 +51,15 @@ def exporter_text(test_result_ext, test_suite_properties=None):
     @return Tuple with table of results and result quantity summary string
     """
     from prettytable import PrettyTable, HEADER
-    #TODO: export to text, preferably to PrettyTable (SQL like) format
-    cols = ['target', 'platform_name', 'test suite', 'result', 'elapsed_time (sec)', 'copy_method']
+
+    # TODO: export to text, preferably to PrettyTable (SQL like) format
+    cols = ["target", "platform_name", "test suite", "result", "elapsed_time (sec)", "copy_method"]
     pt = PrettyTable(cols, junction_char="|", hrules=HEADER)
     for col in cols:
         pt.align[col] = "l"
-    pt.padding_width = 1 # One space between column edges and contents (default)
+    pt.padding_width = 1  # One space between column edges and contents (default)
 
-    result_dict = {}     # Used to print test suite results
+    result_dict = {}  # Used to print test suite results
 
     for target_name in sorted(test_result_ext):
         test_results = test_result_ext[target_name]
@@ -65,23 +68,26 @@ def exporter_text(test_result_ext, test_suite_properties=None):
             test = test_results[test_name]
 
             # Grab quantity of each test result
-            if test['single_test_result'] in result_dict:
-                result_dict[test['single_test_result']] += 1
+            if test["single_test_result"] in result_dict:
+                result_dict[test["single_test_result"]] += 1
             else:
-                result_dict[test['single_test_result']] = 1
+                result_dict[test["single_test_result"]] = 1
 
             row.append(target_name)
-            row.append(test['platform_name'])
+            row.append(test["platform_name"])
             row.append(test_name)
-            row.append(test['single_test_result'])
-            row.append(round(test['elapsed_time'], 2))
-            row.append(test['copy_method'])
+            row.append(test["single_test_result"])
+            row.append(round(test["elapsed_time"], 2))
+            row.append(test["copy_method"])
             pt.add_row(row)
             row = []
 
     result_pt = pt.get_string()
-    result_res = ' / '.join(['%s %s' % (value, key) for (key, value) in {k: v for k, v in result_dict.items() if v != 0}.items()])
+    result_res = " / ".join(
+        ["%s %s" % (value, key) for (key, value) in {k: v for k, v in result_dict.items() if v != 0}.items()]
+    )
     return result_pt, result_res
+
 
 def exporter_testcase_text(test_result_ext, test_suite_properties=None):
     """! Exports test case results to text formatted output
@@ -91,14 +97,15 @@ def exporter_testcase_text(test_result_ext, test_suite_properties=None):
     @return Tuple with table of results and result quantity summary string
     """
     from prettytable import PrettyTable, HEADER
-    #TODO: export to text, preferably to PrettyTable (SQL like) format
-    cols = ['target', 'platform_name', 'test suite', 'test case', 'passed', 'failed', 'result', 'elapsed_time (sec)']
+
+    # TODO: export to text, preferably to PrettyTable (SQL like) format
+    cols = ["target", "platform_name", "test suite", "test case", "passed", "failed", "result", "elapsed_time (sec)"]
     pt = PrettyTable(cols, junction_char="|", hrules=HEADER)
     for col in cols:
         pt.align[col] = "l"
-    pt.padding_width = 1 # One space between column edges and contents (default)
+    pt.padding_width = 1  # One space between column edges and contents (default)
 
-    result_testcase_dict = {}   # Used to print test case results
+    result_testcase_dict = {}  # Used to print test case results
 
     for target_name in sorted(test_result_ext):
         test_results = test_result_ext[target_name]
@@ -107,7 +114,7 @@ def exporter_testcase_text(test_result_ext, test_suite_properties=None):
             test = test_results[test_suite_name]
 
             # testcase_result stores info about test case results
-            testcase_result = test['testcase_result']
+            testcase_result = test["testcase_result"]
             #   "testcase_result": {
             #       "STRINGS004": {
             #           "duration": 0.009999990463256836,
@@ -117,11 +124,11 @@ def exporter_testcase_text(test_result_ext, test_suite_properties=None):
             #       },
 
             for tc_name in sorted(testcase_result):
-                duration = testcase_result[tc_name].get('duration', 0.0)
+                duration = testcase_result[tc_name].get("duration", 0.0)
                 # result = testcase_result[tc_name].get('result', 0)
-                passed = testcase_result[tc_name].get('passed', 0)
-                failed = testcase_result[tc_name].get('failed', 0)
-                result_text = testcase_result[tc_name].get('result_text', "UNDEF")
+                passed = testcase_result[tc_name].get("passed", 0)
+                failed = testcase_result[tc_name].get("failed", 0)
+                result_text = testcase_result[tc_name].get("result_text", "UNDEF")
 
                 # Grab quantity of each test result
                 if result_text in result_testcase_dict:
@@ -130,7 +137,7 @@ def exporter_testcase_text(test_result_ext, test_suite_properties=None):
                     result_testcase_dict[result_text] = 1
 
                 row.append(target_name)
-                row.append(test['platform_name'])
+                row.append(test["platform_name"])
                 row.append(test_suite_name)
                 row.append(tc_name)
                 row.append(passed)
@@ -141,8 +148,11 @@ def exporter_testcase_text(test_result_ext, test_suite_properties=None):
                 row = []
 
     result_pt = pt.get_string()
-    result_res = ' / '.join(['%s %s' % (value, key) for (key, value) in {k: v for k, v in result_testcase_dict.items() if v != 0}.items()])
+    result_res = " / ".join(
+        ["%s %s" % (value, key) for (key, value) in {k: v for k, v in result_testcase_dict.items() if v != 0}.items()]
+    )
     return result_pt, result_res
+
 
 def exporter_testcase_junit(test_result_ext, test_suite_properties=None):
     """! Export test results in JUnit XML compliant format
@@ -160,10 +170,10 @@ def exporter_testcase_junit(test_result_ext, test_suite_properties=None):
         test_results = test_result_ext[target_name]
         for test_suite_name in test_results:
             test = test_results[test_suite_name]
-            tc_stdout = test['single_test_output']
+            tc_stdout = test["single_test_output"]
 
             # testcase_result stores info about test case results
-            testcase_result = test['testcase_result']
+            testcase_result = test["testcase_result"]
             #   "testcase_result": {
             #       "STRINGS004": {
             #           "duration": 0.009999990463256836,
@@ -175,25 +185,25 @@ def exporter_testcase_junit(test_result_ext, test_suite_properties=None):
             test_cases = []
 
             for tc_name in sorted(testcase_result.keys()):
-                duration = testcase_result[tc_name].get('duration', 0.0)
-                utest_log = testcase_result[tc_name].get('utest_log', '')
-                result_text = testcase_result[tc_name].get('result_text', "UNDEF")
+                duration = testcase_result[tc_name].get("duration", 0.0)
+                utest_log = testcase_result[tc_name].get("utest_log", "")
+                result_text = testcase_result[tc_name].get("result_text", "UNDEF")
 
-                tc_stderr = '\n'.join(utest_log)
-                tc_class = target_name + '.' + test_suite_name
+                tc_stderr = "\n".join(utest_log)
+                tc_class = target_name + "." + test_suite_name
 
-                if result_text == 'SKIPPED':
+                if result_text == "SKIPPED":
                     # Skipped test cases do not have logs and we do not want to put
                     # whole log inside JUNIT for skipped test case
                     tc_stderr = str()
 
                 tc = TestCase(tc_name, tc_class, duration, tc_stdout, tc_stderr)
 
-                if result_text == 'FAIL':
+                if result_text == "FAIL":
                     tc.add_failure_info(result_text)
-                elif result_text == 'SKIPPED':
+                elif result_text == "SKIPPED":
                     tc.add_skipped_info(result_text)
-                elif result_text != 'OK':
+                elif result_text != "OK":
                     tc.add_error_info(result_text)
 
                 test_cases.append(tc)
@@ -209,6 +219,7 @@ def exporter_testcase_junit(test_result_ext, test_suite_properties=None):
             test_suites.append(ts)
 
     return TestSuite.to_xml_string(test_suites)
+
 
 html_template = """
 <!DOCTYPE html>
@@ -234,10 +245,10 @@ html_template = """
                     if (elem) {
                         if (elem.style.height == "0px" || elem.style.height == "") {
                             elem.style.height = "auto";
-                            elem.previousElementSibling.textContent = elem.previousElementSibling.textContent.replace("\u25B2", "\u25BC");
+                            elem.previousElementSibling.textContent = elem.previousElementSibling.textContent.replace("\u25b2", "\u25bc");
                         } else {
                             elem.style.height = 0;
-                            elem.previousElementSibling.textContent = elem.previousElementSibling.textContent.replace("\u25BC", "\u25B2");
+                            elem.previousElementSibling.textContent = elem.previousElementSibling.textContent.replace("\u25bc", "\u25b2");
                         }
                     }
             }
@@ -414,22 +425,23 @@ html_template = """
 </html>"""
 
 TEST_RESULT_COLOURS = {
-    'OK': "limegreen",
-    'FAIL': "darkorange",
-    'ERROR': "orangered",
-    'SKIPPED': "lightsteelblue",
-    'UNDEF': "Red",
-    'IOERR_COPY': "DarkSalmon",
-    'IOERR_DISK': "DarkSalmon",
-    'IOERR_SERIAL': "DarkSalmon",
-    'TIMEOUT': "DarkKhaki",
-    'NO_IMAGE': "DarkSalmon",
-    'NOT_RAN': 'grey'
+    "OK": "limegreen",
+    "FAIL": "darkorange",
+    "ERROR": "orangered",
+    "SKIPPED": "lightsteelblue",
+    "UNDEF": "Red",
+    "IOERR_COPY": "DarkSalmon",
+    "IOERR_DISK": "DarkSalmon",
+    "IOERR_SERIAL": "DarkSalmon",
+    "TIMEOUT": "DarkKhaki",
+    "NO_IMAGE": "DarkSalmon",
+    "NOT_RAN": "grey",
     # 'MBED_ASSERT': "",
     # 'BUILD_FAILED': "",
 }
 
 TEST_RESULT_DEFAULT_COLOUR = "lavender"
+
 
 def get_result_colour_class_css():
     """! Get the CSS for the colour classes
@@ -446,13 +458,12 @@ def get_result_colour_class_css():
     # Create CSS classes for all of the allocated colours
     css = ""
     for result, colour in TEST_RESULT_COLOURS.items():
-        css += colour_class_template % ("result-%s" % result.lower().replace("_", "-"),
-                                        colour)
+        css += colour_class_template % ("result-%s" % result.lower().replace("_", "-"), colour)
 
-    css += colour_class_template % ("result-other",
-                                    TEST_RESULT_DEFAULT_COLOUR)
+    css += colour_class_template % ("result-other", TEST_RESULT_DEFAULT_COLOUR)
 
     return css
+
 
 def get_result_colour_class(result):
     """! Get the CSS colour class representing the result
@@ -465,6 +476,7 @@ def get_result_colour_class(result):
         return "result-%s" % result.lower().replace("_", "-")
     else:
         return "result-other"
+
 
 def get_dropdown_html(div_id, dropdown_name, content, title_classes="", output_text=False, sub_dropdown=False):
     """! Get the HTML for a dropdown menu
@@ -490,12 +502,8 @@ def get_dropdown_html(div_id, dropdown_name, content, title_classes="", output_t
     if sub_dropdown:
         dropdown_classes += " sub-dropdown-content"
 
-    return dropdown_template % (title_classes,
-                                div_id,
-                                dropdown_name,
-                                div_id,
-                                dropdown_classes,
-                                content)
+    return dropdown_template % (title_classes, div_id, dropdown_name, div_id, dropdown_classes, content)
+
 
 def get_result_overlay_testcase_dropdown(result_div_id, index, testcase_result_name, testcase_result):
     """! Get the HTML for an individual testcase dropdown
@@ -521,33 +529,39 @@ def get_result_overlay_testcase_dropdown(result_div_id, index, testcase_result_n
     testcase_div_id = "%s_testcase_result_%d" % (result_div_id, index)
     testcase_utest_div_id = "%s_testcase_result_%d_utest" % (result_div_id, index)
 
-    testcase_utest_log_dropdown = get_dropdown_html(testcase_utest_div_id,
-                                                    "uTest Log",
-                                                    "\n".join(testcase_result.get('utest_log', 'n/a')).rstrip("\n"),
-                                                    output_text=True,
-                                                    sub_dropdown=True)
+    testcase_utest_log_dropdown = get_dropdown_html(
+        testcase_utest_div_id,
+        "uTest Log",
+        "\n".join(testcase_result.get("utest_log", "n/a")).rstrip("\n"),
+        output_text=True,
+        sub_dropdown=True,
+    )
 
-    time_start = 'n/a'
-    time_end = 'n/a'
-    if 'time_start' in testcase_result.keys():
-        time_start = datetime.datetime.fromtimestamp(testcase_result['time_start']).strftime('%d-%m-%Y %H:%M:%S.%f')
-    if 'time_end' in testcase_result.keys():
-        time_end = datetime.datetime.fromtimestamp(testcase_result['time_end']).strftime('%d-%m-%Y %H:%M:%S.%f')
+    time_start = "n/a"
+    time_end = "n/a"
+    if "time_start" in testcase_result.keys():
+        time_start = datetime.datetime.fromtimestamp(testcase_result["time_start"]).strftime("%d-%m-%Y %H:%M:%S.%f")
+    if "time_end" in testcase_result.keys():
+        time_end = datetime.datetime.fromtimestamp(testcase_result["time_end"]).strftime("%d-%m-%Y %H:%M:%S.%f")
 
-    testcase_info = testcase_result_template % (testcase_result.get('result_text', 'n/a'),
-                                                testcase_result.get('duration', 'n/a'),
-                                                time_start,
-                                                time_end,
-                                                testcase_result.get('failed', 'n/a'),
-                                                testcase_result.get('passed', 'n/a'),
-                                                testcase_utest_log_dropdown)
+    testcase_info = testcase_result_template % (
+        testcase_result.get("result_text", "n/a"),
+        testcase_result.get("duration", "n/a"),
+        time_start,
+        time_end,
+        testcase_result.get("failed", "n/a"),
+        testcase_result.get("passed", "n/a"),
+        testcase_utest_log_dropdown,
+    )
 
-    testcase_class = get_result_colour_class(testcase_result['result_text'])
-    testcase_dropdown = get_dropdown_html(testcase_div_id,
-                                          "Testcase: %s<br>" % testcase_result_name,
-                                          testcase_info,
-                                          title_classes=testcase_class,
-                                          sub_dropdown=True)
+    testcase_class = get_result_colour_class(testcase_result["result_text"])
+    testcase_dropdown = get_dropdown_html(
+        testcase_div_id,
+        "Testcase: %s<br>" % testcase_result_name,
+        testcase_info,
+        title_classes=testcase_class,
+        sub_dropdown=True,
+    )
     return testcase_dropdown
 
 
@@ -563,15 +577,17 @@ def get_result_overlay_testcases_dropdown_menu(result_div_id, test_results):
     testcase_results_info = ""
 
     # Loop through the test cases giving them a number to create a unique id
-    for index, (testcase_result_name, testcase_result) in enumerate(test_results['testcase_result'].items()):
-        testcase_results_info += get_result_overlay_testcase_dropdown(result_div_id, index, testcase_result_name, testcase_result)
+    for index, (testcase_result_name, testcase_result) in enumerate(test_results["testcase_result"].items()):
+        testcase_results_info += get_result_overlay_testcase_dropdown(
+            result_div_id, index, testcase_result_name, testcase_result
+        )
 
-    result_testcases_dropdown = get_dropdown_html(testcase_results_div_id,
-                                                  "Testcase Results",
-                                                  testcase_results_info,
-                                                  sub_dropdown=True)
+    result_testcases_dropdown = get_dropdown_html(
+        testcase_results_div_id, "Testcase Results", testcase_results_info, sub_dropdown=True
+    )
 
     return result_testcases_dropdown
+
 
 def get_result_overlay_dropdowns(result_div_id, test_results):
     """! Get the HTML for a test overlay's dropdown menus
@@ -584,18 +600,19 @@ def get_result_overlay_dropdowns(result_div_id, test_results):
     # The HTML for the dropdown containing the ouput of the test
     result_output_div_id = "%s_output" % result_div_id
     result_output_dropdown = get_dropdown_html(
-        result_output_div_id, "Test Output",
-        test_results['single_test_output'].rstrip("\n"),
-        output_text=True
+        result_output_div_id, "Test Output", test_results["single_test_output"].rstrip("\n"), output_text=True
     )
 
     # Add a dropdown for the testcases if they are present
     if len(test_results) > 0:
-        result_overlay_dropdowns = result_output_dropdown + get_result_overlay_testcases_dropdown_menu(result_div_id, test_results)
+        result_overlay_dropdowns = result_output_dropdown + get_result_overlay_testcases_dropdown_menu(
+            result_div_id, test_results
+        )
     else:
         result_overlay_dropdowns = result_output_dropdown
 
     return result_overlay_dropdowns
+
 
 def get_result_overlay(result_div_id, test_name, platform, toolchain, test_results):
     """! Get the HTML for a test's overlay
@@ -625,18 +642,21 @@ def get_result_overlay(result_div_id, test_name, platform, toolchain, test_resul
 
     overlay_dropdowns = get_result_overlay_dropdowns(result_div_id, test_results)
 
-    return overlay_template % (result_div_id,
-                               test_name,
-                               result_div_id,
-                               test_results['single_test_result'],
-                               platform,
-                               toolchain,
-                               test_results['elapsed_time'],
-                               test_results['build_path'],
-                               test_results['build_path_abs'],
-                               test_results['copy_method'],
-                               test_results['image_path'],
-                               overlay_dropdowns)
+    return overlay_template % (
+        result_div_id,
+        test_name,
+        result_div_id,
+        test_results["single_test_result"],
+        platform,
+        toolchain,
+        test_results["elapsed_time"],
+        test_results["build_path"],
+        test_results["build_path_abs"],
+        test_results["copy_method"],
+        test_results["image_path"],
+        overlay_dropdowns,
+    )
+
 
 def exporter_html(test_result_ext, test_suite_properties=None):
     """! Export test results as HTML
@@ -668,8 +688,8 @@ def exporter_html(test_result_ext, test_suite_properties=None):
         # Format of string is <PLATFORM>-<TOOLCHAIN>
         # <PLATFORM> can however contain '-' such as "frdm-k64f"
         # <TOOLCHAIN> is split with '_' fortunately, as in "gcc_arm"
-        toolchain = platform_toolchain.split('-')[-1]
-        platform = platform_toolchain.replace('-%s'% toolchain, '')
+        toolchain = platform_toolchain.split("-")[-1]
+        platform = platform_toolchain.replace("-%s" % toolchain, "")
         if platform in platforms_toolchains:
             platforms_toolchains[platform].append(toolchain)
         else:
@@ -714,50 +734,51 @@ def exporter_html(test_result_ext, test_suite_properties=None):
                     test_results = test_result_ext["%s-%s" % (platform, toolchain)][test_name]
                 else:
                     test_results = {
-                        'single_test_result': 'NOT_RAN',
-                        'elapsed_time': 0.0,
-                        'build_path': 'N/A',
-                        'build_path_abs': 'N/A',
-                        'copy_method': 'N/A',
-                        'image_path': 'N/A',
-                        'single_test_output': 'N/A',
-                        'platform_name': platform,
-                        'test_bin_name': 'N/A',
-                        'testcase_result': {}
+                        "single_test_result": "NOT_RAN",
+                        "elapsed_time": 0.0,
+                        "build_path": "N/A",
+                        "build_path_abs": "N/A",
+                        "copy_method": "N/A",
+                        "image_path": "N/A",
+                        "single_test_output": "N/A",
+                        "platform_name": platform,
+                        "test_bin_name": "N/A",
+                        "testcase_result": {},
                     }
 
-                test_results['single_test_passes'] = 0
-                test_results['single_test_count'] = 0
-                result_div_id = "target_%s_toolchain_%s_test_%s" % (platform, toolchain, test_name.replace('-', '_'))
+                test_results["single_test_passes"] = 0
+                test_results["single_test_count"] = 0
+                result_div_id = "target_%s_toolchain_%s_test_%s" % (platform, toolchain, test_name.replace("-", "_"))
 
-                result_overlay = get_result_overlay(result_div_id,
-                                                    test_name,
-                                                    platform,
-                                                    toolchain,
-                                                    test_results)
+                result_overlay = get_result_overlay(result_div_id, test_name, platform, toolchain, test_results)
 
                 # Loop through the test cases and count the passes and failures
-                for index, (testcase_result_name, testcase_result) in enumerate(test_results['testcase_result'].items()):
-                    test_results['single_test_passes'] += testcase_result['passed']
-                    test_results['single_test_count'] += 1
+                for index, (testcase_result_name, testcase_result) in enumerate(
+                    test_results["testcase_result"].items()
+                ):
+                    test_results["single_test_passes"] += testcase_result["passed"]
+                    test_results["single_test_count"] += 1
 
-                result_class = get_result_colour_class(test_results['single_test_result'])
+                result_class = get_result_colour_class(test_results["single_test_result"])
                 try:
-                    percent_pass = int((test_results['single_test_passes']*100.0)/test_results['single_test_count'])
+                    percent_pass = int((test_results["single_test_passes"] * 100.0) / test_results["single_test_count"])
                 except ZeroDivisionError:
                     percent_pass = 100
-                this_row += result_cell_template % (result_class,
-                                                    result_div_id,
-                                                    test_results['single_test_result'],
-                                                    percent_pass,
-                                                    test_results['single_test_passes'],
-                                                    test_results['single_test_count'],
-                                                    result_overlay)
+                this_row += result_cell_template % (
+                    result_class,
+                    result_div_id,
+                    test_results["single_test_result"],
+                    percent_pass,
+                    test_results["single_test_passes"],
+                    test_results["single_test_count"],
+                    result_overlay,
+                )
 
         table += row_template % this_row
 
     # Add the numbers of columns to make them have the same width
     return html_template % (get_result_colour_class_css(), len(test_result_ext), table)
+
 
 def exporter_memory_metrics_csv(test_result_ext, test_suite_properties=None):
     """! Export memory metrics as CSV
@@ -773,37 +794,37 @@ def exporter_memory_metrics_csv(test_result_ext, test_suite_properties=None):
         for test_suite_name in test_results:
             test = test_results[test_suite_name]
 
-            if 'memory_metrics' in test and test['memory_metrics']:
-                memory_metrics = test['memory_metrics']
+            if "memory_metrics" in test and test["memory_metrics"]:
+                memory_metrics = test["memory_metrics"]
 
-                if 'max_heap' in memory_metrics:
-                    report_key = '%s_%s_max_heap_usage' % (target_name, test_suite_name)
-                    metrics_report[report_key] = memory_metrics['max_heap']
+                if "max_heap" in memory_metrics:
+                    report_key = "%s_%s_max_heap_usage" % (target_name, test_suite_name)
+                    metrics_report[report_key] = memory_metrics["max_heap"]
 
-                if 'reserved_heap' in memory_metrics:
-                    report_key = '%s_%s_reserved_heap_usage' % (target_name, test_suite_name)
-                    metrics_report[report_key] = memory_metrics['reserved_heap']
+                if "reserved_heap" in memory_metrics:
+                    report_key = "%s_%s_reserved_heap_usage" % (target_name, test_suite_name)
+                    metrics_report[report_key] = memory_metrics["reserved_heap"]
 
-                if 'thread_stack_summary' in memory_metrics:
-                    thread_stack_summary = memory_metrics['thread_stack_summary']
+                if "thread_stack_summary" in memory_metrics:
+                    thread_stack_summary = memory_metrics["thread_stack_summary"]
 
-                    if 'max_stack_size' in thread_stack_summary:
-                        report_key = '%s_%s_max_stack_size' % (target_name, test_suite_name)
-                        metrics_report[report_key] = thread_stack_summary['max_stack_size']
+                    if "max_stack_size" in thread_stack_summary:
+                        report_key = "%s_%s_max_stack_size" % (target_name, test_suite_name)
+                        metrics_report[report_key] = thread_stack_summary["max_stack_size"]
 
-                    if 'max_stack_usage' in thread_stack_summary:
-                        report_key = '%s_%s_max_stack_usage' % (target_name, test_suite_name)
-                        metrics_report[report_key] = thread_stack_summary['max_stack_usage']
+                    if "max_stack_usage" in thread_stack_summary:
+                        report_key = "%s_%s_max_stack_usage" % (target_name, test_suite_name)
+                        metrics_report[report_key] = thread_stack_summary["max_stack_usage"]
 
-                    if 'max_stack_usage_total' in thread_stack_summary:
-                        report_key = '%s_%s_max_stack_usage_total' % (target_name, test_suite_name)
-                        metrics_report[report_key] = thread_stack_summary['max_stack_usage_total']
+                    if "max_stack_usage_total" in thread_stack_summary:
+                        report_key = "%s_%s_max_stack_usage_total" % (target_name, test_suite_name)
+                        metrics_report[report_key] = thread_stack_summary["max_stack_usage_total"]
 
-                    if 'reserved_stack_total' in thread_stack_summary:
-                        report_key = '%s_%s_reserved_stack_total' % (target_name, test_suite_name)
-                        metrics_report[report_key] = thread_stack_summary['reserved_stack_total']
+                    if "reserved_stack_total" in thread_stack_summary:
+                        report_key = "%s_%s_reserved_stack_total" % (target_name, test_suite_name)
+                        metrics_report[report_key] = thread_stack_summary["reserved_stack_total"]
 
     column_names = sorted(metrics_report.keys())
     column_values = [str(metrics_report[x]) for x in column_names]
 
-    return "%s\n%s" % (','.join(column_names), ','.join(column_values))
+    return "%s\n%s" % (",".join(column_names), ",".join(column_values))

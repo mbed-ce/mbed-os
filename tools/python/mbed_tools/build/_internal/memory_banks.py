@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from typing import Dict, Any, Set, TypedDict, NotRequired
 
@@ -29,17 +30,18 @@ if TYPE_CHECKING:
         """
         Info about one memory bank
         """
+
         size: int
         start: int
         default: NotRequired[bool]
         startup: NotRequired[bool]
         access: Dict[str, bool]
 
-
     class BanksByType(TypedDict):
         """
         Info about all memory banks, ROM and RAM
         """
+
         ROM: Dict[str, MemoryBankInfo]
         RAM: Dict[str, MemoryBankInfo]
 
@@ -60,8 +62,7 @@ DEPRECATED_MEM_CONFIG_PROPERTIES = {
 BANK_TYPES = ("RAM", "ROM")
 
 
-def incorporate_memory_bank_data_from_cmsis(target_attributes: Dict[str, Any],
-                                            program: MbedProgram) -> None:
+def incorporate_memory_bank_data_from_cmsis(target_attributes: Dict[str, Any], program: MbedProgram) -> None:
     """
     Incorporate the memory bank information from the CMSIS JSON file into
     the target attributes.
@@ -77,10 +78,11 @@ def incorporate_memory_bank_data_from_cmsis(target_attributes: Dict[str, Any],
 
     if target_attributes["device_name"] not in cmsis_mcu_descriptions:
         raise MbedBuildError(
-f"""Target specifies device_name {target_attributes["device_name"]} but this device is not
+            f"""Target specifies device_name {target_attributes["device_name"]} but this device is not
 listed in {program.mbed_os.cmsis_mcu_descriptions_json_file}.  Perhaps you need to use
 the 'python -m mbed_tools.cli.main cmsis-mcu-descr fetch-missing' command to download
-the missing MCU description?""")
+the missing MCU description?"""
+        )
 
     mcu_description = cmsis_mcu_descriptions[target_attributes["device_name"]]
     mcu_memory_description: Dict[str, Dict[str, Any]] = mcu_description["memories"]
@@ -95,7 +97,6 @@ the missing MCU description?""")
 
 
 def _apply_configured_overrides(banks_by_type: BanksByType, bank_config: Dict[str, Dict[str, int]]) -> BanksByType:
-
     """
     Apply overrides from configuration to the physical memory bank information, producing the configured
     memory bank information.
@@ -106,14 +107,14 @@ def _apply_configured_overrides(banks_by_type: BanksByType, bank_config: Dict[st
     configured_memory_banks = copy.deepcopy(banks_by_type)
 
     for bank_name, bank_data in bank_config.items():
-
         if bank_name not in configured_memory_banks["RAM"] and bank_name not in configured_memory_banks["ROM"]:
             raise MbedBuildError(f"Attempt to configure memory bank {bank_name} which does not exist for this device.")
         bank_type = "RAM" if bank_name in configured_memory_banks["RAM"] else "ROM"
 
         if len(set(bank_data.keys()) - {"size", "start"}):
-            raise MbedBuildError("Only the size and start properties of a memory bank can be "
-                                 "configured in memory_bank_config")
+            raise MbedBuildError(
+                "Only the size and start properties of a memory bank can be configured in memory_bank_config"
+            )
 
         for property_name, property_value in bank_data.items():
             if not isinstance(property_value, int):
@@ -125,7 +126,6 @@ def _apply_configured_overrides(banks_by_type: BanksByType, bank_config: Dict[st
 
 
 def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type: BanksByType) -> None:
-
     """
     Print a summary of the memory banks to the console
     :param banks_by_type: Physical memory bank information
@@ -137,15 +137,17 @@ def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type
         banks = banks_by_type[bank_type]
 
         if len(banks) == 0:
-            logger.warning("No %s banks are known to the Mbed configuration system!  This can cause problems with "
-                           "features like Mbed Stats and FlashIAPBlockDevice!  To fix this, define a 'device_name'"
-                           " property or specify 'memory_banks' in your target JSON.", bank_type)
+            logger.warning(
+                "No %s banks are known to the Mbed configuration system!  This can cause problems with "
+                "features like Mbed Stats and FlashIAPBlockDevice!  To fix this, define a 'device_name'"
+                " property or specify 'memory_banks' in your target JSON.",
+                bank_type,
+            )
             continue
 
         print(f"Target {bank_type} banks: -----------------------------------------------------------")
 
         for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
-
             bank_size = bank_data["size"]
             bank_start = bank_data["start"]
 
@@ -160,16 +162,16 @@ def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type
             if configured_start_addr != bank_start:
                 configured_start_addr_str = f" (configured to 0x{configured_start_addr:08x})"
 
-            print(f"{bank_index}. {bank_name}, "
-                  f"start addr 0x{bank_start:08x}{configured_start_addr_str}, "
-                  f"size {humanize.naturalsize(bank_size, binary=True)}{configured_size_str}")
+            print(
+                f"{bank_index}. {bank_name}, "
+                f"start addr 0x{bank_start:08x}{configured_start_addr_str}, "
+                f"size {humanize.naturalsize(bank_size, binary=True)}{configured_size_str}"
+            )
 
         print()
 
 
-def _generate_macros_for_memory_banks(banks_by_type: BanksByType,
-                                      configured_banks_by_type: BanksByType) -> Set[str]:
-
+def _generate_macros_for_memory_banks(banks_by_type: BanksByType, configured_banks_by_type: BanksByType) -> Set[str]:
     """
     Generate a set of macros to define to pass the memory bank information into Mbed.
     :param banks_by_type: Physical memory bank information
@@ -181,7 +183,6 @@ def _generate_macros_for_memory_banks(banks_by_type: BanksByType,
         banks = banks_by_type[bank_type]
 
         for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
-
             bank_number_str = "" if bank_index == 0 else str(bank_index)
 
             configured_bank_data = configured_banks_by_type[bank_type][bank_name]
@@ -217,10 +218,13 @@ def process_memory_banks(config: Config) -> Dict[str, BanksByType]:
     # Check for deprecated properties
     for property_name in DEPRECATED_MEM_CONFIG_PROPERTIES:
         if property_name in config:
-            logger.warning("Configuration uses old-style memory bank configuration property %s. "
-                           "This is deprecated and is not processed anymore, replace it with a "
-                           "'memory_bank_config' section.  See here for more: "
-                           "https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information", property_name)
+            logger.warning(
+                "Configuration uses old-style memory bank configuration property %s. "
+                "This is deprecated and is not processed anymore, replace it with a "
+                "'memory_bank_config' section.  See here for more: "
+                "https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information",
+                property_name,
+            )
 
     # Check attributes, sort into rom and ram
     banks_by_type: BanksByType = {"ROM": {}, "RAM": {}}
@@ -246,8 +250,4 @@ def process_memory_banks(config: Config) -> Dict[str, BanksByType]:
     config["memory_bank_macros"] = _generate_macros_for_memory_banks(banks_by_type, configured_banks_by_type)
 
     # Write out JSON file
-    return {
-        "memory_banks": banks_by_type,
-        "configured_memory_banks": configured_banks_by_type
-    }
-
+    return {"memory_banks": banks_by_type, "configured_memory_banks": configured_banks_by_type}

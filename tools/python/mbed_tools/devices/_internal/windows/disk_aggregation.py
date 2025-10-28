@@ -9,6 +9,7 @@ Partitions and Logical Drives.
 This file tries to reconcile all these pieces of information so that it is presented
 as a single object: AggregatedDiskData.
 """
+
 from typing import List, Optional, Callable
 from typing import NamedTuple, cast
 

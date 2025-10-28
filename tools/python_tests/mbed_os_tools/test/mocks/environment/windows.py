@@ -18,12 +18,12 @@ from builtins import super
 
 from . import MockTestEnvironment
 
-class MockTestEnvironmentWindows(MockTestEnvironment):
 
+class MockTestEnvironmentWindows(MockTestEnvironment):
     def __init__(self, test_case, platform_info, image_path):
         super().__init__(test_case, platform_info, image_path)
 
-        self.patch('os.name', new='nt')
+        self.patch("os.name", new="nt")
 
     def __exit__(self, type, value, traceback):
         super().__exit__(type, value, traceback)
@@ -32,9 +32,7 @@ class MockTestEnvironmentWindows(MockTestEnvironment):
             return False
 
         # Assert for proper image copy
-        mocked_call = self.patches[
-            'mbed_os_tools.test.host_tests_plugins.host_test_plugins.call'
-        ]
+        mocked_call = self.patches["mbed_os_tools.test.host_tests_plugins.host_test_plugins.call"]
 
         first_call_args = mocked_call.call_args_list[0][0][0]
         self._test_case.assertEqual(first_call_args[0], "copy")

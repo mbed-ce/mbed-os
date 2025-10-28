@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Utility in charge of finding the instance ID of a device."""
+
 import win32con
 import win32api
 from mbed_tools.devices._internal.exceptions import SystemException

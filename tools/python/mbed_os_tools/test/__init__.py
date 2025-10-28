@@ -62,9 +62,7 @@ def init_host_test_cli_params() -> Any:
         metavar="MICRO",
     )
 
-    parser.add_argument(
-        "-p", "--port", dest="port", help="Serial port of the target", metavar="PORT"
-    )
+    parser.add_argument("-p", "--port", dest="port", help="Serial port of the target", metavar="PORT")
 
     parser.add_argument(
         "-d",
@@ -120,9 +118,7 @@ def init_host_test_cli_params() -> Any:
         metavar="IMAGE_PATH",
     )
 
-    copy_methods_str = "Plugin support: " + ", ".join(
-        host_tests_plugins.get_plugin_caps("CopyMethod")
-    )
+    copy_methods_str = "Plugin support: " + ", ".join(host_tests_plugins.get_plugin_caps("CopyMethod"))
 
     parser.add_argument(
         "-c",
@@ -153,9 +149,7 @@ def init_host_test_cli_params() -> Any:
         metavar="TAG_FILTERS",
     )
 
-    reset_methods_str = "Plugin support: " + ", ".join(
-        host_tests_plugins.get_plugin_caps("ResetMethod")
-    )
+    reset_methods_str = "Plugin support: " + ", ".join(host_tests_plugins.get_plugin_caps("ResetMethod"))
 
     parser.add_argument(
         "-r",
@@ -246,10 +240,10 @@ def init_host_test_cli_params() -> Any:
     )
 
     # Show --fm option only if "fm_agent" module installed
-    fm_help=SUPPRESS
+    fm_help = SUPPRESS
     try:
-        if importlib.util.find_spec('fm_agent') is not None:
-            fm_help='Fast Model connection, This option requires mbed-fastmodel-agent module installed, list CONFIGs via "mbedfm"'
+        if importlib.util.find_spec("fm_agent") is not None:
+            fm_help = 'Fast Model connection, This option requires mbed-fastmodel-agent module installed, list CONFIGs via "mbedfm"'
     except ModuleNotFoundError:
         pass
 
@@ -292,10 +286,7 @@ def init_host_test_cli_params() -> Any:
         default=60,
         metavar="NUMBER",
         type=int,
-        help=(
-            "Timeout in sec for readiness of mount point and serial port of "
-            "local or remote device. Default 60 sec"
-        ),
+        help=("Timeout in sec for readiness of mount point and serial port of local or remote device. Default 60 sec"),
     )
 
     parser.add_argument(
@@ -357,12 +348,8 @@ def init_host_test_cli_params() -> Any:
         help="Image file format passed to pyocd (elf, bin, hex, axf...).",
     )
 
-    parser.description = (
-        """Flash, reset and perform host supervised tests on mbed platforms"""
-    )
-    parser.epilog = (
-        """Example: mbedhtrun -d E: -p COM5 -f "test.bin" -C 4 -c shell -m K64F"""
-    )
+    parser.description = """Flash, reset and perform host supervised tests on mbed platforms"""
+    parser.epilog = """Example: mbedhtrun -d E: -p COM5 -f "test.bin" -C 4 -c shell -m K64F"""
 
     if len(sys.argv) == 1:
         parser.print_help()

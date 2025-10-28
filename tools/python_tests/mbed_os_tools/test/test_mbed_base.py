@@ -20,6 +20,7 @@ from tempfile import mkdtemp
 
 from mbed_os_tools.test.host_tests_runner.mbed_base import Mbed
 
+
 class TemporaryDirectory(object):
     def __init__(self):
         self.fname = "tempdir"
@@ -31,12 +32,11 @@ class TemporaryDirectory(object):
     def __exit__(self, *args, **kwargs):
         shutil.rmtree(self.fname)
 
+
 @mock.patch("mbed_os_tools.test.host_tests_runner.mbed_base.ht_plugins")
 @mock.patch("mbed_os_tools.test.host_tests_runner.mbed_base.detect")
 class TestMbed(unittest.TestCase):
-    def test_skips_discover_mbed_if_non_mbed_copy_method_used(
-        self, mock_detect, mock_ht_plugins
-    ):
+    def test_skips_discover_mbed_if_non_mbed_copy_method_used(self, mock_detect, mock_ht_plugins):
         with TemporaryDirectory() as tmpdir:
             image_path = os.path.join(tmpdir, "test.elf")
             with open(image_path, "w") as f:
@@ -71,9 +71,7 @@ class TestMbed(unittest.TestCase):
                 format=options.format,
             )
 
-    def test_discovers_mbed_if_mbed_copy_method_used(
-        self, mock_detect, mock_ht_plugins
-    ):
+    def test_discovers_mbed_if_mbed_copy_method_used(self, mock_detect, mock_ht_plugins):
         with TemporaryDirectory() as tmpdir:
             image_path = os.path.join(tmpdir, "test.elf")
             with open(image_path, "w") as f:

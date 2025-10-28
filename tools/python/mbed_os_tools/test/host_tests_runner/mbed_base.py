@@ -27,19 +27,19 @@ class Mbed:
     @details This class stores information about things like disk, port, serial speed etc.
              Class is also responsible for manipulation of serial port between host and mbed device
     """
+
     def __init__(self, options):
-        """ ctor
-        """
+        """ctor"""
         # For compatibility with old mbed. We can use command line options for Mbed object
         # or we can pass options directly from .
         self.options = options
-        self.logger = HtrunLogger('MBED')
+        self.logger = HtrunLogger("MBED")
         # Options related to copy / reset mbed device
         self.port = self.options.port
         self.mcu = self.options.micro
         self.disk = self.options.disk
         self.target_id = self.options.target_id
-        self.image_path = self.options.image_path.strip('"') if self.options.image_path is not None else ''
+        self.image_path = self.options.image_path.strip('"') if self.options.image_path is not None else ""
         self.copy_method = self.options.copy_method
         self.retry_copy = self.options.retry_copy
         self.program_cycle_s = float(self.options.program_cycle_s if self.options.program_cycle_s is not None else 2.0)
@@ -51,7 +51,7 @@ class Mbed:
 
         # Users can use command to pass port speeds together with port name. E.g. COM4:115200:1
         # Format if PORT:SPEED:TIMEOUT
-        port_config = self.port.split(':') if self.port else ''
+        port_config = self.port.split(":") if self.port else ""
         if len(port_config) == 2:
             # -p COM4:115200
             self.port = port_config[0]
@@ -75,8 +75,11 @@ class Mbed:
                 with open(json_test_configuration_path) as data_file:
                     self.test_cfg = json.load(data_file)
             except IOError as e:
-                self.logger.prn_err("Test configuration JSON file '{0}' I/O error({1}): {2}"
-                                    .format(json_test_configuration_path, e.errno, e.strerror))
+                self.logger.prn_err(
+                    "Test configuration JSON file '{0}' I/O error({1}): {2}".format(
+                        json_test_configuration_path, e.errno, e.strerror
+                    )
+                )
             except:
                 self.logger.prn_err("Test configuration JSON Unexpected error:", str(e))
                 raise
@@ -85,23 +88,24 @@ class Mbed:
         """! Closure for copy_image_raw() method.
         @return Returns result from copy plugin
         """
+
         def get_remount_count(disk_path, tries=2):
             """! Get the remount count from 'DETAILS.TXT' file
             @return Returns count, None if not-available
             """
 
-            #In case of no disk path, nothing to do
+            # In case of no disk path, nothing to do
             if disk_path is None:
                 return None
-                
+
             for cur_try in range(1, tries + 1):
                 try:
                     files_on_disk = [x.upper() for x in os.listdir(disk_path)]
-                    if 'DETAILS.TXT' in files_on_disk:
-                        with open(os.path.join(disk_path, 'DETAILS.TXT'), 'r') as details_txt:
+                    if "DETAILS.TXT" in files_on_disk:
+                        with open(os.path.join(disk_path, "DETAILS.TXT"), "r") as details_txt:
                             for line in details_txt.readlines():
-                                if 'Remount count:' in line:
-                                    return int(line.replace('Remount count: ', ''))
+                                if "Remount count:" in line:
+                                    return int(line.replace("Remount count: ", ""))
                             # Remount count not found in file
                             return None
                     # 'DETAILS.TXT file not found
@@ -136,17 +140,17 @@ class Mbed:
                 # trying to check for Mbed Enabled devices.
                 return True
 
-            bad_files = set(['FAIL.TXT'])
+            bad_files = set(["FAIL.TXT"])
             # Re-try at max 5 times with 0.5 sec in delay
             for i in range(5):
                 # mbed_os_tools.detect.create() should be done inside the loop. Otherwise it will loop on same data.
                 mbeds = detect.create()
-                mbed_list = mbeds.list_mbeds() #list of mbeds present
+                mbed_list = mbeds.list_mbeds()  # list of mbeds present
                 # get first item in list with a matching target_id, if present
-                mbed_target = next((x for x in mbed_list if x['target_id']==target_id), None)
+                mbed_target = next((x for x in mbed_list if x["target_id"] == target_id), None)
 
                 if mbed_target is not None:
-                    if 'mount_point' in mbed_target and mbed_target['mount_point'] is not None:
+                    if "mount_point" in mbed_target and mbed_target["mount_point"] is not None:
                         if not initial_remount_count is None:
                             new_remount_count = get_remount_count(disk)
                             if not new_remount_count is None and new_remount_count == initial_remount_count:
@@ -155,15 +159,15 @@ class Mbed:
 
                         common_items = []
                         try:
-                            items = set([x.upper() for x in os.listdir(mbed_target['mount_point'])])
+                            items = set([x.upper() for x in os.listdir(mbed_target["mount_point"])])
                             common_items = bad_files.intersection(items)
                         except OSError as e:
                             print("Failed to enumerate disk files, retrying")
                             continue
 
                         for common_item in common_items:
-                            full_path = os.path.join(mbed_target['mount_point'], common_item)
-                            self.logger.prn_err("Found %s"% (full_path))
+                            full_path = os.path.join(mbed_target["mount_point"], common_item)
+                            self.logger.prn_err("Found %s" % (full_path))
                             bad_file_contents = "[failed to read bad file]"
                             try:
                                 with open(full_path, "r") as bad_file:
@@ -223,20 +227,21 @@ class Mbed:
         # Select copy_method
         # We override 'default' method with 'shell' method
         copy_method = {
-            None : 'shell',
-            'default' : 'shell',
+            None: "shell",
+            "default": "shell",
         }.get(copy_method, copy_method)
 
-        result = ht_plugins.call_plugin('CopyMethod',
-                                        copy_method,
-                                        image_path=image_path,
-                                        mcu=mcu,
-                                        serial=port,
-                                        destination_disk=disk,
-                                        target_id=self.target_id,
-                                        pooling_timeout=self.polling_timeout,
-                                        format=self.options.format
-                                        )
+        result = ht_plugins.call_plugin(
+            "CopyMethod",
+            copy_method,
+            image_path=image_path,
+            mcu=mcu,
+            serial=port,
+            destination_disk=disk,
+            target_id=self.target_id,
+            pooling_timeout=self.polling_timeout,
+            format=self.options.format,
+        )
         return result
 
     def hw_reset(self):
@@ -246,12 +251,10 @@ class Mbed:
         :return:
         """
         device_info = {}
-        result = ht_plugins.call_plugin('ResetMethod',
-                                        'power_cycle',
-                                        target_id=self.target_id,
-                                        device_info=device_info,
-                                        format=self.options.format)
+        result = ht_plugins.call_plugin(
+            "ResetMethod", "power_cycle", target_id=self.target_id, device_info=device_info, format=self.options.format
+        )
         if result:
-            self.port = device_info['serial_port']
-            self.disk = device_info['mount_point']
+            self.port = device_info["serial_port"]
+            self.disk = device_info["mount_point"]
         return result

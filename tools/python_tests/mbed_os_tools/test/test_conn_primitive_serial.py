@@ -19,6 +19,7 @@ import mock
 from mbed_os_tools.test.host_tests_conn_proxy.conn_primitive_serial import SerialConnectorPrimitive
 from mbed_os_tools.test.host_tests_conn_proxy.conn_primitive import ConnectorPrimitiveException
 
+
 @mock.patch("mbed_os_tools.test.host_tests_conn_proxy.conn_primitive_serial.Serial")
 @mock.patch("mbed_os_tools.test.host_tests_plugins.host_test_plugins.detect")
 class ConnPrimitiveSerialTestCase(unittest.TestCase):
@@ -33,9 +34,7 @@ class ConnPrimitiveSerialTestCase(unittest.TestCase):
         # check_serial_port_ready() function we are testing will sleep waiting
         # for the serial port to become ready.
         mock_detect.create().list_mbeds.return_value = [
-            {"target_id": target_id,
-             "serial_port": port,
-             "platform_name": platform_name},
+            {"target_id": target_id, "serial_port": port, "platform_name": platform_name},
         ]
 
         # Set skip_reset to avoid the use of a physical serial port.
@@ -58,9 +57,7 @@ class ConnPrimitiveSerialTestCase(unittest.TestCase):
         baudrate = "9600"
 
         mock_detect.create().list_mbeds.return_value = [
-            {"target_id": target_id,
-             "serial_port": port,
-             "platform_name": platform_name},
+            {"target_id": target_id, "serial_port": port, "platform_name": platform_name},
         ]
 
         # Set skip_reset to avoid the use of a physical serial port. Don't pass
@@ -82,5 +79,6 @@ class ConnPrimitiveSerialTestCase(unittest.TestCase):
 
         mock_detect.create().list_mbeds.assert_called_once()
 
-if __name__ == '__main__':
-      unittest.main()
+
+if __name__ == "__main__":
+    unittest.main()

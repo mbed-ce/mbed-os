@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 import sys
 from os.path import isfile, join
 import json
@@ -28,6 +29,7 @@ from copy import deepcopy
 """
 Tests for test_api.py
 """
+
 
 @pytest.fixture
 def memap_parser():
@@ -45,23 +47,23 @@ def memap_parser():
             ".bss": 3,
             ".heap": 0,
             ".stack": 0,
-            ".interrupts_ram":0,
-            ".init":0,
-            ".ARM.extab":0,
-            ".ARM.exidx":0,
-            ".ARM.attributes":0,
-            ".eh_frame":0,
-            ".init_array":0,
-            ".fini_array":0,
-            ".jcr":0,
-            ".stab":0,
-            ".stabstr":0,
-            ".ARM.exidx":0,
-            ".ARM":0,
-            ".interrupts":0,
-            ".flash_config":0,
-            "unknown":0,
-            "OUTPUT":0,
+            ".interrupts_ram": 0,
+            ".init": 0,
+            ".ARM.extab": 0,
+            ".ARM.exidx": 0,
+            ".ARM.attributes": 0,
+            ".eh_frame": 0,
+            ".init_array": 0,
+            ".fini_array": 0,
+            ".jcr": 0,
+            ".stab": 0,
+            ".stabstr": 0,
+            ".ARM.exidx": 0,
+            ".ARM": 0,
+            ".interrupts": 0,
+            ".flash_config": 0,
+            "unknown": 0,
+            "OUTPUT": 0,
         },
         "[lib]/libc.a/lib_a-printf.o": {
             ".text": 4,
@@ -69,23 +71,23 @@ def memap_parser():
             ".bss": 6,
             ".heap": 0,
             ".stack": 0,
-            ".interrupts_ram":0,
-            ".init":0,
-            ".ARM.extab":0,
-            ".ARM.exidx":0,
-            ".ARM.attributes":0,
-            ".eh_frame":0,
-            ".init_array":0,
-            ".fini_array":0,
-            ".jcr":0,
-            ".stab":0,
-            ".stabstr":0,
-            ".ARM.exidx":0,
-            ".ARM":0,
-            ".interrupts":0,
-            ".flash_config":0,
-            "unknown":0,
-            "OUTPUT":0,
+            ".interrupts_ram": 0,
+            ".init": 0,
+            ".ARM.extab": 0,
+            ".ARM.exidx": 0,
+            ".ARM.attributes": 0,
+            ".eh_frame": 0,
+            ".init_array": 0,
+            ".fini_array": 0,
+            ".jcr": 0,
+            ".stab": 0,
+            ".stabstr": 0,
+            ".ARM.exidx": 0,
+            ".ARM": 0,
+            ".interrupts": 0,
+            ".flash_config": 0,
+            "unknown": 0,
+            "OUTPUT": 0,
         },
         "main.o": {
             ".text": 7,
@@ -93,23 +95,23 @@ def memap_parser():
             ".bss": 0,
             ".heap": 0,
             ".stack": 0,
-            ".interrupts_ram":0,
-            ".init":0,
-            ".ARM.extab":0,
-            ".ARM.exidx":0,
-            ".ARM.attributes":0,
-            ".eh_frame":0,
-            ".init_array":0,
-            ".fini_array":0,
-            ".jcr":0,
-            ".stab":0,
-            ".stabstr":0,
-            ".ARM.exidx":0,
-            ".ARM":0,
-            ".interrupts":0,
-            ".flash_config":0,
-            "unknown":0,
-            "OUTPUT":0,
+            ".interrupts_ram": 0,
+            ".init": 0,
+            ".ARM.extab": 0,
+            ".ARM.exidx": 0,
+            ".ARM.attributes": 0,
+            ".eh_frame": 0,
+            ".init_array": 0,
+            ".fini_array": 0,
+            ".jcr": 0,
+            ".stab": 0,
+            ".stabstr": 0,
+            ".ARM.exidx": 0,
+            ".ARM": 0,
+            ".interrupts": 0,
+            ".flash_config": 0,
+            "unknown": 0,
+            "OUTPUT": 0,
         },
         "test.o": {
             ".text": 0,
@@ -117,41 +119,33 @@ def memap_parser():
             ".bss": 0,
             ".heap": 0,
             ".stack": 0,
-            ".interrupts_ram":0,
-            ".init":0,
-            ".ARM.extab":0,
-            ".ARM.exidx":0,
-            ".ARM.attributes":0,
-            ".eh_frame":0,
-            ".init_array":0,
-            ".fini_array":0,
-            ".jcr":0,
-            ".stab":0,
-            ".stabstr":0,
-            ".ARM.exidx":0,
-            ".ARM":0,
-            ".interrupts":0,
-            ".flash_config":0,
-            "unknown":0,
-            "OUTPUT":0,
+            ".interrupts_ram": 0,
+            ".init": 0,
+            ".ARM.extab": 0,
+            ".ARM.exidx": 0,
+            ".ARM.attributes": 0,
+            ".eh_frame": 0,
+            ".init_array": 0,
+            ".fini_array": 0,
+            ".jcr": 0,
+            ".stab": 0,
+            ".stabstr": 0,
+            ".ARM.exidx": 0,
+            ".ARM": 0,
+            ".interrupts": 0,
+            ".flash_config": 0,
+            "unknown": 0,
+            "OUTPUT": 0,
         },
     }
 
     memap_parser.memory_banks = {
-        "RAM": [
-            MemoryBankInfo(name="IRAM1", start_addr=0x20000000, total_size=32768, used_size=2000)
-        ],
-        "ROM": [
-            MemoryBankInfo(name="IROM1", start_addr=0x20000000, total_size=65536, used_size=10000)
-        ]
+        "RAM": [MemoryBankInfo(name="IRAM1", start_addr=0x20000000, total_size=32768, used_size=2000)],
+        "ROM": [MemoryBankInfo(name="IROM1", start_addr=0x20000000, total_size=65536, used_size=10000)],
     }
     memap_parser.old_memory_banks = {
-        "RAM": [
-            MemoryBankInfo(name="IRAM1", start_addr=0x20000000, total_size=32768, used_size=2014)
-        ],
-        "ROM": [
-            MemoryBankInfo(name="IROM1", start_addr=0x20000000, total_size=65536, used_size=9000)
-        ]
+        "RAM": [MemoryBankInfo(name="IRAM1", start_addr=0x20000000, total_size=32768, used_size=2014)],
+        "ROM": [MemoryBankInfo(name="IROM1", start_addr=0x20000000, total_size=65536, used_size=9000)],
     }
 
     return memap_parser
@@ -172,11 +166,10 @@ def generate_test_helper(memap_parser, format, depth, sep, file_output=None):
     memap.sep = sep
     memap_parser.generate_output(format, depth, file_output=file_output)
 
-    assert memap_parser.modules == old_modules,\
-        "generate_output modified the 'modules' property"
+    assert memap_parser.modules == old_modules, "generate_output modified the 'modules' property"
 
     for file_name in memap_parser.short_modules:
-        assert(len(file_name.split(memap.sep)) <= depth)
+        assert len(file_name.split(memap.sep)) <= depth
 
 
 @pytest.mark.parametrize("depth", [1, 2, 20])
@@ -189,7 +182,7 @@ def test_report_computed(memap_parser, depth, sep):
     :param depth: the detail of the output
     """
 
-    memap_parser.generate_output('table', depth, sep)
+    memap_parser.generate_output("table", depth, sep)
 
     # Report is created after generating output
     assert memap_parser.mem_summary
@@ -204,7 +197,7 @@ def test_generate_output_table(memap_parser, depth, sep):
     :param memap_parser: Mocked parser
     :param depth: the detail of the output
     """
-    generate_test_helper(memap_parser, 'table', depth, sep)
+    generate_test_helper(memap_parser, "table", depth, sep)
 
 
 @pytest.mark.parametrize("depth", [1, 2, 20])
@@ -216,8 +209,8 @@ def test_generate_output_json(memap_parser, tmpdir, depth, sep):
     :param tmpdir: a unique location to place an output file
     :param depth: the detail of the output
     """
-    file_name = str(tmpdir.join('output.json').realpath())
-    generate_test_helper(memap_parser, 'json', depth, sep, file_name)
+    file_name = str(tmpdir.join("output.json").realpath())
+    generate_test_helper(memap_parser, "json", depth, sep, file_name)
     assert isfile(file_name), "Failed to create json file"
     json.load(open(file_name))
 
@@ -232,8 +225,8 @@ def test_generate_output_csv_ci(memap_parser, tmpdir, depth, sep):
     :param tmpdir: a unique location to place an output file
     :param depth: the detail of the output
     """
-    file_name = str(tmpdir.join('output.csv').realpath())
-    generate_test_helper(memap_parser, 'csv-ci', depth, sep, file_name)
+    file_name = str(tmpdir.join("output.csv").realpath())
+    generate_test_helper(memap_parser, "csv-ci", depth, sep, file_name)
     assert isfile(file_name), "Failed to create csv-ci file"
 
 
@@ -242,7 +235,7 @@ def test_memory_bank_summary(memap_parser: MemapParser):
     Test that the memory bank summary has the expected information in it.
     """
 
-    memap_parser.generate_output('table', 1, "/")
+    memap_parser.generate_output("table", 1, "/")
 
     assert memap_parser.memory_bank_summary["RAM"].keys() == {"IRAM1"}
     assert memap_parser.memory_bank_summary["ROM"].keys() == {"IROM1"}

@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 from __future__ import annotations
 
 """
@@ -53,8 +54,7 @@ from abc import abstractmethod, ABC
 from sys import stdout, exit, argv, path
 import sys
 from os import sep
-from os.path import (basename, dirname, join, relpath, abspath, commonprefix,
-                     splitext)
+from os.path import basename, dirname, join, relpath, abspath, commonprefix, splitext
 import re
 import csv
 import json
@@ -66,6 +66,7 @@ from prettytable import PrettyTable
 # prettytable moved this constant into an enum in the Python 3.9 release.
 if sys.version_info >= (3, 9):
     from prettytable import HRuleStyle
+
     HEADER = HRuleStyle.HEADER
 else:
     from prettytable import HEADER
@@ -78,11 +79,7 @@ from jinja2.environment import Environment
 ROOT = abspath(join(dirname(__file__), ".."))
 path.insert(0, ROOT)
 
-from .utils import (
-    argparse_filestring_type,
-    argparse_lowercase_hyphen_type,
-    argparse_uppercase_type
-)  # noqa: E402
+from .utils import argparse_filestring_type, argparse_lowercase_hyphen_type, argparse_uppercase_type  # noqa: E402
 
 
 @dataclasses.dataclass
@@ -108,12 +105,24 @@ class MemoryBankInfo:
 
 class _Parser(ABC):
     """Internal interface for parsing"""
-    SECTIONS = ('.text', '.data', '.bss', '.heap', '.heap_0', '.stack')
-    MISC_FLASH_SECTIONS = ('.interrupts', '.flash_config')
-    OTHER_SECTIONS = ('.interrupts_ram', '.init', '.ARM.extab',
-                      '.ARM.exidx', '.ARM.attributes', '.eh_frame',
-                      '.init_array', '.fini_array', '.jcr', '.stab',
-                      '.stabstr', '.ARM.exidx', '.ARM')
+
+    SECTIONS = (".text", ".data", ".bss", ".heap", ".heap_0", ".stack")
+    MISC_FLASH_SECTIONS = (".interrupts", ".flash_config")
+    OTHER_SECTIONS = (
+        ".interrupts_ram",
+        ".init",
+        ".ARM.extab",
+        ".ARM.exidx",
+        ".ARM.attributes",
+        ".eh_frame",
+        ".init_array",
+        ".fini_array",
+        ".jcr",
+        ".stab",
+        ".stabstr",
+        ".ARM.exidx",
+        ".ARM",
+    )
 
     def __init__(self):
         self.modules: dict[str, dict[str, int]] = {}
@@ -135,7 +144,9 @@ class _Parser(ABC):
         for banks in self.memory_banks.values():
             for bank_info in banks:
                 if bank_info.contains_addr(symbol_start_addr):
-                    if bank_info.contains_addr(end_addr - 1): # end_addr is the first address past the end of the symbol so we subtract 1 here
+                    if bank_info.contains_addr(
+                        end_addr - 1
+                    ):  # end_addr is the first address past the end of the symbol so we subtract 1 here
                         # Symbol fully inside this memory bank
                         bank_info.used_size += size
 
@@ -147,11 +158,15 @@ class _Parser(ABC):
                     first_addr_after_bank = bank_info.start_addr + bank_info.total_size
                     bank_info.used_size += first_addr_after_bank - symbol_start_addr
 
-        print(f"Warning: Symbol {symbol_name} (at address 0x{symbol_start_addr:x}, size {size}) is not inside a "
-              f"defined memory bank for this target.")
+        print(
+            f"Warning: Symbol {symbol_name} (at address 0x{symbol_start_addr:x}, size {size}) is not inside a "
+            f"defined memory bank for this target."
+        )
 
-    def add_symbol(self, symbol_name: str, object_name: str, start_addr: int, size: int, section: str, vma_lma_offset: int) -> None:
-        """ Adds information about a symbol (e.g. a function or global variable) to the data structures.
+    def add_symbol(
+        self, symbol_name: str, object_name: str, start_addr: int, size: int, section: str, vma_lma_offset: int
+    ) -> None:
+        """Adds information about a symbol (e.g. a function or global variable) to the data structures.
 
         Positional arguments:
         symbol_name - Descriptive name of the symbol, e.g. ".text.some_function" or "*fill*"
@@ -195,11 +210,9 @@ class _Parser(ABC):
         memory_banks_json = json.load(memory_banks_json_file)
         for bank_type, banks in memory_banks_json["configured_memory_banks"].items():
             for bank_name, bank_data in banks.items():
-                self.memory_banks[bank_type].append(MemoryBankInfo(
-                    name=bank_name,
-                    start_addr=bank_data["start"],
-                    total_size=bank_data["size"]
-                ))
+                self.memory_banks[bank_type].append(
+                    MemoryBankInfo(name=bank_name, start_addr=bank_data["start"], total_size=bank_data["size"])
+                )
 
     @abstractmethod
     def parse_mapfile(self, file_desc: TextIO) -> dict[str, dict[str, int]]:
@@ -215,13 +228,11 @@ class _Parser(ABC):
 
 
 class _GccParser(_Parser):
-    RE_OBJECT_FILE = re.compile(r'^(.+\/.+\.o(bj)?)$')
-    RE_LIBRARY_OBJECT = re.compile(
-        r'^.*' + r''.format(sep) + r'lib((.+\.a)\((.+\.o(bj)?)\))$'
-    )
-    RE_STD_SECTION = re.compile(r'^\s+.*0x(\w{8,16})\s+0x(\w+)\s(.+)$')
-    RE_FILL_SECTION = re.compile(r'^\s*\*fill\*\s+0x(\w{8,16})\s+0x(\w+).*$')
-    RE_TRANS_FILE = re.compile(r'^(.+\/|.+\.ltrans.o(bj)?)$')
+    RE_OBJECT_FILE = re.compile(r"^(.+\/.+\.o(bj)?)$")
+    RE_LIBRARY_OBJECT = re.compile(r"^.*" + r"".format(sep) + r"lib((.+\.a)\((.+\.o(bj)?)\))$")
+    RE_STD_SECTION = re.compile(r"^\s+.*0x(\w{8,16})\s+0x(\w+)\s(.+)$")
+    RE_FILL_SECTION = re.compile(r"^\s*\*fill\*\s+0x(\w{8,16})\s+0x(\w+).*$")
+    RE_TRANS_FILE = re.compile(r"^(.+\/|.+\.ltrans.o(bj)?)$")
     OBJECT_EXTENSIONS = (".o", ".obj")
 
     # Parses a line beginning a new output section in the map file that has a load address
@@ -230,7 +241,9 @@ class _GccParser(_Parser):
     # 2 = in-memory address, hex, no 0x
     # 3 = section size
     # 4 = load address, i.e. where is the data for this section stored in flash
-    RE_OUTPUT_SECTION_WITH_LOAD_ADDRESS = re.compile(r'^(.\w+) +0x([0-9a-f]+) +0x([0-9a-f]+) +load address +0x([0-9a-f]+)')
+    RE_OUTPUT_SECTION_WITH_LOAD_ADDRESS = re.compile(
+        r"^(.\w+) +0x([0-9a-f]+) +0x([0-9a-f]+) +load address +0x([0-9a-f]+)"
+    )
 
     # Parses a line beginning a new output section in the map file does not have a load address
     # Groups:
@@ -238,23 +251,18 @@ class _GccParser(_Parser):
     # 2 = in-memory address, hex, no 0x
     # 3 = section size
     # 4 = load address, i.e. where is the data for this section stored in flash
-    RE_OUTPUT_SECTION_NO_LOAD_ADDRESS = re.compile(r'^(.\w+) +0x([0-9a-f]+) +0x([0-9a-f]+)')
+    RE_OUTPUT_SECTION_NO_LOAD_ADDRESS = re.compile(r"^(.\w+) +0x([0-9a-f]+) +0x([0-9a-f]+)")
 
     # Gets the input section name from the line, if it exists.
     # Input section names are always indented 1 space.
     # Note: This allows up to 3 dots... hopefully that's enough...
     # It can also capture "*fill*" instead of something that looks like a section name.
-    RE_INPUT_SECTION_NAME = re.compile(r'^ ((?:\.\w+\.?\w*\.?\w*)|(?:\*fill\*))')
+    RE_INPUT_SECTION_NAME = re.compile(r"^ ((?:\.\w+\.?\w*\.?\w*)|(?:\*fill\*))")
 
-    ALL_SECTIONS = (
-        _Parser.SECTIONS
-        + _Parser.OTHER_SECTIONS
-        + _Parser.MISC_FLASH_SECTIONS
-        + ('unknown', )
-    )
+    ALL_SECTIONS = _Parser.SECTIONS + _Parser.OTHER_SECTIONS + _Parser.MISC_FLASH_SECTIONS + ("unknown",)
 
     def check_new_output_section(self, line: str) -> tuple[str, int] | None:
-        """ Check whether a new output section in a map file has been detected
+        """Check whether a new output section in a map file has been detected
 
         Positional arguments:
         line - the line to check for a new section
@@ -290,7 +298,7 @@ class _GccParser(_Parser):
         return section_name, load_addr_offset
 
     def check_input_section(self, line) -> Optional[str]:
-        """ Check whether a new input section in a map file has been detected.
+        """Check whether a new input section in a map file has been detected.
 
         Positional arguments:
         line - the line to check for a new section
@@ -304,7 +312,7 @@ class _GccParser(_Parser):
         return match.group(1)
 
     def parse_object_name(self, line: str) -> str:
-        """ Parse a path to object file
+        """Parse a path to object file
 
         Positional arguments:
         line - the path to parse the object and module name from
@@ -312,7 +320,7 @@ class _GccParser(_Parser):
         return value - an object file name
         """
         if re.match(self.RE_TRANS_FILE, line):
-            return '[misc]'
+            return "[misc]"
 
         test_re_mbed_os_name = re.match(self.RE_OBJECT_FILE, line)
 
@@ -320,27 +328,22 @@ class _GccParser(_Parser):
             object_name = test_re_mbed_os_name.group(1)
 
             # corner case: certain objects are provided by the GCC toolchain
-            if 'arm-none-eabi' in line:
-                return join('[lib]', 'misc', basename(object_name))
+            if "arm-none-eabi" in line:
+                return join("[lib]", "misc", basename(object_name))
             return object_name
 
         else:
             test_re_obj_name = re.match(self.RE_LIBRARY_OBJECT, line)
 
             if test_re_obj_name:
-                return join('[lib]', test_re_obj_name.group(2),
-                            test_re_obj_name.group(3))
+                return join("[lib]", test_re_obj_name.group(2), test_re_obj_name.group(3))
             else:
-                if (
-                    not line.startswith("LONG") and
-                    not line.startswith("linker stubs")
-                ):
-                    print("Unknown object name found in GCC map file: %s"
-                          % line)
-                return '[misc]'
+                if not line.startswith("LONG") and not line.startswith("linker stubs"):
+                    print("Unknown object name found in GCC map file: %s" % line)
+                return "[misc]"
 
     def parse_section(self, line: str) -> tuple[str, int, int]:
-        """ Parse data from a section of gcc map file describing one symbol in the code.
+        """Parse data from a section of gcc map file describing one symbol in the code.
 
         examples:
                         0x00004308       0x7c ./BUILD/K64F/GCC_ARM/spi_api.o
@@ -353,7 +356,7 @@ class _GccParser(_Parser):
         """
         is_fill = re.match(self.RE_FILL_SECTION, line)
         if is_fill:
-            o_name = '[fill]'
+            o_name = "[fill]"
             o_start_addr = int(is_fill.group(1), 16)
             o_size = int(is_fill.group(2), 16)
             return o_name, o_start_addr, o_size
@@ -369,7 +372,7 @@ class _GccParser(_Parser):
         return "", 0, 0
 
     def parse_mapfile(self, file_desc: TextIO) -> dict[str, dict[str, int]]:
-        """ Main logic to decode gcc map files
+        """Main logic to decode gcc map files
 
         Positional arguments:
         file_desc - a stream object to parse as a gcc map file
@@ -378,13 +381,13 @@ class _GccParser(_Parser):
         # GCC can put the section/symbol info on its own line or on the same line as the size and address.
         # So since this is a line oriented parser, we have to remember the most recently seen input & output
         # section name for later.
-        current_output_section = 'unknown'
+        current_output_section = "unknown"
         current_output_section_addr_offset = 0
-        current_input_section = 'unknown'
+        current_input_section = "unknown"
 
         with file_desc as infile:
             for line in infile:
-                if line.startswith('Linker script and memory map'):
+                if line.startswith("Linker script and memory map"):
                     break
 
             for line in infile:
@@ -405,14 +408,20 @@ class _GccParser(_Parser):
                 # With GCC at least, the closest we can get to a descriptive symbol name is the input section
                 # name.  Thanks to the -ffunction-sections and -fdata-sections options, the section names should
                 # be unique for each symbol.
-                self.add_symbol(current_input_section, symbol_name, symbol_start_addr, symbol_size, current_output_section, current_output_section_addr_offset)
+                self.add_symbol(
+                    current_input_section,
+                    symbol_name,
+                    symbol_start_addr,
+                    symbol_size,
+                    current_output_section,
+                    current_output_section_addr_offset,
+                )
 
-        common_prefix = dirname(commonprefix([
-            o for o in self.modules.keys()
-            if (
-                    o.endswith(self.OBJECT_EXTENSIONS)
-                    and not o.startswith("[lib]")
-            )]))
+        common_prefix = dirname(
+            commonprefix(
+                [o for o in self.modules.keys() if (o.endswith(self.OBJECT_EXTENSIONS) and not o.startswith("[lib]"))]
+            )
+        )
         new_modules = {}
         for name, stats in self.modules.items():
             if name.startswith("[lib]"):
@@ -429,8 +438,8 @@ class MemapParser(object):
     and writes out different file types of memory results
     """
 
-    print_sections = ('.text', '.data', '.bss')
-    delta_sections = ('.text-delta', '.data-delta', '.bss-delta')
+    print_sections = (".text", ".data", ".bss")
+    delta_sections = (".text-delta", ".data-delta", ".bss-delta")
 
     # sections to print info (generic for all toolchains)
     sections = _Parser.SECTIONS
@@ -480,29 +489,29 @@ class MemapParser(object):
             self.short_modules = dict()
             for module_name, v in self.modules.items():
                 split_name = module_name.split(sep)
-                if split_name[0] == '':
+                if split_name[0] == "":
                     split_name = split_name[1:]
                 new_name = join(*split_name[:depth])
                 self.short_modules.setdefault(new_name, defaultdict(int))
                 for section_idx, value in v.items():
                     self.short_modules[new_name][section_idx] += value
-                    delta_name = section_idx + '-delta'
+                    delta_name = section_idx + "-delta"
                     self.short_modules[new_name][delta_name] += value
             if self.old_modules:
                 for module_name, v in self.old_modules.items():
                     split_name = module_name.split(sep)
-                    if split_name[0] == '':
+                    if split_name[0] == "":
                         split_name = split_name[1:]
                     new_name = join(*split_name[:depth])
                     self.short_modules.setdefault(new_name, defaultdict(int))
                     for section_idx, value in v.items():
-                        delta_name = section_idx + '-delta'
+                        delta_name = section_idx + "-delta"
                         self.short_modules[new_name][delta_name] -= value
 
     export_formats = ["json", "csv-ci", "html", "table"]
 
     def generate_output(self, export_format, depth, file_output=None):
-        """ Generates summary of memory map data
+        """Generates summary of memory map data
 
         Positional arguments:
         export_format - the format to dump
@@ -518,17 +527,19 @@ class MemapParser(object):
         self.compute_report()
         try:
             if file_output:
-                file_desc = open(file_output, 'w')
+                file_desc = open(file_output, "w")
             else:
                 file_desc = stdout
         except IOError as error:
             print("I/O error({0}): {1}".format(error.errno, error.strerror))
             return False
 
-        to_call = {'json': self.generate_json,
-                   'html': self.generate_html,
-                   'csv-ci': self.generate_csv,
-                   'table': self.generate_table}[export_format]
+        to_call = {
+            "json": self.generate_json,
+            "html": self.generate_html,
+            "csv-ci": self.generate_csv,
+            "table": self.generate_table,
+        }[export_format]
         output = to_call(file_desc)
 
         if file_desc is not stdout:
@@ -563,18 +574,18 @@ class MemapParser(object):
             modules = name.split(sep)
             while True:
                 try:
-                    cur_text["value"] += dct['.text']
-                    cur_text["delta"] += dct['.text']
+                    cur_text["value"] += dct[".text"]
+                    cur_text["delta"] += dct[".text"]
                 except KeyError:
                     pass
                 try:
-                    cur_bss["value"] += dct['.bss']
-                    cur_bss["delta"] += dct['.bss']
+                    cur_bss["value"] += dct[".bss"]
+                    cur_bss["delta"] += dct[".bss"]
                 except KeyError:
                     pass
                 try:
-                    cur_data["value"] += dct['.data']
-                    cur_data["delta"] += dct['.data']
+                    cur_data["value"] += dct[".data"]
+                    cur_data["delta"] += dct[".data"]
                 except KeyError:
                     pass
                 if not modules:
@@ -591,24 +602,21 @@ class MemapParser(object):
                 modules = name.split(sep)
                 while True:
                     try:
-                        cur_text["delta"] -= dct['.text']
+                        cur_text["delta"] -= dct[".text"]
                     except KeyError:
                         pass
                     try:
-                        cur_bss["delta"] -= dct['.bss']
+                        cur_bss["delta"] -= dct[".bss"]
                     except KeyError:
                         pass
                     try:
-                        cur_data["delta"] -= dct['.data']
+                        cur_data["delta"] -= dct[".data"]
                     except KeyError:
                         pass
                     if not modules:
                         break
                     next_module = modules.pop(0)
-                    if not any(
-                        cld['name'] == next_module
-                        for cld in cur_text['children']
-                    ):
+                    if not any(cld["name"] == next_module for cld in cur_text["children"]):
                         break
                     cur_text = self._move_up_tree(cur_text, next_module)
                     cur_data = self._move_up_tree(cur_data, next_module)
@@ -618,18 +626,17 @@ class MemapParser(object):
             "name": "ROM",
             "value": tree_text["value"] + tree_data["value"],
             "delta": tree_text["delta"] + tree_data["delta"],
-            "children": [tree_text, tree_data]
+            "children": [tree_text, tree_data],
         }
         tree_ram = {
             "name": "RAM",
             "value": tree_bss["value"] + tree_data["value"],
             "delta": tree_bss["delta"] + tree_data["delta"],
-            "children": [tree_bss, tree_data]
+            "children": [tree_bss, tree_data],
         }
 
         jinja_loader = FileSystemLoader(dirname(abspath(__file__)))
-        jinja_environment = Environment(loader=jinja_loader,
-                                        undefined=StrictUndefined)
+        jinja_environment = Environment(loader=jinja_loader, undefined=StrictUndefined)
 
         template = jinja_environment.get_template("memap_flamegraph.html")
         name, _ = splitext(basename(file_desc.name))
@@ -652,16 +659,12 @@ class MemapParser(object):
         file_desc - the file to write out the final report to
         """
         file_desc.write(json.dumps(self.mem_report, indent=4))
-        file_desc.write('\n')
+        file_desc.write("\n")
         return None
 
-    RAM_FORMAT_STR = (
-        "Total Static RAM memory (data + bss): {}({:+}) bytes\n"
-    )
+    RAM_FORMAT_STR = "Total Static RAM memory (data + bss): {}({:+}) bytes\n"
 
-    ROM_FORMAT_STR = (
-        "Total Flash memory (text + data): {}({:+}) bytes\n"
-    )
+    ROM_FORMAT_STR = "Total Flash memory (text + data): {}({:+}) bytes\n"
 
     def generate_csv(self, file_desc: TextIO) -> None:
         """Generate a CSV file from a memoy map
@@ -669,8 +672,7 @@ class MemapParser(object):
         Positional arguments:
         file_desc - the file to write out the final report to
         """
-        writer = csv.writer(file_desc, delimiter=',',
-                            quoting=csv.QUOTE_MINIMAL)
+        writer = csv.writer(file_desc, delimiter=",", quoting=csv.QUOTE_MINIMAL)
 
         module_section = []
         sizes = []
@@ -679,11 +681,11 @@ class MemapParser(object):
                 module_section.append((i + k))
                 sizes += [self.short_modules[i][k]]
 
-        module_section.append('static_ram')
-        sizes.append(self.mem_summary['static_ram'])
+        module_section.append("static_ram")
+        sizes.append(self.mem_summary["static_ram"])
 
-        module_section.append('total_flash')
-        sizes.append(self.mem_summary['total_flash'])
+        module_section.append("total_flash")
+        sizes.append(self.mem_summary["total_flash"])
 
         writer.writerow(module_section)
         writer.writerow(sizes)
@@ -695,54 +697,46 @@ class MemapParser(object):
         Returns: string of the generated table
         """
         # Create table
-        columns = ['Module']
+        columns = ["Module"]
         columns.extend(self.print_sections)
 
         table = PrettyTable(columns, junction_char="|", hrules=HEADER)
         table.align["Module"] = "l"
         for col in self.print_sections:
-            table.align[col] = 'r'
+            table.align[col] = "r"
 
         for i in list(self.print_sections):
-            table.align[i] = 'r'
+            table.align[i] = "r"
 
         for i in sorted(self.short_modules):
             row = [i]
 
             for k in self.print_sections:
-                row.append("{}({:+})".format(
-                    self.short_modules[i][k],
-                    self.short_modules[i][k + "-delta"]
-                ))
+                row.append("{}({:+})".format(self.short_modules[i][k], self.short_modules[i][k + "-delta"]))
 
             table.add_row(row)
 
-        subtotal_row = ['Subtotals']
+        subtotal_row = ["Subtotals"]
         for k in self.print_sections:
-            subtotal_row.append("{}({:+})".format(
-                self.subtotal[k], self.subtotal[k + '-delta']))
+            subtotal_row.append("{}({:+})".format(self.subtotal[k], self.subtotal[k + "-delta"]))
 
         table.add_row(subtotal_row)
 
         output = table.get_string()
-        output += '\n'
+        output += "\n"
 
-        output += self.RAM_FORMAT_STR.format(
-            self.mem_summary['static_ram'],
-            self.mem_summary['static_ram_delta']
-        )
-        output += self.ROM_FORMAT_STR.format(
-            self.mem_summary['total_flash'],
-            self.mem_summary['total_flash_delta']
-        )
+        output += self.RAM_FORMAT_STR.format(self.mem_summary["static_ram"], self.mem_summary["static_ram_delta"])
+        output += self.ROM_FORMAT_STR.format(self.mem_summary["total_flash"], self.mem_summary["total_flash_delta"])
 
-        output += '\n'
+        output += "\n"
         for bank_type, banks in self.memory_banks.items():
             for bank_info in banks:
                 this_bank_deltas = self.memory_bank_summary[bank_type][bank_info.name]
-                output += (f"{bank_type} Bank {bank_info.name}: {bank_info.used_size}({this_bank_deltas['delta_bytes_used']:+})/"
-                           f"{bank_info.total_size} bytes used, "
-                           f"{this_bank_deltas['percent_used']:.01f}% ({this_bank_deltas['delta_percent_used']:+.01f}%) used\n")
+                output += (
+                    f"{bank_type} Bank {bank_info.name}: {bank_info.used_size}({this_bank_deltas['delta_bytes_used']:+})/"
+                    f"{bank_info.total_size} bytes used, "
+                    f"{this_bank_deltas['percent_used']:.01f}% ({this_bank_deltas['delta_percent_used']:+.01f}%) used\n"
+                )
 
         return output
 
@@ -758,42 +752,35 @@ class MemapParser(object):
         for mod in self.modules.values():
             for k in self.sections:
                 self.subtotal[k] += mod[k]
-                self.subtotal[k + '-delta'] += mod[k]
+                self.subtotal[k + "-delta"] += mod[k]
         if self.old_modules:
             for mod in self.old_modules.values():
                 for k in self.sections:
-                    self.subtotal[k + '-delta'] -= mod[k]
+                    self.subtotal[k + "-delta"] -= mod[k]
 
         self.mem_summary = {
-            'static_ram': self.subtotal['.data'] + self.subtotal['.bss'],
-            'static_ram_delta':
-            self.subtotal['.data-delta'] + self.subtotal['.bss-delta'],
-            'total_flash': (self.subtotal['.text'] + self.subtotal['.data']),
-            'total_flash_delta':
-            self.subtotal['.text-delta'] + self.subtotal['.data-delta'],
+            "static_ram": self.subtotal[".data"] + self.subtotal[".bss"],
+            "static_ram_delta": self.subtotal[".data-delta"] + self.subtotal[".bss-delta"],
+            "total_flash": (self.subtotal[".text"] + self.subtotal[".data"]),
+            "total_flash_delta": self.subtotal[".text-delta"] + self.subtotal[".data-delta"],
         }
 
         self.mem_report = {}
         modules = []
         if self.short_modules:
             for name, sizes in sorted(self.short_modules.items()):
-                modules.append({
-                    "module": name,
-                    "size": {
-                        k: sizes.get(k, 0) for k in (self.print_sections +
-                                                     self.delta_sections)
-                    }
-                })
+                modules.append(
+                    {"module": name, "size": {k: sizes.get(k, 0) for k in (self.print_sections + self.delta_sections)}}
+                )
         self.mem_report["modules"] = modules
 
         self.mem_report["summary"] = self.mem_summary
 
         # Calculate the delta sizes for each memory bank in a couple different formats
-        self.memory_bank_summary: dict[str, dict[str, dict[str, float|int]]] = {}
+        self.memory_bank_summary: dict[str, dict[str, dict[str, float | int]]] = {}
         for bank_type, banks in self.memory_banks.items():
             self.memory_bank_summary[bank_type] = {}
             for bank_info in banks:
-
                 this_bank_info = {}
 
                 # Find matching memory bank in old memory banks.  Compare by name as it would be possible
@@ -807,16 +794,18 @@ class MemapParser(object):
 
                 this_bank_info["bytes_used"] = bank_info.used_size
                 this_bank_info["total_size"] = bank_info.total_size
-                this_bank_info["delta_bytes_used"] = 0 if old_bank_info is None else bank_info.used_size - old_bank_info.used_size
-                this_bank_info["percent_used"] = 100 * bank_info.used_size/bank_info.total_size
-                this_bank_info["delta_percent_used"] = 100 * this_bank_info["delta_bytes_used"]/bank_info.total_size
+                this_bank_info["delta_bytes_used"] = (
+                    0 if old_bank_info is None else bank_info.used_size - old_bank_info.used_size
+                )
+                this_bank_info["percent_used"] = 100 * bank_info.used_size / bank_info.total_size
+                this_bank_info["delta_percent_used"] = 100 * this_bank_info["delta_bytes_used"] / bank_info.total_size
 
                 self.memory_bank_summary[bank_type][bank_info.name] = this_bank_info
 
         self.mem_report["memory_bank_usage"] = self.memory_bank_summary
 
     def parse(self, mapfile: str, toolchain: str, memory_banks_json_path: str | None) -> bool:
-        """ Parse and decode map file depending on the toolchain
+        """Parse and decode map file depending on the toolchain
 
         Positional arguments:
         mapfile - the file name of the memory map file
@@ -831,15 +820,15 @@ class MemapParser(object):
         old_map_parser = parser_class()
 
         if memory_banks_json_path is not None:
-            with open(memory_banks_json_path, 'r') as memory_banks_json_file:
+            with open(memory_banks_json_path, "r") as memory_banks_json_file:
                 parser.load_memory_banks_info(memory_banks_json_file)
 
         try:
-            with open(mapfile, 'r') as file_input:
+            with open(mapfile, "r") as file_input:
                 self.modules = parser.parse_mapfile(file_input)
                 self.memory_banks = parser.memory_banks
             try:
-                with open("%s.old" % mapfile, 'r') as old_input:
+                with open("%s.old" % mapfile, "r") as old_input:
                     self.old_modules = old_map_parser.parse_mapfile(old_input)
                     self.old_memory_banks = old_map_parser.memory_banks
             except IOError:
@@ -854,43 +843,46 @@ class MemapParser(object):
 
 def main():
     """Entry Point"""
-    version = '1.0.0'
+    version = "1.0.0"
 
     # Parser handling
-    parser = ArgumentParser(
-        description="Memory Map File Analyser for ARM mbed\nversion %s" %
-        version)
+    parser = ArgumentParser(description="Memory Map File Analyser for ARM mbed\nversion %s" % version)
+
+    parser.add_argument("file", type=argparse_filestring_type, help="memory map file")
 
     parser.add_argument(
-        'file', type=argparse_filestring_type, help='memory map file')
-
-    parser.add_argument(
-        '-t', '--toolchain', dest='toolchain',
-        help='select a toolchain used to build the memory map file (%s)' %
-        ", ".join(MemapParser.toolchains),
+        "-t",
+        "--toolchain",
+        dest="toolchain",
+        help="select a toolchain used to build the memory map file (%s)" % ", ".join(MemapParser.toolchains),
         required=True,
-        type=argparse_uppercase_type(MemapParser.toolchains, "toolchain"))
+        type=argparse_uppercase_type(MemapParser.toolchains, "toolchain"),
+    )
 
     parser.add_argument(
-        '-d', '--depth', dest='depth', type=int,
-        help='specify directory depth level to display report', required=False)
+        "-d", "--depth", dest="depth", type=int, help="specify directory depth level to display report", required=False
+    )
+
+    parser.add_argument("-o", "--output", help="output file name", required=False)
 
     parser.add_argument(
-        '-o', '--output', help='output file name', required=False)
+        "-e",
+        "--export",
+        dest="export",
+        required=False,
+        default="table",
+        type=argparse_lowercase_hyphen_type(MemapParser.export_formats, "export format"),
+        help="export format (examples: %s: default)" % ", ".join(MemapParser.export_formats),
+    )
+
+    parser.add_argument("-v", "--version", action="version", version=version)
 
     parser.add_argument(
-        '-e', '--export', dest='export', required=False, default='table',
-        type=argparse_lowercase_hyphen_type(MemapParser.export_formats,
-                                            'export format'),
-        help="export format (examples: %s: default)" %
-        ", ".join(MemapParser.export_formats))
-
-    parser.add_argument('-v', '--version', action='version', version=version)
-
-    parser.add_argument(
-        '-m', '--memory-banks-json',
+        "-m",
+        "--memory-banks-json",
         type=argparse_filestring_type,
-        help='Path to memory bank JSON file.  If passed, memap will track the used space in each memory bank.')
+        help="Path to memory bank JSON file.  If passed, memap will track the used space in each memory bank.",
+    )
 
     # Parse/run command
     if len(argv) <= 1:
@@ -915,15 +907,11 @@ def main():
     returned_string = None
     # Write output in file
     if args.output is not None:
-        returned_string = memap.generate_output(
-            args.export,
-            depth,
-            args.output
-        )
+        returned_string = memap.generate_output(args.export, depth, args.output)
     else:  # Write output in screen
         returned_string = memap.generate_output(args.export, depth)
 
-    if args.export == 'table' and returned_string:
+    if args.export == "table" and returned_string:
         print(returned_string)
 
     exit(0)

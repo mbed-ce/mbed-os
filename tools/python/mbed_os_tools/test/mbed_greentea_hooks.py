@@ -25,8 +25,8 @@ List of available hooks:
 
 
 class GreenteaTestHook(object):
-    """! Class used to define
-    """
+    """! Class used to define"""
+
     name = None
 
     def __init__(self, name):
@@ -35,9 +35,10 @@ class GreenteaTestHook(object):
     def run(self, format=None):
         pass
 
+
 class GreenteaCliTestHook(GreenteaTestHook):
-    """! Class used to define a hook which will call command line program
-    """
+    """! Class used to define a hook which will call command line program"""
+
     cmd = None
 
     def __init__(self, name, cmd):
@@ -64,14 +65,14 @@ class GreenteaCliTestHook(GreenteaTestHook):
         @format Pass format dictionary to replace hook {tags} with real values
         @param format Used to format string with cmd, notation used is e.g: {build_name}
         """
-        gt_logger.gt_log("hook '%s' execution"% self.name)
+        gt_logger.gt_log("hook '%s' execution" % self.name)
         cmd = self.format_before_run(self.cmd, format)
-        gt_logger.gt_log_tab("hook command: %s"% cmd)
+        gt_logger.gt_log_tab("hook command: %s" % cmd)
         (_stdout, _stderr, ret) = self.run_cli_process(cmd)
         if _stdout:
             print(_stdout)
         if ret:
-            gt_logger.gt_log_err("hook exited with error: %d, dumping stderr..."% ret)
+            gt_logger.gt_log_err("hook exited with error: %d, dumping stderr..." % ret)
             print(_stderr)
         return ret
 
@@ -83,15 +84,15 @@ class GreenteaCliTestHook(GreenteaTestHook):
             if cmd_expand:
                 cmd = cmd_expand
                 if verbose:
-                    gt_logger.gt_log_tab("hook expanded: %s"% cmd)
+                    gt_logger.gt_log_tab("hook expanded: %s" % cmd)
 
             cmd = cmd.format(**format)
             if verbose:
-                gt_logger.gt_log_tab("hook formated: %s"% cmd)
+                gt_logger.gt_log_tab("hook formated: %s" % cmd)
         return cmd
 
     @staticmethod
-    def expand_parameters(expr, expandables, delimiter=' '):
+    def expand_parameters(expr, expandables, delimiter=" "):
         """! Expands lists for multiple parameters in hook command
         @param expr Expression to expand
         @param expandables Dictionary of token: list_to_expand See details for more info
@@ -117,7 +118,7 @@ class GreenteaCliTestHook(GreenteaTestHook):
         result = None
         if expandables:
             expansion_result = []
-            m = re.search(r'\[.*?\]', expr)
+            m = re.search(r"\[.*?\]", expr)
             if m:
                 expr_str_orig = m.group(0)
                 expr_str_base = m.group(0)[1:-1]
@@ -126,7 +127,7 @@ class GreenteaCliTestHook(GreenteaTestHook):
                     # We will expand only values which are lists (of strings)
                     if type(expandables[token]) is list:
                         # Use tokens with curly braces (Python string format like)
-                        format_token = '{' + token + '}'
+                        format_token = "{" + token + "}"
                         for expr_str in expr_str_list:
                             if format_token in expr_str:
                                 patterns = expandables[token]
@@ -135,19 +136,22 @@ class GreenteaCliTestHook(GreenteaTestHook):
                                     s = s.replace(format_token, pattern)
                                     expr_str_list.append(s)
                                     # Nothing to extend/change in this string
-                                    if not any('{' + p + '}' in s for p in expandables.keys() if type(expandables[p]) is list):
+                                    if not any(
+                                        "{" + p + "}" in s for p in expandables.keys() if type(expandables[p]) is list
+                                    ):
                                         expansion_result.append(s)
                 expansion_result.sort()
                 result = expr.replace(expr_str_orig, delimiter.join(expansion_result))
         return result
 
+
 class LcovHook(GreenteaCliTestHook):
-    """! Class used to define a LCOV hook
-    """
+    """! Class used to define a LCOV hook"""
+
     lcov_hooks = {
         "hooks": {
             "hook_test_end": "$lcov --gcov-tool gcov  --capture --directory ./build --output-file {build_path}/{test_name}.info",
-            "hook_post_all_test_end": "$lcov --gcov-tool gcov [(-a << {build_path}/{test_name_list}.info>>)] --output-file result.info"
+            "hook_post_all_test_end": "$lcov --gcov-tool gcov [(-a << {build_path}/{test_name_list}.info>>)] --output-file result.info",
         }
     }
 
@@ -162,12 +166,12 @@ class LcovHook(GreenteaCliTestHook):
             if cmd_expand:
                 cmd = cmd_expand
                 if verbose:
-                    gt_logger.gt_log_tab("hook expanded: %s"% cmd)
+                    gt_logger.gt_log_tab("hook expanded: %s" % cmd)
 
             cmd = cmd.format(**format)
             cmd = LcovHook.check_if_file_exists_or_is_empty(cmd)
             if verbose:
-                gt_logger.gt_log_tab("hook formated: %s"% cmd)
+                gt_logger.gt_log_tab("hook formated: %s" % cmd)
         return cmd
 
     @staticmethod
@@ -186,48 +190,50 @@ class LcovHook(GreenteaCliTestHook):
         expr = "lcov --gcov-tool gcov [(-a <<./build/{yotta_target_name}/{test_name_list}.info>>)] --output-file result.info"
         """
         result = expr
-        expr_strs_orig = re.findall(r'\(.*?\)', expr)
+        expr_strs_orig = re.findall(r"\(.*?\)", expr)
         for expr_str_orig in expr_strs_orig:
             expr_str_base = expr_str_orig[1:-1]
             result = result.replace(expr_str_orig, expr_str_base)
-            m = re.search(r'\<<.*?\>>', expr_str_base)
+            m = re.search(r"\<<.*?\>>", expr_str_base)
             if m:
                 expr_str_path = m.group(0)[2:-2]
                 # Remove option if file not exists OR if file exists but empty
                 if not os.path.exists(expr_str_path):
-                    result = result.replace(expr_str_base, '')
+                    result = result.replace(expr_str_base, "")
                 elif os.path.getsize(expr_str_path) == 0:
-                    result = result.replace(expr_str_base, '')
+                    result = result.replace(expr_str_base, "")
 
         # Remove path limiter
-        result = result.replace('<<', '')
-        result = result.replace('>>', '')
+        result = result.replace("<<", "")
+        result = result.replace(">>", "")
         return result
+
 
 class GreenteaHooks(object):
     """! Class used to store all hooks
     @details Hooks command starts with '$' dollar sign
     """
+
     HOOKS = {}
+
     def __init__(self, path_to_hooks):
-        """! Opens JSON file with
-        """
+        """! Opens JSON file with"""
         try:
-            if path_to_hooks == 'lcov':
+            if path_to_hooks == "lcov":
                 hooks = LcovHook.lcov_hooks
-                for hook in hooks['hooks']:
+                for hook in hooks["hooks"]:
                     hook_name = hook
-                    hook_expression = hooks['hooks'][hook]
+                    hook_expression = hooks["hooks"][hook]
                     self.HOOKS[hook_name] = LcovHook(hook_name, hook_expression[1:])
             else:
-                with open(path_to_hooks, 'r') as data_file:
+                with open(path_to_hooks, "r") as data_file:
                     hooks = json.load(data_file)
-                    if 'hooks' in hooks:
-                        for hook in hooks['hooks']:
+                    if "hooks" in hooks:
+                        for hook in hooks["hooks"]:
                             hook_name = hook
-                            hook_expression = hooks['hooks'][hook]
+                            hook_expression = hooks["hooks"][hook]
                             # This is a command line hook
-                            if hook_expression.startswith('$'):
+                            if hook_expression.startswith("$"):
                                 self.HOOKS[hook_name] = GreenteaCliTestHook(hook_name, hook_expression[1:])
         except IOError as e:
             print(str(e))

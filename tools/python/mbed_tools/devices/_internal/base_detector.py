@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Interface for device detectors."""
+
 from abc import ABC, abstractmethod
 from typing import List
 

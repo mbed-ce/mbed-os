@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Tests for `mbed_tools.targets.get_board`."""
+
 import pytest
 
 from unittest import mock

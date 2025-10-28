@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Writes out files to specified locations."""
+
 import pathlib
 from mbed_tools.build.exceptions import InvalidExportOutputDirectory
 

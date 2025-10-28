@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Render jinja templates required by the project package."""
+
 import datetime
 
 from pathlib import Path

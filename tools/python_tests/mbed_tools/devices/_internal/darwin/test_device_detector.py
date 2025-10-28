@@ -51,7 +51,8 @@ class TestBuildCandidateDevice(TestCase):
         _assemble_candidate_data.return_value = device_data
 
         self.assertEqual(
-            _build_candidate(device_data), CandidateDevice(**device_data),
+            _build_candidate(device_data),
+            CandidateDevice(**device_data),
         )
 
     @mock.patch("mbed_tools.devices._internal.darwin.device_detector.CandidateDevice")
@@ -113,7 +114,8 @@ class TestGetSerialPort(TestCase):
         serial_port = "/dev/tty.usb1234"
         ioreg.get_io_dialin_device.return_value = serial_port
         ioreg_device_name = _build_ioreg_device_name(
-            device_name=device_data["_name"], location_id=device_data["location_id"],
+            device_name=device_data["_name"],
+            location_id=device_data["location_id"],
         )
 
         self.assertEqual(_get_serial_port(device_data), serial_port)
@@ -127,6 +129,9 @@ class TestGetSerialPort(TestCase):
 class TestBuildIoregDeviceName(TestCase):
     def test_builds_ioreg_device_name_from_system_profiler_data(self):
         self.assertEqual(
-            _build_ioreg_device_name(device_name="VeryNiceDevice Really", location_id="0x14420000 / 2",),
+            _build_ioreg_device_name(
+                device_name="VeryNiceDevice Really",
+                location_id="0x14420000 / 2",
+            ),
             "VeryNiceDevice Really@14420000",
         )

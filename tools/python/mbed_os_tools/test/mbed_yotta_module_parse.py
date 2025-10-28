@@ -18,12 +18,11 @@ import json
 
 
 class YottaConfig(object):
-
     yotta_config = None
 
     def __init__(self):
-        self.BUILD_DIR = 'build'
-        self.YOTTA_CONFIG_NAME = 'yotta_config.json'
+        self.BUILD_DIR = "build"
+        self.YOTTA_CONFIG_NAME = "yotta_config.json"
         self.DEFAULT_BAUDRATE = 115200
 
     def init(self, target_name):
@@ -32,7 +31,7 @@ class YottaConfig(object):
         """
         try:
             path = os.path.join(self.BUILD_DIR, target_name, self.YOTTA_CONFIG_NAME)
-            with open(path, 'r') as data_file:
+            with open(path, "r") as data_file:
                 self.yotta_config = json.load(data_file)
         except IOError as e:
             self.yotta_config = {}
@@ -62,27 +61,26 @@ class YottaConfig(object):
           },
         """
         # Get default baudrate for this target
-        if self.yotta_config and 'mbed-os' in self.yotta_config:
-            if 'stdio' in self.yotta_config['mbed-os']:
-                if 'default-baud' in self.yotta_config['mbed-os']['stdio']:
-                    return int(self.yotta_config['mbed-os']['stdio']['default-baud'])
+        if self.yotta_config and "mbed-os" in self.yotta_config:
+            if "stdio" in self.yotta_config["mbed-os"]:
+                if "default-baud" in self.yotta_config["mbed-os"]["stdio"]:
+                    return int(self.yotta_config["mbed-os"]["stdio"]["default-baud"])
         return self.DEFAULT_BAUDRATE
 
     def get_test_pins(self):
-        if self.yotta_config and 'hardware' in self.yotta_config:
-            if 'test-pins' in self.yotta_config['hardware']:
-                return self.yotta_config['hardware']['test-pins']
+        if self.yotta_config and "hardware" in self.yotta_config:
+            if "test-pins" in self.yotta_config["hardware"]:
+                return self.yotta_config["hardware"]["test-pins"]
         return None
 
 
 class YottaModule(object):
-
     __yotta_module = None
-    __greentea_client = 'greentea-client'
+    __greentea_client = "greentea-client"
 
     def __init__(self):
-        self.MODULE_PATH = '.'
-        self.YOTTA_CONFIG_NAME = 'module.json'
+        self.MODULE_PATH = "."
+        self.YOTTA_CONFIG_NAME = "module.json"
 
     def init(self):
         """! Loads yotta_module.json as an object from local yotta build directory
@@ -94,11 +92,11 @@ class YottaModule(object):
             path = os.path.join(self.MODULE_PATH, self.YOTTA_CONFIG_NAME)
             if os.path.exists(path):
                 # Load module.json only if it exists
-                with open(path, 'r') as data_file:
+                with open(path, "r") as data_file:
                     self.__yotta_module = json.load(data_file)
         except IOError as e:
             print("YottaModule: error - %s" % str(e))
-        return bool(self.__yotta_module)    # bool({}) == False
+        return bool(self.__yotta_module)  # bool({}) == False
 
     def set_yotta_module(self, yotta_module):
         self.__yotta_module = yotta_module
@@ -107,14 +105,14 @@ class YottaModule(object):
         return self.__yotta_module
 
     def get_name(self):
-        return self.__yotta_module.get('name', 'unknown')
+        return self.__yotta_module.get("name", "unknown")
 
     def check_greentea_client(self):
         if self.get_name() == self.__greentea_client:
             return True
 
-        dependencies = self.__yotta_module.get('dependencies', False)
-        testDependencies = self.__yotta_module.get('testDependencies', False)
+        dependencies = self.__yotta_module.get("dependencies", False)
+        testDependencies = self.__yotta_module.get("testDependencies", False)
         if dependencies:
             if dependencies.get(self.__greentea_client, False):
                 return True

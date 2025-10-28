@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Helpers for logging errors according to severity of the exception."""
+
 from typing import Type, Optional, cast
 from types import TracebackType
 import logging

@@ -18,12 +18,11 @@ from mbed_os_tools.test.host_tests_runner.host_test_default import DefaultTestSe
 
 
 class HostTestDefaultTestCase(unittest.TestCase):
-
     def test_os_info(self):
         expected = {
-            "grm_module" : "module_name",
-            "grm_host" : "10.2.123.43",
-            "grm_port" : "3334",
+            "grm_module": "module_name",
+            "grm_host": "10.2.123.43",
+            "grm_port": "3334",
         }
 
         # Case that includes an IP address but no protocol
@@ -50,5 +49,6 @@ class HostTestDefaultTestCase(unittest.TestCase):
         result = DefaultTestSelector._parse_grm(":".join(arg))
         self.assertEqual(result, expected)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

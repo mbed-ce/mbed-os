@@ -18,6 +18,7 @@ by any values previously set in your environment.
    Do not upload `.env` files containing private tokens to version control! If you use this package
    as a dependency of your project, please ensure to include the `.env` in your `.gitignore`.
 """
+
 import os
 
 import dotenv

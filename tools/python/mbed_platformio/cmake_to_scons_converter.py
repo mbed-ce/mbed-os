@@ -13,22 +13,20 @@ from SCons.Environment import Base as Environment
 import pathlib
 import click
 
+
 def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
     def _normalize_define(define_string):
         define_string = define_string.strip()
         if "=" in define_string:
             define, value = define_string.split("=", maxsplit=1)
-            if any(char in value for char in (' ', '<', '>')):
+            if any(char in value for char in (" ", "<", ">")):
                 value = f'"{value}"'
             elif '"' in value and not value.startswith("\\"):
                 value = value.replace('"', '\\"')
             return define, value
         return define_string
 
-    result = [
-        _normalize_define(d.get("define", ""))
-        for d in compile_group.get("defines", []) if d
-    ]
+    result = [_normalize_define(d.get("define", "")) for d in compile_group.get("defines", []) if d]
 
     for f in compile_group.get("compileCommandFragments", []):
         fragment = f.get("fragment", "").strip()
@@ -39,6 +37,7 @@ def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
 
     return result
 
+
 def prepare_build_envs(target_json: dict, default_env: Environment) -> list[Environment]:
     """
     Creates the Scons Environment(s) needed to build the source files in a CMake target
@@ -46,9 +45,10 @@ def prepare_build_envs(target_json: dict, default_env: Environment) -> list[Envi
     build_envs = []
     target_compile_groups = target_json.get("compileGroups", [])
     if not target_compile_groups:
-        print("Warning! The `%s` component doesn't register any source files. "
-              "Check if sources are set in component's CMakeLists.txt!" % target_json["name"]
-              )
+        print(
+            "Warning! The `%s` component doesn't register any source files. "
+            "Check if sources are set in component's CMakeLists.txt!" % target_json["name"]
+        )
 
     for cg in target_compile_groups:
         includes = []
@@ -73,8 +73,14 @@ def prepare_build_envs(target_json: dict, default_env: Environment) -> list[Envi
 
     return build_envs
 
+
 def compile_source_files(
-        config: dict, default_env: Environment, project_src_dir: pathlib.Path, framework_dir: pathlib.Path, framework_obj_dir: pathlib.Path) -> list:
+    config: dict,
+    default_env: Environment,
+    project_src_dir: pathlib.Path,
+    framework_dir: pathlib.Path,
+    framework_obj_dir: pathlib.Path,
+) -> list:
     """
     Generates SCons rules to compile the source files in a target.
     Returns list of object files to build.
@@ -89,7 +95,6 @@ def compile_source_files(
             continue
         compile_group_idx = source.get("compileGroupIndex")
         if compile_group_idx is not None:
-
             # Get absolute path to source, resolving relative to source dir if needed
             src_path = pathlib.Path(source.get("path"))
             if not src_path.is_absolute():
@@ -101,7 +106,9 @@ def compile_source_files(
             elif src_path.is_relative_to(framework_dir):
                 obj_path = (framework_obj_dir / src_path.relative_to(framework_dir)).with_suffix(".o")
             else:
-                raise RuntimeError(f"Source path {src_path!s} outside of project source dir and framework dir, don't know where to save object file!")
+                raise RuntimeError(
+                    f"Source path {src_path!s} outside of project source dir and framework dir, don't know where to save object file!"
+                )
 
             env = build_envs[compile_group_idx]
 
@@ -112,23 +119,24 @@ def compile_source_files(
             for included_file in find_included_files(env):
                 env.Depends(str(obj_path), included_file)
 
-
     return objects
 
+
 def build_library(
-        default_env: Environment, lib_config: dict, project_src_dir: pathlib.Path, framework_dir: pathlib.Path, framework_obj_dir: pathlib.Path
+    default_env: Environment,
+    lib_config: dict,
+    project_src_dir: pathlib.Path,
+    framework_dir: pathlib.Path,
+    framework_obj_dir: pathlib.Path,
 ):
     lib_name = lib_config["nameOnDisk"]
     lib_path = lib_config["paths"]["build"]
-    lib_objects = compile_source_files(
-        lib_config, default_env, project_src_dir, framework_dir, framework_obj_dir
-    )
+    lib_objects = compile_source_files(lib_config, default_env, project_src_dir, framework_dir, framework_obj_dir)
 
-    #print(f"Created build rule for " + str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name))
+    # print(f"Created build rule for " + str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name))
 
-    return default_env.Library(
-        target=str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name), source=lib_objects
-    )
+    return default_env.Library(target=str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name), source=lib_objects)
+
 
 def _get_flags_for_compile_group(compile_group_json: dict) -> list[str]:
     """
@@ -139,10 +147,9 @@ def _get_flags_for_compile_group(compile_group_json: dict) -> list[str]:
         fragment = ccfragment.get("fragment", "").strip()
         if not fragment or fragment.startswith("-D"):
             continue
-        flags.extend(
-            click.parser.split_arg_string(fragment)
-        )
+        flags.extend(click.parser.split_arg_string(fragment))
     return flags
+
 
 def extract_flags(target_json: dict) -> dict[str, list[str]]:
     """
@@ -159,6 +166,7 @@ def extract_flags(target_json: dict) -> dict[str, list[str]]:
         "CXXFLAGS": default_flags.get("CXX"),
     }
 
+
 def find_included_files(environment: Environment) -> set[str]:
     """
     Process a list of flags produced by extract_flags() to find files manually included by '-include'
@@ -170,6 +178,7 @@ def find_included_files(environment: Environment) -> set[str]:
             if language_flags[index] == "-include" and index < len(language_flags) - 1:
                 result.add(language_flags[index + 1])
     return result
+
 
 def extract_includes(target_json: dict) -> dict[str, list[str]]:
     """
@@ -186,6 +195,7 @@ def extract_includes(target_json: dict) -> dict[str, list[str]]:
             plain_includes.append(inc_path)
 
     return {"plain_includes": plain_includes, "sys_includes": sys_includes}
+
 
 def extract_link_args(target_json: dict) -> list[str]:
     """

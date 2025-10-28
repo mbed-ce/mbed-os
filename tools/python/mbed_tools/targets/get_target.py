@@ -7,6 +7,7 @@
 An instance of `mbed_tools.targets.target.Target`
 can be retrieved by calling one of the public functions.
 """
+
 from mbed_tools.targets.exceptions import TargetError
 from mbed_tools.targets._internal import target_attributes
 

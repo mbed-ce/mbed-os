@@ -7,6 +7,7 @@ and returns information about the configuration to the PIO build system.
 Copyright (c) 2025 Jamie Smith
 SPDX-License-Identifier: Apache-2.0
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -32,7 +33,7 @@ CMAKE_API_DIR = BUILD_DIR / ".cmake" / "api" / "v1"
 CMAKE_API_QUERY_DIR = CMAKE_API_DIR / "query"
 CMAKE_API_REPLY_DIR = CMAKE_API_DIR / "reply"
 
-PROJECT_CMAKELISTS_TXT = FRAMEWORK_DIR  / "tools" / "python" / "mbed_platformio" / "CMakeLists.txt"
+PROJECT_CMAKELISTS_TXT = FRAMEWORK_DIR / "tools" / "python" / "mbed_platformio" / "CMakeLists.txt"
 PROJECT_MBED_APP_JSON5 = PROJECT_DIR / "mbed_app.json5"
 PROJECT_TARGET_CONFIG_H = BUILD_DIR / "mbed-os" / "generated-headers" / "mbed-target-config.h"
 
@@ -46,30 +47,31 @@ CMAKE_PATH = pathlib.Path(platform.get_package_dir("tool-cmake")) / "bin" / "cma
 sys.path.append(str(FRAMEWORK_DIR / "tools" / "python"))
 
 from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
-from mbed_platformio.cmake_to_scons_converter import build_library, extract_defines, extract_flags, extract_includes, extract_link_args, find_included_files
+from mbed_platformio.cmake_to_scons_converter import (
+    build_library,
+    extract_defines,
+    extract_flags,
+    extract_includes,
+    extract_link_args,
+    find_included_files,
+)
+
 
 def get_mbed_target():
     board_type = env.subst("$BOARD")
-    variant = (
-        PIO_VARIANT_TO_MBED_TARGET[board_type]
-        if board_type in PIO_VARIANT_TO_MBED_TARGET
-        else board_type.upper()
-    )
+    variant = PIO_VARIANT_TO_MBED_TARGET[board_type] if board_type in PIO_VARIANT_TO_MBED_TARGET else board_type.upper()
     return board.get("build.mbed_variant", variant)
 
+
 def is_proper_mbed_ce_project():
-    return all(
-        path.is_file()
-        for path in (
-            PROJECT_MBED_APP_JSON5,
-        )
-    )
+    return all(path.is_file() for path in (PROJECT_MBED_APP_JSON5,))
+
 
 def create_default_project_files():
     print("Mbed CE: Creating default project files")
     if not PROJECT_MBED_APP_JSON5.exists():
         PROJECT_MBED_APP_JSON5.write_text(
-"""
+            """
 {
    "target_overrides": {
       "*": {
@@ -84,12 +86,10 @@ def create_default_project_files():
 """
         )
 
+
 def is_cmake_reconfigure_required():
     cmake_cache_file = BUILD_DIR / "CMakeCache.txt"
-    cmake_config_files = [
-        PROJECT_MBED_APP_JSON5,
-        PROJECT_CMAKELISTS_TXT
-    ]
+    cmake_config_files = [PROJECT_MBED_APP_JSON5, PROJECT_CMAKELISTS_TXT]
     ninja_buildfile = BUILD_DIR / "build.ninja"
 
     if not cmake_cache_file.exists():
@@ -129,7 +129,6 @@ def run_tool(command_and_args: list[str] | None = None):
 
 
 def get_cmake_code_model(cmake_args: list) -> dict:
-
     query_file = CMAKE_API_QUERY_DIR / "codemodel-v2"
 
     if not query_file.exists():
@@ -161,6 +160,7 @@ def get_cmake_code_model(cmake_args: list) -> dict:
     assert codemodel["version"]["major"] == 2
     return codemodel
 
+
 def get_target_config(project_configs: dict, target_index):
     target_json = project_configs.get("targets")[target_index].get("jsonFile", "")
     target_config_file = CMAKE_API_REPLY_DIR / target_json
@@ -177,15 +177,13 @@ def load_target_configurations(cmake_codemodel: dict) -> dict:
     project_configs = cmake_codemodel.get("configurations")[0]
     for config in project_configs.get("projects", []):
         for target_index in config.get("targetIndexes", []):
-            target_config = get_target_config(
-                project_configs, target_index
-            )
+            target_config = get_target_config(project_configs, target_index)
             configs[target_config["name"]] = target_config
 
     return configs
 
-def generate_project_ld_script() -> pathlib.Path:
 
+def generate_project_ld_script() -> pathlib.Path:
     # Run Ninja to build the target which generates the linker script.
     # Note that we don't want to use CMake as running it has the side effect of redoing
     # the file API query.
@@ -193,7 +191,7 @@ def generate_project_ld_script() -> pathlib.Path:
         str(pathlib.Path(platform.get_package_dir("tool-ninja")) / "ninja"),
         "-C",
         str(BUILD_DIR),
-        "mbed-linker-script"
+        "mbed-linker-script",
     ]
     run_tool(cmd)
 
@@ -202,19 +200,19 @@ def generate_project_ld_script() -> pathlib.Path:
     return next(BUILD_DIR.glob("*.link_script.ld"))
 
 
-def get_targets_by_type(target_configs: dict, target_types: list[str], ignore_targets: list[str] | None=None) -> list:
+def get_targets_by_type(target_configs: dict, target_types: list[str], ignore_targets: list[str] | None = None) -> list:
     ignore_targets = ignore_targets or []
     result = []
     for target_config in target_configs.values():
-        if (
-                target_config["type"] in target_types
-                and target_config["name"] not in ignore_targets
-        ):
+        if target_config["type"] in target_types and target_config["name"] not in ignore_targets:
             result.append(target_config)
 
     return result
 
-def get_components_map(target_configs: dict, target_types: list[str], ignore_components: list[str] | None=None) -> dict:
+
+def get_components_map(
+    target_configs: dict, target_types: list[str], ignore_components: list[str] | None = None
+) -> dict:
     result = {}
     for config in get_targets_by_type(target_configs, target_types, ignore_components):
         if "nameOnDisk" not in config:
@@ -224,16 +222,16 @@ def get_components_map(target_configs: dict, target_types: list[str], ignore_com
     return result
 
 
-def build_components(
-        env: Environment, components_map: dict, project_src_dir: pathlib.Path
-):
+def build_components(env: Environment, components_map: dict, project_src_dir: pathlib.Path):
     for k, v in components_map.items():
         components_map[k]["lib"] = build_library(
             env, v["config"], project_src_dir, FRAMEWORK_DIR, pathlib.Path("$BUILD_DIR/mbed-os")
         )
 
+
 def get_app_defines(app_config: dict):
     return extract_defines(app_config["compileGroups"][0])
+
 
 ## CMake configuration -------------------------------------------------------------------------------------------------
 
@@ -245,15 +243,16 @@ project_codemodel = get_cmake_code_model(
         BUILD_DIR,
         "-G",
         "Ninja",
-        "-DCMAKE_MAKE_PROGRAM=" + str(NINJA_PATH.as_posix()), # Note: CMake prefers to be passed paths with forward slashes, so use as_posix()
+        "-DCMAKE_MAKE_PROGRAM="
+        + str(NINJA_PATH.as_posix()),  # Note: CMake prefers to be passed paths with forward slashes, so use as_posix()
         "-DCMAKE_BUILD_TYPE=" + CMAKE_BUILD_TYPE,
         "-DPLATFORMIO_MBED_OS_PATH=" + str(FRAMEWORK_DIR.as_posix()),
         "-DPLATFORMIO_PROJECT_PATH=" + str(PROJECT_DIR.as_posix()),
         "-DMBED_TARGET=" + get_mbed_target(),
-        "-DUPLOAD_METHOD=NONE", # Disable Mbed CE upload method system as PlatformIO has its own
+        "-DUPLOAD_METHOD=NONE",  # Disable Mbed CE upload method system as PlatformIO has its own
     ]
     + click.parser.split_arg_string(board.get("build.cmake_extra_args", "")),
-    )
+)
 
 if not project_codemodel:
     sys.stderr.write("Error: Couldn't find code model generated by CMake\n")
@@ -292,7 +291,7 @@ link_args.extend(extract_link_args(app_target_json))
 
 # The CMake build system adds a flag in mbed_set_post_build() to output a map file.
 # We need to do that here.
-map_file = BUILD_DIR / 'firmware.map'
+map_file = BUILD_DIR / "firmware.map"
 link_args.append(f"-Wl,-Map={str(map_file)}")
 
 ## Build environment configuration -------------------------------------------------------------------------------------

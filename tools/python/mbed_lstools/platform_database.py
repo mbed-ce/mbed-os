@@ -21,7 +21,7 @@ from mbed_os_tools.detect.platform_database import (
     LOCAL_PLATFORM_DATABASE,
     LOCAL_MOCKS_DATABASE,
     DEFAULT_PLATFORM_DB,
-    PlatformDatabase
+    PlatformDatabase,
 )
 
 """

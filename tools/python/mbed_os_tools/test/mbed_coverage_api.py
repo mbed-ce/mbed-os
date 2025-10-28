@@ -29,6 +29,7 @@ def __default_coverage_start_callback(self, key, value, timestamp):
         self.log("LCOV:" + str(e))
 """
 
+
 def coverage_pack_hex_payload(payload):
     """! Convert a block of hex string data back to binary and return the binary data
     @param payload String with hex encoded ascii data, e.g.: '6164636772...'
@@ -36,9 +37,9 @@ def coverage_pack_hex_payload(payload):
     """
     # This payload might be packed with dot compression
     # where byte value 0x00 is coded as ".", and not as "00"
-    payload = payload.replace('.', '00')
+    payload = payload.replace(".", "00")
 
-    hex_pairs = map(''.join, zip(*[iter(payload)] * 2)) # ['61', '64', '63', '67', '72', ... ]
+    hex_pairs = map("".join, zip(*[iter(payload)] * 2))  # ['61', '64', '63', '67', '72', ... ]
     bin_payload = bytearray([int(s, 16) for s in hex_pairs])
     return bin_payload
 

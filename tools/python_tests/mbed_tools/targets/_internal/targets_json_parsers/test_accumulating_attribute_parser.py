@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Tests for parsing the attributes for targets in targets.json that accumulate."""
+
 from unittest import TestCase, mock
 import copy
 
@@ -40,8 +41,7 @@ class ListAllAccumulatingAttributes(TestCase):
 
 class TestGetAccumulatingAttributes(TestCase):
     @mock.patch(
-        "mbed_tools.targets._internal.targets_json_parsers."
-        "accumulating_attribute_parser._targets_accumulate_hierarchy"
+        "mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser._targets_accumulate_hierarchy"
     )
     @mock.patch(
         "mbed_tools.targets._internal.targets_json_parsers."
@@ -158,6 +158,7 @@ class TestAccumulatingAttributes(TestCase):
         self.assertEqual(result, expected_attributes)
 
         self.assertEqual(orig_accumulation_order, accumulation_order)
+
 
 class TestElementMatches(TestCase):
     def test_element_matches_exactly(self):

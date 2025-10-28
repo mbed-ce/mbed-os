@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Tests for parsing the attributes for targets in targets.json that override."""
+
 from unittest import TestCase, mock
 
 from mbed_tools.targets._internal.targets_json_parsers.overriding_attribute_parser import (
@@ -18,11 +19,10 @@ from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_pa
 
 class TestGetOverridingAttributes(TestCase):
     @mock.patch(
-        "mbed_tools.targets._internal.targets_json_parsers." "overriding_attribute_parser._targets_override_hierarchy"
+        "mbed_tools.targets._internal.targets_json_parsers.overriding_attribute_parser._targets_override_hierarchy"
     )
     @mock.patch(
-        "mbed_tools.targets._internal.targets_json_parsers."
-        "overriding_attribute_parser._determine_overridden_attributes"
+        "mbed_tools.targets._internal.targets_json_parsers.overriding_attribute_parser._determine_overridden_attributes"
     )
     def test_correctly_calls(self, _determine_overridden_attributes, _targets_override_hierarchy):
         target_name = "Target_Name"

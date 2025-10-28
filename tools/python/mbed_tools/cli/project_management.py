@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Project management commands: new, import_, deploy and libs."""
+
 import os
 import pathlib
 

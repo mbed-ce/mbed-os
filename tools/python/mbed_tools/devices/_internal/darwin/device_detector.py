@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Device detector for Darwin."""
+
 import logging
 import pathlib
 import re

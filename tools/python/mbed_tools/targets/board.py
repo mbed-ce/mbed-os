@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Representation of an Mbed-Enabled Development Board and related utilities."""
+
 from dataclasses import dataclass
 from typing import Tuple
 

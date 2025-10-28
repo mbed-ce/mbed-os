@@ -48,7 +48,7 @@ def find_connected_device(target_name: str, identifier: Optional[int] = None) ->
         return devices[identifier]
 
     detected_targets = "\n".join(
-        f"target: {dev.mbed_board.board_type}[{i}]," f" port: {dev.serial_port}, mount point(s): {dev.mount_points}"
+        f"target: {dev.mbed_board.board_type}[{i}], port: {dev.serial_port}, mount point(s): {dev.mount_points}"
         for i, dev in enumerate(devices)
     )
     if identifier is None:

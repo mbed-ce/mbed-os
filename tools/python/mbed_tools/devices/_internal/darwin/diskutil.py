@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Interactions with `diskutil`."""
+
 import plistlib
 import subprocess
 from typing import Dict, Iterable, List, Optional, cast

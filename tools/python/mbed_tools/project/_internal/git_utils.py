@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Wrappers for git operations."""
+
 from dataclasses import dataclass
 from pathlib import Path
 

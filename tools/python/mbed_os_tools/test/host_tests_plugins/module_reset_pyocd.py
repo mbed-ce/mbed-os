@@ -17,19 +17,19 @@ from .host_test_plugins import HostTestPluginBase
 
 try:
     from pyocd.core.helpers import ConnectHelper
+
     PYOCD_PRESENT = True
 except ImportError:
     PYOCD_PRESENT = False
 
 
 class HostTestPluginResetMethod_pyOCD(HostTestPluginBase):
-
     # Plugin interface
-    name = 'HostTestPluginResetMethod_pyOCD'
-    type = 'ResetMethod'
+    name = "HostTestPluginResetMethod_pyOCD"
+    type = "ResetMethod"
     stable = True
-    capabilities = ['pyocd']
-    required_parameters = ['target_id']
+    capabilities = ["pyocd"]
+    required_parameters = ["target_id"]
 
     def __init__(self):
         """! ctor
@@ -41,8 +41,7 @@ class HostTestPluginResetMethod_pyOCD(HostTestPluginBase):
         HostTestPluginBase.__init__(self)
 
     def setup(self, *args, **kwargs):
-        """! Configure plugin, this function should be called before plugin execute() method is used.
-        """
+        """! Configure plugin, this function should be called before plugin execute() method is used."""
         return True
 
     def execute(self, capability, *args, **kwargs):
@@ -60,17 +59,18 @@ class HostTestPluginResetMethod_pyOCD(HostTestPluginBase):
             )
             return False
 
-        if not kwargs['target_id']:
+        if not kwargs["target_id"]:
             self.print_plugin_error("Error: target_id not set")
             return False
 
         result = False
         if self.check_parameters(capability, *args, **kwargs) is True:
-            if kwargs['target_id']:
-                if capability == 'pyocd':
-                    target_id = kwargs['target_id']
-                    with ConnectHelper.session_with_chosen_probe(unique_id=target_id,
-                                resume_on_disconnect=False) as session:
+            if kwargs["target_id"]:
+                if capability == "pyocd":
+                    target_id = kwargs["target_id"]
+                    with ConnectHelper.session_with_chosen_probe(
+                        unique_id=target_id, resume_on_disconnect=False
+                    ) as session:
                         session.target.reset()
                         session.target.resume()
                         result = True
@@ -78,6 +78,5 @@ class HostTestPluginResetMethod_pyOCD(HostTestPluginBase):
 
 
 def load_plugin():
-    """! Returns plugin available in this module
-    """
+    """! Returns plugin available in this module"""
     return HostTestPluginResetMethod_pyOCD()

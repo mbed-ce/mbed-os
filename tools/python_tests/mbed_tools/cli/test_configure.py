@@ -22,7 +22,9 @@ class TestConfigureCommand(TestCase):
     @mock.patch("mbed_tools.cli.configure.generate_config")
     @mock.patch("mbed_tools.cli.configure.MbedProgram")
     def test_generate_config_called_with_mbed_os_path(self, program, generate_config):
-        CliRunner().invoke(configure, ["-m", "k64f", "-t", "gcc_arm", "--mbed-os-path", "./extern/mbed-os", "-o", "some_output_dir"])
+        CliRunner().invoke(
+            configure, ["-m", "k64f", "-t", "gcc_arm", "--mbed-os-path", "./extern/mbed-os", "-o", "some_output_dir"]
+        )
 
         generate_config.assert_called_once_with("K64F", "GCC_ARM", program.from_existing())
 
@@ -32,7 +34,8 @@ class TestConfigureCommand(TestCase):
         program = program.from_existing()
         custom_targets_json_path = pathlib.Path("custom", "custom_targets.json")
         CliRunner().invoke(
-            configure, ["-t", "gcc_arm", "-m", "k64f", "--custom-targets-json", custom_targets_json_path, "-o", "some_output_dir"]
+            configure,
+            ["-t", "gcc_arm", "-m", "k64f", "--custom-targets-json", custom_targets_json_path, "-o", "some_output_dir"],
         )
 
         generate_config.assert_called_once_with("K64F", "GCC_ARM", program)
@@ -59,12 +62,7 @@ class TestConfigureCommand(TestCase):
         toolchain = "gcc_arm"
         target = "k64f"
 
-        CliRunner().invoke(
-            configure, ["-t", toolchain, "-m", target, "-o", "some_output_dir"]
-        )
+        CliRunner().invoke(configure, ["-t", toolchain, "-m", target, "-o", "some_output_dir"])
 
-        program.from_existing.assert_called_once_with(
-            pathlib.Path("."),
-            pathlib.Path("some_output_dir")
-        )
+        program.from_existing.assert_called_once_with(pathlib.Path("."), pathlib.Path("some_output_dir"))
         generate_config.assert_called_once_with("K64F", "GCC_ARM", test_program)

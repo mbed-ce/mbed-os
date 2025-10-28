@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Find files in MbedOS program directory."""
+
 from pathlib import Path
 import fnmatch
 from typing import Callable, Iterable, Optional, List, Tuple

@@ -18,6 +18,7 @@ current inheritance level.
 
 This means a target on a higher level could potentially override one on a lower level.
 """
+
 from collections import deque
 from functools import reduce
 from typing import Dict, List, Any, Deque, Set

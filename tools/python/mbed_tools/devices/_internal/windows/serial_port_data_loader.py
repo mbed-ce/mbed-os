@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Loads serial port data."""
+
 from typing import Optional, Generator, cast, List
 
 from mbed_tools.devices._internal.windows.system_data_loader import SystemDataLoader, ComponentsLoader

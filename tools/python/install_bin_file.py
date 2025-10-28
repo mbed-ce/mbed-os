@@ -18,21 +18,28 @@ import mbed_os_tools.detect
 def get_detected_targets():
     targets = []
     oldError = None
-    if os.name == 'nt':
-        oldError = ctypes.windll.kernel32.SetErrorMode(1) # Disable Windows error box temporarily. note that SEM_FAILCRITICALERRORS = 1
+    if os.name == "nt":
+        oldError = ctypes.windll.kernel32.SetErrorMode(
+            1
+        )  # Disable Windows error box temporarily. note that SEM_FAILCRITICALERRORS = 1
     mbeds = mbed_os_tools.detect.create()
     detect_muts_list = mbeds.list_mbeds()
-    if os.name == 'nt':
+    if os.name == "nt":
         ctypes.windll.kernel32.SetErrorMode(oldError)
 
     for mut in detect_muts_list:
-        targets.append({
-            'id': mut['target_id'], 'name': mut['platform_name'],
-            'mount': mut['mount_point'], 'serial': mut['serial_port'],
-            'uid': mut['target_id_usb_id']
-        })
+        targets.append(
+            {
+                "id": mut["target_id"],
+                "name": mut["platform_name"],
+                "mount": mut["mount_point"],
+                "serial": mut["serial_port"],
+                "uid": mut["target_id_usb_id"],
+            }
+        )
 
     return targets
+
 
 def error(lines, code=-1):
     sys.stderr.write("[install-bin-file] ERROR: %s\n" % (lines.pop(0),))
@@ -41,8 +48,13 @@ def error(lines, code=-1):
     sys.stderr.write("---\n")
     sys.exit(code)
 
+
 if len(sys.argv) < 3:
-    print("Error: Usage: " + sys.argv[0] + " <path to bin file> <Mbed OS target name> <serial baudrate for sending break> [Target UID for distinguishing multiple targets]")
+    print(
+        "Error: Usage: "
+        + sys.argv[0]
+        + " <path to bin file> <Mbed OS target name> <serial baudrate for sending break> [Target UID for distinguishing multiple targets]"
+    )
     sys.exit(1)
 
 bin_file = sys.argv[1]
@@ -56,32 +68,33 @@ else:
 all_connected = []
 
 # Convert Dual Core target name to mbedls target name
-if target_name.upper().endswith('_CM4') or target_name.upper().endswith('_CM7'):
+if target_name.upper().endswith("_CM4") or target_name.upper().endswith("_CM7"):
     target_name = target_name[:-4]
-    print('Target to detect: %s' % (target_name,))
+    print("Target to detect: %s" % (target_name,))
 targets = get_detected_targets()
 if targets:
     for _target in targets:
-
-        if _target['name'] is None:
-            if target_uid is not None and _target['uid'] == target_uid:
+        if _target["name"] is None:
+            if target_uid is not None and _target["uid"] == target_uid:
                 # If we have an exact UID match and we don't know the name, then assume that
                 # the UID is correct.
                 all_connected.append(_target)
         else:
-            if _target['name'].upper() == target_name.upper():
-                if target_uid is None or _target['uid'] == target_uid:
+            if _target["name"].upper() == target_name.upper():
+                if target_uid is None or _target["uid"] == target_uid:
                     # Name matches, UID either matches or was not specified
                     all_connected.append(_target)
 
-if len(all_connected) == 0 and len(targets) == 1 and targets[0]['name'] is None and target_uid is None:
+if len(all_connected) == 0 and len(targets) == 1 and targets[0]["name"] is None and target_uid is None:
     # Special case: if we only have one board connected to the system and we aren't filtering by UID, then
     # assume it's the one we want even if we could not detect its name.
     all_connected.append(targets[0])
 
 if len(all_connected) == 0:
-    error_lines = ["The target board you compiled for is not connected to your system.",
-                   "Please reconnect it and retry the last command."]
+    error_lines = [
+        "The target board you compiled for is not connected to your system.",
+        "Please reconnect it and retry the last command.",
+    ]
     if target_uid is None:
         error_lines.append("(Searched for any %s board.)" % (target_name,))
     else:
@@ -91,16 +104,16 @@ if len(all_connected) == 0:
 elif len(all_connected) > 1:
     error_lines = ["There are multiple of the targeted board connected to the system.  Which do you wish to flash?"]
     for target in all_connected:
-        error_lines.append("Board: %s, Mount Point: %s, UID: %s" % (target['name'], target['mount'], target['uid']))
+        error_lines.append("Board: %s, Mount Point: %s, UID: %s" % (target["name"], target["mount"], target["uid"]))
     error_lines.append("Please set the CMake variable MBED_TARGET_UID to the UID of the board you wish to flash.")
     error(error_lines, 5)
 
 connected = all_connected[0]
 # apply new firmware
 if not os.path.exists(bin_file):
-    error("Build program file (firmware) not found \"%s\"" % bin_file, 1)
-if not flash_dev(connected['mount'], bin_file, program_cycle_s=4):
+    error('Build program file (firmware) not found "%s"' % bin_file, 1)
+if not flash_dev(connected["mount"], bin_file, program_cycle_s=4):
     error("Unable to flash the target board connected to your system.", 1)
 
 # reset board
-reset_dev(port=connected["serial"], disk=connected['mount'], baudrate=serial_baud)
+reset_dev(port=connected["serial"], disk=connected["mount"], baudrate=serial_baud)

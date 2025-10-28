@@ -7,6 +7,7 @@
 This information is parsed from the targets.json configuration file
 found in the mbed-os repo.
 """
+
 import logging
 import pathlib
 from typing import Dict, Any, Set, Optional
@@ -69,7 +70,9 @@ def get_target_attributes(targets_json_data: dict, target_name: str, allow_non_p
     return target_attributes
 
 
-def _extract_target_attributes(all_targets_data: Dict[str, Any], target_name: str, allow_non_public_targets: bool) -> dict:
+def _extract_target_attributes(
+    all_targets_data: Dict[str, Any], target_name: str, allow_non_public_targets: bool
+) -> dict:
     """Extracts the definition for a particular target from all the targets in targets.json.
 
     Args:
@@ -88,7 +91,9 @@ def _extract_target_attributes(all_targets_data: Dict[str, Any], target_name: st
 
     # All target definitions are assumed to be public unless specifically set as public=false
     if not all_targets_data[target_name].get("public", True) and not allow_non_public_targets:
-        raise TargetNotFoundError(f"Cannot get attributes for {target_name} because it is marked non-public in targets JSON.  This likely means you set MBED_TARGET to the name of the MCU rather than the name of the board.")
+        raise TargetNotFoundError(
+            f"Cannot get attributes for {target_name} because it is marked non-public in targets JSON.  This likely means you set MBED_TARGET to the name of the MCU rather than the name of the board."
+        )
 
     target_attributes = get_overriding_attributes_for_target(all_targets_data, target_name)
     accumulated_attributes = get_accumulating_attributes_for_target(all_targets_data, target_name)

@@ -20,8 +20,8 @@ import os
 
 from mbed_host_tests.host_tests_plugins.module_copy_mps2 import HostTestPluginCopyMethod_MPS2
 
-class MPS2CopyTestCase(unittest.TestCase):
 
+class MPS2CopyTestCase(unittest.TestCase):
     def setUp(self):
         self.mps2_copy_plugin = HostTestPluginCopyMethod_MPS2()
         self.filename = "toto.bin"
@@ -45,5 +45,6 @@ class MPS2CopyTestCase(unittest.TestCase):
         self.assertTrue(os.path.isfile("mbed.elf"))
         os.remove("mbed.elf")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

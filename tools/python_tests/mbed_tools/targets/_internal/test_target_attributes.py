@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Tests for `mbed_tools.targets.target_attributes`."""
+
 from unittest import TestCase, mock
 
 from mbed_tools.targets._internal.target_attributes import (

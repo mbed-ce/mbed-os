@@ -16,7 +16,7 @@
 import unittest
 from copy import copy
 from mbed_os_tools.test import init_host_test_cli_params
-from mbed_os_tools.test.host_tests_runner.host_test_default  import DefaultTestSelector
+from mbed_os_tools.test.host_tests_runner.host_test_default import DefaultTestSelector
 
 from .mocks.environment.linux import MockTestEnvironmentLinux
 from .mocks.environment.darwin import MockTestEnvironmentDarwin
@@ -30,8 +30,8 @@ mock_platform_info = {
 }
 mock_image_path = "BUILD/tests/K64F/GCC_ARM/TESTS/network/interface/interface.bin"
 
-class BlackBoxHostTestTestCase(unittest.TestCase):
 
+class BlackBoxHostTestTestCase(unittest.TestCase):
     def _run_host_test(self, environment):
         with environment as _env:
             test_selector = DefaultTestSelector(init_host_test_cli_params())
@@ -41,22 +41,17 @@ class BlackBoxHostTestTestCase(unittest.TestCase):
         self.assertEqual(result, 0)
 
     def test_host_test_linux(self):
-        self._run_host_test(
-            MockTestEnvironmentLinux(self, mock_platform_info, mock_image_path)
-        )
+        self._run_host_test(MockTestEnvironmentLinux(self, mock_platform_info, mock_image_path))
 
     def test_host_test_darwin(self):
-        self._run_host_test(
-            MockTestEnvironmentDarwin(self, mock_platform_info, mock_image_path)
-        )
+        self._run_host_test(MockTestEnvironmentDarwin(self, mock_platform_info, mock_image_path))
 
     def test_host_test_windows(self):
         win_mock_platform_info = copy(mock_platform_info)
         win_mock_platform_info["serial_port"] = "COM5"
 
-        self._run_host_test(
-            MockTestEnvironmentWindows(self, win_mock_platform_info, mock_image_path)
-        )
+        self._run_host_test(MockTestEnvironmentWindows(self, win_mock_platform_info, mock_image_path))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

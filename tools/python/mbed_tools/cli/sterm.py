@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Command to launch a serial terminal to a connected Mbed device."""
+
 from typing import Any, Optional, Tuple
 
 import click

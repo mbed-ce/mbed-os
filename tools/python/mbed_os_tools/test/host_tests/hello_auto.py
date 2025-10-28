@@ -15,6 +15,7 @@
 
 from .. import BaseHostTest
 
+
 class HelloTest(BaseHostTest):
     HELLO_WORLD = "Hello World"
 
