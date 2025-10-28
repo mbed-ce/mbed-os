@@ -140,8 +140,6 @@ jobs:
 
       - name: Install Python packages
         run: |
-          python3 -m venv venv
-          source venv/bin/activate
           pip install -e ./tools[linters]
 
       - name: Check Python Formatting
@@ -183,8 +181,6 @@ jobs:
 
       - name: Install Python packages
         run: |
-          python3 -m venv venv
-          source venv/bin/activate
           pip install -e ./tools[unit-tests]
 
       - name: Python Tests
