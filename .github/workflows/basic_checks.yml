@@ -86,26 +86,20 @@ jobs:
 
   style-check:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/armmbed/mbed-os-env:master-latest
-
     steps:
 
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
     
-      - 
-        name: UTF-8 Check
+      - name: UTF-8 Check
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           # Make sure we're not introducing any text which is not UTF-8 encoded
           git diff origin/${GITHUB_BASE_REF} -U0 | ( grep -a '^+' || true ) | ( ! grep -axv '.*' )
-          
 
-      - 
-        name: astyle checks
+      - name: astyle checks
         run: |
           set -x
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -134,10 +128,27 @@ jobs:
           tee BUILD/badlibs |
           sed -e "s/^/Bad library name found: /" && [ ! -s BUILD/badlibs ]
           # Assert that all assembler files are named correctly
-          # The strange command below asserts that there are exactly 0 libraries
+          # The strange command below asserts that there are exactly 0 files
           # that do end with .s
           find  -name "*.s" | tee BUILD/badasm |
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
+
+      # Set up the oldest python version that's currently still supported by Python (as of Fall 2025)
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.9'
+
+      - name: Install Python packages
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -e ./tools[linters]
+
+      - name: Check Python Formatting
+        run: |
+          cd tools
+          ruff format --diff
+          
 
   docs-check:
     runs-on: ubuntu-latest
@@ -162,14 +173,13 @@ jobs:
   python-tests:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout repo
-        uses: actions/checkout@v4
-        
-      - name: Install python3-venv
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-venv
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      # Set up the oldest python version that's currently still supported by Python (as of Fall 2025)
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.9'
 
       - name: Install Python packages
         run: |

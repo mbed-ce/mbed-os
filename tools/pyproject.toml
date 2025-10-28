@@ -71,6 +71,9 @@ unit-tests = [
     "beautifulsoup4",
     "lxml"
 ]
+linters = [
+    "ruff"
+]
 greentea = [
     ## Additional requirements to install into the Mbed environment when running Greentea tests
     # For USB Device host tests
@@ -103,3 +106,8 @@ mbedls = "mbed_lstools.main:mbedls_main"
 mbed-tools = "mbed_tools.cli.main:cli"
 memap = "memap.memap:main"
 ambiq_svl = "ambiq_svl.svl:cli"
+
+[tool.ruff]
+line-length = 120
+show-fixes = true
+src = ['python']
