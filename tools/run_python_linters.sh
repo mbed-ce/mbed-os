@@ -28,4 +28,4 @@ if ! command -v ruff >/dev/null 2>&1; then
 fi
 
 echo ">> Formatting with Ruff..."
-ruff format --verbose
+ruff format
