@@ -13,7 +13,7 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations 
+limitations
 """
 
 import subprocess
@@ -22,8 +22,7 @@ import os.path
 
 """A test that all code scores above a 9.25 in pylint"""
 
-SCORE_REGEXP = re.compile(
-    r'^Your\ code\ has\ been\ rated\ at\ (\-?[0-9\.]+)/10')
+SCORE_REGEXP = re.compile(r"^Your\ code\ has\ been\ rated\ at\ (\-?[0-9\.]+)/10")
 
 TOOLS_ROOT = os.path.dirname(os.path.dirname(__file__))
 
@@ -38,28 +37,22 @@ def parse_score(pylint_output):
             return float(match.group(1))
     return 0.0
 
+
 def execute_pylint(filename):
-    """Execute a pylint process and collect it's output
-    """
+    """Execute a pylint process and collect it's output"""
     process = subprocess.Popen(
-        ["pylint", filename],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True
+        ["pylint", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
     )
     stout, sterr = process.communicate()
     status = process.poll()
     return status, stout, sterr
 
+
 FILES = ["python/memap/memap.py", "test/pylint.py"]
 
 if __name__ == "__main__":
     for python_module in FILES:
-        _, stdout, stderr = execute_pylint(os.path.join(TOOLS_ROOT,
-                                                        python_module))
+        _, stdout, stderr = execute_pylint(os.path.join(TOOLS_ROOT, python_module))
         score = parse_score(stdout)
         if score < 9.25:
             print(stdout)
-
-
-

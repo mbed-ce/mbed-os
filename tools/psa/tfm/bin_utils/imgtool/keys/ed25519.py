@@ -46,21 +46,21 @@ class Ed25519Public(KeyClass):
     def get_public_bytes(self):
         # The key is embedded into MBUboot in "SubjectPublicKeyInfo" format
         return self._get_public().public_bytes(
-                encoding=serialization.Encoding.DER,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo)
+            encoding=serialization.Encoding.DER, format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
 
     def get_private_bytes(self, minimal):
-        self._unsupported('get_private_bytes')
+        self._unsupported("get_private_bytes")
 
     def export_private(self, path, passwd=None):
-        self._unsupported('export_private')
+        self._unsupported("export_private")
 
     def export_public(self, path):
         """Write the public key to the given file."""
         pem = self._get_public().public_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo)
-        with open(path, 'wb') as f:
+            encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+        with open(path, "wb") as f:
             f.write(pem)
 
     def sig_type(self):
@@ -91,8 +91,7 @@ class Ed25519(Ed25519Public):
         return self.key.public_key()
 
     def get_private_bytes(self, minimal):
-        raise Ed25519UsageError("Operation not supported with {} keys".format(
-            self.shortname()))
+        raise Ed25519UsageError("Operation not supported with {} keys".format(self.shortname()))
 
     def export_private(self, path, passwd=None):
         """
@@ -104,10 +103,9 @@ class Ed25519(Ed25519Public):
         else:
             enc = serialization.BestAvailableEncryption(passwd)
         pem = self.key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.PKCS8,
-                encryption_algorithm=enc)
-        with open(path, 'wb') as f:
+            encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=enc
+        )
+        with open(path, "wb") as f:
             f.write(pem)
 
     def sign_digest(self, digest):

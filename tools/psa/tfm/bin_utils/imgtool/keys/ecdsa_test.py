@@ -29,12 +29,12 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.hashes import SHA256
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from imgtool.keys import load, ECDSA256P1, ECDSAUsageError
 
-class EcKeyGeneration(unittest.TestCase):
 
+class EcKeyGeneration(unittest.TestCase):
     def setUp(self):
         self.test_dir = tempfile.TemporaryDirectory()
 
@@ -47,21 +47,20 @@ class EcKeyGeneration(unittest.TestCase):
     def test_keygen(self):
         name1 = self.tname("keygen.pem")
         k = ECDSA256P1.generate()
-        k.export_private(name1, b'secret')
+        k.export_private(name1, b"secret")
 
         self.assertIsNone(load(name1))
 
-        k2 = load(name1, b'secret')
+        k2 = load(name1, b"secret")
 
-        pubname = self.tname('keygen-pub.pem')
+        pubname = self.tname("keygen-pub.pem")
         k2.export_public(pubname)
         pk2 = load(pubname)
 
         # We should be able to export the public key from the loaded
         # public key, but not the private key.
-        pk2.export_public(self.tname('keygen-pub2.pem'))
-        self.assertRaises(ECDSAUsageError,
-                pk2.export_private, self.tname('keygen-priv2.pem'))
+        pk2.export_public(self.tname("keygen-pub2.pem"))
+        self.assertRaises(ECDSAUsageError, pk2.export_private, self.tname("keygen-priv2.pem"))
 
     def test_emit(self):
         """Basic sanity check on the code emitters."""
@@ -95,22 +94,22 @@ class EcKeyGeneration(unittest.TestCase):
 
     def test_sig(self):
         k = ECDSA256P1.generate()
-        buf = b'This is the message'
+        buf = b"This is the message"
         sig = k.raw_sign(buf)
 
         # The code doesn't have any verification, so verify this
         # manually.
-        k.key.public_key().verify(
-                signature=sig,
-                data=buf,
-                signature_algorithm=ec.ECDSA(SHA256()))
+        k.key.public_key().verify(signature=sig, data=buf, signature_algorithm=ec.ECDSA(SHA256()))
 
         # Modify the message to make sure the signature fails.
-        self.assertRaises(InvalidSignature,
-                k.key.public_key().verify,
-                signature=sig,
-                data=b'This is thE message',
-                signature_algorithm=ec.ECDSA(SHA256()))
+        self.assertRaises(
+            InvalidSignature,
+            k.key.public_key().verify,
+            signature=sig,
+            data=b"This is thE message",
+            signature_algorithm=ec.ECDSA(SHA256()),
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

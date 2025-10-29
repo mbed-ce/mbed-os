@@ -16,6 +16,4 @@
 
 from .assemble import Assembly
 
-__all__ = [
-    'Assembly'
-]
+__all__ = ["Assembly"]

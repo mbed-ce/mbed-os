@@ -20,14 +20,10 @@ Cryptographic key management for imgtool.
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric.rsa import (
-    RSAPrivateKey, RSAPublicKey)
-from cryptography.hazmat.primitives.asymmetric.ec import (
-    EllipticCurvePrivateKey, EllipticCurvePublicKey)
-from cryptography.hazmat.primitives.asymmetric.ed25519 import (
-    Ed25519PrivateKey, Ed25519PublicKey)
-from cryptography.hazmat.primitives.asymmetric.x25519 import (
-    X25519PrivateKey, X25519PublicKey)
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey, RSAPublicKey
+from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurvePrivateKey, EllipticCurvePublicKey
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
+from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey, X25519PublicKey
 
 from .rsa import RSA, RSAPublic, RSAUsageError, RSA_KEY_SIZES
 from .ecdsa import ECDSA256P1, ECDSA256P1Public, ECDSAUsageError
@@ -38,18 +34,16 @@ from .x25519 import X25519, X25519Public, X25519UsageError
 class PasswordRequired(Exception):
     """Raised to indicate that the key is password protected, but a
     password was not specified."""
+
     pass
 
 
 def load(path, passwd=None):
     """Try loading a key from the given path.  Returns None if the password wasn't specified."""
-    with open(path, 'rb') as f:
+    with open(path, "rb") as f:
         raw_pem = f.read()
     try:
-        pk = serialization.load_pem_private_key(
-                raw_pem,
-                password=passwd,
-                backend=default_backend())
+        pk = serialization.load_pem_private_key(raw_pem, password=passwd, backend=default_backend())
     # Unfortunately, the crypto library raises unhelpful exceptions,
     # so we have to look at the text.
     except TypeError as e:
@@ -60,9 +54,7 @@ def load(path, passwd=None):
     except ValueError:
         # This seems to happen if the key is a public key, let's try
         # loading it as a public key.
-        pk = serialization.load_pem_public_key(
-                raw_pem,
-                backend=default_backend())
+        pk = serialization.load_pem_public_key(raw_pem, backend=default_backend())
 
     if isinstance(pk, RSAPrivateKey):
         if pk.key_size not in RSA_KEY_SIZES:
@@ -73,13 +65,13 @@ def load(path, passwd=None):
             raise Exception("Unsupported RSA key size: " + pk.key_size)
         return RSAPublic(pk)
     elif isinstance(pk, EllipticCurvePrivateKey):
-        if pk.curve.name != 'secp256r1':
+        if pk.curve.name != "secp256r1":
             raise Exception("Unsupported EC curve: " + pk.curve.name)
         if pk.key_size != 256:
             raise Exception("Unsupported EC size: " + pk.key_size)
         return ECDSA256P1(pk)
     elif isinstance(pk, EllipticCurvePublicKey):
-        if pk.curve.name != 'secp256r1':
+        if pk.curve.name != "secp256r1":
             raise Exception("Unsupported EC curve: " + pk.curve.name)
         if pk.key_size != 256:
             raise Exception("Unsupported EC size: " + pk.key_size)

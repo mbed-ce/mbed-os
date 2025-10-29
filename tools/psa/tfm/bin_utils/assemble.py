@@ -32,7 +32,8 @@ import macro_parser
 offset_re = re.compile(r"^\s*RE_([0-9A-Z_]+)_IMAGE_OFFSET\s*=\s*(.*)")
 size_re = re.compile(r"^\s*RE_([0-9A-Z_]+)_IMAGE_MAX_SIZE\s*=\s*(.*)")
 
-class Assembly():
+
+class Assembly:
     def __init__(self, layout_path, output):
         self.output = output
         self.layout_path = layout_path
@@ -50,40 +51,37 @@ class Assembly():
         offsets = macro_parser.evaluate_macro(self.layout_path, offset_re, 1, 2)
         sizes = macro_parser.evaluate_macro(self.layout_path, size_re, 1, 2)
 
-        if 'SECURE' not in offsets:
+        if "SECURE" not in offsets:
             raise Exception("Image config does not have secure partition")
 
-        if 'NON_SECURE' not in offsets:
+        if "NON_SECURE" not in offsets:
             raise Exception("Image config does not have non-secure partition")
 
         self.offsets = offsets
         self.sizes = sizes
 
     def add_image(self, source, partition):
-        with open(self.output, 'ab') as ofd:
+        with open(self.output, "ab") as ofd:
             ofd.seek(0, os.SEEK_END)
             pos = ofd.tell()
             if pos > self.offsets[partition]:
                 raise Exception("Partitions not in order, unsupported")
             if pos < self.offsets[partition]:
-                ofd.write(b'\xFF' * (self.offsets[partition] - pos))
+                ofd.write(b"\xff" * (self.offsets[partition] - pos))
             statinfo = os.stat(source)
             if statinfo.st_size > self.sizes[partition]:
                 raise Exception("Image {} is too large for partition".format(source))
-            with open(source, 'rb') as rfd:
+            with open(source, "rb") as rfd:
                 shutil.copyfileobj(rfd, ofd, 0x10000)
+
 
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-l', '--layout', required=True,
-            help='Location of the file that contains preprocessed macros')
-    parser.add_argument('-s', '--secure', required=True,
-            help='Unsigned secure image')
-    parser.add_argument('-n', '--non_secure',
-            help='Unsigned non-secure image')
-    parser.add_argument('-o', '--output', required=True,
-            help='Filename to write full image to')
+    parser.add_argument("-l", "--layout", required=True, help="Location of the file that contains preprocessed macros")
+    parser.add_argument("-s", "--secure", required=True, help="Unsigned secure image")
+    parser.add_argument("-n", "--non_secure", help="Unsigned non-secure image")
+    parser.add_argument("-o", "--output", required=True, help="Filename to write full image to")
 
     args = parser.parse_args()
     output = Assembly(args.layout, args.output)
@@ -91,5 +89,6 @@ def main():
     output.add_image(args.secure, "SECURE")
     output.add_image(args.non_secure, "NON_SECURE")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

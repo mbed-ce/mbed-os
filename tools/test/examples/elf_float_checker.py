@@ -12,6 +12,7 @@ import subprocess
 import sys
 from enum import Enum
 
+
 class ReturnCode(Enum):
     """Return codes."""
 
@@ -25,6 +26,7 @@ log = logging.getLogger(__name__)
 LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
 FLOATING_POINT_SYMBOL_REGEX = r"__aeabi_(cd.+|cf.+|h2f.+|d.+|f.+|.+2d|.+2f)"
 OBJECT_FILE_ANALYSIS_CMD = ["objdump", "-t"]
+
 
 class SymbolParser:
     """Parse the given ELF format file."""
@@ -46,9 +48,7 @@ class SymbolParser:
 
     def get_symbol_table(self, elf_file):
         """Get the symbol table from an ELF format file."""
-        log.debug(
-            "Get the symbol table for ELF format file '{}'".format(elf_file)
-        )
+        log.debug("Get the symbol table for ELF format file '{}'".format(elf_file))
 
         cmd = [OBJECT_FILE_ANALYSIS_CMD[0], OBJECT_FILE_ANALYSIS_CMD[1], elf_file]
         log.debug("command: '{}'".format(cmd))
@@ -56,16 +56,14 @@ class SymbolParser:
             process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         except OSError as error:
             raise SymbolTableError(
-                "Getting symbol table for ELF format file '{}' failed,"
-                " error: {}".format(elf_file, error)
+                "Getting symbol table for ELF format file '{}' failed, error: {}".format(elf_file, error)
             )
 
         stdout, _ = process.communicate()
 
         if process.returncode:
             raise SymbolTableError(
-                "Getting symbol table for ELF format file '{}' failed,"
-                " error: {}".format(elf_file, stdout.decode())
+                "Getting symbol table for ELF format file '{}' failed, error: {}".format(elf_file, stdout.decode())
             )
 
         symbol_table = stdout.decode()
@@ -81,6 +79,7 @@ class SymbolTableError(Exception):
 
 class FloatSymbolsFound(Exception):
     """An exception generated when floating point symbols are found."""
+
 
 class ArgumentParserWithDefaultHelp(argparse.ArgumentParser):
     """Subclass that always shows the help message on invalid arguments."""
@@ -109,9 +108,7 @@ def check_float_symbols(elf_file):
     parser = SymbolParser()
     symbol_table = parser.get_symbol_table(elf_file)
 
-    float_symbols = parser.get_symbols_from_table(
-        symbol_table, FLOATING_POINT_SYMBOL_REGEX
-    )
+    float_symbols = parser.get_symbols_from_table(symbol_table, FLOATING_POINT_SYMBOL_REGEX)
 
     return float_symbols
 
@@ -138,10 +135,7 @@ def parse_args():
     parser.add_argument(
         "elf_file",
         type=str,
-        help=(
-            "the Executable and Linkable Format (ELF) file to check"
-            " for floating point instruction inclusion."
-        ),
+        help=("the Executable and Linkable Format (ELF) file to check for floating point instruction inclusion."),
     )
 
     parser.add_argument(
@@ -185,6 +179,7 @@ def _main():
         return ReturnCode.ERROR.value
     else:
         return ReturnCode.SUCCESS.value
+
 
 if __name__ == "__main__":
     sys.exit(_main())

@@ -12,7 +12,10 @@ import re
 import os
 
 # Match (((x) + (y))) mode and ((x) + (y)) mode. x, y can be HEX or DEC value.
-expression_re = re.compile(r"([(]?[(]?[(]?(([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*([\+\-]\s*([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*)*)[)]?\s*([\+\-])\s*[(]?(([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*([\+\-]\s*([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*)*)[)]?[)]?[)]?)|([(]?[(]?[(]?(([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*([\+\-]\s*([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*)*)[)]?[)]?[)]?)")
+expression_re = re.compile(
+    r"([(]?[(]?[(]?(([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*([\+\-]\s*([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*)*)[)]?\s*([\+\-])\s*[(]?(([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*([\+\-]\s*([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*)*)[)]?[)]?[)]?)|([(]?[(]?[(]?(([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*([\+\-]\s*([(]?(((0x)[0-9a-fA-F]+)|([0-9]+))[)]?)\s*)*)[)]?[)]?[)]?)"
+)
+
 
 # Simple parser that takes a string and evaluates an expression from it.
 # The expression might contain additions and subtractions amongst numbers that
@@ -32,16 +35,16 @@ def parse_and_sum(text):
         msg += " (NON-)SECURE_IMAGE_MAX_SIZE macros"
         raise Exception(msg)
 
-    nums = re.findall(r'(0x[A-Fa-f0-9]+)|[\d]+', m.group(0))
+    nums = re.findall(r"(0x[A-Fa-f0-9]+)|[\d]+", m.group(0))
     for i in range(len(nums)):
         nums[i] = int(nums[i], 0)
-    ops = re.findall(r'\+|\-', m.group(0))
+    ops = re.findall(r"\+|\-", m.group(0))
     sum = nums[0]
     for i in range(len(ops)):
-        if ops[i] == '+':
-            sum += nums[i+1]
+        if ops[i] == "+":
+            sum += nums[i + 1]
         else:
-            sum -= nums[i+1]
+            sum -= nums[i + 1]
     return sum
 
 
@@ -58,17 +61,16 @@ def evaluate_macro(file, regexp, matchGroupKey, matchGroupData, bracketless=Fals
         configFile = os.path.join(scriptsDir, file)
 
     macroValue = {}
-    with open(configFile, 'r') as macros_preprocessed_file:
+    with open(configFile, "r") as macros_preprocessed_file:
         for line in macros_preprocessed_file:
             if bracketless:
-                line=line.replace("(","")
-                line=line.replace(")","")
+                line = line.replace("(", "")
+                line = line.replace(")", "")
             m = regexp_compiled.match(line)
             if m is not None:
-                macroValue[m.group(matchGroupKey)] = \
-                parse_and_sum(m.group(matchGroupData))
+                macroValue[m.group(matchGroupKey)] = parse_and_sum(m.group(matchGroupData))
 
-    if (matchGroupKey == 0 and not macroValue):
+    if matchGroupKey == 0 and not macroValue:
         macroValue["None"] = None
 
     return list(macroValue.values())[0] if (matchGroupKey == 0) else macroValue

@@ -29,13 +29,12 @@ import unittest
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric import ed25519
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from imgtool.keys import load, Ed25519, Ed25519UsageError
 
 
 class Ed25519KeyGeneration(unittest.TestCase):
-
     def setUp(self):
         self.test_dir = tempfile.TemporaryDirectory()
 
@@ -48,21 +47,20 @@ class Ed25519KeyGeneration(unittest.TestCase):
     def test_keygen(self):
         name1 = self.tname("keygen.pem")
         k = Ed25519.generate()
-        k.export_private(name1, b'secret')
+        k.export_private(name1, b"secret")
 
         self.assertIsNone(load(name1))
 
-        k2 = load(name1, b'secret')
+        k2 = load(name1, b"secret")
 
-        pubname = self.tname('keygen-pub.pem')
+        pubname = self.tname("keygen-pub.pem")
         k2.export_public(pubname)
         pk2 = load(pubname)
 
         # We should be able to export the public key from the loaded
         # public key, but not the private key.
-        pk2.export_public(self.tname('keygen-pub2.pem'))
-        self.assertRaises(Ed25519UsageError,
-                          pk2.export_private, self.tname('keygen-priv2.pem'))
+        pk2.export_public(self.tname("keygen-pub2.pem"))
+        self.assertRaises(Ed25519UsageError, pk2.export_private, self.tname("keygen-priv2.pem"))
 
     def test_emit(self):
         """Basic sanity check on the code emitters."""
@@ -96,7 +94,7 @@ class Ed25519KeyGeneration(unittest.TestCase):
 
     def test_sig(self):
         k = Ed25519.generate()
-        buf = b'This is the message'
+        buf = b"This is the message"
         sha = hashlib.sha256()
         sha.update(buf)
         digest = sha.digest()
@@ -108,13 +106,10 @@ class Ed25519KeyGeneration(unittest.TestCase):
 
         # Modify the message to make sure the signature fails.
         sha = hashlib.sha256()
-        sha.update(b'This is thE message')
+        sha.update(b"This is thE message")
         new_digest = sha.digest()
-        self.assertRaises(InvalidSignature,
-                          k.key.public_key().verify,
-                          signature=sig,
-                          data=new_digest)
+        self.assertRaises(InvalidSignature, k.key.public_key().verify, signature=sig, data=new_digest)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -39,19 +39,19 @@ FLOAT_SYMBOLS = [
 ]
 
 SYMBOL_TABLE_WITH_FLOATS = (
-    " Symbol table '.symtab' contains 2723 entries:\n"+
-    "Num:    Value  Size Type    Bind   Vis      Ndx Name\n"+
-    "  0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND \n"+
-    "  1: 000045fd    16 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[0])+
-    "  2: 00004609    16 FUNC    GLOBAL HIDDEN     3 lp_ticker_disable_interrupt\n"+
-    "  3: 00004615    16 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[1])+
-    "  4: 00004625    36 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[2])+
-    "  5: 00004645     8 FUNC    GLOBAL HIDDEN     3 lp_ticker_get_info\n"+
-    "  6: 0000464d   116 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[3])+
-    "  7: 000046bd    20 FUNC    GLOBAL HIDDEN     3 lp_ticker_irq_handler\n"+
-    "  8: 000046d1    16 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[4])+
-    "  9: 000046e1    52 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[5])+
-    " 10: 000046f1    52 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[6])
+    " Symbol table '.symtab' contains 2723 entries:\n"
+    + "Num:    Value  Size Type    Bind   Vis      Ndx Name\n"
+    + "  0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND \n"
+    + "  1: 000045fd    16 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[0])
+    + "  2: 00004609    16 FUNC    GLOBAL HIDDEN     3 lp_ticker_disable_interrupt\n"
+    + "  3: 00004615    16 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[1])
+    + "  4: 00004625    36 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[2])
+    + "  5: 00004645     8 FUNC    GLOBAL HIDDEN     3 lp_ticker_get_info\n"
+    + "  6: 0000464d   116 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[3])
+    + "  7: 000046bd    20 FUNC    GLOBAL HIDDEN     3 lp_ticker_irq_handler\n"
+    + "  8: 000046d1    16 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[4])
+    + "  9: 000046e1    52 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[5])
+    + " 10: 000046f1    52 FUNC    GLOBAL HIDDEN     3 {}\n".format(FLOAT_SYMBOLS[6])
 )
 
 
@@ -59,8 +59,9 @@ ELF_FORMAT_FILE = "mbed-os-example.elf"
 OBJECT_FILE_ANALYSIS_CMD = [
     TARGET.OBJECT_FILE_ANALYSIS_CMD[0],
     TARGET.OBJECT_FILE_ANALYSIS_CMD[1],
-    "{}".format(ELF_FORMAT_FILE)
+    "{}".format(ELF_FORMAT_FILE),
 ]
+
 
 class TestElfFloatChecker:
     """Test class"""
@@ -69,7 +70,8 @@ class TestElfFloatChecker:
     def setup_class(cls):
         # Create a dummy ELF format file
         if not os.path.exists(ELF_FORMAT_FILE):
-            with open(ELF_FORMAT_FILE, 'w'): pass
+            with open(ELF_FORMAT_FILE, "w"):
+                pass
 
     @classmethod
     def teardown_class(cls):
@@ -78,15 +80,11 @@ class TestElfFloatChecker:
             os.remove(ELF_FORMAT_FILE)
 
     @mock.patch("subprocess.Popen")
-    def test_correctly_detect_absence_of_float_symbols(
-        self, mock_subprocess_popen
-    ):
+    def test_correctly_detect_absence_of_float_symbols(self, mock_subprocess_popen):
         """Test that no false positive occur."""
         process_mock = mock.Mock()
         attrs = {
-            "communicate.return_value":(
-                SYMBOL_TABLE_WITHOUT_FLOATS.encode(), None
-            ),
+            "communicate.return_value": (SYMBOL_TABLE_WITHOUT_FLOATS.encode(), None),
             "returncode": 0,
         }
         process_mock.configure_mock(**attrs)
@@ -99,22 +97,16 @@ class TestElfFloatChecker:
         )
 
     @mock.patch("subprocess.Popen")
-    def test_correctly_detect_presence_of_float_symbols(
-        self, mock_subprocess_popen
-    ):
+    def test_correctly_detect_presence_of_float_symbols(self, mock_subprocess_popen):
         """Test that float symbols can be discovered in a symbol table."""
         process_mock = mock.Mock()
         attrs = {
-            "communicate.return_value":(
-                SYMBOL_TABLE_WITH_FLOATS.encode(), None
-            ),
+            "communicate.return_value": (SYMBOL_TABLE_WITH_FLOATS.encode(), None),
             "returncode": 0,
         }
         process_mock.configure_mock(**attrs)
         mock_subprocess_popen.return_value = process_mock
-        assert FLOAT_SYMBOLS == TARGET.check_float_symbols(
-            ELF_FORMAT_FILE
-        )
+        assert FLOAT_SYMBOLS == TARGET.check_float_symbols(ELF_FORMAT_FILE)
         mock_subprocess_popen.assert_called_with(
             OBJECT_FILE_ANALYSIS_CMD,
             stdout=subprocess.PIPE,
