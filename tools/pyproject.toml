@@ -109,5 +109,4 @@ ambiq_svl = "ambiq_svl.svl:cli"
 
 [tool.ruff]
 line-length = 120
-show-fixes = true
 src = ['python']

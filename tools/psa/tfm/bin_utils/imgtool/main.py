@@ -96,7 +96,7 @@ def get_password():
     required=True,
     type=click.Choice(keygens.keys()),
     prompt=True,
-    help="{}".format("One of: {}".format(", ".join(keygens.keys()))),
+    help="One of: {}".format(", ".join(keygens.keys())),
 )
 @click.option("-k", "--key", metavar="filename", required=True)
 @click.command(help="Generate pub/private keypair")
