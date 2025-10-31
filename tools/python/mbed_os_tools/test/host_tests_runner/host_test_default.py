@@ -590,8 +590,4 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             grm_host = leftover
             grm_port = None
 
-        return {
-            "grm_module": grm_module,
-            "grm_host": grm_host,
-            "grm_port": grm_port,
-        }
+        return {"grm_module": grm_module, "grm_host": grm_host, "grm_port": grm_port}

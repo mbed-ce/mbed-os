@@ -34,10 +34,7 @@ def list_connected_devices(format: str, show_all: bool) -> None:
     else:
         devices = _sort_devices(connected_devices.identified_devices)
 
-    output_builders = {
-        "table": _build_tabular_output,
-        "json": _build_json_output,
-    }
+    output_builders = {"table": _build_tabular_output, "json": _build_json_output}
     if devices:
         output = output_builders[format](devices)
         click.echo(output)

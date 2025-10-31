@@ -61,10 +61,7 @@ class TestLinuxDeviceDetector(TestCase):
         mock_find_fs_mounts.return_value = []
         devs = [
             mock_device_factory(
-                ID_SERIAL_SHORT="2090290209",
-                ID_VENDOR_ID="0x45",
-                ID_MODEL_ID="0x48",
-                DEVNAME="/dev/sdabcde",
+                ID_SERIAL_SHORT="2090290209", ID_VENDOR_ID="0x45", ID_MODEL_ID="0x48", DEVNAME="/dev/sdabcde"
             )
         ]
         mock_udev_context().list_devices.return_value = devs

@@ -34,13 +34,7 @@ else:
 
 
 MAX_COMPOSITE_DEVICE_SUBDEVICES = 8
-MBED_STORAGE_DEVICE_VENDOR_STRINGS = [
-    "ven_mbed",
-    "ven_segger",
-    "ven_arm_v2m",
-    "ven_nxp",
-    "ven_atmel",
-]
+MBED_STORAGE_DEVICE_VENDOR_STRINGS = ["ven_mbed", "ven_segger", "ven_arm_v2m", "ven_nxp", "ven_atmel"]
 
 
 def _get_values_with_numeric_keys(reg_key):
@@ -116,10 +110,7 @@ def _get_disks():
 def _get_usb_storage_devices():
     logger.debug("Fetching usb storage devices from USBSTOR service registry entry")
     try:
-        usbstor_key = winreg.OpenKey(
-            winreg.HKEY_LOCAL_MACHINE,
-            "SYSTEM\\CurrentControlSet\\Services\\USBSTOR\\Enum",
-        )
+        usbstor_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\USBSTOR\\Enum")
         return _get_values_with_numeric_keys(usbstor_key)
     except OSError:
         logger.debug("No USBSTOR service found, no device can be detected")
@@ -142,18 +133,11 @@ def _determine_valid_non_composite_devices(devices, target_id_usb_id_mount_point
         try:
             capability = _determine_subdevice_capability(device_key)
         except CompatibleIDsNotFoundException:
-            logger.debug(
-                'Expected %s to have subkey "CompatibleIDs". Skipping.',
-                device_key_string,
-            )
+            logger.debug('Expected %s to have subkey "CompatibleIDs". Skipping.', device_key_string)
             continue
 
         if capability != "msd":
-            logger.debug(
-                "Expected msd device but got %s, skipping %s",
-                capability,
-                device["full_path"],
-            )
+            logger.debug("Expected msd device but got %s, skipping %s", capability, device["full_path"])
             continue
 
         target_id_usb_id = device["entry_key_string"]
@@ -253,8 +237,7 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                 if match_string in cached_mount_point_info["volume_string"]:
                     # TargetID is a hex string with 10-48 chars
                     target_id_usb_id_match = re.search(
-                        "[&#]([0-9A-Za-z]{10,48})[&#]",
-                        cached_mount_point_info["volume_string"],
+                        "[&#]([0-9A-Za-z]{10,48})[&#]", cached_mount_point_info["volume_string"]
                     )
                     if not target_id_usb_id_match:
                         logger.debug(
@@ -270,10 +253,7 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                     disks.pop(index)
                     break
 
-        logger.debug(
-            "target_id_usb_id -> mount_point mapping: %s ",
-            target_id_usb_id_mount_point_map,
-        )
+        logger.debug("target_id_usb_id -> mount_point mapping: %s ", target_id_usb_id_mount_point_map)
         non_composite_devices = []
         composite_devices = []
         for vid_pid_path in usb_storage_devices:
@@ -283,10 +263,7 @@ class MbedLsToolsWin7(MbedLsToolsBase):
             vid_pid_components = vid_pid_path_componets[1].split("&")
 
             if len(vid_pid_components) != 2 and len(vid_pid_components) != 3:
-                logger.debug(
-                    "Skipping USBSTOR device with unusual VID/PID string format '%s'",
-                    vid_pid_path,
-                )
+                logger.debug("Skipping USBSTOR device with unusual VID/PID string format '%s'", vid_pid_path)
                 continue
 
             device = {
@@ -325,10 +302,7 @@ class MbedLsToolsWin7(MbedLsToolsBase):
 
             overlapping_target_id_usb_ids = target_id_usb_id_sub_keys.intersection(set(target_id_usb_ids))
             for target_id_usb_id in overlapping_target_id_usb_ids:
-                composite_device_key_string = "%s\\%s" % (
-                    vid_pid_key_string,
-                    target_id_usb_id,
-                )
+                composite_device_key_string = "%s\\%s" % (vid_pid_key_string, target_id_usb_id)
                 composite_device_key = winreg.OpenKey(vid_pid_key, target_id_usb_id)
 
                 entry_key_string = target_id_usb_id
@@ -357,10 +331,7 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                     "is_prefix": is_prefix,
                 }
 
-        for (
-            vid_pid_path,
-            entry_key_string_target_id_usb_id_map,
-        ) in vid_pid_target_id_usb_id_map.items():
+        for vid_pid_path, entry_key_string_target_id_usb_id_map in vid_pid_target_id_usb_id_map.items():
             for composite_device_subdevice_number in range(MAX_COMPOSITE_DEVICE_SUBDEVICES):
                 subdevice_type_key_string = "%s\\%s&MI_0%d" % (
                     usb_key_string,
@@ -370,27 +341,15 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                 try:
                     subdevice_type_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, subdevice_type_key_string)
                 except OSError:
-                    logger.debug(
-                        "Composite device subdevice key %s was not found, skipping",
-                        subdevice_type_key_string,
-                    )
+                    logger.debug("Composite device subdevice key %s was not found, skipping", subdevice_type_key_string)
                     continue
 
-                for (
-                    entry_key_string,
-                    entry_data,
-                ) in entry_key_string_target_id_usb_id_map.items():
+                for entry_key_string, entry_data in entry_key_string_target_id_usb_id_map.items():
                     if entry_data["is_prefix"]:
-                        prepared_entry_key_string = "%s&000%d" % (
-                            entry_key_string,
-                            composite_device_subdevice_number,
-                        )
+                        prepared_entry_key_string = "%s&000%d" % (entry_key_string, composite_device_subdevice_number)
                     else:
                         prepared_entry_key_string = entry_key_string
-                    subdevice_key_string = "%s\\%s" % (
-                        subdevice_type_key_string,
-                        prepared_entry_key_string,
-                    )
+                    subdevice_key_string = "%s\\%s" % (subdevice_type_key_string, prepared_entry_key_string)
                     try:
                         subdevice_key = winreg.OpenKey(subdevice_type_key, prepared_entry_key_string)
                     except OSError:
@@ -400,10 +359,7 @@ class MbedLsToolsWin7(MbedLsToolsBase):
                     try:
                         capability = _determine_subdevice_capability(subdevice_key)
                     except CompatibleIDsNotFoundException:
-                        logger.debug(
-                            'Expected %s to have subkey "CompatibleIDs". Skipping.',
-                            subdevice_key_string,
-                        )
+                        logger.debug('Expected %s to have subkey "CompatibleIDs". Skipping.', subdevice_key_string)
                         continue
 
                     if capability == "msd":
@@ -456,10 +412,6 @@ class MbedLsToolsWin7(MbedLsToolsBase):
         if result:
             logger.debug("Mount point %s is ready", path)
         else:
-            logger.debug(
-                "Mount point %s reported not ready with error '%s'",
-                path,
-                stderr.strip(),
-            )
+            logger.debug("Mount point %s reported not ready with error '%s'", path, stderr.strip())
 
         return result

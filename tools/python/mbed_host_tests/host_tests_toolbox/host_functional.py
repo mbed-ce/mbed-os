@@ -17,8 +17,4 @@ limitations under the License.
 Author: Przemyslaw Wirkus <Przemyslaw.Wirkus@arm.com>
 """
 
-from mbed_os_tools.test.host_tests_toolbox.host_functional import (
-    flash_dev,
-    reset_dev,
-    handle_send_break_cmd,
-)
+from mbed_os_tools.test.host_tests_toolbox.host_functional import flash_dev, reset_dev, handle_send_break_cmd

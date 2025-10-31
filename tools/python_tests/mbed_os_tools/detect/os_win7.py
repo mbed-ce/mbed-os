@@ -80,7 +80,7 @@ class Win7TestCase(unittest.TestCase):
                     "_??_USBSTOR#Disk&Ven_MBED&Prod_VFS&Rev_0.1#9&215b8c47&0&0240000032044e4500257009997b00386781000097969900&0#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}".encode(
                         "utf-16le"
                     ),
-                ),
+                )
             ],
             (None, "SYSTEM\\CurrentControlSet\\Services\\volume\\Enum"): [],
             (None, "SYSTEM\\CurrentControlSet\\Services\\USBSTOR\\Enum"): [],
@@ -152,12 +152,7 @@ class Win7TestCase(unittest.TestCase):
     def test_get_values_with_numeric_keys(self):
         dummy_key = "dummy_key"
         with patch("mbed_os_tools.detect.windows._iter_vals") as _iter_vals:
-            _iter_vals.return_value = [
-                ("0", True),
-                ("1", True),
-                ("Count", False),
-                ("NextInstance", False),
-            ]
+            _iter_vals.return_value = [("0", True), ("1", True), ("Count", False), ("NextInstance", False)]
 
             values = _get_values_with_numeric_keys(dummy_key)
             _iter_vals.assert_called_once_with(dummy_key)
@@ -219,10 +214,7 @@ class Win7TestCase(unittest.TestCase):
 
     def test_get_disks(self):
         dummy_key = "dummy_key"
-        volume_strings = [
-            "dummy_volume_1",
-            "dummy_volume_2",
-        ]
+        volume_strings = ["dummy_volume_1", "dummy_volume_2"]
         with patch("mbed_os_tools.detect.windows._get_values_with_numeric_keys") as _num_keys, patch(
             "mbed_os_tools.detect.windows._is_mbed_volume"
         ) as _is_mbed_volume:
@@ -252,10 +244,7 @@ class Win7TestCase(unittest.TestCase):
 
     def test_get_usb_storage_devices(self):
         dummy_key = "dummy_key"
-        volume_strings = [
-            "dummy_usb_storage_1",
-            "dummy_usb_storage_2",
-        ]
+        volume_strings = ["dummy_usb_storage_1", "dummy_usb_storage_2"]
         with patch("mbed_os_tools.detect.windows._get_values_with_numeric_keys") as _num_keys, patch(
             "mbed_os_tools.detect.windows._is_mbed_volume"
         ) as _is_mbed_volume:

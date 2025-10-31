@@ -427,9 +427,7 @@ def sign(
 
 
 class AliasesGroup(click.Group):
-    _aliases = {
-        "create": "sign",
-    }
+    _aliases = {"create": "sign"}
 
     def list_commands(self, ctx):
         cmds = [k for k in self.commands]

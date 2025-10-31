@@ -246,8 +246,8 @@ class TestListConnectedDevicesJSONOutput:
                     f"{board.board_type}_{board.build_variant[0]}",
                     f"{board.board_type}_{board.build_variant[1]}",
                     f"{board.board_type}",
-                ],
-            },
+                ]
+            }
         ]
 
         assert result.exit_code == 0
@@ -268,14 +268,14 @@ class TestListConnectedDevicesJSONOutput:
                     f"{board.board_type}_{board.build_variant[0]}[0]",
                     f"{board.board_type}_{board.build_variant[1]}[0]",
                     f"{board.board_type}[0]",
-                ],
+                ]
             },
             {
                 "build_targets": [
                     f"{board.board_type}_{board.build_variant[0]}[1]",
                     f"{board.board_type}_{board.build_variant[1]}[1]",
                     f"{board.board_type}[1]",
-                ],
+                ]
             },
         ]
 

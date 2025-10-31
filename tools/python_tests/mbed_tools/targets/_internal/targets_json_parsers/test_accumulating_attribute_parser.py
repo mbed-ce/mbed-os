@@ -121,10 +121,7 @@ class TestAccumulatingAttributes(TestCase):
             {ALL_ACCUMULATING_ATTRIBUTES[0]: ["1"]},
             {ALL_ACCUMULATING_ATTRIBUTES[1]: ["A", "B", "C"]},
         ]
-        expected_attributes = {
-            ALL_ACCUMULATING_ATTRIBUTES[0]: ["1", "2", "3"],
-            ALL_ACCUMULATING_ATTRIBUTES[1]: ["A"],
-        }
+        expected_attributes = {ALL_ACCUMULATING_ATTRIBUTES[0]: ["1", "2", "3"], ALL_ACCUMULATING_ATTRIBUTES[1]: ["A"]}
         result = _determine_accumulated_attributes(accumulation_order)
         self.assertEqual(result, expected_attributes)
 
@@ -136,10 +133,7 @@ class TestAccumulatingAttributes(TestCase):
             {ALL_ACCUMULATING_ATTRIBUTES[1]: ["A", "B", "C"]},
             {ALL_ACCUMULATING_ATTRIBUTES[1]: []},
         ]
-        expected_attributes = {
-            ALL_ACCUMULATING_ATTRIBUTES[0]: ["1", "2", "3"],
-            ALL_ACCUMULATING_ATTRIBUTES[1]: ["A"],
-        }
+        expected_attributes = {ALL_ACCUMULATING_ATTRIBUTES[0]: ["1", "2", "3"], ALL_ACCUMULATING_ATTRIBUTES[1]: ["A"]}
         result = _determine_accumulated_attributes(accumulation_order)
         self.assertEqual(result, expected_attributes)
 

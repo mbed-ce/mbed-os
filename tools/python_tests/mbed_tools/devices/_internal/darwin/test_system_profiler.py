@@ -5,10 +5,7 @@
 import plistlib
 from unittest import TestCase, mock
 
-from mbed_tools.devices._internal.darwin.system_profiler import (
-    get_all_usb_devices_data,
-    get_end_usb_devices_data,
-)
+from mbed_tools.devices._internal.darwin.system_profiler import get_all_usb_devices_data, get_end_usb_devices_data
 
 
 class TestGetAllUSBDevicesData(TestCase):

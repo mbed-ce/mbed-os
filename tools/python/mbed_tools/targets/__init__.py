@@ -22,13 +22,6 @@ For details about configuration of this module, look at `mbed_tools.targets.conf
 """
 
 from mbed_tools.targets import exceptions
-from mbed_tools.targets.get_target import (
-    get_target_by_name,
-    get_target_by_board_type,
-)
-from mbed_tools.targets.get_board import (
-    get_board_by_product_code,
-    get_board_by_online_id,
-    get_board_by_jlink_slug,
-)
+from mbed_tools.targets.get_target import get_target_by_name, get_target_by_board_type
+from mbed_tools.targets.get_board import get_board_by_product_code, get_board_by_online_id, get_board_by_jlink_slug
 from mbed_tools.targets.board import Board

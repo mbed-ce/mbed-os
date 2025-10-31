@@ -17,7 +17,4 @@ limitations under the License.
 Author: Russ Butler <russ.butler@arm.com>
 """
 
-from mbed_os_tools.test.host_tests_plugins.module_copy_pyocd import (
-    HostTestPluginCopyMethod_pyOCD,
-    load_plugin,
-)
+from mbed_os_tools.test.host_tests_plugins.module_copy_pyocd import HostTestPluginCopyMethod_pyOCD, load_plugin

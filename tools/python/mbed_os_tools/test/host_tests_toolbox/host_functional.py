@@ -103,13 +103,7 @@ def handle_send_break_cmd(port, disk, reset_type=None, baudrate=None, timeout=1,
         print("mbedhtrun: %s" % (str(e)))
         print(
             json.dumps(
-                {
-                    "port": port,
-                    "disk": disk,
-                    "baudrate": baudrate,
-                    "timeout": timeout,
-                    "reset_type": reset_type,
-                },
+                {"port": port, "disk": disk, "baudrate": baudrate, "timeout": timeout, "reset_type": reset_type},
                 indent=4,
             )
         )

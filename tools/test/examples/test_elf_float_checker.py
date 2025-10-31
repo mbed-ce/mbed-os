@@ -83,32 +83,22 @@ class TestElfFloatChecker:
     def test_correctly_detect_absence_of_float_symbols(self, mock_subprocess_popen):
         """Test that no false positive occur."""
         process_mock = mock.Mock()
-        attrs = {
-            "communicate.return_value": (SYMBOL_TABLE_WITHOUT_FLOATS.encode(), None),
-            "returncode": 0,
-        }
+        attrs = {"communicate.return_value": (SYMBOL_TABLE_WITHOUT_FLOATS.encode(), None), "returncode": 0}
         process_mock.configure_mock(**attrs)
         mock_subprocess_popen.return_value = process_mock
         assert [] == TARGET.check_float_symbols(ELF_FORMAT_FILE)
         mock_subprocess_popen.assert_called_with(
-            OBJECT_FILE_ANALYSIS_CMD,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            OBJECT_FILE_ANALYSIS_CMD, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
 
     @mock.patch("subprocess.Popen")
     def test_correctly_detect_presence_of_float_symbols(self, mock_subprocess_popen):
         """Test that float symbols can be discovered in a symbol table."""
         process_mock = mock.Mock()
-        attrs = {
-            "communicate.return_value": (SYMBOL_TABLE_WITH_FLOATS.encode(), None),
-            "returncode": 0,
-        }
+        attrs = {"communicate.return_value": (SYMBOL_TABLE_WITH_FLOATS.encode(), None), "returncode": 0}
         process_mock.configure_mock(**attrs)
         mock_subprocess_popen.return_value = process_mock
         assert FLOAT_SYMBOLS == TARGET.check_float_symbols(ELF_FORMAT_FILE)
         mock_subprocess_popen.assert_called_with(
-            OBJECT_FILE_ANALYSIS_CMD,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
+            OBJECT_FILE_ANALYSIS_CMD, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )

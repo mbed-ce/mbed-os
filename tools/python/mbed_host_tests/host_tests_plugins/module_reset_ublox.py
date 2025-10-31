@@ -17,7 +17,4 @@ limitations under the License.
 Author: Przemyslaw Wirkus <Przemyslaw.Wirkus@arm.com>
 """
 
-from mbed_os_tools.test.host_tests_plugins.module_reset_ublox import (
-    HostTestPluginResetMethod_ublox,
-    load_plugin,
-)
+from mbed_os_tools.test.host_tests_plugins.module_reset_ublox import HostTestPluginResetMethod_ublox, load_plugin

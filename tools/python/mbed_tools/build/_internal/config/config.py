@@ -70,10 +70,7 @@ class Config(UserDict):
                 )
 
                 valid_params_in_namespace = list(
-                    filter(
-                        lambda x: x.namespace == override.namespace,
-                        self.data.get(CONFIG_SECTION, []),
-                    )
+                    filter(lambda x: x.namespace == override.namespace, self.data.get(CONFIG_SECTION, []))
                 )
                 valid_param_names = [f'"{param.namespace}.{param.name}"' for param in valid_params_in_namespace]
 

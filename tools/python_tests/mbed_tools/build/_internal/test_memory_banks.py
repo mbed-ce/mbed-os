@@ -119,7 +119,7 @@ class TestMemoryBankProcessing:
             "memory_bank_config": {
                 "IRAM1": {
                     # Configure size only
-                    "size": 0xA0000,
+                    "size": 0xA0000
                 },
                 "IROM1": {
                     # Configure size and address

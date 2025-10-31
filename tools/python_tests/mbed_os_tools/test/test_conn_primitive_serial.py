@@ -34,7 +34,7 @@ class ConnPrimitiveSerialTestCase(unittest.TestCase):
         # check_serial_port_ready() function we are testing will sleep waiting
         # for the serial port to become ready.
         mock_detect.create().list_mbeds.return_value = [
-            {"target_id": target_id, "serial_port": port, "platform_name": platform_name},
+            {"target_id": target_id, "serial_port": port, "platform_name": platform_name}
         ]
 
         # Set skip_reset to avoid the use of a physical serial port.
@@ -57,7 +57,7 @@ class ConnPrimitiveSerialTestCase(unittest.TestCase):
         baudrate = "9600"
 
         mock_detect.create().list_mbeds.return_value = [
-            {"target_id": target_id, "serial_port": port, "platform_name": platform_name},
+            {"target_id": target_id, "serial_port": port, "platform_name": platform_name}
         ]
 
         # Set skip_reset to avoid the use of a physical serial port. Don't pass

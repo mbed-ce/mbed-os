@@ -251,7 +251,7 @@ project_codemodel = get_cmake_code_model(
         "-DMBED_TARGET=" + get_mbed_target(),
         "-DUPLOAD_METHOD=NONE",  # Disable Mbed CE upload method system as PlatformIO has its own
     ]
-    + click.parser.split_arg_string(board.get("build.cmake_extra_args", "")),
+    + click.parser.split_arg_string(board.get("build.cmake_extra_args", ""))
 )
 
 if not project_codemodel:
@@ -261,11 +261,7 @@ if not project_codemodel:
 print("Mbed CE: Reading CMake configuration...")
 target_configs = load_target_configurations(project_codemodel)
 
-framework_components_map = get_components_map(
-    target_configs,
-    ["STATIC_LIBRARY", "OBJECT_LIBRARY"],
-    [],
-)
+framework_components_map = get_components_map(target_configs, ["STATIC_LIBRARY", "OBJECT_LIBRARY"], [])
 
 ## Convert targets & flags from CMake to SCons -------------------------------------------------------------------------
 
@@ -297,10 +293,7 @@ link_args.append(f"-Wl,-Map={str(map_file)}")
 ## Build environment configuration -------------------------------------------------------------------------------------
 
 env.MergeFlags(project_flags)
-env.Prepend(
-    CPPPATH=app_includes["plain_includes"],
-    CPPDEFINES=project_defines,
-)
+env.Prepend(CPPPATH=app_includes["plain_includes"], CPPDEFINES=project_defines)
 env.Append(_LIBFLAGS=link_args)
 
 # Set up a dependency between all application source files and mbed-target-config.h.

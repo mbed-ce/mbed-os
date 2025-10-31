@@ -226,10 +226,7 @@ class Mbed:
 
         # Select copy_method
         # We override 'default' method with 'shell' method
-        copy_method = {
-            None: "shell",
-            "default": "shell",
-        }.get(copy_method, copy_method)
+        copy_method = {None: "shell", "default": "shell"}.get(copy_method, copy_method)
 
         result = ht_plugins.call_plugin(
             "CopyMethod",

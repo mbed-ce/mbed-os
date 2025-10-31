@@ -46,9 +46,7 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> T
     (program.files.cmake_build_dir / MEMORY_BANKS_JSON_FILE).write_text(json.dumps(memory_banks_json_content, indent=4))
 
     cmake_file_contents = render_mbed_config_cmake_template(
-        target_name=target_name,
-        config=config,
-        toolchain_name=toolchain,
+        target_name=target_name, config=config, toolchain_name=toolchain
     )
     cmake_config_file_path = program.files.cmake_build_dir / CMAKE_CONFIG_FILE
     write_file(cmake_config_file_path, cmake_file_contents)

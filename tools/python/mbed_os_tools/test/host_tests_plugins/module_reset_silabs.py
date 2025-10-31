@@ -52,26 +52,12 @@ class HostTestPluginResetMethod_SiLabs(HostTestPluginBase):
             if capability == "eACommander":
                 # For this copy method 'disk' will be 'serialno' for eACommander command line parameters
                 # Note: Commands are executed in the order they are specified on the command line
-                cmd = [
-                    self.EACOMMANDER_CMD,
-                    "--serialno",
-                    disk,
-                    "--resettype",
-                    "2",
-                    "--reset",
-                ]
+                cmd = [self.EACOMMANDER_CMD, "--serialno", disk, "--resettype", "2", "--reset"]
                 result = self.run_command(cmd)
             elif capability == "eACommander-usb":
                 # For this copy method 'disk' will be 'usb address' for eACommander command line parameters
                 # Note: Commands are executed in the order they are specified on the command line
-                cmd = [
-                    self.EACOMMANDER_CMD,
-                    "--usb",
-                    disk,
-                    "--resettype",
-                    "2",
-                    "--reset",
-                ]
+                cmd = [self.EACOMMANDER_CMD, "--usb", disk, "--resettype", "2", "--reset"]
                 result = self.run_command(cmd)
         return result
 

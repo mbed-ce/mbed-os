@@ -145,25 +145,14 @@ class MbedLsToolsLinuxGeneric(MbedLsToolsBase):
                 with open(vendor_id_file_paths, "r") as vendor_file:
                     vendor_id = vendor_file.read().strip()
             except OSError as e:
-                logger.debug(
-                    "Failed to read vendor id file %s weith error:",
-                    vendor_id_file_paths,
-                    e,
-                )
+                logger.debug("Failed to read vendor id file %s weith error:", vendor_id_file_paths, e)
 
             try:
                 with open(product_id_file_paths, "r") as product_file:
                     product_id = product_file.read().strip()
             except OSError as e:
-                logger.debug(
-                    "Failed to read product id file %s weith error:",
-                    product_id_file_paths,
-                    e,
-                )
+                logger.debug("Failed to read product id file %s weith error:", product_id_file_paths, e)
 
-            result[device_names[common_device_name]] = {
-                "vendor_id": vendor_id,
-                "product_id": product_id,
-            }
+            result[device_names[common_device_name]] = {"vendor_id": vendor_id, "product_id": product_id}
 
         return result

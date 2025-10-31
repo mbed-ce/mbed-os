@@ -15,12 +15,7 @@ from mbed_tools.build import generate_config
 @click.command(
     help="Generate an Mbed OS config CMake file and write it to a .mbedbuild folder in the program directory."
 )
-@click.option(
-    "--custom-targets-json",
-    type=click.Path(),
-    default=None,
-    help="Path to custom_targets.json.",
-)
+@click.option("--custom-targets-json", type=click.Path(), default=None, help="Path to custom_targets.json.")
 @click.option(
     "-t",
     "--toolchain",
@@ -43,18 +38,8 @@ from mbed_tools.build import generate_config
     default=".",
     help="Path to local Mbed program. By default is the current working directory.",
 )
-@click.option(
-    "--mbed-os-path",
-    type=click.Path(),
-    default=None,
-    help="Path to local Mbed OS directory.",
-)
-@click.option(
-    "--app-config",
-    type=click.Path(),
-    default=None,
-    help="Path to application configuration file.",
-)
+@click.option("--mbed-os-path", type=click.Path(), default=None, help="Path to local Mbed OS directory.")
+@click.option("--app-config", type=click.Path(), default=None, help="Path to application configuration file.")
 def configure(
     toolchain: str,
     mbed_target: str,

@@ -71,7 +71,7 @@ class Win7TestCase(unittest.TestCase):
                     "_??_USBSTOR#Disk&Ven_MBED&Prod_VFS&Rev_0.1#9&215b8c47&0&0240000032044e4500257009997b00386781000097969900&0#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}".encode(
                         "utf-16le"
                     ),
-                ),
+                )
             ],
             (None, "SYSTEM\\CurrentControlSet\\Services\\volume\\Enum"): [],
             (None, "SYSTEM\\CurrentControlSet\\Services\\USBSTOR\\Enum"): [],

@@ -17,28 +17,19 @@ from mbed_tools.targets._internal.target_attributes import (
 
 class TestExtractTargetAttributes(TestCase):
     def test_no_target_found(self):
-        all_targets_data = {
-            "Target_1": "some attributes",
-            "Target_2": "some more attributes",
-        }
+        all_targets_data = {"Target_1": "some attributes", "Target_2": "some more attributes"}
         with self.assertRaises(TargetNotFoundError):
             _extract_target_attributes(all_targets_data, "Unlisted_Target", False)
 
     def test_target_found(self):
         target_attributes = {"attribute1": "something"}
 
-        all_targets_data = {
-            "Target_1": target_attributes,
-            "Target_2": "some more attributes",
-        }
+        all_targets_data = {"Target_1": target_attributes, "Target_2": "some more attributes"}
         # When not explicitly included public is assumed to be True
         self.assertEqual(_extract_target_attributes(all_targets_data, "Target_1", False), target_attributes)
 
     def test_target_public(self):
-        all_targets_data = {
-            "Target_1": {"attribute1": "something", "public": True},
-            "Target_2": "some more attributes",
-        }
+        all_targets_data = {"Target_1": {"attribute1": "something", "public": True}, "Target_2": "some more attributes"}
         # The public attribute affects visibility but is removed from result
         self.assertEqual(_extract_target_attributes(all_targets_data, "Target_1", False), {"attribute1": "something"})
 

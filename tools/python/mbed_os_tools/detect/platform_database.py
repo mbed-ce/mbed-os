@@ -366,26 +366,11 @@ DEFAULT_PLATFORM_DB = {
         "RIOT": "RIOT",
     },
     "jlink": {
-        "X729475D28G": {
-            "platform_name": "NRF51_DK",
-            "jlink_device_name": "nRF51422_xxAC",
-        },
-        "X349858SLYN": {
-            "platform_name": "NRF52_DK",
-            "jlink_device_name": "nRF52832_xxaa",
-        },
-        "FRDM-KL25Z": {
-            "platform_name": "KL25Z",
-            "jlink_device_name": "MKL25Z128xxx4",
-        },
-        "FRDM-KL27Z": {
-            "platform_name": "KL27Z",
-            "jlink_device_name": "MKL27Z64xxx4",
-        },
-        "FRDM-KL43Z": {
-            "platform_name": "KL43Z",
-            "jlink_device_name": "MKL43Z256xxx4",
-        },
+        "X729475D28G": {"platform_name": "NRF51_DK", "jlink_device_name": "nRF51422_xxAC"},
+        "X349858SLYN": {"platform_name": "NRF52_DK", "jlink_device_name": "nRF52832_xxaa"},
+        "FRDM-KL25Z": {"platform_name": "KL25Z", "jlink_device_name": "MKL25Z128xxx4"},
+        "FRDM-KL27Z": {"platform_name": "KL27Z", "jlink_device_name": "MKL27Z64xxx4"},
+        "FRDM-KL43Z": {"platform_name": "KL43Z", "jlink_device_name": "MKL43Z256xxx4"},
     },
     "atmel": {"2241": "SAML21J18A"},
 }

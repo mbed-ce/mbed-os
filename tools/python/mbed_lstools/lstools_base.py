@@ -19,7 +19,4 @@ import functools
 import json
 import logging
 
-from mbed_os_tools.detect.lstools_base import (
-    FSInteraction,
-    MbedLsToolsBase,
-)
+from mbed_os_tools.detect.lstools_base import FSInteraction, MbedLsToolsBase

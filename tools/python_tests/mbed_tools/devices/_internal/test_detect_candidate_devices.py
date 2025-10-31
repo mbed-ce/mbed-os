@@ -8,10 +8,7 @@ from unittest import mock
 from python_tests.mbed_tools.devices.markers import windows_only, darwin_only, linux_only
 from mbed_tools.devices._internal.base_detector import DeviceDetector
 from mbed_tools.devices.exceptions import UnknownOSError
-from mbed_tools.devices._internal.detect_candidate_devices import (
-    detect_candidate_devices,
-    _get_detector_for_current_os,
-)
+from mbed_tools.devices._internal.detect_candidate_devices import detect_candidate_devices, _get_detector_for_current_os
 
 
 class TestDetectCandidateDevices:

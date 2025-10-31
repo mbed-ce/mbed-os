@@ -133,9 +133,7 @@ class TestGetLabelsForTarget(TestCase):
         self.assertSetEqual(result, expected_result)
 
     def test_no_inheritance(self):
-        all_targets_data = {
-            "A": {"attribute_3": ["some things"]},
-        }
+        all_targets_data = {"A": {"attribute_3": ["some things"]}}
         target_name = "A"
         expected_result = {"A"}
         result = get_labels_for_target(all_targets_data, target_name)

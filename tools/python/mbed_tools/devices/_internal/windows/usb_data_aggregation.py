@@ -76,12 +76,7 @@ class UsbDataAggregator:
         usb_data = self._usb_devices.get_usb_devices(usb_id)
         aggregated_data = AggregatedUsbData()
         aggregated_data.set_data_values(
-            dict(
-                usb_identifier=usb_id,
-                disks=disk_data,
-                serial_port=serial_data,
-                related_usb_interfaces=usb_data,
-            )
+            dict(usb_identifier=usb_id, disks=disk_data, serial_port=serial_data, related_usb_interfaces=usb_data)
         )
         return aggregated_data
 

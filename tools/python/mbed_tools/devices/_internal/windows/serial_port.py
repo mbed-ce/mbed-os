@@ -14,10 +14,7 @@ https://serverfault.com/questions/398469/what-are-the-minimum-permissions-to-rea
 import re
 from typing import NamedTuple, cast
 
-from mbed_tools.devices._internal.windows.component_descriptor import (
-    ComponentDescriptor,
-    UNKNOWN_VALUE,
-)
+from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor, UNKNOWN_VALUE
 
 CAPTION_PATTERN = re.compile(r"^.* [(](.*)[)]$")
 

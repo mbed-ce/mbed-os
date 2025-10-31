@@ -67,9 +67,7 @@ class TestDiskUid(unittest.TestCase):
         from mbed_tools.devices._internal.windows.usb_device_identifier import UsbIdentifier, WindowsUID
 
         disk_uid = WindowsUID(
-            uid="000440112138",
-            raw_uid="9&DBDECF6&0&000440112138&0",
-            serial_number="                         134657890",
+            uid="000440112138", raw_uid="9&DBDECF6&0&000440112138&0", serial_number="                         134657890"
         )
 
         usb_uid = UsbIdentifier(

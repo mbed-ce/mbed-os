@@ -128,8 +128,7 @@ def check_action(args):
 def parse_args():
     """Parse the command line args."""
     parser = ArgumentParserWithDefaultHelp(
-        description="ELF floats checker",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description="ELF floats checker", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument(
@@ -138,12 +137,7 @@ def parse_args():
         help=("the Executable and Linkable Format (ELF) file to check for floating point instruction inclusion."),
     )
 
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        action="store_true",
-        help="increase verbosity of status information.",
-    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="increase verbosity of status information.")
 
     parser.set_defaults(func=check_action)
 

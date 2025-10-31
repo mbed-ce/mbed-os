@@ -95,11 +95,7 @@ TARGET_INFO_MAPPING = {
     },
 }
 
-TARGET_TOOLCAHINS = {
-    "-armcc": "ARM",
-    "-gcc": "GCC_ARM",
-    "-iar": "IAR",
-}
+TARGET_TOOLCAHINS = {"-armcc": "ARM", "-gcc": "GCC_ARM", "-iar": "IAR"}
 
 
 def get_mbed_target_call_yotta_target():

@@ -11,10 +11,7 @@ from typing import List, Any, Generator, Optional, NamedTuple, cast
 import pythoncom
 import win32com.client
 
-from mbed_tools.devices._internal.windows.component_descriptor_utils import (
-    UNKNOWN_VALUE,
-    is_undefined_data_object,
-)
+from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE, is_undefined_data_object
 
 NAMED_TUPLE_FIELDS_ATTRIBUTE = "_fields"
 

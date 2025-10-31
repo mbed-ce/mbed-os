@@ -12,11 +12,7 @@ from mbed_tools.targets._internal.exceptions import BoardAPIError
 
 # Import from top level as this is the expected interface for users
 from mbed_tools.targets import get_board_by_online_id, get_board_by_product_code, get_board_by_jlink_slug
-from mbed_tools.targets.get_board import (
-    _DatabaseMode,
-    _get_database_mode,
-    get_board,
-)
+from mbed_tools.targets.get_board import _DatabaseMode, _get_database_mode, get_board
 from mbed_tools.targets.env import env
 from mbed_tools.targets.exceptions import UnknownBoard, UnsupportedMode
 from python_tests.mbed_tools.targets.factories import make_board

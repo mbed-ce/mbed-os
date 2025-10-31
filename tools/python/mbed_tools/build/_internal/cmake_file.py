@@ -27,9 +27,7 @@ def render_mbed_config_cmake_template(config: Config, toolchain_name: str, targe
     Returns:
         The rendered mbed_config template.
     """
-    env = jinja2.Environment(
-        loader=jinja2.PackageLoader("mbed_tools.build", str(TEMPLATES_DIRECTORY)),
-    )
+    env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_tools.build", str(TEMPLATES_DIRECTORY)))
     env.filters["to_hex"] = to_hex
     template = env.get_template(TEMPLATE_NAME)
     config["supported_c_libs"] = [x for x in config["supported_c_libs"][toolchain_name.lower()]]

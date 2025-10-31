@@ -17,7 +17,4 @@ limitations under the License.
 Author: Przemyslaw Wirkus <Przemyslaw.Wirkus@arm.com>
 """
 
-from mbed_os_tools.test.host_tests_plugins.module_copy_silabs import (
-    HostTestPluginCopyMethod_Silabs,
-    load_plugin,
-)
+from mbed_os_tools.test.host_tests_plugins.module_copy_silabs import HostTestPluginCopyMethod_Silabs, load_plugin

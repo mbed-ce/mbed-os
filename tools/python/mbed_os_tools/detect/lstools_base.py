@@ -23,11 +23,7 @@ import logging
 import functools
 import json
 
-from .platform_database import (
-    PlatformDatabase,
-    LOCAL_PLATFORM_DATABASE,
-    LOCAL_MOCKS_DATABASE,
-)
+from .platform_database import PlatformDatabase, LOCAL_PLATFORM_DATABASE, LOCAL_MOCKS_DATABASE
 
 mbedls_root_logger = logging.getLogger("mbedls")
 mbedls_root_logger.setLevel(logging.WARNING)
@@ -72,12 +68,7 @@ class MbedLsToolsBase(ABC):
     DETAILS_TXT_NAME = "DETAILS.TXT"
     MBED_HTM_NAME = "mbed.htm"
 
-    VENDOR_ID_DEVICE_TYPE_MAP = {
-        "0483": "stlink",
-        "0d28": "daplink",
-        "1366": "jlink",
-        "03eb": "atmel",
-    }
+    VENDOR_ID_DEVICE_TYPE_MAP = {"0483": "stlink", "0d28": "daplink", "1366": "jlink", "03eb": "atmel"}
 
     def __init__(self, list_unmounted=False, **kwargs):
         """ctor"""
@@ -144,9 +135,7 @@ class MbedLsToolsBase(ABC):
                     )
             else:
                 platform_data = self.plat_db.get(
-                    device["target_id_usb_id"][0:4],
-                    device_type=device["device_type"] or "daplink",
-                    verbose_data=True,
+                    device["target_id_usb_id"][0:4], device_type=device["device_type"] or "daplink", verbose_data=True
                 )
                 device.update(platform_data or {"platform_name": None})
                 maybe_device = {
@@ -159,16 +148,11 @@ class MbedLsToolsBase(ABC):
                         name = device["platform_name"]
                         platform_count.setdefault(name, -1)
                         platform_count[name] += 1
-                        device["platform_name_unique"] = "%s[%d]" % (
-                            name,
-                            platform_count[name],
-                        )
+                        device["platform_name_unique"] = "%s[%d]" % (name, platform_count[name])
                     try:
                         device.update(self.retarget_data[device["target_id"]])
                         logger.debug(
-                            "retargeting %s with %r",
-                            device["target_id"],
-                            self.retarget_data[device["target_id"]],
+                            "retargeting %s with %r", device["target_id"], self.retarget_data[device["target_id"]]
                         )
                     except KeyError:
                         pass
@@ -323,17 +307,10 @@ class MbedLsToolsBase(ABC):
         if daplink_info:
             device.update({"daplink_%s" % f.lower().replace(" ", "_"): v for f, v in daplink_info.items()})
         if htm_target_id:
-            logger.debug(
-                "Found htm target id, %s, for usb target id %s",
-                htm_target_id,
-                device["target_id_usb_id"],
-            )
+            logger.debug("Found htm target id, %s, for usb target id %s", htm_target_id, device["target_id_usb_id"])
             device["target_id"] = htm_target_id
         else:
-            logger.debug(
-                "Could not read htm on from usb id %s. Falling back to usb id",
-                device["target_id_usb_id"],
-            )
+            logger.debug("Could not read htm on from usb id %s. Falling back to usb id", device["target_id_usb_id"])
             device["target_id"] = device["target_id_usb_id"]
         device["target_id_mbed_htm"] = htm_target_id
 

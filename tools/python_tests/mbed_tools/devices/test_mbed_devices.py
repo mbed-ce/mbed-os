@@ -15,11 +15,7 @@ from python_tests.mbed_tools.devices.factories import CandidateDeviceFactory
 from mbed_tools.devices.device import Device
 from mbed_tools.devices._internal.exceptions import NoBoardForCandidate, ResolveBoardError
 
-from mbed_tools.devices.devices import (
-    get_connected_devices,
-    find_connected_device,
-    find_all_connected_devices,
-)
+from mbed_tools.devices.devices import get_connected_devices, find_connected_device, find_all_connected_devices
 from mbed_tools.devices.exceptions import DeviceLookupFailed, NoDevicesFound
 
 

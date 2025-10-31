@@ -30,13 +30,7 @@ class HtrunLogger(object):
         self.format_str = "[%(logger_level)s] %(message)s"
 
         def __prn_log(self, logger_level, text, timestamp=None):
-            self.logger.debug(
-                self.format_str
-                % {
-                    "logger_level": logger_level,
-                    "message": text,
-                }
-            )
+            self.logger.debug(self.format_str % {"logger_level": logger_level, "message": text})
 
         self.prn_dbg = partial(__prn_log, self, "DBG")
         self.prn_wrn = partial(__prn_log, self, "WRN")

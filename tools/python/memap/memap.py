@@ -644,11 +644,7 @@ class MemapParser(object):
             name = name[:-4]
         if self.tc_name:
             name = "%s %s" % (name, self.tc_name)
-        data = {
-            "name": name,
-            "rom": json.dumps(tree_rom),
-            "ram": json.dumps(tree_ram),
-        }
+        data = {"name": name, "rom": json.dumps(tree_rom), "ram": json.dumps(tree_ram)}
         file_desc.write(template.render(data))
         return None
 

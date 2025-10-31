@@ -17,6 +17,4 @@ limitations under the License.
 Author: Przemyslaw Wirkus <Przemyslaw.Wirkus@arm.com>
 """
 
-from mbed_os_tools.test.host_tests_runner.host_test_default import (
-    DefaultTestSelector,
-)
+from mbed_os_tools.test.host_tests_runner.host_test_default import DefaultTestSelector

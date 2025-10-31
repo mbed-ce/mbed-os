@@ -165,13 +165,7 @@ class MbedLsToolsDarwin(MbedLsToolsBase):
         # serial number, and then search down again to find a tty that's part
         # of the same composite device
         # ioreg -a -r -n <usb_controller_name> -l
-        usb_controllers = [
-            "AppleUSBXHCI",
-            "AppleUSBUHCI",
-            "AppleUSBEHCI",
-            "AppleUSBOHCI",
-            "IOUSBHostDevice",
-        ]
+        usb_controllers = ["AppleUSBXHCI", "AppleUSBUHCI", "AppleUSBEHCI", "AppleUSBOHCI", "IOUSBHostDevice"]
 
         cmp_par = "-n"
         # For El Captain we need to list all the instances of (-c) rather than
@@ -181,33 +175,19 @@ class MbedLsToolsDarwin(MbedLsToolsBase):
 
         usb_tree = []
         for usb_controller in usb_controllers:
-            ioreg_usb = subprocess.Popen(
-                ["ioreg", "-a", "-r", cmp_par, usb_controller, "-l"],
-                stdout=subprocess.PIPE,
-            )
+            ioreg_usb = subprocess.Popen(["ioreg", "-a", "-r", cmp_par, usb_controller, "-l"], stdout=subprocess.PIPE)
             usb_tree.extend(_plist_from_popen(ioreg_usb))
 
         r = {}
 
         for name, obj in enumerate(usb_tree):
             pruned_obj = _prune(
-                obj,
-                [
-                    "USB Serial Number",
-                    "idVendor",
-                    "BSD Name",
-                    "IORegistryEntryName",
-                    "idProduct",
-                    "IODialinDevice",
-                ],
+                obj, ["USB Serial Number", "idVendor", "BSD Name", "IORegistryEntryName", "idProduct", "IODialinDevice"]
             )
             if logger.isEnabledFor(DEBUG):
                 import pprint
 
-                logger.debug(
-                    "finding in \n%s",
-                    pprint.PrettyPrinter(indent=2).pformat(pruned_obj),
-                )
+                logger.debug("finding in \n%s", pprint.PrettyPrinter(indent=2).pformat(pruned_obj))
             r.update(_dfs_usb_info(pruned_obj, []))
 
         logger.debug("_volumes return %r", r)

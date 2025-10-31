@@ -54,30 +54,14 @@ def init_host_test_cli_params() -> Any:
     """
     parser = ArgumentParser()
 
-    parser.add_argument(
-        "-m",
-        "--micro",
-        dest="micro",
-        help="Target microcontroller name",
-        metavar="MICRO",
-    )
+    parser.add_argument("-m", "--micro", dest="micro", help="Target microcontroller name", metavar="MICRO")
 
     parser.add_argument("-p", "--port", dest="port", help="Serial port of the target", metavar="PORT")
 
-    parser.add_argument(
-        "-d",
-        "--disk",
-        dest="disk",
-        help="Target disk (mount point) path",
-        metavar="DISK_PATH",
-    )
+    parser.add_argument("-d", "--disk", dest="disk", help="Target disk (mount point) path", metavar="DISK_PATH")
 
     parser.add_argument(
-        "-t",
-        "--target-id",
-        dest="target_id",
-        help="Unique Target Id or mbed platform",
-        metavar="TARGET_ID",
+        "-t", "--target-id", dest="target_id", help="Unique Target Id or mbed platform", metavar="TARGET_ID"
     )
 
     parser.add_argument(
@@ -111,11 +95,7 @@ def init_host_test_cli_params() -> Any:
     )
 
     parser.add_argument(
-        "-f",
-        "--image-path",
-        dest="image_path",
-        help="Path with target's binary image",
-        metavar="IMAGE_PATH",
+        "-f", "--image-path", dest="image_path", help="Path with target's binary image", metavar="IMAGE_PATH"
     )
 
     copy_methods_str = "Plugin support: " + ", ".join(host_tests_plugins.get_plugin_caps("CopyMethod"))
@@ -152,10 +132,7 @@ def init_host_test_cli_params() -> Any:
     reset_methods_str = "Plugin support: " + ", ".join(host_tests_plugins.get_plugin_caps("ResetMethod"))
 
     parser.add_argument(
-        "-r",
-        "--reset",
-        dest="forced_reset_type",
-        help="Forces different type of reset. " + reset_methods_str,
+        "-r", "--reset", dest="forced_reset_type", help="Forces different type of reset. " + reset_methods_str
     )
 
     parser.add_argument(
@@ -207,25 +184,15 @@ def init_host_test_cli_params() -> Any:
     )
 
     parser.add_argument(
-        "--test-cfg",
-        dest="json_test_configuration",
-        help="Pass to host test class data about host test configuration",
+        "--test-cfg", dest="json_test_configuration", help="Pass to host test class data about host test configuration"
     )
 
     parser.add_argument(
-        "--list",
-        dest="list_reg_hts",
-        default=False,
-        action="store_true",
-        help="Prints registered host test and exits",
+        "--list", dest="list_reg_hts", default=False, action="store_true", help="Prints registered host test and exits"
     )
 
     parser.add_argument(
-        "--plugins",
-        dest="list_plugins",
-        default=False,
-        action="store_true",
-        help="Prints registered plugins and exits",
+        "--plugins", dest="list_plugins", default=False, action="store_true", help="Prints registered plugins and exits"
     )
 
     parser.add_argument(
@@ -247,13 +214,7 @@ def init_host_test_cli_params() -> Any:
     except ModuleNotFoundError:
         pass
 
-    parser.add_argument(
-        "--fm",
-        dest="fast_model_connection",
-        metavar="CONFIG",
-        default=None,
-        help=fm_help,
-    )
+    parser.add_argument("--fm", dest="fast_model_connection", metavar="CONFIG", default=None, help=fm_help)
 
     parser.add_argument(
         "--run",
@@ -311,20 +272,10 @@ def init_host_test_cli_params() -> Any:
         metavar="BAUD_RATE",
     )
 
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        dest="verbose",
-        default=False,
-        action="store_true",
-        help="More verbose mode",
-    )
+    parser.add_argument("-v", "--verbose", dest="verbose", default=False, action="store_true", help="More verbose mode")
 
     parser.add_argument(
-        "--serial-output-file",
-        dest="serial_output_file",
-        default=None,
-        help="Save target serial output to this file.",
+        "--serial-output-file", dest="serial_output_file", default=None, help="Save target serial output to this file."
     )
 
     parser.add_argument(
@@ -335,18 +286,10 @@ def init_host_test_cli_params() -> Any:
     )
 
     parser.add_argument(
-        "--version",
-        dest="version",
-        default=False,
-        action="store_true",
-        help="Prints package version and exits",
+        "--version", dest="version", default=False, action="store_true", help="Prints package version and exits"
     )
 
-    parser.add_argument(
-        "--format",
-        dest="format",
-        help="Image file format passed to pyocd (elf, bin, hex, axf...).",
-    )
+    parser.add_argument("--format", dest="format", help="Image file format passed to pyocd (elf, bin, hex, axf...).")
 
     parser.description = """Flash, reset and perform host supervised tests on mbed platforms"""
     parser.epilog = """Example: mbedhtrun -d E: -p COM5 -f "test.bin" -C 4 -c shell -m K64F"""

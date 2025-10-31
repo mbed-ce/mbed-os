@@ -15,6 +15,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from mbed_os_tools.test.host_tests_conn_proxy.conn_primitive_fastmodel import (
-    FastmodelConnectorPrimitive,
-)
+from mbed_os_tools.test.host_tests_conn_proxy.conn_primitive_fastmodel import FastmodelConnectorPrimitive

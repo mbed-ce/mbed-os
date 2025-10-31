@@ -17,6 +17,4 @@ limitations under the License.
 Author: Przemyslaw Wirkus <Przemyslaw.Wirkus@arm.com>
 """
 
-from mbed_os_tools.test.host_tests_plugins.host_test_plugins import (
-    HostTestPluginBase,
-)
+from mbed_os_tools.test.host_tests_plugins.host_test_plugins import HostTestPluginBase

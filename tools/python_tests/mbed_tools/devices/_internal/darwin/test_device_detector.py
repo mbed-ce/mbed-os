@@ -50,10 +50,7 @@ class TestBuildCandidateDevice(TestCase):
         }
         _assemble_candidate_data.return_value = device_data
 
-        self.assertEqual(
-            _build_candidate(device_data),
-            CandidateDevice(**device_data),
-        )
+        self.assertEqual(_build_candidate(device_data), CandidateDevice(**device_data))
 
     @mock.patch("mbed_tools.devices._internal.darwin.device_detector.CandidateDevice")
     def test_raises_if_candidate_cannot_be_built(self, CandidateDevice, _assemble_candidate_data):
@@ -66,11 +63,7 @@ class TestBuildCandidateDevice(TestCase):
 @mock.patch("mbed_tools.devices._internal.darwin.device_detector._get_mount_points")
 class TestAssembleCandidateDeviceData(TestCase):
     def test_glues_device_data_from_various_sources(self, _get_mount_points, _get_serial_port):
-        device_data = {
-            "vendor_id": "0xff",
-            "product_id": "0x24",
-            "serial_num": "123456",
-        }
+        device_data = {"vendor_id": "0xff", "product_id": "0x24", "serial_num": "123456"}
         _get_serial_port.return_value = "port-1"
         _get_mount_points.return_value = ["/Volumes/A"]
 
@@ -107,15 +100,11 @@ class TestGetSerialPort(TestCase):
     @mock.patch("mbed_tools.devices._internal.darwin.device_detector.ioreg", spec_set=ioreg)
     def test_returns_retrieved_io_dialin_device(self, ioreg):
         """Given enough data, it constructs an ioreg device name and fetches serial port information."""
-        device_data = {
-            "location_id": "0x12345 / 2",
-            "_name": "SomeDevice",
-        }
+        device_data = {"location_id": "0x12345 / 2", "_name": "SomeDevice"}
         serial_port = "/dev/tty.usb1234"
         ioreg.get_io_dialin_device.return_value = serial_port
         ioreg_device_name = _build_ioreg_device_name(
-            device_name=device_data["_name"],
-            location_id=device_data["location_id"],
+            device_name=device_data["_name"], location_id=device_data["location_id"]
         )
 
         self.assertEqual(_get_serial_port(device_data), serial_port)
@@ -129,9 +118,6 @@ class TestGetSerialPort(TestCase):
 class TestBuildIoregDeviceName(TestCase):
     def test_builds_ioreg_device_name_from_system_profiler_data(self):
         self.assertEqual(
-            _build_ioreg_device_name(
-                device_name="VeryNiceDevice Really",
-                location_id="0x14420000 / 2",
-            ),
+            _build_ioreg_device_name(device_name="VeryNiceDevice Really", location_id="0x14420000 / 2"),
             "VeryNiceDevice Really@14420000",
         )
