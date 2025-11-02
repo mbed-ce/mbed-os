@@ -81,7 +81,7 @@ def _assemble_config_from_sources(
     while previous_filter_data != current_filter_data:
         filtered_files = _filter_files(mbed_lib_files, current_filter_data)
         for config_file in filtered_files:
-            config.update(source.from_file(config_file, target_filters=current_filter_data.labels))
+            config.update(source.from_mbed_lib_json_file(config_file, target_filters=current_filter_data.labels))
             # Remove any mbed_lib files we've already visited from the list so we don't parse them multiple times.
             mbed_lib_files.remove(config_file)
 
