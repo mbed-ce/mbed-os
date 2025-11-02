@@ -1,6 +1,5 @@
 {
     "name": "SX126X-lora-driver",
-    "requires": ["lora"],
     "config": {
         "spi-frequency": {
         	"help": "SPI frequency, Default: 16 MHz",
