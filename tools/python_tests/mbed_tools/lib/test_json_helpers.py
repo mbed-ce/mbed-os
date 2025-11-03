@@ -22,5 +22,5 @@ def test_invalid_json5(tmp_path):
     lib_json_path = tmp_path / "mbed_lib.json5"
     lib_json_path.write_text("name")
 
-    with pytest.raises(pyjson5.Json5Exception):
+    with pytest.raises(ValueError):
         decode_json_file(lib_json_path)

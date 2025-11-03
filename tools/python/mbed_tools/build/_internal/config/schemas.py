@@ -77,7 +77,7 @@ class BaseJSONConfig(BaseModel):
     By convention, the name used for a configuration setting should be in skewer-case and should not contain
     periods, underscores, or uppercase letters.
     
-    In target JSON, this is a merging attribute.
+    In target JSON, this is a merging attribute in its base form.
     """
 
     macros: list[str] | None = None
@@ -93,7 +93,8 @@ class BaseJSONConfig(BaseModel):
     
     Overrides take the form "[<namespace>.]<setting>": <value> and cause the value of the given config
     setting to be changed to the given value. If the namespace is omitted, it will be set to the current
-    namespace.
+    namespace (i.e. the value of the "name" property for mbed_lib.json5 files, "target" for targets.json5 entries, and
+    "app" in mbed_app.json5).
     
     Note that in mbed_lib.json files, only settings defined in the current file or in the 'app' namespace
     (mbed_app.json) can be overridden.
@@ -157,8 +158,8 @@ class TargetJSON(BaseJSONConfig):
     Multiple parent targets are allowed, but be careful as the inheritance tree is flattened into a list before 
     being processed, which can cause some possibly unexpected behavior. See below for more details.
     
-    In the Mbed target configuration language, each attribute has one of three behaviors with respect to inheritance:
-    "overriding", "merging", and "accumulating".
+    In the Mbed target configuration language, each attribute has one of four behaviors with respect to inheritance:
+    "overriding", "merging", "accumulating", and "non-inherited".
 
     Overriding attributes are the simplest, and work like regular inheritance in programming: the value of the attribute
     from the "closest" ancestor is used, and all other values are discarded.
@@ -193,14 +194,17 @@ class TargetJSON(BaseJSONConfig):
        |
        A
 
-    Would give us an inheritance order of [A, B, C, D, E]. To process this, the first occurance of the bare
+    Would give us an inheritance order of [A, B, C, D, E]. To process this, the first occurrence of the bare
     attribute name in the above list is found, and then we work backwards towards target A processing "_add" and
     "_remove" directives until the full set of values is built up.
     
     *note:* Based on my current understanding of this code, if no parent target defines the attribute in base form,
     then the child targets cannot add to the value using "_add" - the config system will simply treat the attribute as
-    not existing. This seems like a potential source of bugs, but I don't want to change it for fear of
-    breaking something. -Jamie
+    not existing. This is probably why Target, the base for all targets, defines every property as its empty
+    value. -Jamie
+    
+    Last but not least, non-inherited attributes simply are not affected by parent targets at all, and have their
+    own value based on what is set in the individual target definition.
     """
 
     public: bool = True
@@ -208,8 +212,7 @@ class TargetJSON(BaseJSONConfig):
     Whether this target is intended for user use and can be passed as a target when building Mbed.
     Set this to false for targets that are incomplete and intended to be inherited from other targets.
     
-    This attribute is not affected by inheritance and always defaults to true unless set to false for
-    each individual target.
+    This is a non-inherited attribute.
     """
 
     core: str | None = None
@@ -220,7 +223,7 @@ class TargetJSON(BaseJSONConfig):
     This is an overriding attribute.
     """
 
-    supported_form_factors: list[Literal["ARDUINO_UNO", "PMOD", "STMOD"]]
+    supported_form_factors: list[Literal["ARDUINO_UNO", "ARDUINO", "PMOD", "STMOD"]] = Field(default_factory=list)
     """
     Form factors that this board supports.
     Form factors provide a standard electrical interface with standardized pin locations and functions for
@@ -235,7 +238,7 @@ class TargetJSON(BaseJSONConfig):
     Macros to add (see "macros"). 
     Using this attribute adds macros to the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its add form.
+    This is an accumulating attribute in its add form.
     """
 
     macros_remove: list[str] = Field(default_factory=list)
@@ -243,7 +246,7 @@ class TargetJSON(BaseJSONConfig):
     Macros to remove (see "macros"). 
     Using this attribute removes macros from the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its remove form.
+    This is an accumulating attribute in its remove form.
 
     Note that this specific attribute has some special behavior, in that the value after the "=" in the macro
     definition can be ignored when finding matches to remove. So if the parent target adds a macro "FOO=7", then
@@ -257,7 +260,7 @@ class TargetJSON(BaseJSONConfig):
     in the format `TARGET_<label>`.
     They are also used to control which directories in the source code are scanned for mbed_lib.json5 files.
     
-    This is a merging attribute in its base form.
+    This is an accumulating attribute in its base form.
     """
 
     extra_labels_add: list[str] = Field(default_factory=list)
@@ -265,7 +268,7 @@ class TargetJSON(BaseJSONConfig):
     Labels to add (see "extra_labels"). 
     Using this attribute adds labels to the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its add form.
+    This is an accumulating attribute in its add form.
     """
 
     extra_labels_remove: list[str] = Field(default_factory=list)
@@ -273,7 +276,7 @@ class TargetJSON(BaseJSONConfig):
     Labels to remove (see "extra_labels"). 
     Using this attribute removes labels from the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its remove form.
+    This is an accumulating attribute in its remove form.
     """
 
     components: list[str] = Field(default_factory=list)
@@ -289,7 +292,7 @@ class TargetJSON(BaseJSONConfig):
     The component list becomes compile definitions in the format `COMPONENT_<name>`.
     It is also used to control which directories in the source code are scanned for mbed_lib.json5 files.
     
-    This is a merging attribute in its base form.
+    This is an accumulating attribute in its base form.
     """
 
     components_add: list[str] = Field(default_factory=list)
@@ -297,7 +300,7 @@ class TargetJSON(BaseJSONConfig):
     Components to add (see "components"). 
     Using this attribute adds components to the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its add form.
+    This is an accumulating attribute in its add form.
     """
 
     components_remove: list[str] = Field(default_factory=list)
@@ -305,7 +308,7 @@ class TargetJSON(BaseJSONConfig):
     Components to remove (see "components"). 
     Using this attribute removes components from the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its remove form.
+    This is an accumulating attribute in its remove form.
     """
 
     features: list[str] = Field(default_factory=list)
@@ -319,7 +322,7 @@ class TargetJSON(BaseJSONConfig):
     The feature list becomes compile definitions in the format `FEATURE_<name>`.
     It is also used to control which directories in the source code are scanned for mbed_lib.json5 files.
     
-    This is a merging attribute in its base form.
+    This is an accumulating attribute in its base form.
     """
 
     features_add: list[str] = Field(default_factory=list)
@@ -327,7 +330,7 @@ class TargetJSON(BaseJSONConfig):
     Features to add (see "features"). 
     Using this attribute adds features to the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its add form.
+    This is an accumulating attribute in its add form.
     """
 
     features_remove: list[str] = Field(default_factory=list)
@@ -335,7 +338,7 @@ class TargetJSON(BaseJSONConfig):
     Features to remove (see "features"). 
     Using this attribute removes features from the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its remove form.
+    This is an accumulating attribute in its remove form.
     """
 
     device_has: list[str] = Field(default_factory=list)
@@ -347,7 +350,7 @@ class TargetJSON(BaseJSONConfig):
      
     The peripheral list becomes compile definitions in the format `DEVICE_<name>`.
     
-    This is a merging attribute in its base form.
+    This is an accumulating attribute in its base form.
     """
 
     device_has_add: list[str] = Field(default_factory=list)
@@ -355,7 +358,7 @@ class TargetJSON(BaseJSONConfig):
     Peripherals to add (see "device_has"). 
     Using this attribute adds peripherals to the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its add form.
+    This is an accumulating attribute in its add form.
     """
 
     device_has_remove: list[str] = Field(default_factory=list)
@@ -363,5 +366,56 @@ class TargetJSON(BaseJSONConfig):
     Peripherals to remove (see "device_has"). 
     Using this attribute removes peripherals from the set defined by parent target(s), rather than overwriting it.
     
-    This is a merging attribute in its remove form.
+    This is an accumulating attribute in its remove form.
+    """
+
+    supported_c_libs: dict[Literal["gcc_arm"], list[str]] = Field(default_factory=list)
+    """
+    C libraries that this target supports on each toolchain. This gives the valid values for the "c_lib" setting.
+    
+    This is an overriding attribute.
+    """
+
+    c_lib: str | None = None
+    """
+    C library that should be used. This allows specifying either the "std" or "small" versions of the library.
+    
+    With the GCC ARM toolchain, setting this to "small" causes newlib-nano to be linked instead of regular Newlib.
+    
+    This is an overriding attribute.
+    """
+
+    printf_lib: Literal["std", "minimal-printf"] | None = None
+    """
+    Printf library that should be used. Minimal printf causes printf to be replaced with Mbed's smaller version.
+    This saves around 20k of code space compared to the newlib version, at the cost of not supporting
+    all of the features specified in the C standard.
+    
+    See here for more details:
+    https://web.archive.org/web/20250422110455/https://os.mbed.com/docs/mbed-os/v6.16/apis/printf-and-reducing-memory.html
+        
+    This is an overriding attribute.
+    """
+
+    device_name: str | None = None
+    """
+    CMSIS name of the MCU in this target. This name is used to index into cmsis_mcu_descriptions.json5 and
+    find the target's memory banks and other information.
+    
+    This is an overriding attribute.
+    """
+
+    image_url: str | None = None
+    """
+    Image to display for this target on the targets index page.
+    
+    This is an overriding attribute.
+    """
+
+    is_mcu_family_target: bool = False
+    """
+    Whether this target is the top-level target for a family of MCUs. This causes a new sub-page to be created for it
+    on the targets index page.
+    
+    This is a non-inherited attribute.
     """
