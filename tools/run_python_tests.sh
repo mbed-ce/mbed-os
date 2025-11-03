@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # Copyright (c) 2020-2023 Arm Limited and Contributors. All rights reserved.
@@ -9,11 +9,23 @@
 # This is executed by the GitHub Actions CI build but also can be run locally.
 
 # Make sure to install the unit tests requirements before running this command, via a command like:
-# $ cd mbed-os # and also activate venv if desired
-# $ pip install -e ./tools[unit-tests]
+# $ cd mbed-os
+# $ venv/bin/pip install -e ./tools[unit-tests]
 
 set -e
 cd "$(dirname "$0")"
+
+# Activate Mbed OS virtualenv
+if command -v mbedhtrun >/dev/null 2>&1; then
+  echo "Mbed OS python environment appears to already be activated."
+elif [ -e "../venv/Scripts/activate" ]; then
+  source "../venv/Scripts/activate"
+elif [ -e "../venv/bin/activate" ]; then
+  source "../venv/bin/activate"
+else
+  echo "Failed to find Mbed OS virtualenv in ../venv and Python packages not installed to global environment."
+  exit 1
+fi
 
 PYTHON=python
 

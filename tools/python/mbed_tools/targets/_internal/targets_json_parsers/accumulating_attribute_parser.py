@@ -90,7 +90,7 @@ def _add_attribute_element(
     return accumulator
 
 
-def _element_matches(element_to_remove: str, element_to_check: str) -> bool:
+def _macros_element_matches(element_to_remove: str, element_to_check: str) -> bool:
     """Checks if an element meets the criteria to be removed from list.
 
     Some attribute elements (eg. macros) can be defined with a number value
@@ -126,7 +126,8 @@ def _remove_attribute_element(
     checked_elements_to_remove = [
         existing_element
         for existing_element, element in combinations_to_check
-        if _element_matches(element, existing_element)
+        if (attribute_name == "macros" and _macros_element_matches(element, existing_element))
+        or (element == existing_element)
     ]
 
     for element in checked_elements_to_remove:
