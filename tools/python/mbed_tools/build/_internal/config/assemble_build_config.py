@@ -10,7 +10,7 @@ from typing import Iterable, List, Optional, Set
 
 from mbed_tools.build._internal.config import source
 from mbed_tools.build._internal.config.config import Config
-from mbed_tools.build._internal.find_files import LabelFilter, RequiresFilter, filter_files, find_files
+from mbed_tools.build._internal.find_files import LabelFilter, filter_files, find_files
 from mbed_tools.project import MbedProgram
 
 
@@ -38,10 +38,12 @@ def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
         mbed_lib_files.update(find_files("mbed_lib.json", path.absolute().resolve()))
         mbed_lib_files.update(find_files("mbed_lib.json5", path.absolute().resolve()))
 
-    config = _assemble_config_from_sources(target_attributes, list(mbed_lib_files), program.files.app_config_file)
+    config, used_mbed_lib_files = _assemble_config_from_sources(
+        target_attributes, list(mbed_lib_files), program.files.app_config_file
+    )
 
     # Set up the config source path list using the path to every JSON
-    config.json_sources.extend(mbed_lib_files)
+    config.json_sources.extend(used_mbed_lib_files)
     if program.files.app_config_file is not None:
         config.json_sources.append(program.files.app_config_file)
     config.json_sources.append(program.mbed_os.targets_json_file)
@@ -64,7 +66,7 @@ def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
 
 def _assemble_config_from_sources(
     target_attributes: dict, mbed_lib_files: List[Path], mbed_app_file: Optional[Path] = None
-) -> Config:
+) -> tuple[Config, list[Path]]:
     config = Config(**source.prepare(target_attributes, source_name="target"))
     previous_filter_data = None
     app_data = None
@@ -77,22 +79,19 @@ def _assemble_config_from_sources(
         )
         _get_app_filter_labels(app_data, config)
 
-    current_filter_data = FileFilterData.from_config(config)
-    while previous_filter_data != current_filter_data:
-        filtered_files = _filter_files(mbed_lib_files, current_filter_data)
-        for config_file in filtered_files:
-            config.update(source.from_mbed_lib_json_file(config_file, target_filters=current_filter_data.labels))
-            # Remove any mbed_lib files we've already visited from the list so we don't parse them multiple times.
-            mbed_lib_files.remove(config_file)
-
-        previous_filter_data = current_filter_data
-        current_filter_data = FileFilterData.from_config(config)
+    # Process mbed_lib.json files according to the filter.
+    filter_data = FileFilterData.from_config(config)
+    filtered_files = list(_filter_files(mbed_lib_files, filter_data))
+    for config_file in filtered_files:
+        config.update(source.from_mbed_lib_json_file(config_file, target_filters=filter_data.labels))
+        # Remove any mbed_lib files we've already visited from the list so we don't parse them multiple times.
+        mbed_lib_files.remove(config_file)
 
     # Apply mbed_app.json data last so config parameters are overriden in the correct order.
     if app_data:
         config.update(app_data)
 
-    return config
+    return config, filtered_files
 
 
 def _get_app_filter_labels(mbed_app_data: dict, config: Config) -> None:
@@ -132,6 +131,5 @@ def _filter_files(files: Iterable[Path], filter_data: FileFilterData) -> Iterabl
         LabelFilter("TARGET", filter_data.labels),
         LabelFilter("FEATURE", filter_data.features),
         LabelFilter("COMPONENT", filter_data.components),
-        RequiresFilter(filter_data.requires),
     )
     return filter_files(files, filters)

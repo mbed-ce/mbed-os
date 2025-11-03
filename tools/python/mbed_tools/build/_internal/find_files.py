@@ -72,29 +72,6 @@ def filter_files(files: Iterable[Path], filters: Iterable[Callable]) -> Iterable
     return [file for file in files if all(f(file) for f in filters)]
 
 
-class RequiresFilter:
-    """
-    Filter out mbed libraries not needed by application.
-
-    The 'requires' config option in mbed_app.json can specify list of mbed
-    libraries (mbed_lib.json) that application requires. Apply 'requires'
-    filter to remove mbed_lib.json files not required by application.
-    """
-
-    def __init__(self, requires: Iterable[str]) -> None:
-        """
-        Initialise the filter attributes.
-
-        Args:
-            requires: List of required mbed libraries.
-        """
-        self._requires = requires
-
-    def __call__(self, path: Path) -> bool:
-        """Return True if no requires are specified or our lib name is in the list of required libs."""
-        return decode_json_file(path).get("name", "") in self._requires or not self._requires
-
-
 class LabelFilter:
     """
     Filter out given paths using path labelling rules.

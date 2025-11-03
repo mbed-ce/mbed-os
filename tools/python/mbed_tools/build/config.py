@@ -7,16 +7,21 @@
 import json
 import pathlib
 from typing import Any, Tuple
+import logging
 
+import pydantic
 from mbed_tools.build._internal.cmake_file import render_mbed_config_cmake_template
 from mbed_tools.build._internal.config.assemble_build_config import assemble_config
 from mbed_tools.build._internal.config.config import Config
 from mbed_tools.build._internal.memory_banks import incorporate_memory_bank_data_from_cmsis, process_memory_banks
 from mbed_tools.build._internal.write_files import write_file
+from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.build.exceptions import MbedBuildError
 from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.project import MbedProgram
 from mbed_tools.targets import get_target_by_name
+
+logger = logging.getLogger(__name__)
 
 CMAKE_CONFIG_FILE = "mbed_config.cmake"
 MEMORY_BANKS_JSON_FILE = "memory_banks.json"
@@ -72,5 +77,13 @@ def _load_raw_targets_data(program: MbedProgram) -> Any:
                 raise MbedBuildError(msg)
 
         targets_data.update(custom_targets_data)
+
+    # Validate and parse data for each target
+    for target, target_json_dict in targets_data.items():
+        try:
+            target_json = TargetJSON.model_validate(target_json_dict, extra="forbid", strict=True)
+        except pydantic.ValidationError as ex:
+            logger.error(f"Target {target} did not validate against the schema for target JSON!")
+            raise ex
 
     return targets_data
