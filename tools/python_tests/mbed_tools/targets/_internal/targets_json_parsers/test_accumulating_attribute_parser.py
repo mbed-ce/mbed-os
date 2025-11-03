@@ -192,7 +192,15 @@ class TestRemoveAttributeElement(TestCase):
     def test_remove_element_with_numbers(self):
         current_attribute_state = {"attribute_1": ["ONE", "TWO=2", "THREE"]}
         elements_to_remove = ["TWO"]
-        expected_result = {"attribute_1": ["ONE", "THREE"]}
+        expected_result = current_attribute_state.copy()
         _remove_attribute_element(current_attribute_state, "attribute_1", elements_to_remove)
 
         self.assertEqual(current_attribute_state, expected_result)
+
+    def test_remove_macros_with_value(self):
+        current_attribute_state = {"macros": ["ONE", "TWO=2", "THREE"]}
+        elements_to_remove = ["TWO"]
+        expected_result = {"macros": ["ONE", "THREE"]}
+        result = _remove_attribute_element(current_attribute_state, "macros", elements_to_remove)
+
+        self.assertEqual(result, expected_result)

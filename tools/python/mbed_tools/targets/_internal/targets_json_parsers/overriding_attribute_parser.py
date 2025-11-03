@@ -27,7 +27,7 @@ from typing import Any, Deque, Dict, List, Set
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import ALL_ACCUMULATING_ATTRIBUTES
 
 MERGING_ATTRIBUTES = ("config", "overrides", "memory_banks", "memory_overrides")
-NON_OVERRIDING_ATTRIBUTES = (*ALL_ACCUMULATING_ATTRIBUTES, "public", "inherits")
+NON_OVERRIDING_ATTRIBUTES = (*ALL_ACCUMULATING_ATTRIBUTES, "public", "inherits", "is_mcu_family_target")
 
 
 def get_overriding_attributes_for_target(all_targets_data: Dict[str, Any], target_name: str) -> Dict[str, Any]:
