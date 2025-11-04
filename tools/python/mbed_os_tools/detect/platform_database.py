@@ -299,7 +299,6 @@ DEFAULT_PLATFORM_DB = {
         "3105": "SDT64B",
         "3701": "S5JS100",
         "3702": "S3JT100",
-        "3703": "S1SBP6A",
         "4000": "LPC11U35_Y5_MBUG",
         "4005": "NRF51822_Y5_MBUG",
         "4100": "MOTE_L152RC",
