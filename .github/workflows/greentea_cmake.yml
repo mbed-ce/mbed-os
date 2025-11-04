@@ -86,10 +86,6 @@ jobs:
           - target: NU_M2354
             profile: full
 
-          # Samsung MCUs
-          - target: S1SBP6A
-            profile: full
-
           # nRF MCUs
           - target: NRF52840_DK
             profile: full
