@@ -480,30 +480,6 @@
         "mbed_enabled": []
     },
     {
-        "board_type": "S1SBP6A",
-        "board_name": "SIDK S1SBP6A Bio-processor dev kit",
-        "product_code": "3703",
-        "target_type": "platform",
-        "slug": "S1SBP6A",
-        "build_variant": [],
-        "mbed_os_support": [
-            "Mbed OS 6.10",
-            "Mbed OS 6.11",
-            "Mbed OS 6.12",
-            "Mbed OS 6.13",
-            "Mbed OS 6.14",
-            "Mbed OS 6.15",
-            "Mbed OS 6.5",
-            "Mbed OS 6.6",
-            "Mbed OS 6.7",
-            "Mbed OS 6.8",
-            "Mbed OS 6.9"
-        ],
-        "mbed_enabled": [
-            "Baseline"
-        ]
-    },
-    {
         "board_type": "NUCLEO_L010RB",
         "board_name": "NUCLEO_L010RB",
         "product_code": "0783",
