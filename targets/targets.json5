@@ -9586,50 +9586,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://os.mbed.com/media/cache/platforms/SSP_8683_Ywwh0ix.jpg.250x250_q85.jpg"
     },
 
-    // Samsung Targets -------------------------------------------------------------------------------------------------
-
-    "S1SBP6A": { // AKA Samsung Bio-Processor S1SBP6A
-        "inherits": ["Target"],
-        "core": "Cortex-M4F",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "default_toolchain": "GCC_ARM",
-        "extra_labels": [
-            "Samsung",
-            "SIDK_S1SBP6A"
-        ],
-        "device_has": [
-            "USTICKER",
-            "INTERRUPTIN",
-            "SERIAL",
-            "MPU",
-            "SPI",
-            "I2C",
-            "RTC",
-            "FLASH",
-            "SLEEP",
-            "WATCHDOG"
-        ],
-        "release_versions": ["5"],
-        "detect_code": ["3703"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
-        "device_name": "S1SBP6A",
-        "image_url": "https://os.mbed.com/media/uploads/heuisam/pinout2.jpg"
-    },
-
     // Ambiq Micro Targets ---------------------------------------------------------------------------------------------
     "FAMILY_Apollo3": {
         "inherits": ["Target"],
