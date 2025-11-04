@@ -10,6 +10,7 @@
         "public": false,
         "c_lib": "std",
         "printf_lib": "minimal-printf",
+        "OUTPUT_EXT": "",
         "supported_c_libs": {
             "gcc_arm": [
                 "std",
@@ -1377,7 +1378,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "program_cycle_s": 2,
         "components_add": [
             "SD"
         ],
@@ -1514,9 +1514,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0826"
-        ],
         "device_has_add": [
             "USBDEVICE"
         ],
@@ -1537,9 +1534,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "clock_source": "USE_PLL_HSI",
             "network-default-interface-type": "WIFI"
         },
-        "detect_code": [
-            "0451"
-        ],
         "image_url": "https://cdn.mxchip.com/mxchip_official_website/img/EMW3166-P-%E7%99%BD-%E6%AD%A3.jpg"
     },
     "MCU_STM32F413xH": {
@@ -1582,9 +1576,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "N25Q128A"
         ],
-        "detect_code": [
-            "0743"
-        ],
         "device_has_add": [
             "QSPI",
             "USBDEVICE"
@@ -1598,9 +1589,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0743"
         ],
         "device_has_add": [
             "USBDEVICE"
@@ -1653,9 +1641,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EMAC",
             "USBDEVICE"
         ],
-        "detect_code": [
-            "0796"
-        ],
         "device_name": "STM32F429ZITx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
@@ -1679,9 +1664,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER"
         ],
         "device_name": "STM32F429ZITx",
-        "detect_code": [
-            "0795"
-        ],
         "image_url": "https://m.media-amazon.com/images/I/71M-Bd6yaJL._AC_UF894,1000_QL80_.jpg"
     },
     "MCU_STM32F439xI": {
@@ -1724,9 +1706,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EMAC",
             "USBDEVICE"
         ],
-        "detect_code": [
-            "0797"
-        ],
         "device_name": "STM32F439ZITx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
@@ -1756,9 +1735,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0777"
-        ],
         "device_name": "STM32F446RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1775,9 +1751,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "USE_USB_OTG_FS"
             }
         },
-        "detect_code": [
-            "0778"
-        ],
         "device_has_add": [
             "USBDEVICE"
         ],
@@ -1817,9 +1790,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
         },
-        "detect_code": [
-            "0788"
-        ],
         "device_has_add": [
             "QSPI",
             "USBDEVICE"
@@ -1857,9 +1827,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER"
         ],
         "device_name": "STM32F469NIHx",
-        "detect_code": [
-            "0604"
-        ],
         "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-images/images/eval-sdp-ck1ztop-web.gif?rev=2b0d46c94afe490cb3543819752a0471&sc_lang=en&h=270&thn=1&hash=C1A2567A6E5A569665B40C5DCFE1B8C3"
     },
 
@@ -1927,9 +1894,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0812"
-        ],
         "device_name": "STM32F722ZETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1957,9 +1921,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
             "network-default-interface-type": "ETHERNET"
         },
-        "detect_code": [
-            "0815"
-        ],
         "macros_add": [
             "STM32F746xx",
             "HSE_VALUE=25000000"
@@ -1993,9 +1954,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0816"
-        ],
         "device_has_add": [
             "EMAC",
             "USBDEVICE"
@@ -2028,9 +1986,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0819"
-        ],
         "device_has_add": [
             "EMAC",
             "USBDEVICE"
@@ -2057,9 +2012,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "STM32F767xx"
-        ],
-        "detect_code": [
-            "9020"
         ],
         "device_has_remove": [
             "SERIAL_FC"
@@ -2091,9 +2043,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "STM32F767xx"
-        ],
-        "detect_code": [
-            "0818"
         ],
         "device_has_add": [
             "EMAC",
@@ -2129,9 +2078,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "USE_USB_OTG_HS"
             }
         },
-        "detect_code": [
-            "0817"
-        ],
         "macros_add": [
             "STM32F769xx",
             "HSE_VALUE=25000000"
@@ -2198,9 +2144,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32G0"
         ],
         "public": false,
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G030x8"
         ],
@@ -2221,9 +2164,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G031x8"
         ],
@@ -2234,9 +2174,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "NUCLEO_G031K8": {
         "inherits": [
             "MCU_STM32G031x8"
-        ],
-        "detect_code": [
-            "0852"
         ],
         "device_name": "STM32G031K8Tx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267508.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2249,9 +2186,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G041x8"
         ],
@@ -2264,9 +2198,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32G0"
         ],
         "public": false,
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G050x8"
         ],
@@ -2287,9 +2218,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G051x8"
         ],
@@ -2308,9 +2236,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G061x8"
         ],
@@ -2362,9 +2287,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0221"
         ],
         "device_name": "STM32G071RBTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF265386.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2423,9 +2345,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0872"
         ],
         "device_name": "STM32G0B1RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF265386.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2518,9 +2437,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0850"
-        ],
         "overrides": {
             "hse_value": 24000000
         },
@@ -2535,9 +2451,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "clock_source": "USE_PLL_HSI",
         "lse_available":  0
       },
-      "detect_code": [
-        "0851"
-      ],
       "device_name": "STM32G431KBTx",
       "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267030.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -2599,9 +2512,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "hse_value": 24000000
         },
-        "detect_code": [
-            "0841"
-        ],
         "device_name": "STM32G474RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267029.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -2742,9 +2652,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0832"
-        ],
         "device_name": "STM32H503RBTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF274336.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -2782,9 +2689,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0878"
         ],
         "device_name": "STM32H563ZITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF274337.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2833,9 +2737,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "MX25LM51245G"
         ],
-        "detect_code": [
-            "0831"
-        ],
         "device_has_add": [
             "QSPI",
             "OSPI"
@@ -2868,10 +2769,18 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "RCC_LSEDRIVE_LOW"
             },
             "system_power_supply": {
-                "expected_value1": "PWR_LDO_SUPPLY | PWR_DIRECT_SMPS_SUPPLY",
-                "expected_value2": "PWR_SMPS_1V8_SUPPLIES_LDO | PWR_SMPS_2V5_SUPPLIES_LDO | PWR_SMPS_1V8_SUPPLIES_EXT_AND_LDO | PWR_SMPS_2V5_SUPPLIES_EXT_AND_LDO",
-                "expected_value3": "PWR_SMPS_1V8_SUPPLIES_EXT | PWR_SMPS_2V5_SUPPLIES_EXT | PWR_EXTERNAL_SOURCE_SUPPLY",
-                "value": "NC"
+                accepted_values: [
+                    "PWR_LDO_SUPPLY",
+                    "PWR_DIRECT_SMPS_SUPPLY",
+                    "PWR_SMPS_1V8_SUPPLIES_LDO",
+                    "PWR_SMPS_2V5_SUPPLIES_LDO",
+                    "PWR_SMPS_1V8_SUPPLIES_EXT_AND_LDO",
+                    "PWR_SMPS_2V5_SUPPLIES_EXT_AND_LDO",
+                    "PWR_SMPS_1V8_SUPPLIES_EXT",
+                    "PWR_SMPS_2V5_SUPPLIES_EXT",
+                    "PWR_EXTERNAL_SOURCE_SUPPLY"
+                ],
+                "value": null
             },
             "i2c_timing_value_algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
@@ -3026,9 +2935,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0836"
-        ],
         "device_name": "STM32H743ZITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -3040,7 +2946,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32H723ZG"
         ],
         "config": {
-
             "d11_configuration": {
                 "help": "Value: PB_5 for the default board configuration, PA_7 in case of solder bridge update (SB33 on/ SB35 off)",
                 "value": "PB_5",
@@ -3062,9 +2967,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0836"
         ],
         "device_name": "STM32H723ZGTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -3231,9 +3133,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "QSPI"
         ],
-        "detect_code": [
-            "0814"
-        ],
         "device_name": "STM32H747XIHx"
     },
     "DISCO_H747I_CM7": {
@@ -3341,7 +3240,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "ARDUINO_PORTENTA_H7": {
         "public": false,
-        "detect_code": ["0813"],
         inherits: ["STM32H747_ARDUINO"],
         "device_has_add": [
             "EMAC"
@@ -3449,9 +3347,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0860"
         ],
         "overrides": {
             "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
