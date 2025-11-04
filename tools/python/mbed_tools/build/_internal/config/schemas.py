@@ -145,6 +145,66 @@ class MbedLibJSON(BaseJSONConfig):
     results may not be what you expect.
     """
 
+class MemoryBankDefinition(BaseModel):
+    """
+    Definition of one memory bank in JSON.
+
+    This follows the schema defined by the CMSIS spec:
+    https://open-cmsis-pack.github.io/Open-CMSIS-Pack-Spec/main/html/pdsc_family_pg.html#element_memory
+    (though this data gets converted from XML to JSON by the cmsis-pack-manager tool)
+    """
+
+    default: bool = False
+    """
+    Hint from the CMSIS data that this memory region should be used for storing general data/code.
+    If this is false, the memory region requires special considerations (access speed, remapping, protection, etc.)
+    and should not be used without user configuration.
+    
+    This is not used by Mbed for actually determining where to put stuff, that is handled by the linker script!
+    """
+
+    startup: bool = False
+    """
+    Hint from the CMSIS data that the startup code of the application should be placed into this memory region.
+    
+    This is not used by Mbed for actually determining where to put stuff, that is handled by the linker script!
+    """
+
+    access: dict[Literal["execute", "non_secure", "non_secure_callable", "peripheral", "read", "secure", "write"], bool] = Field(default_factory=dict)
+    """
+    Access permissions of the memory, as defined by CMSIS.
+    
+    This is used by Mbed to detect the bank type. Banks with read and write permission are assumed to be ram,
+    while banks with read and execute permissions are assumed to be flash. Banks without read and (write || execute)
+    permissions are ignored (assumed to be ROM or other memory areas). The other permission fields are currently
+    unused by Mbed. 
+    """
+
+    start: int
+    """
+    Start address of the memory region.
+    """
+
+    size: int
+    """
+    Size of the memory region in bytes.
+    """
+
+class MemoryBankConfiguration(BaseModel):
+    """
+    Configuration of one memory bank in JSON.
+    This is a "mini" version of MemoryBankDefinition that just allows setting the size and start address.
+    """
+
+    start: int
+    """
+    Start address of the memory region.
+    """
+
+    size: int
+    """
+    Size of the memory region in bytes.
+    """
 
 class TargetJSON(BaseJSONConfig):
     """
@@ -418,4 +478,50 @@ class TargetJSON(BaseJSONConfig):
     on the targets index page.
     
     This is a non-inherited attribute.
+    """
+
+    memory_banks: dict[str, MemoryBankDefinition] = Field(default_factory=dict)
+    """
+    Memory banks defined for this target.
+    
+    This attribute can be used to define new memory banks, or to add new ones that do not exist in the target's
+    cmsis_mcu_descriptions.json5 entry.
+    See the memory bank system design document for more information:
+    https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information
+    
+    This is a merging attribute.
+    
+    Warning: This attribute is used to define the *physical extents* of memory banks on the device. If you
+    want to restrict the application to use a specific area of RAM, that should be done with
+    memory_bank_config instead!
+    """
+
+    memory_bank_config: dict[str, MemoryBankConfiguration] = Field(default_factory=dict)
+    """
+    Configuration of memory banks for this target.
+    
+    This can be used to restrict where the application lives in memory (as long as the linker script
+    has support). Setting this will set the ``MBED_CONFIGURED_[ROM/RAM][number/name]_[START/SIZE]`` definitions
+    to contain the configured sizes.
+    
+    See the memory bank system design document for more information:
+    https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information
+    
+    This is a merging attribute.
+    """
+
+    OUTPUT_EXT: Literal["bin", "hex", ""] | None = None
+    """
+    Configures the extension of binary files that the Mbed build system will create.
+    
+    Setting this to "bin" or "" (or leaving it unset) will cause both bin and hex files to be created. Setting 
+    this to "hex" will cause only hex files to be created. (note: you used to be able to create only bin files,
+    but Mbed needs to use the hex files internally for uploading code, so this was changed). This option really
+    should be reworked...
+    
+    As for why you would want to disable bin files, this is because bin files are just a raw memory image of the
+    target, so they cannot handle holes. If, for example, your target has two flash banks that are 1GB apart in the
+    address space, and you have constant data in both those banks, then the toolchain will generate a 1GB bin file!
+    
+    This is an overriding attribute.
     """
