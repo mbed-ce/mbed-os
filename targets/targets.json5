@@ -3436,9 +3436,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "device_has_add": [
             "ANALOGOUT",
             "TRNG"
@@ -3493,13 +3490,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32L072xZ"
         ],
         "supported_form_factors": [
-            "ARDUINO_UNO_PART"
+            "ARDUINO_UNO"
         ],
         "components_add": [
             "SX1276"
-        ],
-        "detect_code": [
-            "0833"
         ],
         "device_name": "STM32L072CZTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF264368.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -3526,9 +3520,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0760"
         ],
         "device_name": "STM32L073RZTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -3634,9 +3625,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SERIAL_FC"
         ],
         "device_name": "STM32L151CCTx",
-        "detect_code": [
-            "0350"
-        ],
         "image_url": "https://multitech.com/wp-content/uploads/elementor/thumbs/MT_xDot_Kit_MTMDK-NX-XDOT_clear_hp1000px-qiietlpii6czroara761mb7hrzdtvfj6350luxui2o.png"
     },
     // As of 2024, L-Tek no longer sells the FF1705 as far as I can tell from their webshop.
@@ -3644,9 +3632,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "FF1705_L151CC": { // AKA L-Tek FF1705
         "inherits": [
             "XDOT_L151CC"
-        ],
-        "detect_code": [
-            "8080"
         ],
         "image_url": "https://os.mbed.com/media/cache/platforms/LTEK-xdot.jpg.250x250_q85.jpg"
     },
@@ -3672,9 +3657,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "STM32L152RC"
         ],
-        "detect_code": [
-            "4100"
-        ],
         "device_has_remove": [
             "SERIAL_FC"
         ],
@@ -3699,9 +3681,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0710"
         ],
         "device_name": "STM32L152RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -3789,9 +3768,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_STM32L432xC"
         ],
-        "detect_code": [
-            "0770"
-        ],
         "device_name": "STM32L432KCUx",
         "image_url": "https://eu.mouser.com/images/marketingid/2019/img/168228755.png?v=021424.0917"
     },
@@ -3814,9 +3790,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0779"
         ],
         "device_name": "STM32L433RCTx",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2508/MFG_NUCLEO-L433RC-P.jpg"
@@ -3848,9 +3821,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER"
         ],
         "device_name": "STM32L443RCTx",
-        "detect_code": [
-            "0458"
-        ],
         "image_url": "https://www.mouser.com/images/advantechcorporation/lrg/WISE-1510WMB-SDA1E_DSL.jpg"
     },
     "MCU_STM32L452xE": {
@@ -3872,9 +3842,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0829"
         ],
         "overrides": {
             // ADC vref on this board is connected to 3.3V VDD
@@ -3902,9 +3869,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0312"
         ],
         "components_add": [
             "MULTITECH_DRAGONFLY_NANO_CELLULAR",
@@ -3944,9 +3908,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0764"
-        ],
         "device_has_add": [
             "QSPI",
             "USBDEVICE"
@@ -3980,9 +3941,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0765"
-        ],
         "device_name": "STM32L476RGTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -3995,9 +3953,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "extra_labels_add": [
             "N25Q128A"
-        ],
-        "detect_code": [
-            "0820"
         ],
         "device_has_add": [
             "QSPI",
@@ -4029,9 +3984,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0827"
         ],
         "device_name": "STM32L486RGTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -4067,9 +4019,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "components_add": [
             "QSPIF"
         ],
-        "detect_code": [
-            "0822"
-        ],
         "device_has_add": [
             "USBDEVICE",
             "QSPI"
@@ -4084,9 +4033,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0823"
-        ],
         "device_has_add": [
             "USBDEVICE"
         ],
@@ -4097,9 +4043,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "NUCLEO_L496ZG"
         ],
-        "detect_code": [
-            "0828"
-        ]
     },
     "MCU_STM32L4P5xG": {
         "inherits": [
@@ -4136,9 +4079,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L4R5ZI",
             "STM32L4R5xI"
         ],
-        "detect_code": [
-            "0776"
-        ],
         "device_has_add": [
             "USBDEVICE"
         ],
@@ -4148,9 +4088,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "NUCLEO_L4R5ZI_P": {
         "inherits": [
             "NUCLEO_L4R5ZI"
-        ],
-        "detect_code": [
-            "0781"
         ]
     },
     "MCU_STM32L4R9xI": {
@@ -4183,9 +4120,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "HSE_VALUE=16000000"
-        ],
-        "detect_code": [
-            "0774"
         ],
         "device_has_add": [
             "QSPI",
@@ -4226,9 +4160,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "HSE_VALUE=8000000"
-        ],
-        "detect_code": [
-            "0885"
         ],
         "device_has_add": [
             "USBDEVICE",
@@ -4311,9 +4242,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "device_name": "STM32L552ZETxQ",
-        "detect_code": [
-            "0854"
-        ],
         "image_url": "https://cdn11.bigcommerce.com/s-3fd3md1ghs/images/stencil/500x659/products/30236/11949/NUCLEO-L552ZE-Q__51179.1642762880.jpg?c=2"
     },
     "MCU_STM32L562xE": {
@@ -4354,9 +4282,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "BLE"
         ],
         "device_name": "STM32L562QEIxQ",
-        "detect_code": [
-            "0854"
-        ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF268050.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     // STM32U0 Targets -------------------------------------------------------------------------------------------------
@@ -4433,9 +4358,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "device_name": "STM32U083RCTx",
-        "detect_code": [
-            "0888"
-        ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF273876.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
 
@@ -4519,9 +4441,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "device_name": "STM32U575ZITx",
-        "detect_code": [
-            "886"
-        ],
         "overrides": {
             // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
             // Jumper JP4 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
@@ -4577,9 +4496,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
-        "detect_code": [
-            "887"
-        ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271412.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
     "MCU_STM32U545xE": {
@@ -4689,9 +4605,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32WB"
         ],
         "public": false,
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "c_lib": "small",
         "extra_labels_add": [
             "STM32WB15xC"
@@ -4717,9 +4630,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0883"
         ],
         "image_url": "https://www.mouser.com/images/stmicroelectronics/hd/NUCLEO-WB15CC_SPL.jpg"
     },
@@ -4750,9 +4660,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0839"
         ],
         "device_has_add": [
             "USBDEVICE"
@@ -4787,9 +4694,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0884"
         ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271050.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
@@ -4856,9 +4760,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0866"
-        ],
         "image_url": "https://www.mouser.com/images/marketingid/2020/img/114771861.png?v=012324.0355"
     },
     "MCU_STM32WLE5xC": {
@@ -4880,10 +4781,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     // See here for details: https://github.com/mbed-ce/mbed-os/wiki/MCU-Info-Page:-MIMXRT105x-and-106x
     "MIMXRT105X": {
         "core": "Cortex-M7FD",
-        "supported_application_profiles": [
-            "full",
-            "bare-metal"
-        ],
         "public": false,
         "extra_labels": [
             "NXP",
@@ -4961,9 +4858,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "FLASH"
         ],
-        "detect_code": [
-            "0227"
-        ],
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
@@ -5035,7 +4929,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "start": 0x80000000,
                 "startup": false
             },
-            // MIMXRT1050 EVK uses QSPI flash by default
+            // MIMXRT1060 EVK uses QSPI flash by default
             "EXT_FLASH": {
                 "access": {
                     "execute": true,
@@ -5167,9 +5061,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "Target"
         ],
-        "detect_code": [
-            "0228"
-        ],
         "device_has": [
             "ANALOGIN",
             "FLASH",
@@ -5183,20 +5074,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "device_name": "MIMXRT1176DVMAA",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/MIMXRT1170-EVKB-TOP-IMG.jpg"
     },
@@ -5222,9 +5099,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "Target"
         ],
-        "detect_code": [
-            "1054"
-        ],
         "device_has": [
             "USTICKER",
             "RTC",
@@ -5246,24 +5120,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "tickless-from-us-ticker": true,
             "init-us-ticker-at-boot": true
         },
-        "release_versions": [
-            "5"
-        ],
-        "post_binary_hook": {
-            "function": "LPCTargetCode.lpc_patch"
-        },
         "device_name": "LPC54114J256BD64",
-        "supported_c_libs": {
-            "arm": [
-                "std", "small"
-            ],
-            "gcc_arm": [
-                "std", "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/691/OM13089UL.JPG"
     },
     "MCU_LPC546XX": {
@@ -5310,20 +5167,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "init-us-ticker-at-boot": true,
             "network-default-interface-type": "ETHERNET"
         },
-        "post_binary_hook": {
-            "function": "LPCTargetCode.lpc_patch"
-        },
-        "supported_c_libs": {
-            "arm": [
-                "std", "small"
-            ],
-            "gcc_arm": [
-                "std", "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true
     },
     "LPC546XX": { // AKA LPCXpresso54608
@@ -5336,12 +5179,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "LPCXpresso"
         ],
-        "detect_code": [
-            "1056"
-        ],
-        "release_versions": [
-            "5"
-        ],
         "components_add": [
             "QSPIF"
         ],
@@ -5352,14 +5189,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_LPC546XX"
         ],
-        "detect_code": [
-            "8081"
-        ],
         "device_has_remove": [
             "QSPI"
-        ],
-        "release_versions": [
-            "5"
         ],
         // Note: this target has a DataFlash flash on the board, BUT they actually pinned it out wrong:
         // SCLK is connected to SPI3, while MOSI and MISO are connected to SPI5. So, the flash is
@@ -5390,17 +5221,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPISLAVE",
             "TSC"
         ],
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "is_mcu_family_target": true
     },
     "ARM_MPS2_M0": {
@@ -5433,11 +5253,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TSC",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MPS2_M0P": {
@@ -5468,11 +5283,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TSC",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MPS2_M3": {
@@ -5504,11 +5314,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MPS2_M4": {
@@ -5540,11 +5345,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MPS2_M7": {
@@ -5576,11 +5376,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_IOTSS_Target": {
@@ -5616,7 +5411,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_SSG",
             "CM3DS_MPS2"
         ],
-        "OUTPUT_EXT": "elf",
         "macros": [
             "CMSDK_CM3DS"
         ],
@@ -5638,30 +5432,17 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USTICKER",
             "MPU"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
-        "detect_code": [
-            "5004"
-        ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MUSCA_B1": {
         "inherits": [
             "PSA_V8_M"
         ],
-        "default_toolchain": "ARMC6",
         "features_add": [
             "EXPERIMENTAL_API"
-        ],
-        "forced_reset_timeout": 20,
-        "release_versions": [
-            "5"
         ],
         "core": "Cortex-M33-NS",
         "device_has_add": [
@@ -5686,21 +5467,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_SSG",
             "MUSCA_B1"
         ],
-        "post_binary_hook": {
-            "function": "ArmMuscaB1Code.binary_hook"
-        },
-        "secure_image_filename": "tfm_s.bin",
-        "tfm_target_name": "arm/musca_b1/sse_200",
-        "tfm_bootloader_supported": true,
-        "tfm_default_toolchain": "ARMCLANG",
-        "tfm_supported_toolchains": [
-            "ARMCLANG",
-            "GNUARM"
-        ],
-        "tfm_delivery_dir": "TARGET_ARM_SSG/TARGET_MUSCA_B1",
-        "detect_code": [
-            "5007"
-        ],
         "OUTPUT_EXT": "bin",
         "image_url": "https://www.psacertified.org/app/uploads/2019/01/musca-b1-600x0-c-default.jpg"
     },
@@ -5708,13 +5474,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "PSA_V8_M"
         ],
-        "default_toolchain": "ARMC6",
         "features_add": [
             "EXPERIMENTAL_API"
-        ],
-        "forced_reset_timeout": 20,
-        "release_versions": [
-            "5"
         ],
         "core": "Cortex-M33-NS",
         "device_has_add": [
@@ -5741,21 +5502,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "ARM_SSG",
             "MUSCA_S1"
-        ],
-        "post_binary_hook": {
-            "function": "ArmMuscaS1Code.binary_hook"
-        },
-        "secure_image_filename": "tfm_s.bin",
-        "tfm_target_name": "arm/musca_s1",
-        "tfm_bootloader_supported": true,
-        "tfm_default_toolchain": "ARMCLANG",
-        "tfm_supported_toolchains": [
-            "ARMCLANG",
-            "GNUARM"
-        ],
-        "tfm_delivery_dir": "TARGET_ARM_SSG/TARGET_MUSCA_S1",
-        "detect_code": [
-            "5009"
         ],
         "OUTPUT_EXT": "bin",
         "image_url": "https://os.mbed.com/media/cache/platforms/Musca-S1_Rev_B_Board-1_transpant.png.250x250_q85.png"
@@ -5794,20 +5540,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPISLAVE",
             "SPI_ASYNCH"
         ],
-        "program_cycle_s": 2,
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        },
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
         },
         "is_mcu_family_target": true
     },
@@ -5832,9 +5566,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH",
             "LPTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "R7S72100",
         // 8MB serial flash on the board
         "memory_banks": {
@@ -5852,15 +5583,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "startup": true
             }
         },
-        "sectors": [
-            [
-                402653184,
-                4096
-            ]
-        ],
-        "detect_code": [
-            "5500"
-        ],
         "image_url": "https://os.mbed.com/media/cache/platforms/GR-PEACH_C_trans.png.250x250_q85.png"
     },
     "GR_LYCHEE": {
@@ -5886,9 +5608,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_remove": [
             "EMAC"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "R7S72103",
         "memory_banks": {
             "EXT_FLASH": {
@@ -5905,18 +5624,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "startup": true
             }
         },
-        "sectors": [
-            [
-                402653184,
-                4096
-            ]
-        ],
         "overrides": {
             "network-default-interface-type": null
         },
-        "detect_code": [
-            "5501"
-        ],
         "image_url": "https://www.cnx-software.com/wp-content/uploads/2017/06/GR-LYCHEE.jpg"
     },
     "RZ_A2XX": {
