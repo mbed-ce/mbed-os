@@ -196,12 +196,12 @@ class MemoryBankConfiguration(BaseModel):
     This is a "mini" version of MemoryBankDefinition that just allows setting the size and start address.
     """
 
-    start: int
+    start: int | None = None
     """
     Start address of the memory region.
     """
 
-    size: int
+    size: int | None = None
     """
     Size of the memory region in bytes.
     """
