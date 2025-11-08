@@ -163,6 +163,8 @@ int ESP32Interface::set_credentials(const char *ssid, const char *pass, nsapi_se
         case NSAPI_SECURITY_WPA:
         case NSAPI_SECURITY_WPA2:
         case NSAPI_SECURITY_WPA_WPA2:
+        case NSAPI_SECURITY_WPA3:
+        case NSAPI_SECURITY_WPA3_WPA2:
             if ((pass_len < 8) || (pass_len > 63)) {
                 ret = NSAPI_ERROR_PARAMETER;
             }

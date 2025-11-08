@@ -135,6 +135,8 @@ int ESP32InterfaceAP::set_credentials(const char *ssid, const char *pass, nsapi_
         case NSAPI_SECURITY_WPA:
         case NSAPI_SECURITY_WPA2:
         case NSAPI_SECURITY_WPA_WPA2:
+        case NSAPI_SECURITY_WPA3:
+        case NSAPI_SECURITY_WPA3_WPA2:
             _own_sec = security;
             break;
         case NSAPI_SECURITY_UNKNOWN:
