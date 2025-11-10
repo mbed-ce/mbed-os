@@ -24,9 +24,9 @@
 
 #include "cybsp.h"
 #include "cybsp_wifi.h"
-#include "cy_network_buffer.h"
 #include "cyabs_rtos.h"
 #include "whd_types.h"
+#include "whd_network_types.h"
 #include "cyhal.h"
 #if defined(COMPONENT_BSP_DESIGN_MODUS) || defined(COMPONENT_CUSTOM_DESIGN_MODUS)
 #include "cycfg.h"
@@ -88,16 +88,6 @@ extern "C" {
 static whd_driver_t whd_drv;
 
 extern whd_resource_source_t resource_ops;
-
-static whd_buffer_funcs_t buffer_if_default =
-{
-    .whd_host_buffer_get                       = cy_host_buffer_get,
-    .whd_buffer_release                        = cy_buffer_release,
-    .whd_buffer_get_current_piece_data_pointer = cy_buffer_get_current_piece_data_pointer,
-    .whd_buffer_get_current_piece_size         = cy_buffer_get_current_piece_size,
-    .whd_buffer_set_size                       = cy_buffer_set_size,
-    .whd_buffer_add_remove_at_front            = cy_buffer_add_remove_at_front,
-};
 
 static whd_netif_funcs_t netif_if_default =
 {
@@ -252,10 +242,7 @@ cy_rslt_t cybsp_wifi_init_primary_extended(whd_interface_t* interface,
     {
         resource_if = &resource_ops;
     }
-    if (buffer_if == NULL)
-    {
-        buffer_if = &buffer_if_default;
-    }
+    CY_ASSERT(buffer_if != NULL);
     if (netif_if == NULL)
     {
         netif_if = &netif_if_default;

@@ -505,16 +505,10 @@ bool LPC17_EMAC::link_out(emac_mem_buf_t *p)
     if (notdmasafe) {
         /* Allocate a buffer in DMA memory.
            MEMORY MANAGER HEAP MUST BE IN DMA SAFE MEMORY. */
-        np = memory_manager->alloc_heap(memory_manager->get_total_len(p), 0);
-        if (np == NULL) {
-            memory_manager->free(p);
+        p = memory_manager->realloc_heap(p, 0);
+        if (p == nullptr) {
             return false;
         }
-        memory_manager->copy(np, p);
-        /* use the new buffer for descriptor queueing. The original buffer will
-           be de-allocated. */
-        memory_manager->free(p);
-        p = np;
         dn = 1;
     }
 #else

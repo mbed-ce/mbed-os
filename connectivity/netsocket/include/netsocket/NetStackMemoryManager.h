@@ -18,6 +18,8 @@
 #ifndef NET_STACK_MEMORY_MANAGER_H
 #define NET_STACK_MEMORY_MANAGER_H
 
+#include <optional>
+
 /**
  * Network Stack interface memory manager
  *
@@ -47,7 +49,8 @@
 #include "nsapi.h"
 #include "Callback.h"
 
-typedef void net_stack_mem_buf_t;          // Memory buffer
+// Opaque struct representing a memory buffer or a chain of memory buffers.
+typedef void net_stack_mem_buf_t;
 
 class NetStackMemoryManager {
 protected:
@@ -86,6 +89,21 @@ public:
      * @return         Allocated memory buffer chain, or NULL in case of error
      */
     virtual net_stack_mem_buf_t *alloc_pool(uint32_t size, uint32_t align) = 0;
+
+    /**
+     * @brief Reallocates a buffer or buffer chain as a contiguous (non-chained) heap buffer, freeing the original.
+     *
+     * Only the visible data in the source buffer is copied, not any skipped headers. Data from chained
+     * buffers *will* be copied.
+     *
+     * @param orig_buf Original buffer. Will be freed whether or not the new buffer is allocated.
+     * @param new_align Alignment to allocate the new buffer with
+     * @param new_len If set, this length will be used instead of the buffer's original length
+     * @param new_header_skip_size If set, this header skip size will be set on the new buffer. If unset, no header skip will be set
+     *
+     * @return Pointer to new buffer, or nullptr if allocation failed.
+     */
+    net_stack_mem_buf_t *realloc_heap(net_stack_mem_buf_t *orig_buf, uint32_t new_align, std::optional<uint32_t> new_len = std::nullopt, std::optional<uint16_t> new_header_skip_size = std::nullopt);
 
     /**
      * Get memory buffer pool allocation unit
@@ -131,18 +149,7 @@ public:
     virtual uint32_t get_total_len(const net_stack_mem_buf_t *buf) const = 0;
 
     /**
-     * Copy a memory buffer chain
-     *
-     * Copies data from one buffer chain to another. Copy operation does not adjust the lengths
-     * of the copied-to memory buffer chain, so chain total lengths must be the same.
-     *
-     * @param to_buf    Memory buffer chain to copy to
-     * @param from_buf  Memory buffer chain to copy from
-     */
-    virtual void copy(net_stack_mem_buf_t *to_buf, const net_stack_mem_buf_t *from_buf) = 0;
-
-    /**
-     * Copy to a memory buffer chain
+     * @brief Copy from a raw buffer in memory to a memory buffer chain
      *
      * Copies data to a buffer chain. Copy operation does not adjust the lengths
      * of the copied-to memory buffer chain, so chain total length must match the
@@ -155,9 +162,10 @@ public:
     virtual void copy_to_buf(net_stack_mem_buf_t *to_buf, const void *ptr, uint32_t len);
 
     /**
-     * Copy from a memory buffer chain
+     * @brief Copy from a memory buffer chain to a raw buffer in memory.
      *
-     * Copies data from a memory buffer chain.
+     * Header skip bytes are processed, so the copy will begin AFTER the header bytes of
+     * \c from_buf
      *
      * @param len       Data length
      * @param ptr       Pointer to data
@@ -172,6 +180,8 @@ public:
      * Concatenates buffer chain to end of the other buffer chain. Concatenated-to buffer total length
      * is adjusted accordingly. cat_buf must point to the start of a the chain. After concatenation
      * to_buf's chain now owns those buffers, and they will be freed when the to_buf chain is freed.
+     *
+     * @warning It is forbidden for \c cat_buf to have skipped header bytes.
      *
      * @param to_buf   Memory buffer chain to concatenate to
      * @param cat_buf  Memory buffer chain to concatenate
@@ -207,6 +217,8 @@ public:
     /**
      * Return pointer to the payload of the buffer
      *
+     * Note that this is affected by the current header skip size (see below)
+     *
      * @param buf      Memory buffer
      * @return         Pointer to the payload
      */
@@ -214,6 +226,8 @@ public:
 
     /**
      * Return payload size of this individual buffer (NOT including any chained buffers)
+     *
+     * Note that this is affected by the current header skip size (see below)
      *
      * @param buf      Memory buffer
      * @return         Size in bytes
@@ -225,6 +239,8 @@ public:
      *
      * The allocated payload size will not change. It is not permitted
      * to change the length of a buffer that is not the first (or only) in a chain.
+     *
+     * Note that this is affected by the current header skip size (see below)
      *
      * *Note as of Dec 2024: Different implementations (Nanostack vs LwIP) disagree about
      * how to implement this operation.  Specifically, if called on the head of a buffer
@@ -238,6 +254,51 @@ public:
      * @param len      Payload size, must be less or equal to the allocated size
      */
     virtual void set_len(net_stack_mem_buf_t *buf, uint32_t len) = 0;
+
+    /**
+     * @brief Skips (or un-skips) header space from the buffer.
+     *
+     * Skipping n bytes of header space causes the buffer's payload pointer to refer to a location n bytes after
+     * the base address of the packet buffer, and the length of the buffer to be decreased by n.
+     *
+     * This is commonly used to skip protocol headers in network
+     * packets. For example, if you have an Ethernet frame, skipping 14 bytes of header space will cause
+     * the "start" of the packet buffer to point to the IP header instead.
+     *
+     * Multiple calls to this function add together, so for example if you first skip 14 bytes, then -4, then
+     * 10, the result will be 20 total bytes of skipped header.
+     *
+     * @param buf Buffer to operate on.
+     * @param amount Amount of header space to skip. Negative values are allowed and cause
+     *    previously skipped header space to be removed.
+     *
+     * @warning Skipping a larger total header space than the size of the first buffer in the chain, or skipping a negative
+     *    total header space, results in undefined behavior.
+     */
+    virtual void skip_header_space(net_stack_mem_buf_t *buf, int32_t amount) = 0;
+
+    /**
+     * @brief Restores previously skipped header space to the buffer.
+     *
+     * This function is the inverse of \c skip_header_space().
+     *
+     * @param buf Buffer to operate on.
+     * @param amount Amount of header space to skip. Negative values are allowed and cause
+     *    previously skipped header space to be removed.
+     */
+    inline void restore_header_space(net_stack_mem_buf_t *buf, const int32_t amount)
+    {
+        skip_header_space(buf, -1 * amount);
+    }
+
+    /**
+     * @brief Get the total number of header bytes that are currently being skipped.
+     *
+     * This is the aggregate result of all \c skip_header_space() / \c restore_header_space() calls.
+     *
+     * @param buf Buffer to operate on.
+     */
+    virtual int32_t get_header_skip_size(net_stack_mem_buf_t *buf) = 0;
 
     enum class Lifetime {
         POOL_ALLOCATED, ///< Allocated from the memory manager's pool

@@ -35,8 +35,6 @@ public:
 
     uint32_t get_total_len(const net_stack_mem_buf_t *buf) const override;
 
-    void copy(net_stack_mem_buf_t *to_buf, const net_stack_mem_buf_t *from_buf) override;
-
     void copy_to_buf(net_stack_mem_buf_t *to_buf, const void *ptr, uint32_t len) override;
 
     uint32_t copy_from_buf(void *ptr, uint32_t len, const net_stack_mem_buf_t *from_buf) const override;
@@ -52,6 +50,10 @@ public:
     void set_len(net_stack_mem_buf_t *buf, uint32_t len) override;
 
     Lifetime get_lifetime(const net_stack_mem_buf_t *buf) const override;
+
+    void skip_header_space(net_stack_mem_buf_t *buf, int32_t amount) override;
+
+    int32_t get_header_skip_size(net_stack_mem_buf_t *buf) override;
 
 private:
 

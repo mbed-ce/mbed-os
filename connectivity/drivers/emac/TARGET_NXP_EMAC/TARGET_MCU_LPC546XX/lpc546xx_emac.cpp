@@ -397,17 +397,11 @@ bool LPC546XX_EMAC::link_out(emac_mem_buf_t *buf)
     // If buffer is chained or not aligned then make a contiguous aligned copy of it
     if (memory_manager->get_next(buf) ||
             reinterpret_cast<uint32_t>(memory_manager->get_ptr(buf)) % ENET_BUFF_ALIGNMENT) {
-        emac_mem_buf_t *copy_buf;
-        copy_buf = memory_manager->alloc_heap(memory_manager->get_total_len(buf), ENET_BUFF_ALIGNMENT);
-        if (NULL == copy_buf) {
-            memory_manager->free(buf);
-            return false;
-        }
 
-        // Copy to new buffer and free original
-        memory_manager->copy(copy_buf, buf);
-        memory_manager->free(buf);
-        buf = copy_buf;
+        buf = memory_manager->realloc_heap(buf, ENET_BUFF_ALIGNMENT);
+        if(buf == nullptr) {
+          return false;
+        }
     }
 
     /* Check if a descriptor is available for the transfer. */

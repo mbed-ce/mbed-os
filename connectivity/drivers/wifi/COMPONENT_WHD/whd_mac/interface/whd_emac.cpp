@@ -22,8 +22,6 @@
 
 #include "cmsis_os.h"
 #include "whd_emac.h"
-#include "lwip/etharp.h"
-#include "lwip/ethip6.h"
 #include "events/mbed_shared_queues.h"
 #include "whd_wlioctl.h"
 #include "whd_buffer_api.h"
@@ -31,6 +29,8 @@
 #include "cybsp_wifi.h"
 #include "emac_eapol.h"
 #include "cy_result.h"
+
+#include "WhdMemoryManagerInterface.h"
 
 #if defined(CY_EXT_WIFI_FW_STORAGE) && !MBED_CONF_TARGET_XIP_ENABLE
 #include "cy_ext_wifi_fw_reserved_region_bd.h"
@@ -87,7 +87,25 @@ void WHD_EMAC::remove_multicast_group(const uint8_t *addr)
 
 void WHD_EMAC::set_all_multicast(bool all)
 {
-    /* No-op at this stage */
+    // Sadly, the WHD wifi modules do not have a "pass all multicast" option. And extra sadly,
+    // nanostack does not track individual multicast subscriptions and just calls this function
+    // at bootup.
+    // So, we have to do an awful hack here of adding the "all systems" and "all routers" multicast
+    // addresses when this is enabled so that Nanostack's IPv6 stack can work. This is gross because
+    // it means subscribing to other multicast groups with Nanostack won't work, but it's the best
+    // we can do for now.
+
+    uint8_t ALL_SYSTEMS_MCAST_MAC[] = {0x33, 0x33, 0x00, 0x00, 0x00, 0x01};
+    uint8_t ALL_ROUTERS_MCAST_MAC[] = {0x33, 0x33, 0x00, 0x00, 0x00, 0x01};
+
+    if(all) {
+        add_multicast_group(ALL_SYSTEMS_MCAST_MAC);
+        add_multicast_group(ALL_ROUTERS_MCAST_MAC);
+    }
+    else {
+        remove_multicast_group(ALL_SYSTEMS_MCAST_MAC);
+        remove_multicast_group(ALL_ROUTERS_MCAST_MAC);
+    }
 }
 
 void WHD_EMAC::power_down()
@@ -122,11 +140,11 @@ bool WHD_EMAC::power_up()
                 reserved_region_bd->init();
 
                 extern whd_resource_source_t cy_ext_wifi_fw_resource_ops;
-                res = cybsp_wifi_init_primary_extended(&ifp /* OUT */, &cy_ext_wifi_fw_resource_ops, NULL, NULL);
+                res = cybsp_wifi_init_primary_extended(&ifp /* OUT */, &cy_ext_wifi_fw_resource_ops, &buffer_funcs.value(), NULL);
 
                 reserved_region_bd->deinit();
 #else
-                res = cybsp_wifi_init_primary(&ifp /* OUT */);
+                res = cybsp_wifi_init_primary_extended(&ifp /* OUT */, nullptr, &buffer_funcs.value(), nullptr);
 #endif /* defined(CY_EXT_WIFI_FW_STORAGE) && !MBED_CONF_TARGET_XIP_ENABLE */
             } else {
                 ifp = emac_other.ifp;
@@ -182,33 +200,34 @@ void WHD_EMAC::set_link_state_cb(emac_link_state_change_cb_t state_cb)
 
 void WHD_EMAC::set_memory_manager(EMACMemoryManager &mem_mngr)
 {
+    // Ignore if we are using the same memory manager already
+    if(&mem_mngr == memory_manager) {
+        return;
+    }
+
+    MBED_ASSERT(!powered_up);
     memory_manager = &mem_mngr;
+    buffer_funcs.emplace(getMbedWHDBufferFuncs(mem_mngr));
 }
 
 bool WHD_EMAC::link_out(emac_mem_buf_t *buf)
 {
-    uint16_t offset = 64;
-    whd_buffer_t buffer;
+    // Currently we always need to copy the buffer, because the driver needs both some header space before the buffer,
+    // and 64 bytes padding after the buffer. Currently there is no way to force the IP stack(s) to allocate
+    // extra space in this manner, so we can't implement 0-copy Tx. Note that LwIP does have
+    // PBUF_LINK_ENCAPSULATION_HLEN which does half of this but we are still missing the other half.
 
-    uint16_t size = memory_manager->get_total_len(buf);
+    buf = memory_manager->realloc_heap(buf, WHD_MEM_BUFFER_ALIGNMENT, memory_manager->get_total_len(buf) + WHD_MEM_BUFFER_EXTRA_SPACE, MBED_CONF_CY_PSOC6_WHD_TX_BUFFER_HEADER_SPACE);
 
-    whd_result_t res = whd_host_buffer_get(drvp, &buffer, WHD_NETWORK_TX, size + offset, WHD_TRUE);
-    if (res != WHD_SUCCESS) {
-        memory_manager->free(buf);
-        return true;
+    if(!buf) {
+        return false;
     }
-    MBED_ASSERT(res == WHD_SUCCESS);
-
-    whd_buffer_add_remove_at_front(drvp, &buffer, offset);
-
-    void *dest = whd_buffer_get_current_piece_data_pointer(drvp, buffer);
-    memory_manager->copy_from_buf(dest, size, buf);
 
     if (activity_cb) {
         activity_cb(true);
     }
-    whd_network_send_ethernet_data(ifp, buffer);
-    memory_manager->free(buf);
+
+    whd_network_send_ethernet_data(ifp, buf);
     return true;
 }
 
@@ -264,8 +283,6 @@ extern "C"
 
     void cy_network_process_ethernet_data(whd_interface_t ifp, whd_buffer_t buffer)
     {
-        emac_mem_buf_t *mem_buf = NULL;
-
         WHD_EMAC &emac = WHD_EMAC::get_instance(ifp->role);
 
         if (!emac.powered_up || !emac.emac_link_input_cb) {
@@ -274,16 +291,12 @@ extern "C"
             return;
         }
 
-        uint8_t *data = whd_buffer_get_current_piece_data_pointer(emac.drvp, buffer);
-
-        uint16_t size = whd_buffer_get_current_piece_size(emac.drvp, buffer);
-
+        uint8_t const * const data = whd_buffer_get_current_piece_data_pointer(emac.drvp, buffer);
+        uint16_t const size = whd_buffer_get_current_piece_size(emac.drvp, buffer);
 
         if (size > WHD_ETHERNET_SIZE) {
 
-            uint16_t ethertype;
-
-            ethertype = (uint16_t)(data[12] << 8 | data[13]);
+            const uint16_t ethertype = (uint16_t)(data[12] << 8 | data[13]);
 
             if (ethertype == EAPOL_PACKET_TYPE) {
 
@@ -291,11 +304,14 @@ extern "C"
                 emac_receive_eapol_packet(ifp, buffer);
 
             } else {
-                mem_buf = buffer;
                 if (emac.activity_cb) {
                     emac.activity_cb(false);
                 }
-                emac.emac_link_input_cb(mem_buf);
+
+                // The WHD layer allocates buffers with extra size used in SDIO reads. Trim off this size now.
+                emac.memory_manager->set_len(buffer, size);
+
+                emac.emac_link_input_cb(buffer);
             }
         }
     }

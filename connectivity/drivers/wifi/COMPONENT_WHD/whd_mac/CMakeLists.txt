@@ -16,6 +16,7 @@ target_sources(mbed-wifi
         interface/WhdSTAInterface.cpp
         interface/WhdSoftAPInterface.cpp
         interface/whd_emac.cpp
+        interface/WhdMemoryManagerInterface.cpp
         interface/whd_interface.cpp
 
         utils/cydhcp_server_debug.cpp
