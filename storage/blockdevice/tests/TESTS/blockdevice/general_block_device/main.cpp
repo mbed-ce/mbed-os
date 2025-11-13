@@ -704,7 +704,6 @@ void test_contiguous_erase_write_read()
     TEST_ASSERT_EQUAL(0, err);
 
     // Loop through all write/read regions
-    int region = 0;
 #if COMPONENT_SPINAND
     for (; start_address < stop_address; start_address += 0x40000) {
 #else
