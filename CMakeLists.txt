@@ -283,6 +283,20 @@ if(NOT MBED_IS_NATIVE_BUILD)
     mbed_apply_mcu_target_file_disables()
 endif()
 
+# Determine Cortex core type from target labels
+set(CORTEX_CORE_LABEL "")
+foreach(core_label ${MBED_TARGET_LABELS})
+    if(${core_label} MATCHES "CORTEX_A")
+        set(CORTEX_CORE_LABEL "CORTEX_A")
+    elseif(${core_label} MATCHES "CORTEX_M")
+        set(CORTEX_CORE_LABEL "CORTEX_M")
+    endif()
+endforeach()
+
+if(CORTEX_CORE_LABEL STREQUAL "")
+    message(FATAL_ERROR "Could not determine Cortex core type from target labels: ${MBED_TARGET_LABELS}")
+endif()
+    
 add_subdirectory(cmsis)
 add_subdirectory(drivers)
 add_subdirectory(hal)
@@ -295,7 +309,7 @@ add_subdirectory(connectivity)
 # The directories below contain optional target libraries
 add_subdirectory(drivers/device_key EXCLUDE_FROM_ALL)
 add_subdirectory(features EXCLUDE_FROM_ALL)
-add_subdirectory(cmsis/CMSIS_5/CMSIS/RTOS2 EXCLUDE_FROM_ALL)
+add_subdirectory(cmsis/CMSIS_cmake EXCLUDE_FROM_ALL)
 add_subdirectory(cmsis/device/rtos EXCLUDE_FROM_ALL)
 
 # Create top-level targets  ----------------------------------------------------------------------------------

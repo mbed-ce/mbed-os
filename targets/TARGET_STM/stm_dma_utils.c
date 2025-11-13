@@ -24,8 +24,8 @@
 #include <string.h>
 
 #ifdef MBED_CONF_RTOS_PRESENT
-#include "cmsis_os.h"
-#include "cmsis_os2.h"
+#include "rtx_os.h"
+#include "mbed_rtos1_types.h"
 static osMutexId dmaMutex;
 static osRtxMutex_t dmaMutexMem;
 #endif
@@ -50,7 +50,7 @@ void stm_init_dma_mutex()
 void stm_lock_dma_mutex()
 {
 #ifdef MBED_CONF_RTOS_PRESENT
-    osMutexWait(dmaMutex, osWaitForever);
+    osMutexAcquire(dmaMutex, osWaitForever);
 #endif
 }
 

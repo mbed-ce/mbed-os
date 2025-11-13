@@ -95,11 +95,7 @@ static void powerdown_nvic()
         NVIC->ICER[i] = 0xFFFFFFFF;
         NVIC->ICPR[i] = 0xFFFFFFFF;
         for (j = 0; j < 8; j++) {
-#if defined(__CORTEX_M23) || defined(__CORTEX_M33)
             NVIC->IPR[i * 8 + j] = 0x00000000;
-#else
-            NVIC->IP[i * 8 + j] = 0x00000000;
-#endif
         }
     }
 }
