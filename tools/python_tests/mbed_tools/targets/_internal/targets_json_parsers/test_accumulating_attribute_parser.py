@@ -7,6 +7,7 @@
 from unittest import TestCase, mock
 import copy
 
+from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import (
     ALL_ACCUMULATING_ATTRIBUTES,
     get_accumulating_attributes_for_target,
@@ -60,35 +61,42 @@ class TestGetAccumulatingAttributes(TestCase):
 class TestParseHierarchy(TestCase):
     def test_accumulate_hierarchy_single_inheritance(self):
         all_targets_data = {
-            "D": {"attribute_1": ["some things"]},
-            "C": {"inherits": ["D"], "attribute_2": "something else"},
-            "B": {},
-            "A": {"inherits": ["C"], "attribute_3": ["even more things"]},
-        }
-        result = _targets_accumulate_hierarchy(all_targets_data, "A")
-
-        self.assertEqual(result, [all_targets_data["A"], all_targets_data["C"], all_targets_data["D"]])
-
-    def test_accumulate_hierarchy_multiple_inheritance(self):
-        all_targets_data = {
-            "F": {"attribute_1": "some thing"},
-            "E": {"attribute_2": "some other thing"},
-            "D": {"inherits": ["F"]},
-            "C": {"inherits": ["E"]},
-            "B": {"inherits": ["C", "D"]},
-            "A": {"inherits": ["B"]},
+            "D": TargetJSON(),
+            "C": TargetJSON(inherits=["D"]),
+            "B": TargetJSON(),
+            "A": TargetJSON(inherits=["C"]),
         }
         result = _targets_accumulate_hierarchy(all_targets_data, "A")
 
         self.assertEqual(
             result,
             [
-                all_targets_data["A"],
-                all_targets_data["B"],
-                all_targets_data["C"],
-                all_targets_data["D"],
-                all_targets_data["E"],
-                all_targets_data["F"],
+                all_targets_data["A"].model_dump(exclude_unset=True),
+                all_targets_data["C"].model_dump(exclude_unset=True),
+                all_targets_data["D"].model_dump(exclude_unset=True),
+            ],
+        )
+
+    def test_accumulate_hierarchy_multiple_inheritance(self):
+        all_targets_data = {
+            "F": TargetJSON(),
+            "E": TargetJSON(macros=["foo"]),  # Set an attribute so that it does not compare equal to target F
+            "D": TargetJSON(inherits=["F"]),
+            "C": TargetJSON(inherits=["E"]),
+            "B": TargetJSON(inherits=["C", "D"]),
+            "A": TargetJSON(inherits=["B"]),
+        }
+        result = _targets_accumulate_hierarchy(all_targets_data, "A")
+
+        self.assertEqual(
+            result,
+            [
+                all_targets_data["A"].model_dump(exclude_unset=True),
+                all_targets_data["B"].model_dump(exclude_unset=True),
+                all_targets_data["C"].model_dump(exclude_unset=True),
+                all_targets_data["D"].model_dump(exclude_unset=True),
+                all_targets_data["E"].model_dump(exclude_unset=True),
+                all_targets_data["F"].model_dump(exclude_unset=True),
             ],
         )
 

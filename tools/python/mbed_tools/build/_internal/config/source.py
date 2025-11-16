@@ -30,7 +30,8 @@ def from_file(
         "file " + str(config_source_file_path),
         decode_json_file(config_source_file_path),
         source_name=default_name,
-        target_filters=target_filters)
+        target_filters=target_filters,
+    )
 
 
 def prepare(
@@ -97,6 +98,7 @@ def check_and_transform_config_name(context: str, config_name: str) -> str:
         )
 
     return config_name.replace("_", "-")
+
 
 def from_mbed_lib_json_file(
     mbed_lib_json_path: pathlib.Path, target_filters: Iterable[str]
@@ -300,7 +302,9 @@ def _extract_target_overrides(
     return _extract_overrides(context, namespace, valid_target_data)
 
 
-def _extract_overrides(context: str, namespace: str, override_data: dict[str, schemas.ConfigSettingValue]) -> List[Override]:
+def _extract_overrides(
+    context: str, namespace: str, override_data: dict[str, schemas.ConfigSettingValue]
+) -> List[Override]:
     overrides = []
     for name, value in override_data.items():
         split_results = name.split(".", maxsplit=1)

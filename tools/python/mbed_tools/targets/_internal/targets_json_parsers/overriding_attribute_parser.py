@@ -28,7 +28,8 @@ from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import ALL_ACCUMULATING_ATTRIBUTES
 
 MERGING_ATTRIBUTES = ("config", "overrides", "memory_banks", "memory_overrides")
-NON_OVERRIDING_ATTRIBUTES = (*ALL_ACCUMULATING_ATTRIBUTES, "public", "inherits", "is_mcu_family_target")
+NON_INHERITED_ATTRIBUTES = ("public", "inherits", "is_mcu_family_target")
+NON_OVERRIDING_ATTRIBUTES = ALL_ACCUMULATING_ATTRIBUTES + NON_INHERITED_ATTRIBUTES
 
 
 def get_overriding_attributes_for_target(all_targets_data: Dict[str, TargetJSON], target_name: str) -> Dict[str, Any]:

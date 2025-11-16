@@ -22,6 +22,7 @@ from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_pa
 from mbed_tools.targets._internal.targets_json_parsers.overriding_attribute_parser import (
     get_labels_for_target,
     get_overriding_attributes_for_target,
+    NON_INHERITED_ATTRIBUTES,
 )
 
 INTERNAL_PACKAGE_DIR = pathlib.Path(__file__).parent
@@ -42,7 +43,9 @@ class TargetNotFoundError(TargetAttributesError):
     """Target definition not found in targets.json."""
 
 
-def get_target_attributes(targets_json_data: dict[str, TargetJSON], target_name: str, allow_non_public_targets: bool = False) -> dict:
+def get_target_attributes(
+    targets_json_data: dict[str, TargetJSON], target_name: str, allow_non_public_targets: bool = False
+) -> dict:
     """
     Retrieves attribute data taken from targets.json for a single target.
 
@@ -108,6 +111,14 @@ def _extract_full_target_definition(
     target_attributes = get_overriding_attributes_for_target(all_targets_data, target_name)
     accumulated_attributes = get_accumulating_attributes_for_target(all_targets_data, target_name)
     target_attributes.update(accumulated_attributes)
+
+    # Lastly, manually move over non-inherited attributes to the final target, except for "inherits"
+    # which we would like to discard (it has already served its purpose).
+    target_data_as_dict = all_targets_data[target_name].model_dump(exclude_unset=True)
+    for attr_name in NON_INHERITED_ATTRIBUTES:
+        if attr_name != "inherits":
+            if attr_name in target_data_as_dict:
+                target_attributes[attr_name] = target_data_as_dict[attr_name]
 
     # Once we have combined together all the target attributes, we can combine them into one target JSON
     # model again.
