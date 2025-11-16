@@ -25,7 +25,9 @@ class ConfigEntryDetails(BaseModel):
     macro_name: str | None = None
     """
     Name of the macro that this setting shall generate. If unset, defaults to 
-    'MBED_CONF_<namespace uppercase>_<config entry name uppercase>'
+    'MBED_CONF_<namespace uppercase>_<config entry name uppercase>', where
+    <namespace> is the current namespace, i.e. the value of the "name" property for mbed_lib.json5 files, 
+    "target" for targets.json5 entries, and "app" in mbed_app.json5.
     """
 
     value: ConfigSettingValue = None
@@ -61,16 +63,31 @@ class ConfigEntryDetails(BaseModel):
 
         return self
 
+class MemoryBankConfiguration(BaseModel):
+    """
+    Configuration of one memory bank in JSON.
+    This is a "mini" version of MemoryBankDefinition that just allows setting the size and start address.
+    """
+
+    start: int | None = None
+    """
+    Start address of the memory region.
+    """
+
+    size: int | None = None
+    """
+    Size of the memory region in bytes.
+    """
 
 class BaseJSONConfig(BaseModel):
     """
-    Base schema for JSON config files. This schema applies to mbed_app.json5 and mbed_lib.json5,
-    as well as each entry in targets.json5
+    Base schema for JSON config files. This schema is the parent of the schemas for mbed_app.json5 and mbed_lib.json5,
+    as well as each entry in targets.json5.
     """
 
     config: dict[str, ConfigSettingValue | ConfigEntryDetails] = Field(default_factory=dict)
     """
-    Configuration items for this library. These can be defined directly as "name": default value, or as
+    Configuration items for this library or app. These can be defined directly as "name": default value, or as
     "name": {details...} (see ConfigEntryDetails above). Using details is recommended as it allows
     adding documentation for the setting.
     
@@ -87,7 +104,7 @@ class BaseJSONConfig(BaseModel):
     In target JSON, this is an accumulating attribute.
     """
 
-    overrides: dict[str, ConfigSettingValue] = Field(default_factory=dict)
+    overrides: dict[str, ConfigSettingValue | MemoryBankConfiguration] = Field(default_factory=dict)
     """
     List of overrides to unconditionally apply when this lib is included.
     
@@ -106,8 +123,25 @@ class BaseJSONConfig(BaseModel):
     Override order between different mbed_lib.json5 files is not currently defined but should not matter
     because they cannot override settings from targets.json5 or other mbed_lib.json5 files.
     
+    Note that, in mbed_app.json only, the "target.memory_bank_config" setting may be included in this list
+    in order to specify memory bank configuration. Its value is a MemoryBankConfiguration rather than a regular
+    primitive type.
+    
     In target JSON, this is a merging attribute.
     """
+
+    @model_validator(mode="after")
+    def verify_memory_bank_config_used_where_appropriate(self) -> Self:
+        for name, value in self.overrides.items():
+            if name == "target.memory_bank_config":
+                if self.__class__ != MbedAppJSON:
+                    raise ValueError("target.memory_bank_config is only allowed in \"overrides\" mbed_app.json5!")
+                if not isinstance(value, MemoryBankConfiguration):
+                    raise ValueError("target.memory_bank_config in \"overrides\" must be a MemoryBankConfiguration schema element!")
+            else:
+                if isinstance(value, MemoryBankConfiguration):
+                    raise ValueError("Only target.memory_bank_config in \"overrides\" may be a dict! Everything else must be a primitive type!")
+        return self
 
 
 class MbedLibJSON(BaseJSONConfig):
@@ -138,7 +172,7 @@ class MbedLibJSON(BaseJSONConfig):
     
     would apply the override only for targets in the MIMXRT105X target family.
     
-    The magic target label "*" is always true and is equivalent to using the "overrides" section.
+    The magic target label "*" is always present and is equivalent to using the "overrides" section.
     
     Also note that the override priority between different sections within target_overrides, and between 
     target_overrides and overrides, is not currently defined. So, if you override the same setting in both,
@@ -186,22 +220,6 @@ class MemoryBankDefinition(BaseModel):
     """
 
     size: int
-    """
-    Size of the memory region in bytes.
-    """
-
-class MemoryBankConfiguration(BaseModel):
-    """
-    Configuration of one memory bank in JSON.
-    This is a "mini" version of MemoryBankDefinition that just allows setting the size and start address.
-    """
-
-    start: int | None = None
-    """
-    Start address of the memory region.
-    """
-
-    size: int | None = None
     """
     Size of the memory region in bytes.
     """
@@ -527,3 +545,46 @@ class TargetJSON(BaseJSONConfig):
     
     This is an overriding attribute.
     """
+
+class MbedAppJSON(BaseJSONConfig):
+    """
+    Schema for mbed_app.json5 files.
+    """
+
+    target_overrides: dict[str, dict[str, ConfigSettingValue | MemoryBankConfiguration]] = Field(default_factory=dict)
+    """
+    List of overrides applied based on target labels. This is similar to the "overrides" section,
+    but allows applying the override only if the target has a specific label. Labels generally
+    come from the names of the target and its parents, but targets can also add extra ones.
+    For example:
+    
+    "target_overrides": {
+        "MIMXRT105X": {
+            "some-setting": some-value
+        }
+    }
+    
+    would apply the override only for targets in the MIMXRT105X target family.
+    
+    The magic target label "*" is always present and is equivalent to using the "overrides" section.
+    
+    Note that the "target.memory_bank_config" setting may be included in this list
+    in order to specify memory bank configuration. Its value is a MemoryBankConfiguration rather than a regular
+    primitive type.
+    
+    Also note that the override priority between different sections within target_overrides, and between 
+    target_overrides and overrides, is not currently defined. So, if you override the same setting in both,
+    results may not be what you expect.
+    """
+
+    @model_validator(mode="after")
+    def verify_target_memory_bank_config_used_where_appropriate(self) -> Self:
+        for overrides in self.target_overrides.values():
+            for name, value in overrides.items():
+                if name == "target.memory_bank_config":
+                    if not isinstance(value, MemoryBankConfiguration):
+                        raise ValueError("target.memory_bank_config in \"target_overrides\" must be a MemoryBankConfiguration schema element!")
+                else:
+                    if isinstance(value, MemoryBankConfiguration):
+                        raise ValueError("Only target.memory_bank_config in \"target_overrides\" may be a dict! Everything else must be a primitive type!")
+        return self
