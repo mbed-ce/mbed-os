@@ -66,7 +66,7 @@ def prepare(
         data["overrides"] = _extract_overrides(context, namespace, data["overrides"])
 
     if "target_overrides" in data:
-        data["overrides"] = _extract_target_overrides(
+        data["overrides"] = data.get("overrides", []) + _extract_target_overrides(
             context, namespace, data.pop("target_overrides"), target_filters if target_filters is not None else []
         )
 
