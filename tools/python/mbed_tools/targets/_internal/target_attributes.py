@@ -13,6 +13,7 @@ import logging
 import pathlib
 from typing import Any, Dict, Optional, Set
 
+from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.lib.exceptions import ToolsError
 from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import (
@@ -41,7 +42,7 @@ class TargetNotFoundError(TargetAttributesError):
     """Target definition not found in targets.json."""
 
 
-def get_target_attributes(targets_json_data: dict, target_name: str, allow_non_public_targets: bool = False) -> dict:
+def get_target_attributes(targets_json_data: dict[str, TargetJSON], target_name: str, allow_non_public_targets: bool = False) -> dict:
     """
     Retrieves attribute data taken from targets.json for a single target.
 
@@ -57,7 +58,14 @@ def get_target_attributes(targets_json_data: dict, target_name: str, allow_non_p
         ParsingTargetJSONError: error parsing targets.json
         TargetNotFoundError: there is no target attribute data found for that target.
     """
-    target_attributes = _extract_target_attributes(targets_json_data, target_name, allow_non_public_targets)
+
+    target_definition = _extract_full_target_definition(targets_json_data, target_name, allow_non_public_targets)
+
+    # At this point, for now, we stop using the schema and just convert into a dict, as this is where
+    # lots of additional, often undocumented attributes start getting added by the config system.
+    # Someday this may be refactored more to remove the use of dicts entirely...
+    target_attributes = target_definition.model_dump(exclude_unset=True)
+
     target_attributes["labels"] = get_labels_for_target(targets_json_data, target_name).union(
         _extract_core_labels(target_attributes.get("core", None))
     )
@@ -71,11 +79,11 @@ def get_target_attributes(targets_json_data: dict, target_name: str, allow_non_p
     return target_attributes
 
 
-def _extract_target_attributes(
-    all_targets_data: Dict[str, Any], target_name: str, allow_non_public_targets: bool
-) -> dict:
+def _extract_full_target_definition(
+    all_targets_data: Dict[str, TargetJSON], target_name: str, allow_non_public_targets: bool
+) -> TargetJSON:
     """
-    Extracts the definition for a particular target from all the targets in targets.json.
+    Extracts the definition for a particular target from all the targets in targets.json, processing the inheritance hierarchy.
 
     Args:
         all_targets_data: a dictionary representation of the raw targets.json data.
@@ -93,14 +101,17 @@ def _extract_target_attributes(
         raise TargetNotFoundError(msg)
 
     # All target definitions are assumed to be public unless specifically set as public=false
-    if not all_targets_data[target_name].get("public", True) and not allow_non_public_targets:
+    if not all_targets_data[target_name].public and not allow_non_public_targets:
         msg = f"Cannot get attributes for {target_name} because it is marked non-public in targets JSON.  This likely means you set MBED_TARGET to the name of the MCU rather than the name of the board."
         raise TargetNotFoundError(msg)
 
     target_attributes = get_overriding_attributes_for_target(all_targets_data, target_name)
     accumulated_attributes = get_accumulating_attributes_for_target(all_targets_data, target_name)
     target_attributes.update(accumulated_attributes)
-    return target_attributes
+
+    # Once we have combined together all the target attributes, we can combine them into one target JSON
+    # model again.
+    return TargetJSON.model_validate(target_attributes)
 
 
 def _extract_core_labels(target_core: Optional[str]) -> Set[str]:

@@ -26,11 +26,15 @@ def from_file(
     config_source_file_path: pathlib.Path, target_filters: Iterable[str], default_name: Optional[str] = None
 ) -> dict:
     """Load a JSON config file and prepare the contents as a config source."""
-    return prepare(decode_json_file(config_source_file_path), source_name=default_name, target_filters=target_filters)
+    return prepare(
+        "file " + str(config_source_file_path),
+        decode_json_file(config_source_file_path),
+        source_name=default_name,
+        target_filters=target_filters)
 
 
 def prepare(
-    input_data: dict, source_name: Optional[str] = None, target_filters: Optional[Iterable[str]] = None
+    context: str, input_data: dict, source_name: Optional[str] = None, target_filters: Optional[Iterable[str]] = None
 ) -> dict:
     """
     Prepare a config source for entry into the Config object.
@@ -39,6 +43,8 @@ def prepare(
     lists of objects which are namespaced in the way the Mbed config system expects.
 
     Args:
+        context String that will be printed when issuing warnings. Should be something like
+            "file foo.json" or "target MCU_FOO".
         input_data: The raw config JSON object parsed from the config file.
         source_name: Optional default name to use for namespacing config settings. If the input_data contains a 'name'
             field, that field is used as the namespace.
@@ -54,36 +60,43 @@ def prepare(
         data[key] = _sanitise_value(data[key])
 
     if "config" in data:
-        data["config"] = _extract_config_settings(namespace, data["config"])
+        data["config"] = _extract_config_settings(context, namespace, data["config"])
 
     if "overrides" in data:
-        data["overrides"] = _extract_overrides(namespace, data["overrides"])
+        data["overrides"] = _extract_overrides(context, namespace, data["overrides"])
 
     if "target_overrides" in data:
         data["overrides"] = _extract_target_overrides(
-            namespace, data.pop("target_overrides"), target_filters if target_filters is not None else []
+            context, namespace, data.pop("target_overrides"), target_filters if target_filters is not None else []
         )
 
     return data
 
 
-def _check_config_name(file_path: pathlib.Path, config_name: str) -> None:
+def check_and_transform_config_name(context: str, config_name: str) -> str:
     """
-    Issue a warning if a config name is not recommended to be used.
+    Issue a warning if a config name is not recommended to be used, and transform the name into the recommended format.
+
+    :param context: String that will be printed about where this warning comes from. Should be something like
+        "file foo.json" or "target MCU_FOO".
+    :param config_name: Name of config
+
+    :return: New name to use for the config.
     """
     if config_name.lower() != config_name:
         logger.warning(
-            f"Config setting '{config_name}' in file {file_path} contains uppercase letters. This style is not recommended."
+            f"Config setting '{config_name}' in {context} contains uppercase letters. This style is not recommended."
         )
     if "." in config_name:
         logger.warning(
-            f"Config setting '{config_name}' in file {file_path} contains a period. This style is not recommended as it may cause confusion with the config namespace name."
+            f"Config setting '{config_name}' in {context} contains a period. This style is not recommended as it may cause confusion with the config namespace name."
         )
     if "_" in config_name:
         logger.warning(
-            f"Config setting '{config_name}' in file {file_path} contains an underscore. This style is not recommended as it may cause confusion (config names should be in skewer-case). Underscores will be replaced by hyphens when Mbed processes JSON settings."
+            f"Config setting '{config_name}' in {context} contains an underscore. This style is not recommended as it may cause confusion (config names should be in skewer-case). Underscores are replaced by hyphens when Mbed processes JSON settings."
         )
 
+    return config_name.replace("_", "-")
 
 def from_mbed_lib_json_file(
     mbed_lib_json_path: pathlib.Path, target_filters: Iterable[str]
@@ -101,11 +114,13 @@ def from_mbed_lib_json_file(
     Returns:
         Prepared config source.
     """
+    context = "file " + str(mbed_lib_json_path)
+
     # Load JSON file using schema
     try:
         mbed_lib = schemas.MbedLibJSON.model_validate(decode_json_file(mbed_lib_json_path), extra="forbid", strict=True)
     except pydantic.ValidationError as ex:
-        logger.error(f"{mbed_lib_json_path!s} did not validate against the schema for mbed_lib.json5!")
+        logger.error(f"{context} did not validate against the schema for mbed_lib.json5!")
         raise ex
 
     config_source = {}
@@ -127,10 +142,8 @@ def from_mbed_lib_json_file(
                 )
                 continue
 
-            _check_config_name(mbed_lib_json_path, config_name)
-
             # Remove all underscores in the setting name and replace with hyphens, as this makes settings harder to get wrong
-            config_name = config_name.replace("_", "-")
+            config_name = check_and_transform_config_name(context, config_name)
 
             logger.debug("Extracting config setting from '%s': '%s'='%s'", mbed_lib.name, config_name, item)
             if isinstance(item, schemas.ConfigEntryDetails):
@@ -157,7 +170,9 @@ def from_mbed_lib_json_file(
                 )
             settings.append(setting)
 
-        config_source["settings"] = settings
+        # Note: I believe this needs to be before 'overrides' in the dict for the logic in
+        # config.Config to work
+        config_source["config"] = settings
 
     # Process macros
     if mbed_lib.macros is not None and len(mbed_lib.macros) > 0:
@@ -165,12 +180,12 @@ def from_mbed_lib_json_file(
 
     # Process overrides
     if len(mbed_lib.overrides) > 0:
-        config_source["overrides"] = _extract_overrides(mbed_lib.namespace, mbed_lib.overrides)
+        config_source["overrides"] = _extract_overrides(context, mbed_lib.namespace, mbed_lib.overrides)
 
     # Process target overrides
     if len(mbed_lib.target_overrides) > 0:
         target_overrides = _extract_target_overrides(
-            mbed_lib.name, mbed_lib.target_overrides, target_filters if target_filters is not None else []
+            context, mbed_lib.name, mbed_lib.target_overrides, target_filters if target_filters is not None else []
         )
 
         config_source["overrides"] = config_source.get("overrides", []) + target_overrides
@@ -227,6 +242,7 @@ class Override:
     Checks for _add or _remove modifiers and splits them from the name.
     """
 
+    context: str
     namespace: str
     name: str
     value: schemas.ConfigSettingValue
@@ -240,7 +256,7 @@ class Override:
         self.value = _sanitise_value(self.value)
 
 
-def _extract_config_settings(namespace: str, config_data: dict) -> List[ConfigSetting]:
+def _extract_config_settings(context: str, namespace: str, config_data: dict) -> List[ConfigSetting]:
     settings = []
     for name, item in config_data.items():
         logger.debug("Extracting config setting from '%s': '%s'='%s'", namespace, name, item)
@@ -252,6 +268,8 @@ def _extract_config_settings(namespace: str, config_data: dict) -> List[ConfigSe
             macro_name = None
             help_text = None
             value = item
+
+        name = check_and_transform_config_name(context, name)
 
         setting = ConfigSetting(namespace=namespace, name=name, macro_name=macro_name, help_text=help_text, value=value)
         # If the config item is about a certain component or feature
@@ -269,6 +287,7 @@ def _extract_config_settings(namespace: str, config_data: dict) -> List[ConfigSe
 
 
 def _extract_target_overrides(
+    context: str,
     namespace: str,
     target_override_data: dict[str, dict[str, schemas.ConfigSettingValue]],
     allowed_target_labels: Iterable[str],
@@ -278,10 +297,10 @@ def _extract_target_overrides(
         if target_type == "*" or target_type in allowed_target_labels:
             valid_target_data.update(override)
 
-    return _extract_overrides(namespace, valid_target_data)
+    return _extract_overrides(context, namespace, valid_target_data)
 
 
-def _extract_overrides(namespace: str, override_data: dict[str, schemas.ConfigSettingValue]) -> List[Override]:
+def _extract_overrides(context: str, namespace: str, override_data: dict[str, schemas.ConfigSettingValue]) -> List[Override]:
     overrides = []
     for name, value in override_data.items():
         split_results = name.split(".", maxsplit=1)
@@ -296,14 +315,14 @@ def _extract_overrides(namespace: str, override_data: dict[str, schemas.ConfigSe
 
         if override_namespace not in {namespace, "target"} and namespace != "app":
             msg = (
-                "It is only possible to override config settings defined in an mbed_lib.json from mbed_app.json. "
-                f"An override was defined by the lib `{namespace}` that attempts to override "
-                f"`{override_namespace}.{override_name}`."
+                "mbed_lib.json files may only override their own settings and settings from targets.json5."
+                f"An override was defined by {context} that attempts to override "
+                f"`{override_namespace}.{override_name}`, which is not allowed."
             )
 
             raise InvalidConfigOverrideError(msg)
 
-        overrides.append(Override(namespace=override_namespace, name=override_name, value=value))
+        overrides.append(Override(context=context, namespace=override_namespace, name=override_name, value=value))
 
     return overrides
 

@@ -8,12 +8,12 @@ Interface for accessing Targets from Mbed OS's targets.json.
 An instance of `mbed_tools.targets.target.Target`
 can be retrieved by calling one of the public functions.
 """
-
+from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.targets._internal import target_attributes
 from mbed_tools.targets.exceptions import TargetError
 
 
-def get_target_by_name(name: str, targets_json_data: dict) -> dict:
+def get_target_by_name(name: str, targets_json_data: dict[str, TargetJSON]) -> dict:
     """
     Returns a dictionary of attributes for the target whose name matches the name given.
 

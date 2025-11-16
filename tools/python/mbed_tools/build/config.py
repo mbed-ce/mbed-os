@@ -16,6 +16,7 @@ from mbed_tools.build._internal.config.config import Config
 from mbed_tools.build._internal.memory_banks import incorporate_memory_bank_data_from_cmsis, process_memory_banks
 from mbed_tools.build._internal.write_files import write_file
 from mbed_tools.build._internal.config.schemas import TargetJSON
+from mbed_tools.build._internal.config.source import check_and_transform_config_name
 from mbed_tools.build.exceptions import MbedBuildError
 from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.project import MbedProgram
@@ -63,7 +64,7 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> T
     return config, cmake_config_file_path
 
 
-def _load_raw_targets_data(program: MbedProgram) -> Any:
+def _load_raw_targets_data(program: MbedProgram) -> dict[str, TargetJSON]:
     targets_data = decode_json_file(program.mbed_os.targets_json_file)
     if program.files.custom_targets_json.exists():
         custom_targets_data = decode_json_file(program.files.custom_targets_json)
@@ -79,11 +80,20 @@ def _load_raw_targets_data(program: MbedProgram) -> Any:
         targets_data.update(custom_targets_data)
 
     # Validate and parse data for each target
+    results = {}
     for target, target_json_dict in targets_data.items():
         try:
             target_json = TargetJSON.model_validate(target_json_dict, extra="forbid", strict=True)
+
+            # Issue warnings if any config entries have invalid names.
+            # We need to do this here, or otherwise warnings will only get printed
+            # for the currently selected target instead of any defined target.
+            for config_setting, default_or_details in target_json.config.items():
+                check_and_transform_config_name("target " + target, config_setting)
+
+            results[target] = target_json
         except pydantic.ValidationError as ex:
             logger.error(f"Target {target} did not validate against the schema for target JSON!")
             raise ex
 
-    return targets_data
+    return results

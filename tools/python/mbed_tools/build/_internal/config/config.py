@@ -73,7 +73,7 @@ class Config(UserDict):
             )
             if setting is None:
                 logger.warning(
-                    f"You are attempting to override an undefined config parameter "
+                    f"{override.context} is attempting to override an undefined config parameter "
                     f"`{override.namespace}.{override.name}`.\n"
                     "It is an error to override an undefined configuration parameter. "
                     "Please check your target_overrides are correct.\n"

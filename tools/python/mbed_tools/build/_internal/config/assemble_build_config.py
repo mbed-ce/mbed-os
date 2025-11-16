@@ -67,7 +67,7 @@ def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
 def _assemble_config_from_sources(
     target_attributes: dict, mbed_lib_files: List[Path], mbed_app_file: Optional[Path] = None
 ) -> tuple[Config, list[Path]]:
-    config = Config(**source.prepare(target_attributes, source_name="target"))
+    config = Config(**source.prepare("merged target JSON", target_attributes, source_name="target"))
     previous_filter_data = None
     app_data = None
     if mbed_app_file:
@@ -83,7 +83,8 @@ def _assemble_config_from_sources(
     filter_data = FileFilterData.from_config(config)
     filtered_files = list(_filter_files(mbed_lib_files, filter_data))
     for config_file in filtered_files:
-        config.update(source.from_mbed_lib_json_file(config_file, target_filters=filter_data.labels))
+        mbed_lib_config_source = source.from_mbed_lib_json_file(config_file, target_filters=filter_data.labels)
+        config.update(mbed_lib_config_source)
         # Remove any mbed_lib files we've already visited from the list so we don't parse them multiple times.
         mbed_lib_files.remove(config_file)
 

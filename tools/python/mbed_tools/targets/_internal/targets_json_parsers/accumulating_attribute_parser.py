@@ -14,6 +14,8 @@ import itertools
 from collections import deque
 from typing import Any, Deque, Dict, List
 
+from mbed_tools.build._internal.config.schemas import TargetJSON
+
 ACCUMULATING_ATTRIBUTES = ("extra_labels", "macros", "device_has", "features", "components")
 MODIFIERS = ("add", "remove")
 ALL_ACCUMULATING_ATTRIBUTES = ACCUMULATING_ATTRIBUTES + tuple(
@@ -21,7 +23,7 @@ ALL_ACCUMULATING_ATTRIBUTES = ACCUMULATING_ATTRIBUTES + tuple(
 )
 
 
-def get_accumulating_attributes_for_target(all_targets_data: Dict[str, Any], target_name: str) -> Dict[str, Any]:
+def get_accumulating_attributes_for_target(all_targets_data: Dict[str, TargetJSON], target_name: str) -> Dict[str, Any]:
     """
     Parses the data for all targets and returns the accumulating attributes for the specified target.
 
@@ -36,7 +38,7 @@ def get_accumulating_attributes_for_target(all_targets_data: Dict[str, Any], tar
     return _determine_accumulated_attributes(accumulating_order)
 
 
-def _targets_accumulate_hierarchy(all_targets_data: Dict[str, Any], target_name: str) -> List[dict]:
+def _targets_accumulate_hierarchy(all_targets_data: Dict[str, TargetJSON], target_name: str) -> List[dict[str, Any]]:
     """
     List all ancestors of a target in order of accumulation inheritance (breadth-first).
 
@@ -61,15 +63,19 @@ def _targets_accumulate_hierarchy(all_targets_data: Dict[str, Any], target_name:
     Returns:
         A list of dicts representing each target in the hierarchy.
     """
-    targets_in_order: List[dict] = []
+    targets_in_order: List[dict[str, Any]] = []
 
-    still_to_visit: Deque[dict] = deque()
+    still_to_visit: Deque[TargetJSON] = deque()
     still_to_visit.appendleft(all_targets_data[target_name])
 
     while still_to_visit:
         current_target = still_to_visit.popleft()
-        targets_in_order.append(current_target)
-        for parent_target in current_target.get("inherits", []):
+
+        # At this point we need to work with individual attributes, so we need to dump from
+        # Pydantic model to a dict.
+        targets_in_order.append(current_target.model_dump(exclude_unset=True))
+
+        for parent_target in current_target.inherits:
             still_to_visit.append(all_targets_data[parent_target])
 
     return targets_in_order
