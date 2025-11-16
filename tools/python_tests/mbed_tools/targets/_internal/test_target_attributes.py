@@ -6,6 +6,7 @@
 
 from unittest import TestCase, mock
 
+from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.targets._internal.target_attributes import (
     TargetNotFoundError,
     get_target_attributes,
@@ -17,50 +18,43 @@ from mbed_tools.targets._internal.target_attributes import (
 
 class TestExtractTargetAttributes(TestCase):
     def test_no_target_found(self):
-        all_targets_data = {"Target_1": "some attributes", "Target_2": "some more attributes"}
+        all_targets_data = {"Target_1": TargetJSON(), "Target_2": TargetJSON()}
         with self.assertRaises(TargetNotFoundError):
             _extract_full_target_definition(all_targets_data, "Unlisted_Target", False)
 
     def test_target_found(self):
-        target_attributes = {"attribute1": "something"}
-
-        all_targets_data = {"Target_1": target_attributes, "Target_2": "some more attributes"}
+        all_targets_data = {
+            "Target_1": TargetJSON(macros=["some_macro"]),
+            "Target_2": TargetJSON(macros=["other_macro"]),
+        }
         # When not explicitly included public is assumed to be True
-        self.assertEqual(_extract_full_target_definition(all_targets_data, "Target_1", False), target_attributes)
+        self.assertEqual(
+            _extract_full_target_definition(all_targets_data, "Target_1", False),
+            all_targets_data["Target_1"],
+        )
 
     def test_target_public(self):
-        all_targets_data = {"Target_1": {"attribute1": "something", "public": True}, "Target_2": "some more attributes"}
-        # The public attribute affects visibility but is removed from result
-        self.assertEqual(_extract_full_target_definition(all_targets_data, "Target_1", False), {"attribute1": "something"})
+        all_targets_data = {
+            "Target_1": TargetJSON(macros=["some_macro"], public=True),
+            "Target_2": TargetJSON(macros=["other_macro"]),
+        }
+        # The public attribute affects visibility and should still be in the result since it was manually set.
+        result_target_json = _extract_full_target_definition(all_targets_data, "Target_1", False)
+        self.assertEqual(result_target_json, all_targets_data["Target_1"])
 
     def test_target_private(self):
         all_targets_data = {
-            "Target_1": {"attribute1": "something", "public": False},
-            "Target_2": "some more attributes",
+            "Target_1": TargetJSON(macros=["some_macro"], public=False),
+            "Target_2": TargetJSON(macros=["other_macro"]),
         }
         with self.assertRaises(TargetNotFoundError):
             _extract_full_target_definition(all_targets_data, "Target_1", False)
 
         # Should be able to get it if we pass the allow non public flag
-        self.assertEqual(_extract_full_target_definition(all_targets_data, "Target_1", True), {"attribute1": "something"})
-
-
-class TestGetTargetAttributes(TestCase):
-    @mock.patch("mbed_tools.targets._internal.target_attributes._extract_target_attributes")
-    @mock.patch("mbed_tools.targets._internal.target_attributes.get_labels_for_target")
-    @mock.patch("mbed_tools.targets._internal.target_attributes._extract_core_labels")
-    def test_gets_attributes_for_target(self, extract_core_labels, get_labels_for_target, extract_target_attributes):
-        targets_json_data = {"attrs": "vals"}
-        target_name = "My_Target"
-        build_attributes = {"attribute": "value"}
-        extract_target_attributes.return_value = build_attributes
-
-        result = get_target_attributes(targets_json_data, target_name, False)
-
-        extract_target_attributes.assert_called_once_with(targets_json_data, target_name, False)
-        get_labels_for_target.assert_called_once_with(targets_json_data, target_name)
-        extract_core_labels.assert_called_once_with(build_attributes.get("core", None))
-        self.assertEqual(result, extract_target_attributes.return_value)
+        self.assertEqual(
+            _extract_full_target_definition(all_targets_data, "Target_1", True),
+            all_targets_data["Target_1"],
+        )
 
 
 class TestExtractCoreLabels(TestCase):

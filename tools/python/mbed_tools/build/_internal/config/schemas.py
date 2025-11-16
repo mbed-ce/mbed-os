@@ -63,6 +63,7 @@ class ConfigEntryDetails(BaseModel):
 
         return self
 
+
 class MemoryBankConfiguration(BaseModel):
     """
     Configuration of one memory bank in JSON.
@@ -78,6 +79,7 @@ class MemoryBankConfiguration(BaseModel):
     """
     Size of the memory region in bytes.
     """
+
 
 class BaseJSONConfig(BaseModel):
     """
@@ -135,12 +137,16 @@ class BaseJSONConfig(BaseModel):
         for name, value in self.overrides.items():
             if name == "target.memory_bank_config":
                 if self.__class__ != MbedAppJSON:
-                    raise ValueError("target.memory_bank_config is only allowed in \"overrides\" mbed_app.json5!")
+                    raise ValueError('target.memory_bank_config is only allowed in "overrides" mbed_app.json5!')
                 if not isinstance(value, MemoryBankConfiguration):
-                    raise ValueError("target.memory_bank_config in \"overrides\" must be a MemoryBankConfiguration schema element!")
+                    raise ValueError(
+                        'target.memory_bank_config in "overrides" must be a MemoryBankConfiguration schema element!'
+                    )
             else:
                 if isinstance(value, MemoryBankConfiguration):
-                    raise ValueError("Only target.memory_bank_config in \"overrides\" may be a dict! Everything else must be a primitive type!")
+                    raise ValueError(
+                        'Only target.memory_bank_config in "overrides" may be a dict! Everything else must be a primitive type!'
+                    )
         return self
 
 
@@ -179,6 +185,7 @@ class MbedLibJSON(BaseJSONConfig):
     results may not be what you expect.
     """
 
+
 class MemoryBankDefinition(BaseModel):
     """
     Definition of one memory bank in JSON.
@@ -204,7 +211,9 @@ class MemoryBankDefinition(BaseModel):
     This is not used by Mbed for actually determining where to put stuff, that is handled by the linker script!
     """
 
-    access: dict[Literal["execute", "non_secure", "non_secure_callable", "peripheral", "read", "secure", "write"], bool] = Field(default_factory=dict)
+    access: dict[
+        Literal["execute", "non_secure", "non_secure_callable", "peripheral", "read", "secure", "write"], bool
+    ] = Field(default_factory=dict)
     """
     Access permissions of the memory, as defined by CMSIS.
     
@@ -223,6 +232,7 @@ class MemoryBankDefinition(BaseModel):
     """
     Size of the memory region in bytes.
     """
+
 
 class TargetJSON(BaseJSONConfig):
     """
@@ -546,6 +556,7 @@ class TargetJSON(BaseJSONConfig):
     This is an overriding attribute.
     """
 
+
 class MbedAppJSON(BaseJSONConfig):
     """
     Schema for mbed_app.json5 files.
@@ -583,8 +594,12 @@ class MbedAppJSON(BaseJSONConfig):
             for name, value in overrides.items():
                 if name == "target.memory_bank_config":
                     if not isinstance(value, MemoryBankConfiguration):
-                        raise ValueError("target.memory_bank_config in \"target_overrides\" must be a MemoryBankConfiguration schema element!")
+                        raise ValueError(
+                            'target.memory_bank_config in "target_overrides" must be a MemoryBankConfiguration schema element!'
+                        )
                 else:
                     if isinstance(value, MemoryBankConfiguration):
-                        raise ValueError("Only target.memory_bank_config in \"target_overrides\" may be a dict! Everything else must be a primitive type!")
+                        raise ValueError(
+                            'Only target.memory_bank_config in "target_overrides" may be a dict! Everything else must be a primitive type!'
+                        )
         return self

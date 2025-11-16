@@ -98,19 +98,17 @@ def _assemble_config_from_sources(
         try:
             MbedAppJSON.model_validate(mbed_app_json_dict, extra="forbid", strict=True)
         except pydantic.ValidationError as ex:
-            logger.warning("mbed_app.json5 failed to validate against the schema. This likely means it contains deprecated attributes, misspelled attributes, or overrides for things that should not be set in mbed_app.json5. This version of mbed-os still allows this, but this will change in the future.")
+            logger.warning(
+                "mbed_app.json5 failed to validate against the schema. This likely means it contains deprecated attributes, misspelled attributes, or overrides for things that should not be set in mbed_app.json5. This version of mbed-os still allows this, but this will change in the future."
+            )
             logger.warning("Error was: " + str(ex))
 
         app_data = source.prepare(
-            "mbed_app.json5",
-            mbed_app_json_dict,
-            source_name="app",
-            target_filters=filter_data.labels
+            "mbed_app.json5", mbed_app_json_dict, source_name="app", target_filters=filter_data.labels
         )
         config.update(app_data)
 
     return config, filtered_files
-
 
 
 @dataclass(frozen=True)
