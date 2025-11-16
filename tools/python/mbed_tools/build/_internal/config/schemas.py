@@ -71,7 +71,7 @@ class BaseJSONConfig(BaseModel):
     config: dict[str, ConfigSettingValue | ConfigEntryDetails] = Field(default_factory=dict)
     """
     Configuration items for this library. These can be defined directly as "name": default value, or as
-    "name": {details...} (see _ConfigEntryDetails above). Using details is recommended as it allows
+    "name": {details...} (see ConfigEntryDetails above). Using details is recommended as it allows
     adding documentation for the setting.
     
     By convention, the name used for a configuration setting should be in skewer-case and should not contain
@@ -237,15 +237,17 @@ class TargetJSON(BaseJSONConfig):
     Would give us an inheritance order of [A, B, D, C, E]. Then, the overriding attribute's value would be taken
     from the first target in this list to contain the attribute.
 
-    Merging attributes work similarly but are all of dict type. With merging attributes, the dicts are merged
-    together with only elements with the same keys overriding based on the order above.
+    Merging attributes work similarly to overriding ones but are all of dict type. With merging attributes, 
+    the dicts are merged together between each target and its parents, with only elements with the same keys 
+    overriding based on the order above.
     
     Accumulating attributes, on the other hand, work very differently. These are all of list type, and have
     three forms: "<attribute>", "<attribute>_add", and "<attribute>_remove". Using the first of those forms (the base form)
     gives the attribute its initial value, and the second and third forms remove the attribute from parent targets.
     
     UNLIKE overriding and merging attributes, accumulating attributes use a breadth-first search to flatten
-    the inheritance hierarchy. (why? no idea! -Jamie).  For example, an inheritance tree diagram for the target "A" below
+    the inheritance hierarchy. (why? no idea! Probably for legacy compatibility...).  For example, an inheritance 
+    tree diagram for the target "A" below
 
     D     E
     |     |

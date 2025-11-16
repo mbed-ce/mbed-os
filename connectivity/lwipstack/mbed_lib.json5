@@ -1,7 +1,6 @@
 {
     "name": "lwip",
     "config": {
-        "present": 1,
         "ipv4-enabled": {
             "help": "Enable IPv4",
             "value": true
