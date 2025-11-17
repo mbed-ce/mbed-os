@@ -84,7 +84,7 @@ def _load_raw_targets_data(program: MbedProgram) -> dict[str, TargetJSON]:
     results = {}
     for target, target_json_dict in targets_data.items():
         try:
-            target_json = TargetJSON.model_validate(target_json_dict, extra="forbid", strict=True)
+            target_json = TargetJSON.model_validate(target_json_dict, strict=True)
 
             # Issue warnings if any config entries have invalid names.
             # We need to do this here, or otherwise warnings will only get printed

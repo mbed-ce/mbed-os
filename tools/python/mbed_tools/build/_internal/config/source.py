@@ -120,7 +120,7 @@ def from_mbed_lib_json_file(
 
     # Load JSON file using schema
     try:
-        mbed_lib = schemas.MbedLibJSON.model_validate(decode_json_file(mbed_lib_json_path), extra="forbid", strict=True)
+        mbed_lib = schemas.MbedLibJSON.model_validate(decode_json_file(mbed_lib_json_path), strict=True)
     except pydantic.ValidationError as ex:
         logger.error(f"{context} did not validate against the schema for mbed_lib.json5!")
         raise ex

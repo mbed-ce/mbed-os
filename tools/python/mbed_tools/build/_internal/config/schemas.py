@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import Union, Literal
 from typing_extensions import Self
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ConfigDict
 
 ConfigSettingValue = Union[int, float, bool, str, None]
 
@@ -22,6 +22,9 @@ class ConfigEntryDetails(BaseModel):
     Details for an entry in a JSON file's 'config' section. This defines the attributes of a configurable setting
     for a library, target, or application.
     """
+
+    # Throw an error during validation if there are extra fields
+    model_config = ConfigDict(extra="forbid")
 
     macro_name: str | None = None
     """
@@ -71,6 +74,9 @@ class MemoryBankConfiguration(BaseModel):
     This is a "mini" version of MemoryBankDefinition that just allows setting the size and start address.
     """
 
+    # Throw an error during validation if there are extra fields
+    model_config = ConfigDict(extra="forbid")
+
     start: int | None = None
     """
     Start address of the memory region.
@@ -87,6 +93,9 @@ class BaseJSONConfig(BaseModel):
     Base schema for JSON config files. This schema is the parent of the schemas for mbed_app.json5 and mbed_lib.json5,
     as well as each entry in targets.json5.
     """
+
+    # Throw an error during validation if there are extra fields
+    model_config = ConfigDict(extra="forbid")
 
     config: dict[str, ConfigSettingValue | ConfigEntryDetails] = Field(default_factory=dict)
     """
@@ -158,6 +167,9 @@ class MbedLibJSON(BaseJSONConfig):
     to the Mbed configuration system.
     """
 
+    # Throw an error during validation if there are extra fields
+    model_config = ConfigDict(extra="forbid")
+
     name: str
     """
     The name of this library. This is also considered the 'namespace' and will be prepended to all
@@ -195,6 +207,9 @@ class MemoryBankDefinition(BaseModel):
     https://open-cmsis-pack.github.io/Open-CMSIS-Pack-Spec/main/html/pdsc_family_pg.html#element_memory
     (though this data gets converted from XML to JSON by the cmsis-pack-manager tool)
     """
+
+    # Throw an error during validation if there are extra fields
+    model_config = ConfigDict(extra="forbid")
 
     default: bool = False
     """
@@ -239,6 +254,9 @@ class TargetJSON(BaseJSONConfig):
     """
     Schema for one entry in targets.json5.
     """
+
+    # Throw an error during validation if there are extra fields
+    model_config = ConfigDict(extra="forbid")
 
     inherits: list[str] = Field(default_factory=list)
     """
@@ -562,6 +580,9 @@ class MbedAppJSON(BaseJSONConfig):
     """
     Schema for mbed_app.json5 files.
     """
+
+    # Throw an error during validation if there are extra fields
+    model_config = ConfigDict(extra="forbid")
 
     target_overrides: dict[str, dict[str, ConfigSettingValue | MemoryBankConfiguration]] = Field(default_factory=dict)
     """
