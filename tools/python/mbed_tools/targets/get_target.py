@@ -9,6 +9,8 @@ An instance of `mbed_tools.targets.target.Target`
 can be retrieved by calling one of the public functions.
 """
 
+from __future__ import annotations
+
 from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.targets._internal import target_attributes
 from mbed_tools.targets.exceptions import TargetError
