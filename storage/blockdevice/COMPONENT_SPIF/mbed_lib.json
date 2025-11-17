@@ -8,7 +8,7 @@
         "SPI_FREQ": "40000000",
         "debug": {
             "help": "Enable debug logs. [0/1]",
-            "options" : [0, 1],
+            "accepted_values" : [0, 1],
             "value": 0
         }
     },
