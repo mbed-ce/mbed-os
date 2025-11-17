@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import pathlib
 from dataclasses import dataclass
-from typing import Any, Iterable, List, Literal, Optional
+from typing import Iterable, Any, Optional, List, Literal, Union
 
 import pydantic
 
@@ -102,7 +102,7 @@ def check_and_transform_config_name(context: str, config_name: str) -> str:
 
 def from_mbed_lib_json_file(
     mbed_lib_json_path: pathlib.Path, target_filters: Iterable[str]
-) -> dict[str, list | str | dict]:
+) -> dict[str, Union[list, str, dict]]:
     """
     Prepare a config source for entry into the Config object.
 
