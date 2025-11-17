@@ -8,6 +8,8 @@ This information is parsed from the targets.json configuration file
 found in the mbed-os repo.
 """
 
+from __future__ import annotations
+
 import logging
 import pathlib
 from typing import Dict, Any, Set, Optional
