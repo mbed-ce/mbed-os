@@ -9,7 +9,8 @@ Pydantic schemas for Mbed OS JSON config files.
 
 from __future__ import annotations
 
-from typing import Union, Self, Literal
+from typing import Union, Literal
+from typing_extensions import Self
 
 from pydantic import BaseModel, Field, model_validator
 
