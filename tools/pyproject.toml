@@ -29,6 +29,7 @@ dependencies = [
     "humanize>=4.9.0",
     "setuptools>=64.0",
     "pydantic>=2.5", # note: 2.5 is the last version that supports python3.7
+    "eval_type_backport", # Lets pydantic use new-style type annotations on old Python versions
 
     # We need two JSON5 parsers because 'json5' is slow as hell, but 'pyjson5' has completely inscrutable
     # error messages when parsing fails. Combining them produces a decent experience.
