@@ -98,7 +98,7 @@ def _assemble_config_from_sources(
         # if it does not pass the schema. This provides compatibility with older projects, as mbed_app.json has
         # historically been a total wild west where any internal Mbed state could potentially be overridden.
         try:
-            MbedAppJSON.model_validate(mbed_app_json_dict, extra="forbid", strict=True)
+            MbedAppJSON.model_validate(mbed_app_json_dict, strict=True)
         except pydantic.ValidationError as ex:
             logger.warning(
                 "mbed_app.json5 failed to validate against the schema. This likely means it contains deprecated attributes, misspelled attributes, or overrides for things that should not be set in mbed_app.json5. This version of mbed-os still allows this, but this will change in the future."
