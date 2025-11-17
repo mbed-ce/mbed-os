@@ -4,6 +4,8 @@
 #
 """Parses the Mbed configuration system and generates a CMake config script."""
 
+from __future__ import annotations
+
 import pathlib
 
 from typing import Any, Tuple
