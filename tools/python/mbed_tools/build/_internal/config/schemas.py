@@ -14,7 +14,7 @@ from typing_extensions import Self
 
 from pydantic import BaseModel, Field, model_validator
 
-ConfigSettingValue = Union[int | float | bool | str | None]
+ConfigSettingValue = Union[int, float, bool, str, None]
 
 
 class ConfigEntryDetails(BaseModel):
