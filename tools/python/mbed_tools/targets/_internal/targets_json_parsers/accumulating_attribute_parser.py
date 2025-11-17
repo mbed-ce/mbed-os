@@ -10,6 +10,8 @@ The hierarchy is also slightly different to the other fields as it is determined
 multiple inheritance, so targets at a lower level will always take precedence over targets at a higher level.
 """
 
+from __future__ import annotations
+
 import itertools
 from collections import deque
 from typing import Any, Deque, Dict, List
@@ -63,7 +65,7 @@ def _targets_accumulate_hierarchy(all_targets_data: Dict[str, TargetJSON], targe
     Returns:
         A list of dicts representing each target in the hierarchy.
     """
-    targets_in_order: List[dict[str, Any]] = []
+    targets_in_order: List[Dict[str, Any]] = []
 
     still_to_visit: Deque[TargetJSON] = deque()
     still_to_visit.appendleft(all_targets_data[target_name])

@@ -20,6 +20,8 @@ current inheritance level.
 This means a target on a higher level could potentially override one on a lower level.
 """
 
+from __future__ import annotations
+
 from collections import deque
 from functools import reduce
 from typing import Any, Deque, Dict, List, Set
