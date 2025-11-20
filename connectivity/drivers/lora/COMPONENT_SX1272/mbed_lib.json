@@ -1,6 +1,5 @@
 {
     "name": "sx1272-lora-driver",
-    "requires": ["lora"],
     "config": {
         "spi-frequency": {
         	"help": "SPI frequency, Default: 8 MHz",

@@ -11,6 +11,10 @@ if((NOT "MBED_CPU_STATS_ENABLED=1" IN_LIST MBED_CONFIG_DEFINITIONS) AND (NOT "MB
 	set(TEST_SKIPPED "CPU stats not enabled")
 endif()
 
+if("MBED_CONF_TARGET_APPLICATION_PROFILE=bare-metal" IN_LIST MBED_CONFIG_DEFINITIONS)
+    set(TEST_SKIPPED "This test requires the RTOS")
+endif()
+
 mbed_greentea_add_test(
     TEST_NAME
         mbed-platform-stats-cpu

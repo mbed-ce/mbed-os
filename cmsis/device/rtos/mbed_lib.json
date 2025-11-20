@@ -1,7 +1,6 @@
 {
     "name": "rtos",
     "config": {
-        "present": 1,
          "main-thread-stack-size": {
             "help": "The size of the main thread's stack",
             "value": 4096

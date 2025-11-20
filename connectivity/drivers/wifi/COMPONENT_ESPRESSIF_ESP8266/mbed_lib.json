@@ -31,7 +31,7 @@
         },
         "power-on-polarity": {
             "help": "Polarity of power-on for the modem. 0 means 0/1 for power on/off; 1 means 1/0 for power on/off.",
-            "options": [0, 1],
+            "accepted_values": [0, 1],
             "value": 0
         },
         "power-on-time-ms": {

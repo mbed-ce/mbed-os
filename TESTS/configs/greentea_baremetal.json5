@@ -1,11 +1,9 @@
 {
-    "target_overrides": {
-        "*": {
-            "target.c_lib": "small",
-            "target.application-profile": "bare-metal"
-        }
-    },
     "overrides": {
+        "target.c_lib": "small",
+
+        "target.application-profile": "bare-metal",
+
         // Enable Mbed Stats tests
         "platform.all-stats-enabled": 1,
 
