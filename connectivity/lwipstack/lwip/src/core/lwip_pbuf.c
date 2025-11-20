@@ -176,7 +176,7 @@ pbuf_pool_is_empty(void)
 
 /* Initialize members of struct pbuf after allocation */
 static void
-pbuf_init_alloced_pbuf(struct pbuf *p, void *payload, u16_t tot_len, u16_t len, pbuf_type type, u8_t flags)
+pbuf_init_alloced_pbuf(struct pbuf *p, void *payload, u16_t initial_header_bytes, u16_t tot_len, u16_t len, pbuf_type type, u8_t flags)
 {
   p->next = NULL;
   p->payload = payload;
@@ -186,6 +186,7 @@ pbuf_init_alloced_pbuf(struct pbuf *p, void *payload, u16_t tot_len, u16_t len, 
   p->flags = flags;
   p->ref = 1;
   p->if_idx = NETIF_NO_INDEX;
+  p->header_bytes_removed = initial_header_bytes;
 }
 
 /**
@@ -251,7 +252,7 @@ pbuf_alloc(pbuf_layer layer, u16_t length, pbuf_type type)
           return NULL;
         }
         qlen = LWIP_MIN(rem_len, (u16_t)(PBUF_POOL_BUFSIZE_ALIGNED - LWIP_MEM_ALIGN_SIZE(offset)));
-        pbuf_init_alloced_pbuf(q, LWIP_MEM_ALIGN((void *)((u8_t *)q + SIZEOF_STRUCT_PBUF + offset)),
+        pbuf_init_alloced_pbuf(q, LWIP_MEM_ALIGN((void *)((u8_t *)q + SIZEOF_STRUCT_PBUF + offset)), offset,
                                rem_len, qlen, type, 0);
         LWIP_ASSERT("pbuf_alloc: pbuf q->payload properly aligned",
                     ((mem_ptr_t)q->payload % MEM_ALIGNMENT) == 0);
@@ -285,7 +286,7 @@ pbuf_alloc(pbuf_layer layer, u16_t length, pbuf_type type)
       if (p == NULL) {
         return NULL;
       }
-      pbuf_init_alloced_pbuf(p, LWIP_MEM_ALIGN((void *)((u8_t *)p + SIZEOF_STRUCT_PBUF + offset)),
+      pbuf_init_alloced_pbuf(p, LWIP_MEM_ALIGN((void *)((u8_t *)p + SIZEOF_STRUCT_PBUF + offset)), offset,
                              length, length, type, 0);
       LWIP_ASSERT("pbuf_alloc: pbuf->payload properly aligned",
                   ((mem_ptr_t)p->payload % MEM_ALIGNMENT) == 0);
@@ -336,7 +337,7 @@ pbuf_alloc_reference(void *payload, u16_t length, pbuf_type type)
                  (type == PBUF_ROM) ? "ROM" : "REF"));
     return NULL;
   }
-  pbuf_init_alloced_pbuf(p, payload, length, length, type, 0);
+  pbuf_init_alloced_pbuf(p, payload, 0, length, length, type, 0);
   return p;
 }
 
@@ -377,7 +378,7 @@ pbuf_alloced_custom(pbuf_layer l, u16_t length, pbuf_type type, struct pbuf_cust
   } else {
     payload = NULL;
   }
-  pbuf_init_alloced_pbuf(&p->pbuf, payload, length, length, type, PBUF_FLAG_IS_CUSTOM);
+  pbuf_init_alloced_pbuf(&p->pbuf, payload, 0, length, length, type, PBUF_FLAG_IS_CUSTOM);
   return &p->pbuf;
 }
 #endif /* LWIP_SUPPORT_CUSTOM_PBUF */
@@ -522,7 +523,7 @@ pbuf_add_header_impl(struct pbuf *p, size_t header_size_increment, u8_t force)
   p->payload = payload;
   p->len = (u16_t)(p->len + increment_magnitude);
   p->tot_len = (u16_t)(p->tot_len + increment_magnitude);
-
+  p->header_bytes_removed -= header_size_increment;
 
   return 0;
 }
@@ -605,6 +606,7 @@ pbuf_remove_header(struct pbuf *p, size_t header_size_decrement)
   /* modify pbuf length fields */
   p->len = (u16_t)(p->len - increment_magnitude);
   p->tot_len = (u16_t)(p->tot_len - increment_magnitude);
+  p->header_bytes_removed += increment_magnitude;
 
   LWIP_DEBUGF(PBUF_DEBUG | LWIP_DBG_TRACE, ("pbuf_remove_header: old %p new %p (%"U16_F")\n",
               (void *)payload, (void *)p->payload, increment_magnitude));

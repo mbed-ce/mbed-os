@@ -38,7 +38,7 @@ endif()
 # First, verify that MBED_TARGET has not changed
 if(DEFINED MBED_INTERNAL_LAST_MBED_TARGET)
     if(NOT "${MBED_INTERNAL_LAST_MBED_TARGET}" STREQUAL "${MBED_TARGET}")
-        message(FATAL_ERROR "MBED_TARGET has changed since this directory was originally configured. (previously was: ${MBED_INTERNAL_LAST_MBED_TARGET}).  Due to CMake limitations, this build dir must be deleted and recreated from scratch (or use cmake --fresh [CMake 3.24 or newer]).")
+        message(FATAL_ERROR "MBED_TARGET has changed since this directory was originally configured. (previously was: ${MBED_INTERNAL_LAST_MBED_TARGET}). Due to CMake limitations, this build dir must be deleted and recreated from scratch (or use cmake --fresh [CMake 3.24 or newer]). If using platformio, run the clean task with 'pio run -t clean'.")
     endif()
 else()
     if("${MBED_TARGET}" STREQUAL "")

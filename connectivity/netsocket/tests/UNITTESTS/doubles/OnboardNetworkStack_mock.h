@@ -52,6 +52,7 @@ public:
     MOCK_METHOD4(add_ethernet_interface_mock, nsapi_error_t(EMAC &emac, bool default_if,
                                                             OnboardNetworkStack::Interface **interface_out,
                                                             NetworkInterface *user_network_interface));
+    MOCK_METHOD(EMACMemoryManager &, get_memory_manager, (), (override));
 
     // Wrapper written to handle function with the default argument in the gmock.
     nsapi_error_t add_ethernet_interface(EMAC &emac, bool default_if, Interface **interface_out, NetworkInterface *user_network_interface = NULL)

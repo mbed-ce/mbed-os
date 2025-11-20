@@ -65,7 +65,7 @@ whd_result_t whd_host_buffer_get(whd_driver_t whd_driver, whd_buffer_t *buffer, 
 {
     if (whd_driver->buffer_if->whd_host_buffer_get)
     {
-        return whd_driver->buffer_if->whd_host_buffer_get(buffer, direction, size, timeout_ms);
+        return whd_driver->buffer_if->whd_host_buffer_get(whd_driver->buffer_if->instance, buffer, direction, size, timeout_ms);
     }
     else
     {
@@ -94,7 +94,7 @@ whd_result_t whd_buffer_release(whd_driver_t whd_driver, whd_buffer_t buffer, wh
 {
     if (whd_driver->buffer_if->whd_buffer_release)
     {
-        whd_driver->buffer_if->whd_buffer_release(buffer, direction);
+        whd_driver->buffer_if->whd_buffer_release(whd_driver->buffer_if->instance, buffer, direction);
         return WHD_SUCCESS;
     }
     else
@@ -121,7 +121,7 @@ uint8_t *whd_buffer_get_current_piece_data_pointer(whd_driver_t whd_driver, whd_
 {
     if (whd_driver->buffer_if->whd_buffer_get_current_piece_data_pointer)
     {
-        return whd_driver->buffer_if->whd_buffer_get_current_piece_data_pointer(buffer);
+        return whd_driver->buffer_if->whd_buffer_get_current_piece_data_pointer(whd_driver->buffer_if->instance, buffer);
     }
     else
     {
@@ -148,7 +148,7 @@ uint16_t whd_buffer_get_current_piece_size(whd_driver_t whd_driver, whd_buffer_t
 {
     if (whd_driver->buffer_if->whd_buffer_get_current_piece_size)
     {
-        return whd_driver->buffer_if->whd_buffer_get_current_piece_size(buffer);
+        return whd_driver->buffer_if->whd_buffer_get_current_piece_size(whd_driver->buffer_if->instance, buffer);
     }
     else
     {
@@ -174,7 +174,7 @@ whd_result_t whd_buffer_set_size(whd_driver_t whd_driver, whd_buffer_t buffer, u
 {
     if (whd_driver->buffer_if->whd_buffer_set_size)
     {
-        return whd_driver->buffer_if->whd_buffer_set_size(buffer, size);
+        return whd_driver->buffer_if->whd_buffer_set_size(whd_driver->buffer_if->instance, buffer, size);
     }
     else
     {
@@ -208,7 +208,7 @@ whd_result_t whd_buffer_add_remove_at_front(whd_driver_t whd_driver, whd_buffer_
 {
     if (whd_driver->buffer_if->whd_buffer_add_remove_at_front)
     {
-        return whd_driver->buffer_if->whd_buffer_add_remove_at_front(buffer, add_remove_amount);
+        return whd_driver->buffer_if->whd_buffer_add_remove_at_front(whd_driver->buffer_if->instance, buffer, add_remove_amount);
     }
     else
     {

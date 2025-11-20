@@ -27,21 +27,37 @@ extern "C" {
 
 static cyhal_rtc_t cy_rtc;
 
+static bool rtc_initialized = false;
+
 void rtc_init(void)
 {
-    if (CY_RSLT_SUCCESS != cyhal_rtc_init(&cy_rtc)) {
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_rtc_init");
+    if(!rtc_initialized)
+    {
+        if (CY_RSLT_SUCCESS != cyhal_rtc_init(&cy_rtc)) {
+            MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_rtc_init");
+        }
+
+        // Default CyHAL RTC behavior is for the RTC to start at year 0 when first initialized.
+        // However, this will cause rtc_read() to crash as this date is not representable as a time_t.
+        // To fix this, if the time has never been set before, set it to Jan 1 1970.
+        if(!cyhal_rtc_is_enabled(&cy_rtc)) // This function is poorly named but returns whether the time has ever been set.
+        {
+            rtc_write(0);
+        }
+        
+        rtc_initialized = true;
     }
 }
 
 void rtc_free(void)
 {
     cyhal_rtc_free(&cy_rtc);
+    rtc_initialized = false;
 }
 
 int rtc_isenabled(void)
 {
-    return cyhal_rtc_is_enabled(&cy_rtc) ? 1 : 0;
+    return rtc_initialized;
 }
 
 time_t rtc_read(void)
@@ -51,7 +67,7 @@ time_t rtc_read(void)
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_rtc_read");
     }
     time_t seconds;
-    if (!_rtc_maketime(&rtc_time, &seconds, RTC_FULL_LEAP_YEAR_SUPPORT)) {
+    if (!_rtc_maketime(&rtc_time, &seconds, RTC_4_YEAR_LEAP_YEAR_SUPPORT)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER, MBED_ERROR_CODE_FAILED_OPERATION), "_rtc_maketime");
     }
     return seconds;

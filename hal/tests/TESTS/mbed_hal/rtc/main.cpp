@@ -98,12 +98,23 @@ void rtc_sleep_test_support(bool deepsleep_mode)
 }
 #endif
 
-/* Test that ::rtc_init can be called multiple times. */
+/* Tests ::rtc_init() behavior:
+ - rtc_init() can be called multiple times
+ - rtc_isenabled() returns false before init and true after
+ - RTC returns valid time after being initialized (though that time may be anything). */
 void rtc_init_test()
 {
+    TEST_ASSERT_FALSE(RealTimeClock::isenabled());
+
     for (int i = 0; i < 10; i++) {
         RealTimeClock::init();
+
+        TEST_ASSERT_TRUE(RealTimeClock::isenabled());
     }
+
+    // Note that if the RTC returns an invalid time after being initialized, this function will crash Mbed,
+    // so we just need to call it.
+    RealTimeClock::now();
 
     RealTimeClock::free();
 }

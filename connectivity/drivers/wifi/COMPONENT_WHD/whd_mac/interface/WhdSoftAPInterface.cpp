@@ -16,12 +16,8 @@
  */
 
 #include "nsapi.h"
-#include "lwipopts.h"
 #include "WhdSoftAPInterface.h"
 #include "nsapi.h"
-#include "lwipopts.h"
-#include "lwip/etharp.h"
-#include "lwip/ethip6.h"
 #include "rtos.h"
 #include "whd_emac.h"
 #include "whd_wifi_api.h"

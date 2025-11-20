@@ -20,9 +20,6 @@
 #include <vector>
 #include "WhdSTAInterface.h"
 #include "nsapi.h"
-#include "lwipopts.h"
-#include "lwip/etharp.h"
-#include "lwip/ethip6.h"
 #include "rtos.h"
 #include "whd_emac.h"
 #include "whd_wifi_api.h"
@@ -263,6 +260,7 @@ nsapi_error_t WhdSTAInterface::connect()
 
     // initialize wiced, this is noop if already init
     if (!_whd_emac.powered_up) {
+        _whd_emac.set_memory_manager(_stack.get_memory_manager());
         if(!_whd_emac.power_up()) {
             return NSAPI_ERROR_DEVICE_ERROR;
         }
@@ -351,16 +349,21 @@ nsapi_error_t WhdSTAInterface::connect()
         return whd_toerror(res);
     }
 
-    if (whd_wifi_is_ready_to_transceive(_whd_emac.ifp) == WHD_SUCCESS) {
-        whd_emac_wifi_link_state_changed(_whd_emac.ifp, WHD_TRUE);
-    }
-
     // bring up
-    return _interface->bringup(_dhcp,
+    auto ret = _interface->bringup(_dhcp,
                                _ip_address[0] ? _ip_address : 0,
                                _netmask[0] ? _netmask : 0,
                                _gateway[0] ? _gateway : 0,
                                DEFAULT_STACK);
+
+    // There's a bit of a race condition here: many stacks attach a link state callback to the EMAC in their
+    // bringup() method, but the wifi may have already connected before we got here, meaning the callback never gets
+    // delivered. So, redeliver the link state callback now.
+    if (ret == NSAPI_ERROR_OK && whd_wifi_is_ready_to_transceive(_whd_emac.ifp) == WHD_SUCCESS) {
+        whd_emac_wifi_link_state_changed(_whd_emac.ifp, WHD_TRUE);
+    }
+
+    return ret;
 }
 
 void WhdSTAInterface::wifi_on()

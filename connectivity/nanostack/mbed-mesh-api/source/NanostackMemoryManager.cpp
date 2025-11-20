@@ -23,8 +23,9 @@
 
 struct ns_stack_mem_t {
     ns_stack_mem_t *next;
-    void *payload;
-    uint32_t len;
+    uint8_t *payload;
+    uint32_t len; // Original requested length of buffer (not including extra space allocated for alignment, or header size)
+    uint16_t header_size; // Number of header bytes being skipped
     uint8_t mem[];
 };
 
@@ -38,6 +39,7 @@ emac_mem_buf_t *NanostackMemoryManager::alloc_heap(uint32_t size, uint32_t align
     buf->next = NULL;
     buf->payload = buf->mem;
     buf->len = size;
+    buf->header_size = 0;
 
     if (align) {
         uint32_t remainder = reinterpret_cast<uint32_t>(buf->payload) % align;
@@ -47,7 +49,7 @@ emac_mem_buf_t *NanostackMemoryManager::alloc_heap(uint32_t size, uint32_t align
                 offset = align;
             }
 
-            buf->payload = static_cast<char *>(buf->payload) + offset;
+            buf->payload = buf->payload + offset;
         }
     }
 
@@ -76,44 +78,19 @@ uint32_t NanostackMemoryManager::get_total_len(const emac_mem_buf_t *buf) const
     uint32_t total = 0;
 
     while (mem) {
-        total += mem->len;
+        total += mem->len - mem->header_size; // note: header size can only legally be set on the first buffer
         mem = mem->next;
     }
+
     return total;
-}
-
-void NanostackMemoryManager::copy(emac_mem_buf_t *to, const emac_mem_buf_t *from)
-{
-    ns_stack_mem_t *to_mem = static_cast<ns_stack_mem_t *>(to);
-    const ns_stack_mem_t *from_mem = static_cast<const ns_stack_mem_t *>(from);
-    MBED_ASSERT(get_total_len(to) >= get_total_len(from));
-
-    uint32_t to_offset = 0;
-    uint32_t from_offset = 0;
-    while (from_mem) {
-        uint32_t to_avail = to_mem->len - to_offset;
-        uint32_t from_avail = from_mem->len - from_offset;
-        uint32_t chunk = to_avail < from_avail ? to_avail : from_avail;
-        uint8_t *to_ptr = static_cast<uint8_t *>(to_mem->payload) + to_offset;
-        const uint8_t *from_ptr = static_cast<const uint8_t *>(from_mem->payload) + from_offset;
-        memcpy(to_ptr, from_ptr, chunk);
-        to_offset += chunk;
-        if (to_offset == to_mem->len) {
-            to_mem = to_mem->next;
-            to_offset = 0;
-        }
-        from_offset += chunk;
-        if (from_offset == from_mem->len) {
-            from_mem = from_mem->next;
-            from_offset = 0;
-        }
-    }
 }
 
 void NanostackMemoryManager::cat(emac_mem_buf_t *to_buf, emac_mem_buf_t *cat_buf)
 {
     ns_stack_mem_t *to_mem = static_cast<ns_stack_mem_t *>(to_buf);
     ns_stack_mem_t *cat_mem = static_cast<ns_stack_mem_t *>(cat_buf);
+
+    MBED_ASSERT(cat_mem->header_size == 0);
 
     while (to_mem->next) {
         to_mem = to_mem->next;
@@ -129,19 +106,20 @@ emac_mem_buf_t *NanostackMemoryManager::get_next(const emac_mem_buf_t *buf) cons
 
 void *NanostackMemoryManager::get_ptr(const emac_mem_buf_t *buf) const
 {
-    return static_cast<const ns_stack_mem_t *>(buf)->payload;
+    auto mem = static_cast<const ns_stack_mem_t *>(buf);
+    return mem->payload + mem->header_size;
 }
 
 uint32_t NanostackMemoryManager::get_len(const emac_mem_buf_t *buf) const
 {
-    return static_cast<const ns_stack_mem_t *>(buf)->len;
+    auto mem = static_cast<const ns_stack_mem_t *>(buf);
+    return mem->len - mem->header_size;
 }
 
 void NanostackMemoryManager::set_len(emac_mem_buf_t *buf, uint32_t len)
 {
-    ns_stack_mem_t *mem = static_cast<ns_stack_mem_t *>(buf);
-
-    mem->len = len;
+    auto *mem = static_cast<ns_stack_mem_t *>(buf);
+    mem->len = len + mem->header_size;
 }
 
 NetStackMemoryManager::Lifetime NanostackMemoryManager::get_lifetime(const net_stack_mem_buf_t *buf) const
@@ -149,6 +127,24 @@ NetStackMemoryManager::Lifetime NanostackMemoryManager::get_lifetime(const net_s
     // For Nanostack, all buffers are heap allocated and can be kept around as long as
     // is needed by the EMAC driver.
     return Lifetime::HEAP_ALLOCATED;
+}
+
+void NanostackMemoryManager::skip_header_space(net_stack_mem_buf_t *buf, int32_t amount)
+{
+    auto *const mem = static_cast<ns_stack_mem_t *>(buf);
+
+    if (amount > 0) {
+        MBED_ASSERT(amount + static_cast<int32_t>(mem->header_size) < static_cast<int32_t>(mem->len)); // header_size cannot exceed len
+    } else {
+        MBED_ASSERT(-1 * amount <= static_cast<int32_t>(mem->header_size)); // header_size cannot go below 0
+    }
+
+    mem->header_size += amount;
+}
+
+int32_t NanostackMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf)
+{
+    return static_cast<ns_stack_mem_t *>(buf)->header_size;
 }
 
 void mbed_ns_heap_free_hook()

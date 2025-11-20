@@ -61,11 +61,6 @@ uint32_t LWIPMemoryManager::get_total_len(const net_stack_mem_buf_t *buf) const
     return (static_cast<const struct pbuf *>(buf))->tot_len;
 }
 
-void LWIPMemoryManager::copy(net_stack_mem_buf_t *to_buf, const net_stack_mem_buf_t *from_buf)
-{
-    pbuf_copy(static_cast<struct pbuf *>(to_buf), static_cast<const struct pbuf *>(from_buf));
-}
-
 void LWIPMemoryManager::copy_to_buf(net_stack_mem_buf_t *to_buf, const void *ptr, uint32_t len)
 {
     pbuf_take(static_cast<struct pbuf *>(to_buf), ptr, len);
@@ -122,6 +117,23 @@ NetStackMemoryManager::Lifetime LWIPMemoryManager::get_lifetime(const net_stack_
     } else {
         return Lifetime::HEAP_ALLOCATED;
     }
+}
+
+void LWIPMemoryManager::skip_header_space(net_stack_mem_buf_t *const buf, const int32_t amount)
+{
+    // Sanity check that we aren't making the header size negative
+    MBED_ASSERT(amount + static_cast<struct pbuf *>(buf)->header_bytes_removed >= 0);
+
+    // Note: With LwIP, the header direction is inverted: a negative value "hides headers in the payload",
+    // i.e. it increases the skip size.
+    // Also note that because have our own independant check on the skip amount, we can use pbuf_header_force().
+    // Otherwise, the normal pbuf_header() function cannot unskip header bytes for some types of pbufs.
+    MBED_ASSERT(pbuf_header_force(static_cast<struct pbuf *>(buf), -amount) == 0);
+}
+
+int32_t LWIPMemoryManager::get_header_skip_size(net_stack_mem_buf_t *buf)
+{
+    return static_cast<struct pbuf *>(buf)->header_bytes_removed;
 }
 
 uint32_t LWIPMemoryManager::count_total_align(uint32_t size, uint32_t align)

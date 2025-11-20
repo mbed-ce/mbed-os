@@ -520,6 +520,11 @@ const char *osMutexGetName (osMutexId_t mutex_id) {
 osStatus_t osMutexAcquire (osMutexId_t mutex_id, uint32_t timeout) {
   osStatus_t status;
 
+  // a null mutex handle is always invalid
+  if(mutex_id == 0) {
+    return osErrorParameter;
+  }
+
   EvrRtxMutexAcquire(mutex_id, timeout);
   if (IsException() || IsIrqMasked()) {
     EvrRtxMutexError(mutex_id, (int32_t)osErrorISR);
@@ -533,6 +538,11 @@ osStatus_t osMutexAcquire (osMutexId_t mutex_id, uint32_t timeout) {
 /// Release a Mutex that was acquired by \ref osMutexAcquire.
 osStatus_t osMutexRelease (osMutexId_t mutex_id) {
   osStatus_t status;
+
+  // a null mutex handle is always invalid
+  if(mutex_id == 0) {
+    return osErrorParameter;
+  }
 
   EvrRtxMutexRelease(mutex_id);
   if (IsException() || IsIrqMasked()) {
@@ -560,6 +570,11 @@ osThreadId_t osMutexGetOwner (osMutexId_t mutex_id) {
 /// Delete a Mutex object.
 osStatus_t osMutexDelete (osMutexId_t mutex_id) {
   osStatus_t status;
+
+  // a null mutex handle is always invalid
+  if(mutex_id == 0) {
+    return osErrorParameter;
+  }
 
   EvrRtxMutexDelete(mutex_id);
   if (IsException() || IsIrqMasked()) {
