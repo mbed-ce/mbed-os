@@ -110,3 +110,90 @@ ambiq_svl = "ambiq_svl.svl:cli"
 [tool.ruff]
 line-length = 120
 src = ['python']
+
+[tool.ruff.lint]
+select = [
+    'A',    # Builtins
+    'ANN',  # Annotations
+    'ARG',  # Unused arguments
+    'B',    # Bugbear
+    'BLE',  # Blind except
+    'C4',   # Comprehensions
+    'C90',  # mccabe
+    'COM',  # Commas
+    'D2',   # Docstring conventions
+    'DTZ',  # Datetimes
+    'EM',   # Error messages
+    'ERA',  # Commented-out code
+    'EXE',  # Executable
+    'F',    # Pyflakes
+    'FA',   # __future__ annotations
+    'FLY',  # F-strings
+    'FURB', # Refurb
+    'G',    # Logging format
+    'I',    # Isort
+    'ICN',  # Import conventions
+    'INP',  # Disallow PEP-420 (Implicit namespace packages)
+    'INT',  # gettext
+    'ISC',  # Implicit str concat
+    'LOG',  # Logging
+    'N',    # PEP-8 Naming
+    'NPY',  # Numpy
+    'PERF', # Unnecessary performance costs
+    'PGH',  # Pygrep hooks
+    'PIE',  # Unnecessary code
+    'PL',   # Pylint
+    'PT',   # Pytest
+    'PTH',  # Use Pathlib
+    'PYI',  # Stub files
+    'Q',    # Quotes
+    'RET',  # Return
+    'RUF',  # Ruff
+    'RSE',  # Raise
+    'S',    # Bandit
+    'SIM',  # Code simplification
+    'SLF',  # Private member access
+    'SLOT', # __slots__
+    'T10',  # Debugger
+    'T20',  # Print
+    'TCH',  # Type checking
+    'TID',  # Tidy imports
+    'TRY',  # Exception handling
+    'UP',   # Pyupgrade
+    'W',    # Warnings
+    'YTT',  # sys.version
+]
+ignore = [
+    'D203',    # One blank line before class docstring
+    'D212',    # Multi-line summary first line
+    'Q000',    # Single quotes found but double quotes preferred
+    'D200',    # One-line docstring should fit on one line
+    'S101',    # Assert statements
+    'RET505',  # Unnecessary `elif` after `return` statement
+    'RET506',  # Unnecessary `else` after `raise` statement
+    'TRY003',  # Inline exception messages - Redundant with EM101
+    'COM812',  # Missing trailing commas - incompatible with formatter
+    'ISC001',  # Single line implicit string concatenation - incompatible with formatter
+    'TRY300',  # Returns within try blocks
+    'PLR2004', # Magic value used in comparison
+    'SIM102',  # Allow multiple nested if statements.  Sometimes it's nice for readability
+    'TC001', 'TC003', # Don't require TYPE_CHECKING checks in imports. Waaaay too annoying to manage.
+    'PERF203', # Allow try-except within loops. Sometimes this is needed!
+    'PERF401', # Allow for loops that could be comprehensions. Sometimes this makes code easier to understand.
+    'PLR5501', # Stop collapsing my if statements!
+    'TC006',   # Allow unquoted types passed to typing.cast()
+    'G004',    # Allow f-strings in logging calls
+    'ANN401',  # Allow typing things as Any
+    'DTZ005',  # Allow creating datetime.datetime without passing a timezone. If this lint is enabled, it seems difficult to actually work with datetime objects that should be in the local time zone.
+    'S701',    # Allow using jinja without autoescape. autoescape not needed because we are not rendering HTML
+    'BLE001',  # Allow catching Exception
+    'S603',    # Allow running subprocesses with variable arguments (why is this a lint in the first place??)
+
+    # For now allow old-style type annotations. Currently there's lots of code that uses them, and I am
+    # not sure if there is a way to upgrade them automatically.
+    "FA100",
+    "UP045"
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15

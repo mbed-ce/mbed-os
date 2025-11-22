@@ -4,20 +4,20 @@
 #
 """Defines the public API of the package."""
 
-import pathlib
 import logging
+import pathlib
+from typing import Any, List
 
-from typing import List, Any
-
-from mbed_tools.project.mbed_program import MbedProgram, parse_url
-from mbed_tools.project._internal.libraries import LibraryReferences
 from mbed_tools.project._internal import git_utils
+from mbed_tools.project._internal.libraries import LibraryReferences
+from mbed_tools.project.mbed_program import MbedProgram, parse_url
 
 logger = logging.getLogger(__name__)
 
 
 def import_project(url: str, dst_path: Any = None, recursive: bool = False) -> pathlib.Path:
-    """Clones an Mbed project from a remote repository.
+    """
+    Clones an Mbed project from a remote repository.
 
     Args:
         url: URL of the repository to clone.
@@ -41,7 +41,8 @@ def import_project(url: str, dst_path: Any = None, recursive: bool = False) -> p
 
 
 def initialise_project(path: pathlib.Path, create_only: bool) -> None:
-    """Create a new Mbed project, optionally fetching and adding mbed-os.
+    """
+    Create a new Mbed project, optionally fetching and adding mbed-os.
 
     Args:
         path: Path to the project folder. Created if it doesn't exist.
@@ -54,7 +55,8 @@ def initialise_project(path: pathlib.Path, create_only: bool) -> None:
 
 
 def deploy_project(path: pathlib.Path, force: bool = False) -> None:
-    """Deploy a specific revision of the current Mbed project.
+    """
+    Deploy a specific revision of the current Mbed project.
 
     This function also resolves and syncs all library dependencies to the revision specified in the library reference
     files.
@@ -72,7 +74,8 @@ def deploy_project(path: pathlib.Path, force: bool = False) -> None:
 
 
 def get_known_libs(path: pathlib.Path) -> List:
-    """List all resolved library dependencies.
+    """
+    List all resolved library dependencies.
 
     This function will not resolve dependencies. This will only generate a list of resolved dependencies.
 
@@ -83,4 +86,4 @@ def get_known_libs(path: pathlib.Path) -> List:
         A list of known dependencies.
     """
     libs = LibraryReferences(path, ignore_paths=["mbed-os"])
-    return list(sorted(libs.iter_resolved()))
+    return sorted(libs.iter_resolved())

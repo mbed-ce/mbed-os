@@ -15,13 +15,13 @@ class VersionControlError(MbedProjectError):
     """Raised when a source control management operation failed."""
 
 
-class ExistingProgram(MbedProjectError):
+class ExistingProgramError(MbedProjectError):
     """Raised when a program already exists at a given path."""
 
 
-class ProgramNotFound(MbedProjectError):
+class ProgramNotFoundError(MbedProjectError):
     """Raised when an expected program is not found."""
 
 
-class MbedOSNotFound(MbedProjectError):
+class MbedOSNotFoundError(MbedProjectError):
     """A valid copy of MbedOS was not found."""

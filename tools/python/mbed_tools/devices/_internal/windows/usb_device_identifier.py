@@ -5,7 +5,7 @@
 """Defines a USB Identifier."""
 
 import re
-from typing import Dict, List, NamedTuple, Optional, Pattern, Any, cast
+from typing import Dict, List, NamedTuple, Optional, Pattern, cast
 
 from mbed_tools.devices._internal.windows.component_descriptor_utils import is_undefined_data_object
 from mbed_tools.devices._internal.windows.windows_identifier import WindowsUID
@@ -14,7 +14,8 @@ KEY_UID = "UID"
 
 
 class UsbIdentifier(NamedTuple):
-    """Object describing the different elements present in the device ID.
+    """
+    Object describing the different elements present in the device ID.
 
     Attributes:
         UID: Universal ID, either the serial number or device instance ID.
@@ -54,7 +55,7 @@ class UsbIdentifier(NamedTuple):
         """Returns the product id field."""
         return self.VID or ""
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """States whether the other id equals to self."""
         if not other or not isinstance(other, UsbIdentifier):
             return False
@@ -74,13 +75,15 @@ class UsbIdentifier(NamedTuple):
 
 
 class Win32DeviceIdParser:
-    """Parser of a standard Win32 device ID.
+    """
+    Parser of a standard Win32 device ID.
 
     See https://docs.microsoft.com/en-us/windows-hardware/drivers/install/standard-usb-identifiers
     """
 
     def parse_uid(self, raw_id: str, serial_number: Optional[str] = None) -> WindowsUID:
-        """Parses the UID value.
+        """
+        Parses the UID value.
 
         As described here:
         https://docs.microsoft.com/it-it/windows-hardware/drivers/install/device-instance-ids
@@ -107,9 +110,9 @@ class Win32DeviceIdParser:
             if match:
                 valuable_information[k] = match.group(1)
 
-    def split_id_elements(self, parts: List[str], serial_number: str = None) -> dict:
+    def split_id_elements(self, parts: List[str], serial_number: Optional[str] = None) -> dict:
         """Splits the different elements of an Device ID."""
-        information = dict()
+        information = {}
         information[KEY_UID] = self.parse_uid(parts[-1], serial_number)
         other_elements = parts[-2].split("&")
         patterns_dict = UsbIdentifier.get_patterns_dict()
@@ -118,7 +121,8 @@ class Win32DeviceIdParser:
         return information
 
     def parse(self, id_string: Optional[str], serial_number: Optional[str] = None) -> "UsbIdentifier":
-        r"""Parses the device id string and retrieves the different elements of interest.
+        r"""
+        Parses the device id string and retrieves the different elements of interest.
 
         See https://docs.microsoft.com/en-us/windows-hardware/drivers/install/standard-usb-identifiers
          Format: <device-ID>\<instance-specific-ID>
@@ -146,7 +150,8 @@ class Win32DeviceIdParser:
 
 
 def parse_device_id(id_string: Optional[str], serial_number: Optional[str] = None) -> UsbIdentifier:
-    """Parses the device id string and retrieves the different elements of interest.
+    """
+    Parses the device id string and retrieves the different elements of interest.
 
     See https://docs.microsoft.com/en-us/windows-hardware/drivers/install/standard-usb-identifiers
     """

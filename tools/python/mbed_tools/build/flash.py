@@ -4,28 +4,30 @@
 #
 """Flash binary onto the connected device."""
 
-import shutil
 import os
 import pathlib
 import platform
+import shutil
 
 from mbed_tools.build.exceptions import BinaryFileNotFoundError
 
 
 def _flash_dev(disk: pathlib.Path, image_path: pathlib.Path) -> None:
-    """Flash device using copy method.
+    """
+    Flash device using copy method.
 
     Args:
         disk: Device mount point.
         image_path: Image file to be copied to device.
     """
     shutil.copy(image_path, disk, follow_symlinks=False)
-    if not platform.system() == "Windows":
+    if platform.system() != "Windows":
         os.sync()
 
 
 def _build_binary_file_path(program_path: pathlib.Path, build_dir: pathlib.Path, hex_file: bool) -> pathlib.Path:
-    """Build binary file name.
+    """
+    Build binary file name.
 
     Args:
        program_path: Path to the Mbed project.
@@ -41,14 +43,16 @@ def _build_binary_file_path(program_path: pathlib.Path, build_dir: pathlib.Path,
     fw_fbase = build_dir / program_path.name
     fw_file = fw_fbase.with_suffix(".hex" if hex_file else ".bin")
     if not fw_file.exists():
-        raise BinaryFileNotFoundError(f"Build program file (firmware) not found {fw_file}")
+        msg = f"Build program file (firmware) not found {fw_file}"
+        raise BinaryFileNotFoundError(msg)
     return fw_file
 
 
 def flash_binary(
     mount_point: pathlib.Path, program_path: pathlib.Path, build_dir: pathlib.Path, mbed_target: str, hex_file: bool
 ) -> pathlib.Path:
-    """Flash binary onto a device.
+    """
+    Flash binary onto a device.
 
     Look through the connected devices and flash the binary if the connected and built target matches.
 

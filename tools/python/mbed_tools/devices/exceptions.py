@@ -11,11 +11,11 @@ class MbedDevicesError(ToolsError):
     """Base public exception for the mbed-devices package."""
 
 
-class DeviceLookupFailed(MbedDevicesError):
+class DeviceLookupFailedError(MbedDevicesError):
     """Failed to look up data associated with the device."""
 
 
-class NoDevicesFound(MbedDevicesError):
+class NoDevicesFoundError(MbedDevicesError):
     """No Mbed Enabled devices were found."""
 
 

@@ -6,14 +6,13 @@
 
 import logging
 from pathlib import Path
-from typing import Tuple, List, Optional, cast
+from typing import List, Optional, Tuple, cast
 
 import psutil
 import pyudev
 
 from mbed_tools.devices._internal.base_detector import DeviceDetector
 from mbed_tools.devices._internal.candidate_device import CandidateDevice, FilesystemMountpointError
-
 
 logger = logging.getLogger(__name__)
 

@@ -8,8 +8,8 @@ import pathlib
 
 import click
 
-from mbed_tools.project import MbedProgram
 from mbed_tools.build import generate_config
+from mbed_tools.project import MbedProgram
 
 
 @click.command(
@@ -49,7 +49,8 @@ def configure(
     custom_targets_json: str,
     app_config: str,
 ) -> None:
-    """Exports a mbed_config.cmake file to build directory in the program root.
+    """
+    Exports a mbed_config.cmake file to build directory in the program root.
 
     The parameters set in the CMake file will be dependent on the combination of
     toolchain and Mbed target provided and these can then control which parts of
@@ -80,4 +81,4 @@ def configure(
 
     mbed_target = mbed_target.upper()
     _, output_path = generate_config(mbed_target, toolchain, program)
-    click.echo(f"mbed_config.cmake has been generated and written to '{str(output_path.resolve())}'")
+    click.echo(f"mbed_config.cmake has been generated and written to '{output_path.resolve()!s}'")

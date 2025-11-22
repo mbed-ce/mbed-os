@@ -27,5 +27,8 @@ if ! command -v ruff >/dev/null 2>&1; then
   echo "Linters optional dependency of Mbed not installed. Please run 'mbed-os/venv/bin/pip install mbed-os/tools[linters]'."
 fi
 
-echo ">> Formatting with Ruff..."
+echo ">> Formatting with ruff..."
 ruff format
+
+echo ">> Linting with ruff..."
+ruff check --fix python/mbed_tools python/mbed_platformio

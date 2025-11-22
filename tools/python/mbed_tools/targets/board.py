@@ -10,7 +10,8 @@ from typing import Tuple
 
 @dataclass(frozen=True, order=True)
 class Board:
-    """Representation of an Mbed-Enabled Development Board.
+    """
+    Representation of an Mbed-Enabled Development Board.
 
     Attributes:
         board_type: Type of board in format that allows cross-referencing with target definitions.
@@ -37,7 +38,8 @@ class Board:
 
     @classmethod
     def from_online_board_entry(cls, board_entry: dict) -> "Board":
-        """Create a new instance of Board from an online database entry.
+        """
+        Create a new instance of Board from an online database entry.
 
         Args:
             board_entry: A single entity retrieved from the board database API.
@@ -60,7 +62,7 @@ class Board:
             # This is simply so we can demo the tools to PE. This must be removed and replaced with a proper mechanism
             # for determining the build variant for all platforms. We probably need to add this information to the
             # boards database.
-            build_variant=tuple(),
+            build_variant=(),
         )
 
     @classmethod

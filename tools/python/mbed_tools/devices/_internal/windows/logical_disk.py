@@ -10,7 +10,8 @@ from mbed_tools.devices._internal.windows.component_descriptor import ComponentD
 
 
 class LogicalDiskMsdnDefinition(NamedTuple):
-    """Msdn definition of a logical disk.
+    """
+    Msdn definition of a logical disk.
 
     See https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/cim-logicaldisk
     """
@@ -44,7 +45,8 @@ class LogicalDiskMsdnDefinition(NamedTuple):
 
 
 class LogicalDisk(ComponentDescriptor):
-    """Logical disk as defined in Windows API.
+    """
+    Logical disk as defined in Windows API.
 
     See https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/cim-logicaldisk
     """

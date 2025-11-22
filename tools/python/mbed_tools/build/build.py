@@ -7,17 +7,16 @@
 import logging
 import pathlib
 import subprocess
-
 from typing import Optional
 
 from mbed_tools.build.exceptions import MbedBuildError
-
 
 logger = logging.getLogger(__name__)
 
 
 def build_project(build_dir: pathlib.Path, target: Optional[str] = None) -> None:
-    """Build a project using CMake to invoke Ninja.
+    """
+    Build a project using CMake to invoke Ninja.
 
     Args:
         build_dir: Path to the CMake build tree.
@@ -29,7 +28,8 @@ def build_project(build_dir: pathlib.Path, target: Optional[str] = None) -> None
 
 
 def generate_build_system(source_dir: pathlib.Path, build_dir: pathlib.Path, profile: str) -> None:
-    """Configure a project using CMake.
+    """
+    Configure a project using CMake.
 
     Args:
         source_dir: Path to the CMake source tree.
@@ -45,15 +45,16 @@ def _cmake_wrapper(*cmake_args: str) -> None:
         logger.debug("Running CMake with args: %s", cmake_args)
         subprocess.run(["cmake", *cmake_args], check=True)
     except FileNotFoundError:
-        raise MbedBuildError("Could not find CMake. Please ensure CMake is installed and added to PATH.")
+        msg = "Could not find CMake. Please ensure CMake is installed and added to PATH."
+        raise MbedBuildError(msg)
     except subprocess.CalledProcessError:
-        raise MbedBuildError("CMake invocation failed!")
+        msg = "CMake invocation failed!"
+        raise MbedBuildError(msg)
 
 
 def _check_ninja_found() -> None:
     try:
-        subprocess.run(["ninja", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(["ninja", "--version"], check=True, capture_output=True)
     except FileNotFoundError:
-        raise MbedBuildError(
-            "Could not find the 'Ninja' build program. Please ensure 'Ninja' is installed and added to PATH."
-        )
+        msg = "Could not find the 'Ninja' build program. Please ensure 'Ninja' is installed and added to PATH."
+        raise MbedBuildError(msg)

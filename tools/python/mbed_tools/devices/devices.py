@@ -8,13 +8,13 @@ from operator import attrgetter
 from typing import List, Optional
 
 from mbed_tools.devices._internal.detect_candidate_devices import detect_candidate_devices
-
 from mbed_tools.devices.device import ConnectedDevices, Device
-from mbed_tools.devices.exceptions import DeviceLookupFailed, NoDevicesFound
+from mbed_tools.devices.exceptions import DeviceLookupFailedError, NoDevicesFoundError
 
 
 def get_connected_devices() -> ConnectedDevices:
-    """Returns Mbed Devices connected to host computer.
+    """
+    Returns Mbed Devices connected to host computer.
 
     Connected devices which have been identified as Mbed Boards and also connected devices which are potentially
     Mbed Boards (but not could not be identified in the database) are returned.
@@ -29,7 +29,8 @@ def get_connected_devices() -> ConnectedDevices:
 
 
 def find_connected_device(target_name: str, identifier: Optional[int] = None) -> Device:
-    """Find a connected device matching the given target_name, if there is only one.
+    """
+    Find a connected device matching the given target_name, if there is only one.
 
     Args:
         target_name: The Mbed target name of the device.
@@ -61,11 +62,12 @@ def find_connected_device(target_name: str, identifier: Optional[int] = None) ->
             f"`{target_name}[{identifier}]` is not a valid connected target.\n"
             f"The following {target_name}s were detected:\n{detected_targets}"
         )
-    raise DeviceLookupFailed(msg)
+    raise DeviceLookupFailedError(msg)
 
 
 def find_all_connected_devices(target_name: str) -> List[Device]:
-    """Find all connected devices matching the given target_name.
+    """
+    Find all connected devices matching the given target_name.
 
     Args:
         target_name: The Mbed target name of the device.
@@ -79,7 +81,8 @@ def find_all_connected_devices(target_name: str) -> List[Device]:
     """
     connected = get_connected_devices()
     if not connected.identified_devices:
-        raise NoDevicesFound("No Mbed enabled devices found.")
+        msg = "No Mbed enabled devices found."
+        raise NoDevicesFoundError(msg)
 
     matching_devices = sorted(
         [device for device in connected.identified_devices if device.mbed_board.board_type == target_name.upper()],
@@ -97,4 +100,4 @@ def find_all_connected_devices(target_name: str) -> List[Device]:
         "Check the device is connected by USB, and that the name is entered correctly.\n"
         f"The following devices were detected:\n{detected_targets}"
     )
-    raise DeviceLookupFailed(msg)
+    raise DeviceLookupFailedError(msg)

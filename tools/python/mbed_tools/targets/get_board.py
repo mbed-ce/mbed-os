@@ -2,7 +2,8 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Interface for accessing Mbed-Enabled Development Board data.
+"""
+Interface for accessing Mbed-Enabled Development Board data.
 
 An instance of `mbed_tools.targets.board.Board` can be retrieved by calling one of the public functions.
 """
@@ -11,17 +12,17 @@ import logging
 from enum import Enum
 from typing import Callable
 
-from mbed_tools.targets.env import env
-from mbed_tools.targets.exceptions import UnknownBoard, UnsupportedMode, BoardDatabaseError
 from mbed_tools.targets.board import Board
 from mbed_tools.targets.boards import Boards
-
+from mbed_tools.targets.env import env
+from mbed_tools.targets.exceptions import BoardDatabaseError, UnknownBoardError, UnsupportedModeError
 
 logger = logging.getLogger(__name__)
 
 
 def get_board_by_product_code(product_code: str) -> Board:
-    """Returns first `mbed_tools.targets.board.Board` matching given product code.
+    """
+    Returns first `mbed_tools.targets.board.Board` matching given product code.
 
     Args:
         product_code: the product code to look up in the database.
@@ -33,7 +34,8 @@ def get_board_by_product_code(product_code: str) -> Board:
 
 
 def get_board_by_online_id(slug: str, target_type: str) -> Board:
-    """Returns first `mbed_tools.targets.board.Board` matching given online id.
+    """
+    Returns first `mbed_tools.targets.board.Board` matching given online id.
 
     Args:
         slug: The slug to look up in the database.
@@ -47,7 +49,8 @@ def get_board_by_online_id(slug: str, target_type: str) -> Board:
 
 
 def get_board_by_jlink_slug(slug: str) -> Board:
-    """Returns first `mbed-tools.targets.board.Board` matching given slug.
+    """
+    Returns first `mbed-tools.targets.board.Board` matching given slug.
 
     With J-Link, the slug is extracted from a board manufacturer URL, and may not match
     the Mbed slug. The J-Link slug is compared against the slug, board_name and
@@ -66,7 +69,8 @@ def get_board_by_jlink_slug(slug: str) -> Board:
 
 
 def get_board(matching: Callable) -> Board:
-    """Returns first `mbed_tools.targets.board.Board` for which `matching` is True.
+    """
+    Returns first `mbed_tools.targets.board.Board` for which `matching` is True.
 
     Uses database mode configured in the environment.
 
@@ -88,13 +92,13 @@ def get_board(matching: Callable) -> Board:
     try:
         logger.info("Using the offline database to identify boards.")
         return Boards.from_offline_database().get_board(matching)
-    except UnknownBoard:
+    except UnknownBoardError:
         logger.info("Unable to identify a board using the offline database, trying the online database.")
         try:
             return Boards.from_online_database().get_board(matching)
-        except BoardDatabaseError:
-            logger.error("Unable to access the online database to identify a board.")
-            raise UnknownBoard()
+        except BoardDatabaseError as ex:
+            logger.exception("Unable to access the online database to identify a board.")
+            raise UnknownBoardError from ex
 
 
 class _DatabaseMode(Enum):
@@ -109,5 +113,6 @@ def _get_database_mode() -> _DatabaseMode:
     database_mode = env.MBED_DATABASE_MODE
     try:
         return _DatabaseMode[database_mode]
-    except KeyError:
-        raise UnsupportedMode(f"{database_mode} is not a supported database mode.")
+    except KeyError as ex:
+        msg = f"{database_mode} is not a supported database mode."
+        raise UnsupportedModeError(msg) from ex

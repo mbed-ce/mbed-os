@@ -5,7 +5,6 @@
 """Render jinja templates required by the project package."""
 
 import datetime
-
 from pathlib import Path
 
 import jinja2
@@ -14,7 +13,8 @@ TEMPLATES_DIRECTORY = Path("_internal", "templates")
 
 
 def render_cmakelists_template(cmakelists_file: Path, program_name: str) -> None:
-    """Render CMakeLists.tmpl with the copyright year and program name as the app target name.
+    """
+    Render CMakeLists.tmpl with the copyright year and program name as the app target name.
 
     Args:
         cmakelists_file: The path where CMakeLists.txt will be written.
@@ -28,7 +28,8 @@ def render_cmakelists_template(cmakelists_file: Path, program_name: str) -> None
 
 
 def render_main_cpp_template(main_cpp: Path) -> None:
-    """Render a basic main.cpp which prints a hello message and returns.
+    """
+    Render a basic main.cpp which prints a hello message and returns.
 
     Args:
         main_cpp: Path where the main.cpp file will be written.
@@ -37,7 +38,8 @@ def render_main_cpp_template(main_cpp: Path) -> None:
 
 
 def render_gitignore_template(gitignore: Path) -> None:
-    """Write out a basic gitignore file ignoring the build and config directory.
+    """
+    Write out a basic gitignore file ignoring the build and config directory.
 
     Args:
         gitignore: The path where the gitignore file will be written.
@@ -46,12 +48,16 @@ def render_gitignore_template(gitignore: Path) -> None:
 
 
 def render_jinja_template(template_name: str, context: dict) -> str:
-    """Render a jinja template.
+    """
+    Render a jinja template.
 
     Args:
         template_name: The name of the template being rendered.
         context: Data to render into the jinja template.
     """
-    env = jinja2.Environment(loader=jinja2.PackageLoader("mbed_tools.project", str(TEMPLATES_DIRECTORY)))
+    env = jinja2.Environment(
+        loader=jinja2.PackageLoader("mbed_tools.project", str(TEMPLATES_DIRECTORY)),
+        autoescape=False,  # autoescape not needed because we are not rendering HTML
+    )
     template = env.get_template(template_name)
     return template.render(context)

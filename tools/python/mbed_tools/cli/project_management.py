@@ -6,13 +6,12 @@
 
 import os
 import pathlib
-
 from typing import Any, List
 
 import click
 import tabulate
 
-from mbed_tools.project import initialise_project, import_project, get_known_libs, deploy_project
+from mbed_tools.project import deploy_project, get_known_libs, import_project, initialise_project
 from mbed_tools.project._internal import git_utils
 
 
@@ -20,7 +19,8 @@ from mbed_tools.project._internal import git_utils
 @click.option("--create-only", "-c", is_flag=True, show_default=True, help="Create a program without fetching mbed-os.")
 @click.argument("path", type=click.Path(resolve_path=True))
 def new(path: str, create_only: bool) -> None:
-    """Creates a new Mbed project at the specified path. Downloads mbed-os and adds it to the project.
+    """
+    Creates a new Mbed project at the specified path. Downloads mbed-os and adds it to the project.
 
     PATH: Path to the destination directory for the project. Will be created if it does not exist.
     """
@@ -42,7 +42,8 @@ def new(path: str, create_only: bool) -> None:
     help="Skip resolving program library dependencies after cloning.",
 )
 def import_(url: str, path: Any, skip_resolve_libs: bool) -> None:
-    """Clone an Mbed project and library dependencies.
+    """
+    Clone an Mbed project and library dependencies.
 
     URL: The git url of the remote project to clone.
 
@@ -72,7 +73,8 @@ def import_(url: str, path: Any, skip_resolve_libs: bool) -> None:
     help="Forces checkout of all library repositories at specified commit in the .lib file, overwrites local changes.",
 )
 def deploy(path: str, force: bool) -> None:
-    """Checks out Mbed program library dependencies at the revision specified in the ".lib" files.
+    """
+    Checks out Mbed program library dependencies at the revision specified in the ".lib" files.
 
     Ensures all dependencies are resolved and the versions are synchronised to the version specified in the library
     reference.

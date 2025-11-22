@@ -4,22 +4,19 @@
 #
 """Configuration assembly algorithm."""
 
-import itertools
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional, Set
 
-from setuptools.build_meta import build_editable
-
-from mbed_tools.project import MbedProgram
-from mbed_tools.build._internal.config.config import Config
 from mbed_tools.build._internal.config import source
+from mbed_tools.build._internal.config.config import Config
 from mbed_tools.build._internal.find_files import LabelFilter, RequiresFilter, filter_files, find_files
+from mbed_tools.project import MbedProgram
 
 
 def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
-    """Assemble config for given target and program directory.
+    """
+    Assemble config for given target and program directory.
 
     Mbed library and application specific config parameters are parsed from mbed_lib.json and mbed_app.json files
     located in the project source tree.

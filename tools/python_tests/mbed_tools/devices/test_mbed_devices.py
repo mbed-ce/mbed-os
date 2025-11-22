@@ -13,10 +13,10 @@ from mbed_tools.targets import Board
 
 from python_tests.mbed_tools.devices.factories import CandidateDeviceFactory
 from mbed_tools.devices.device import Device
-from mbed_tools.devices._internal.exceptions import NoBoardForCandidate, ResolveBoardError
+from mbed_tools.devices._internal.exceptions import NoBoardForCandidateError, ResolveBoardError
 
 from mbed_tools.devices.devices import get_connected_devices, find_connected_device, find_all_connected_devices
-from mbed_tools.devices.exceptions import DeviceLookupFailed, NoDevicesFound
+from mbed_tools.devices.exceptions import DeviceLookupFailedError, NoDevicesFoundError
 
 
 @mock.patch("mbed_tools.devices.devices.detect_candidate_devices")
@@ -45,7 +45,7 @@ class TestGetConnectedDevices:
     @mock.patch.object(Board, "from_offline_board_entry")
     def test_skips_candidates_without_a_board(self, board, resolve_board, detect_candidate_devices):
         candidate = CandidateDeviceFactory()
-        resolve_board.side_effect = NoBoardForCandidate
+        resolve_board.side_effect = NoBoardForCandidateError
         detect_candidate_devices.return_value = [candidate]
         board.return_value = None
 
@@ -66,7 +66,7 @@ class TestGetConnectedDevices:
         resolve_board.side_effect = ResolveBoardError
         detect_candidate_devices.return_value = [candidate]
 
-        with pytest.raises(DeviceLookupFailed, match="candidate"):
+        with pytest.raises(DeviceLookupFailedError, match="candidate"):
             get_connected_devices()
 
 
@@ -113,7 +113,7 @@ class TestFindConnectedDevice:
             ),
         ]
 
-        with pytest.raises(DeviceLookupFailed, match="Multiple"):
+        with pytest.raises(DeviceLookupFailedError, match="Multiple"):
             find_connected_device("K64F", None)
 
     def test_raises_when_identifier_out_of_bounds(self, mock_find_connected_devices):
@@ -135,7 +135,7 @@ class TestFindConnectedDevice:
             ),
         ]
 
-        with pytest.raises(DeviceLookupFailed, match="valid"):
+        with pytest.raises(DeviceLookupFailedError, match="valid"):
             find_connected_device("K64F", 2)
 
 
@@ -161,7 +161,7 @@ class TestFindAllConnectedDevices:
     def test_raises_when_no_mbed_enabled_devices_found(self, mock_get_connected_devices):
         mock_get_connected_devices.return_value = mock.Mock(identified_devices=[], spec=True)
 
-        with pytest.raises(NoDevicesFound):
+        with pytest.raises(NoDevicesFoundError):
             find_all_connected_devices("K64F")
 
     def test_raises_when_device_matching_target_name_not_found(self, mock_get_connected_devices):
@@ -182,7 +182,7 @@ class TestFindAllConnectedDevices:
         )
 
         with pytest.raises(
-            DeviceLookupFailed,
+            DeviceLookupFailedError,
             match=(
                 f".*(target: {re.escape(connected_target_name)}).*(port: {re.escape(connected_target_serial_port)}).*"
                 f"(mount point.*: {re.escape(str(connected_target_mount_point))})"

@@ -6,17 +6,19 @@
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Tuple, Optional, List
-from mbed_tools.targets import Board
+from typing import List, Optional, Tuple
+
 from mbed_tools.devices._internal.detect_candidate_devices import CandidateDevice
-from mbed_tools.devices._internal.resolve_board import resolve_board, NoBoardForCandidate, ResolveBoardError
 from mbed_tools.devices._internal.file_parser import read_device_files
-from mbed_tools.devices.exceptions import DeviceLookupFailed
+from mbed_tools.devices._internal.resolve_board import NoBoardForCandidateError, ResolveBoardError, resolve_board
+from mbed_tools.devices.exceptions import DeviceLookupFailedError
+from mbed_tools.targets import Board
 
 
 @dataclass(frozen=True, order=True)
 class Device:
-    """Definition of an Mbed Enabled Device.
+    """
+    Definition of an Mbed Enabled Device.
 
     An Mbed Device is always a USB mass storage device, which sometimes also presents a USB serial port.
     A valid Mbed Device must have a Board associated with it.
@@ -37,7 +39,8 @@ class Device:
 
     @classmethod
     def from_candidate(cls, candidate: CandidateDevice) -> "Device":
-        """Contruct a Device from a CandidateDevice.
+        """
+        Contruct a Device from a CandidateDevice.
 
         We try to resolve a board using data files that may be stored on the CandidateDevice.
         If this fails we set the board to `None` which means we couldn't verify this Device
@@ -52,15 +55,16 @@ class Device:
                 device_file_info.product_code, device_file_info.online_id, candidate.serial_number
             )
             mbed_enabled = True
-        except NoBoardForCandidate:
+        except NoBoardForCandidateError:
             # Create an empty Board to ensure the device is fully populated and rendering is simple
             mbed_board = Board.from_offline_board_entry({})
             mbed_enabled = False
-        except ResolveBoardError:
-            raise DeviceLookupFailed(
+        except ResolveBoardError as ex:
+            msg = (
                 f"Failed to resolve the board for candidate device {candidate!r}. There was a problem looking up the "
                 "board data in the database."
             )
+            raise DeviceLookupFailedError(msg) from ex
 
         return Device(
             serial_port=candidate.serial_port,
@@ -74,7 +78,8 @@ class Device:
 
 @dataclass(order=True)
 class ConnectedDevices:
-    """Definition of connected devices which may be Mbed Boards.
+    """
+    Definition of connected devices which may be Mbed Boards.
 
     If a connected device is identified as an Mbed Board by using the HTM file on the USB mass storage device (or
     sometimes by using the serial number), it will be included in the `identified_devices` list.
@@ -91,7 +96,8 @@ class ConnectedDevices:
     unidentified_devices: List[Device] = field(default_factory=list)
 
     def add_device(self, device: Device) -> None:
-        """Add a device to the connected devices.
+        """
+        Add a device to the connected devices.
 
         Args:
             device: a Device object containing the device information.

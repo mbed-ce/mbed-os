@@ -10,7 +10,7 @@ from unittest import mock, TestCase
 
 from mbed_tools.targets import Board
 from mbed_tools.targets.boards import Boards
-from mbed_tools.targets.exceptions import UnknownBoard
+from mbed_tools.targets.exceptions import UnknownBoardError
 from python_tests.mbed_tools.targets.factories import make_dummy_internal_board_data
 
 
@@ -75,7 +75,7 @@ class TestBoards(TestCase):
 
         boards = Boards.from_online_database()
 
-        with self.assertRaises(UnknownBoard):
+        with self.assertRaises(UnknownBoardError):
             boards.get_board(lambda b: b.product_code == "unknown")
 
     @mock.patch("mbed_tools.targets._internal.board_database.get_offline_board_data")

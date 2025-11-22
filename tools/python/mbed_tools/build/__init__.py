@@ -2,7 +2,8 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Provides the core build system for Mbed OS, which relies on CMake and Ninja as underlying technologies.
+"""
+Provides the core build system for Mbed OS, which relies on CMake and Ninja as underlying technologies.
 
 The functionality covered in this package includes the following:
 

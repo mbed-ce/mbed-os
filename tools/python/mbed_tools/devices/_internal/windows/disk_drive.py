@@ -4,18 +4,19 @@
 #
 """Defines a Disk drive."""
 
-from typing import NamedTuple, cast, Optional, Tuple
 import re
+from typing import NamedTuple, Optional, Tuple, cast
 
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
-from mbed_tools.devices._internal.windows.component_descriptor_utils import is_undefined_value, UNKNOWN_VALUE
+from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE, is_undefined_value
 from mbed_tools.devices._internal.windows.windows_identifier import WindowsUID
 
 PATTERN_UID = re.compile(r"[&#]?([0-9A-Za-z]{10,48})[&#]?")
 
 
 class DiskDriveMsdnDefinition(NamedTuple):
-    """Msdn definition of a disk drive.
+    """
+    Msdn definition of a disk drive.
 
     See https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-diskdrive
     """
@@ -74,7 +75,8 @@ class DiskDriveMsdnDefinition(NamedTuple):
 
 
 class DiskDrive(ComponentDescriptor):
-    """Disk Drive as defined in Windows API.
+    """
+    Disk Drive as defined in Windows API.
 
     See https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-diskdrive
     """
@@ -111,7 +113,8 @@ class Win32DiskIdParser:
         return (UNKNOWN_VALUE, UNKNOWN_VALUE)
 
     def parse(self, pnpid: str, serial_number: Optional[str]) -> WindowsUID:
-        """Parses the UID value based on multiple fields.
+        """
+        Parses the UID value based on multiple fields.
 
         For different boards, the ID is stored in different fields.
         e.g. JLink serial number is irrelevant whereas it is the correct field for Daplink boards.

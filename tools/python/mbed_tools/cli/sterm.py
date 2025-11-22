@@ -18,7 +18,8 @@ def _get_target_id(target: str) -> Tuple[str, Optional[int]]:
         target_name, target_id = target.replace("]", "").split("[", maxsplit=1)
         if target_id.isdigit() and int(target_id) >= 0:
             return (target_name, int(target_id))
-        raise click.ClickException("When using the format mbed-target[ID], ID must be a positive integer or 0.")
+        msg = "When using the format mbed-target[ID], ID must be a positive integer or 0."
+        raise click.ClickException(msg)
     return (target, None)
 
 
@@ -46,13 +47,14 @@ def sterm(port: str, baudrate: int, echo: str, mbed_target: str) -> None:
     if port is None:
         port = _find_target_serial_port_or_default(mbed_target)
 
-    terminal.run(port, baudrate, echo=True if echo == "on" else False)
+    terminal.run(port, baudrate, echo=echo == "on")
 
 
 def _get_connected_mbed_devices() -> Any:
     connected_devices = get_connected_devices()
     if not connected_devices.identified_devices:
-        raise MbedDevicesError("No Mbed enabled devices found.")
+        msg = "No Mbed enabled devices found."
+        raise MbedDevicesError(msg)
 
     return connected_devices.identified_devices
 

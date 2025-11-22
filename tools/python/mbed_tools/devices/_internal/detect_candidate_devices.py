@@ -7,9 +7,16 @@
 import platform
 from typing import Iterable
 
-from mbed_tools.devices._internal.candidate_device import CandidateDevice
 from mbed_tools.devices._internal.base_detector import DeviceDetector
+from mbed_tools.devices._internal.candidate_device import CandidateDevice
 from mbed_tools.devices.exceptions import UnknownOSError
+
+if platform.system() == "Windows":
+    from mbed_tools.devices._internal.windows.device_detector import WindowsDeviceDetector as DeviceDetector
+if platform.system() == "Linux":
+    from mbed_tools.devices._internal.linux.device_detector import LinuxDeviceDetector as DeviceDetector
+if platform.system() == "Darwin":
+    from mbed_tools.devices._internal.darwin.device_detector import DarwinDeviceDetector as DeviceDetector
 
 
 def detect_candidate_devices() -> Iterable[CandidateDevice]:
@@ -20,20 +27,11 @@ def detect_candidate_devices() -> Iterable[CandidateDevice]:
 
 def _get_detector_for_current_os() -> DeviceDetector:
     """Returns DeviceDetector for current operating system."""
-    if platform.system() == "Windows":
-        from mbed_tools.devices._internal.windows.device_detector import WindowsDeviceDetector
+    if platform.system() not in {"Linux", "Darwin", "Windows"}:
+        msg = (
+            f"We have detected the OS you are running is '{platform.system()}'. "
+            "Unfortunately we haven't implemented device detection support for this OS yet. Sorry!"
+        )
+        raise UnknownOSError(msg)
 
-        return WindowsDeviceDetector()
-    if platform.system() == "Linux":
-        from mbed_tools.devices._internal.linux.device_detector import LinuxDeviceDetector
-
-        return LinuxDeviceDetector()
-    if platform.system() == "Darwin":
-        from mbed_tools.devices._internal.darwin.device_detector import DarwinDeviceDetector
-
-        return DarwinDeviceDetector()
-
-    raise UnknownOSError(
-        f"We have detected the OS you are running is '{platform.system()}'. "
-        "Unfortunately we haven't implemented device detection support for this OS yet. Sorry!"
-    )
+    return DeviceDetector()

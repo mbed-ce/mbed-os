@@ -15,11 +15,11 @@ class TargetError(ToolsError):
     """Target definition cannot be retrieved."""
 
 
-class UnknownBoard(MbedTargetsError):
+class UnknownBoardError(MbedTargetsError):
     """Requested board was not found."""
 
 
-class UnsupportedMode(MbedTargetsError):
+class UnsupportedModeError(MbedTargetsError):
     """The Database Mode is unsupported."""
 
 
