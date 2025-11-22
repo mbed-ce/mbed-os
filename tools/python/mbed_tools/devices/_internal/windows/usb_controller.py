@@ -10,7 +10,8 @@ from mbed_tools.devices._internal.windows.component_descriptor import ComponentD
 
 
 class UsbControllerMsdnDefinition(NamedTuple):
-    """Msdn definition of a USB controller.
+    """
+    Msdn definition of a USB controller.
 
     See https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-usbcontroller?redirectedfrom=MSDN
     Similar to https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-usbcontrollerdevice
@@ -42,7 +43,8 @@ class UsbControllerMsdnDefinition(NamedTuple):
 
 
 class UsbController(ComponentDescriptor):
-    """USB Controller as defined in Windows API.
+    """
+    USB Controller as defined in Windows API.
 
     See https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-usbcontroller?redirectedfrom=MSDN
     Similar to https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-usbcontrollerdevice

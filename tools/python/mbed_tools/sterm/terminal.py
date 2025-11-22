@@ -2,7 +2,8 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Serial terminal implementation based on pyserial.tools.miniterm.
+"""
+Serial terminal implementation based on pyserial.tools.miniterm.
 
 The Mbed serial terminal makes the following modifications to the default Miniterm.
 * Custom help menu text
@@ -20,7 +21,8 @@ from serial.tools.miniterm import Miniterm
 
 
 def run(port: str, baud: int, echo: bool = True) -> None:
-    """Run the serial terminal.
+    """
+    Run the serial terminal.
 
     This function is blocking as it waits for the terminal thread to finish executing before returning.
 
@@ -42,7 +44,8 @@ def run(port: str, baud: int, echo: bool = True) -> None:
 
 
 class SerialTerminal(Miniterm):
-    """An implementation of Miniterm that implements the additional Mbed terminal functionality.
+    """
+    An implementation of Miniterm that implements the additional Mbed terminal functionality.
 
     Overrides the `writer` method to implement modified menu key handling behaviour.
     Overrides the Miniterm::get_help_text method to return the Mbed custom help text.

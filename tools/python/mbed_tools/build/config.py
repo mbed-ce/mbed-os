@@ -4,19 +4,18 @@
 #
 """Parses the Mbed configuration system and generates a CMake config script."""
 
-import pathlib
-
-from typing import Any, Tuple
 import json
+import pathlib
+from typing import Any, Tuple
 
-from mbed_tools.lib.json_helpers import decode_json_file
-from mbed_tools.project import MbedProgram
-from mbed_tools.targets import get_target_by_name
 from mbed_tools.build._internal.cmake_file import render_mbed_config_cmake_template
 from mbed_tools.build._internal.config.assemble_build_config import Config, assemble_config
 from mbed_tools.build._internal.memory_banks import incorporate_memory_bank_data_from_cmsis, process_memory_banks
 from mbed_tools.build._internal.write_files import write_file
 from mbed_tools.build.exceptions import MbedBuildError
+from mbed_tools.lib.json_helpers import decode_json_file
+from mbed_tools.project import MbedProgram
+from mbed_tools.targets import get_target_by_name
 
 CMAKE_CONFIG_FILE = "mbed_config.cmake"
 MEMORY_BANKS_JSON_FILE = "memory_banks.json"
@@ -24,7 +23,8 @@ MBEDIGNORE_FILE = ".mbedignore"
 
 
 def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> Tuple[Config, pathlib.Path]:
-    """Generate an Mbed config file after parsing the Mbed config system.
+    """
+    Generate an Mbed config file after parsing the Mbed config system.
 
     Args:
         target_name: Name of the target to configure for.
@@ -61,11 +61,12 @@ def _load_raw_targets_data(program: MbedProgram) -> Any:
         custom_targets_data = decode_json_file(program.files.custom_targets_json)
         for custom_target in custom_targets_data:
             if custom_target in targets_data:
-                raise MbedBuildError(
+                msg = (
                     f"Error found in {program.files.custom_targets_json}.\n"
                     f"A target with the name '{custom_target}' already exists in targets.json. "
                     "Please give your custom target a unique name so it can be identified."
                 )
+                raise MbedBuildError(msg)
 
         targets_data.update(custom_targets_data)
 

@@ -4,22 +4,23 @@
 #
 """Wrappers for git operations."""
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 import git
-import logging
 
-from mbed_tools.project.exceptions import VersionControlError
 from mbed_tools.project._internal.progress import ProgressReporter
-from typing import Optional
+from mbed_tools.project.exceptions import VersionControlError
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class GitReference:
-    """Git reference for a remote repository.
+    """
+    Git reference for a remote repository.
 
     Attributes:
         repo_url: URL of the git repository.
@@ -31,7 +32,8 @@ class GitReference:
 
 
 def clone(url: str, dst_dir: Path, ref: Optional[str] = None, depth: int = 1) -> git.Repo:
-    """Clone a library repository.
+    """
+    Clone a library repository.
 
     Args:
         url: URL of the remote to clone.
@@ -47,7 +49,8 @@ def clone(url: str, dst_dir: Path, ref: Optional[str] = None, depth: int = 1) ->
     # cloned, so we cannot depend on git to handle the "already cloned" error.
     # We must handle this ourselves instead.
     if dst_dir.exists() and list(dst_dir.glob("*")):
-        raise VersionControlError(f"{dst_dir} exists and is not an empty directory.")
+        msg = f"{dst_dir} exists and is not an empty directory."
+        raise VersionControlError(msg)
 
     clone_from_kwargs = {"url": url, "to_path": str(dst_dir), "progress": ProgressReporter(name=url), "depth": depth}
     if ref:
@@ -56,11 +59,13 @@ def clone(url: str, dst_dir: Path, ref: Optional[str] = None, depth: int = 1) ->
     try:
         return git.Repo.clone_from(**clone_from_kwargs)
     except git.exc.GitCommandError as err:
-        raise VersionControlError(f"Cloning git repository from url '{url}' failed. Error from VCS: {err}")
+        msg = f"Cloning git repository from url '{url}' failed. Error from VCS: {err}"
+        raise VersionControlError(msg) from err
 
 
 def checkout(repo: git.Repo, ref: str, force: bool = False) -> None:
-    """Check out a specific reference in the given repository.
+    """
+    Check out a specific reference in the given repository.
 
     Args:
         repo: git.Repo object where the checkout will be performed.
@@ -70,14 +75,16 @@ def checkout(repo: git.Repo, ref: str, force: bool = False) -> None:
         VersionControlError: Check out failed.
     """
     try:
-        git_args = [ref] + ["--force"] if force else [ref]
+        git_args = [ref, "--force"] if force else [ref]
         repo.git.checkout(*git_args)
     except git.exc.GitCommandError as err:
-        raise VersionControlError(f"Failed to check out revision '{ref}'. Error from VCS: {err}")
+        msg = f"Failed to check out revision '{ref}'. Error from VCS: {err}"
+        raise VersionControlError(msg) from err
 
 
 def fetch(repo: git.Repo, ref: str) -> None:
-    """Fetch from the repo's origin.
+    """
+    Fetch from the repo's origin.
 
     Args:
         repo: git.Repo object where the checkout will be performed.
@@ -89,11 +96,13 @@ def fetch(repo: git.Repo, ref: str) -> None:
     try:
         repo.git.fetch("origin", ref)
     except git.exc.GitCommandError as err:
-        raise VersionControlError(f"Failed to fetch. Error from VCS: {err}")
+        msg = f"Failed to fetch. Error from VCS: {err}"
+        raise VersionControlError(msg) from err
 
 
 def init(path: Path) -> git.Repo:
-    """Initialise a git repository at the given path.
+    """
+    Initialise a git repository at the given path.
 
     Args:
         path: Path where the repo will be initialised.
@@ -107,11 +116,13 @@ def init(path: Path) -> git.Repo:
     try:
         return git.Repo.init(str(path))
     except git.exc.GitCommandError as err:
-        raise VersionControlError(f"Failed to initialise git repository at path '{path}'. Error from VCS: {err}")
+        msg = f"Failed to initialise git repository at path '{path}'. Error from VCS: {err}"
+        raise VersionControlError(msg) from err
 
 
 def get_repo(path: Path) -> git.Repo:
-    """Get a git.Repo object from an existing repository path.
+    """
+    Get a git.Repo object from an existing repository path.
 
     Args:
         path: Path to the git repository.
@@ -124,14 +135,14 @@ def get_repo(path: Path) -> git.Repo:
     """
     try:
         return git.Repo(str(path))
-    except git.exc.InvalidGitRepositoryError:
-        raise VersionControlError(
-            "Could not find a valid git repository at this path. Please perform a `git init` command."
-        )
+    except git.exc.InvalidGitRepositoryError as err:
+        msg = "Could not find a valid git repository at this path. Please perform a `git init` command."
+        raise VersionControlError(msg) from err
 
 
 def get_default_branch(repo: git.Repo) -> str:
-    """Get a default branch from an existing git.Repo.
+    """
+    Get a default branch from an existing git.Repo.
 
     Args:
         repo: git.Repo object
@@ -145,4 +156,5 @@ def get_default_branch(repo: git.Repo) -> str:
     try:
         return str(repo.git.symbolic_ref("refs/remotes/origin/HEAD").rsplit("/", maxsplit=1)[-1])
     except git.exc.GitCommandError as err:
-        raise VersionControlError(f"Could not resolve default repository branch name. Error from VCS: {err}")
+        msg = f"Could not resolve default repository branch name. Error from VCS: {err}"
+        raise VersionControlError(msg) from err

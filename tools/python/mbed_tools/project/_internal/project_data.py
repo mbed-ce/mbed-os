@@ -6,15 +6,14 @@
 
 import json
 import logging
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 from mbed_tools.project._internal.render_templates import (
     render_cmakelists_template,
-    render_main_cpp_template,
     render_gitignore_template,
+    render_main_cpp_template,
 )
 
 logger = logging.getLogger(__name__)
@@ -43,7 +42,8 @@ DEFAULT_APP_CONFIG = {"target_overrides": {"K64F": {"platform.stdio-baud-rate": 
 
 @dataclass
 class MbedProgramFiles:
-    """Files defining an MbedProgram.
+    """
+    Files defining an MbedProgram.
 
     This object holds paths to the various files which define an MbedProgram.
 
@@ -65,7 +65,8 @@ class MbedProgramFiles:
 
     @classmethod
     def from_new(cls, root_path: Path) -> "MbedProgramFiles":
-        """Create MbedProgramFiles from a new directory.
+        """
+        Create MbedProgramFiles from a new directory.
 
         A "new directory" in this context means it doesn't already contain an Mbed program.
 
@@ -84,7 +85,8 @@ class MbedProgramFiles:
         custom_targets_json = root_path / CUSTOM_TARGETS_JSON_FILE_NAME
 
         if mbed_os_ref.exists():
-            raise ValueError(f"Program already exists at path {root_path}.")
+            msg = f"Program already exists at path {root_path}."
+            raise ValueError(msg)
 
         app_config.write_text(json.dumps(DEFAULT_APP_CONFIG, indent=4))
         mbed_os_ref.write_text(f"{MBED_OS_REFERENCE_URL}#{MBED_OS_REFERENCE_ID}")
@@ -101,7 +103,8 @@ class MbedProgramFiles:
 
     @classmethod
     def from_existing(cls, root_path: Path, build_dir: Path) -> "MbedProgramFiles":
-        """Create MbedProgramFiles from a directory containing an existing program.
+        """
+        Create MbedProgramFiles from a directory containing an existing program.
 
         Args:
             root_path: The path containing the MbedProgramFiles.
@@ -139,7 +142,8 @@ class MbedProgramFiles:
 
 @dataclass
 class MbedOS:
-    """Metadata associated with a copy of MbedOS.
+    """
+    Metadata associated with a copy of MbedOS.
 
     This object holds information about MbedOS used by MbedProgram.
 
@@ -159,13 +163,16 @@ class MbedOS:
         cmsis_mcu_descriptions_json_file = root_path / CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH
 
         if check_root_path_exists and not root_path.exists():
-            raise ValueError("The mbed-os directory does not exist.")
+            msg = "The mbed-os directory does not exist."
+            raise ValueError(msg)
 
         if root_path.exists() and not targets_json_file.exists():
-            raise ValueError(f"This MbedOS copy does not contain a {TARGETS_JSON_FILE_PATH} file.")
+            msg = f"This MbedOS copy does not contain a {TARGETS_JSON_FILE_PATH} file."
+            raise ValueError(msg)
 
         if root_path.exists() and not cmsis_mcu_descriptions_json_file.exists():
-            raise ValueError(f"This MbedOS copy does not contain a {CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH.name} file.")
+            msg = f"This MbedOS copy does not contain a {CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH.name} file."
+            raise ValueError(msg)
 
         return cls(
             root=root_path,

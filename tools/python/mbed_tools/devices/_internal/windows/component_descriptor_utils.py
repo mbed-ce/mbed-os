@@ -4,8 +4,8 @@
 #
 """Utilities with regards to Win32 component descriptors."""
 
-from typing import Any, NamedTuple, Union
 from collections import OrderedDict
+from typing import Any, NamedTuple, Union
 
 UNKNOWN_VALUE = "Unknown"
 

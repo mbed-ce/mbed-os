@@ -4,13 +4,14 @@
 #
 """Command to list all Mbed enabled devices connected to the host computer."""
 
-import click
 import json
 from operator import attrgetter
 from typing import Iterable, List, Optional, Tuple
+
+import click
 from tabulate import tabulate
 
-from mbed_tools.devices import get_connected_devices, Device
+from mbed_tools.devices import Device, get_connected_devices
 from mbed_tools.targets import Board
 
 

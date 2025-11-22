@@ -2,26 +2,29 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Defines a Volume Set.
+"""
+Defines a Volume Set.
 
 CIM_VolumeSet should be the data model to use but does not seem to actually return the data that we are looking for:
 https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/cim-volumeset
 Therefore, a specific data model needs to be constructed using other Windows methods.
 """
 
-from enum import Enum
-from typing import NamedTuple, List
-from mbed_tools.devices._internal.windows.component_descriptor import UNKNOWN_VALUE
-
 import logging
+from enum import Enum
+from typing import List, NamedTuple
+
 import win32.win32api
 import win32.win32file
+
+from mbed_tools.devices._internal.windows.component_descriptor import UNKNOWN_VALUE
 
 logger = logging.getLogger(__name__)
 
 
 class DriveType(Enum):
-    """Drive type as defined in Win32 API.
+    """
+    Drive type as defined in Win32 API.
 
     See https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getdrivetypea.
     """
@@ -39,7 +42,8 @@ class DriveType(Enum):
 
 
 class VolumeInformation(NamedTuple):
-    """Volume information.
+    """
+    Volume information.
 
     See http://timgolden.me.uk/pywin32-docs/win32api__GetVolumeInformation_meth.html
     See also http://timgolden.me.uk/python/win32_how_do_i/find-drive-types.html
@@ -82,8 +86,9 @@ def get_volume_information(volume: str) -> VolumeInformation:
     """Gets the volume information."""
     if not volume.endswith("\\"):
         volume = f"{volume}\\"
-    values: list = _get_windows_volume_information(volume) + [
+    values: list = [
+        *_get_windows_volume_information(volume),
         _get_volume_name_for_mount_point(volume),
-        _get_drive_type(volume),  # type: ignore
+        _get_drive_type(volume),
     ]
     return VolumeInformation(*values)

@@ -6,10 +6,10 @@ from unittest import mock
 
 import pytest
 
-from mbed_tools.targets.exceptions import UnknownBoard, MbedTargetsError
+from mbed_tools.targets.exceptions import UnknownBoardError, MbedTargetsError
 
 from mbed_tools.devices._internal.file_parser import OnlineId, DeviceFileInfo
-from mbed_tools.devices._internal.resolve_board import NoBoardForCandidate, resolve_board, ResolveBoardError
+from mbed_tools.devices._internal.resolve_board import NoBoardForCandidateError, resolve_board, ResolveBoardError
 
 
 @pytest.fixture
@@ -40,9 +40,9 @@ class TestResolveBoardUsingProductCodeFromHTM:
         get_board_by_product_code_mock.assert_called_once_with(dev_info.product_code)
 
     def test_raises_when_board_not_found(self, get_board_by_product_code_mock):
-        get_board_by_product_code_mock.side_effect = UnknownBoard
+        get_board_by_product_code_mock.side_effect = UnknownBoardError
 
-        with pytest.raises(NoBoardForCandidate):
+        with pytest.raises(NoBoardForCandidateError):
             resolve_board(product_code="0123")
 
     def test_raises_when_database_lookup_fails(self, get_board_by_product_code_mock, caplog):
@@ -66,9 +66,9 @@ class TestResolveBoardUsingOnlineIdFromHTM:
         get_board_by_online_id_mock.assert_called_once_with(target_type=online_id.target_type, slug=online_id.slug)
 
     def test_raises_when_board_not_found(self, get_board_by_online_id_mock):
-        get_board_by_online_id_mock.side_effect = UnknownBoard
+        get_board_by_online_id_mock.side_effect = UnknownBoardError
 
-        with pytest.raises(NoBoardForCandidate):
+        with pytest.raises(NoBoardForCandidateError):
             resolve_board(online_id=OnlineId(target_type="hat", slug="boat"))
 
     def test_raises_when_database_lookup_fails(self, get_board_by_online_id_mock, caplog):
@@ -92,10 +92,10 @@ class TestResolveBoardUsingSlugFromJlink:
         get_board_by_jlink_slug_mock.assert_called_once_with(online_id.slug)
 
     def test_raises_when_board_not_found(self, get_board_by_jlink_slug_mock):
-        get_board_by_jlink_slug_mock.side_effect = UnknownBoard
+        get_board_by_jlink_slug_mock.side_effect = UnknownBoardError
         online_id = OnlineId("jlink", "test-board")
 
-        with pytest.raises(NoBoardForCandidate):
+        with pytest.raises(NoBoardForCandidateError):
             resolve_board(online_id=online_id)
 
     def test_raises_when_database_lookup_fails(self, get_board_by_jlink_slug_mock, caplog):
@@ -118,9 +118,9 @@ class TestResolveBoardUsingProductCodeFromSerial:
         get_board_by_product_code_mock.assert_called_once_with(serial_number[:4])
 
     def test_raises_when_board_not_found(self, get_board_by_product_code_mock):
-        get_board_by_product_code_mock.side_effect = UnknownBoard
+        get_board_by_product_code_mock.side_effect = UnknownBoardError
 
-        with pytest.raises(NoBoardForCandidate):
+        with pytest.raises(NoBoardForCandidateError):
             resolve_board(serial_number="0")
 
     def test_raises_when_database_lookup_fails(self, get_board_by_product_code_mock, caplog):

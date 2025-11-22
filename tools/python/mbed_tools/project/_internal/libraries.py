@@ -5,7 +5,6 @@
 """Objects for library reference handling."""
 
 import logging
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Generator, List
@@ -18,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, order=True)
 class MbedLibReference:
-    """Metadata associated with an Mbed library.
+    """
+    Metadata associated with an Mbed library.
 
     An Mbed library is an external dependency of an MbedProgram. The MbedProgram is made aware of the library
     dependency by the presence of a .lib file in the project tree, which we refer to as a library reference file. The
@@ -37,13 +37,14 @@ class MbedLibReference:
         return self.source_code_path.exists() and self.source_code_path.is_dir()
 
     def get_git_reference(self) -> git_utils.GitReference:
-        """Get the source code location from the library reference file.
+        """
+        Get the source code location from the library reference file.
 
         Returns:
             Data structure containing the contents of the library reference file.
         """
         raw_ref = self.reference_file.read_text().strip()
-        url, sep, ref = raw_ref.partition("#")
+        url, _sep, ref = raw_ref.partition("#")
 
         if url.endswith("/"):
             url = url[:-1]
@@ -82,7 +83,8 @@ class LibraryReferences:
             git_utils.checkout(repo, "FETCH_HEAD", force=force)
 
     def iter_all(self) -> Generator[MbedLibReference, None, None]:
-        """Iterate all library references in the tree.
+        """
+        Iterate all library references in the tree.
 
         Yields:
             Iterator to library reference.
@@ -92,7 +94,8 @@ class LibraryReferences:
                 yield MbedLibReference(lib, lib.with_suffix(""))
 
     def iter_unresolved(self) -> Generator[MbedLibReference, None, None]:
-        """Iterate all unresolved library references in the tree.
+        """
+        Iterate all unresolved library references in the tree.
 
         Yields:
             Iterator to library reference.
@@ -102,7 +105,8 @@ class LibraryReferences:
                 yield lib
 
     def iter_resolved(self) -> Generator[MbedLibReference, None, None]:
-        """Iterate all resolved library references in the tree.
+        """
+        Iterate all resolved library references in the tree.
 
         Yields:
             Iterator to library reference.

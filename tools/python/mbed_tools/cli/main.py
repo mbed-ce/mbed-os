@@ -6,20 +6,18 @@
 
 import logging
 import sys
-
-from typing import Union, Any
+from typing import Any, Union
 
 import click
 
-from mbed_tools.lib.logging import set_log_level, MbedToolsHandler
-
+from mbed_tools.cli.cmsis_mcu_descr import cmsis_mcu_descr
 from mbed_tools.cli.configure import configure
 from mbed_tools.cli.list_connected_devices import list_connected_devices
-from mbed_tools.cli.project_management import new, import_, deploy
+from mbed_tools.cli.project_management import deploy, import_, new
 from mbed_tools.cli.sterm import sterm
-from mbed_tools.cli.cmsis_mcu_descr import cmsis_mcu_descr
+from mbed_tools.lib.logging import MbedToolsHandler, set_log_level
 
-CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
+CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 LOGGER = logging.getLogger(__name__)
 
 
@@ -27,7 +25,8 @@ class GroupWithExceptionHandling(click.Group):
     """A click.Group which handles ToolsErrors and logging."""
 
     def invoke(self, context: click.Context) -> None:
-        """Invoke the command group.
+        """
+        Invoke the command group.
 
         Args:
             context: The current click context.

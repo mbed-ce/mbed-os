@@ -10,15 +10,18 @@ SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
 
-import pathlib
-from pathlib import Path
 import json
+import pathlib
 import sys
+from pathlib import Path
+from typing import TYPE_CHECKING
 
-from SCons.Script import DefaultEnvironment, ARGUMENTS
-from SCons.Environment import Base as Environment
-from platformio.proc import exec_command
 import click
+from platformio.proc import exec_command
+from SCons.Script import ARGUMENTS, DefaultEnvironment
+
+if TYPE_CHECKING:
+    from SCons.Environment import Base as Environment
 
 env: Environment = DefaultEnvironment()
 platform = env.PioPlatform()
@@ -46,7 +49,6 @@ CMAKE_PATH = pathlib.Path(platform.get_package_dir("tool-cmake")) / "bin" / "cma
 # This script is run by SCons so it does not have access to any other Python modules by default.
 sys.path.append(str(FRAMEWORK_DIR / "tools" / "python"))
 
-from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
 from mbed_platformio.cmake_to_scons_converter import (
     build_library,
     extract_defines,
@@ -55,6 +57,7 @@ from mbed_platformio.cmake_to_scons_converter import (
     extract_link_args,
     find_included_files,
 )
+from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
 
 
 def get_mbed_target():
@@ -67,8 +70,7 @@ def is_proper_mbed_ce_project():
     return all(path.is_file() for path in (PROJECT_MBED_APP_JSON5,))
 
 
-def create_default_project_files():
-    print("Mbed CE: Creating default project files")
+def create_default_project_files() -> None:
     if not PROJECT_MBED_APP_JSON5.exists():
         PROJECT_MBED_APP_JSON5.write_text(
             """
@@ -87,36 +89,27 @@ def create_default_project_files():
         )
 
 
-def is_cmake_reconfigure_required():
+def is_cmake_reconfigure_required() -> bool:
     cmake_cache_file = BUILD_DIR / "CMakeCache.txt"
     cmake_config_files = [PROJECT_MBED_APP_JSON5, PROJECT_CMAKELISTS_TXT]
     ninja_buildfile = BUILD_DIR / "build.ninja"
 
     if not cmake_cache_file.exists():
-        print(f"Mbed CE: Reconfigure required because CMake cache does not exist")
         return True
     if not CMAKE_API_REPLY_DIR.is_dir() or not any(CMAKE_API_REPLY_DIR.iterdir()):
-        print("Mbed CE: Reconfigure required because CMake API reply dir is missing")
         return True
     if not ninja_buildfile.exists():
-        print("Mbed CE: Reconfigure required because Ninja buildfile does not exist")
         return True
 
     # If the JSON files have 'Debug' in their names that means this project was previously configured as Debug.
     if not any(CMAKE_API_REPLY_DIR.glob(f"directory-*{CMAKE_BUILD_TYPE}*.json")):
-        print("Mbed CE: Reconfigure required because build type (debug / release) changed.")
         return True
 
     cache_file_mtime = cmake_cache_file.stat().st_mtime
-    for file in cmake_config_files:
-        if file.stat().st_mtime > cache_file_mtime:
-            print(f"Mbed CE: Reconfigure required because {file.name} was modified")
-            return True
-
-    return False
+    return any(file.stat().st_mtime > cache_file_mtime for file in cmake_config_files)
 
 
-def run_tool(command_and_args: list[str] | None = None):
+def run_tool(command_and_args: list[str] | None = None) -> None:
     result = exec_command(command_and_args)
     if result["returncode"] != 0:
         sys.stderr.write(result["out"] + "\n")
@@ -124,8 +117,7 @@ def run_tool(command_and_args: list[str] | None = None):
         env.Exit(1)
 
     if int(ARGUMENTS.get("PIOVERBOSE", 0)):
-        print(result["out"])
-        print(result["err"])
+        pass
 
 
 def get_cmake_code_model(cmake_args: list) -> dict:
@@ -139,7 +131,6 @@ def get_cmake_code_model(cmake_args: list) -> dict:
         create_default_project_files()
 
     if is_cmake_reconfigure_required():
-        print("Mbed CE: Configuring CMake build system...")
         cmake_command = [str(CMAKE_PATH), *cmake_args]
         run_tool(cmake_command)
 
@@ -154,7 +145,7 @@ def get_cmake_code_model(cmake_args: list) -> dict:
     codemodel = {}
     for target in CMAKE_API_REPLY_DIR.iterdir():
         if target.name.startswith("codemodel-v2"):
-            with open(target, "r") as fp:
+            with open(target) as fp:
                 codemodel = json.load(fp)
 
     assert codemodel["version"]["major"] == 2
@@ -165,7 +156,7 @@ def get_target_config(project_configs: dict, target_index):
     target_json = project_configs.get("targets")[target_index].get("jsonFile", "")
     target_config_file = CMAKE_API_REPLY_DIR / target_json
     if not target_config_file.is_file():
-        sys.stderr.write("Error: Couldn't find target config %s\n" % target_json)
+        sys.stderr.write(f"Error: Couldn't find target config {target_json}\n")
         env.Exit(1)
 
     with open(target_config_file) as fp:
@@ -216,13 +207,13 @@ def get_components_map(
     result = {}
     for config in get_targets_by_type(target_configs, target_types, ignore_components):
         if "nameOnDisk" not in config:
-            config["nameOnDisk"] = "lib%s.a" % config["name"]
+            config["nameOnDisk"] = "lib{}.a".format(config["name"])
         result[config["id"]] = {"config": config}
 
     return result
 
 
-def build_components(env: Environment, components_map: dict, project_src_dir: pathlib.Path):
+def build_components(env: Environment, components_map: dict, project_src_dir: pathlib.Path) -> None:
     for k, v in components_map.items():
         components_map[k]["lib"] = build_library(
             env, v["config"], project_src_dir, FRAMEWORK_DIR, pathlib.Path("$BUILD_DIR/mbed-os")
@@ -258,7 +249,6 @@ if not project_codemodel:
     sys.stderr.write("Error: Couldn't find code model generated by CMake\n")
     env.Exit(1)
 
-print("Mbed CE: Reading CMake configuration...")
 target_configs = load_target_configurations(project_codemodel)
 
 framework_components_map = get_components_map(target_configs, ["STATIC_LIBRARY", "OBJECT_LIBRARY"], [])
@@ -288,7 +278,7 @@ link_args.extend(extract_link_args(app_target_json))
 # The CMake build system adds a flag in mbed_set_post_build() to output a map file.
 # We need to do that here.
 map_file = BUILD_DIR / "firmware.map"
-link_args.append(f"-Wl,-Map={str(map_file)}")
+link_args.append(f"-Wl,-Map={map_file!s}")
 
 ## Build environment configuration -------------------------------------------------------------------------------------
 
@@ -305,9 +295,6 @@ env.Append(PIO_EXTRA_APP_SOURCE_DEPS=find_included_files(env))
 # Run Ninja to produce the linker script.
 # Note that this seems to execute CMake, causing the code model query to be re-done.
 # So, we have to do this after we are done using the results of said query.
-print("Mbed CE: Generating linker script...")
 project_ld_script = generate_project_ld_script()
 env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", str(project_ld_script))
 env.Append(LDSCRIPT_PATH=str(project_ld_script))
-
-print("Mbed CE: Build environment configured.")

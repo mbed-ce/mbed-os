@@ -10,7 +10,8 @@ from mbed_tools.devices._internal.windows.component_descriptor import ComponentD
 
 
 class DiskToPartitionMsdnDefinition(NamedTuple):
-    """Msdn definition of a disk partition - logical disk relationship.
+    """
+    Msdn definition of a disk partition - logical disk relationship.
 
     See https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-logicaldisktopartition
     """
@@ -22,7 +23,8 @@ class DiskToPartitionMsdnDefinition(NamedTuple):
 
 
 class DiskPartitionLogicalDiskRelationship(ComponentDescriptor):
-    """Disk partition as defined in Windows API.
+    """
+    Disk partition as defined in Windows API.
 
     See https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-logicaldisktopartition
     """

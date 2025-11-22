@@ -5,18 +5,18 @@
 """Build configuration representation."""
 
 import logging
-
-from collections import UserDict
-from typing import Any, Iterable, Hashable, List
 import pathlib
+from collections import UserDict
+from typing import Any, Hashable, Iterable, List
 
-from mbed_tools.build._internal.config.source import Override, ConfigSetting
+from mbed_tools.build._internal.config.source import ConfigSetting, Override
 
 logger = logging.getLogger(__name__)
 
 
 class Config(UserDict):
-    """Mapping of config settings.
+    """
+    Mapping of config settings.
 
     This object understands how to populate the different 'config sections' which all have different rules for how the
     settings are collected.
@@ -86,9 +86,10 @@ class Config(UserDict):
         for setting in config_settings:
             logger.debug("Adding config setting: '%s.%s'", setting.namespace, setting.name)
             if setting in self.data.get(CONFIG_SECTION, []):
-                raise ValueError(
+                msg = (
                     f"Setting {setting.namespace}.{setting.name} already defined. You cannot duplicate config settings!"
                 )
+                raise ValueError(msg)
 
         self.data[CONFIG_SECTION] = self.data.get(CONFIG_SECTION, []) + config_settings
 

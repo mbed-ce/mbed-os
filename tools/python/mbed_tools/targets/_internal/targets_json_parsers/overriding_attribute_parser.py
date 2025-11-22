@@ -2,7 +2,8 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Functions for parsing the inheritance for overriding attributes.
+"""
+Functions for parsing the inheritance for overriding attributes.
 
 Overriding attributes are defined and can be overridden further down the hierarchy.
 
@@ -21,16 +22,17 @@ This means a target on a higher level could potentially override one on a lower 
 
 from collections import deque
 from functools import reduce
-from typing import Dict, List, Any, Deque, Set
+from typing import Any, Deque, Dict, List, Set
 
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import ALL_ACCUMULATING_ATTRIBUTES
 
 MERGING_ATTRIBUTES = ("config", "overrides", "memory_banks", "memory_overrides")
-NON_OVERRIDING_ATTRIBUTES = ALL_ACCUMULATING_ATTRIBUTES + ("public", "inherits")
+NON_OVERRIDING_ATTRIBUTES = (*ALL_ACCUMULATING_ATTRIBUTES, "public", "inherits")
 
 
 def get_overriding_attributes_for_target(all_targets_data: Dict[str, Any], target_name: str) -> Dict[str, Any]:
-    """Parses the data for all targets and returns the overriding attributes for the specified target.
+    """
+    Parses the data for all targets and returns the overriding attributes for the specified target.
 
     Args:
         all_targets_data: a dictionary representation of the contents of targets.json
@@ -44,7 +46,8 @@ def get_overriding_attributes_for_target(all_targets_data: Dict[str, Any], targe
 
 
 def get_labels_for_target(all_targets_data: Dict[str, Any], target_name: str) -> Set[str]:
-    """The labels for a target are the names of all the boards (public and private) that the board inherits from.
+    """
+    The labels for a target are the names of all the boards (public and private) that the board inherits from.
 
     The order of these labels are not reflective of inheritance order.
 
@@ -60,7 +63,8 @@ def get_labels_for_target(all_targets_data: Dict[str, Any], target_name: str) ->
 
 
 def _targets_override_hierarchy(all_targets_data: Dict[str, Any], target_name: str) -> List[dict]:
-    """List all ancestors of a target in order of overriding inheritance (depth-first).
+    """
+    List all ancestors of a target in order of overriding inheritance (depth-first).
 
     Using a depth-first traverse of the inheritance tree, return a list of targets in the
     order of inheritance, starting with the target itself and finishing with its highest ancestor.
@@ -98,7 +102,8 @@ def _targets_override_hierarchy(all_targets_data: Dict[str, Any], target_name: s
 
 
 def _determine_overridden_attributes(targets_in_order: List[dict]) -> Dict[str, Any]:
-    """Finds all the overrideable attributes for a target from its list of ancestors.
+    """
+    Finds all the overrideable attributes for a target from its list of ancestors.
 
     Combines the attributes from all the targets in the hierarchy. Starts from the highest ancestor
     reduces down to the target itself, overriding if they define the same attribute.
@@ -120,8 +125,7 @@ def _determine_overridden_attributes(targets_in_order: List[dict]) -> Dict[str, 
         merged_attribute_elements = _reduce_right_list_of_dictionaries(list(override_order_for_single_attribute))
         if merged_attribute_elements:
             target_attributes[merging_attribute] = merged_attribute_elements
-    overridden_attributes = _remove_unwanted_attributes(target_attributes)
-    return overridden_attributes
+    return _remove_unwanted_attributes(target_attributes)
 
 
 def _reduce_right_list_of_dictionaries(list_of_dicts: List[dict]) -> Dict[str, Any]:
@@ -130,7 +134,8 @@ def _reduce_right_list_of_dictionaries(list_of_dicts: List[dict]) -> Dict[str, A
 
 
 def _remove_unwanted_attributes(target_attributes: Dict[str, Any]) -> Dict[str, Any]:
-    """Removes all non-overriding attributes.
+    """
+    Removes all non-overriding attributes.
 
     Defined in NON_OVERRIDING_ATTRIBUTES.
     Accumulating arguments are inherited in a different way that is handled by its own parser.
@@ -150,7 +155,8 @@ def _remove_unwanted_attributes(target_attributes: Dict[str, Any]) -> Dict[str, 
 
 
 def _extract_target_labels(targets_in_order: List[dict], target_name: str) -> Set[str]:
-    """Collect a set of all the board names from the inherits field in each target in the hierarchy.
+    """
+    Collect a set of all the board names from the inherits field in each target in the hierarchy.
 
     Args:
         targets_in_order: list of targets in order of inheritance, starting with the target up to its highest ancestor

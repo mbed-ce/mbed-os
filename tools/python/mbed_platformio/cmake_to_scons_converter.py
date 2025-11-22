@@ -8,10 +8,13 @@ SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
 import collections
-
-from SCons.Environment import Base as Environment
 import pathlib
+from typing import TYPE_CHECKING
+
 import click
+
+if TYPE_CHECKING:
+    from SCons.Environment import Base as Environment
 
 
 def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
@@ -45,10 +48,7 @@ def prepare_build_envs(target_json: dict, default_env: Environment) -> list[Envi
     build_envs = []
     target_compile_groups = target_json.get("compileGroups", [])
     if not target_compile_groups:
-        print(
-            "Warning! The `%s` component doesn't register any source files. "
-            "Check if sources are set in component's CMakeLists.txt!" % target_json["name"]
-        )
+        pass
 
     for cg in target_compile_groups:
         includes = []
@@ -106,9 +106,8 @@ def compile_source_files(
             elif src_path.is_relative_to(framework_dir):
                 obj_path = (framework_obj_dir / src_path.relative_to(framework_dir)).with_suffix(".o")
             else:
-                raise RuntimeError(
-                    f"Source path {src_path!s} outside of project source dir and framework dir, don't know where to save object file!"
-                )
+                msg = f"Source path {src_path!s} outside of project source dir and framework dir, don't know where to save object file!"
+                raise RuntimeError(msg)
 
             env = build_envs[compile_group_idx]
 
@@ -174,7 +173,7 @@ def find_included_files(environment: Environment) -> set[str]:
     result = set()
     for flag_var in ["CFLAGS", "CXXFLAGS", "CCFLAGS"]:
         language_flags = environment.get(flag_var)
-        for index in range(0, len(language_flags)):
+        for index in range(len(language_flags)):
             if language_flags[index] == "-include" and index < len(language_flags) - 1:
                 result.add(language_flags[index + 1])
     return result
@@ -201,7 +200,6 @@ def extract_link_args(target_json: dict) -> list[str]:
     """
     Extract the linker flags from a CMake target
     """
-
     result = []
 
     for f in target_json.get("link", {}).get("commandFragments", []):
