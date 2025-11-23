@@ -73,10 +73,16 @@ public:
         return rtc_free();
     }
 
-    /** Check if the RTC has the time set and is counting
+    /** Check if the RTC has been initialized and is counting
      *
      * @retval false The time reported by the RTC is not valid
-     * @retval true  The time has been set and the RTC is counting
+     * @retval true  The RTC has been initialized and is counting
+     *
+     * @note In versions of Mbed before 7.0, this function claimed to return false "if the time had not been set."
+     *     However, this was flawed because, in most implementations, it only returned true if the time had been
+     *     set *on this boot*. There wasn't, and isn't, a way to detect whether the time was set correctly by a previous
+     *     boot. To answer that question, you may wish to check if the time is approximately valid (in the 21st
+     *     century), or add another flag at the application level.
      *
      * @see ::rtc_isenabled
      */

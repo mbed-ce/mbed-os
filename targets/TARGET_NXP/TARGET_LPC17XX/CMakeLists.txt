@@ -39,6 +39,7 @@ target_sources(mbed-lpc17xx
         spi_api.c
         us_ticker.c
         watchdog_api.c
+        mbed_overrides.c
 
         device/CRP.c
         device/flash_api.c

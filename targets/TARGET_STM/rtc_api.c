@@ -294,11 +294,7 @@ void rtc_write(time_t t)
 
 int rtc_isenabled(void)
 {
-#if defined (RTC_FLAG_INITS) /* all STM32 except STM32F1 */
-    return LL_RTC_IsActiveFlag_INITS(RTC);
-#else /* RTC_FLAG_INITS */ /* TARGET_STM32F1 */
-    return ((RTC->CRL & RTC_CRL_RSF) ==  RTC_CRL_RSF);
-#endif /* RTC_FLAG_INITS */
+    return RTC_inited;
 }
 
 
