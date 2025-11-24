@@ -151,6 +151,11 @@ jobs:
         run: |
           cd tools
           ruff format --diff
+
+      - name: Check Python Lint
+        run: |
+          cd tools
+          ruff check --diff python/mbed_tools python/mbed_platformio
           
 
   docs-check:
