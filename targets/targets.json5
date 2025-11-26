@@ -8294,6 +8294,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "usb-device-hsusbd": {
                 "help": "Select high-speed USB device or not",
                 "value": 0
+            },
+	    "wdt-reset-workaround": {
+                "help": "Workaround to H/W limit with WDT reset from power-down",
+                "options": [false, true],
+                "value": true
             }
         },
         "inherits": [
@@ -8328,7 +8333,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EMAC",
             "MPU",
             "WATCHDOG",
-            "RESET_REASON",
             "USBDEVICE"
         ],
         "release_versions": [
