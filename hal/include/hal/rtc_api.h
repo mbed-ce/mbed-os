@@ -44,7 +44,7 @@ extern "C" {
  * * Shutdown mode doesn't stop RTC from counting - Not verified.
  * * The functions ::rtc_write/::rtc_read provides availability to set/get RTC time
  * - Verified by test rtc_write_read_test.
- * * The function ::rtc_isenabled returns 1 if the RTC has been initialized and 0 otherwise - Verified by test rtc_enabled_test.
+ * * The function ::rtc_isenabled returns 1 if the RTC has been initialized and is counting and 0 otherwise - Verified by test rtc_enabled_test.
  * * ::rtc_read may be called before rtc_write. If the RTC time has not been set, this will return the
  *    time since some arbitrary epoch. If the RTC time was set on a previous boot, this will return time
  *    based on what was set then.
