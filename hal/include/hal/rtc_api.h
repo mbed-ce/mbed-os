@@ -44,8 +44,7 @@ extern "C" {
  * * Shutdown mode doesn't stop RTC from counting - Not verified.
  * * The functions ::rtc_write/::rtc_read provides availability to set/get RTC time
  * - Verified by test rtc_write_read_test.
- * * The functions ::rtc_isenabled returns 1 if the RTC is counting and the time has been set,
- * 0 otherwise - Verified by test rtc_enabled_test.
+ * * The function ::rtc_isenabled returns 1 if the RTC has been initialized and is counting and 0 otherwise - Verified by test rtc_enabled_test.
  * * ::rtc_read may be called before rtc_write. If the RTC time has not been set, this will return the
  *    time since some arbitrary epoch. If the RTC time was set on a previous boot, this will return time
  *    based on what was set then.
@@ -115,13 +114,23 @@ void rtc_init(void);
  *     POWER_CTRL &= ~POWER_CTRL_RTC_Msk;
  * }
  * @endcode
+ *
+ * @note Implementations are allowed to not implement this function if it's impossible or there is
+ *     no significant benefit to disabling the RTC. As such, the RTC is allowed to remain initialized
+ *     after this function is called if freeing the RTC is not implemented.
  */
 void rtc_free(void);
 
-/** Check if the RTC has the time set and is counting
+/** Check if the RTC has been initialized and is counting
  *
  * @retval 0 The time reported by the RTC is not valid
- * @retval 1 The time has been set the RTC is counting
+ * @retval 1 The RTC has been initialized and is counting
+ *
+ * @note In versions of Mbed before 7.0, this function claimed to return false "if the time had not been set."
+ *     However, this was flawed because, in most implementations, it only returned true if the time had been
+ *     set *on this boot*. There wasn't, and isn't, a way to detect whether the time was set correctly by a previous
+ *     boot. To answer that question, you may wish to check if the time is approximately valid (in the 21st
+ *     century), or add another flag at the application level.
  *
  * Example Implementation Pseudo Code:
  * @code

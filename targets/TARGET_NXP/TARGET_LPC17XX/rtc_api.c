@@ -17,7 +17,8 @@
 #include "rtc_api.h"
 #include "mbed_mktime.h"
 
-// ensure rtc is running (unchanged if already running)
+// RTC Power/Clock Control bit
+#define LPC_SC_PCONP_PCRTC (1 << 9)
 
 /* Setup the RTC based on a time structure, ensuring RTC is enabled
  *
@@ -36,14 +37,19 @@
  * without impacting if it is the case
  */
 void rtc_init(void) {
-    LPC_SC->PCONP |= 0x200; // Ensure power is on
-    LPC_RTC->CCR = 0x00;
-    
-    LPC_RTC->CCR |= 1 << 0; // Ensure the RTC is enabled
+    if(!rtc_isenabled()) {
+        LPC_SC->PCONP |= LPC_SC_PCONP_PCRTC; // Ensure power is on
+        LPC_RTC->CCR = 0x00;
+
+        LPC_RTC->CCR |= 1 << 0; // Ensure the RTC is enabled
+    }
 }
 
 void rtc_free(void) {
-    // [TODO]
+    // Turn off power for RTC register block.
+    // The datasheet is not very clear, but in my testing, this does not impact the ability of the RTC
+    // to count the time.
+    LPC_SC->PCONP &= ~LPC_SC_PCONP_PCRTC;
 }
 
 /*
@@ -54,7 +60,7 @@ void rtc_free(void) {
  *
  */
 int rtc_isenabled(void) {
-    return(((LPC_RTC->CCR) & 0x01) != 0);
+    return (LPC_SC->PCONP & LPC_SC_PCONP_PCRTC) && (LPC_RTC->CCR & 0x01);
 }
 
 /*
