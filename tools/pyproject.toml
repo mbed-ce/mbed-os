@@ -73,6 +73,7 @@ unit-tests = [
 ]
 linters = [
     "ruff",
+    "basedpyright",
     "SCons" # For packages imported by the PlatformIO scripts
 ]
 greentea = [
@@ -208,3 +209,27 @@ max-args = 10
 [tool.ruff.lint.flake8-annotations]
 # Don't require a return type annotation for __init__ in most cases
 mypy-init-return = true
+
+[tool.basedpyright]
+
+# Don't warn about things deprecated more recently than python 3.7
+pythonVersion = "3.7"
+
+include = [
+    "python/mbed_tools/**",
+    "python/mbed_platformio/**"
+]
+
+# For right now, we can configure basedpyright in relatively permissive mode.
+# We will allow code where the types of things are partially unknown, as there is
+# lots of legacy code in that category.
+# Also the PlatformIO code has to work with SCons, which is fundamentally type
+# annotation proof, so that can likely never pass these checks.
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportUnknownLambdaType = false
+reportMissingTypeArgument = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportAny = false
+reportExplicitAny = false

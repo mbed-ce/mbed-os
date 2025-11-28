@@ -24,7 +24,7 @@ import os
 
 import dotenv
 
-dotenv.load_dotenv(dotenv.find_dotenv(usecwd=True))
+_ = dotenv.load_dotenv(dotenv.find_dotenv(usecwd=True))
 
 
 class Env:
@@ -50,26 +50,6 @@ class Env:
         `MBED_API_AUTH_TOKEN`.
         """
         return os.getenv("MBED_API_AUTH_TOKEN", "")
-
-    @property
-    def MBED_DATABASE_MODE(self) -> str:  # noqa: N802
-        """
-        Database mode to use when retrieving board data.
-
-        Mbed Targets supports an online and offline mode, which controls where to look up the board database.
-
-        The board lookup can be from either the online or offline database, depending
-        on the value of an environment variable called `MBED_DATABASE_MODE`.
-
-        The mode can be set to one of the following:
-
-        - `AUTO`: the offline database is searched first, if the board isn't found the online database is searched.
-        - `ONLINE`: the online database is always used.
-        - `OFFLINE`: the offline database is always used.
-
-        If `MBED_DATABASE_MODE` is not set, it defaults to `AUTO`.
-        """
-        return os.getenv("MBED_DATABASE_MODE", "AUTO")
 
 
 env = Env()

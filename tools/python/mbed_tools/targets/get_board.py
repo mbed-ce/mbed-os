@@ -9,13 +9,10 @@ An instance of `mbed_tools.targets.board.Board` can be retrieved by calling one 
 """
 
 import logging
-from enum import Enum
 from typing import Callable
 
 from mbed_tools.targets.board import Board
 from mbed_tools.targets.boards import Boards
-from mbed_tools.targets.env import env
-from mbed_tools.targets.exceptions import BoardDatabaseError, UnknownBoardError, UnsupportedModeError
 
 logger = logging.getLogger(__name__)
 
@@ -80,39 +77,4 @@ def get_board(matching: Callable) -> Board:
     Raises:
         UnknownBoard: a board matching the criteria could not be found in the board database.
     """
-    database_mode = _get_database_mode()
-
-    if database_mode == _DatabaseMode.OFFLINE:
-        logger.info("Using the offline database (only) to identify boards.")
-        return Boards.from_offline_database().get_board(matching)
-
-    if database_mode == _DatabaseMode.ONLINE:
-        logger.info("Using the online database (only) to identify boards.")
-        return Boards.from_online_database().get_board(matching)
-    try:
-        logger.info("Using the offline database to identify boards.")
-        return Boards.from_offline_database().get_board(matching)
-    except UnknownBoardError:
-        logger.info("Unable to identify a board using the offline database, trying the online database.")
-        try:
-            return Boards.from_online_database().get_board(matching)
-        except BoardDatabaseError as ex:
-            logger.exception("Unable to access the online database to identify a board.")
-            raise UnknownBoardError from ex
-
-
-class _DatabaseMode(Enum):
-    """Selected database mode."""
-
-    OFFLINE = 0
-    ONLINE = 1
-    AUTO = 2
-
-
-def _get_database_mode() -> _DatabaseMode:
-    database_mode = env.MBED_DATABASE_MODE
-    try:
-        return _DatabaseMode[database_mode]
-    except KeyError as ex:
-        msg = f"{database_mode} is not a supported database mode."
-        raise UnsupportedModeError(msg) from ex
+    return Boards.from_offline_database().get_board(matching)

@@ -4,10 +4,14 @@
 #
 """Interface to the Board Database."""
 
+from __future__ import annotations
+
 import json
 from collections.abc import Set as AbstractSet
 from dataclasses import asdict
-from typing import Callable, Iterable, Iterator
+from typing import Callable, Iterable, Iterator, Sequence
+
+from typing_extensions import override
 
 from mbed_tools.targets._internal import board_database
 from mbed_tools.targets.board import Board
@@ -23,7 +27,7 @@ class Boards(AbstractSet):
     """
 
     @classmethod
-    def from_offline_database(cls) -> "Boards":
+    def from_offline_database(cls) -> Boards:
         """
         Initialise with the offline board database.
 
@@ -32,23 +36,26 @@ class Boards(AbstractSet):
         """
         return cls(Board.from_offline_board_entry(b) for b in board_database.get_offline_board_data())
 
-    def __init__(self, boards_data: Iterable["Board"]) -> None:
+    def __init__(self, boards_data: Iterable[Board]) -> None:
         """
         Initialise with a list of boards.
 
         Args:
             boards_data: iterable of board data from a board database source.
         """
-        self._boards_data = tuple(boards_data)
+        self._boards_data: Sequence[Board] = tuple(boards_data)
 
-    def __iter__(self) -> Iterator["Board"]:
+    @override
+    def __iter__(self) -> Iterator[Board]:
         """Yield an Board on each iteration."""
         yield from self._boards_data
 
+    @override
     def __len__(self) -> int:
         """Return the number of boards."""
         return len(self._boards_data)
 
+    @override
     def __contains__(self, board: object) -> bool:
         """
         Check if a board is in the collection of boards.

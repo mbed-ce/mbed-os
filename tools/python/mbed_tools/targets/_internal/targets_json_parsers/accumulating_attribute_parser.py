@@ -75,9 +75,7 @@ def _targets_accumulate_hierarchy(all_targets_data: Dict[str, Any], target_name:
     return targets_in_order
 
 
-def _add_attribute_element(
-    accumulator: Dict[str, Any], attribute_name: str, elements_to_add: List[Any]
-) -> Dict[str, Any]:
+def _add_attribute_element(accumulator: Dict[str, Any], attribute_name: str, elements_to_add: List[Any]) -> None:
     """
     Adds an attribute element to an attribute.
 
@@ -85,13 +83,9 @@ def _add_attribute_element(
         accumulator: a store of attributes to be updated
         attribute_name: name of the attribute to update
         elements_to_add: element to add to the attribute list
-
-    Returns:
-        The accumulator object with the new elements added
     """
     for element in elements_to_add:
         accumulator[attribute_name].append(element)
-    return accumulator
 
 
 def _element_matches(element_to_remove: str, element_to_check: str) -> bool:
@@ -113,9 +107,7 @@ def _element_matches(element_to_remove: str, element_to_check: str) -> bool:
     return element_to_check == element_to_remove or element_to_check.startswith(f"{element_to_remove}=")
 
 
-def _remove_attribute_element(
-    accumulator: Dict[str, Any], attribute_name: str, elements_to_remove: List[Any]
-) -> Dict[str, Any]:
+def _remove_attribute_element(accumulator: Dict[str, Any], attribute_name: str, elements_to_remove: List[Any]) -> None:
     """
     Removes an attribute element from an attribute.
 
@@ -123,9 +115,6 @@ def _remove_attribute_element(
         accumulator: a store of attributes to be updated
         attribute_name: name of the attribute to update
         elements_to_remove: element to remove from the attribute list
-
-    Returns:
-        The accumulator object with the desired elements removed
     """
     existing_elements = accumulator[attribute_name]
     combinations_to_check = itertools.product(existing_elements, elements_to_remove)
@@ -137,7 +126,6 @@ def _remove_attribute_element(
 
     for element in checked_elements_to_remove:
         accumulator[attribute_name].remove(element)
-    return accumulator
 
 
 def _calculate_attribute_elements(

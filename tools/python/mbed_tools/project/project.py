@@ -32,7 +32,7 @@ def import_project(url: str, dst_path: Any = None, recursive: bool = False) -> p
     if not dst_path:
         dst_path = pathlib.Path(git_data["dst_path"])
 
-    git_utils.clone(url, dst_path)
+    _ = git_utils.clone(url, dst_path)
     if recursive:
         libs = LibraryReferences(root=dst_path, ignore_paths=["mbed-os"])
         libs.fetch()
