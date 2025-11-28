@@ -115,8 +115,6 @@ class MbedProgramFiles:
             app_config = root_path / APP_CONFIG_FILE_NAME_JSON5
         elif (root_path / APP_CONFIG_FILE_NAME_JSON).exists():
             app_config = root_path / APP_CONFIG_FILE_NAME_JSON
-        else:
-            logger.info("This program does not contain an mbed_app.json config file.")
 
         # If there's already a custom_targets.json5, use that.
         # Otherwise, assume json.

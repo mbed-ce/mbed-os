@@ -5,6 +5,7 @@
 
 """
 Subcommands to allow managing the list of CMSIS MCU descriptions that comes with Mbed.
+
 The MCU description list is used both for generating docs, and for providing information to the code
 about the memory banks present on a device.
 
@@ -14,13 +15,15 @@ from the CMSIS pack index (a resource hosted by ARM), but can also be edited man
 This is needed since the index is missing certain MCUs and has wrong information about a few others.
 """
 
+from __future__ import annotations
+
 import datetime
 import logging
 import os
 import pathlib
 import re
 import sys
-from typing import Any, Dict, Set
+from typing import Any, Dict, Sequence, Set
 
 import click
 import cmsis_pack_manager
@@ -31,7 +34,7 @@ from mbed_tools.lib.json_helpers import decode_json_file
 LOGGER = logging.getLogger(__name__)
 
 # Calculate path to Mbed OS JSON files
-THIS_SCRIPT_DIR = pathlib.Path(os.path.dirname(__file__))
+THIS_SCRIPT_DIR = pathlib.Path(__file__).parent
 PROJECT_ROOT = THIS_SCRIPT_DIR.parent.parent.parent.parent.parent
 MBED_OS_DIR = THIS_SCRIPT_DIR.parent.parent.parent.parent
 TARGETS_JSON5_PATH = MBED_OS_DIR / "targets" / "targets.json5"
@@ -58,14 +61,18 @@ def open_cmsis_cache(*, must_exist: bool = True) -> cmsis_pack_manager.Cache:
 
     if index_file_path.exists():
         # Check how old the index file is
-        index_file_modified_time = datetime.datetime.fromtimestamp(index_file_path.stat().st_mtime)
+        index_file_modified_time = datetime.datetime.fromtimestamp(
+            index_file_path.stat().st_mtime, tz=datetime.timezone.utc
+        )
         index_age = humanize.naturaltime(index_file_modified_time)
         LOGGER.info("CMSIS MCU description cache was last updated: %s", index_age)
 
     return cmsis_cache
 
 
-def find_json_files(root_dir, exclude_dirs=None, file_pattern=r".*\.(json|json5)"):
+def find_json_files(
+    root_dir: pathlib.Path, exclude_dirs: Sequence[str] | None = None, file_pattern: str = r".*\.(json|json5)"
+) -> list[pathlib.Path]:
     """
     Recursively searches for files matching the specified pattern in a given directory, excluding specified directories.
 
@@ -89,7 +96,7 @@ def find_json_files(root_dir, exclude_dirs=None, file_pattern=r".*\.(json|json5)
 
         for file in files:
             if re.match(file_pattern, file):
-                json_files.append(pathlib.Path(os.path.join(root, file)))
+                json_files.append(pathlib.Path(root) / file)
 
     return json_files
 
@@ -105,7 +112,7 @@ def get_mcu_names_used_by_targets_json5() -> Set[str]:
 
     custom_targets_json_path = {}
     for file in custom_targets_file:
-        if os.path.exists(file):
+        if file.exists():
             custom_targets_json_path = file
             LOGGER.info(f"Custom_targets file detected - {custom_targets_json_path}")
 
@@ -125,7 +132,10 @@ def get_mcu_names_used_by_targets_json5() -> Set[str]:
 @cmsis_mcu_descr.command(short_help="Reload the cache of CMSIS MCU descriptions.  This can take several minutes.")
 def reload_cache() -> None:
     """
-    Reload the cache of CMSIS MCU descriptions.  This can take several minutes.
+    Reload the cache of CMSIS MCU descriptions.
+
+    This can take several minutes.
+
     Note that it's possible for various MCU vendors' CMSIS pack servers to be down, and
     cmsis-pack-manager does not report any errors in this case (augh whyyyyy).
 
@@ -143,6 +153,7 @@ def reload_cache() -> None:
 def find_unused() -> None:
     """
     Remove MCU descriptions that are not used by targets.json5.
+
     Use this command after removing targets from Mbed to clean up old MCU definitions.
     """
     used_mcu_names = get_mcu_names_used_by_targets_json5()
@@ -182,11 +193,13 @@ def check_missing() -> None:
 
 @cmsis_mcu_descr.command(
     name="fetch-missing",
-    short_help="Fetch any missing MCU descriptions used by targets.json5 or custom_targets.json/json5..",
+    short_help="Fetch any missing MCU descriptions used by targets.json5 or custom_targets.json/json5.",
 )
 def fetch_missing() -> None:
     """
-    Scans through cmsis_mcu_descriptions.json5 for any missing MCU descriptions that are referenced by
+    Fetches any missing MCU descriptions used by targets.json5 or custom_targets.json/json5.
+
+    This scans through cmsis_mcu_descriptions.json5 for any missing MCU descriptions that are referenced by
     targets.json5 or custom_targets.json/json5. If any are found, they are imported from the CMSIS cache.
 
     Note that downloaded descriptions should be checked for accuracy before they are committed.

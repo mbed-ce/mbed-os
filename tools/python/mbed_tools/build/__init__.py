@@ -12,6 +12,5 @@ The functionality covered in this package includes the following:
 - Export of build instructions to third party command line tools and IDEs.
 """
 
-from mbed_tools.build.build import build_project, generate_build_system
-from mbed_tools.build.config import generate_config
-from mbed_tools.build.flash import flash_binary
+from mbed_tools.build.config import generate_config as generate_config
+from mbed_tools.build.flash import flash_binary as flash_binary

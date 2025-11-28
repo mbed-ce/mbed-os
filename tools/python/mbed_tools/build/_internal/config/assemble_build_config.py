@@ -50,7 +50,7 @@ def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
         config.json_sources.append(program.files.custom_targets_json)
 
     # Make all JSON sources relative paths to the program root
-    def make_relative_if_possible(path: Path):
+    def make_relative_if_possible(path: Path) -> Path:
         # Sadly, Pathlib did not gain a better way to do this until newer python versions.
         try:
             return path.relative_to(program.root)

@@ -4,12 +4,15 @@
 #
 """Command to generate the application CMake configuration script used by the build/compile system."""
 
+import logging
 import pathlib
 
 import click
 
 from mbed_tools.build import generate_config
 from mbed_tools.project import MbedProgram
+
+logger = logging.getLogger(__name__)
 
 
 @click.command(
@@ -78,6 +81,9 @@ def configure(
         program.files.custom_targets_json = pathlib.Path(custom_targets_json)
     if app_config is not None:
         program.files.app_config_file = pathlib.Path(app_config)
+
+    if program.files.app_config_file is None:
+        logger.info("This program does not contain an mbed_app.json config file.")
 
     mbed_target = mbed_target.upper()
     _, output_path = generate_config(mbed_target, toolchain, program)

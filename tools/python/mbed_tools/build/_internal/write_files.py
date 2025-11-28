@@ -6,7 +6,7 @@
 
 import pathlib
 
-from mbed_tools.build.exceptions import InvalidExportOutputDirectory
+from mbed_tools.build.exceptions import InvalidExportOutputDirectoryError
 
 
 def write_file(file_path: pathlib.Path, file_contents: str) -> None:
@@ -25,7 +25,7 @@ def write_file(file_path: pathlib.Path, file_contents: str) -> None:
     output_directory = file_path.parent
     if output_directory.is_file():
         msg = "Output directory cannot be a path to a file."
-        raise InvalidExportOutputDirectory(msg)
+        raise InvalidExportOutputDirectoryError(msg)
 
     output_directory.mkdir(parents=True, exist_ok=True)
     file_path.write_text(file_contents)

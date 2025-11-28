@@ -9,7 +9,7 @@ import pathlib
 from dataclasses import dataclass
 from typing import Any, Iterable, List, Optional
 
-from mbed_tools.build.exceptions import InvalidConfigOverride
+from mbed_tools.build.exceptions import InvalidConfigOverrideError
 from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.lib.python_helpers import flatten_nested
 
@@ -133,9 +133,9 @@ def _extract_target_overrides(
     namespace: str, override_data: dict, allowed_target_labels: Iterable[str]
 ) -> List[Override]:
     valid_target_data = {}
-    for target_type in override_data:
+    for target_type, override in override_data.items():
         if target_type == "*" or target_type in allowed_target_labels:
-            valid_target_data.update(override_data[target_type])
+            valid_target_data.update(override)
 
     return _extract_overrides(namespace, valid_target_data)
 
@@ -151,7 +151,7 @@ def _extract_overrides(namespace: str, override_data: dict) -> List[Override]:
                     f"An override was defined by the lib `{namespace}` that attempts to override "
                     f"`{override_namespace}.{override_name}`."
                 )
-                raise InvalidConfigOverride(msg)
+                raise InvalidConfigOverrideError(msg)
         except ValueError:
             override_namespace = namespace
             override_name = name

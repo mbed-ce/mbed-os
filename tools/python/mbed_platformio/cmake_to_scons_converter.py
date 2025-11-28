@@ -15,10 +15,11 @@ import click
 
 if TYPE_CHECKING:
     from SCons.Environment import Base as Environment
+    from SCons.Node import NodeList
 
 
 def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
-    def _normalize_define(define_string):
+    def _normalize_define(define_string: str) -> tuple[str, str]:
         define_string = define_string.strip()
         if "=" in define_string:
             define, value = define_string.split("=", maxsplit=1)
@@ -27,7 +28,10 @@ def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
             elif '"' in value and not value.startswith("\\"):
                 value = value.replace('"', '\\"')
             return define, value
-        return define_string
+
+        # If a define is passed without a value on the command line it gets set equal to 1 by the compiler.
+        # We can replicate that behavior here to turn every define into a key-value pair.
+        return define_string, "1"
 
     result = [_normalize_define(d.get("define", "")) for d in compile_group.get("defines", []) if d]
 
@@ -83,6 +87,7 @@ def compile_source_files(
 ) -> list:
     """
     Generates SCons rules to compile the source files in a target.
+
     Returns list of object files to build.
 
     :param framework_dir: Path to the Mbed CE framework source
@@ -127,7 +132,7 @@ def build_library(
     project_src_dir: pathlib.Path,
     framework_dir: pathlib.Path,
     framework_obj_dir: pathlib.Path,
-):
+) -> NodeList:
     lib_name = lib_config["nameOnDisk"]
     lib_path = lib_config["paths"]["build"]
     lib_objects = compile_source_files(lib_config, default_env, project_src_dir, framework_dir, framework_obj_dir)

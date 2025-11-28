@@ -72,7 +72,8 @@ unit-tests = [
     "lxml"
 ]
 linters = [
-    "ruff"
+    "ruff",
+    "SCons" # For packages imported by the PlatformIO scripts
 ]
 greentea = [
     ## Additional requirements to install into the Mbed environment when running Greentea tests
@@ -188,12 +189,22 @@ ignore = [
     'S701',    # Allow using jinja without autoescape. autoescape not needed because we are not rendering HTML
     'BLE001',  # Allow catching Exception
     'S603',    # Allow running subprocesses with variable arguments (why is this a lint in the first place??)
+    'ERA001',  # Allow commented code
 
     # For now allow old-style type annotations. Currently there's lots of code that uses them, and I am
-    # not sure if there is a way to upgrade them automatically.
+    # not sure if there is a way to upgrade them automatically. And since this project still supports
+    # back to Python 3.7, you can't actually use the new style of annotations without using the future annotations feature.
     "FA100",
-    "UP045"
+    "UP045",
+    "UP006"
 ]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 15
+
+[tool.ruff.lint.pylint]
+max-args = 10
+
+[tool.ruff.lint.flake8-annotations]
+# Don't require a return type annotation for __init__ in most cases
+mypy-init-return = true

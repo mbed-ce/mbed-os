@@ -63,8 +63,7 @@ BANK_TYPES = ("RAM", "ROM")
 
 def incorporate_memory_bank_data_from_cmsis(target_attributes: dict[str, Any], program: MbedProgram) -> None:
     """
-    Incorporate the memory bank information from the CMSIS JSON file into
-    the target attributes.
+    Incorporate the memory bank information from the CMSIS JSON file into the target attributes.
 
     :param target_attributes: Merged targets.json content for this target
     """
@@ -95,8 +94,8 @@ the missing MCU description?"""
 
 def _apply_configured_overrides(banks_by_type: BanksByType, bank_config: dict[str, dict[str, int]]) -> BanksByType:
     """
-    Apply overrides from configuration to the physical memory bank information, producing the configured
-    memory bank information.
+    Apply overrides from configuration to the physical memory bank information, producing the configured memory banks.
+
     :param bank_config: memory_bank_config element from target JSON
     :param banks_by_type: Physical memory bank information
     """
@@ -125,6 +124,7 @@ def _apply_configured_overrides(banks_by_type: BanksByType, bank_config: dict[st
 def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type: BanksByType) -> None:
     """
     Print a summary of the memory banks to the console
+
     :param banks_by_type: Physical memory bank information
     :param configured_banks_by_type: Configured memory bank information
     """
@@ -157,6 +157,7 @@ def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type
 def _generate_macros_for_memory_banks(banks_by_type: BanksByType, configured_banks_by_type: BanksByType) -> set[str]:
     """
     Generate a set of macros to define to pass the memory bank information into Mbed.
+
     :param banks_by_type: Physical memory bank information
     :param configured_banks_by_type: Configured memory bank information
     """
@@ -189,8 +190,9 @@ def _generate_macros_for_memory_banks(banks_by_type: BanksByType, configured_ban
 
 def process_memory_banks(config: Config) -> dict[str, BanksByType]:
     """
-    Process memory bank information in the config.  Reads the 'memory_banks' and
-    'memory_bank_config' sections and adds the memory_bank_macros section accordingly.
+    Processes memory bank information in the config.
+
+    Reads the 'memory_banks' and 'memory_bank_config' sections and adds the memory_bank_macros section accordingly.
 
     :param config: Config structure containing merged data from every JSON file (app, lib, and targets)
     :return: Memory bank information structure that shall be written to memory_banks.json

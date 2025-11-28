@@ -4,7 +4,6 @@
 #
 """Project management commands: new, import_, deploy and libs."""
 
-import os
 import pathlib
 from typing import Any, List
 
@@ -64,7 +63,7 @@ def import_(url: str, path: Any, skip_resolve_libs: bool) -> None:
 
 
 @click.command()
-@click.argument("path", type=click.Path(), default=os.getcwd())
+@click.argument("path", type=click.Path(), default=pathlib.Path.cwd())
 @click.option(
     "--force",
     "-f",

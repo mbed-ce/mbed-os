@@ -24,7 +24,7 @@ else
 fi
 
 if ! command -v ruff >/dev/null 2>&1; then
-  echo "Linters optional dependency of Mbed not installed. Please run 'mbed-os/venv/bin/pip install mbed-os/tools[linters]'."
+  echo "Linters optional dependency of Mbed not installed. Please run 'cd mbed-os && venv/bin/pip install -e ./tools[linters]'."
 fi
 
 echo ">> Formatting with ruff..."

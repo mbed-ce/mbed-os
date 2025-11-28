@@ -14,7 +14,7 @@ import json
 import pathlib
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import click
 from platformio.proc import exec_command
@@ -60,13 +60,13 @@ from mbed_platformio.cmake_to_scons_converter import (
 from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
 
 
-def get_mbed_target():
+def get_mbed_target() -> str:
     board_type = env.subst("$BOARD")
     variant = PIO_VARIANT_TO_MBED_TARGET[board_type] if board_type in PIO_VARIANT_TO_MBED_TARGET else board_type.upper()
     return board.get("build.mbed_variant", variant)
 
 
-def is_proper_mbed_ce_project():
+def is_proper_mbed_ce_project() -> bool:
     return all(path.is_file() for path in (PROJECT_MBED_APP_JSON5,))
 
 
@@ -145,21 +145,21 @@ def get_cmake_code_model(cmake_args: list) -> dict:
     codemodel = {}
     for target in CMAKE_API_REPLY_DIR.iterdir():
         if target.name.startswith("codemodel-v2"):
-            with open(target) as fp:
+            with target.open(encoding="utf-8") as fp:
                 codemodel = json.load(fp)
 
     assert codemodel["version"]["major"] == 2
     return codemodel
 
 
-def get_target_config(project_configs: dict, target_index):
+def get_target_config(project_configs: dict, target_index: int) -> dict[str, Any]:
     target_json = project_configs.get("targets")[target_index].get("jsonFile", "")
     target_config_file = CMAKE_API_REPLY_DIR / target_json
     if not target_config_file.is_file():
         sys.stderr.write(f"Error: Couldn't find target config {target_json}\n")
         env.Exit(1)
 
-    with open(target_config_file) as fp:
+    with target_config_file.open(encoding="utf-8") as fp:
         return json.load(fp)
 
 
@@ -220,7 +220,7 @@ def build_components(env: Environment, components_map: dict, project_src_dir: pa
         )
 
 
-def get_app_defines(app_config: dict):
+def get_app_defines(app_config: dict) -> list[tuple[str, str]]:
     return extract_defines(app_config["compileGroups"][0])
 
 
@@ -241,8 +241,9 @@ project_codemodel = get_cmake_code_model(
         "-DPLATFORMIO_PROJECT_PATH=" + str(PROJECT_DIR.as_posix()),
         "-DMBED_TARGET=" + get_mbed_target(),
         "-DUPLOAD_METHOD=NONE",  # Disable Mbed CE upload method system as PlatformIO has its own
+        # Add in any extra options from higher layers
+        *click.parser.split_arg_string(board.get("build.cmake_extra_args", "")),
     ]
-    + click.parser.split_arg_string(board.get("build.cmake_extra_args", ""))
 )
 
 if not project_codemodel:

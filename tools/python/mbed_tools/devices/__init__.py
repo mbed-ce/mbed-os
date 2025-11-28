@@ -12,6 +12,14 @@ Please see the documentation for mbed-targets for information on configuration o
 For the command line interface to the API see the package https://github.com/ARMmbed/mbed-tools
 """
 
-from mbed_tools.devices import exceptions
-from mbed_tools.devices.device import Device
-from mbed_tools.devices.devices import find_all_connected_devices, find_connected_device, get_connected_devices
+from mbed_tools.devices import exceptions as exceptions
+from mbed_tools.devices.device import Device as Device
+from mbed_tools.devices.devices import (
+    find_all_connected_devices as find_all_connected_devices,
+)
+from mbed_tools.devices.devices import (
+    find_connected_device as find_connected_device,
+)
+from mbed_tools.devices.devices import (
+    get_connected_devices as get_connected_devices,
+)

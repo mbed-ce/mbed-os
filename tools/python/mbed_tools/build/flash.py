@@ -49,7 +49,7 @@ def _build_binary_file_path(program_path: pathlib.Path, build_dir: pathlib.Path,
 
 
 def flash_binary(
-    mount_point: pathlib.Path, program_path: pathlib.Path, build_dir: pathlib.Path, mbed_target: str, hex_file: bool
+    mount_point: pathlib.Path, program_path: pathlib.Path, build_dir: pathlib.Path, hex_file: bool
 ) -> pathlib.Path:
     """
     Flash binary onto a device.
@@ -60,7 +60,6 @@ def flash_binary(
        mount_point: Mount point of the target device.
        program_path: Path to the Mbed project.
        build_dir: Path to the CMake build folder.
-       mbed_target: The name of the Mbed target to build for.
        hex_file: Use hex file.
     """
     fw_file = _build_binary_file_path(program_path, build_dir, hex_file)

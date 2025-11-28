@@ -9,6 +9,7 @@ import sys
 from typing import Any, Union
 
 import click
+from pkg_resources import get_distribution
 
 from mbed_tools.cli.cmsis_mcu_descr import cmsis_mcu_descr
 from mbed_tools.cli.configure import configure
@@ -39,13 +40,12 @@ class GroupWithExceptionHandling(click.Group):
         sys.exit(handler.exit_code)
 
 
-def print_version(context: click.Context, param: Union[click.Option, click.Parameter], value: bool) -> Any:
+def print_version(context: click.Context, _param: Union[click.Option, click.Parameter], value: bool) -> Any:
     """Print the version of mbed-tools."""
     if not value or context.resilient_parsing:
         return
 
-    # Mbed CE: changed this to be hardcoded for now.
-    version_string = "7.60.0"
+    version_string = get_distribution("mbed-ce-tools").version
     click.echo(version_string)
     context.exit()
 
@@ -66,8 +66,7 @@ def print_version(context: click.Context, param: Union[click.Option, click.Param
     count=True,
     help="Set the verbosity level, enter multiple times to increase verbosity.",
 )
-@click.option("-t", "--traceback", is_flag=True, show_default=True, help="Show a traceback when an error is raised.")
-def cli(verbose: int, traceback: bool) -> None:
+def cli(verbose: int) -> None:
     """Command line tool for interacting with Mbed OS."""
     set_log_level(verbose)
 
