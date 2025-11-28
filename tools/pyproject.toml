@@ -224,7 +224,7 @@ include = [
 # We will allow code where the types of things are partially unknown, as there is
 # lots of legacy code in that category.
 # Also the PlatformIO code has to work with SCons, which is fundamentally type
-# annotation proof, so that can likely never pass these checks.
+# annotation proof, so it can likely never pass these checks.
 reportUnknownVariableType = false
 reportUnknownMemberType = false
 reportUnknownLambdaType = false
@@ -233,3 +233,8 @@ reportUnknownArgumentType = false
 reportUnknownParameterType = false
 reportAny = false
 reportExplicitAny = false
+
+# Use "medium strict" member variable annotation rules, where the type checker
+# is allowed to infer the types of class variables based on what gets assigned in __init__
+reportIncompatibleUnannotatedOverride = true
+reportUnannotatedClassAttribute = false

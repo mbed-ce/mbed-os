@@ -66,8 +66,12 @@ def print_version(context: click.Context, _param: Union[click.Option, click.Para
     count=True,
     help="Set the verbosity level, enter multiple times to increase verbosity.",
 )
-def cli(verbose: int) -> None:
+@click.option("-t", "--traceback", is_flag=True, show_default=True, help="Show a traceback when an error is raised.")
+def cli(verbose: int, _traceback: bool) -> None:
     """Command line tool for interacting with Mbed OS."""
+    # note: traceback parameter not used here but is accessed through
+    # click.context.params in GroupWithExceptionHandling
+
     set_log_level(verbose)
 
 

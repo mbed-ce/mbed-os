@@ -10,7 +10,7 @@ from typing import Any, List
 
 from mbed_tools.project._internal import git_utils
 from mbed_tools.project._internal.libraries import LibraryReferences
-from mbed_tools.project.mbed_program import MbedProgram, parse_url
+from mbed_tools.project.mbed_program import parse_url
 
 logger = logging.getLogger(__name__)
 
@@ -38,20 +38,6 @@ def import_project(url: str, dst_path: Any = None, recursive: bool = False) -> p
         libs.fetch()
 
     return dst_path
-
-
-def initialise_project(path: pathlib.Path, create_only: bool) -> None:
-    """
-    Create a new Mbed project, optionally fetching and adding mbed-os.
-
-    Args:
-        path: Path to the project folder. Created if it doesn't exist.
-        create_only: Flag which suppreses fetching mbed-os. If the value is `False`, fetch mbed-os from the remote.
-    """
-    program = MbedProgram.from_new(path)
-    if not create_only:
-        libs = LibraryReferences(root=program.root, ignore_paths=["mbed-os"])
-        libs.fetch()
 
 
 def deploy_project(path: pathlib.Path, force: bool = False) -> None:

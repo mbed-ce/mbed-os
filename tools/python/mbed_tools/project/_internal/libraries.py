@@ -124,7 +124,7 @@ def _clone_at_ref(url: str, path: Path, ref: str) -> None:
     if ref:
         logger.info(f"Checking out revision {ref} for library {url}.")
         try:
-            git_utils.clone(url, path, ref)
+            _ = git_utils.clone(url, path, ref)
         except VersionControlError:
             # We weren't able to clone. Try again without the ref.
             repo = git_utils.clone(url, path)
@@ -135,4 +135,4 @@ def _clone_at_ref(url: str, path: Path, ref: str) -> None:
             git_utils.fetch(repo, ref)
             git_utils.checkout(repo, "FETCH_HEAD")
     else:
-        git_utils.clone(url, path)
+        _ = git_utils.clone(url, path)

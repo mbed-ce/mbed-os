@@ -16,7 +16,7 @@ from mbed_tools.project._internal.project_data import (
     MbedOS,
     MbedProgramFiles,
 )
-from mbed_tools.project.exceptions import ExistingProgramError, MbedOSNotFoundError, ProgramNotFoundError
+from mbed_tools.project.exceptions import MbedOSNotFoundError, ProgramNotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -42,33 +42,6 @@ class MbedProgram:
         self.files = program_files
         self.root = root_path
         self.mbed_os = mbed_os
-
-    @classmethod
-    def from_new(cls, dir_path: Path) -> "MbedProgram":
-        """
-        Create an MbedProgram from an empty directory.
-
-        Creates the directory if it doesn't exist.
-
-        Args:
-            dir_path: Directory in which to create the program.
-
-        Raises:
-            ExistingProgram: An existing program was found in the path.
-        """
-        if _tree_contains_program(dir_path):
-            msg = (
-                f"An existing Mbed program was found in the directory tree {dir_path}. It is not possible to nest Mbed "
-                "programs. Please ensure there is no mbed-os.lib file in the cwd hierarchy."
-            )
-            raise ExistingProgramError(msg)
-
-        logger.info(f"Creating Mbed program at path '{dir_path.resolve()}'")
-        dir_path.mkdir(exist_ok=True)
-        program_files = MbedProgramFiles.from_new(dir_path)
-        logger.info(f"Creating git repository for the Mbed program '{dir_path}'")
-        mbed_os = MbedOS.from_new(dir_path / MBED_OS_DIR_NAME)
-        return cls(program_files, mbed_os, dir_path)
 
     @classmethod
     def from_existing(
@@ -128,24 +101,6 @@ def parse_url(name_or_url: str) -> Dict[str, str]:
         url = f"https://github.com/armmbed/{url_obj.path}"
     # We need to create a valid directory name from the url path section.
     return {"url": url, "dst_path": url_obj.path.rsplit("/", maxsplit=1)[-1].replace("/", "")}
-
-
-def _tree_contains_program(path: Path) -> bool:
-    """
-    Check if the current path or its ancestors contain an mbed-os.lib file.
-
-    Args:
-        path: The starting path for the search. The search walks up the tree from this path.
-
-    Returns:
-        `True` if an mbed-os.lib file is located between `path` and filesystem root.
-        `False` if no mbed-os.lib file was found.
-    """
-    try:
-        _find_program_root(path)
-        return True
-    except ProgramNotFoundError:
-        return False
 
 
 def _find_program_root(cwd: Path) -> Path:

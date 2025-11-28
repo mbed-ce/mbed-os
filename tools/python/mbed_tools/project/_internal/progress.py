@@ -4,11 +4,16 @@
 #
 """Progress bar for git operations."""
 
+from __future__ import annotations
+
 import sys
 from typing import Any, Optional
 
 from git import RemoteProgress
 from tqdm import tqdm
+from typing_extensions import override
+
+from mbed_tools.project.exceptions import VersionControlError
 
 
 class ProgressBar(tqdm):
@@ -27,11 +32,13 @@ class ProgressBar(tqdm):
         """
         if total_size is not None and self.total != total_size:
             self.total = total_size
-        self.update(block_num * block_size - self.n)
+        _ = self.update(block_num * block_size - self.n)
 
 
 class ProgressReporter(RemoteProgress):
     """GitPython RemoteProgress subclass that displays a progress bar for git fetch and push operations."""
+
+    bar: Optional[ProgressBar] = None
 
     def __init__(self, *args: Any, name: str = "", **kwargs: Any) -> None:
         """
@@ -43,7 +50,10 @@ class ProgressReporter(RemoteProgress):
         self.name = name
         super().__init__(*args, **kwargs)
 
-    def update(self, op_code: int, cur_count: float, max_count: Optional[float] = None, _message: str = "") -> None:
+    @override
+    def update(
+        self, op_code: int, cur_count: str | float, max_count: str | float | None = None, message: str = ""
+    ) -> None:
         """
         Called whenever the progress changes.
 
@@ -51,10 +61,18 @@ class ProgressReporter(RemoteProgress):
             op_code: Integer describing the stage of the current operation.
             cur_count: Current item count.
             max_count: Maximum number of items expected.
-            _message: Message string describing the number of bytes transferred in the WRITING operation.
+            message: Message string describing the number of bytes transferred in the WRITING operation.
         """
+        cur_count = float(cur_count)
+        if max_count is not None:
+            max_count = float(max_count)
+
         if self.BEGIN & op_code:
             self.bar = ProgressBar(total=max_count, file=sys.stderr, leave=False)
+
+        if self.bar is None:
+            err_message = "Did not get BEGIN opcode from git first!"
+            raise VersionControlError(err_message)
 
         self.bar.desc = f"{self.name} {self._cur_line}"
         self.bar.update_progress(block_num=cur_count, total_size=max_count)
