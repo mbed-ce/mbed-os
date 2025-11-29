@@ -5,7 +5,8 @@
 """
 Provides the core Python parts of the build system for Mbed OS.
 
-This module contains the configuration generation functionality, which processes JSON files into a set of target flags.
+This module contains the configuration generation functionality, which processes JSON files into a set of target labels,
+flags, and options.
 """
 
 from mbed_tools.build.config import generate_config as generate_config

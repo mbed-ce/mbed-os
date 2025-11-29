@@ -54,8 +54,8 @@ def prepare_build_envs(target_json: dict, default_env: Environment) -> list[Envi
     target_compile_groups = target_json.get("compileGroups", [])
     if not target_compile_groups:
         print(
-            "Warning! The `%s` component doesn't register any source files. "
-            "Check if sources are set in component's CMakeLists.txt!" % target_json["name"]
+            f"Warning! The `{target_json['name']}` component doesn't register any source files. "
+            "Check if sources are set in component's CMakeLists.txt!"
         )
 
     for cg in target_compile_groups:
