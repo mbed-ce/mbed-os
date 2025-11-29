@@ -9,7 +9,7 @@ from __future__ import annotations
 import plistlib
 import re
 import subprocess
-from typing import Dict, Iterable, List, cast, Union
+from typing import Dict, Iterable, List, Union, cast
 
 from typing_extensions import TypedDict
 
