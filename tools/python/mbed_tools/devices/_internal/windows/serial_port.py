@@ -15,7 +15,10 @@ https://serverfault.com/questions/398469/what-are-the-minimum-permissions-to-rea
 import re
 from typing import NamedTuple, cast
 
-from mbed_tools.devices._internal.windows.component_descriptor import UNKNOWN_VALUE, ComponentDescriptor
+from typing_extensions import override
+
+from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
+from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE
 
 CAPTION_PATTERN = re.compile(r"^.* [(](.*)[)]$")
 
@@ -79,6 +82,7 @@ class SerialPort(ComponentDescriptor):
         )
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the device id field."""
         return cast(str, self.get("DeviceID"))

@@ -4,8 +4,12 @@
 #
 """Loads system data in parallel and all at once in order to improve performance."""
 
+from __future__ import annotations
+
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, Generator, List, Optional, Tuple, cast
+
+from typing_extensions import TypeVar
 
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor, ComponentDescriptorWrapper
 from mbed_tools.devices._internal.windows.disk_drive import DiskDrive
@@ -64,14 +68,18 @@ class SystemDataLoader:
         return self.system_data.get(cls, [])
 
 
+ComponentT = TypeVar("ComponentT", bound=ComponentDescriptor)
+
+
 class ComponentsLoader:
     """Loads system components."""
 
-    def __init__(self, data_loader: SystemDataLoader, cls: type) -> None:
+    def __init__(self, data_loader: SystemDataLoader, cls: type[ComponentT]) -> None:
         """initialiser."""
         self._cls = cls
         self._data_loader = data_loader
 
-    def element_generator(self) -> Generator["ComponentDescriptor", None, None]:
+    def element_generator(self) -> Generator[ComponentT, None, None]:
         """Gets a generator over all elements currently registered in the system."""
-        yield from self._data_loader.get_system_data(self._cls)
+        elements = cast(list[ComponentT], self._data_loader.get_system_data(self._cls))
+        yield from elements

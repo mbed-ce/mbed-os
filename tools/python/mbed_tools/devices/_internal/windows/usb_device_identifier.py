@@ -7,6 +7,8 @@
 import re
 from typing import Dict, List, NamedTuple, Optional, Pattern, cast
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor_utils import is_undefined_data_object
 from mbed_tools.devices._internal.windows.windows_identifier import WindowsUID
 
@@ -25,7 +27,7 @@ class UsbIdentifier(NamedTuple):
         MI: Multiple Interface, a 2 digit interface number.
     """
 
-    UID: Optional[str] = None
+    UID: Optional[WindowsUID] = None
     VID: Optional[str] = None
     PID: Optional[str] = None
     REV: Optional[str] = None
@@ -55,6 +57,7 @@ class UsbIdentifier(NamedTuple):
         """Returns the product id field."""
         return self.VID or ""
 
+    @override
     def __eq__(self, other: object) -> bool:
         """States whether the other id equals to self."""
         if not other or not isinstance(other, UsbIdentifier):
@@ -64,6 +67,7 @@ class UsbIdentifier(NamedTuple):
 
         return all([self.uid == other.uid, self.product_id == other.product_id, self.vendor_id == other.vendor_id])
 
+    @override
     def __hash__(self) -> int:
         """Generates a hash."""
         return hash(self.uid) + hash(self.product_id) + hash(self.vendor_id)

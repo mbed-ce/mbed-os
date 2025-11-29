@@ -65,7 +65,7 @@ def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
 def _assemble_config_from_sources(
     target_attributes: dict, mbed_lib_files: List[Path], mbed_app_file: Optional[Path] = None
 ) -> Config:
-    config = Config(source.prepare(target_attributes, source_name="target"))
+    config = Config(**source.prepare(target_attributes, source_name="target"))
     previous_filter_data = None
     app_data = None
     if mbed_app_file:

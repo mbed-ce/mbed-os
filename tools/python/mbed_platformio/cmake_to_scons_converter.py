@@ -9,9 +9,10 @@ from __future__ import annotations
 
 import collections
 import pathlib
-from typing import TYPE_CHECKING
+import typing
+from typing import TYPE_CHECKING, Sequence
 
-import click
+from click.parser import split_arg_string
 
 if TYPE_CHECKING:
     from SCons.Environment import Base as Environment
@@ -151,15 +152,15 @@ def _get_flags_for_compile_group(compile_group_json: dict) -> list[str]:
         fragment = ccfragment.get("fragment", "").strip()
         if not fragment or fragment.startswith("-D"):
             continue
-        flags.extend(click.parser.split_arg_string(fragment))
+        flags.extend(split_arg_string(fragment))
     return flags
 
 
-def extract_flags(target_json: dict) -> dict[str, list[str]]:
+def extract_flags(target_json: dict) -> dict[str, list[str] | None]:
     """
     Returns a dictionary with flags for SCons based on a given CMake target
     """
-    default_flags = collections.defaultdict(list)
+    default_flags: dict[str, list[str]] = collections.defaultdict(list)
     for cg in target_json["compileGroups"]:
         default_flags[cg["language"]].extend(_get_flags_for_compile_group(cg))
 
@@ -173,11 +174,11 @@ def extract_flags(target_json: dict) -> dict[str, list[str]]:
 
 def find_included_files(environment: Environment) -> set[str]:
     """
-    Process a list of flags produced by extract_flags() to find files manually included by '-include'
+    Process an environment produced by prepare_build_envs() to find files manually included by '-include'
     """
     result = set()
     for flag_var in ["CFLAGS", "CXXFLAGS", "CCFLAGS"]:
-        language_flags = environment.get(flag_var)
+        language_flags = typing.cast(Sequence[str], environment.get(flag_var))
         for index in range(len(language_flags)):
             if language_flags[index] == "-include" and index < len(language_flags) - 1:
                 result.add(language_flags[index + 1])
@@ -212,7 +213,7 @@ def extract_link_args(target_json: dict) -> list[str]:
         fragment_role = f.get("role", "").strip()
         if not fragment or not fragment_role:
             continue
-        args = click.parser.split_arg_string(fragment)
+        args = split_arg_string(fragment)
         if fragment_role == "flags":
             result.extend(args)
 

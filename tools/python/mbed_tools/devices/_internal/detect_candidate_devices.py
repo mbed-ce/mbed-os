@@ -12,11 +12,11 @@ from mbed_tools.devices._internal.candidate_device import CandidateDevice
 from mbed_tools.devices.exceptions import UnknownOSError
 
 if platform.system() == "Windows":
-    from mbed_tools.devices._internal.windows.device_detector import WindowsDeviceDetector as DeviceDetector
+    from mbed_tools.devices._internal.windows.device_detector import WindowsDeviceDetector as PlatformDeviceDetector
 if platform.system() == "Linux":
-    from mbed_tools.devices._internal.linux.device_detector import LinuxDeviceDetector as DeviceDetector
+    from mbed_tools.devices._internal.linux.device_detector import LinuxDeviceDetector as PlatformDeviceDetector
 if platform.system() == "Darwin":
-    from mbed_tools.devices._internal.darwin.device_detector import DarwinDeviceDetector as DeviceDetector
+    from mbed_tools.devices._internal.darwin.device_detector import DarwinDeviceDetector as PlatformDeviceDetector
 
 
 def detect_candidate_devices() -> Iterable[CandidateDevice]:
@@ -34,4 +34,4 @@ def _get_detector_for_current_os() -> DeviceDetector:
         )
         raise UnknownOSError(msg)
 
-    return DeviceDetector()
+    return PlatformDeviceDetector()  # pyright: ignore[reportPossiblyUnboundVariable]

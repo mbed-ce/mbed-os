@@ -8,9 +8,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from mbed_tools.devices._internal.detect_candidate_devices import CandidateDevice
+from mbed_tools.devices._internal.candidate_device import CandidateDevice
+from mbed_tools.devices._internal.exceptions import NoBoardForCandidateError, ResolveBoardError
 from mbed_tools.devices._internal.file_parser import read_device_files
-from mbed_tools.devices._internal.resolve_board import NoBoardForCandidateError, ResolveBoardError, resolve_board
+from mbed_tools.devices._internal.resolve_board import resolve_board
 from mbed_tools.devices.exceptions import DeviceLookupFailedError
 from mbed_tools.targets import Board
 

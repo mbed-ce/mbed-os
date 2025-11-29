@@ -24,6 +24,8 @@ class FilesystemMountpointError(CandidateDeviceError):
 class DataField:
     """CandidateDevice data attribute descriptor."""
 
+    name: str  # pyright: ignore[reportUninitializedInstanceVariable]
+
     def __set_name__(self, owner: object, name: str) -> None:
         """Sets the descriptor name, this is called by magic in the owners.__new__ method."""
         self.name = name
@@ -85,10 +87,13 @@ class CandidateDevice:
         serial_port: Serial port associated with the device, this could be None.
     """
 
-    product_id: str = cast(str, USBDescriptorHex())
-    vendor_id: str = cast(str, USBDescriptorHex())
-    serial_number: str = cast(str, USBDescriptorString())
-    mount_points: Tuple[Path, ...] = cast(Tuple[Path], FilesystemMountpoints())
+    # Note: these classes (USBDescriptorHex, etc) are field classes that act like specific
+    # types but actually have additional validation triggered when they are set.
+    # So we have to lie to the type checker a bit.
+    product_id: str = cast(str, USBDescriptorHex())  # pyright: ignore[reportInvalidCast]
+    vendor_id: str = cast(str, USBDescriptorHex())  # pyright: ignore[reportInvalidCast]
+    serial_number: str = cast(str, USBDescriptorString())  # pyright: ignore[reportInvalidCast]
+    mount_points: Tuple[Path, ...] = cast(Tuple[Path], FilesystemMountpoints())  # pyright: ignore[reportInvalidCast]
     serial_port: Optional[str] = None
 
 

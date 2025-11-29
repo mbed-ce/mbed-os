@@ -28,4 +28,4 @@ def write_file(file_path: pathlib.Path, file_contents: str) -> None:
         raise InvalidExportOutputDirectoryError(msg)
 
     output_directory.mkdir(parents=True, exist_ok=True)
-    file_path.write_text(file_contents)
+    _ = file_path.write_text(file_contents)

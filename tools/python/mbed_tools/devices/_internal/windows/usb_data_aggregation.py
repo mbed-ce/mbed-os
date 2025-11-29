@@ -6,6 +6,8 @@
 
 from typing import List, NamedTuple, cast
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 from mbed_tools.devices._internal.windows.disk_aggregation import AggregatedDiskData, SystemDiskInformation
 from mbed_tools.devices._internal.windows.serial_port import SerialPort
@@ -35,6 +37,7 @@ class AggregatedUsbData(ComponentDescriptor):
         super().__init__(AggregatedUsbDataDefinition, win32_class_name="AggregatedUsbData")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns an id."""
         return str(self.uid)

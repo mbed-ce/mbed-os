@@ -20,7 +20,7 @@ def _flash_dev(disk: pathlib.Path, image_path: pathlib.Path) -> None:
         disk: Device mount point.
         image_path: Image file to be copied to device.
     """
-    shutil.copy(image_path, disk, follow_symlinks=False)
+    _ = shutil.copy(image_path, disk, follow_symlinks=False)
     if platform.system() != "Windows":
         os.sync()
 

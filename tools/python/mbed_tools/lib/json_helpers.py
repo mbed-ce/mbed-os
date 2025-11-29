@@ -27,7 +27,7 @@ def decode_json_file(path: Path) -> Any:
         try:
             logger.debug(f"Loading JSON file {path}")
             with path.open() as json_file:
-                return pyjson5.decode_io(json_file)
+                return pyjson5.decode_io(json_file)  # pyright: ignore[reportArgumentType]
         except ValueError:
             logger.exception(f"Failed to decode JSON data in the file located at '{path}'")
             raise

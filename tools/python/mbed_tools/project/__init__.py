@@ -11,15 +11,3 @@ Creation and management of Mbed OS projects.
 """
 
 from mbed_tools.project.mbed_program import MbedProgram as MbedProgram
-from mbed_tools.project.project import (
-    deploy_project as deploy_project,
-)
-from mbed_tools.project.project import (
-    get_known_libs as get_known_libs,
-)
-from mbed_tools.project.project import (
-    import_project as import_project,
-)
-from mbed_tools.project.project import (
-    initialise_project as initialise_project,
-)

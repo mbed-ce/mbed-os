@@ -7,6 +7,8 @@
 from functools import total_ordering
 from typing import Optional
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor_utils import is_undefined_value
 
 INSTANCE_ID_CHARACTER = "&"
@@ -63,6 +65,7 @@ class WindowsUID:
         self.raw_uid = raw_uid
         self.serial_number = serial_number
 
+    @override
     def __eq__(self, other: object) -> bool:
         """
         Defines the equality checker.
@@ -112,6 +115,7 @@ class WindowsUID:
         serial_number = self.presumed_serial_number
         return not (is_undefined_value(serial_number) or is_device_instance_id(serial_number))
 
+    @override
     def __hash__(self) -> int:
         """
         Calculates the hash of the UID.
@@ -125,10 +129,12 @@ class WindowsUID:
         """
         return hash(self.instance_id)
 
+    @override
     def __repr__(self) -> str:
         """String representation of the UID."""
         return f"WindowsUID({self.uid})"
 
+    @override
     def __str__(self) -> str:
         """String representation of the UID."""
         elements = [f"{k}={v!r}" for (k, v) in self.__dict__.items()]

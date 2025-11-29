@@ -30,13 +30,10 @@ class SystemUsbDeviceInformation:
         self._data_loader = data_loader
 
     def _list_usb_controller_ids(self) -> List[UsbIdentifier]:
-        return cast(
-            List[UsbIdentifier],
-            [
-                parse_device_id(cast(UsbController, usbc).component_id)
-                for usbc in ComponentsLoader(self._data_loader, UsbController).element_generator()
-            ],
-        )
+        return [
+            parse_device_id(cast(UsbController, usbc).component_id)
+            for usbc in ComponentsLoader(self._data_loader, UsbController).element_generator()
+        ]
 
     def _iterate_over_hubs(self) -> Generator[ComponentDescriptor, None, None]:
         return ComponentsLoader(self._data_loader, UsbHub).element_generator()
@@ -81,8 +78,8 @@ class SystemUsbDeviceInformation:
         """Gets all USB devices related to an identifier."""
         return self.usb_devices.get(uid, [])
 
-    def usb_device_ids(self) -> List[UsbIdentifier]:
+    def usb_device_ids(self) -> Set[UsbIdentifier]:
         """Gets system usb device IDs."""
         if not self._ids_cache:
             self._load()
-        return cast(List[UsbIdentifier], self._ids_cache)
+        return cast(Set[UsbIdentifier], self._ids_cache)

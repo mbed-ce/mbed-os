@@ -10,6 +10,7 @@ from typing import Any, Generator, List, NamedTuple, Optional, cast
 
 import pythoncom
 import win32com.client
+from typing_extensions import override
 
 from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE, is_undefined_data_object
 
@@ -85,6 +86,7 @@ class ComponentDescriptor(ABC):
             logger.debug(f"Attribute [{field_name}] is undefined on this instance {self}: {e}")
             return UNKNOWN_VALUE
 
+    @override
     def __str__(self) -> str:
         """String representation."""
         values = {k: v for k, v in self.__dict__.items() if not k.startswith("_")}

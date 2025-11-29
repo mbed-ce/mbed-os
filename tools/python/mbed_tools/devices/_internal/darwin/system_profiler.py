@@ -4,6 +4,8 @@
 #
 """Interactions with `system_profiler`."""
 
+from __future__ import annotations
+
 import plistlib
 import re
 import subprocess
@@ -31,11 +33,11 @@ class USBDevice(TypedDict, total=False):
     Media: List[USBDeviceMedia]
 
 
-def get_all_usb_devices_data() -> List[USBDeviceTree]:
+def get_all_usb_devices_data() -> List[USBDeviceTree | USBDevice]:
     """Returns parsed output of `system_profiler` call."""
     output = subprocess.check_output(["/usr/sbin/system_profiler", "-xml", "SPUSBDataType"], stderr=subprocess.DEVNULL)
     if output:
-        return cast(List[USBDeviceTree], plistlib.loads(output))
+        return cast(List[USBDeviceTree | USBDevice], plistlib.loads(output))
     return []
 
 
@@ -46,7 +48,7 @@ def get_end_usb_devices_data() -> List[USBDevice]:
     return _filter_end_devices(leaf_devices)
 
 
-def _extract_leaf_devices(data: Iterable[USBDeviceTree]) -> List[USBDevice]:
+def _extract_leaf_devices(data: Iterable[USBDeviceTree | USBDevice]) -> List[USBDevice]:
     """
     Flattens the structure returned by `system_profiler` call.
 

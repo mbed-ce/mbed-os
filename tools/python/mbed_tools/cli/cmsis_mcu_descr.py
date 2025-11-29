@@ -105,24 +105,19 @@ def get_mcu_names_used_by_targets_json5() -> Set[str]:
     """
     Accumulate set of all `device_name` properties used by all targets defined in targets.json5 and custom_targets.json/json5.
     """
+    LOGGER.info("Scanning targets.json5 for used MCU names...")
+    json_contents = decode_json_file(TARGETS_JSON5_PATH)
+
     # Search for files starting with "custom_targets" of type .json or .json5. Also exclude some folders like build and mbed-os
     exclude_dirs = ["build", "mbed-os", ".git"]
     file_pattern = r"custom_targets\.(json|json5)"
-    custom_targets_file = find_json_files(PROJECT_ROOT, exclude_dirs, file_pattern)
+    custom_targets_files = find_json_files(PROJECT_ROOT, exclude_dirs, file_pattern)
 
-    custom_targets_json_path = {}
-    for file in custom_targets_file:
-        if file.exists():
-            custom_targets_json_path = file
-            LOGGER.info(f"Custom_targets file detected - {custom_targets_json_path}")
+    for file in custom_targets_files:
+        LOGGER.info(f"Custom_targets file detected - {file}")
+        json_contents.update(decode_json_file(file))
 
     used_mcu_names = set()
-    LOGGER.info("Scanning targets.json5 for used MCU names...")
-    json_contents = decode_json_file(TARGETS_JSON5_PATH)
-    if custom_targets_file:
-        LOGGER.info("Scanning custom_targets.json/json5. for used MCU names...")
-        json_contents.update(decode_json_file(custom_targets_json_path))
-
     for target_details in json_contents.values():
         if "device_name" in target_details:
             used_mcu_names.add(target_details["device_name"])

@@ -4,6 +4,8 @@
 #
 """Command to generate the application CMake configuration script used by the build/compile system."""
 
+from __future__ import annotations
+
 import logging
 import pathlib
 
@@ -47,10 +49,10 @@ def configure(
     toolchain: str,
     mbed_target: str,
     program_path: str,
-    mbed_os_path: str,
+    mbed_os_path: str | None,
     output_dir: pathlib.Path,
-    custom_targets_json: str,
-    app_config: str,
+    custom_targets_json: str | None,
+    app_config: str | None,
 ) -> None:
     """
     Exports a mbed_config.cmake file to build directory in the program root.

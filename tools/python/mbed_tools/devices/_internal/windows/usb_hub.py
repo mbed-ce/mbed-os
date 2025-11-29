@@ -6,6 +6,8 @@
 
 from typing import NamedTuple, cast
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 
 
@@ -60,6 +62,7 @@ class UsbHub(ComponentDescriptor):
         super().__init__(UsbHubMsdnDefinition, win32_class_name="Win32_USBHub")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the device id field."""
         return cast(str, self.get("DeviceID"))

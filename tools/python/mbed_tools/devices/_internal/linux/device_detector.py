@@ -10,6 +10,7 @@ from typing import List, Optional, Tuple, cast
 
 import psutil
 import pyudev
+from typing_extensions import override
 
 from mbed_tools.devices._internal.base_detector import DeviceDetector
 from mbed_tools.devices._internal.candidate_device import CandidateDevice, FilesystemMountpointError
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 class LinuxDeviceDetector(DeviceDetector):
     """Linux specific implementation of device detection."""
 
+    @override
     def find_candidates(self) -> List[CandidateDevice]:
         """Return a list of CandidateDevices."""
         context = pyudev.Context()

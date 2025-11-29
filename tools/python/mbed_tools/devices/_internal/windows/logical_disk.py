@@ -6,6 +6,8 @@
 
 from typing import NamedTuple, cast
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 
 
@@ -56,6 +58,7 @@ class LogicalDisk(ComponentDescriptor):
         super().__init__(LogicalDiskMsdnDefinition, win32_class_name="CIM_LogicalDisk")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the device id field."""
         return cast(str, self.get("DeviceID"))

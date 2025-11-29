@@ -13,6 +13,8 @@ as a single object: AggregatedDiskData.
 
 from typing import Callable, List, NamedTuple, Optional, cast
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 from mbed_tools.devices._internal.windows.component_descriptor_utils import retain_value_or_default
 from mbed_tools.devices._internal.windows.disk_drive import DiskDrive
@@ -56,6 +58,7 @@ class AggregatedDiskData(ComponentDescriptor):
         super().__init__(AggregatedDiskDataDefinition, win32_class_name="DiskDataAggregation")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the ID field."""
         return cast(str, self.get("label"))

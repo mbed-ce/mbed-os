@@ -10,6 +10,8 @@ https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/cim-volumeset
 Therefore, a specific data model needs to be constructed using other Windows methods.
 """
 
+from __future__ import annotations
+
 import logging
 from enum import Enum
 from typing import List, NamedTuple
@@ -17,7 +19,7 @@ from typing import List, NamedTuple
 import win32.win32api
 import win32.win32file
 
-from mbed_tools.devices._internal.windows.component_descriptor import UNKNOWN_VALUE
+from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +60,7 @@ class VolumeInformation(NamedTuple):
     DriveType: DriveType  # As defined by GetDriveType
 
 
-def _get_windows_volume_information(volume: str) -> List[str]:
+def _get_windows_volume_information(volume: str) -> List[str | int]:
     try:
         return list(win32.win32api.GetVolumeInformation(volume))
     except Exception as e:

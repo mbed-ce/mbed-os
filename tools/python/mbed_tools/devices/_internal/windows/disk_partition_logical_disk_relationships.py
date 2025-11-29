@@ -6,6 +6,8 @@
 
 from typing import NamedTuple
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 
 
@@ -34,6 +36,7 @@ class DiskPartitionLogicalDiskRelationship(ComponentDescriptor):
         super().__init__(DiskToPartitionMsdnDefinition, win32_class_name="Win32_LogicalDiskToPartition")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the device id field."""
         return f"{self.get('Antecedent')}->{self.get('Dependent')}"

@@ -7,6 +7,8 @@
 import re
 from typing import NamedTuple, Optional, Tuple, cast
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE, is_undefined_value
 from mbed_tools.devices._internal.windows.windows_identifier import WindowsUID
@@ -86,6 +88,7 @@ class DiskDrive(ComponentDescriptor):
         super().__init__(DiskDriveMsdnDefinition, win32_class_name="Win32_DiskDrive")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the device id field."""
         return cast(str, self.get("DeviceID"))

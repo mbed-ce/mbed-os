@@ -4,10 +4,14 @@
 #
 """Build configuration representation."""
 
+from __future__ import annotations
+
 import logging
 import pathlib
 from collections import UserDict
 from typing import Any, Hashable, Iterable, List
+
+import typing_extensions
 
 from mbed_tools.build._internal.config.source import ConfigSetting, Override
 
@@ -28,10 +32,11 @@ class Config(UserDict):
     # All paths will be relative to the Mbed program root directory, or absolute if outside said directory.
     json_sources: List[pathlib.Path]
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
         self.json_sources = []
+        super().__init__(**kwargs)
 
+    @typing_extensions.override
     def __setitem__(self, key: Hashable, item: Any) -> None:
         """Set an item based on its key."""
         if key == CONFIG_SECTION:

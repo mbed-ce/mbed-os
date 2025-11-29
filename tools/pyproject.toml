@@ -20,7 +20,6 @@ dependencies = [
     "jinja2>=2.11.3",
     "python-dotenv",
     "Click>=8.0", # Need at least this version for pathlib.Path support
-    "GitPython",
     "tqdm",
     "tabulate",
     "requests>=2.20",
@@ -34,7 +33,7 @@ dependencies = [
     # Needed for downloading CMSIS MCU descriptions
     "cmsis-pack-manager>=0.5.0",
 
-    # USB device detection on Mac
+    # USB device detection on Windows
     "pywin32; platform_system=='Windows'",
 
     # USB device detection on Linux
@@ -74,7 +73,14 @@ unit-tests = [
 linters = [
     "ruff",
     "basedpyright",
-    "SCons" # For packages imported by the PlatformIO scripts
+
+    # To pass Pyright we need all the platform-dependent packages
+    "platformio",
+    "SCons",
+    "psutil",
+    "pyudev",
+    "beautifulsoup4",
+    "lxml"
 ]
 greentea = [
     ## Additional requirements to install into the Mbed environment when running Greentea tests
@@ -191,6 +197,7 @@ ignore = [
     'BLE001',  # Allow catching Exception
     'S603',    # Allow running subprocesses with variable arguments (why is this a lint in the first place??)
     'ERA001',  # Allow commented code
+    'T201',    # Allow print()
 
     # For now allow old-style type annotations. Currently there's lots of code that uses them, and I am
     # not sure if there is a way to upgrade them automatically. And since this project still supports
@@ -233,8 +240,16 @@ reportUnknownArgumentType = false
 reportUnknownParameterType = false
 reportAny = false
 reportExplicitAny = false
+reportMissingTypeStubs = false
 
 # Use "medium strict" member variable annotation rules, where the type checker
 # is allowed to infer the types of class variables based on what gets assigned in __init__
 reportIncompatibleUnannotatedOverride = true
 reportUnannotatedClassAttribute = false
+
+# Conflicts with Ruff rules
+reportImplicitStringConcatenation = false
+
+# Allow isinstance() even when it seems unneccessary based on type annotations.
+# This call is useful to check that the runtime types match the annotations.
+reportUnnecessaryIsInstance = false

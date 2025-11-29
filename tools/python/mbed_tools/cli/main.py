@@ -6,15 +6,13 @@
 
 import logging
 import sys
-from typing import Any, Union
 
 import click
-from pkg_resources import get_distribution
+from typing_extensions import override
 
 from mbed_tools.cli.cmsis_mcu_descr import cmsis_mcu_descr
 from mbed_tools.cli.configure import configure
 from mbed_tools.cli.list_connected_devices import list_connected_devices
-from mbed_tools.cli.project_management import deploy, import_, new
 from mbed_tools.cli.sterm import sterm
 from mbed_tools.lib.logging import MbedToolsHandler, set_log_level
 
@@ -25,40 +23,23 @@ LOGGER = logging.getLogger(__name__)
 class GroupWithExceptionHandling(click.Group):
     """A click.Group which handles ToolsErrors and logging."""
 
-    def invoke(self, context: click.Context) -> None:
+    @override
+    def invoke(self, ctx: click.Context) -> None:
         """
         Invoke the command group.
 
         Args:
-            context: The current click context.
+            ctx: The current click context.
         """
         # Use the context manager to ensure tools exceptions (expected behaviour) are shown as messages to the user,
         # but all other exceptions (unexpected behaviour) are shown as errors.
-        with MbedToolsHandler(LOGGER, context.params["traceback"]) as handler:
-            super().invoke(context)
+        with MbedToolsHandler(LOGGER, ctx.params["traceback"]) as handler:
+            super().invoke(ctx)
 
         sys.exit(handler.exit_code)
 
 
-def print_version(context: click.Context, _param: Union[click.Option, click.Parameter], value: bool) -> Any:
-    """Print the version of mbed-tools."""
-    if not value or context.resilient_parsing:
-        return
-
-    version_string = get_distribution("mbed-ce-tools").version
-    click.echo(version_string)
-    context.exit()
-
-
 @click.group(cls=GroupWithExceptionHandling, context_settings=CONTEXT_SETTINGS)
-@click.option(
-    "--version",
-    is_flag=True,
-    callback=print_version,
-    expose_value=False,
-    is_eager=True,
-    help="Display versions of all Mbed Tools packages.",
-)
 @click.option(
     "-v",
     "--verbose",
@@ -77,9 +58,6 @@ def cli(verbose: int, _traceback: bool) -> None:
 
 cli.add_command(configure, "configure")
 cli.add_command(list_connected_devices, "detect")
-cli.add_command(new, "new")
-cli.add_command(deploy, "deploy")
-cli.add_command(import_, "import")
 cli.add_command(sterm, "sterm")
 cli.add_command(cmsis_mcu_descr)
 

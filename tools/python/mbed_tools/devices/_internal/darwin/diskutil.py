@@ -4,6 +4,8 @@
 #
 """Interactions with `diskutil`."""
 
+from __future__ import annotations
+
 import plistlib
 import subprocess
 from typing import Dict, Iterable, List, Optional, cast
@@ -20,7 +22,7 @@ class Volume(TypedDict, total=False):
     DeviceIdentifier: str  # example: disk2
 
 
-def get_all_external_disks_data() -> List[VolumeTree]:
+def get_all_external_disks_data() -> List[Volume | VolumeTree]:
     """Returns parsed output of `diskutil` call, fetching only information of interest."""
     output = subprocess.check_output(["/usr/sbin/diskutil", "list", "-plist", "external"], stderr=subprocess.DEVNULL)
     if output:
@@ -57,7 +59,7 @@ def get_mount_point(device_identifier: str) -> Optional[str]:
     return None
 
 
-def _filter_volumes(data: Iterable[VolumeTree]) -> List[Volume]:
+def _filter_volumes(data: Iterable[VolumeTree | Volume]) -> List[Volume]:
     """
     Flattens the structure returned by `diskutil` call.
 

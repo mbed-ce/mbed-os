@@ -25,7 +25,7 @@ class RegKey:
         """Initialiser."""
         access = win32con.KEY_READ | win32con.KEY_ENUMERATE_SUB_KEYS | win32con.KEY_QUERY_VALUE
         try:
-            self._hkey = win32api.RegOpenKey(win32con.HKEY_LOCAL_MACHINE, sub_registry_key, 0, access)
+            self._hkey = win32api.RegOpenKey(win32con.HKEY_LOCAL_MACHINE, sub_registry_key, False, access)
         except win32api.error as e:
             msg = f"Could not read key [{sub_registry_key}] in the registry: {e}"
             raise OperatingSystemError(msg) from e
@@ -39,7 +39,7 @@ class RegKey:
     ) -> None:
         """Actions on exit."""
         win32api.RegCloseKey(self._hkey)
-        self._hkey.close()
+        self._hkey.Close()
 
 
 def get_children_instance_id(pnpid: str) -> Optional[str]:

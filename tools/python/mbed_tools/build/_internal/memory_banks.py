@@ -8,7 +8,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Any, NotRequired, TypedDict
+    from typing import Any, TypedDict
+
+    from typing_extensions import NotRequired
 
 import copy
 import logging

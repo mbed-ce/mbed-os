@@ -9,7 +9,7 @@ import pathlib
 import re
 from typing import List, Optional, Tuple
 
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, override
 
 from mbed_tools.devices._internal.base_detector import DeviceDetector
 from mbed_tools.devices._internal.candidate_device import CandidateDevice
@@ -35,6 +35,7 @@ class InvalidCandidateDeviceDataError(ValueError):
 class DarwinDeviceDetector(DeviceDetector):
     """Darwin specific implementation of device detection."""
 
+    @override
     def find_candidates(self) -> List[CandidateDevice]:
         """Return a list of CandidateDevices."""
         usb_devices_data = system_profiler.get_end_usb_devices_data()
