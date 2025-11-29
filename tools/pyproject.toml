@@ -23,7 +23,7 @@ dependencies = [
     "tqdm",
     "tabulate",
     "requests>=2.20",
-    "typing-extensions",
+    "typing-extensions>=4.4.0",
     "pyserial",
     "appdirs",
     "pyjson5>=1.6",
