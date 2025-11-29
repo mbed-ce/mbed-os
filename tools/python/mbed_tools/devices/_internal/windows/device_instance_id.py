@@ -10,8 +10,8 @@ import logging
 from types import TracebackType
 from typing import Any, Optional
 
-import win32api
-import win32con
+import win32api  # pyright: ignore[reportMissingModuleSource]
+import win32con  # pyright: ignore[reportMissingModuleSource]
 
 from mbed_tools.devices._internal.exceptions import OperatingSystemError
 

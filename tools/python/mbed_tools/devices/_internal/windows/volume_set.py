@@ -16,8 +16,8 @@ import logging
 from enum import Enum
 from typing import List, NamedTuple
 
-import win32.win32api
-import win32.win32file
+import win32.win32api  # pyright: ignore[reportMissingModuleSource]
+import win32.win32file  # pyright: ignore[reportMissingModuleSource]
 
 from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE
 

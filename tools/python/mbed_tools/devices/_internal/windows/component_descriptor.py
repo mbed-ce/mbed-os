@@ -8,8 +8,8 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any, Generator, List, NamedTuple, Optional, cast
 
-import pythoncom
-import win32com.client
+import pythoncom  # pyright: ignore[reportMissingModuleSource]
+import win32com.client  # pyright: ignore[reportMissingModuleSource]
 from typing_extensions import override
 
 from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE, is_undefined_data_object

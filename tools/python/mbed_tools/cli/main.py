@@ -48,7 +48,7 @@ class GroupWithExceptionHandling(click.Group):
     help="Set the verbosity level, enter multiple times to increase verbosity.",
 )
 @click.option("-t", "--traceback", is_flag=True, show_default=True, help="Show a traceback when an error is raised.")
-def cli(verbose: int, _traceback: bool) -> None:
+def cli(verbose: int, traceback: bool) -> None:  # noqa: ARG001 # pyright: ignore[reportUnusedParameter]
     """Command line tool for interacting with Mbed OS."""
     # note: traceback parameter not used here but is accessed through
     # click.context.params in GroupWithExceptionHandling

@@ -80,8 +80,7 @@ linters = [
     "psutil",
     "pyudev",
     "beautifulsoup4",
-    "lxml",
-    "types-pywin32",
+    "lxml"
 ]
 greentea = [
     ## Additional requirements to install into the Mbed environment when running Greentea tests
@@ -254,3 +253,7 @@ reportImplicitStringConcatenation = false
 # Allow isinstance() even when it seems unneccessary based on type annotations.
 # This call is useful to check that the runtime types match the annotations.
 reportUnnecessaryIsInstance = false
+
+# Some ignore comments are only needed on specific platforms, so failing due to unneeded ignore
+# comments creates an impossible situation
+reportUnnecessaryTypeIgnoreComment = false
