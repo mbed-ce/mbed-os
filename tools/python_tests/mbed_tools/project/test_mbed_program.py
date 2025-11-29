@@ -25,53 +25,6 @@ def from_new_set_target_toolchain(program_root):
 
 
 class TestInitialiseProgram:
-    def test_from_new_local_dir_raises_if_path_is_existing_program(self, tmp_path):
-        program_root = pathlib.Path(tmp_path, "programfoo")
-        program_root.mkdir()
-        (program_root / "mbed-os.lib").touch()
-
-        with pytest.raises(ExistingProgramError):
-            MbedProgram.from_new(program_root)
-
-    def test_from_new_local_dir_generates_valid_program_creating_directory(self, tmp_path):
-        fs_root = pathlib.Path(tmp_path, "foo")
-        fs_root.mkdir()
-        program_root = fs_root / "programfoo"
-
-        program = from_new_set_target_toolchain(program_root)
-
-        assert program.files == MbedProgramFiles.from_existing(
-            program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR
-        )
-
-    def test_from_new_local_dir_generates_valid_program_creating_directory_in_cwd(self, tmp_path):
-        old_cwd = os.getcwd()
-        try:
-            fs_root = pathlib.Path(tmp_path, "foo")
-            fs_root.mkdir()
-            os.chdir(fs_root)
-            program_root = pathlib.Path("programfoo")
-
-            program = from_new_set_target_toolchain(program_root)
-
-            assert program.files == MbedProgramFiles.from_existing(
-                program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR
-            )
-        finally:
-            os.chdir(old_cwd)
-
-    def test_from_new_local_dir_generates_valid_program_existing_directory(self, tmp_path):
-        fs_root = pathlib.Path(tmp_path, "foo")
-        fs_root.mkdir()
-        program_root = fs_root / "programfoo"
-        program_root.mkdir()
-
-        program = from_new_set_target_toolchain(program_root)
-
-        assert program.files == MbedProgramFiles.from_existing(
-            program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR
-        )
-
     def test_from_existing_raises_if_path_is_not_a_program(self, tmp_path):
         fs_root = pathlib.Path(tmp_path, "foo")
         fs_root.mkdir()

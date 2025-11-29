@@ -16,8 +16,14 @@ from mbed_tools.targets import Board
 
 
 @click.command()
+# Note: We need to give --format an alias so it doesn't shadow a builtin
 @click.option(
-    "--format", type=click.Choice(["table", "json"]), default="table", show_default=True, help="Set output format."
+    "--format",
+    "format_type",
+    type=click.Choice(["table", "json"]),
+    default="table",
+    show_default=True,
+    help="Set output format.",
 )
 @click.option(
     "--show-all",

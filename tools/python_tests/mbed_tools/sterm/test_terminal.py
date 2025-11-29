@@ -35,7 +35,7 @@ def test_initialises_serial_port(mock_sterm, mock_serial):
 
     terminal.run(port, baud)
 
-    mock_serial.assert_called_once_with(port=port, baudrate=str(baud))
+    mock_serial.assert_called_once_with(port=port, baudrate=baud)
 
 
 def test_initialises_sterm(mock_sterm, mock_serial):
@@ -157,7 +157,7 @@ def test_reset_sends_serial_break(mock_serial, mock_console):
 
     term.reset()
 
-    mock_serial().sendBreak.assert_called_once()
+    mock_serial().send_break.assert_called_once()
 
 
 def test_ctrl_b_sends_reset_to_serial_port(mock_serial, mock_console):
@@ -168,7 +168,7 @@ def test_ctrl_b_sends_reset_to_serial_port(mock_serial, mock_console):
     with pytest.raises(StopIteration):
         term.writer()
 
-    mock_serial().sendBreak.assert_called_once()
+    mock_serial().send_break.assert_called_once()
 
 
 def test_ctrl_h_prints_help_text(mock_serial, mock_console):

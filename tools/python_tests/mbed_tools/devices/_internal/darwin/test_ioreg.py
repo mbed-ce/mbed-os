@@ -18,7 +18,7 @@ class TestGetData(TestCase):
         </plist>"""
 
         self.assertEqual(get_data("some device"), ["foo"])
-        check_output.assert_called_once_with(["ioreg", "-a", "-r", "-n", "some device", "-l"])
+        check_output.assert_called_once_with(["/usr/sbin/ioreg", "-a", "-r", "-n", "some device", "-l"])
 
     def test_handles_corrupt_data_gracefully(self, check_output):
         check_output.return_value = b"""<plist version="1.0">
