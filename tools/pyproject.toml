@@ -38,7 +38,7 @@ dependencies = [
 
     # USB device detection on Linux
     "psutil; platform_system=='Linux'",
-    "pyudev; platform_system=='Linux'",
+    "pyudev>=0.24; platform_system=='Linux'", # 0.23.x seems to have issues with its Six dependency
 
     # USB device detection on Mac
     "beautifulsoup4; sys_platform == 'darwin'",
@@ -78,7 +78,7 @@ linters = [
     "platformio",
     "SCons",
     "psutil",
-    "pyudev",
+    "pyudev>=0.24",
     "beautifulsoup4",
     "lxml"
 ]
