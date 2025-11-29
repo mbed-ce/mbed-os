@@ -80,7 +80,8 @@ linters = [
     "psutil",
     "pyudev",
     "beautifulsoup4",
-    "lxml"
+    "lxml",
+    "pywin32",
 ]
 greentea = [
     ## Additional requirements to install into the Mbed environment when running Greentea tests
