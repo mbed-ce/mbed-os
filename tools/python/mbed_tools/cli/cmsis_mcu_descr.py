@@ -18,6 +18,7 @@ This is needed since the index is missing certain MCUs and has wrong information
 from __future__ import annotations
 
 import datetime
+import json
 import logging
 import os
 import pathlib
@@ -162,7 +163,11 @@ def find_unused() -> None:
     removable_mcus = sorted(available_mcu_names - used_mcu_names)
 
     if len(removable_mcus) == 0:
+        print("No MCU descriptions can be pruned, all are used.")
         return
+
+    print("The following MCU descriptions are not used and should be pruned from cmsis_mcu_descriptions.json5")
+    print("\n".join(removable_mcus))
 
     sys.exit(1)
 
@@ -181,8 +186,13 @@ def check_missing() -> None:
     # Are there any missing?
     missing_mcu_names = used_mcu_names - available_mcu_names
     if len(missing_mcu_names) == 0:
+        print("No missing MCUs, no work to do.")
         return
 
+    print(
+        "The following MCU descriptions are used by targets.json5 and need to be added to cmsis_mcu_descriptions.json5:"
+    )
+    print("\n".join(missing_mcu_names))
     sys.exit(1)
 
 
@@ -232,4 +242,6 @@ def fetch_missing() -> None:
         "just the 'memories' section as 'memory_banks' section from content below.\n"
         f"Otherwise add the whole following entries to {CMSIS_MCU_DESCRIPTIONS_JSON_PATH}:"
     )
+    print(json.dumps(missing_mcus_dict, indent=4, sort_keys=True))
+
     sys.exit(1)

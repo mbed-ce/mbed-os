@@ -130,6 +130,7 @@ def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type
     :param banks_by_type: Physical memory bank information
     :param configured_banks_by_type: Configured memory bank information
     """
+    print("Summary of available memory banks:")
     for bank_type in BANK_TYPES:
         banks = banks_by_type[bank_type]
 
@@ -142,7 +143,9 @@ def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type
             )
             continue
 
-        for _bank_index, (bank_name, bank_data) in enumerate(banks.items()):
+        print(f"Target {bank_type} banks: -----------------------------------------------------------")
+
+        for bank_index, (bank_name, bank_data) in enumerate(banks.items()):
             bank_size = bank_data["size"]
             bank_start = bank_data["start"]
 
@@ -150,10 +153,20 @@ def _print_mem_bank_summary(banks_by_type: BanksByType, configured_banks_by_type
             configured_start_addr = configured_banks_by_type[bank_type][bank_name]["start"]
 
             # If the configured sizes are different, add info to the summary
+            configured_size_str = ""
+            configured_start_addr_str = ""
             if configured_size != bank_size:
-                f" (configured to {humanize.naturalsize(configured_size, binary=True)})"
+                configured_size_str = f" (configured to {humanize.naturalsize(configured_size, binary=True)})"
             if configured_start_addr != bank_start:
-                pass
+                configured_start_addr_str = f" (configured to 0x{configured_start_addr:08x})"
+
+            print(
+                f"{bank_index}. {bank_name}, "
+                f"start addr 0x{bank_start:08x}{configured_start_addr_str}, "
+                f"size {humanize.naturalsize(bank_size, binary=True)}{configured_size_str}"
+            )
+
+        print()
 
 
 def _generate_macros_for_memory_banks(banks_by_type: BanksByType, configured_banks_by_type: BanksByType) -> set[str]:
