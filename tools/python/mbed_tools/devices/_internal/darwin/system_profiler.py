@@ -9,7 +9,7 @@ from __future__ import annotations
 import plistlib
 import re
 import subprocess
-from typing import Dict, Iterable, List, cast
+from typing import Dict, Iterable, List, cast, Union
 
 from typing_extensions import TypedDict
 
@@ -37,7 +37,7 @@ def get_all_usb_devices_data() -> List[USBDeviceTree | USBDevice]:
     """Returns parsed output of `system_profiler` call."""
     output = subprocess.check_output(["/usr/sbin/system_profiler", "-xml", "SPUSBDataType"], stderr=subprocess.DEVNULL)
     if output:
-        return cast(List[USBDeviceTree | USBDevice], plistlib.loads(output))
+        return cast(List[Union[USBDeviceTree, USBDevice]], plistlib.loads(output))
     return []
 
 
