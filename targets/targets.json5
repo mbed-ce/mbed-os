@@ -7046,9 +7046,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "help": "Select high-speed USB device or not",
                 "value": 0
             },
-	    "wdt-reset-workaround": {
+	        "wdt-reset-workaround": {
                 "help": "Workaround to H/W limit with WDT reset from power-down",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": true
             }
         },
