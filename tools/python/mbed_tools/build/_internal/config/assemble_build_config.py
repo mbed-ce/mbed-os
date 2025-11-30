@@ -6,21 +6,18 @@
 
 from __future__ import annotations
 
-import itertools
 import logging
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional, Set
 
 import pydantic
-from setuptools.build_meta import build_editable
 
-from mbed_tools.build._internal.config.schemas import MbedAppJSON
-from mbed_tools.lib.json_helpers import decode_json_file
-from mbed_tools.project import MbedProgram
+from mbed_tools.build._internal.config import source
 from mbed_tools.build._internal.config.config import Config
+from mbed_tools.build._internal.config.schemas import MbedAppJSON
 from mbed_tools.build._internal.find_files import LabelFilter, filter_files, find_files
+from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.project import MbedProgram
 
 logger = logging.getLogger(__name__)
@@ -98,12 +95,12 @@ def _assemble_config_from_sources(
         # if it does not pass the schema. This provides compatibility with older projects, as mbed_app.json has
         # historically been a total wild west where any internal Mbed state could potentially be overridden.
         try:
-            MbedAppJSON.model_validate(mbed_app_json_dict, strict=True)
+            _ = MbedAppJSON.model_validate(mbed_app_json_dict, strict=True)
         except pydantic.ValidationError as ex:
             logger.warning(
                 "mbed_app.json5 failed to validate against the schema. This likely means it contains deprecated attributes, misspelled attributes, or overrides for things that should not be set in mbed_app.json5. This version of mbed-os still allows this, but this will change in the future."
             )
-            logger.warning("Error was: " + str(ex))
+            logger.warning("Error was: %s", str(ex))
 
         app_data = source.prepare(
             "mbed_app.json5", mbed_app_json_dict, source_name="app", target_filters=filter_data.labels
@@ -123,7 +120,7 @@ class FileFilterData:
     requires: Set[str]
 
     @classmethod
-    def from_config(cls, config: Config) -> "FileFilterData":
+    def from_config(cls, config: Config) -> FileFilterData:
         """Extract file filters from a Config object."""
         return cls(
             labels=config.get("labels", set()) | config.get("extra_labels", set()),

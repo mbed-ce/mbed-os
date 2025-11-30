@@ -22,9 +22,9 @@ from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_pa
     get_accumulating_attributes_for_target,
 )
 from mbed_tools.targets._internal.targets_json_parsers.overriding_attribute_parser import (
+    NON_INHERITED_ATTRIBUTES,
     get_labels_for_target,
     get_overriding_attributes_for_target,
-    NON_INHERITED_ATTRIBUTES,
 )
 
 INTERNAL_PACKAGE_DIR = pathlib.Path(__file__).parent
@@ -63,7 +63,6 @@ def get_target_attributes(
         ParsingTargetJSONError: error parsing targets.json
         TargetNotFoundError: there is no target attribute data found for that target.
     """
-
     target_definition = _extract_full_target_definition(targets_json_data, target_name, allow_non_public_targets)
 
     # At this point, for now, we stop using the schema and just convert into a dict, as this is where

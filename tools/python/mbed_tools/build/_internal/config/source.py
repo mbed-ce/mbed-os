@@ -8,16 +8,18 @@ from __future__ import annotations
 
 import logging
 import pathlib
+import typing
 from dataclasses import dataclass
-from typing import Iterable, Any, Optional, List, Literal, Union
+from typing import Any, Iterable, List, Literal, Optional, Union
 
 import pydantic
 
+from mbed_tools.build.exceptions import InvalidConfigOverrideError
 from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.lib.python_helpers import flatten_nested
 
-from ...exceptions import InvalidConfigOverrideError
 from . import schemas
+from .schemas import ConfigSettingValue
 
 logger = logging.getLogger(__name__)
 
@@ -121,9 +123,9 @@ def from_mbed_lib_json_file(
     # Load JSON file using schema
     try:
         mbed_lib = schemas.MbedLibJSON.model_validate(decode_json_file(mbed_lib_json_path), strict=True)
-    except pydantic.ValidationError as ex:
-        logger.error(f"{context} did not validate against the schema for mbed_lib.json5!")
-        raise ex
+    except pydantic.ValidationError:
+        logger.exception(f"{context} did not validate against the schema for mbed_lib.json5!")
+        raise
 
     config_source = {}
 
@@ -145,13 +147,13 @@ def from_mbed_lib_json_file(
                 continue
 
             # Remove all underscores in the setting name and replace with hyphens, as this makes settings harder to get wrong
-            config_name = check_and_transform_config_name(context, config_name)
+            transformed_config_name = check_and_transform_config_name(context, config_name)
 
             logger.debug("Extracting config setting from '%s': '%s'='%s'", mbed_lib.name, config_name, item)
             if isinstance(item, schemas.ConfigEntryDetails):
                 setting = ConfigSetting(
                     namespace=mbed_lib.name,
-                    name=config_name,
+                    name=transformed_config_name,
                     macro_name=item.macro_name,
                     help_text=item.help,
                     value=item.value,
@@ -162,7 +164,7 @@ def from_mbed_lib_json_file(
             else:
                 setting = ConfigSetting(
                     namespace=mbed_lib.name,
-                    name=config_name,
+                    name=transformed_config_name,
                     macro_name=None,
                     help_text=None,
                     value=item,
@@ -182,13 +184,12 @@ def from_mbed_lib_json_file(
 
     # Process overrides
     if len(mbed_lib.overrides) > 0:
-        config_source["overrides"] = _extract_overrides(context, mbed_lib.namespace, mbed_lib.overrides)
+        overrides = typing.cast(dict[str, ConfigSettingValue], mbed_lib.overrides)
+        config_source["overrides"] = _extract_overrides(context, mbed_lib.name, overrides)
 
     # Process target overrides
     if len(mbed_lib.target_overrides) > 0:
-        target_overrides = _extract_target_overrides(
-            context, mbed_lib.name, mbed_lib.target_overrides, target_filters if target_filters is not None else []
-        )
+        target_overrides = _extract_target_overrides(context, mbed_lib.name, mbed_lib.target_overrides, target_filters)
 
         config_source["overrides"] = config_source.get("overrides", []) + target_overrides
 
@@ -225,12 +226,20 @@ class ConfigSetting:
                     f"Value set for {self.namespace}.{self.name} ({self.value}) does not appear to be valid. Valid values are {self.accepted_values!r}"
                 )
         if self.value_max is not None:
-            if self.value > self.value_max:
+            if not isinstance(self.value, float) and not isinstance(self.value, int):
+                logger.warning(
+                    f"Configuration setting {self.namespace}.{self.name} has a value_max attribute but is not of integer type (value = {self.value})."
+                )
+            elif self.value > self.value_max:
                 logger.warning(
                     f"Value set for {self.namespace}.{self.name} ({self.value}) does not appear to be valid. Cannot be greater than {self.value_max}"
                 )
         if self.value_min is not None:
-            if self.value < self.value_min:
+            if not isinstance(self.value, float) and not isinstance(self.value, int):
+                logger.warning(
+                    f"Configuration setting {self.namespace}.{self.name} has a value_min attribute but is not of integer type (value = {self.value})."
+                )
+            elif self.value < self.value_min:
                 logger.warning(
                     f"Value set for {self.namespace}.{self.name} ({self.value}) does not appear to be valid. Cannot be less than {self.value_min}"
                 )
@@ -252,8 +261,12 @@ class Override:
 
     def __post_init__(self) -> None:
         """Parse modifiers and convert list values to sets."""
-        if self.name.endswith("_add") or self.name.endswith("_remove"):
-            self.name, self.modifier = self.name.rsplit("_", maxsplit=1)
+        if self.name.endswith("_add"):
+            self.modifier = "add"
+            self.name = self.name.removesuffix("_add")
+        elif self.name.endswith("_remove"):
+            self.modifier = "remove"
+            self.name = self.name.removesuffix("_remove")
 
         self.value = _sanitise_value(self.value)
 
@@ -271,9 +284,11 @@ def _extract_config_settings(context: str, namespace: str, config_data: dict) ->
             help_text = None
             value = item
 
-        name = check_and_transform_config_name(context, name)
+        transformed_name = check_and_transform_config_name(context, name)
 
-        setting = ConfigSetting(namespace=namespace, name=name, macro_name=macro_name, help_text=help_text, value=value)
+        setting = ConfigSetting(
+            namespace=namespace, name=transformed_name, macro_name=macro_name, help_text=help_text, value=value
+        )
         # If the config item is about a certain component or feature
         # being present, avoid adding it to the mbed_config.cmake
         # configuration file. Instead, applications should depend on

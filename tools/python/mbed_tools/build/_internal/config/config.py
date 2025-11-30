@@ -64,7 +64,7 @@ class Config(UserDict):
                 _apply_override(self.data, override)
                 continue
 
-            setting: ConfigSetting = next(
+            setting: ConfigSetting | None = next(
                 filter(
                     lambda x: x.name == override.name and x.namespace == override.namespace,
                     self.data.get(CONFIG_SECTION, []),

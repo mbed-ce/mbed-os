@@ -9,17 +9,19 @@ Pydantic schemas for Mbed OS JSON config files.
 
 from __future__ import annotations
 
-from typing import Union, Literal
-from typing_extensions import Self
+from typing import Literal, Union
 
-from pydantic import BaseModel, Field, model_validator, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+from typing_extensions import Self
 
 ConfigSettingValue = Union[int, float, bool, str, None]
 
 
 class ConfigEntryDetails(BaseModel):
     """
-    Details for an entry in a JSON file's 'config' section. This defines the attributes of a configurable setting
+    Details for an entry in a JSON file's 'config' section.
+
+    This defines the attributes of a configurable setting
     for a library, target, or application.
     """
 
@@ -28,9 +30,9 @@ class ConfigEntryDetails(BaseModel):
 
     macro_name: str | None = None
     """
-    Name of the macro that this setting shall generate. If unset, defaults to 
+    Name of the macro that this setting shall generate. If unset, defaults to
     'MBED_CONF_<namespace uppercase>_<config entry name uppercase>', where
-    <namespace> is the current namespace, i.e. the value of the "name" property for mbed_lib.json5 files, 
+    <namespace> is the current namespace, i.e. the value of the "name" property for mbed_lib.json5 files,
     "target" for targets.json5 entries, and "app" in mbed_app.json5.
     """
 
@@ -41,9 +43,9 @@ class ConfigEntryDetails(BaseModel):
     """ Documentation associated with this setting. """
 
     accepted_values: list[ConfigSettingValue] | None = None
-    """ 
+    """
     Enumeration of legal values for this setting. A warning will be issued if the setting is set to
-    a value not in this list. 
+    a value not in this list.
     """
 
     value_max: int | float | None = None
@@ -59,11 +61,13 @@ class ConfigEntryDetails(BaseModel):
     @model_validator(mode="after")
     def verify_max_min(self) -> Self:
         if self.accepted_values is not None and (self.value_max is not None or self.value_min is not None):
-            raise ValueError("May not specify both 'accepted_values' and 'value_min'/'value_max' at the same time!")
+            msg = "May not specify both 'accepted_values' and 'value_min'/'value_max' at the same time!"
+            raise ValueError(msg)
 
         if self.value_max is not None and self.value_min is not None:
             if self.value_max < self.value_min:
-                raise ValueError("value_max cannot be less than value_min!")
+                msg = "value_max cannot be less than value_min!"
+                raise ValueError(msg)
 
         return self
 
@@ -71,6 +75,7 @@ class ConfigEntryDetails(BaseModel):
 class MemoryBankConfiguration(BaseModel):
     """
     Configuration of one memory bank in JSON.
+
     This is a "mini" version of MemoryBankDefinition that just allows setting the size and start address.
     """
 
@@ -90,7 +95,9 @@ class MemoryBankConfiguration(BaseModel):
 
 class BaseJSONConfig(BaseModel):
     """
-    Base schema for JSON config files. This schema is the parent of the schemas for mbed_app.json5 and mbed_lib.json5,
+    Base schema for JSON config files.
+
+    This schema is the parent of the schemas for mbed_app.json5 and mbed_lib.json5,
     as well as each entry in targets.json5.
     """
 
@@ -102,43 +109,43 @@ class BaseJSONConfig(BaseModel):
     Configuration items for this library or app. These can be defined directly as "name": default value, or as
     "name": {details...} (see ConfigEntryDetails above). Using details is recommended as it allows
     adding documentation for the setting.
-    
+
     By convention, the name used for a configuration setting should be in skewer-case and should not contain
     periods, underscores, or uppercase letters.
-    
+
     In target JSON, this is a merging attribute in its base form.
     """
 
     macros: list[str] | None = None
     """
     List of macros to unconditionally define when this lib is included, in "NAME" or "NAME=VALUE" format.
-    
+
     In target JSON, this is an accumulating attribute.
     """
 
     overrides: dict[str, ConfigSettingValue | MemoryBankConfiguration] = Field(default_factory=dict)
     """
     List of overrides to unconditionally apply when this lib is included.
-    
+
     Overrides take the form "[<namespace>.]<setting>": <value> and cause the value of the given config
     setting to be changed to the given value. If the namespace is omitted, it will be set to the current
     namespace (i.e. the value of the "name" property for mbed_lib.json5 files, "target" for targets.json5 entries, and
     "app" in mbed_app.json5).
-    
+
     Note that in mbed_lib.json files, only settings defined in the current file or in the 'app' namespace
     (mbed_app.json) can be overridden.
-    
+
     Override priority is defined as first mbed_app.json5, then mbed_lib.json5 files, then targets.json5.
     So, for example, an override defined in mbed_app.json5 supersedes any other overrides of that
     same setting.
-    
+
     Override order between different mbed_lib.json5 files is not currently defined but should not matter
     because they cannot override settings from targets.json5 or other mbed_lib.json5 files.
-    
+
     Note that, in mbed_app.json only, the "target.memory_bank_config" setting may be included in this list
     in order to specify memory bank configuration. Its value is a MemoryBankConfiguration rather than a regular
     primitive type.
-    
+
     In target JSON, this is a merging attribute.
     """
 
@@ -147,22 +154,22 @@ class BaseJSONConfig(BaseModel):
         for name, value in self.overrides.items():
             if name == "target.memory_bank_config":
                 if self.__class__ != MbedAppJSON:
-                    raise ValueError('target.memory_bank_config is only allowed in "overrides" mbed_app.json5!')
+                    msg = 'target.memory_bank_config is only allowed in "overrides" mbed_app.json5!'
+                    raise ValueError(msg)
                 if not isinstance(value, MemoryBankConfiguration):
-                    raise ValueError(
-                        'target.memory_bank_config in "overrides" must be a MemoryBankConfiguration schema element!'
-                    )
+                    msg = 'target.memory_bank_config in "overrides" must be a MemoryBankConfiguration schema element!'
+                    raise ValueError(msg)
             else:
                 if isinstance(value, MemoryBankConfiguration):
-                    raise ValueError(
-                        'Only target.memory_bank_config in "overrides" may be a dict! Everything else must be a primitive type!'
-                    )
+                    msg = 'Only target.memory_bank_config in "overrides" may be a dict! Everything else must be a primitive type!'
+                    raise ValueError(msg)
         return self
 
 
 class MbedLibJSON(BaseJSONConfig):
     """
     Schema for an mbed_lib.json5 config file.
+
     This type of config file provides information about a library (inside or outside the Mbed OS source tree)
     to the Mbed configuration system.
     """
@@ -182,18 +189,18 @@ class MbedLibJSON(BaseJSONConfig):
     but allows applying the override only if the target has a specific label. Labels generally
     come from the names of the target and its parents, but targets can also add extra ones.
     For example:
-    
+
     "target_overrides": {
         "MIMXRT105X": {
             "some-setting": some-value
         }
     }
-    
+
     would apply the override only for targets in the MIMXRT105X target family.
-    
+
     The magic target label "*" is always present and is equivalent to using the "overrides" section.
-    
-    Also note that the override priority between different sections within target_overrides, and between 
+
+    Also note that the override priority between different sections within target_overrides, and between
     target_overrides and overrides, is not currently defined. So, if you override the same setting in both,
     results may not be what you expect.
     """
@@ -216,14 +223,14 @@ class MemoryBankDefinition(BaseModel):
     Hint from the CMSIS data that this memory region should be used for storing general data/code.
     If this is false, the memory region requires special considerations (access speed, remapping, protection, etc.)
     and should not be used without user configuration.
-    
+
     This is not used by Mbed for actually determining where to put stuff, that is handled by the linker script!
     """
 
     startup: bool = False
     """
     Hint from the CMSIS data that the startup code of the application should be placed into this memory region.
-    
+
     This is not used by Mbed for actually determining where to put stuff, that is handled by the linker script!
     """
 
@@ -232,11 +239,11 @@ class MemoryBankDefinition(BaseModel):
     ] = Field(default_factory=dict)
     """
     Access permissions of the memory, as defined by CMSIS.
-    
+
     This is used by Mbed to detect the bank type. Banks with read and write permission are assumed to be ram,
     while banks with read and execute permissions are assumed to be flash. Banks without read and (write || execute)
     permissions are ignored (assumed to be ROM or other memory areas). The other permission fields are currently
-    unused by Mbed. 
+    unused by Mbed.
     """
 
     start: int
@@ -261,16 +268,16 @@ class TargetJSON(BaseJSONConfig):
     inherits: list[str] = Field(default_factory=list)
     """
     Parent target(s) to inherit this target's attributes from.
-    
-    Multiple parent targets are allowed, but be careful as the inheritance tree is flattened into a list before 
+
+    Multiple parent targets are allowed, but be careful as the inheritance tree is flattened into a list before
     being processed, which can cause some possibly unexpected behavior. See below for more details.
-    
+
     In the Mbed target configuration language, each attribute has one of four behaviors with respect to inheritance:
     "overriding", "merging", "accumulating", and "non-inherited".
 
     Overriding attributes are the simplest, and work like regular inheritance in programming: the value of the attribute
     from the "closest" ancestor is used, and all other values are discarded.
-    
+
     To determine the attribute's value, the inheritance tree is flattened into a list using a depth-first traversal
     that visits the first parent of each target first. For example, the inheritance tree diagram for target "A" below:
 
@@ -284,16 +291,16 @@ class TargetJSON(BaseJSONConfig):
     Would give us an inheritance order of [A, B, D, C, E]. Then, the overriding attribute's value would be taken
     from the first target in this list to contain the attribute.
 
-    Merging attributes work similarly to overriding ones but are all of dict type. With merging attributes, 
-    the dicts are merged together between each target and its parents, with only elements with the same keys 
+    Merging attributes work similarly to overriding ones but are all of dict type. With merging attributes,
+    the dicts are merged together between each target and its parents, with only elements with the same keys
     overriding based on the order above.
-    
+
     Accumulating attributes, on the other hand, work very differently. These are all of list type, and have
     three forms: "<attribute>", "<attribute>_add", and "<attribute>_remove". Using the first of those forms (the base form)
     gives the attribute its initial value, and the second and third forms remove the attribute from parent targets.
-    
+
     UNLIKE overriding and merging attributes, accumulating attributes use a breadth-first search to flatten
-    the inheritance hierarchy. (why? no idea! Probably for legacy compatibility...).  For example, an inheritance 
+    the inheritance hierarchy. (why? no idea! Probably for legacy compatibility...).  For example, an inheritance
     tree diagram for the target "A" below
 
     D     E
@@ -306,12 +313,12 @@ class TargetJSON(BaseJSONConfig):
     Would give us an inheritance order of [A, B, C, D, E]. To process this, the first occurrence of the bare
     attribute name in the above list is found, and then we work backwards towards target A processing "_add" and
     "_remove" directives until the full set of values is built up.
-    
+
     *note:* Based on my current understanding of this code, if no parent target defines the attribute in base form,
     then the child targets cannot add to the value using "_add" - the config system will simply treat the attribute as
     not existing. This is probably why Target, the base for all targets, defines every property as its empty
     value. -Jamie
-    
+
     Last but not least, non-inherited attributes simply are not affected by parent targets at all, and have their
     own value based on what is set in the individual target definition.
     """
@@ -320,7 +327,7 @@ class TargetJSON(BaseJSONConfig):
     """
     Whether this target is intended for user use and can be passed as a target when building Mbed.
     Set this to false for targets that are incomplete and intended to be inherited from other targets.
-    
+
     This is a non-inherited attribute.
     """
 
@@ -328,7 +335,7 @@ class TargetJSON(BaseJSONConfig):
     """
     Name of the CPU core used by this target. This gets set into the MBED_CPU_CORE CMake variable and
     is used to select the correct compile flags.
-    
+
     This is an overriding attribute.
     """
 
@@ -338,23 +345,23 @@ class TargetJSON(BaseJSONConfig):
     Form factors provide a standard electrical interface with standardized pin locations and functions for
     add-on boards. Enabling a form factor enables its standard pin names.
     See https://web.archive.org/web/20240620001521/https://os.mbed.com/docs/mbed-os/v6.16/porting/standard-pin-names.html
-    
+
     This is an overriding attribute.
     """
 
     macros_add: list[str] = Field(default_factory=list)
     """
-    Macros to add (see "macros"). 
+    Macros to add (see "macros").
     Using this attribute adds macros to the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its add form.
     """
 
     macros_remove: list[str] = Field(default_factory=list)
     """
-    Macros to remove (see "macros"). 
+    Macros to remove (see "macros").
     Using this attribute removes macros from the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its remove form.
 
     Note that this specific attribute has some special behavior, in that the value after the "=" in the macro
@@ -368,23 +375,23 @@ class TargetJSON(BaseJSONConfig):
     Labels are added to the `MBED_TARGET_LABELS` list in CMake, and become compile definitions
     in the format `TARGET_<label>`.
     They are also used to control which directories in the source code are scanned for mbed_lib.json5 files.
-    
+
     This is an accumulating attribute in its base form.
     """
 
     extra_labels_add: list[str] = Field(default_factory=list)
     """
-    Labels to add (see "extra_labels"). 
+    Labels to add (see "extra_labels").
     Using this attribute adds labels to the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its add form.
     """
 
     extra_labels_remove: list[str] = Field(default_factory=list)
     """
-    Labels to remove (see "extra_labels"). 
+    Labels to remove (see "extra_labels").
     Using this attribute removes labels from the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its remove form.
     """
 
@@ -395,28 +402,28 @@ class TargetJSON(BaseJSONConfig):
     board, such as SD cards, SPI flashes, bluetooth modules, etc. If a component is listed here, it should
     also have configuration in the relevant mbed_lib.json5 file so that it works out of the box with this
     target board.
-    
+
     See mbed-os/targets/drivers.json5 for a full list of available components..
-     
+
     The component list becomes compile definitions in the format `COMPONENT_<name>`.
     It is also used to control which directories in the source code are scanned for mbed_lib.json5 files.
-    
+
     This is an accumulating attribute in its base form.
     """
 
     components_add: list[str] = Field(default_factory=list)
     """
-    Components to add (see "components"). 
+    Components to add (see "components").
     Using this attribute adds components to the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its add form.
     """
 
     components_remove: list[str] = Field(default_factory=list)
     """
-    Components to remove (see "components"). 
+    Components to remove (see "components").
     Using this attribute removes components from the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its remove form.
     """
 
@@ -425,28 +432,28 @@ class TargetJSON(BaseJSONConfig):
     Features to add for this target and targets that inherit from it.
     The features listed in the target's JSON give larger Mbed OS optional features that are supported for this target,
     such as bluetooth and security functionality.
-    
+
     See mbed-os/targets/drivers.json5 for a full list of available features.
-     
+
     The feature list becomes compile definitions in the format `FEATURE_<name>`.
     It is also used to control which directories in the source code are scanned for mbed_lib.json5 files.
-    
+
     This is an accumulating attribute in its base form.
     """
 
     features_add: list[str] = Field(default_factory=list)
     """
-    Features to add (see "features"). 
+    Features to add (see "features").
     Using this attribute adds features to the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its add form.
     """
 
     features_remove: list[str] = Field(default_factory=list)
     """
-    Features to remove (see "features"). 
+    Features to remove (see "features").
     Using this attribute removes features from the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its remove form.
     """
 
@@ -454,43 +461,43 @@ class TargetJSON(BaseJSONConfig):
     """
     Peripherals that this MCU has, such as I2C, Ethernet, real-time clock, etc. This tells Mbed which high-level
     APIs to make available for this target.
-    
+
     See mbed-os/targets/drivers.json5 for a full list of recognized peripheral names.
-     
+
     The peripheral list becomes compile definitions in the format `DEVICE_<name>`.
-    
+
     This is an accumulating attribute in its base form.
     """
 
     device_has_add: list[str] = Field(default_factory=list)
     """
-    Peripherals to add (see "device_has"). 
+    Peripherals to add (see "device_has").
     Using this attribute adds peripherals to the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its add form.
     """
 
     device_has_remove: list[str] = Field(default_factory=list)
     """
-    Peripherals to remove (see "device_has"). 
+    Peripherals to remove (see "device_has").
     Using this attribute removes peripherals from the set defined by parent target(s), rather than overwriting it.
-    
+
     This is an accumulating attribute in its remove form.
     """
 
-    supported_c_libs: dict[Literal["gcc_arm"], list[str]] = Field(default_factory=list)
+    supported_c_libs: dict[Literal["gcc_arm"], list[str]] = Field(default_factory=dict)
     """
     C libraries that this target supports on each toolchain. This gives the valid values for the "c_lib" setting.
-    
+
     This is an overriding attribute.
     """
 
     c_lib: str | None = None
     """
     C library that should be used. This allows specifying either the "std" or "small" versions of the library.
-    
+
     With the GCC ARM toolchain, setting this to "small" causes newlib-nano to be linked instead of regular Newlib.
-    
+
     This is an overriding attribute.
     """
 
@@ -499,10 +506,10 @@ class TargetJSON(BaseJSONConfig):
     Printf library that should be used. Minimal printf causes printf to be replaced with Mbed's smaller version.
     This saves around 20k of code space compared to the newlib version, at the cost of not supporting
     all of the features specified in the C standard.
-    
+
     See here for more details:
     https://web.archive.org/web/20250422110455/https://os.mbed.com/docs/mbed-os/v6.16/apis/printf-and-reducing-memory.html
-        
+
     This is an overriding attribute.
     """
 
@@ -510,14 +517,14 @@ class TargetJSON(BaseJSONConfig):
     """
     CMSIS name of the MCU in this target. This name is used to index into cmsis_mcu_descriptions.json5 and
     find the target's memory banks and other information.
-    
+
     This is an overriding attribute.
     """
 
     image_url: str | None = None
     """
     Image to display for this target on the targets index page.
-    
+
     This is an overriding attribute.
     """
 
@@ -525,21 +532,21 @@ class TargetJSON(BaseJSONConfig):
     """
     Whether this target is the top-level target for a family of MCUs. This causes a new sub-page to be created for it
     on the targets index page.
-    
+
     This is a non-inherited attribute.
     """
 
     memory_banks: dict[str, MemoryBankDefinition] = Field(default_factory=dict)
     """
     Memory banks defined for this target.
-    
+
     This attribute can be used to define new memory banks, or to add new ones that do not exist in the target's
     cmsis_mcu_descriptions.json5 entry.
     See the memory bank system design document for more information:
     https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information
-    
+
     This is a merging attribute.
-    
+
     Warning: This attribute is used to define the *physical extents* of memory banks on the device. If you
     want to restrict the application to use a specific area of RAM, that should be done with
     memory_bank_config instead!
@@ -548,30 +555,30 @@ class TargetJSON(BaseJSONConfig):
     memory_bank_config: dict[str, MemoryBankConfiguration] = Field(default_factory=dict)
     """
     Configuration of memory banks for this target.
-    
+
     This can be used to restrict where the application lives in memory (as long as the linker script
     has support). Setting this will set the ``MBED_CONFIGURED_[ROM/RAM][number/name]_[START/SIZE]`` definitions
     to contain the configured sizes.
-    
+
     See the memory bank system design document for more information:
     https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information
-    
+
     This is a merging attribute.
     """
 
     OUTPUT_EXT: Literal["bin", "hex", ""] | None = None
     """
     Configures the extension of binary files that the Mbed build system will create.
-    
-    Setting this to "bin" or "" (or leaving it unset) will cause both bin and hex files to be created. Setting 
+
+    Setting this to "bin" or "" (or leaving it unset) will cause both bin and hex files to be created. Setting
     this to "hex" will cause only hex files to be created. (note: you used to be able to create only bin files,
     but Mbed needs to use the hex files internally for uploading code, so this was changed). This option really
     should be reworked...
-    
+
     As for why you would want to disable bin files, this is because bin files are just a raw memory image of the
     target, so they cannot handle holes. If, for example, your target has two flash banks that are 1GB apart in the
     address space, and you have constant data in both those banks, then the toolchain will generate a 1GB bin file!
-    
+
     This is an overriding attribute.
     """
 
@@ -590,22 +597,22 @@ class MbedAppJSON(BaseJSONConfig):
     but allows applying the override only if the target has a specific label. Labels generally
     come from the names of the target and its parents, but targets can also add extra ones.
     For example:
-    
+
     "target_overrides": {
         "MIMXRT105X": {
             "some-setting": some-value
         }
     }
-    
+
     would apply the override only for targets in the MIMXRT105X target family.
-    
+
     The magic target label "*" is always present and is equivalent to using the "overrides" section.
-    
+
     Note that the "target.memory_bank_config" setting may be included in this list
     in order to specify memory bank configuration. Its value is a MemoryBankConfiguration rather than a regular
     primitive type.
-    
-    Also note that the override priority between different sections within target_overrides, and between 
+
+    Also note that the override priority between different sections within target_overrides, and between
     target_overrides and overrides, is not currently defined. So, if you override the same setting in both,
     results may not be what you expect.
     """
@@ -616,12 +623,10 @@ class MbedAppJSON(BaseJSONConfig):
             for name, value in overrides.items():
                 if name == "target.memory_bank_config":
                     if not isinstance(value, MemoryBankConfiguration):
-                        raise ValueError(
-                            'target.memory_bank_config in "target_overrides" must be a MemoryBankConfiguration schema element!'
-                        )
+                        msg = 'target.memory_bank_config in "target_overrides" must be a MemoryBankConfiguration schema element!'
+                        raise ValueError(msg)
                 else:
                     if isinstance(value, MemoryBankConfiguration):
-                        raise ValueError(
-                            'Only target.memory_bank_config in "target_overrides" may be a dict! Everything else must be a primitive type!'
-                        )
+                        msg = 'Only target.memory_bank_config in "target_overrides" may be a dict! Everything else must be a primitive type!'
+                        raise ValueError(msg)
         return self

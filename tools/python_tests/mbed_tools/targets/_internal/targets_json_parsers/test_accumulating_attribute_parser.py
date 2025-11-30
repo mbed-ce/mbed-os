@@ -209,6 +209,6 @@ class TestRemoveAttributeElement(TestCase):
         current_attribute_state = {"macros": ["ONE", "TWO=2", "THREE"]}
         elements_to_remove = ["TWO"]
         expected_result = {"macros": ["ONE", "THREE"]}
-        result = _remove_attribute_element(current_attribute_state, "macros", elements_to_remove)
+        _remove_attribute_element(current_attribute_state, "macros", elements_to_remove)
 
-        self.assertEqual(result, expected_result)
+        self.assertEqual(current_attribute_state, expected_result)

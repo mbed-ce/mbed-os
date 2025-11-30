@@ -6,10 +6,9 @@
 
 from __future__ import annotations
 
+import fnmatch
 from pathlib import Path
 from typing import Callable, Iterable, List, Optional, Tuple
-
-from mbed_tools.lib.json_helpers import decode_json_file
 
 
 def find_files(filename: str, directory: Path) -> List[Path]:
@@ -130,7 +129,7 @@ class MbedignoreFilter:
         return not any(fnmatch.fnmatch(stringified, pattern) for pattern in self._patterns)
 
     @classmethod
-    def from_file(cls, mbedignore_path: Path) -> "MbedignoreFilter":
+    def from_file(cls, mbedignore_path: Path) -> MbedignoreFilter:
         """
         Return new instance with patterns read from .mbedignore file.
 
