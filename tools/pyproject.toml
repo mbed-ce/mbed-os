@@ -199,7 +199,7 @@ ignore = [
 
     # For now allow old-style type annotations. Currently there's lots of code that uses them, and I am
     # not sure if there is a way to upgrade them automatically. And since this project still supports
-    # back to Python 3.7, you can't actually use the new style of annotations without using the future annotations feature.
+    # back to Python 3.8, you can't actually use the new style of annotations without using the future annotations feature.
     "FA100",   # future-rewritable-type-annotation
     "UP045",   # non-pep604-annotation-optional
     "UP006",   # non-pep585-annotation
