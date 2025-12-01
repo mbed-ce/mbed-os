@@ -58,9 +58,9 @@ if(${CMAKE_CROSSCOMPILING})
             set(RTX_IRQ_FILE "irq_armv8mml.S")
         endif()
     endforeach()
-    message(WARNING "Test: ${RTX_IRQ_FILE_PATH}/${RTX_IRQ_FILE}")
+    
     # Add the IRQ handler file if determined
-    if(DEFINED RTX_IRQ_FILE AND EXISTS ${RTX_IRQ_FILE_PATH}/${RTX_IRQ_FILE})
+    if(EXISTS ${RTX_IRQ_FILE_PATH}/${RTX_IRQ_FILE})
         target_sources(mbed-rtos-sources INTERFACE ${RTX_IRQ_FILE_PATH}/${RTX_IRQ_FILE})
     else()
         message(FATAL_ERROR "CMSIS-RTX: No IRQ handler found for this target (labels: ${MBED_TARGET_LABELS} )")
