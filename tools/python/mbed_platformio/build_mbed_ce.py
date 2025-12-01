@@ -163,7 +163,9 @@ def get_cmake_code_model(cmake_args: list) -> dict:
             with target.open(encoding="utf-8") as fp:
                 codemodel = json.load(fp)
 
-    assert codemodel["version"]["major"] == 2
+    if codemodel["version"]["major"] != 2:
+        print("Warning: Unexpected CMake code model version, reading compilation data may fail!", file=sys.stderr)
+
     return codemodel
 
 

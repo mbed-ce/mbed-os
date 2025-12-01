@@ -7,13 +7,15 @@
 from __future__ import annotations
 
 import logging
-from types import TracebackType
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import win32api  # pyright: ignore[reportMissingModuleSource]
 import win32con  # pyright: ignore[reportMissingModuleSource]
 
 from mbed_tools.devices._internal.exceptions import OperatingSystemError
+
+if TYPE_CHECKING:
+    from types import TracebackType
 
 logger = logging.getLogger(__name__)
 

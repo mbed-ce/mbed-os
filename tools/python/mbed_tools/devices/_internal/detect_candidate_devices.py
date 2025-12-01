@@ -11,13 +11,6 @@ from mbed_tools.devices._internal.base_detector import DeviceDetector
 from mbed_tools.devices._internal.candidate_device import CandidateDevice
 from mbed_tools.devices.exceptions import UnknownOSError
 
-if platform.system() == "Windows":
-    from mbed_tools.devices._internal.windows.device_detector import WindowsDeviceDetector as PlatformDeviceDetector
-if platform.system() == "Linux":
-    from mbed_tools.devices._internal.linux.device_detector import LinuxDeviceDetector as PlatformDeviceDetector
-if platform.system() == "Darwin":
-    from mbed_tools.devices._internal.darwin.device_detector import DarwinDeviceDetector as PlatformDeviceDetector
-
 
 def detect_candidate_devices() -> Iterable[CandidateDevice]:
     """Returns Candidates connected to host computer."""
@@ -27,11 +20,21 @@ def detect_candidate_devices() -> Iterable[CandidateDevice]:
 
 def _get_detector_for_current_os() -> DeviceDetector:
     """Returns DeviceDetector for current operating system."""
-    if platform.system() not in {"Linux", "Darwin", "Windows"}:
+    if platform.system() == "Windows":
+        from mbed_tools.devices._internal.windows.device_detector import WindowsDeviceDetector  # noqa: PLC0415
+
+        return WindowsDeviceDetector()
+    elif platform.system() == "Linux":
+        from mbed_tools.devices._internal.linux.device_detector import LinuxDeviceDetector  # noqa: PLC0415
+
+        return LinuxDeviceDetector()
+    elif platform.system() == "Darwin":
+        from mbed_tools.devices._internal.darwin.device_detector import DarwinDeviceDetector  # noqa: PLC0415
+
+        return DarwinDeviceDetector()
+    else:
         msg = (
             f"We have detected the OS you are running is '{platform.system()}'. "
             "Unfortunately we haven't implemented device detection support for this OS yet. Sorry!"
         )
         raise UnknownOSError(msg)
-
-    return PlatformDeviceDetector()  # pyright: ignore[reportPossiblyUnboundVariable]

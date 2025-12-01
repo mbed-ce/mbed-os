@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
-from typing import Dict, Generator, List, Optional, Tuple, cast
+from typing import Dict, Generator, Generic, List, Optional, Tuple, cast
 
 from typing_extensions import TypeVar
 
@@ -39,6 +39,9 @@ def load_all(cls: type) -> Tuple[type, List[ComponentDescriptor]]:
     return (cls, list(ComponentDescriptorWrapper(cls).element_generator()))
 
 
+ComponentT = TypeVar("ComponentT", bound=ComponentDescriptor)
+
+
 class SystemDataLoader:
     """
     Object in charge of loading all system data with regards to Usb, Disk or serial port.
@@ -63,15 +66,12 @@ class SystemDataLoader:
             self._load()
         return cast(Dict[type, List[ComponentDescriptor]], self._system_data)
 
-    def get_system_data(self, cls: type) -> List[ComponentDescriptor]:
+    def get_system_data(self, cls: type[ComponentT]) -> List[ComponentT]:
         """Gets the system data for a particular type."""
-        return self.system_data.get(cls, [])
+        return cast(List[ComponentT], self.system_data.get(cls, []))
 
 
-ComponentT = TypeVar("ComponentT", bound=ComponentDescriptor)
-
-
-class ComponentsLoader:
+class ComponentsLoader(Generic[ComponentT]):
     """Loads system components."""
 
     def __init__(self, data_loader: SystemDataLoader, cls: type[ComponentT]) -> None:
@@ -81,5 +81,5 @@ class ComponentsLoader:
 
     def element_generator(self) -> Generator[ComponentT, None, None]:
         """Gets a generator over all elements currently registered in the system."""
-        elements = cast(list[ComponentT], self._data_loader.get_system_data(self._cls))
+        elements = self._data_loader.get_system_data(self._cls)
         yield from elements

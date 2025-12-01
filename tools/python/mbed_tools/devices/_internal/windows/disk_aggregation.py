@@ -139,7 +139,7 @@ class WindowsDiskDataAggregator(DiskDataAggregator):
     def __init__(self, data_loader: SystemDataLoader) -> None:
         """Initialiser."""
         super().__init__(
-            physical_disks={d.Index: d for d in ComponentsLoader(data_loader, DiskDrive).element_generator()},
+            physical_disks={d.index: d for d in ComponentsLoader(data_loader, DiskDrive).element_generator()},
             partition_disks={
                 p.component_id: p for p in ComponentsLoader(data_loader, DiskPartition).element_generator()
             },
@@ -165,7 +165,7 @@ class SystemDiskInformation:
         disk_data_by_serialnumber: dict = {}  # The type is enforced so that mypy is happy.
         disk_data_by_label = {}
         for ld in ComponentsLoader(self._data_loader, LogicalDisk).element_generator():
-            aggregation = aggregator.aggregate(cast(LogicalDisk, ld))
+            aggregation = aggregator.aggregate(ld)
             key = aggregation.get("uid").presumed_serial_number
             disk_data_list = disk_data_by_serialnumber.get(key, [])
             disk_data_list.append(aggregation)

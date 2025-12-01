@@ -81,10 +81,9 @@ class WindowsUID:
         if not other or not isinstance(other, WindowsUID):
             return False
         if (
-            self.uid == other.uid
+            self.uid in (other.uid, other.serial_number)
             or self.raw_uid == other.raw_uid
             or self.serial_number in (other.serial_number, other.uid)
-            or self.uid == other.serial_number
         ):
             return True
         # Due to the complexity of determining the UID on Windows,

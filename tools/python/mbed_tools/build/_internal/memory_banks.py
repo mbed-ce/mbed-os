@@ -12,15 +12,16 @@ if TYPE_CHECKING:
 
     from typing_extensions import NotRequired
 
+    from mbed_tools.build._internal.config.config import Config
+    from mbed_tools.project import MbedProgram
+
 import copy
 import logging
 
 import humanize
 
-from mbed_tools.build._internal.config.config import Config
 from mbed_tools.build.exceptions import MbedBuildError
 from mbed_tools.lib.json_helpers import decode_json_file
-from mbed_tools.project import MbedProgram
 
 logger = logging.getLogger(__name__)
 

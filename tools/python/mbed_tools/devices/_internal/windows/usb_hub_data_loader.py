@@ -31,7 +31,7 @@ class SystemUsbDeviceInformation:
 
     def _list_usb_controller_ids(self) -> List[UsbIdentifier]:
         return [
-            parse_device_id(cast(UsbController, usbc).component_id)
+            parse_device_id(usbc.component_id)
             for usbc in ComponentsLoader(self._data_loader, UsbController).element_generator()
         ]
 

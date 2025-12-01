@@ -14,12 +14,6 @@ For the command line interface to the API see the package https://github.com/ARM
 
 from mbed_tools.devices import exceptions as exceptions
 from mbed_tools.devices.device import Device as Device
-from mbed_tools.devices.devices import (
-    find_all_connected_devices as find_all_connected_devices,
-)
-from mbed_tools.devices.devices import (
-    find_connected_device as find_connected_device,
-)
-from mbed_tools.devices.devices import (
-    get_connected_devices as get_connected_devices,
-)
+from mbed_tools.devices.devices import find_all_connected_devices as find_all_connected_devices
+from mbed_tools.devices.devices import find_connected_device as find_connected_device
+from mbed_tools.devices.devices import get_connected_devices as get_connected_devices

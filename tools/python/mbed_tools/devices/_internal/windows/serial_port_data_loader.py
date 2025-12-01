@@ -4,7 +4,7 @@
 #
 """Loads serial port data."""
 
-from typing import Generator, List, Optional, cast
+from typing import List, Optional
 
 from mbed_tools.devices._internal.windows.serial_port import SerialPort
 from mbed_tools.devices._internal.windows.system_data_loader import ComponentsLoader, SystemDataLoader
@@ -21,10 +21,7 @@ class SystemSerialPortInformation:
 
     def _load_data(self) -> None:
         self._serial_port_by_usb_id = {
-            parse_device_id(p.pnp_id): p
-            for p in cast(
-                Generator[SerialPort, None, None], ComponentsLoader(self._data_loader, SerialPort).element_generator()
-            )
+            parse_device_id(p.pnp_id): p for p in ComponentsLoader(self._data_loader, SerialPort).element_generator()
         }
 
     @property

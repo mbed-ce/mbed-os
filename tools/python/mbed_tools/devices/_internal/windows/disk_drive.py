@@ -98,6 +98,15 @@ class DiskDrive(ComponentDescriptor):
         """Returns the disk UID."""
         return Win32DiskIdParser().parse(cast(str, self.get("PNPDeviceID")), self.get("SerialNumber"))
 
+    @property
+    def index(self) -> int:
+        """
+        Per MSDN: Physical drive number of the given drive.
+
+        A value of 0xffffffff indicates that the given drive does not map to a physical drive.
+        """
+        return self.get("Index")
+
 
 class Win32DiskIdParser:
     """Parser of a standard Win32 Disk."""

@@ -7,13 +7,15 @@
 from __future__ import annotations
 
 import logging
-import pathlib
 from collections import UserDict
 from typing import Any, Hashable, Iterable, List
 
 import typing_extensions
 
-from mbed_tools.build._internal.config.source import ConfigSetting, Override
+if typing_extensions.TYPE_CHECKING:
+    import pathlib
+
+    from mbed_tools.build._internal.config.source import ConfigSetting, Override
 
 logger = logging.getLogger(__name__)
 

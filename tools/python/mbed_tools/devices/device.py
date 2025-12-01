@@ -6,7 +6,7 @@
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence
 
 from mbed_tools.devices._internal.candidate_device import CandidateDevice
 from mbed_tools.devices._internal.exceptions import NoBoardForCandidateError, ResolveBoardError
@@ -34,7 +34,7 @@ class Device:
     mbed_board: Board
     serial_number: str
     serial_port: Optional[str]
-    mount_points: Tuple[Path, ...]
+    mount_points: Sequence[Path]
     mbed_enabled: bool = False
     interface_version: Optional[str] = None
 
