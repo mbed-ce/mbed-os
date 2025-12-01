@@ -34,7 +34,7 @@ message(STATUS "CMSIS-RTX 5.9.0")
 
 # Add toolchain-specific interrupt handlers based on core type
 if(${CMAKE_CROSSCOMPILING})
-    set(RTX_IRQ_FILE_PATH "${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX/Source/GCC")
+    set(RTX_IRQ_FILE_PATH ${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX/Source/GCC)
     set(_cm0_variants M0 M0P)
     set(_cmx_variants M3 M4 M7)
     set(_cmxx_variants M33 M35 M35P M55 M85)
@@ -58,12 +58,12 @@ if(${CMAKE_CROSSCOMPILING})
             set(RTX_IRQ_FILE "irq_armv8mml.S")
         endif()
     endforeach()
-
+    message(WARNING "Test: ${RTX_IRQ_FILE_PATH}/${RTX_IRQ_FILE}")
     # Add the IRQ handler file if determined
     if(DEFINED RTX_IRQ_FILE AND EXISTS ${RTX_IRQ_FILE_PATH}/${RTX_IRQ_FILE})
         target_sources(mbed-rtos-sources INTERFACE ${RTX_IRQ_FILE_PATH}/${RTX_IRQ_FILE})
     else()
-        message(WARNING "CMSIS-RTX: No IRQ handler found for this target (labels: ${MBED_TARGET_LABELS})")
+        message(FATAL_ERROR "CMSIS-RTX: No IRQ handler found for this target (labels: ${MBED_TARGET_LABELS} )")
     endif()
 endif()
 
