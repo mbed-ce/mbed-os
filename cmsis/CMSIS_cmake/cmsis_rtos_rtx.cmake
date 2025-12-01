@@ -35,7 +35,7 @@ endif()
 # (needed for typedefs like mbed_rtos_storage_* used by headers even in bare-metal)
 target_include_directories(mbed-core-flags
     INTERFACE
-    ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/include/RTX/config
+    ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/include/RTX
     ${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX/Include
 )
 
@@ -51,6 +51,9 @@ if(APPLICATION_PROFILE_CONFIG_FULL)
     # RTX source files (only compiled when building with RTOS)
     target_sources(mbed-rtos-sources
         INTERFACE
+        ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/source/RTX/mbed_rtos_rtx.c
+        ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/source/RTX/mbed_rtx_handlers.c
+        ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/source/RTX/mbed_rtx_idle.cpp
         # Old CMSIS-RTOS v1 compatibility layer
         ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/source/cmsis_os1.c     
         # Configuration

@@ -21,6 +21,7 @@
 
 #ifndef __ASSEMBLER__
 #include <stdint.h>
+#endif
 
 #if defined(TARGET_BEETLE)
 

@@ -282,10 +282,6 @@ if(NOT MBED_IS_NATIVE_BUILD)
     # Disable any requested files from the targets/ directory.
     mbed_apply_mcu_target_file_disables()
 endif()
-
-if(CORTEX_CORE_LABEL STREQUAL "")
-    message(FATAL_ERROR "Could not determine Cortex core type from target labels: ${MBED_TARGET_LABELS}")
-endif()
     
 add_subdirectory(cmsis)
 add_subdirectory(drivers)

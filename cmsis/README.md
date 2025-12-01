@@ -1,4 +1,3 @@
-
 # CMSIS Version 6
 
 This directory contains
