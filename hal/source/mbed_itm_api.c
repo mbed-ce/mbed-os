@@ -44,10 +44,10 @@ void mbed_itm_init(void)
         ITM->LAR  = ITM_ENABLE_WRITE;
 
         /* Trace Port Interface Selected Pin Protocol Register. */
-        TPI->SPPR = (SWO_NRZ << TPI_SPPR_TXMODE_Pos);
+        TPIU->SPPR = (SWO_NRZ << TPIU_SPPR_TXMODE_Pos);
 
         /* Trace Port Interface Formatter and Flush Control Register */
-        TPI->FFCR = (1 << TPI_FFCR_TrigIn_Pos);
+        TPIU->FFCR = (1 << TPIU_FFCR_TrigIn_Pos);
 
         /* Data Watchpoint and Trace Control Register */
         DWT->CTRL = (1 << DWT_CTRL_CYCTAP_Pos)       |
@@ -61,7 +61,7 @@ void mbed_itm_init(void)
         ITM->TPR  = 0x0;
 
         /* Trace Control Register */
-        ITM->TCR  = (1 << ITM_TCR_TraceBusID_Pos) |
+        ITM->TCR  = (1 << ITM_TCR_TRACEBUSID_Pos) |
                     (1 << ITM_TCR_DWTENA_Pos)     |
                     (1 << ITM_TCR_SYNCENA_Pos)    |
                     (1 << ITM_TCR_ITMENA_Pos);
