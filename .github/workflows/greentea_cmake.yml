@@ -137,12 +137,6 @@ jobs:
           test -f cmsis/CMSIS-RTX/Config/RTX_Config.h
           test -f cmsis/CMSIS_6/CMSIS/Core/Include/cmsis_version.h
 
-      - name: Show submodule SHAs
-        run: |
-          git submodule status --recursive
-          git ls-tree HEAD cmsis/CMSIS-RTX
-          git ls-tree HEAD cmsis/CMSIS_6
-
       - name: Install python3-venv
         run: |
           apt-get update
