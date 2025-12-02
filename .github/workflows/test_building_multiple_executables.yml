@@ -9,6 +9,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive   # fetch submodules
+
+      - name: Verify submodules present
+        run: |
+          git submodule status
+          test -f cmsis/CMSIS-RTX/Config/RTX_Config.h
+          test -f cmsis/CMSIS_6/CMSIS/Core/Include/cmsis_version.h
+          
+      - name: Show submodule SHAs
+        run: |
+          git submodule status --recursive
+          git ls-tree HEAD cmsis/CMSIS-RTX
+          git ls-tree HEAD cmsis/CMSIS_6
 
       - name: Install Python packages
         # Note: pip>=20.3 is needed to install dependencies of cysecuretools
