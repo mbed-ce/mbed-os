@@ -244,6 +244,8 @@ jobs:
       -
         name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          submodules: recursive   # fetch submodules
 
       - name: Install python3-venv
         run: |
