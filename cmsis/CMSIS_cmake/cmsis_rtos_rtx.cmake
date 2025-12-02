@@ -27,7 +27,7 @@
 # Path: /CMSIS-RTX
 
 # Submodule presence
-if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX)
+if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX/Include)
     message(FATAL_ERROR "CMSIS-RTX submodule directory not found!")
 endif()
 message(STATUS "CMSIS-RTX 5.9.0")

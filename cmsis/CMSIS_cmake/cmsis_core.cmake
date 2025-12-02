@@ -29,12 +29,12 @@
 # Components used: CMSIS-Core 6.1.1
 # Path: CMSIS_6/CMSIS/Core
 
-message(STATUS "CMSIS-Core 6.1.1")
 
 # Submodule presence
-if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../CMSIS_6)
+if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../CMSIS_6/CMSIS/Core/Include)
     message(FATAL_ERROR "CMSIS_6 submodule directory not found!")
 endif()
+message(STATUS "CMSIS-Core 6.1.1")
 
 # Add CMSIS-Core base include directories
 target_include_directories(mbed-core-flags
