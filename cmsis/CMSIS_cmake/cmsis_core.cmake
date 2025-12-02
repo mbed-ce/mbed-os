@@ -69,7 +69,7 @@ elseif("CORTEX_M" IN_LIST MBED_TARGET_LABELS)
 
     target_sources(mbed-cmsis-cortex-m
         INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/Source/mbed_tz_context.c
+            ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/source/mbed_tz_context.c
     )
 
 endif()
