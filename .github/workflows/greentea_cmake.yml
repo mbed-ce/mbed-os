@@ -132,6 +132,7 @@ jobs:
 
       - name: Verify submodules present
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git submodule status
           test -f cmsis/CMSIS-RTX/Config/RTX_Config.h
           test -f cmsis/CMSIS_6/CMSIS/Core/Include/cmsis_version.h
