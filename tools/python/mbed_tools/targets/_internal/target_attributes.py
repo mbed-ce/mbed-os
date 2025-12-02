@@ -2,7 +2,8 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Internal helper to retrieve target attribute information.
+"""
+Internal helper to retrieve target attribute information.
 
 This information is parsed from the targets.json configuration file
 found in the mbed-os repo.
@@ -10,17 +11,16 @@ found in the mbed-os repo.
 
 import logging
 import pathlib
-from typing import Dict, Any, Set, Optional
+from typing import Any, Dict, Optional, Set
 
 from mbed_tools.lib.exceptions import ToolsError
 from mbed_tools.lib.json_helpers import decode_json_file
-
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import (
     get_accumulating_attributes_for_target,
 )
 from mbed_tools.targets._internal.targets_json_parsers.overriding_attribute_parser import (
-    get_overriding_attributes_for_target,
     get_labels_for_target,
+    get_overriding_attributes_for_target,
 )
 
 INTERNAL_PACKAGE_DIR = pathlib.Path(__file__).parent
@@ -42,7 +42,8 @@ class TargetNotFoundError(TargetAttributesError):
 
 
 def get_target_attributes(targets_json_data: dict, target_name: str, allow_non_public_targets: bool = False) -> dict:
-    """Retrieves attribute data taken from targets.json for a single target.
+    """
+    Retrieves attribute data taken from targets.json for a single target.
 
     Args:
         targets_json_data: target definitions from targets.json
@@ -73,7 +74,8 @@ def get_target_attributes(targets_json_data: dict, target_name: str, allow_non_p
 def _extract_target_attributes(
     all_targets_data: Dict[str, Any], target_name: str, allow_non_public_targets: bool
 ) -> dict:
-    """Extracts the definition for a particular target from all the targets in targets.json.
+    """
+    Extracts the definition for a particular target from all the targets in targets.json.
 
     Args:
         all_targets_data: a dictionary representation of the raw targets.json data.
@@ -87,13 +89,13 @@ def _extract_target_attributes(
         TargetNotFoundError: no target definition found in targets.json.
     """
     if target_name not in all_targets_data:
-        raise TargetNotFoundError(f"Target attributes for {target_name} not found.")
+        msg = f"Target attributes for {target_name} not found."
+        raise TargetNotFoundError(msg)
 
     # All target definitions are assumed to be public unless specifically set as public=false
     if not all_targets_data[target_name].get("public", True) and not allow_non_public_targets:
-        raise TargetNotFoundError(
-            f"Cannot get attributes for {target_name} because it is marked non-public in targets JSON.  This likely means you set MBED_TARGET to the name of the MCU rather than the name of the board."
-        )
+        msg = f"Cannot get attributes for {target_name} because it is marked non-public in targets JSON.  This likely means you set MBED_TARGET to the name of the MCU rather than the name of the board."
+        raise TargetNotFoundError(msg)
 
     target_attributes = get_overriding_attributes_for_target(all_targets_data, target_name)
     accumulated_attributes = get_accumulating_attributes_for_target(all_targets_data, target_name)
@@ -102,7 +104,8 @@ def _extract_target_attributes(
 
 
 def _extract_core_labels(target_core: Optional[str]) -> Set[str]:
-    """Find the labels associated with the target's core.
+    """
+    Find the labels associated with the target's core.
 
     Args:
         target_core: the target core, set as a build attribute
@@ -118,7 +121,8 @@ def _extract_core_labels(target_core: Optional[str]) -> Set[str]:
 
 
 def _apply_config_overrides(config: Dict[str, Any], overrides: Dict[str, Any]) -> Dict[str, Any]:
-    """Returns the config attribute with any overrides applied.
+    """
+    Returns the config attribute with any overrides applied.
 
     Args:
         config: the cumulative config settings defined for a target
@@ -131,11 +135,11 @@ def _apply_config_overrides(config: Dict[str, Any], overrides: Dict[str, Any]) -
         TargetsJsonConfigurationError: overrides can't be applied to config settings that aren't already defined
     """
     config = config.copy()
-    for key in overrides:
+    for key, override in overrides.items():
         try:
-            config[key]["value"] = overrides[key]
+            config[key]["value"] = override
         except KeyError:
             logger.warning(
-                f"Cannot apply override {key}={overrides[key]}, there is no config setting defined matching that name."
+                f"Cannot apply override {key}={override}, there is no config setting defined matching that name."
             )
     return config

@@ -7,12 +7,13 @@
 import logging
 import pathlib
 import re
-from typing import List, Tuple, Optional
-from typing_extensions import TypedDict
+from typing import List, Optional, Tuple
+
+from typing_extensions import TypedDict, override
+
 from mbed_tools.devices._internal.base_detector import DeviceDetector
 from mbed_tools.devices._internal.candidate_device import CandidateDevice
-from mbed_tools.devices._internal.darwin import system_profiler, ioreg, diskutil
-
+from mbed_tools.devices._internal.darwin import diskutil, ioreg, system_profiler
 
 logger = logging.getLogger(__name__)
 
@@ -30,24 +31,23 @@ class CandidateDeviceData(TypedDict):
 class InvalidCandidateDeviceDataError(ValueError):
     """Raised when CandidateDevice was given invalid data and it cannot be built."""
 
-    pass
-
 
 class DarwinDeviceDetector(DeviceDetector):
     """Darwin specific implementation of device detection."""
 
+    @override
     def find_candidates(self) -> List[CandidateDevice]:
         """Return a list of CandidateDevices."""
         usb_devices_data = system_profiler.get_end_usb_devices_data()
         candidates = []
         for device_data in usb_devices_data:
-            logging.debug(f"Building from: {device_data}.")
+            logger.debug(f"Building from: {device_data}.")
             try:
                 candidate = _build_candidate(device_data)
             except InvalidCandidateDeviceDataError:
                 pass
             else:
-                logging.debug(f"Built candidate: {candidate}.")
+                logger.debug(f"Built candidate: {candidate}.")
                 candidates.append(candidate)
         return candidates
 
@@ -57,8 +57,8 @@ def _build_candidate(device_data: system_profiler.USBDevice) -> CandidateDevice:
     try:
         return CandidateDevice(**assembled_data)
     except ValueError as e:
-        logging.debug(f"Unable to build candidate. {e}")
-        raise InvalidCandidateDeviceDataError
+        logger.debug(f"Unable to build candidate. {e}")
+        raise InvalidCandidateDeviceDataError from e
 
 
 def _assemble_candidate_data(device_data: system_profiler.USBDevice) -> CandidateDeviceData:
@@ -72,7 +72,8 @@ def _assemble_candidate_data(device_data: system_profiler.USBDevice) -> Candidat
 
 
 def _format_vendor_id(vendor_id: str) -> str:
-    """Strips vendor name from vendor_id field.
+    """
+    Strips vendor name from vendor_id field.
 
     Example:
         >>> _format_vendor_id("0x1234 (Nice Vendor Inc.)")  # "0x1234"
@@ -89,7 +90,7 @@ def _get_mount_points(device_data: system_profiler.USBDevice) -> Tuple[pathlib.P
         if mount_point:
             mount_points.append(pathlib.Path(mount_point))
         else:
-            logging.debug(f"Couldn't determine mount point for device id: {storage_identifier}.")
+            logger.debug(f"Couldn't determine mount point for device id: {storage_identifier}.")
     return tuple(mount_points)
 
 
@@ -97,21 +98,21 @@ def _get_serial_port(device_data: system_profiler.USBDevice) -> Optional[str]:
     """Returns serial port for a given device, None if serial port cannot be determined."""
     device_name = device_data.get("_name")
     if not device_name:
-        logging.debug('Missing "_name" in "{device_data}", which is required for ioreg name.')
+        logger.debug('Missing "_name" in "{device_data}", which is required for ioreg name.')
         return None
 
     location_id = device_data.get("location_id")
     if not location_id:
-        logging.debug('Missing "location_id" in "{device_data}", which is required for ioreg name.')
+        logger.debug('Missing "location_id" in "{device_data}", which is required for ioreg name.')
         return None
 
     ioreg_name = _build_ioreg_device_name(device_name=device_name, location_id=location_id)
-    serial_port = ioreg.get_io_dialin_device(ioreg_name)
-    return serial_port
+    return ioreg.get_io_dialin_device(ioreg_name)
 
 
 def _build_ioreg_device_name(device_name: str, location_id: str) -> str:
-    """Converts extracted `_name` and `location_id` attributes from `system_profiler` to a valid ioreg device name.
+    """
+    Converts extracted `_name` and `location_id` attributes from `system_profiler` to a valid ioreg device name.
 
     `system_profiler` utility returns location ids in the form of `0xNNNNNNN`, with an optional suffix of ` / N`.
 

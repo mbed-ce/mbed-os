@@ -2,7 +2,8 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Parses files found on Mbed enabled devices.
+"""
+Parses files found on Mbed enabled devices.
 
 There are a number of data files stored on an mbed enabled device's USB mass storage.
 
@@ -93,16 +94,15 @@ This can be found on connected J-Link devices. An example is shown below.
 import logging
 import pathlib
 import re
-
 from dataclasses import dataclass
-from typing import Optional, NamedTuple, Iterable, List
-
+from typing import Iterable, List, NamedTuple, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class OnlineId(NamedTuple):
-    """Used to identify the target against the os.mbed.com website.
+    """
+    Used to identify the target against the os.mbed.com website.
 
     The target type and slug are used in the URI for the board and together they can be used uniquely identify a board.
 
@@ -123,7 +123,8 @@ class DeviceFileInfo:
 
 
 def read_device_files(directory_paths: Iterable[pathlib.Path]) -> DeviceFileInfo:
-    """Read data from files contained on an mbed enabled device's USB mass storage device.
+    """
+    Read data from files contained on an mbed enabled device's USB mass storage device.
 
     If details.txt exists and it contains a product code, then we will use that code. If not then we try to grep the
     code from the mbed.htm file. We extract an OnlineID from mbed.htm as we also make use of that information to find a
@@ -204,7 +205,8 @@ def _read_first_details_txt_contents(file_paths: Iterable[pathlib.Path]) -> dict
 
 
 def _read_details_txt(file_contents: str) -> dict:
-    """Parse the contents of a daplink-compatible device's details.txt.
+    """
+    Parse the contents of a daplink-compatible device's details.txt.
 
     Args:
         file_contents: The contents of the details.txt file.
@@ -215,7 +217,7 @@ def _read_details_txt(file_contents: str) -> dict:
         if line.startswith("#"):
             continue
 
-        key, sep, value = line.partition(":")
+        key, _sep, value = line.partition(":")
         if key and value:
             output[key.strip()] = value.strip()
 

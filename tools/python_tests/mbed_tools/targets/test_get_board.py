@@ -12,9 +12,9 @@ from mbed_tools.targets._internal.exceptions import BoardAPIError
 
 # Import from top level as this is the expected interface for users
 from mbed_tools.targets import get_board_by_online_id, get_board_by_product_code, get_board_by_jlink_slug
-from mbed_tools.targets.get_board import _DatabaseMode, _get_database_mode, get_board
+from mbed_tools.targets.get_board import get_board
 from mbed_tools.targets.env import env
-from mbed_tools.targets.exceptions import UnknownBoard, UnsupportedMode
+from mbed_tools.targets.exceptions import UnknownBoardError, UnsupportedModeError
 from python_tests.mbed_tools.targets.factories import make_board
 
 
@@ -25,67 +25,19 @@ def mock_get_board():
 
 
 @pytest.fixture
-def mock_env():
-    with mock.patch("mbed_tools.targets.get_board.env", spec_set=env) as gbp:
-        yield gbp
-
-
-@pytest.fixture
 def mocked_boards():
     with mock.patch("mbed_tools.targets.get_board.Boards", autospec=True) as gbp:
         yield gbp
 
 
 class TestGetBoard:
-    def test_online_mode(self, mock_env, mocked_boards):
-        mock_env.MBED_DATABASE_MODE = "ONLINE"
-        fn = mock.Mock()
-
-        subject = get_board(fn)
-
-        assert subject == mocked_boards.from_online_database().get_board.return_value
-        mocked_boards.from_online_database().get_board.assert_called_once_with(fn)
-
-    def test_offline_mode(self, mock_env, mocked_boards):
-        mock_env.MBED_DATABASE_MODE = "OFFLINE"
+    def test_offline_mode(self, mocked_boards):
         fn = mock.Mock()
 
         subject = get_board(fn)
 
         assert subject == mocked_boards.from_offline_database().get_board.return_value
         mocked_boards.from_offline_database().get_board.assert_called_once_with(fn)
-
-    def test_auto_mode_calls_offline_boards_first(self, mock_env, mocked_boards):
-        mock_env.MBED_DATABASE_MODE = "AUTO"
-        fn = mock.Mock()
-
-        subject = get_board(fn)
-
-        assert subject == mocked_boards.from_offline_database().get_board.return_value
-        mocked_boards.from_online_database().get_board.assert_not_called()
-        mocked_boards.from_offline_database().get_board.assert_called_once_with(fn)
-
-    def test_auto_mode_falls_back_to_online_database_when_board_not_found(self, mock_env, mocked_boards):
-        mock_env.MBED_DATABASE_MODE = "AUTO"
-        mocked_boards.from_offline_database().get_board.side_effect = UnknownBoard
-        fn = mock.Mock()
-
-        subject = get_board(fn)
-
-        assert subject == mocked_boards.from_online_database().get_board.return_value
-        mocked_boards.from_offline_database().get_board.assert_called_once_with(fn)
-        mocked_boards.from_online_database().get_board.assert_called_once_with(fn)
-
-    def test_auto_mode_raises_when_board_not_found_offline_with_no_network(self, mock_env, mocked_boards):
-        mock_env.MBED_DATABASE_MODE = "AUTO"
-        mocked_boards.from_offline_database().get_board.side_effect = UnknownBoard
-        mocked_boards.from_online_database().get_board.side_effect = BoardAPIError
-        fn = mock.Mock()
-
-        with pytest.raises(UnknownBoard):
-            get_board(fn)
-        mocked_boards.from_offline_database().get_board.assert_called_once_with(fn)
-        mocked_boards.from_online_database().get_board.assert_called_once_with(fn)
 
 
 class TestGetBoardByProductCode:
@@ -138,14 +90,3 @@ class TestGetBoardByJlinkSlug:
         assert fn(matching_board_2)
         assert fn(matching_board_3)
         assert not fn(not_matching_board)
-
-
-class TestGetDatabaseMode:
-    def test_returns_configured_database_mode(self, mock_env):
-        mock_env.MBED_DATABASE_MODE = "OFFLINE"
-        assert _get_database_mode() == _DatabaseMode.OFFLINE
-
-    def test_raises_when_configuration_is_not_supported(self, mock_env):
-        mock_env.MBED_DATABASE_MODE = "NOT_VALID"
-        with pytest.raises(UnsupportedMode):
-            _get_database_mode()

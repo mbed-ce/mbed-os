@@ -2,18 +2,20 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Interface for accessing Targets from Mbed OS's targets.json.
+"""
+Interface for accessing Targets from Mbed OS's targets.json.
 
 An instance of `mbed_tools.targets.target.Target`
 can be retrieved by calling one of the public functions.
 """
 
-from mbed_tools.targets.exceptions import TargetError
 from mbed_tools.targets._internal import target_attributes
+from mbed_tools.targets.exceptions import TargetError
 
 
 def get_target_by_name(name: str, targets_json_data: dict) -> dict:
-    """Returns a dictionary of attributes for the target whose name matches the name given.
+    """
+    Returns a dictionary of attributes for the target whose name matches the name given.
 
     The target is as defined in the targets.json file found in the Mbed OS library.
 
@@ -31,7 +33,8 @@ def get_target_by_name(name: str, targets_json_data: dict) -> dict:
 
 
 def get_target_by_board_type(board_type: str, targets_json_data: dict) -> dict:
-    """Returns the target whose name matches a board's build_type.
+    """
+    Returns the target whose name matches a board's build_type.
 
     The target is as defined in the targets.json file found in the Mbed OS library.
 

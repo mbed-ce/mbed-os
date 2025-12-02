@@ -4,18 +4,19 @@
 #
 """Loads System's USB hub."""
 
-from typing import Dict, List, cast, Optional, Set, Generator
+from typing import Dict, Generator, List, Optional, Set, cast
 
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 from mbed_tools.devices._internal.windows.device_instance_id import get_children_instance_id
-from mbed_tools.devices._internal.windows.system_data_loader import SystemDataLoader, ComponentsLoader
+from mbed_tools.devices._internal.windows.system_data_loader import ComponentsLoader, SystemDataLoader
 from mbed_tools.devices._internal.windows.usb_controller import UsbController
-from mbed_tools.devices._internal.windows.usb_device_identifier import parse_device_id, UsbIdentifier
+from mbed_tools.devices._internal.windows.usb_device_identifier import UsbIdentifier, parse_device_id
 from mbed_tools.devices._internal.windows.usb_hub import UsbHub
 
 
 class SystemUsbDeviceInformation:
-    """Usb Hub cache for this system.
+    """
+    Usb Hub cache for this system.
 
     On Windows, each interface e.g. Composite, Mass storage, Port is defined as
     a separate independent UsbHub although they are related to the same device.
@@ -29,13 +30,10 @@ class SystemUsbDeviceInformation:
         self._data_loader = data_loader
 
     def _list_usb_controller_ids(self) -> List[UsbIdentifier]:
-        return cast(
-            List[UsbIdentifier],
-            [
-                parse_device_id(cast(UsbController, usbc).component_id)
-                for usbc in ComponentsLoader(self._data_loader, UsbController).element_generator()
-            ],
-        )
+        return [
+            parse_device_id(usbc.component_id)
+            for usbc in ComponentsLoader(self._data_loader, UsbController).element_generator()
+        ]
 
     def _iterate_over_hubs(self) -> Generator[ComponentDescriptor, None, None]:
         return ComponentsLoader(self._data_loader, UsbHub).element_generator()
@@ -52,7 +50,7 @@ class SystemUsbDeviceInformation:
 
     def _load(self) -> None:
         """Populates the cache."""
-        self._cache = cast(Dict[UsbIdentifier, List[UsbHub]], dict())
+        self._cache = cast(Dict[UsbIdentifier, List[UsbHub]], {})
         self._ids_cache = cast(Set[UsbIdentifier], set())
         controllers = self._list_usb_controller_ids()
         for usb_device in self._iterate_over_hubs():
@@ -61,7 +59,7 @@ class SystemUsbDeviceInformation:
             )
             if usb_id in controllers:
                 continue
-            entry = self._cache.get(usb_id, list())
+            entry = self._cache.get(usb_id, [])
             entry.append(cast(UsbHub, usb_device))
             self._cache[usb_id] = entry
 
@@ -78,10 +76,10 @@ class SystemUsbDeviceInformation:
 
     def get_usb_devices(self, uid: UsbIdentifier) -> List[UsbHub]:
         """Gets all USB devices related to an identifier."""
-        return self.usb_devices.get(uid, list())
+        return self.usb_devices.get(uid, [])
 
-    def usb_device_ids(self) -> List[UsbIdentifier]:
+    def usb_device_ids(self) -> Set[UsbIdentifier]:
         """Gets system usb device IDs."""
         if not self._ids_cache:
             self._load()
-        return cast(List[UsbIdentifier], self._ids_cache)
+        return cast(Set[UsbIdentifier], self._ids_cache)

@@ -7,10 +7,12 @@
 from pathlib import Path
 from typing import List
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.base_detector import DeviceDetector
 from mbed_tools.devices._internal.candidate_device import CandidateDevice
 from mbed_tools.devices._internal.windows.system_data_loader import SystemDataLoader
-from mbed_tools.devices._internal.windows.usb_data_aggregation import SystemUsbData, AggregatedUsbData
+from mbed_tools.devices._internal.windows.usb_data_aggregation import AggregatedUsbData, SystemUsbData
 
 
 class WindowsDeviceDetector(DeviceDetector):
@@ -20,6 +22,7 @@ class WindowsDeviceDetector(DeviceDetector):
         """Initialiser."""
         self._data_loader = SystemDataLoader()
 
+    @override
     def find_candidates(self) -> List[CandidateDevice]:
         """Return a generator of Candidates."""
         return [

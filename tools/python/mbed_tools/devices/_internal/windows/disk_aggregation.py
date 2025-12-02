@@ -2,7 +2,8 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Data aggregation about a disk on Windows.
+"""
+Data aggregation about a disk on Windows.
 
 On Windows, information about disk drive is scattered around Physical disks,
 Partitions and Logical Drives.
@@ -10,20 +11,21 @@ This file tries to reconcile all these pieces of information so that it is prese
 as a single object: AggregatedDiskData.
 """
 
-from typing import List, Optional, Callable
-from typing import NamedTuple, cast
+from typing import Callable, List, NamedTuple, Optional, cast
+
+from typing_extensions import override
 
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 from mbed_tools.devices._internal.windows.component_descriptor_utils import retain_value_or_default
-from mbed_tools.devices._internal.windows.windows_identifier import WindowsUID
 from mbed_tools.devices._internal.windows.disk_drive import DiskDrive
 from mbed_tools.devices._internal.windows.disk_partition import DiskPartition
 from mbed_tools.devices._internal.windows.disk_partition_logical_disk_relationships import (
     DiskPartitionLogicalDiskRelationship,
 )
 from mbed_tools.devices._internal.windows.logical_disk import LogicalDisk
+from mbed_tools.devices._internal.windows.system_data_loader import ComponentsLoader, SystemDataLoader
 from mbed_tools.devices._internal.windows.volume_set import VolumeInformation, get_volume_information
-from mbed_tools.devices._internal.windows.system_data_loader import SystemDataLoader, ComponentsLoader
+from mbed_tools.devices._internal.windows.windows_identifier import WindowsUID
 
 
 class AggregatedDiskDataDefinition(NamedTuple):
@@ -56,6 +58,7 @@ class AggregatedDiskData(ComponentDescriptor):
         super().__init__(AggregatedDiskDataDefinition, win32_class_name="DiskDataAggregation")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the ID field."""
         return cast(str, self.get("label"))
@@ -105,29 +108,29 @@ class DiskDataAggregator:
         # Determines which physical disk the partition is on
         # See https://superuser.com/questions/1147218/on-which-physical-drive-is-this-logical-drive
         corresponding_physical = self._physical_disks.get(corresponding_partition.get("DiskIndex"), DiskDrive())
-        aggregatedData = AggregatedDiskData()
-        aggregatedData.set_data_values(
-            dict(
-                uid=corresponding_physical.uid,
-                label=logical_disk.component_id,
-                description=logical_disk.get("Description"),
-                free_space=logical_disk.get("FreeSpace"),
-                size=logical_disk.get("Size"),
-                partition_name=corresponding_partition.component_id,
-                partition_type=corresponding_partition.get("Type"),
-                volume_information=corresponding_volume_information,
-                caption=corresponding_physical.get("Caption"),
-                physical_disk_name=corresponding_physical.get("DeviceID"),
-                model=corresponding_physical.get("Model"),
-                interface_type=corresponding_physical.get("InterfaceType"),
-                media_type=corresponding_physical.get("MediaType"),
-                manufacturer=corresponding_physical.get("Manufacturer"),
-                serial_number=retain_value_or_default(corresponding_physical.get("SerialNumber")),
-                status=corresponding_physical.get("Status"),
-                pnp_device_id=corresponding_physical.get("PNPDeviceID"),
-            )
+        aggregated_data = AggregatedDiskData()
+        aggregated_data.set_data_values(
+            {
+                "uid": corresponding_physical.uid,
+                "label": logical_disk.component_id,
+                "description": logical_disk.get("Description"),
+                "free_space": logical_disk.get("FreeSpace"),
+                "size": logical_disk.get("Size"),
+                "partition_name": corresponding_partition.component_id,
+                "partition_type": corresponding_partition.get("Type"),
+                "volume_information": corresponding_volume_information,
+                "caption": corresponding_physical.get("Caption"),
+                "physical_disk_name": corresponding_physical.get("DeviceID"),
+                "model": corresponding_physical.get("Model"),
+                "interface_type": corresponding_physical.get("InterfaceType"),
+                "media_type": corresponding_physical.get("MediaType"),
+                "manufacturer": corresponding_physical.get("Manufacturer"),
+                "serial_number": retain_value_or_default(corresponding_physical.get("SerialNumber")),
+                "status": corresponding_physical.get("Status"),
+                "pnp_device_id": corresponding_physical.get("PNPDeviceID"),
+            }
         )
-        return aggregatedData
+        return aggregated_data
 
 
 class WindowsDiskDataAggregator(DiskDataAggregator):
@@ -136,15 +139,12 @@ class WindowsDiskDataAggregator(DiskDataAggregator):
     def __init__(self, data_loader: SystemDataLoader) -> None:
         """Initialiser."""
         super().__init__(
-            physical_disks={
-                d.Index: d  # type: ignore
-                for d in ComponentsLoader(data_loader, DiskDrive).element_generator()
-            },
+            physical_disks={d.index: d for d in ComponentsLoader(data_loader, DiskDrive).element_generator()},
             partition_disks={
                 p.component_id: p for p in ComponentsLoader(data_loader, DiskPartition).element_generator()
             },
             logical_partition_relationships={
-                r.logical_disk_id: r.disk_partition_id  # type: ignore
+                r.logical_disk_id: r.disk_partition_id
                 for r in ComponentsLoader(data_loader, DiskPartitionLogicalDiskRelationship).element_generator()
             },
             lookup_volume_information=lambda logical_disk: get_volume_information(logical_disk.component_id),
@@ -162,12 +162,12 @@ class SystemDiskInformation:
 
     def _load_data(self) -> None:
         aggregator = WindowsDiskDataAggregator(self._data_loader)
-        disk_data_by_serialnumber: dict = dict()  # The type is enforced so that mypy is happy.
-        disk_data_by_label = dict()
+        disk_data_by_serialnumber: dict = {}  # The type is enforced so that mypy is happy.
+        disk_data_by_label = {}
         for ld in ComponentsLoader(self._data_loader, LogicalDisk).element_generator():
-            aggregation = aggregator.aggregate(cast(LogicalDisk, ld))
+            aggregation = aggregator.aggregate(ld)
             key = aggregation.get("uid").presumed_serial_number
-            disk_data_list = disk_data_by_serialnumber.get(key, list())
+            disk_data_list = disk_data_by_serialnumber.get(key, [])
             disk_data_list.append(aggregation)
             disk_data_by_serialnumber[key] = disk_data_list
             disk_data_by_label[aggregation.get("label")] = aggregation
@@ -179,18 +179,18 @@ class SystemDiskInformation:
         """Gets system's disk data by serial number."""
         if not self._disk_data_by_serial_number:
             self._load_data()
-        return self._disk_data_by_serial_number if self._disk_data_by_serial_number else dict()
+        return self._disk_data_by_serial_number if self._disk_data_by_serial_number else {}
 
     @property
     def disk_data_by_label(self) -> dict:
         """Gets system's disk data by label."""
         if not self._disk_data_by_label:
             self._load_data()
-        return self._disk_data_by_label if self._disk_data_by_label else dict()
+        return self._disk_data_by_label if self._disk_data_by_label else {}
 
     def get_disk_information(self, uid: WindowsUID) -> List[AggregatedDiskData]:
         """Gets all disk information for a given UID."""
-        return self.disk_data_by_serial_number.get(uid.presumed_serial_number, list())
+        return self.disk_data_by_serial_number.get(uid.presumed_serial_number, [])
 
     def get_disk_information_by_label(self, label: str) -> AggregatedDiskData:
         """Gets all disk information for a given label."""

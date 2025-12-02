@@ -4,19 +4,25 @@
 #
 """Build configuration representation."""
 
+from __future__ import annotations
+
 import logging
-
 from collections import UserDict
-from typing import Any, Iterable, Hashable, List
-import pathlib
+from typing import Any, Hashable, Iterable, List
 
-from mbed_tools.build._internal.config.source import Override, ConfigSetting
+import typing_extensions
+
+if typing_extensions.TYPE_CHECKING:
+    import pathlib
+
+    from mbed_tools.build._internal.config.source import ConfigSetting, Override
 
 logger = logging.getLogger(__name__)
 
 
 class Config(UserDict):
-    """Mapping of config settings.
+    """
+    Mapping of config settings.
 
     This object understands how to populate the different 'config sections' which all have different rules for how the
     settings are collected.
@@ -26,8 +32,13 @@ class Config(UserDict):
     # List of JSON files used to create this config.  Dumped to CMake at the end of configuration
     # so that it can regenerate configuration if the JSONs change.
     # All paths will be relative to the Mbed program root directory, or absolute if outside said directory.
-    json_sources: List[pathlib.Path] = []
+    json_sources: List[pathlib.Path]
 
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
+        self.json_sources = []
+        super().__init__(**kwargs)
+
+    @typing_extensions.override
     def __setitem__(self, key: Hashable, item: Any) -> None:
         """Set an item based on its key."""
         if key == CONFIG_SECTION:
@@ -86,9 +97,10 @@ class Config(UserDict):
         for setting in config_settings:
             logger.debug("Adding config setting: '%s.%s'", setting.namespace, setting.name)
             if setting in self.data.get(CONFIG_SECTION, []):
-                raise ValueError(
+                msg = (
                     f"Setting {setting.namespace}.{setting.name} already defined. You cannot duplicate config settings!"
                 )
+                raise ValueError(msg)
 
         self.data[CONFIG_SECTION] = self.data.get(CONFIG_SECTION, []) + config_settings
 

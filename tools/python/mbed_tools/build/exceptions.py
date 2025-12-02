@@ -11,7 +11,7 @@ class MbedBuildError(ToolsError):
     """Base public exception for the mbed-build package."""
 
 
-class InvalidExportOutputDirectory(MbedBuildError):
+class InvalidExportOutputDirectoryError(MbedBuildError):
     """It is not possible to export to the provided output directory."""
 
 
@@ -23,5 +23,5 @@ class DeviceNotFoundError(MbedBuildError):
     """The requested device is not connected to your system."""
 
 
-class InvalidConfigOverride(MbedBuildError):
+class InvalidConfigOverrideError(MbedBuildError):
     """A given config setting was invalid."""

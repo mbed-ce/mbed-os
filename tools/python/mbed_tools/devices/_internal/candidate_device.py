@@ -5,8 +5,8 @@
 """Defines CandidateDevice model used for device detection."""
 
 from dataclasses import dataclass
-from typing import Optional, Tuple, Any, Union, cast
 from pathlib import Path
+from typing import Any, Optional, Tuple, Union, cast
 
 
 class CandidateDeviceError(ValueError):
@@ -24,6 +24,8 @@ class FilesystemMountpointError(CandidateDeviceError):
 class DataField:
     """CandidateDevice data attribute descriptor."""
 
+    name: str  # pyright: ignore[reportUninitializedInstanceVariable]
+
     def __set_name__(self, owner: object, name: str) -> None:
         """Sets the descriptor name, this is called by magic in the owners.__new__ method."""
         self.name = name
@@ -40,8 +42,9 @@ class USBDescriptorHex(DataField):
         """Prevent setting the descriptor to an empty or invalid hex value."""
         try:
             instance.__dict__[self.name] = _format_hex(value)
-        except ValueError:
-            raise USBDescriptorError(f"{self.name} cannot be an empty and must be valid hex.")
+        except ValueError as ex:
+            msg = f"{self.name} cannot be an empty and must be valid hex."
+            raise USBDescriptorError(msg) from ex
 
 
 class USBDescriptorString(DataField):
@@ -50,7 +53,8 @@ class USBDescriptorString(DataField):
     def __set__(self, instance: object, value: str) -> None:
         """Prevent setting the descriptor to a non-string or empty value."""
         if not value or not isinstance(value, str):
-            raise USBDescriptorError(f"{self.name} cannot be an empty field and must be a string.")
+            msg = f"{self.name} cannot be an empty field and must be a string."
+            raise USBDescriptorError(msg)
 
         instance.__dict__[self.name] = value
 
@@ -61,14 +65,16 @@ class FilesystemMountpoints(DataField):
     def __set__(self, instance: object, value: Union[tuple, list]) -> None:
         """Prevent setting the descriptor to a non-sequence or empty sequence value."""
         if not value or not isinstance(value, (list, tuple)):
-            raise FilesystemMountpointError(f"{self.name} must be set to a non-empty list or tuple.")
+            msg = f"{self.name} must be set to a non-empty list or tuple."
+            raise FilesystemMountpointError(msg)
 
         instance.__dict__[self.name] = tuple(value)
 
 
 @dataclass(frozen=True, order=True)
 class CandidateDevice:
-    """Valid candidate device connected to the host computer.
+    """
+    Valid candidate device connected to the host computer.
 
     We define a CandidateDevice as any USB mass storage device which mounts a filesystem.
     The device may or may not present a serial port.
@@ -81,15 +87,19 @@ class CandidateDevice:
         serial_port: Serial port associated with the device, this could be None.
     """
 
-    product_id: str = cast(str, USBDescriptorHex())
-    vendor_id: str = cast(str, USBDescriptorHex())
-    serial_number: str = cast(str, USBDescriptorString())
-    mount_points: Tuple[Path, ...] = cast(Tuple[Path], FilesystemMountpoints())
+    # Note: these classes (USBDescriptorHex, etc) are field classes that act like specific
+    # types but actually have additional validation triggered when they are set.
+    # So we have to lie to the type checker a bit.
+    product_id: str = cast(str, USBDescriptorHex())  # pyright: ignore[reportInvalidCast]
+    vendor_id: str = cast(str, USBDescriptorHex())  # pyright: ignore[reportInvalidCast]
+    serial_number: str = cast(str, USBDescriptorString())  # pyright: ignore[reportInvalidCast]
+    mount_points: Tuple[Path, ...] = cast(Tuple[Path], FilesystemMountpoints())  # pyright: ignore[reportInvalidCast]
     serial_port: Optional[str] = None
 
 
 def _format_hex(hex_value: str) -> str:
-    """Return hex value with a prefix.
+    """
+    Return hex value with a prefix.
 
     Accepts hex_value in prefixed (0xff) and unprefixed (ff) formats.
     """

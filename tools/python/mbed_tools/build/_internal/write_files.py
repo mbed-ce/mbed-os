@@ -5,11 +5,13 @@
 """Writes out files to specified locations."""
 
 import pathlib
-from mbed_tools.build.exceptions import InvalidExportOutputDirectory
+
+from mbed_tools.build.exceptions import InvalidExportOutputDirectoryError
 
 
 def write_file(file_path: pathlib.Path, file_contents: str) -> None:
-    """Writes out a string to a file.
+    """
+    Writes out a string to a file.
 
     If the intermediate directories to the output directory don't exist,
     this function will create them.
@@ -22,7 +24,8 @@ def write_file(file_path: pathlib.Path, file_contents: str) -> None:
     """
     output_directory = file_path.parent
     if output_directory.is_file():
-        raise InvalidExportOutputDirectory("Output directory cannot be a path to a file.")
+        msg = "Output directory cannot be a path to a file."
+        raise InvalidExportOutputDirectoryError(msg)
 
     output_directory.mkdir(parents=True, exist_ok=True)
-    file_path.write_text(file_contents)
+    _ = file_path.write_text(file_contents)

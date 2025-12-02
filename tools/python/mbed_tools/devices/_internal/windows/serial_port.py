@@ -2,7 +2,8 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Defines a Serial Port.
+"""
+Defines a Serial Port.
 
 On Windows, Win32_SerialPort only represents physical serial Ports and hence, USB connections are not listed.
 https://superuser.com/questions/835848/how-to-view-serial-com-ports-but-not-through-device-manager
@@ -14,7 +15,10 @@ https://serverfault.com/questions/398469/what-are-the-minimum-permissions-to-rea
 import re
 from typing import NamedTuple, cast
 
-from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor, UNKNOWN_VALUE
+from typing_extensions import override
+
+from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
+from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE
 
 CAPTION_PATTERN = re.compile(r"^.* [(](.*)[)]$")
 
@@ -26,7 +30,8 @@ def parse_caption(caption: str) -> str:
 
 
 class PnPEntityMsdnDefinition(NamedTuple):
-    """Msdn definition of a PnPEntity.
+    """
+    Msdn definition of a PnPEntity.
 
     See https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-pnpentity
     """
@@ -60,7 +65,8 @@ class PnPEntityMsdnDefinition(NamedTuple):
 
 
 class SerialPort(ComponentDescriptor):
-    """Serial Port as defined in Windows API.
+    """
+    Serial Port as defined in Windows API.
 
     As can be seen in Windows documentation,
     https://docs.microsoft.com/en-us/windows-hardware/drivers/install/system-defined-device-setup-classes-available-to-vendors#ports--com---lpt-ports--,
@@ -76,6 +82,7 @@ class SerialPort(ComponentDescriptor):
         )
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the device id field."""
         return cast(str, self.get("DeviceID"))

@@ -6,11 +6,14 @@
 
 from typing import NamedTuple, cast
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 
 
 class UsbHubMsdnDefinition(NamedTuple):
-    """Msdn definition of a Usb hub.
+    """
+    Msdn definition of a Usb hub.
 
     See https://docs.microsoft.com/en-gb/previous-versions/windows/desktop/cimwin32a/win32-usbhub?redirectedfrom=MSDN
     See also https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/cim-usbdevice
@@ -47,7 +50,8 @@ class UsbHubMsdnDefinition(NamedTuple):
 
 
 class UsbHub(ComponentDescriptor):
-    """USB Hub as defined in Windows API.
+    """
+    USB Hub as defined in Windows API.
 
     See https://docs.microsoft.com/en-gb/previous-versions/windows/desktop/cimwin32a/win32-usbhub?redirectedfrom=MSDN
     Seems similar to https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/cim-usbhub
@@ -58,6 +62,7 @@ class UsbHub(ComponentDescriptor):
         super().__init__(UsbHubMsdnDefinition, win32_class_name="Win32_USBHub")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the device id field."""
         return cast(str, self.get("DeviceID"))

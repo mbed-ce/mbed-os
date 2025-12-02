@@ -185,14 +185,14 @@ class TestRemoveAttributeElement(TestCase):
         current_attribute_state = {"attribute_1": ["ONE", "TWO=2", "THREE"]}
         elements_to_remove = ["ONE", "THREE"]
         expected_result = {"attribute_1": ["TWO=2"]}
-        result = _remove_attribute_element(current_attribute_state, "attribute_1", elements_to_remove)
+        _remove_attribute_element(current_attribute_state, "attribute_1", elements_to_remove)
 
-        self.assertEqual(result, expected_result)
+        self.assertEqual(current_attribute_state, expected_result)
 
     def test_remove_element_with_numbers(self):
         current_attribute_state = {"attribute_1": ["ONE", "TWO=2", "THREE"]}
         elements_to_remove = ["TWO"]
         expected_result = {"attribute_1": ["ONE", "THREE"]}
-        result = _remove_attribute_element(current_attribute_state, "attribute_1", elements_to_remove)
+        _remove_attribute_element(current_attribute_state, "attribute_1", elements_to_remove)
 
-        self.assertEqual(result, expected_result)
+        self.assertEqual(current_attribute_state, expected_result)

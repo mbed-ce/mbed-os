@@ -8,14 +8,19 @@ SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
 import collections
-
-from SCons.Environment import Base as Environment
 import pathlib
-import click
+import typing
+from typing import TYPE_CHECKING, Sequence
+
+from click.parser import split_arg_string
+
+if TYPE_CHECKING:
+    from SCons.Environment import Base as Environment
+    from SCons.Node import NodeList
 
 
 def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
-    def _normalize_define(define_string):
+    def _normalize_define(define_string: str) -> tuple[str, str]:
         define_string = define_string.strip()
         if "=" in define_string:
             define, value = define_string.split("=", maxsplit=1)
@@ -24,7 +29,10 @@ def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
             elif '"' in value and not value.startswith("\\"):
                 value = value.replace('"', '\\"')
             return define, value
-        return define_string
+
+        # If a define is passed without a value on the command line it gets set equal to 1 by the compiler.
+        # We can replicate that behavior here to turn every define into a key-value pair.
+        return define_string, "1"
 
     result = [_normalize_define(d.get("define", "")) for d in compile_group.get("defines", []) if d]
 
@@ -46,8 +54,8 @@ def prepare_build_envs(target_json: dict, default_env: Environment) -> list[Envi
     target_compile_groups = target_json.get("compileGroups", [])
     if not target_compile_groups:
         print(
-            "Warning! The `%s` component doesn't register any source files. "
-            "Check if sources are set in component's CMakeLists.txt!" % target_json["name"]
+            f"Warning! The `{target_json['name']}` component doesn't register any source files. "
+            "Check if sources are set in component's CMakeLists.txt!"
         )
 
     for cg in target_compile_groups:
@@ -83,6 +91,7 @@ def compile_source_files(
 ) -> list:
     """
     Generates SCons rules to compile the source files in a target.
+
     Returns list of object files to build.
 
     :param framework_dir: Path to the Mbed CE framework source
@@ -106,9 +115,8 @@ def compile_source_files(
             elif src_path.is_relative_to(framework_dir):
                 obj_path = (framework_obj_dir / src_path.relative_to(framework_dir)).with_suffix(".o")
             else:
-                raise RuntimeError(
-                    f"Source path {src_path!s} outside of project source dir and framework dir, don't know where to save object file!"
-                )
+                msg = f"Source path {src_path!s} outside of project source dir and framework dir, don't know where to save object file!"
+                raise RuntimeError(msg)
 
             env = build_envs[compile_group_idx]
 
@@ -128,7 +136,7 @@ def build_library(
     project_src_dir: pathlib.Path,
     framework_dir: pathlib.Path,
     framework_obj_dir: pathlib.Path,
-):
+) -> NodeList:
     lib_name = lib_config["nameOnDisk"]
     lib_path = lib_config["paths"]["build"]
     lib_objects = compile_source_files(lib_config, default_env, project_src_dir, framework_dir, framework_obj_dir)
@@ -147,15 +155,15 @@ def _get_flags_for_compile_group(compile_group_json: dict) -> list[str]:
         fragment = ccfragment.get("fragment", "").strip()
         if not fragment or fragment.startswith("-D"):
             continue
-        flags.extend(click.parser.split_arg_string(fragment))
+        flags.extend(split_arg_string(fragment))
     return flags
 
 
-def extract_flags(target_json: dict) -> dict[str, list[str]]:
+def extract_flags(target_json: dict) -> dict[str, list[str] | None]:
     """
     Returns a dictionary with flags for SCons based on a given CMake target
     """
-    default_flags = collections.defaultdict(list)
+    default_flags: dict[str, list[str]] = collections.defaultdict(list)
     for cg in target_json["compileGroups"]:
         default_flags[cg["language"]].extend(_get_flags_for_compile_group(cg))
 
@@ -169,12 +177,12 @@ def extract_flags(target_json: dict) -> dict[str, list[str]]:
 
 def find_included_files(environment: Environment) -> set[str]:
     """
-    Process a list of flags produced by extract_flags() to find files manually included by '-include'
+    Process an environment produced by prepare_build_envs() to find files manually included by '-include'
     """
     result = set()
     for flag_var in ["CFLAGS", "CXXFLAGS", "CCFLAGS"]:
-        language_flags = environment.get(flag_var)
-        for index in range(0, len(language_flags)):
+        language_flags = typing.cast(Sequence[str], environment.get(flag_var))
+        for index in range(len(language_flags)):
             if language_flags[index] == "-include" and index < len(language_flags) - 1:
                 result.add(language_flags[index + 1])
     return result
@@ -201,7 +209,6 @@ def extract_link_args(target_json: dict) -> list[str]:
     """
     Extract the linker flags from a CMake target
     """
-
     result = []
 
     for f in target_json.get("link", {}).get("commandFragments", []):
@@ -209,7 +216,7 @@ def extract_link_args(target_json: dict) -> list[str]:
         fragment_role = f.get("role", "").strip()
         if not fragment or not fragment_role:
             continue
-        args = click.parser.split_arg_string(fragment)
+        args = split_arg_string(fragment)
         if fragment_role == "flags":
             result.extend(args)
 

@@ -4,18 +4,10 @@
 #
 """Objects representing Mbed program and library data."""
 
-import json
 import logging
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
-
-from mbed_tools.project._internal.render_templates import (
-    render_cmakelists_template,
-    render_main_cpp_template,
-    render_gitignore_template,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +35,8 @@ DEFAULT_APP_CONFIG = {"target_overrides": {"K64F": {"platform.stdio-baud-rate": 
 
 @dataclass
 class MbedProgramFiles:
-    """Files defining an MbedProgram.
+    """
+    Files defining an MbedProgram.
 
     This object holds paths to the various files which define an MbedProgram.
 
@@ -64,44 +57,9 @@ class MbedProgramFiles:
     custom_targets_json: Path
 
     @classmethod
-    def from_new(cls, root_path: Path) -> "MbedProgramFiles":
-        """Create MbedProgramFiles from a new directory.
-
-        A "new directory" in this context means it doesn't already contain an Mbed program.
-
-        Args:
-            root_path: The directory in which to create the program data files.
-
-        Raises:
-            ValueError: A program .mbed or mbed-os.lib file already exists at this path.
-        """
-        app_config = root_path / APP_CONFIG_FILE_NAME_JSON5
-        mbed_os_ref = root_path / MBED_OS_REFERENCE_FILE_NAME
-        cmakelists_file = root_path / CMAKELISTS_FILE_NAME
-        main_cpp = root_path / MAIN_CPP_FILE_NAME
-        gitignore = root_path / ".gitignore"
-        cmake_build_dir = root_path / BUILD_DIR
-        custom_targets_json = root_path / CUSTOM_TARGETS_JSON_FILE_NAME
-
-        if mbed_os_ref.exists():
-            raise ValueError(f"Program already exists at path {root_path}.")
-
-        app_config.write_text(json.dumps(DEFAULT_APP_CONFIG, indent=4))
-        mbed_os_ref.write_text(f"{MBED_OS_REFERENCE_URL}#{MBED_OS_REFERENCE_ID}")
-        render_cmakelists_template(cmakelists_file, root_path.stem)
-        render_main_cpp_template(main_cpp)
-        render_gitignore_template(gitignore)
-        return cls(
-            app_config_file=app_config,
-            mbed_os_ref=mbed_os_ref,
-            cmakelists_file=cmakelists_file,
-            cmake_build_dir=cmake_build_dir,
-            custom_targets_json=custom_targets_json,
-        )
-
-    @classmethod
     def from_existing(cls, root_path: Path, build_dir: Path) -> "MbedProgramFiles":
-        """Create MbedProgramFiles from a directory containing an existing program.
+        """
+        Create MbedProgramFiles from a directory containing an existing program.
 
         Args:
             root_path: The path containing the MbedProgramFiles.
@@ -112,8 +70,6 @@ class MbedProgramFiles:
             app_config = root_path / APP_CONFIG_FILE_NAME_JSON5
         elif (root_path / APP_CONFIG_FILE_NAME_JSON).exists():
             app_config = root_path / APP_CONFIG_FILE_NAME_JSON
-        else:
-            logger.info("This program does not contain an mbed_app.json config file.")
 
         # If there's already a custom_targets.json5, use that.
         # Otherwise, assume json.
@@ -139,7 +95,8 @@ class MbedProgramFiles:
 
 @dataclass
 class MbedOS:
-    """Metadata associated with a copy of MbedOS.
+    """
+    Metadata associated with a copy of MbedOS.
 
     This object holds information about MbedOS used by MbedProgram.
 
@@ -159,13 +116,16 @@ class MbedOS:
         cmsis_mcu_descriptions_json_file = root_path / CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH
 
         if check_root_path_exists and not root_path.exists():
-            raise ValueError("The mbed-os directory does not exist.")
+            msg = "The mbed-os directory does not exist."
+            raise ValueError(msg)
 
         if root_path.exists() and not targets_json_file.exists():
-            raise ValueError(f"This MbedOS copy does not contain a {TARGETS_JSON_FILE_PATH} file.")
+            msg = f"This MbedOS copy does not contain a {TARGETS_JSON_FILE_PATH} file."
+            raise ValueError(msg)
 
         if root_path.exists() and not cmsis_mcu_descriptions_json_file.exists():
-            raise ValueError(f"This MbedOS copy does not contain a {CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH.name} file.")
+            msg = f"This MbedOS copy does not contain a {CMSIS_MCU_DESCRIPTIONS_JSON_FILE_PATH.name} file."
+            raise ValueError(msg)
 
         return cls(
             root=root_path,

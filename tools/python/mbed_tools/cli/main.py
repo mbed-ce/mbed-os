@@ -7,59 +7,39 @@
 import logging
 import sys
 
-from typing import Union, Any
-
 import click
+from typing_extensions import override
 
-from mbed_tools.lib.logging import set_log_level, MbedToolsHandler
-
+from mbed_tools.cli.cmsis_mcu_descr import cmsis_mcu_descr
 from mbed_tools.cli.configure import configure
 from mbed_tools.cli.list_connected_devices import list_connected_devices
-from mbed_tools.cli.project_management import new, import_, deploy
 from mbed_tools.cli.sterm import sterm
-from mbed_tools.cli.cmsis_mcu_descr import cmsis_mcu_descr
+from mbed_tools.lib.logging import MbedToolsHandler, set_log_level
 
-CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
+CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 LOGGER = logging.getLogger(__name__)
 
 
 class GroupWithExceptionHandling(click.Group):
     """A click.Group which handles ToolsErrors and logging."""
 
-    def invoke(self, context: click.Context) -> None:
-        """Invoke the command group.
+    @override
+    def invoke(self, ctx: click.Context) -> None:
+        """
+        Invoke the command group.
 
         Args:
-            context: The current click context.
+            ctx: The current click context.
         """
         # Use the context manager to ensure tools exceptions (expected behaviour) are shown as messages to the user,
         # but all other exceptions (unexpected behaviour) are shown as errors.
-        with MbedToolsHandler(LOGGER, context.params["traceback"]) as handler:
-            super().invoke(context)
+        with MbedToolsHandler(LOGGER, ctx.params["traceback"]) as handler:
+            super().invoke(ctx)
 
         sys.exit(handler.exit_code)
 
 
-def print_version(context: click.Context, param: Union[click.Option, click.Parameter], value: bool) -> Any:
-    """Print the version of mbed-tools."""
-    if not value or context.resilient_parsing:
-        return
-
-    # Mbed CE: changed this to be hardcoded for now.
-    version_string = "7.60.0"
-    click.echo(version_string)
-    context.exit()
-
-
 @click.group(cls=GroupWithExceptionHandling, context_settings=CONTEXT_SETTINGS)
-@click.option(
-    "--version",
-    is_flag=True,
-    callback=print_version,
-    expose_value=False,
-    is_eager=True,
-    help="Display versions of all Mbed Tools packages.",
-)
 @click.option(
     "-v",
     "--verbose",
@@ -70,14 +50,15 @@ def print_version(context: click.Context, param: Union[click.Option, click.Param
 @click.option("-t", "--traceback", is_flag=True, show_default=True, help="Show a traceback when an error is raised.")
 def cli(verbose: int, traceback: bool) -> None:
     """Command line tool for interacting with Mbed OS."""
+    # note: traceback parameter not used here but is accessed through
+    # click.context.params in GroupWithExceptionHandling
+    del traceback
+
     set_log_level(verbose)
 
 
 cli.add_command(configure, "configure")
 cli.add_command(list_connected_devices, "detect")
-cli.add_command(new, "new")
-cli.add_command(deploy, "deploy")
-cli.add_command(import_, "import")
 cli.add_command(sterm, "sterm")
 cli.add_command(cmsis_mcu_descr)
 

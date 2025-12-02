@@ -8,7 +8,7 @@ import pytest
 
 
 from mbed_tools.project import MbedProgram
-from mbed_tools.project.exceptions import ExistingProgram, ProgramNotFound, MbedOSNotFound
+from mbed_tools.project.exceptions import ExistingProgramError, ProgramNotFoundError, MbedOSNotFoundError
 from mbed_tools.project.mbed_program import _find_program_root, parse_url
 from mbed_tools.project._internal.project_data import MbedProgramFiles, BUILD_DIR
 from python_tests.mbed_tools.project.factories import make_mbed_program_files, make_mbed_os_files
@@ -25,66 +25,19 @@ def from_new_set_target_toolchain(program_root):
 
 
 class TestInitialiseProgram:
-    def test_from_new_local_dir_raises_if_path_is_existing_program(self, tmp_path):
-        program_root = pathlib.Path(tmp_path, "programfoo")
-        program_root.mkdir()
-        (program_root / "mbed-os.lib").touch()
-
-        with pytest.raises(ExistingProgram):
-            MbedProgram.from_new(program_root)
-
-    def test_from_new_local_dir_generates_valid_program_creating_directory(self, tmp_path):
-        fs_root = pathlib.Path(tmp_path, "foo")
-        fs_root.mkdir()
-        program_root = fs_root / "programfoo"
-
-        program = from_new_set_target_toolchain(program_root)
-
-        assert program.files == MbedProgramFiles.from_existing(
-            program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR
-        )
-
-    def test_from_new_local_dir_generates_valid_program_creating_directory_in_cwd(self, tmp_path):
-        old_cwd = os.getcwd()
-        try:
-            fs_root = pathlib.Path(tmp_path, "foo")
-            fs_root.mkdir()
-            os.chdir(fs_root)
-            program_root = pathlib.Path("programfoo")
-
-            program = from_new_set_target_toolchain(program_root)
-
-            assert program.files == MbedProgramFiles.from_existing(
-                program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR
-            )
-        finally:
-            os.chdir(old_cwd)
-
-    def test_from_new_local_dir_generates_valid_program_existing_directory(self, tmp_path):
-        fs_root = pathlib.Path(tmp_path, "foo")
-        fs_root.mkdir()
-        program_root = fs_root / "programfoo"
-        program_root.mkdir()
-
-        program = from_new_set_target_toolchain(program_root)
-
-        assert program.files == MbedProgramFiles.from_existing(
-            program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR
-        )
-
     def test_from_existing_raises_if_path_is_not_a_program(self, tmp_path):
         fs_root = pathlib.Path(tmp_path, "foo")
         fs_root.mkdir()
         program_root = fs_root / "programfoo"
 
-        with pytest.raises(ProgramNotFound):
+        with pytest.raises(ProgramNotFoundError):
             MbedProgram.from_existing(program_root, program_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR)
 
     def test_from_existing_raises_if_no_mbed_os_dir_found_and_check_mbed_os_is_true(self, tmp_path):
         fs_root = pathlib.Path(tmp_path, "foo")
         make_mbed_program_files(fs_root)
 
-        with pytest.raises(MbedOSNotFound):
+        with pytest.raises(MbedOSNotFoundError):
             MbedProgram.from_existing(fs_root, fs_root / BUILD_DIR / DEFAULT_BUILD_SUBDIR, check_mbed_os=True)
 
     def test_from_existing_returns_valid_program(self, tmp_path):
@@ -151,5 +104,5 @@ class TestFindProgramRoot:
         program_root = pathlib.Path(tmp_path, "foo")
         program_root.mkdir()
 
-        with pytest.raises(ProgramNotFound):
+        with pytest.raises(ProgramNotFoundError):
             _find_program_root(program_root)

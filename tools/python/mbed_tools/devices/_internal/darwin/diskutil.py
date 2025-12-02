@@ -4,11 +4,13 @@
 #
 """Interactions with `diskutil`."""
 
+from __future__ import annotations
+
 import plistlib
 import subprocess
 from typing import Dict, Iterable, List, Optional, cast
-from typing_extensions import TypedDict
 
+from typing_extensions import TypedDict
 
 VolumeTree = Dict  # mypy does not work with recursive types, which nested "Partitions" would require
 
@@ -20,9 +22,9 @@ class Volume(TypedDict, total=False):
     DeviceIdentifier: str  # example: disk2
 
 
-def get_all_external_disks_data() -> List[VolumeTree]:
+def get_all_external_disks_data() -> List[Volume | VolumeTree]:
     """Returns parsed output of `diskutil` call, fetching only information of interest."""
-    output = subprocess.check_output(["diskutil", "list", "-plist", "external"], stderr=subprocess.DEVNULL)
+    output = subprocess.check_output(["/usr/sbin/diskutil", "list", "-plist", "external"], stderr=subprocess.DEVNULL)
     if output:
         data: Dict = plistlib.loads(output)
         return data.get("AllDisksAndPartitions", [])
@@ -30,7 +32,8 @@ def get_all_external_disks_data() -> List[VolumeTree]:
 
 
 def get_all_external_volumes_data() -> List[Volume]:
-    """Returns all external volumes data.
+    """
+    Returns all external volumes data.
 
     Reduces structure returned by `diskutil` call to one which will only contain data about Volumes.
     Useful for determining MountPoints and DeviceIdentifiers.
@@ -56,8 +59,9 @@ def get_mount_point(device_identifier: str) -> Optional[str]:
     return None
 
 
-def _filter_volumes(data: Iterable[VolumeTree]) -> List[Volume]:
-    """Flattens the structure returned by `diskutil` call.
+def _filter_volumes(data: Iterable[VolumeTree | Volume]) -> List[Volume]:
+    """
+    Flattens the structure returned by `diskutil` call.
 
     Expected input will contain both partitioned an unpartitioned devices.
     Partitioned devices list mounted partitions under an arbitrary key,

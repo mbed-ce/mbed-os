@@ -4,12 +4,17 @@
 #
 """Command to generate the application CMake configuration script used by the build/compile system."""
 
+from __future__ import annotations
+
+import logging
 import pathlib
 
 import click
 
-from mbed_tools.project import MbedProgram
 from mbed_tools.build import generate_config
+from mbed_tools.project import MbedProgram
+
+logger = logging.getLogger(__name__)
 
 
 @click.command(
@@ -44,12 +49,13 @@ def configure(
     toolchain: str,
     mbed_target: str,
     program_path: str,
-    mbed_os_path: str,
+    mbed_os_path: str | None,
     output_dir: pathlib.Path,
-    custom_targets_json: str,
-    app_config: str,
+    custom_targets_json: str | None,
+    app_config: str | None,
 ) -> None:
-    """Exports a mbed_config.cmake file to build directory in the program root.
+    """
+    Exports a mbed_config.cmake file to build directory in the program root.
 
     The parameters set in the CMake file will be dependent on the combination of
     toolchain and Mbed target provided and these can then control which parts of
@@ -78,6 +84,9 @@ def configure(
     if app_config is not None:
         program.files.app_config_file = pathlib.Path(app_config)
 
+    if program.files.app_config_file is None:
+        logger.info("This program does not contain an mbed_app.json config file.")
+
     mbed_target = mbed_target.upper()
     _, output_path = generate_config(mbed_target, toolchain, program)
-    click.echo(f"mbed_config.cmake has been generated and written to '{str(output_path.resolve())}'")
+    click.echo(f"mbed_config.cmake has been generated and written to '{output_path.resolve()!s}'")

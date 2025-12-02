@@ -1036,6 +1036,15 @@
         "mbed_enabled": []
     },
     {
+        "board_type": "CY8CPROTO_062S3_4343W",
+        "board_name": "PSoC 62S3 Wi-Fi BT Prototyping Kit",
+        "product_code": "190E",
+        "target_type": "platform",
+        "slug": "CY8CPROTO-062S3-4343W",
+        "build_variant": [],
+        "mbed_enabled": []
+    },
+    {
         "board_type": "RHOMBIO_L476DMW1K",
         "board_name": "RHOMBIO L476DMW1K",
         "product_code": "1500",

@@ -16,4 +16,3 @@ class DeviceDetector(ABC):
     @abstractmethod
     def find_candidates(self) -> List[CandidateDevice]:
         """Returns CandidateDevices."""
-        pass

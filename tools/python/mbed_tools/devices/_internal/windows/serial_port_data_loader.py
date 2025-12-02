@@ -4,11 +4,11 @@
 #
 """Loads serial port data."""
 
-from typing import Optional, Generator, cast, List
+from typing import List, Optional
 
-from mbed_tools.devices._internal.windows.system_data_loader import SystemDataLoader, ComponentsLoader
-from mbed_tools.devices._internal.windows.usb_device_identifier import UsbIdentifier, parse_device_id
 from mbed_tools.devices._internal.windows.serial_port import SerialPort
+from mbed_tools.devices._internal.windows.system_data_loader import ComponentsLoader, SystemDataLoader
+from mbed_tools.devices._internal.windows.usb_device_identifier import UsbIdentifier, parse_device_id
 
 
 class SystemSerialPortInformation:
@@ -21,10 +21,7 @@ class SystemSerialPortInformation:
 
     def _load_data(self) -> None:
         self._serial_port_by_usb_id = {
-            parse_device_id(p.pnp_id): p
-            for p in cast(
-                Generator[SerialPort, None, None], ComponentsLoader(self._data_loader, SerialPort).element_generator()
-            )
+            parse_device_id(p.pnp_id): p for p in ComponentsLoader(self._data_loader, SerialPort).element_generator()
         }
 
     @property
@@ -32,9 +29,9 @@ class SystemSerialPortInformation:
         """Gets system's serial ports by usb id."""
         if not self._serial_port_by_usb_id:
             self._load_data()
-        return self._serial_port_by_usb_id if self._serial_port_by_usb_id else dict()
+        return self._serial_port_by_usb_id if self._serial_port_by_usb_id else {}
 
     def get_serial_port_information(self, usb_id: UsbIdentifier) -> List[SerialPort]:
         """Gets all disk information for a given serial number."""
         port = self.serial_port_data_by_id.get(usb_id)
-        return [port] if port else list()
+        return [port] if port else []

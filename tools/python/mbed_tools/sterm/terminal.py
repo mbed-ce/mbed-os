@@ -2,7 +2,8 @@
 # Copyright (c) 2020-2021 Arm Limited and Contributors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-"""Serial terminal implementation based on pyserial.tools.miniterm.
+"""
+Serial terminal implementation based on pyserial.tools.miniterm.
 
 The Mbed serial terminal makes the following modifications to the default Miniterm.
 * Custom help menu text
@@ -13,14 +14,18 @@ The Mbed serial terminal makes the following modifications to the default Minite
 To start the terminal clients should call the "run" function, this is the entry point to the module.
 """
 
+import codecs
+import typing
 from typing import Any
 
 from serial import Serial
 from serial.tools.miniterm import Miniterm
+from typing_extensions import override
 
 
 def run(port: str, baud: int, echo: bool = True) -> None:
-    """Run the serial terminal.
+    """
+    Run the serial terminal.
 
     This function is blocking as it waits for the terminal thread to finish executing before returning.
 
@@ -29,7 +34,7 @@ def run(port: str, baud: int, echo: bool = True) -> None:
         baud: Serial baud rate.
         echo: Echo user input back to the console.
     """
-    term = SerialTerminal(Serial(port=port, baudrate=str(baud)), echo=echo)
+    term = SerialTerminal(Serial(port=port, baudrate=baud), echo=echo)
     term.start()
 
     try:
@@ -42,7 +47,8 @@ def run(port: str, baud: int, echo: bool = True) -> None:
 
 
 class SerialTerminal(Miniterm):
-    """An implementation of Miniterm that implements the additional Mbed terminal functionality.
+    """
+    An implementation of Miniterm that implements the additional Mbed terminal functionality.
 
     Overrides the `writer` method to implement modified menu key handling behaviour.
     Overrides the Miniterm::get_help_text method to return the Mbed custom help text.
@@ -52,21 +58,23 @@ class SerialTerminal(Miniterm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Set the rx/tx encoding and special characters."""
         super().__init__(*args, **kwargs)
-        self.exit_character = CTRL_C
-        self.menu_character = CTRL_T
-        self.reset_character = CTRL_B
-        self.help_character = CTRL_H
+        self.exit_character: str = CTRL_C
+        self.menu_character: str = CTRL_T
+        self.reset_character: str = CTRL_B
+        self.help_character: str = CTRL_H
         self.set_rx_encoding("UTF-8")
         self.set_tx_encoding("UTF-8")
 
     def reset(self) -> None:
         """Send a reset signal."""
-        self.serial.sendBreak()
+        self.serial.send_break()
 
+    @override
     def get_help_text(self) -> str:
         """Return the text displayed when the user requests help."""
         return HELP_TEXT
 
+    @override
     def writer(self) -> None:
         """Implements terminal behaviour."""
         menu_active = False
@@ -75,6 +83,9 @@ class SerialTerminal(Miniterm):
                 input_key = self.console.getkey()
             except KeyboardInterrupt:
                 input_key = self.exit_character
+
+            if input_key is None:
+                continue
 
             if (menu_active and input_key in VALID_MENU_KEYS) or (input_key == self.help_character):
                 self.handle_menu_key(input_key)
@@ -100,7 +111,8 @@ class SerialTerminal(Miniterm):
         for transformation in self.tx_transformations:
             text = transformation.tx(text)
 
-        self.serial.write(self.tx_encoder.encode(text))
+        encoder = typing.cast(codecs.IncrementalEncoder, self.tx_encoder)
+        _ = self.serial.write(encoder.encode(text))
 
     def _echo_transformed_char(self, text: str) -> None:
         for transformation in self.tx_transformations:

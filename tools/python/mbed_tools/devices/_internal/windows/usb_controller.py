@@ -6,11 +6,14 @@
 
 from typing import NamedTuple, cast
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 
 
 class UsbControllerMsdnDefinition(NamedTuple):
-    """Msdn definition of a USB controller.
+    """
+    Msdn definition of a USB controller.
 
     See https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-usbcontroller?redirectedfrom=MSDN
     Similar to https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-usbcontrollerdevice
@@ -42,7 +45,8 @@ class UsbControllerMsdnDefinition(NamedTuple):
 
 
 class UsbController(ComponentDescriptor):
-    """USB Controller as defined in Windows API.
+    """
+    USB Controller as defined in Windows API.
 
     See https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-usbcontroller?redirectedfrom=MSDN
     Similar to https://docs.microsoft.com/en-gb/windows/win32/cimwin32prov/win32-usbcontrollerdevice
@@ -53,6 +57,7 @@ class UsbController(ComponentDescriptor):
         super().__init__(UsbControllerMsdnDefinition, win32_class_name="Win32_USBController")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the device id field."""
         return cast(str, self.get("DeviceID"))

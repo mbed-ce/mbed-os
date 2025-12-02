@@ -31,11 +31,3 @@ class TestClickGroupWithExceptionHandling(TestCase):
 
         self.assertEqual(1, result.exit_code)
         logger_error.assert_called_once()
-
-
-class TestVersionCommand(TestCase):
-    def test_version_command(self):
-        runner = CliRunner()
-        result = runner.invoke(main.cli, ["--version"])
-        self.assertTrue(result.output)
-        self.assertEqual(0, result.exit_code)

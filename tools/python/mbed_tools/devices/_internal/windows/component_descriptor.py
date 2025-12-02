@@ -6,10 +6,11 @@
 
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Any, Generator, Optional, NamedTuple, cast
+from typing import Any, Generator, List, NamedTuple, Optional, cast
 
-import pythoncom
-import win32com.client
+import pythoncom  # pyright: ignore[reportMissingModuleSource]
+import win32com.client  # pyright: ignore[reportMissingModuleSource]
+from typing_extensions import override
 
 from mbed_tools.devices._internal.windows.component_descriptor_utils import UNKNOWN_VALUE, is_undefined_data_object
 
@@ -21,8 +22,9 @@ logger = logging.getLogger(__name__)
 class ComponentDescriptor(ABC):
     """Win32 component descriptor."""
 
-    def __init__(self, win32_definition: type, win32_class_name: str, win32_filter: Optional[str] = None):
-        """Initialiser.
+    def __init__(self, win32_definition: type, win32_class_name: str, win32_filter: Optional[str] = None) -> None:
+        """
+        Initialiser.
 
         Args:
             win32_definition: definition of the Windows component as defined in MSDN.
@@ -51,7 +53,7 @@ class ComponentDescriptor(ABC):
     @property
     def field_names(self) -> List[str]:
         """Returns the names of all the fields of the descriptor."""
-        return [k for k in getattr(self._win32_definition, NAMED_TUPLE_FIELDS_ATTRIBUTE)]
+        return list(getattr(self._win32_definition, NAMED_TUPLE_FIELDS_ATTRIBUTE))
 
     @property
     @abstractmethod
@@ -60,7 +62,8 @@ class ComponentDescriptor(ABC):
 
     @property
     def win32_filter(self) -> Optional[str]:
-        """Filter applied on a Win32 category.
+        """
+        Filter applied on a Win32 category.
 
         For instance, the current component can be a subclass/subcategory of a component exposed by Win32.
         """
@@ -83,6 +86,7 @@ class ComponentDescriptor(ABC):
             logger.debug(f"Attribute [{field_name}] is undefined on this instance {self}: {e}")
             return UNKNOWN_VALUE
 
+    @override
     def __str__(self) -> str:
         """String representation."""
         values = {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
@@ -105,7 +109,7 @@ class Win32Wrapper:
     def _read_cdispatch_fields(self, win32_element: Any, element_fields_list: List[str]) -> dict:
         """Reads all the fields from a cdispatch object returned by pywin32."""
         if not win32_element:
-            return dict()
+            return {}
         return {k: self._read_cdispatch_field(win32_element, k) for k in element_fields_list}
 
     def _read_cdispatch_field(self, win32_element: Any, key: str) -> Any:
@@ -124,9 +128,10 @@ class Win32Wrapper:
 
     def _get_list_iterator(self, win32_class_name: str, list_filter: Optional[str]) -> Generator[Any, None, None]:
         if list_filter:
-            query = f"Select * from {win32_class_name} where {list_filter}"
-            return self.wmi.ExecQuery(query)  # type: ignore
-        return self.wmi.InstancesOf(win32_class_name)  # type: ignore
+            # Note: This is a WQL query, not true SQL, and there does not appear to be a way to bind parameters.
+            query = f"Select * from {win32_class_name} where {list_filter}"  # noqa: S608
+            return self.wmi.ExecQuery(query)
+        return self.wmi.InstancesOf(win32_class_name)
 
     def element_generator(
         self, to_cls: type, win32_class_name: str, list_filter: Optional[str]
@@ -139,7 +144,7 @@ class Win32Wrapper:
 class ComponentDescriptorWrapper:
     """Wraps a component descriptor."""
 
-    def __init__(self, cls: type):
+    def __init__(self, cls: type) -> None:
         """initialiser."""
         self._cls = cls
         self._win32_wrapper = Win32Wrapper()

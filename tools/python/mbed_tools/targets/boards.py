@@ -4,62 +4,61 @@
 #
 """Interface to the Board Database."""
 
-import json
+from __future__ import annotations
 
+import json
+from collections.abc import Set as AbstractSet
 from dataclasses import asdict
-from collections.abc import Set
-from typing import Iterator, Iterable, Any, Callable
+from typing import Callable, Iterable, Iterator, Sequence
+
+from typing_extensions import override
 
 from mbed_tools.targets._internal import board_database
-
-from mbed_tools.targets.exceptions import UnknownBoard
 from mbed_tools.targets.board import Board
+from mbed_tools.targets.exceptions import UnknownBoardError
 
 
-class Boards(Set):
-    """Interface to the Board Database.
+class Boards(AbstractSet):
+    """
+    Interface to the Board Database.
 
     Boards is initialised with an Iterable[Board]. The classmethods
     can be used to construct Boards with data from either the online or offline database.
     """
 
     @classmethod
-    def from_offline_database(cls) -> "Boards":
-        """Initialise with the offline board database.
+    def from_offline_database(cls) -> Boards:
+        """
+        Initialise with the offline board database.
 
         Raises:
             BoardDatabaseError: Could not retrieve data from the board database.
         """
         return cls(Board.from_offline_board_entry(b) for b in board_database.get_offline_board_data())
 
-    @classmethod
-    def from_online_database(cls) -> "Boards":
-        """Initialise with the online board database.
-
-        Raises:
-            BoardDatabaseError: Could not retrieve data from the board database.
+    def __init__(self, boards_data: Iterable[Board]) -> None:
         """
-        return cls(Board.from_online_board_entry(b) for b in board_database.get_online_board_data())
-
-    def __init__(self, boards_data: Iterable["Board"]) -> None:
-        """Initialise with a list of boards.
+        Initialise with a list of boards.
 
         Args:
             boards_data: iterable of board data from a board database source.
         """
-        self._boards_data = tuple(boards_data)
+        self._boards_data: Sequence[Board] = tuple(boards_data)
 
-    def __iter__(self) -> Iterator["Board"]:
+    @override
+    def __iter__(self) -> Iterator[Board]:
         """Yield an Board on each iteration."""
-        for board in self._boards_data:
-            yield board
+        yield from self._boards_data
 
+    @override
     def __len__(self) -> int:
         """Return the number of boards."""
         return len(self._boards_data)
 
-    def __contains__(self, board: object) -> Any:
-        """Check if a board is in the collection of boards.
+    @override
+    def __contains__(self, board: object) -> bool:
+        """
+        Check if a board is in the collection of boards.
 
         Args:
             board: An instance of Board.
@@ -70,7 +69,8 @@ class Boards(Set):
         return any(x == board for x in self)
 
     def get_board(self, matching: Callable) -> Board:
-        """Returns first Board for which `matching` returns True.
+        """
+        Returns first Board for which `matching` returns True.
 
         Args:
             matching: A function which will be called for each board in database
@@ -81,7 +81,7 @@ class Boards(Set):
         try:
             return next(board for board in self if matching(board))
         except StopIteration:
-            raise UnknownBoard()
+            raise UnknownBoardError from None
 
     def json_dump(self) -> str:
         """Return the contents of the board database as a json string."""

@@ -4,16 +4,18 @@
 #
 """Aggregation of all USB data given by Windows in various locations."""
 
-from typing import NamedTuple, List, cast
+from typing import List, NamedTuple, cast
+
+from typing_extensions import override
 
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
-from mbed_tools.devices._internal.windows.disk_aggregation import SystemDiskInformation, AggregatedDiskData
+from mbed_tools.devices._internal.windows.disk_aggregation import AggregatedDiskData, SystemDiskInformation
 from mbed_tools.devices._internal.windows.serial_port import SerialPort
 from mbed_tools.devices._internal.windows.serial_port_data_loader import SystemSerialPortInformation
+from mbed_tools.devices._internal.windows.system_data_loader import SystemDataLoader
 from mbed_tools.devices._internal.windows.usb_device_identifier import UsbIdentifier
 from mbed_tools.devices._internal.windows.usb_hub import UsbHub
 from mbed_tools.devices._internal.windows.usb_hub_data_loader import SystemUsbDeviceInformation
-from mbed_tools.devices._internal.windows.system_data_loader import SystemDataLoader
 
 
 class AggregatedUsbDataDefinition(NamedTuple):
@@ -35,6 +37,7 @@ class AggregatedUsbData(ComponentDescriptor):
         super().__init__(AggregatedUsbDataDefinition, win32_class_name="AggregatedUsbData")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns an id."""
         return str(self.uid)
@@ -76,7 +79,12 @@ class UsbDataAggregator:
         usb_data = self._usb_devices.get_usb_devices(usb_id)
         aggregated_data = AggregatedUsbData()
         aggregated_data.set_data_values(
-            dict(usb_identifier=usb_id, disks=disk_data, serial_port=serial_data, related_usb_interfaces=usb_data)
+            {
+                "usb_identifier": usb_id,
+                "disks": disk_data,
+                "serial_port": serial_data,
+                "related_usb_interfaces": usb_data,
+            }
         )
         return aggregated_data
 

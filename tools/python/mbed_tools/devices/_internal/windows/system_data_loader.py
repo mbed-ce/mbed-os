@@ -4,10 +4,14 @@
 #
 """Loads system data in parallel and all at once in order to improve performance."""
 
-from concurrent.futures import ThreadPoolExecutor
-from typing import List, Tuple, Dict, Generator, Optional, cast
+from __future__ import annotations
 
-from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptorWrapper, ComponentDescriptor
+from concurrent.futures import ThreadPoolExecutor
+from typing import Dict, Generator, Generic, List, Optional, Tuple, cast
+
+from typing_extensions import TypeVar
+
+from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor, ComponentDescriptorWrapper
 from mbed_tools.devices._internal.windows.disk_drive import DiskDrive
 from mbed_tools.devices._internal.windows.disk_partition import DiskPartition
 from mbed_tools.devices._internal.windows.disk_partition_logical_disk_relationships import (
@@ -32,11 +36,15 @@ SYSTEM_DATA_TYPES = [
 
 def load_all(cls: type) -> Tuple[type, List[ComponentDescriptor]]:
     """Loads all elements present in the system referring to a specific type."""
-    return (cls, [element for element in ComponentDescriptorWrapper(cls).element_generator()])
+    return (cls, list(ComponentDescriptorWrapper(cls).element_generator()))
+
+
+ComponentT = TypeVar("ComponentT", bound=ComponentDescriptor)
 
 
 class SystemDataLoader:
-    """Object in charge of loading all system data with regards to Usb, Disk or serial port.
+    """
+    Object in charge of loading all system data with regards to Usb, Disk or serial port.
 
     It loads all the data in parallel and all at once in order to improve performance.
     """
@@ -49,7 +57,7 @@ class SystemDataLoader:
         """Loads all system data in parallel."""
         with ThreadPoolExecutor() as executor:
             results = executor.map(load_all, SYSTEM_DATA_TYPES)
-        self._system_data = {k: v for (k, v) in results}
+        self._system_data = dict(results)
 
     @property
     def system_data(self) -> Dict[type, List[ComponentDescriptor]]:
@@ -58,20 +66,20 @@ class SystemDataLoader:
             self._load()
         return cast(Dict[type, List[ComponentDescriptor]], self._system_data)
 
-    def get_system_data(self, cls: type) -> List[ComponentDescriptor]:
+    def get_system_data(self, cls: type[ComponentT]) -> List[ComponentT]:
         """Gets the system data for a particular type."""
-        return self.system_data.get(cls, list())
+        return cast(List[ComponentT], self.system_data.get(cls, []))
 
 
-class ComponentsLoader:
+class ComponentsLoader(Generic[ComponentT]):
     """Loads system components."""
 
-    def __init__(self, data_loader: SystemDataLoader, cls: type) -> None:
+    def __init__(self, data_loader: SystemDataLoader, cls: type[ComponentT]) -> None:
         """initialiser."""
         self._cls = cls
         self._data_loader = data_loader
 
-    def element_generator(self) -> Generator["ComponentDescriptor", None, None]:
+    def element_generator(self) -> Generator[ComponentT, None, None]:
         """Gets a generator over all elements currently registered in the system."""
-        for component in self._data_loader.get_system_data(self._cls):
-            yield component
+        elements = self._data_loader.get_system_data(self._cls)
+        yield from elements

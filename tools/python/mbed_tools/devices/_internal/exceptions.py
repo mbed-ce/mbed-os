@@ -7,11 +7,11 @@
 from mbed_tools.lib.exceptions import ToolsError
 
 
-class SystemException(ToolsError):
+class OperatingSystemError(ToolsError):
     """Exception with regards to the underlying operating system."""
 
 
-class NoBoardForCandidate(ToolsError):
+class NoBoardForCandidateError(ToolsError):
     """Raised when board data cannot be determined for a candidate."""
 
 

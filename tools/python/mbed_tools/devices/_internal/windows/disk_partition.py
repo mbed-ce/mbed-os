@@ -6,11 +6,14 @@
 
 from typing import NamedTuple, cast
 
+from typing_extensions import override
+
 from mbed_tools.devices._internal.windows.component_descriptor import ComponentDescriptor
 
 
 class DiskPartitionMsdnDefinition(NamedTuple):
-    """Msdn definition of a disk partition.
+    """
+    Msdn definition of a disk partition.
 
     See https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-diskpartition
     """
@@ -58,7 +61,8 @@ class DiskPartitionMsdnDefinition(NamedTuple):
 
 
 class DiskPartition(ComponentDescriptor):
-    """Disk partition as defined in Windows API.
+    """
+    Disk partition as defined in Windows API.
 
     See https://docs.microsoft.com/en-us/windows/win32/cimwin32prov/win32-diskpartition
     """
@@ -68,6 +72,7 @@ class DiskPartition(ComponentDescriptor):
         super().__init__(DiskPartitionMsdnDefinition, win32_class_name="Win32_DiskPartition")
 
     @property
+    @override
     def component_id(self) -> str:
         """Returns the device id field."""
         return cast(str, self.get("DeviceID"))

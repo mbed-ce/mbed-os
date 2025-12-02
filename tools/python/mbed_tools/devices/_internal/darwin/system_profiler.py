@@ -4,10 +4,13 @@
 #
 """Interactions with `system_profiler`."""
 
+from __future__ import annotations
+
 import plistlib
 import re
 import subprocess
-from typing import Dict, Iterable, List, cast
+from typing import Dict, Iterable, List, Union, cast
+
 from typing_extensions import TypedDict
 
 USBDeviceTree = Dict  # mypy does not work with recursive types, which "_items" would require
@@ -30,11 +33,11 @@ class USBDevice(TypedDict, total=False):
     Media: List[USBDeviceMedia]
 
 
-def get_all_usb_devices_data() -> List[USBDeviceTree]:
+def get_all_usb_devices_data() -> List[USBDeviceTree | USBDevice]:
     """Returns parsed output of `system_profiler` call."""
-    output = subprocess.check_output(["system_profiler", "-xml", "SPUSBDataType"], stderr=subprocess.DEVNULL)
+    output = subprocess.check_output(["/usr/sbin/system_profiler", "-xml", "SPUSBDataType"], stderr=subprocess.DEVNULL)
     if output:
-        return cast(List[USBDeviceTree], plistlib.loads(output))
+        return cast(List[Union[USBDeviceTree, USBDevice]], plistlib.loads(output))
     return []
 
 
@@ -42,12 +45,12 @@ def get_end_usb_devices_data() -> List[USBDevice]:
     """Returns only end devices from the output of `system_profiler` call."""
     data = get_all_usb_devices_data()
     leaf_devices = _extract_leaf_devices(data)
-    end_devices = _filter_end_devices(leaf_devices)
-    return end_devices
+    return _filter_end_devices(leaf_devices)
 
 
-def _extract_leaf_devices(data: Iterable[USBDeviceTree]) -> List[USBDevice]:
-    """Flattens the structure returned by `system_profiler` call.
+def _extract_leaf_devices(data: Iterable[USBDeviceTree | USBDevice]) -> List[USBDevice]:
+    """
+    Flattens the structure returned by `system_profiler` call.
 
     Expected input will contain a tree-like structures, this function will return their leaf nodes.
     """
@@ -62,7 +65,8 @@ def _extract_leaf_devices(data: Iterable[USBDeviceTree]) -> List[USBDevice]:
 
 
 def _filter_end_devices(data: Iterable[USBDevice]) -> List[USBDevice]:
-    """Removes devices that don't look like end devices.
+    """
+    Removes devices that don't look like end devices.
 
     An end device is a device that shouldn't have child devices.
     I.e.: a hub IS NOT an end device, a mouse IS an end device.

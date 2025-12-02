@@ -20,11 +20,10 @@ dependencies = [
     "jinja2>=2.11.3",
     "python-dotenv",
     "Click>=8.0", # Need at least this version for pathlib.Path support
-    "GitPython",
     "tqdm",
     "tabulate",
     "requests>=2.20",
-    "typing-extensions",
+    "typing-extensions>=4.4.0",
     "pyserial",
     "appdirs",
     "pyjson5>=1.6",
@@ -34,12 +33,12 @@ dependencies = [
     # Needed for downloading CMSIS MCU descriptions
     "cmsis-pack-manager>=0.5.0",
 
-    # USB device detection on Mac
+    # USB device detection on Windows
     "pywin32; platform_system=='Windows'",
 
     # USB device detection on Linux
     "psutil; platform_system=='Linux'",
-    "pyudev; platform_system=='Linux'",
+    "pyudev>=0.24; platform_system=='Linux'", # 0.23.x seems to have issues with its Six dependency
 
     # USB device detection on Mac
     "beautifulsoup4; sys_platform == 'darwin'",
@@ -72,7 +71,16 @@ unit-tests = [
     "lxml"
 ]
 linters = [
-    "ruff"
+    "ruff",
+    "basedpyright",
+
+    # To pass Pyright we need all the platform-dependent packages
+    "platformio",
+    "SCons",
+    "psutil",
+    "pyudev>=0.24",
+    "beautifulsoup4",
+    "lxml"
 ]
 greentea = [
     ## Additional requirements to install into the Mbed environment when running Greentea tests
@@ -110,3 +118,154 @@ ambiq_svl = "ambiq_svl.svl:cli"
 [tool.ruff]
 line-length = 120
 src = ['python']
+
+[tool.ruff.lint]
+select = [
+    'A',    # Builtins
+    'ANN',  # Annotations
+    'ARG',  # Unused arguments
+    'B',    # Bugbear
+    'BLE',  # Blind except
+    'C4',   # Comprehensions
+    'C90',  # mccabe
+    'COM',  # Commas
+    'D2',   # Docstring conventions
+    'DTZ',  # Datetimes
+    'EM',   # Error messages
+    'ERA',  # Commented-out code
+    'EXE',  # Executable
+    'F',    # Pyflakes
+    'FA',   # __future__ annotations
+    'FLY',  # F-strings
+    'FURB', # Refurb
+    'G',    # Logging format
+    'I',    # Isort
+    'ICN',  # Import conventions
+    'INP',  # Disallow PEP-420 (Implicit namespace packages)
+    'INT',  # gettext
+    'ISC',  # Implicit str concat
+    'LOG',  # Logging
+    'N',    # PEP-8 Naming
+    'NPY',  # Numpy
+    'PERF', # Unnecessary performance costs
+    'PGH',  # Pygrep hooks
+    'PIE',  # Unnecessary code
+    'PL',   # Pylint
+    'PT',   # Pytest
+    'PTH',  # Use Pathlib
+    'PYI',  # Stub files
+    'Q',    # Quotes
+    'RET',  # Return
+    'RUF',  # Ruff
+    'RSE',  # Raise
+    'S',    # Bandit
+    'SIM',  # Code simplification
+    'SLF',  # Private member access
+    'SLOT', # __slots__
+    'T10',  # Debugger
+    'T20',  # Print
+    'TCH',  # Type checking
+    'TID',  # Tidy imports
+    'TRY',  # Exception handling
+    'UP',   # Pyupgrade
+    'W',    # Warnings
+    'YTT',  # sys.version
+]
+ignore = [
+    'D203',    # incorrect-blank-line-before-class
+    'D212',    # surrounding-whitespace
+    'Q000',    # bad-quotes-inline-string - Allow using single or double quotes
+    'D200',    # unnecessary-multiline-docstring
+    'RET505',  # superfluous-else-return
+    'RET506',  # superfluous-else-raise
+    'TRY003',  # raise-vanilla-args - Redundant with EM101
+    'COM812',  # missing-trailing-comma - incompatible with formatter
+    'ISC001',  # single-line-implicit-string-concatenation - incompatible with formatter
+    'TRY300',  # try-consider-else
+    'PLR2004', # magic-value-comparison
+    'SIM102',  # collapsible-if - Sometimes it's nice for readability
+    'PERF203', # try-except-in-loop - Sometimes this is needed!
+    'PERF401', # manual-list-comprehension - Sometimes this makes code easier to understand.
+    'PLR5501', # collapsible-else-if - Stop collapsing my if statements!
+    'TC006',   # runtime-cast-value
+    'G004',    # logging-f-string
+    'ANN401',  # any-type
+    'DTZ005',  # call-datetime-now-without-tzinfo - If this lint is enabled, it seems difficult to actually work with datetime objects that should be in the local time zone.
+    'S701',    # jinja2-autoescape-false - autoescape not needed because we are not rendering HTML
+    'BLE001',  # blind-except
+    'S603',    # subprocess-without-shell-equals-true - without disabling this, subprocess cannot be used at all!
+    'ERA001',  # commented-out-code
+    'T201',    # print
+
+    # For now allow old-style type annotations. Currently there's lots of code that uses them, and I am
+    # not sure if there is a way to upgrade them automatically. And since this project still supports
+    # back to Python 3.8, you can't actually use the new style of annotations without using the future annotations feature.
+    "FA100",   # future-rewritable-type-annotation
+    "UP045",   # non-pep604-annotation-optional
+    "UP006",   # non-pep585-annotation
+    "UP007"    # non-pep604-annotation-union
+]
+
+# Allow "unsafe" fixes to be done automatically for the following:
+extend-safe-fixes = [
+    "W291",  # trailing-whitespace
+    "W293",  # blank-line-with-whitespace
+    "EM101", # raw-string-in-exception
+    "TC001", # typing-only-first-party-import
+    "TC003", # typing-only-standard-library-import
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.ruff.lint.pylint]
+max-args = 10
+
+[tool.ruff.lint.flake8-annotations]
+# Don't require a return type annotation for __init__ in most cases
+mypy-init-return = true
+
+[tool.ruff.lint.isort]
+# Still fold imports onto one line if possible, even if the last import ends with a comma
+split-on-trailing-comma = false
+
+[tool.basedpyright]
+
+# Don't warn about things deprecated more recently than python 3.8
+pythonVersion = "3.8"
+
+include = [
+    "python/mbed_tools/**",
+    "python/mbed_platformio/**"
+]
+
+# For right now, we can configure basedpyright in relatively permissive mode.
+# We will allow code where the types of things are partially unknown, as there is
+# lots of legacy code in that category.
+# Also the PlatformIO code has to work with SCons, which is fundamentally type
+# annotation proof, so it can likely never pass these checks.
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportUnknownLambdaType = false
+reportMissingTypeArgument = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportAny = false
+reportExplicitAny = false
+reportMissingTypeStubs = false
+
+# Use "medium strict" member variable annotation rules, where the type checker
+# is allowed to infer the types of class variables based on what gets assigned in __init__
+reportIncompatibleUnannotatedOverride = true
+reportUnannotatedClassAttribute = false
+
+# Conflicts with Ruff rules
+reportImplicitStringConcatenation = false
+
+# Allow isinstance() even when it seems unneccessary based on type annotations.
+# This call is useful to check that the runtime types match the annotations.
+reportUnnecessaryIsInstance = false
+
+# Some ignore comments are only needed on specific platforms, so failing due to unneeded ignore
+# comments creates an impossible situation
+reportUnnecessaryTypeIgnoreComment = false

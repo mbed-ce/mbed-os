@@ -4,6 +4,8 @@
 #
 """Command to launch a serial terminal to a connected Mbed device."""
 
+from __future__ import annotations
+
 from typing import Any, Optional, Tuple
 
 import click
@@ -18,7 +20,8 @@ def _get_target_id(target: str) -> Tuple[str, Optional[int]]:
         target_name, target_id = target.replace("]", "").split("[", maxsplit=1)
         if target_id.isdigit() and int(target_id) >= 0:
             return (target_name, int(target_id))
-        raise click.ClickException("When using the format mbed-target[ID], ID must be a positive integer or 0.")
+        msg = "When using the format mbed-target[ID], ID must be a positive integer or 0."
+        raise click.ClickException(msg)
     return (target, None)
 
 
@@ -41,27 +44,33 @@ def _get_target_id(target: str) -> Tuple[str, Optional[int]]:
     help="Switch local echo on/off.",
 )
 @click.option("-m", "--mbed-target", type=str, help="Mbed target to detect. Example: K64F, NUCLEO_F401RE, NRF51822...")
-def sterm(port: str, baudrate: int, echo: str, mbed_target: str) -> None:
+def sterm(port: str | None, baudrate: int, echo: str, mbed_target: str) -> None:
     """Launches a serial terminal to a connected device."""
     if port is None:
         port = _find_target_serial_port_or_default(mbed_target)
 
-    terminal.run(port, baudrate, echo=True if echo == "on" else False)
+    terminal.run(port, baudrate, echo=echo == "on")
 
 
 def _get_connected_mbed_devices() -> Any:
     connected_devices = get_connected_devices()
     if not connected_devices.identified_devices:
-        raise MbedDevicesError("No Mbed enabled devices found.")
+        msg = "No Mbed enabled devices found."
+        raise MbedDevicesError(msg)
 
     return connected_devices.identified_devices
 
 
-def _find_target_serial_port_or_default(target: Optional[str]) -> Any:
+def _find_target_serial_port_or_default(target: Optional[str]) -> str:
     if target is None:
         # just return the first valid device found
         device, *_ = _get_connected_mbed_devices()
     else:
         target_name, target_id = _get_target_id(target)
         device = find_connected_device(target_name.upper(), target_id)
+
+    if device.serial_port is None:
+        msg = f"Could not detect the serial port for {device.mbed_board} with serial number {device.serial_number}"
+        raise MbedDevicesError(msg)
+
     return device.serial_port
