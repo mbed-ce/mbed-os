@@ -69,7 +69,7 @@ static void setupSWOForPrint(void)
        Actual divider is TPI->ACPR + 1. */
     uint32_t freq = CMU_ClockFreqGet(cmuClock_DBG) + (875000 / 2);
     uint32_t div  = freq / 875000;
-    TPI->ACPR = div - 1;
+    TPIU->ACPR = div - 1;
 }
 
 static bool swoIsInitd()

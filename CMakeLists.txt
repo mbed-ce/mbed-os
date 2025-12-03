@@ -255,7 +255,12 @@ endif()
 if(NOT MBED_IS_NATIVE_BUILD)
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated-headers)
     mbed_write_target_config_header(${CMAKE_CURRENT_BINARY_DIR}/generated-headers/mbed-target-config.h MBED_TARGET_DEFINITIONS MBED_CONFIG_DEFINITIONS)
-    target_compile_options(mbed-core-flags INTERFACE -include ${CMAKE_CURRENT_BINARY_DIR}/generated-headers/mbed-target-config.h)
+    # Scope preincluded target config to C/C++ only to avoid leaking into ASM builds
+    # Use a single OR-ed generator expression and avoid semicolons to prevent
+    # creation of an empty "-include" argument.
+    target_compile_options(mbed-core-flags INTERFACE
+        $<$<OR:$<COMPILE_LANGUAGE:C>,$<COMPILE_LANGUAGE:CXX>>:-include ${CMAKE_CURRENT_BINARY_DIR}/generated-headers/mbed-target-config.h>
+    )
     target_include_directories(mbed-core-flags INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated-headers)
 endif()
 
