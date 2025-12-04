@@ -398,8 +398,8 @@ void ticker_overflow_test(void)
 
     const uint32_t after_overflow = intf->read();
 
-    // Interrupt should NOT have fired yet
-    TEST_ASSERT_EQUAL_INT(0, intFlag);
+    // Note: at this point the interrupt may or may not have fired, depending on implementation.
+    // See lp_ticker_set_interrupt() docs for details.
 
     /* Now we are just after overflow. Wait a while assuming that ticker still counts. */
     while (intf->read() < isrTicksAfterOverflow + TICKER_DELTA) {

@@ -123,7 +123,7 @@
 
 #endif // (DUAL_CORE) && (TARGET_STM32H7)
 
-
+#define LPTIM_PERIOD 0xFFFF
 
 LPTIM_HandleTypeDef LptimHandle;
 
@@ -267,7 +267,7 @@ void lp_ticker_init(void)
     LptimHandle.Init.Trigger.ActiveEdge = LPTIM_ACTIVEEDGE_FALLING;
 #endif
 #if defined(TARGET_STM32U5) || defined(TARGET_STM32U0)
-    LptimHandle.Init.Period = 0xFFFF;
+    LptimHandle.Init.Period = LPTIM_PERIOD;
 #endif
 #if defined (LPTIM_TRIGSAMPLETIME_DIRECTTRANSITION)
     LptimHandle.Init.Trigger.SampleTime = LPTIM_TRIGSAMPLETIME_DIRECTTRANSITION;
@@ -333,7 +333,7 @@ void lp_ticker_init(void)
     __HAL_LPTIM_ENABLE_IT(&LptimHandle, LPTIM_IT_CMPM);
     __HAL_LPTIM_ENABLE_IT(&LptimHandle, LPTIM_IT_CMPOK);
 
-    HAL_LPTIM_Counter_Start(&LptimHandle, 0xFFFF);
+    HAL_LPTIM_Counter_Start(&LptimHandle, LPTIM_PERIOD);
 
     /* Need to write a compare value in order to get LPTIM_FLAG_CMPOK in set_interrupt */
     __HAL_LPTIM_CLEAR_FLAG(&LptimHandle, LPTIM_FLAG_CMPOK);
@@ -465,9 +465,9 @@ void lp_ticker_set_interrupt(timestamp_t timestamp)
 
         /* If this target timestamp is close to the roll over of the ticker counter
          * and current tick is also close to the roll over, then we are in danger zone.*/
-        if (((0xFFFF - LP_TIMER_SAFE_GUARD < timestamp) || (timestamp < LP_TIMER_SAFE_GUARD)) && (0xFFFA < last_read_counter)) {
+        if (((LPTIM_PERIOD - LP_TIMER_SAFE_GUARD < timestamp) || (timestamp < LP_TIMER_SAFE_GUARD)) && (0xFFFA < last_read_counter)) {
             roll_over_flag = true;
-            /* Change the lp_delayed_counter buffer in that way so the value of (0xFFFF - LP_TIMER_SAFE_GUARD) is equal to 0.
+            /* Change the lp_delayed_counter buffer in that way so the value of (LPTIM_PERIOD - LP_TIMER_SAFE_GUARD) is equal to 0.
              * By doing this it is easy to check if the value of timestamp get outdated by delaying its programming
              * For example if LP_TIMER_SAFE_GUARD is set to 5
              * (0xFFFA + LP_TIMER_SAFE_GUARD + 1) & 0xFFFF = 0
@@ -499,23 +499,26 @@ void lp_ticker_set_interrupt(timestamp_t timestamp)
             }
         }
 
-        /* Then check if this target timestamp is not in the past, or close to wrap-around
+        /* Then check if this target timestamp is in the past and we are not close to wrap-around.
          * Let's assume last_read_counter = 0xFFFC, and we want to program timestamp = 0x100
          * The interrupt will not fire before the CMPOK flag is OK, so there are 2 cases:
          * in case CMPOK flag is set by HW after or at wrap-around, then this will fire only @0x100
          * in case CMPOK flag is set before, it will indeed fire early, as for the wrap-around case.
+         * (this is because the comparison is implemented as ">= CMP" rather than "== CMP" as indicated
+         * by the reference manual, see https://community.st.com/t5/stm32-mcus-embedded-software/lptim-compare-interruption-sometimes-is-triggered-when-it-should/td-p/85513 )
+         *
          * But that will take at least 3 cycles and the interrupt fires at the end of a cycle.
          * In our case 0xFFFC + 3 => at the transition between 0xFFFF and 0.
          * If last_read_counter was 0xFFFB, it should be at the transition between 0xFFFE and 0xFFFF.
          * There might be crossing cases where it would also fire @ 0xFFFE, but by the time we read the counter,
          * it may already have moved to the next one, so for now we've taken this as margin of error.
          */
-        if ((timestamp < last_read_counter) && (last_read_counter <= (0xFFFF - LP_TIMER_SAFE_GUARD))) {
-            /*  Workaround, because limitation */
+        if ((timestamp < last_read_counter) && (last_read_counter <= (LPTIM_PERIOD - LP_TIMER_SAFE_GUARD))) {
+            /* Workaround, because limitation. Trigger the interrupt when we are about to roll over. */
 #if defined(LPTIM_CHANNEL_1)
-            __HAL_LPTIM_COMPARE_SET(&LptimHandle, LPTIM_CHANNEL_1, ~0);
+            __HAL_LPTIM_COMPARE_SET(&LptimHandle, LPTIM_CHANNEL_1, LPTIM_PERIOD);
 #else
-            __HAL_LPTIM_COMPARE_SET(&LptimHandle, ~0);
+            __HAL_LPTIM_COMPARE_SET(&LptimHandle, LPTIM_PERIOD);
 #endif
         } else {
             /*  It is safe to write */
@@ -524,7 +527,6 @@ void lp_ticker_set_interrupt(timestamp_t timestamp)
 #else
             __HAL_LPTIM_COMPARE_SET(&LptimHandle, timestamp);
 #endif
-
         }
 
         /* We just programed the CMP so we'll need to wait for cmpok before
