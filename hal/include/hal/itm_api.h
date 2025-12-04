@@ -45,7 +45,7 @@ enum {
  *             debug output.
  *
  *             The only Cortex-M register that should be modified is the clock
- *             prescaler in TPI->ACPR.
+ *             prescaler in TPIU->ACPR.
  *
  *             The generic mbed_itm_init initialization function will setup:
  *
@@ -53,8 +53,8 @@ enum {
  *                  ITM->TPR
  *                  ITM->TCR
  *                  ITM->TER
- *                  TPI->SPPR
- *                  TPI->FFCR
+ *                  TPIU->SPPR
+ *                  TPIU->FFCR
  *                  DWT->CTRL
  *
  *             for SWO output on stimulus port 0.

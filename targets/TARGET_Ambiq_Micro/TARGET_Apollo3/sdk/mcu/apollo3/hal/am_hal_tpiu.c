@@ -107,7 +107,7 @@ am_hal_tpiu_clock_disable(void)
 void
 am_hal_tpiu_port_width_set(uint32_t ui32PortWidth)
 {
-    TPI->CSPSR = 1 << (ui32PortWidth - 1);
+    TPIU->CSPSR = 1 << (ui32PortWidth - 1);
 }
 
 //*****************************************************************************
@@ -128,7 +128,7 @@ am_hal_tpiu_supported_port_width_get(void)
     //
     // Read the supported width register.
     //
-    ui32WidthValue = TPI->SSPSR;
+    ui32WidthValue = TPIU->SSPSR;
 
     //
     // The register value is encoded in a one-hot format, so the position of
@@ -170,7 +170,7 @@ am_hal_tpiu_port_width_get(void)
     uint32_t ui32Width;
 
     ui32Width = 1;
-    ui32Temp = TPI->CSPSR;
+    ui32Temp = TPIU->CSPSR;
 
     while ( !(ui32Temp & 1) )
     {
@@ -214,18 +214,18 @@ am_hal_tpiu_configure(am_hal_tpiu_config_t *psConfig)
     //
     // Set the desired protocol.
     //
-    TPI->SPPR = psConfig->ui32PinProtocol;
+    TPIU->SPPR = psConfig->ui32PinProtocol;
 
     //
     // Set the parallel port width. This may be redundant if the user has
     // selected a serial protocol, but we'll set it anyway.
     //
-    TPI->CSPSR = (1 << (psConfig->ui32ParallelPortSize - 1));
+    TPIU->CSPSR = (1 << (psConfig->ui32ParallelPortSize - 1));
 
     //
     // Set the clock prescaler.
     //
-    TPI->ACPR = psConfig->ui32ClockPrescaler;
+    TPIU->ACPR = psConfig->ui32ClockPrescaler;
 }
 
 //*****************************************************************************
@@ -262,14 +262,14 @@ am_hal_tpiu_enable(am_hal_tpiu_config_t *psConfig)
     //
     // TPIU formatter & flush control register.
     //
-    TPI->FFCR = 0;
+    TPIU->FFCR = 0;
 
     if ( ui32ITMbitrate )
     {
         //
         // Set the Current Parallel Port Size (note - only 1 bit can be set).
         //
-        TPI->CSPSR = TPI_CSPSR_CWIDTH_1BIT;
+        TPIU->CSPSR = TPI_CSPSR_CWIDTH_1BIT;
 
         //
         // Use some default assumptions to set the ITM frequency.
@@ -302,18 +302,18 @@ am_hal_tpiu_enable(am_hal_tpiu_config_t *psConfig)
         //
         // Set the scaler value.
         //
-        TPI->ACPR = _VAL2FLD(TPI_ACPR_SWOSCALER, ui32SWOscaler);
+        TPIU->ACPR = _VAL2FLD(TPI_ACPR_SWOSCALER, ui32SWOscaler);
 
         //
         // Set for UART mode
         //
-        TPI->SPPR = _VAL2FLD( TPI_SPPR_TXMODE, TPI_SPPR_TXMODE_UART);
+        TPIU->SPPR = _VAL2FLD( TPI_SPPR_TXMODE, TPI_SPPR_TXMODE_UART);
 
         //
         // Make sure we are not in test mode (important for proper deep sleep
         // operation).
         //
-        TPI->ITCTRL = _VAL2FLD(TPI_ITCTRL_Mode, TPI_ITCTRL_Mode_NORMAL);
+        TPIU->ITCTRL = _VAL2FLD(TPI_ITCTRL_Mode, TPI_ITCTRL_Mode_NORMAL);
 
         //
         // Enable the TPIU clock source in MCU control.
@@ -332,26 +332,26 @@ am_hal_tpiu_enable(am_hal_tpiu_config_t *psConfig)
         //
         // Set the Asynchronous Clock Prescaler Register.
         //
-        TPI->ACPR = psConfig->ui32ClockPrescaler;
+        TPIU->ACPR = psConfig->ui32ClockPrescaler;
 
         //
         // Set the Selected Pin Protocol Register.
         //  e.g. AM_REG_TPIU_SPPR_TXMODE_UART
         //
-        TPI->SPPR = psConfig->ui32PinProtocol;
+        TPIU->SPPR = psConfig->ui32PinProtocol;
 
         //
         // Set the Current Parallel Port Size (note - only 1 bit can be set).
         // This may be redundant if the user has selected a serial protocol,
         // but we'll set it anyway.
         //
-        TPI->CSPSR = (1 << (psConfig->ui32ParallelPortSize - 1));
+        TPIU->CSPSR = (1 << (psConfig->ui32ParallelPortSize - 1));
 
         //
         // Make sure we are not in test mode (important for proper deep sleep
         // operation).
         //
-        TPI->ITCTRL = _VAL2FLD(TPI_ITCTRL_Mode, TPI_ITCTRL_Mode_NORMAL);
+        TPIU->ITCTRL = _VAL2FLD(TPI_ITCTRL_Mode, TPI_ITCTRL_Mode_NORMAL);
 
         //
         // Set the clock freq and enable fields in the MCUCTRL register.

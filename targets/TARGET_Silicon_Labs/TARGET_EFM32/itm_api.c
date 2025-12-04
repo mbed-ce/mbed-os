@@ -66,7 +66,7 @@ static void setupSWOForPrint(void)
 
     /* Set TPIU prescaler for the current debug clock frequency. Target frequency
        is 875 kHz so we choose a divider that gives us the closest match.
-       Actual divider is TPI->ACPR + 1. */
+       Actual divider is TPIU->ACPR + 1. */
     uint32_t freq = CMU_ClockFreqGet(cmuClock_DBG) + (875000 / 2);
     uint32_t div  = freq / 875000;
     TPIU->ACPR = div - 1;
