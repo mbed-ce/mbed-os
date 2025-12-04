@@ -145,13 +145,13 @@ cy_rslt_t cy_rtos_create_thread(cy_thread_t* thread, cy_thread_entry_fn_t entry_
     }
     else
     {
-        attr.name       = name;
-        attr.attr_bits  = osThreadJoinable;
-        attr.cb_size    = osRtxThreadCbSize;
-        attr.stack_size = stack_size;
-        attr.priority   = (osPriority_t)priority;
-        attr.tz_module  = 0;
-        attr.reserved   = 0;
+        attr.name           = name;
+        attr.attr_bits      = osThreadJoinable;
+        attr.cb_size        = osRtxThreadCbSize;
+        attr.stack_size     = stack_size;
+        attr.priority       = (osPriority_t)priority;
+        attr.tz_module      = 0;
+        attr.affinity_mask  = 0;
 
         // Allocate stack if NULL was passed
         if ((uint32_t*)stack == NULL)
