@@ -22,6 +22,7 @@ option(MBED_USE_SHALLOW_SUBMODULES "If true, clone submodules as shallow. This r
 #    an error will be printed)
 # - Is the submodule on the same commit as that pointed to by the outer repo? If not, it will be automatically updated,
 #    as long as it does not have any local changes.
+# - Is the submodule
 #
 function(mbed_setup_submodule SUBMODULE_PATH)
     # Parse args
@@ -148,14 +149,13 @@ git submodule update --init ${SUBMODULE_PATH}")
         WORKING_DIRECTORY ${FULL_SUBMODULE_PATH}
     )
 
+    # Remove ending newline
+    string(STRIP "${SUBMODULE_IS_SHALLOW}" SUBMODULE_IS_SHALLOW)
+
     # If the submodule is shallow and we don't want it to be, unshallow it.
     # Note that if it is NOT shallow and should be, we do nothing. This is likely because the user or another
     # CMake build configuration already unshallowed it.
-
-    # Note: Oddly, if(SUBMODULE_IS_SHALLOW) evaluates to true when SUBMODULE_IS_SHALLOW contains the string "false".
-    # I think this is a bug in CMake regarding the result of execute_process().
-    # Expanding it into a string makes things work.
-    if(${SUBMODULE_IS_SHALLOW} AND NOT MBED_USE_SHALLOW_SUBMODULES)
+    if(SUBMODULE_IS_SHALLOW AND NOT MBED_USE_SHALLOW_SUBMODULES)
         # Now unshallow the repo
         message(STATUS "Submodule ${SOURCE_DIR_REL_SUBMODULE_PATH} will now be unshallowed.")
 
