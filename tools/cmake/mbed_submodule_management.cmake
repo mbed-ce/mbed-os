@@ -24,7 +24,6 @@ option(MBED_USE_SHALLOW_SUBMODULES "If true, clone submodules as shallow. This r
 #    as long as it does not have any local changes.
 #
 function(mbed_setup_submodule SUBMODULE_PATH)
-
     # Parse args
     cmake_parse_arguments(PARSE_ARGV 1 ARGS "" "CHECK_FILE;IF_LABEL" "")
     if("${ARGS_CHECK_FILE}" STREQUAL "")
@@ -40,7 +39,7 @@ function(mbed_setup_submodule SUBMODULE_PATH)
 
     # Is the submodule cloned?
     set(FULL_SUBMODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/${SUBMODULE_PATH})
-    file(RELATIVE_PATH SOURCE_DIR_REL_SUBMODULE_PATH ${CMAKE_SOURCE_DIR} FULL_SUBMODULE_PATH)
+    file(RELATIVE_PATH SOURCE_DIR_REL_SUBMODULE_PATH ${CMAKE_SOURCE_DIR} ${FULL_SUBMODULE_PATH})
     if(EXISTS "${FULL_SUBMODULE_PATH}/${ARGS_CHECK_FILE}")
         set(SUBMODULE_CLONED TRUE)
     else()
@@ -71,22 +70,39 @@ git submodule update --init ${SUBMODULE_PATH}")
 
         message(STATUS "Cloning git submodule ${SOURCE_DIR_REL_SUBMODULE_PATH}...")
         execute_process(
-                COMMAND Git::Git submodule update --init ${SHALLOW_ARGS} ${SUBMODULE_PATH}
+                COMMAND ${GIT_EXECUTABLE} submodule update --init ${SHALLOW_ARGS} ${SUBMODULE_PATH}
                 COMMAND_ERROR_IS_FATAL ANY
-                COMMAND_ECHO STDOUT
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
         )
     endif()
 
+    # To get the current commit that the submodule is actually on, we need this command.
+    # See https://stackoverflow.com/a/54238999
+    execute_process(
+            COMMAND ${GIT_EXECUTABLE} submodule status ${SUBMODULE_PATH}
+            COMMAND_ERROR_IS_FATAL ANY
+            OUTPUT_VARIABLE SUBMODULE_GIT_SUBMODULE_STATUS
+            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    )
+    if(NOT "${SUBMODULE_GIT_SUBMODULE_STATUS}" MATCHES "^[ +]([0-9a-z]+)")
+        message(WARNING "Unable to parse output of 'git submodule status ${SOURCE_DIR_REL_SUBMODULE_PATH}': \"${SUBMODULE_GIT_SUBMODULE_STATUS}\". Not touching this submodule.")
+        return()
+    endif()
+    string(SUBSTRING ${CMAKE_MATCH_1} 0 8 SUBMODULE_CURRENT_HASH)
+
     # Check whether the submodule is on the right commit
     execute_process(
-        COMMAND Git::Git status --porcelain=2 ${SUBMODULE_PATH}
+        COMMAND ${GIT_EXECUTABLE} status --porcelain=2 ${SUBMODULE_PATH}
         COMMAND_ERROR_IS_FATAL ANY
         OUTPUT_VARIABLE SUBMODULE_GIT_STATUS
         WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     )
+    set(SUBMODULE_COMMIT_CHANGED FALSE)
+    set(SUBMODULE_TRACKED_CHANGES FALSE)
+    set(SUBMODULE_UNTRACKED_CHANGES FALSE)
     if("${SUBMODULE_GIT_STATUS}" STREQUAL "")
         # Submodule is up to date, OK
+        set(SUBMODULE_SUPERPROJECT_POINTER_HASH ${SUBMODULE_CURRENT_HASH})
     else()
         # Some sort of change detected. Check what kind of change it is.
         # Format documented here: https://git-scm.com/docs/git-status#_changed_tracked_entries
@@ -94,9 +110,6 @@ git submodule update --init ${SUBMODULE_PATH}")
             message(WARNING "Unable to parse output of 'git status --porcelain=2 ${SOURCE_DIR_REL_SUBMODULE_PATH}': \"${SUBMODULE_GIT_STATUS}\". Not touching this submodule.")
             return()
         endif()
-        set(SUBMODULE_COMMIT_CHANGED FALSE)
-        set(SUBMODULE_TRACKED_CHANGES FALSE)
-        set(SUBMODULE_UNTRACKED_CHANGES FALSE)
         if(${CMAKE_MATCH_1} STREQUAL "C")
             set(SUBMODULE_COMMIT_CHANGED TRUE)
         endif()
@@ -106,21 +119,7 @@ git submodule update --init ${SUBMODULE_PATH}")
         if(${CMAKE_MATCH_3} STREQUAL "U")
             set(SUBMODULE_UNTRACKED_CHANGES TRUE)
         endif()
-        string(SUBSTRING CMAKE_MATCH_4 0 8 SUBMODULE_SUPERPROJECT_POINTER_HASH)
-
-        # To get the current commit that the submodule is actually on, we need a slightly different command.
-        # See https://stackoverflow.com/a/54238999
-        execute_process(
-            COMMAND Git::Git submodule status ${SUBMODULE_PATH}
-            COMMAND_ERROR_IS_FATAL ANY
-            OUTPUT_VARIABLE SUBMODULE_GIT_SUBMODULE_STATUS
-            WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-        )
-        if(NOT "${SUBMODULE_GIT_SUBMODULE_STATUS}" MATCHES "+([0-9a-z]+)")
-            message(WARNING "Unable to parse output of 'git submodule status ${SOURCE_DIR_REL_SUBMODULE_PATH}': \"${SUBMODULE_GIT_SUBMODULE_STATUS}\". Not touching this submodule.")
-            return()
-        endif()
-        string(SUBSTRING CMAKE_MATCH_1 0 8 SUBMODULE_CURRENT_HASH)
+        string(SUBSTRING ${CMAKE_MATCH_4} 0 8 SUBMODULE_SUPERPROJECT_POINTER_HASH)
 
         if(SUBMODULE_COMMIT_CHANGED)
             if(SUBMODULE_TRACKED_CHANGES OR SUBMODULE_UNTRACKED_CHANGES)
@@ -128,14 +127,48 @@ git submodule update --init ${SUBMODULE_PATH}")
                 return()
             endif()
 
-            message("Submodule ${SOURCE_DIR_REL_SUBMODULE_PATH} is on the wrong commit (should be ${SUBMODULE_SUPERPROJECT_POINTER_HASH}, is ${SUBMODULE_CURRENT_HASH}). This is expected if the super-project commit changed. Updating it to the correct one.")
+            message(STATUS "Submodule ${SOURCE_DIR_REL_SUBMODULE_PATH} is on the wrong commit (should be ${SUBMODULE_SUPERPROJECT_POINTER_HASH}, is ${SUBMODULE_CURRENT_HASH}).")
+            message(STATUS "This is expected if the super-project commit changed. Updating the commit to the correct one.")
             execute_process(
-                COMMAND Git::Git submodule update ${SUBMODULE_PATH}
+                COMMAND ${GIT_EXECUTABLE} submodule update ${SUBMODULE_PATH}
                 COMMAND_ERROR_IS_FATAL ANY
-                COMMAND_ECHO STDOUT
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
             )
         endif()
+    endif()
+
+    # Now process shallow vs deepness.
+    # Is the submodule currently shallow?
+    # This command can tell us -- it conveniently returns "true" or "false"
+    # https://stackoverflow.com/a/37533086
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} rev-parse --is-shallow-repository
+        COMMAND_ERROR_IS_FATAL ANY
+        OUTPUT_VARIABLE SUBMODULE_IS_SHALLOW
+        WORKING_DIRECTORY ${FULL_SUBMODULE_PATH}
+    )
+
+    # If the submodule is shallow and we don't want it to be, unshallow it.
+    # Note that if it is NOT shallow and should be, we do nothing. This is likely because the user or another
+    # CMake build configuration already unshallowed it.
+
+    # Note: Oddly, if(SUBMODULE_IS_SHALLOW) evaluates to true when SUBMODULE_IS_SHALLOW contains the string "false".
+    # I think this is a bug in CMake regarding the result of execute_process().
+    # Expanding it into a string makes things work.
+    if(${SUBMODULE_IS_SHALLOW} AND NOT MBED_USE_SHALLOW_SUBMODULES)
+        # Now unshallow the repo
+        message(STATUS "Submodule ${SOURCE_DIR_REL_SUBMODULE_PATH} will now be unshallowed.")
+
+        # Commands from here: https://stackoverflow.com/a/17937889/7083698
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} fetch --unshallow
+            COMMAND ${GIT_EXECUTABLE} config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+            COMMAND ${GIT_EXECUTABLE} fetch origin
+            COMMAND_ERROR_IS_FATAL ANY
+            COMMAND_ECHO STDOUT
+            OUTPUT_VARIABLE SUBMODULE_IS_SHALLOW
+            WORKING_DIRECTORY ${FULL_SUBMODULE_PATH}
+        )
     endif()
 
 endfunction(mbed_setup_submodule)
