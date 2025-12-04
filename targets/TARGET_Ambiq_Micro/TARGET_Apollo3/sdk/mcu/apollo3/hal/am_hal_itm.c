@@ -96,17 +96,14 @@ am_hal_itm_enable(void)
     // Write to the ITM control and status register.
     //
     ITM->TCR =
-        _VAL2FLD(ITM_TCR_TraceBusID, 0x15)      |
+        _VAL2FLD(ITM_TCR_TRACEBUSID, 0x15)      |
         _VAL2FLD(ITM_TCR_GTSFREQ, 1)            |
-        _VAL2FLD(ITM_TCR_TSPrescale, 1)         |
+        _VAL2FLD(ITM_TCR_TSPRESCALE, 1)         |
         _VAL2FLD(ITM_TCR_SWOENA, 1)             |
         _VAL2FLD(ITM_TCR_DWTENA, 0)             |
         _VAL2FLD(ITM_TCR_SYNCENA, 0)            |
         _VAL2FLD(ITM_TCR_TSENA, 0)              |
         _VAL2FLD(ITM_TCR_ITMENA, 1);
-
-
-
 }
 
 //*****************************************************************************

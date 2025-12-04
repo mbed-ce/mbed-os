@@ -307,13 +307,13 @@ am_hal_tpiu_enable(am_hal_tpiu_config_t *psConfig)
         //
         // Set for UART mode
         //
-        TPIU->SPPR = _VAL2FLD( TPI_SPPR_TXMODE, TPI_SPPR_TXMODE_UART);
+        TPIU->SPPR = _VAL2FLD(TPIU_SPPR_TXMODE, TPI_SPPR_TXMODE_UART);
 
         //
         // Make sure we are not in test mode (important for proper deep sleep
         // operation).
         //
-        TPIU->ITCTRL = _VAL2FLD(TPI_ITCTRL_Mode, TPI_ITCTRL_Mode_NORMAL);
+        TPIU->ITCTRL = _VAL2FLD(TPIU_ITCTRL_Mode, TPI_ITCTRL_Mode_NORMAL);
 
         //
         // Enable the TPIU clock source in MCU control.
@@ -351,7 +351,7 @@ am_hal_tpiu_enable(am_hal_tpiu_config_t *psConfig)
         // Make sure we are not in test mode (important for proper deep sleep
         // operation).
         //
-        TPIU->ITCTRL = _VAL2FLD(TPI_ITCTRL_Mode, TPI_ITCTRL_Mode_NORMAL);
+        TPIU->ITCTRL = _VAL2FLD(TPIU_ITCTRL_Mode, TPI_ITCTRL_Mode_NORMAL);
 
         //
         // Set the clock freq and enable fields in the MCUCTRL register.
