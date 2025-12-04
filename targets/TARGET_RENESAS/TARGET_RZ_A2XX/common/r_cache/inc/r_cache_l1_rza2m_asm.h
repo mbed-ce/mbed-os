@@ -54,6 +54,13 @@ Includes <System Includes> , "Project Includes"
 /******************************************************************************
 Typedef definitions
 ******************************************************************************/
+#ifndef __get_ACTRL
+#define __get_ACTRL __get_ACTLR
+#endif
+
+#ifndef __set_ACTRL
+#define __set_ACTRL __set_ACTLR
+#endif
 
 /******************************************************************************
 Functions Prototypes
