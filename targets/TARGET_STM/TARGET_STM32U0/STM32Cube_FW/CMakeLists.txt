@@ -1,6 +1,8 @@
 # Copyright (c) 2025 Jan Kamidra
 # SPDX-License-Identifier: Apache-2.0
 
+mbed_setup_submodule(stm32u0xx-hal-driver CHECK_FILE Src/stm32u0xx_hal.c IF_LABEL MCU_STM32U0)
+
 add_library(mbed-stm32u0cube-fw INTERFACE)
 
 target_sources(mbed-stm32u0cube-fw
