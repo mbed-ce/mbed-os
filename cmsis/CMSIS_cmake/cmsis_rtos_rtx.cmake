@@ -70,10 +70,12 @@ endif()
 # Make RTX headers and Mbed's device RTOS wrapper headers visible to ALL profiles
 # (needed for typedefs like mbed_rtos_storage_* used by headers even in bare-metal)
 target_include_directories(mbed-core-flags
+    BEFORE
     INTERFACE
-    ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/include/RTX
-    ${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX/Include
-    ${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX/Source
+        ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/include/RTX/RTX_overrides
+        ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/include/RTX
+        ${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX/Include
+        ${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX/Source
 )
 
 # RTX source files (only compiled when building with RTOS)
