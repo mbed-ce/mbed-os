@@ -108,3 +108,7 @@ CMakeUserPresets.json
 
 # CLion
 cmake-build-*/
+
+# Test executor runs
+test-executor-build/
+test-executor-results/

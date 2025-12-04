@@ -188,6 +188,11 @@ uint32_t lp_ticker_read(void);
  *    we want to wake up far in the future, we will instead set a wakeup for about (rollover period/2) ticks
  *    in the future, then reschedule the timer for the correct time.
  *
+ * @note Some hardware implementations do not support setting an interrupt for after the ticker rolls over
+ *   (e.g. the STM32 LPTIM, which implements a >= comparison for interrupts rather than an == comparison).
+ *   For these implementations, it is acceptable to schedule the interrupt for the time that the ticker
+ *   rolls over. Higher level code will then reschedule the interrupt for the correct time.
+ *
  * Calling this function with timestamp of more than the supported
  * number of bits returned by ::lp_ticker_get_info results in undefined
  * behavior.
