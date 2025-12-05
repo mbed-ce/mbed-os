@@ -237,7 +237,7 @@ void SystemInit(void)
                               (GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos);
 
         /* set prescaler */
-        TPI->ACPR = 0;
+        TPIU->ACPR = 0;
 #endif
 }
 

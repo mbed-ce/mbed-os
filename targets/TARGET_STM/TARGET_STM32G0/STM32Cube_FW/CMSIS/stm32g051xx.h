@@ -70,7 +70,7 @@ typedef enum
 /******  Cortex-M0+ Processor Exceptions Numbers ***************************************************************/
   NonMaskableInt_IRQn         = -14,    /*!< 2 Non Maskable Interrupt                                          */
   HardFault_IRQn              = -13,    /*!< 3 Cortex-M Hard Fault Interrupt                                   */
-  SVC_IRQn                    = -5,     /*!< 11 Cortex-M SV Call Interrupt                                     */
+  SVCall_IRQn                 = -5,     /*!< 11 Cortex-M SV Call Interrupt                                     */
   PendSV_IRQn                 = -2,     /*!< 14 Cortex-M Pend SV Interrupt                                     */
   SysTick_IRQn                = -1,     /*!< 15 Cortex-M System Tick Interrupt                                 */
 /******  STM32G0xxxx specific Interrupt Numbers ****************************************************************/
