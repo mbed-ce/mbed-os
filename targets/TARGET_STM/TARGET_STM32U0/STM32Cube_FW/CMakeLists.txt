@@ -1,6 +1,7 @@
 # Copyright (c) 2025 Jan Kamidra
 # SPDX-License-Identifier: Apache-2.0
 
+mbed_setup_submodule(cmsis-device-u0 CHECK_FILE Source/Templates/system_stm32u0xx.c IF_LABEL MCU_STM32U0)
 mbed_setup_submodule(stm32u0xx-hal-driver CHECK_FILE Src/stm32u0xx_hal.c IF_LABEL MCU_STM32U0)
 
 add_library(mbed-stm32u0cube-fw INTERFACE)
@@ -74,13 +75,15 @@ target_sources(mbed-stm32u0cube-fw
         stm32u0xx-hal-driver/Src/stm32u0xx_ll_exti.c
         stm32u0xx-hal-driver/Src/stm32u0xx_ll_gpio.c
         stm32u0xx-hal-driver/Src/stm32u0xx_ll_i2c.c
-        system_stm32u0xx.c
+
+        # For now we use this file unmodified, so we can get it directly from the submodule
+        cmsis-device-u0/Source/Templates/system_stm32u0xx.c
 )
 
 target_include_directories(mbed-stm32u0cube-fw
     INTERFACE
         .
-        CMSIS
+        cmsis-device-u0/Include
         stm32u0xx-hal-driver/Inc
         stm32u0xx-hal-driver/Inc/Legacy
 )

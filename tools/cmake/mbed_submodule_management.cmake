@@ -119,6 +119,10 @@ git submodule update --init ${SUBMODULE_PATH}")
     if("${SUBMODULE_GIT_STATUS}" STREQUAL "")
         # Submodule is up to date, OK
         set(SUBMODULE_SUPERPROJECT_POINTER_HASH ${SUBMODULE_CURRENT_HASH})
+    elseif("${SUBMODULE_GIT_STATUS}" MATCHES "^1 A.")
+        # Submodule newly added locally and not commited yet, OK.
+        # Don't touch this submodule any more as it's not committed yet.
+        return()
     else()
         # Some sort of change detected. Check what kind of change it is.
         # Format documented here: https://git-scm.com/docs/git-status#_changed_tracked_entries
