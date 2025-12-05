@@ -4,3 +4,6 @@
 [submodule "cmsis/CMSIS_6"]
 	path = cmsis/CMSIS_6
 	url = https://github.com/ARM-software/CMSIS_6.git
+[submodule "cmsis/CMSIS-RTX"]
+	path = cmsis/CMSIS-RTX
+	url = https://github.com/ARM-software/CMSIS-RTX.git
