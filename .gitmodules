@@ -1,3 +1,6 @@
 [submodule "doxygen-awesome-css"]
 	path = tools/doxygen-awesome-css
 	url = https://github.com/jothepro/doxygen-awesome-css.git
+[submodule "cmsis/CMSIS_6"]
+	path = cmsis/CMSIS_6
+	url = https://github.com/ARM-software/CMSIS_6.git
