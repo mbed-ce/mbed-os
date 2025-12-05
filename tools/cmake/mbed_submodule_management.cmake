@@ -63,6 +63,21 @@ git submodule update --init ${SUBMODULE_PATH}")
 
     # Clone the submodule if not done already
     if(NOT SUBMODULE_CLONED)
+
+        # Github Actions has an issue where the clone of the repo is done as a different user
+        # https://github.com/actions/checkout/issues/47
+        # This causes an error like 'fatal: unsafe repository ('/__w/mbed-os/mbed-os' is owned by someone else)'
+        # Other than chown-ing the source directory after the checkout step, it seems like the only fix
+        # is to run the following command if we detect Github Actions
+        if(NOT "$ENV{GITHUB_RUN_ID}" STREQUAL "")
+            execute_process(
+                COMMAND ${GIT_EXECUTABLE} config --global --add safe.directory ${CMAKE_SOURCE_DIR}
+                COMMAND_ERROR_IS_FATAL ANY
+                WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+            )
+        endif()
+
+
         if(MBED_USE_SHALLOW_SUBMODULES)
             set(SHALLOW_ARGS --depth 1)
         else()
