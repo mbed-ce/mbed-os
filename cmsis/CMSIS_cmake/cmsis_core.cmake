@@ -31,7 +31,7 @@
 
 
 # Manage CMSIS_6 submodule
-include(${CMAKE_SOURCE_DIR}/mbed-os/tools/cmake/mbed_submodule_management.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../../tools/cmake/mbed_submodule_management.cmake)
 mbed_setup_submodule(../CMSIS_6 CHECK_FILE CMSIS/Core/Include/cmsis_gcc.h)
 
 message(STATUS "CMSIS-Core 6.1.1")
