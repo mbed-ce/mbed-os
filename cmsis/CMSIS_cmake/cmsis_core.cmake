@@ -30,10 +30,9 @@
 # Path: CMSIS_6/CMSIS/Core
 
 
-# Submodule presence
-if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../CMSIS_6/CMSIS/Core/Include)
-    message(FATAL_ERROR "CMSIS_6 submodule directory not found!")
-endif()
+# Manage CMSIS_6 submodule
+mbed_setup_submodule(../CMSIS_6 CHECK_FILE CMSIS/Core/Include/cmsis_gcc.h)
+
 message(STATUS "CMSIS-Core 6.1.1")
 
 # Add CMSIS-Core base include directories

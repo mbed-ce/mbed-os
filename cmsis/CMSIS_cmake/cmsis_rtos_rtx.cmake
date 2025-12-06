@@ -26,10 +26,9 @@
 # Components used: CMSIS-RTX 5.9.0
 # Path: /CMSIS-RTX
 
-# Submodule presence
-if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../CMSIS-RTX/Include)
-    message(FATAL_ERROR "CMSIS-RTX submodule directory not found!")
-endif()
+# Manage CMSIS-RTX submodule
+mbed_setup_submodule(../CMSIS-RTX CHECK_FILE Include/rtx_os.h)
+
 message(STATUS "CMSIS-RTX 5.9.0")
 
 # Add toolchain-specific interrupt handlers based on core type
