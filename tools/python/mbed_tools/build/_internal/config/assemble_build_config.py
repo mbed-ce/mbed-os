@@ -8,8 +8,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Iterable, List, Optional, Set
+from typing import TYPE_CHECKING, Iterable, List, Optional, Set
 
 import pydantic
 
@@ -18,7 +17,11 @@ from mbed_tools.build._internal.config.config import Config
 from mbed_tools.build._internal.config.schemas import MbedAppJSON
 from mbed_tools.build._internal.find_files import LabelFilter, filter_files, find_files
 from mbed_tools.lib.json_helpers import decode_json_file
-from mbed_tools.project import MbedProgram
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from mbed_tools.project import MbedProgram
 
 logger = logging.getLogger(__name__)
 

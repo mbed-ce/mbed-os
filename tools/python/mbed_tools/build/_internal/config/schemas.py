@@ -487,7 +487,9 @@ class TargetJSON(BaseJSONConfig):
 
     supported_c_libs: dict[Literal["gcc_arm"], list[str]] = Field(default_factory=dict)
     """
-    C libraries that this target supports on each toolchain. This gives the valid values for the "c_lib" setting.
+    Map of toolchain name to the C libraries that this target supports for it.
+
+    This gives the valid values for the "c_lib" setting.
 
     This is an overriding attribute.
     """

@@ -8,22 +8,25 @@ from __future__ import annotations
 
 import json
 import logging
-import pathlib
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 
 import pydantic
 
 from mbed_tools.build._internal.cmake_file import render_mbed_config_cmake_template
 from mbed_tools.build._internal.config.assemble_build_config import assemble_config
-from mbed_tools.build._internal.config.config import Config
 from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.build._internal.config.source import check_and_transform_config_name
 from mbed_tools.build._internal.memory_banks import incorporate_memory_bank_data_from_cmsis, process_memory_banks
 from mbed_tools.build._internal.write_files import write_file
 from mbed_tools.build.exceptions import MbedBuildError
 from mbed_tools.lib.json_helpers import decode_json_file
-from mbed_tools.project import MbedProgram
 from mbed_tools.targets import get_target_by_name
+
+if TYPE_CHECKING:
+    import pathlib
+
+    from mbed_tools.build._internal.config.config import Config
+    from mbed_tools.project import MbedProgram
 
 logger = logging.getLogger(__name__)
 

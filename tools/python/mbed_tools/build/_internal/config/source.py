@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 import logging
-import pathlib
 import typing
 from dataclasses import dataclass
 from typing import Any, Iterable, List, Literal, Optional, Union
@@ -20,6 +19,9 @@ from mbed_tools.lib.python_helpers import flatten_nested
 
 from . import schemas
 from .schemas import ConfigSettingValue
+
+if typing.TYPE_CHECKING:
+    import pathlib
 
 logger = logging.getLogger(__name__)
 

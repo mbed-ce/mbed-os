@@ -14,9 +14,10 @@ from __future__ import annotations
 
 import itertools
 from collections import deque
-from typing import Any, Deque, Dict, List
+from typing import TYPE_CHECKING, Any, Deque, Dict, List
 
-from mbed_tools.build._internal.config.schemas import TargetJSON
+if TYPE_CHECKING:
+    from mbed_tools.build._internal.config.schemas import TargetJSON
 
 ACCUMULATING_ATTRIBUTES = ("extra_labels", "macros", "device_has", "features", "components")
 MODIFIERS = ("add", "remove")
