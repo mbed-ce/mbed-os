@@ -20,25 +20,23 @@
 # Note: this is preparation for future support of multiple RTOS backends
 # ============================================================================
 
-# TODO:
-# 1. Check for Submodules are present (CMSIS-RTX, CMSIS-FreeRTOS, etc.)
-# 2. Support additional RTOS backends (e.g., FreeRTOS) in future
-
 # Determine RTOS backend from config/macros (default: RTX)
 set(MBED_RTOS_BACKEND "RTX")
 
 # Prefer library config: MBED_CONF_RTOS_BACKEND
 foreach(def ${MBED_CONFIG_DEFINITIONS})
-    if(def STREQUAL "MBED_CONF_RTOS_BACKEND=RTX")
-        set(MBED_RTOS_BACKEND "RTX")
+    if(def MATCHES "^MBED_CONF_RTOS_BACKEND=(.+)$")
+        string(REGEX REPLACE "^MBED_CONF_RTOS_BACKEND=(.+)$" "\\1" _backend "${def}")
+        set(MBED_RTOS_BACKEND "${_backend}")
     endif()
 endforeach()
 
 # Fallback: user macro MBED_RTOS_BACKEND
 if(MBED_RTOS_BACKEND STREQUAL "RTX")
     foreach(def ${MBED_CONFIG_DEFINITIONS})
-        if(def STREQUAL "MBED_RTOS_BACKEND=RTX")
-            set(MBED_RTOS_BACKEND "RTX")
+        if(def MATCHES "^MBED_RTOS_BACKEND=(.+)$")
+            string(REGEX REPLACE "^MBED_RTOS_BACKEND=(.+)$" "\\1" _backend "${def}")
+            set(MBED_RTOS_BACKEND "${_backend}")
         endif()
     endforeach()
 endif()

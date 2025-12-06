@@ -27,6 +27,7 @@ include(mbed_python_interpreter)
 include(mbed_generate_config_header)
 include(mbed_target_functions)
 include(mbed_create_distro)
+include(mbed_submodule_management)
 
 # Load toolchain and mbed configuration, generating it if needed
 include(mbed_generate_configuration)
