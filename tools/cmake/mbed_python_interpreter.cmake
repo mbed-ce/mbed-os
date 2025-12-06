@@ -34,10 +34,10 @@ if(MBED_CREATE_PYTHON_VENV)
     # check/create the venv, only one can operate at a time
     # Also note that this will create the venv directory if it doesn't exist
     # First we try to lock with a short wait time, and then if that doesn't work, we print a message and wait longer.
-    file(LOCK ${MBED_VENV_LOCATION} DIRECTORY TIMEOUT 2 RESULT_VARIABLE VENV_LOCK_ACQUIRED)
+    file(LOCK ${MBED_VENV_LOCATION} DIRECTORY TIMEOUT 5 RESULT_VARIABLE VENV_LOCK_ACQUIRED)
     set(VENV_LOCK_TIMEOUT 60) # sec
     if(NOT VENV_LOCK_ACQUIRED EQUAL 0)
-        message(STATUS "Another CMake instance appears to be operating on the python venv, waiting up to ${VENV_LOCK_TIMEOUT} sec...")
+        message(STATUS "Mbed: Another CMake instance appears to be operating on the python venv, waiting up to ${VENV_LOCK_TIMEOUT} sec...")
         file(LOCK ${MBED_VENV_LOCATION} DIRECTORY TIMEOUT ${VENV_LOCK_TIMEOUT} RESULT_VARIABLE VENV_LOCK_ACQUIRED)
         if(NOT VENV_LOCK_ACQUIRED EQUAL 0)
             message(FATAL_ERROR "Failed to acquire lock ${MBED_VENV_LOCATION}/cmake.lock. You may need to delete this file, as long as you are sure another CMake instance is not running.")
