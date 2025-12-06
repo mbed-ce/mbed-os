@@ -30,6 +30,20 @@ if(MBED_CREATE_PYTHON_VENV)
     # Make it so modifying pyproject.toml will trigger a reconfigure
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${MBED_PYPROJECT_TOML_LOCATION})
 
+    # Lock the venv directory. This ensures that if there are multiple CMake instances trying to
+    # check/create the venv, only one can operate at a time
+    # Also note that this will create the venv directory if it doesn't exist
+    # First we try to lock with a short wait time, and then if that doesn't work, we print a message and wait longer.
+    file(LOCK ${MBED_VENV_LOCATION} DIRECTORY TIMEOUT 2 RESULT_VARIABLE VENV_LOCK_ACQUIRED)
+    set(VENV_LOCK_TIMEOUT 60) # sec
+    if(NOT VENV_LOCK_ACQUIRED EQUAL 0)
+        message(STATUS "Another CMake instance appears to be operating on the python venv, waiting up to ${VENV_LOCK_TIMEOUT} sec...")
+        file(LOCK ${MBED_VENV_LOCATION} DIRECTORY TIMEOUT ${VENV_LOCK_TIMEOUT} RESULT_VARIABLE VENV_LOCK_ACQUIRED)
+        if(NOT VENV_LOCK_ACQUIRED EQUAL 0)
+            message(FATAL_ERROR "Failed to acquire lock ${MBED_VENV_LOCATION}/cmake.lock. You may need to delete this file, as long as you are sure another CMake instance is not running.")
+        endif()
+    endif()
+
     # Find Python3 (this will get the one in the venv if we already found it)
     set(ENV{VIRTUAL_ENV} ${MBED_VENV_LOCATION})
     set(Python3_FIND_VIRTUALENV FIRST)
@@ -77,7 +91,7 @@ if(MBED_CREATE_PYTHON_VENV)
     # If greentea tests are being built, we need to ensure greentea dependencies are installed
     if(MBED_BUILD_GREENTEA_TESTS AND NOT EXISTS "${GT_STAMP_FILE}")
         set(NEED_TO_INSTALL_PACKAGES TRUE)
-    endif()   
+    endif()
 
     if(NEED_TO_CREATE_VENV)
         # Create venv.
@@ -129,6 +143,9 @@ if(MBED_CREATE_PYTHON_VENV)
         endif()
         
     endif()
+
+    # Done checking/modifying the venv!
+    file(LOCK ${MBED_VENV_LOCATION} DIRECTORY RELEASE)
 
     # When using the venv, scripts will always be installed to the directory where Python itself is installed
     # (venv\Scripts on Windows, venv/bin on Linux/Mac)
