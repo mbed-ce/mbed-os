@@ -27,6 +27,7 @@
 # Path: /CMSIS-RTX
 
 # Manage CMSIS-RTX submodule
+include(${CMAKE_SOURCE_DIR}/mbed-os/tools/cmake/mbed_submodule_management.cmake)
 mbed_setup_submodule(../CMSIS-RTX CHECK_FILE Include/rtx_os.h)
 
 message(STATUS "CMSIS-RTX 5.9.0")
