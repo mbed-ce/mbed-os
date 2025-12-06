@@ -153,7 +153,7 @@ class BaseJSONConfig(BaseModel):
     def verify_memory_bank_config_used_where_appropriate(self) -> Self:
         for name, value in self.overrides.items():
             if name == "target.memory_bank_config":
-                if self.__class__ != MbedAppJSON:
+                if not isinstance(self, MbedAppJSON):
                     msg = 'target.memory_bank_config is only allowed in "overrides" mbed_app.json5!'
                     raise ValueError(msg)
                 if not isinstance(value, MemoryBankConfiguration):
