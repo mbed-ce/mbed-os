@@ -90,7 +90,7 @@ def check_and_transform_config_name(context: str, config_name: str) -> str:
     """
     if config_name.lower() != config_name:
         logger.warning(
-            f"Config setting '{config_name}' in {context} contains uppercase letters. This style is not recommended."
+            f"Config setting '{config_name}' in {context} contains uppercase letters. This style is not recommended and these will be replaced by lowercase letters."
         )
     if "." in config_name:
         logger.warning(
@@ -101,7 +101,7 @@ def check_and_transform_config_name(context: str, config_name: str) -> str:
             f"Config setting '{config_name}' in {context} contains an underscore. This style is not recommended as it may cause confusion (config names should be in skewer-case). Underscores are replaced by hyphens when Mbed processes JSON settings."
         )
 
-    return config_name.replace("_", "-")
+    return config_name.replace("_", "-").lower()
 
 
 def from_mbed_lib_json_file(

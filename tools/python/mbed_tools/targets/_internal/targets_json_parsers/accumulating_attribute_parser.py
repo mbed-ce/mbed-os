@@ -97,28 +97,14 @@ def _add_attribute_element(accumulator: Dict[str, Any], attribute_name: str, ele
         accumulator[attribute_name].append(element)
 
 
-def _macros_element_matches(element_to_remove: str, element_to_check: str) -> bool:
-    """
-    Checks if an element meets the criteria to be removed from list.
-
-    Some attribute elements (eg. macros) can be defined with a number value
-    eg. MACRO_SOMETHING=5. If we are then instructed to remove
-    MACRO_SOMETHING then this element needs to be recognised and removed
-    in addition to exact matches.
-
-    Args:
-        element_to_remove: the element as taken from list to be removed from an attribute
-        element_to_check: an element that currently makes up part of an attribute definition
-
-    Returns:
-        A boolean reflecting whether the element is a match and should be removed
-    """
-    return element_to_check == element_to_remove or element_to_check.startswith(f"{element_to_remove}=")
-
-
 def _remove_attribute_element(accumulator: Dict[str, Any], attribute_name: str, elements_to_remove: List[Any]) -> None:
     """
     Removes an attribute element from an attribute.
+
+    Note that macros can be defined with a number value
+    eg. "MACRO_SOMETHING=5". If we are then instructed to remove
+    MACRO_SOMETHING then this element needs to be recognised and removed
+    in addition to exact matches. This logic is specific to the "macros" attribute_name
 
     Args:
         accumulator: a store of attributes to be updated
@@ -129,9 +115,9 @@ def _remove_attribute_element(accumulator: Dict[str, Any], attribute_name: str, 
     combinations_to_check = itertools.product(existing_elements, elements_to_remove)
     checked_elements_to_remove = [
         existing_element
-        for existing_element, element in combinations_to_check
-        if (attribute_name == "macros" and _macros_element_matches(element, existing_element))
-        or (element == existing_element)
+        for existing_element, element_to_remove in combinations_to_check
+        if (attribute_name == "macros" and existing_element.startswith(f"{element_to_remove}="))
+        or (element_to_remove == existing_element)
     ]
 
     for element in checked_elements_to_remove:

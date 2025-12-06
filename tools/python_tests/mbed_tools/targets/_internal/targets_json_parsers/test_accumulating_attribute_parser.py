@@ -14,7 +14,6 @@ from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_pa
     _targets_accumulate_hierarchy,
     _determine_accumulated_attributes,
     _remove_attribute_element,
-    _macros_element_matches,
 )
 
 
@@ -160,32 +159,6 @@ class TestAccumulatingAttributes(TestCase):
         self.assertEqual(result, expected_attributes)
 
         self.assertEqual(orig_accumulation_order, accumulation_order)
-
-
-class TestElementMatches(TestCase):
-    def test_element_matches_exactly(self):
-        element_to_remove = "SOMETHING"
-        element_to_check = "SOMETHING"
-
-        self.assertTrue(_macros_element_matches(element_to_remove, element_to_check))
-
-    def test_element_no_match(self):
-        element_to_remove = "SOMETHING"
-        element_to_check = "SOMETHING_ELSE"
-
-        self.assertFalse(_macros_element_matches(element_to_remove, element_to_check))
-
-    def test_element_matches_with_number_arg(self):
-        element_to_remove = "SOMETHING"
-        element_to_check = "SOMETHING=5"
-
-        self.assertTrue(_macros_element_matches(element_to_remove, element_to_check))
-
-    def test_element_no_match_with_number_arg(self):
-        element_to_remove = "SOMETHING"
-        element_to_check = "SOMETHING_DIFFERENT=5"
-
-        self.assertFalse(_macros_element_matches(element_to_remove, element_to_check))
 
 
 class TestRemoveAttributeElement(TestCase):

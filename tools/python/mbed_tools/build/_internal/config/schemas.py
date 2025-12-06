@@ -31,7 +31,7 @@ class ConfigEntryDetails(BaseModel):
     macro_name: str | None = None
     """
     Name of the macro that this setting shall generate. If unset, defaults to
-    'MBED_CONF_<namespace uppercase>_<config entry name uppercase>', where
+    ``'MBED_CONF_<namespace uppercase>_<config entry name uppercase>'``, where
     <namespace> is the current namespace, i.e. the value of the "name" property for mbed_lib.json5 files,
     "target" for targets.json5 entries, and "app" in mbed_app.json5.
     """
@@ -127,7 +127,7 @@ class BaseJSONConfig(BaseModel):
     """
     List of overrides to unconditionally apply when this lib is included.
 
-    Overrides take the form "[<namespace>.]<setting>": <value> and cause the value of the given config
+    Overrides take the form ``"[<namespace>.]<setting>": <value>`` and cause the value of the given config
     setting to be changed to the given value. If the namespace is omitted, it will be set to the current
     namespace (i.e. the value of the "name" property for mbed_lib.json5 files, "target" for targets.json5 entries, and
     "app" in mbed_app.json5).
@@ -188,13 +188,13 @@ class MbedLibJSON(BaseJSONConfig):
     List of overrides applied based on target labels. This is similar to the "overrides" section,
     but allows applying the override only if the target has a specific label. Labels generally
     come from the names of the target and its parents, but targets can also add extra ones.
-    For example:
+    For example::
 
-    "target_overrides": {
-        "MIMXRT105X": {
-            "some-setting": some-value
+        "target_overrides": {
+            "MIMXRT105X": {
+                "some-setting": some-value
+            }
         }
-    }
 
     would apply the override only for targets in the MIMXRT105X target family.
 
@@ -279,14 +279,14 @@ class TargetJSON(BaseJSONConfig):
     from the "closest" ancestor is used, and all other values are discarded.
 
     To determine the attribute's value, the inheritance tree is flattened into a list using a depth-first traversal
-    that visits the first parent of each target first. For example, the inheritance tree diagram for target "A" below:
+    that visits the first parent of each target first. For example, the inheritance tree diagram for target "A" below::
 
-    D     E
-    |     |
-    B     C
-    |_____|
-       |
-       A
+        D     E
+        |     |
+        B     C
+        |_____|
+           |
+           A
 
     Would give us an inheritance order of [A, B, D, C, E]. Then, the overriding attribute's value would be taken
     from the first target in this list to contain the attribute.
@@ -301,14 +301,14 @@ class TargetJSON(BaseJSONConfig):
 
     UNLIKE overriding and merging attributes, accumulating attributes use a breadth-first search to flatten
     the inheritance hierarchy. (why? no idea! Probably for legacy compatibility...).  For example, an inheritance
-    tree diagram for the target "A" below
+    tree diagram for the target "A" below::
 
-    D     E
-    |     |
-    B     C
-    |_____|
-       |
-       A
+        D     E
+        |     |
+        B     C
+        |_____|
+           |
+           A
 
     Would give us an inheritance order of [A, B, C, D, E]. To process this, the first occurrence of the bare
     attribute name in the above list is found, and then we work backwards towards target A processing "_add" and
@@ -366,14 +366,14 @@ class TargetJSON(BaseJSONConfig):
 
     Note that this specific attribute has some special behavior, in that the value after the "=" in the macro
     definition can be ignored when finding matches to remove. So if the parent target adds a macro "FOO=7", then
-    doing "macros_remove": ["FOO"] in a child target is enough to remove it.
+    doing ``"macros_remove": ["FOO"]`` in a child target is enough to remove it.
     """
 
     extra_labels: list[str] = Field(default_factory=list)
     """
     Additional labels to add for this target and targets that inherit from it.
-    Labels are added to the `MBED_TARGET_LABELS` list in CMake, and become compile definitions
-    in the format `TARGET_<label>`.
+    Labels are added to the ``MBED_TARGET_LABELS`` list in CMake, and become compile definitions
+    in the format ``TARGET_<label>``.
     They are also used to control which directories in the source code are scanned for mbed_lib.json5 files.
 
     This is an accumulating attribute in its base form.
@@ -464,7 +464,7 @@ class TargetJSON(BaseJSONConfig):
 
     See mbed-os/targets/drivers.json5 for a full list of recognized peripheral names.
 
-    The peripheral list becomes compile definitions in the format `DEVICE_<name>`.
+    The peripheral list becomes compile definitions in the format ``DEVICE_<name>``.
 
     This is an accumulating attribute in its base form.
     """
@@ -598,13 +598,13 @@ class MbedAppJSON(BaseJSONConfig):
     List of overrides applied based on target labels. This is similar to the "overrides" section,
     but allows applying the override only if the target has a specific label. Labels generally
     come from the names of the target and its parents, but targets can also add extra ones.
-    For example:
+    For example::
 
-    "target_overrides": {
-        "MIMXRT105X": {
-            "some-setting": some-value
+        "target_overrides": {
+            "MIMXRT105X": {
+                "some-setting": some-value
+            }
         }
-    }
 
     would apply the override only for targets in the MIMXRT105X target family.
 
