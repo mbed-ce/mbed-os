@@ -11,6 +11,8 @@ option(MBED_USE_SHALLOW_SUBMODULES "If true, clone submodules as shallow. This r
 # is to add the repo base dir to the safe directory root.
 # We can find the repo base dir by doing some string munging on a certain command
 if(NOT "$ENV{GITHUB_RUN_ID}" STREQUAL "")
+    find_package(Git REQUIRED)
+
     execute_process(
         COMMAND ${GIT_EXECUTABLE} rev-parse --git-dir
         COMMAND_ERROR_IS_FATAL ANY
