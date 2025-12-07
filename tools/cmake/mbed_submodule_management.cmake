@@ -74,6 +74,7 @@ git submodule update --init ${SUBMODULE_PATH}")
                 COMMAND ${GIT_EXECUTABLE} config --global --add safe.directory ${CMAKE_SOURCE_DIR}
                 COMMAND_ERROR_IS_FATAL ANY
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+                COMMAND_ECHO STDOUT
             )
         endif()
 
@@ -89,6 +90,7 @@ git submodule update --init ${SUBMODULE_PATH}")
                 COMMAND ${GIT_EXECUTABLE} submodule update --init ${SHALLOW_ARGS} ${SUBMODULE_PATH}
                 COMMAND_ERROR_IS_FATAL ANY
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+                COMMAND_ECHO STDOUT
         )
     endif()
 
