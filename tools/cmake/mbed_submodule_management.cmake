@@ -79,7 +79,7 @@ git submodule update --init ${SUBMODULE_PATH}")
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
             )
 
-            if(${GIT_STATUS_RESULT_CODE} NOT EQUAL 0)
+            if(NOT ${GIT_STATUS_RESULT_CODE} EQUAL 0)
                 if("${GIT_STATUS_ERR_OUTPUT}" MATCHES "fatal: unsafe repository \\('([^']+)' is owned by someone else\\)")
                     message(STATUS "Github Actions repo ownership issue detected. Adding ${CMAKE_MATCH_1} as safe directory to enable submodule cloning.")
                     execute_process(
