@@ -4,6 +4,43 @@
 option(MBED_MANAGE_SUBMODULES "If true, Mbed will clone submodules as-needed based on the build target(s) the user has selected." TRUE)
 option(MBED_USE_SHALLOW_SUBMODULES "If true, clone submodules as shallow. This reduces disk space usage at the cost of making it difficult to make & push changes to the code in the submodule. Disabling this will cause all submodules to be recloned as non-shallow." TRUE)
 
+# Github Actions has an issue where the clone of the repo is done as a different user
+# https://github.com/actions/checkout/issues/47
+# This causes an error like 'fatal: unsafe repository ('/__w/mbed-os/mbed-os' is owned by someone else)'
+# Other than chown-ing the source directory after the checkout step, it seems like the only fix
+# is to add the repo base dir to the safe directory root.
+# We can find the repo base dir by doing some string munging on a certain command
+if(NOT "$ENV{GITHUB_RUN_ID}" STREQUAL "")
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} rev-parse --git-dir
+        COMMAND_ERROR_IS_FATAL ANY
+        OUTPUT_VARIABLE REV_PARSE_GIT_DIR_OUTPUT
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+
+    # Remove ending newline
+    string(STRIP "${REV_PARSE_GIT_DIR_OUTPUT}" REV_PARSE_GIT_DIR_OUTPUT)
+
+    set(CMAKE_MATCH_1 "") # In case the regex matches no chars
+
+    if(NOT "${REV_PARSE_GIT_DIR_OUTPUT}" MATCHES "^(.*)\\.git.*$")
+        message(WARNING "Unable to detect git dir from 'git rev-parse --git-dir' output \"${REV_PARSE_GIT_DIR_OUTPUT}\". Unable to auto add safe directory.")
+    else()
+        # Note: The result can be an absolute or relative path, so normalize to absolute. Also, handle the case where the regex matched 0 chars.
+        if("${CMAKE_MATCH_1}" STREQUAL "")
+            set(TOP_LEVEL_REPO_DIR ${CMAKE_SOURCE_DIR})
+        else()
+            get_filename_component(TOP_LEVEL_REPO_DIR ${CMAKE_MATCH_1} ABSOLUTE BASE_DIR ${CMAKE_SOURCE_DIR})
+        endif()
+
+        message(STATUS "Github Actions detected. Adding ${TOP_LEVEL_REPO_DIR} as safe directory to enable submodule cloning.")
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} config --global --add safe.directory ${TOP_LEVEL_REPO_DIR}
+            COMMAND_ERROR_IS_FATAL ANY
+        )
+    endif()
+endif()
+
 #
 # Function to set up a git submodule, cloning it if necessary.
 #
@@ -63,22 +100,6 @@ git submodule update --init ${SUBMODULE_PATH}")
 
     # Clone the submodule if not done already
     if(NOT SUBMODULE_CLONED)
-
-        # Github Actions has an issue where the clone of the repo is done as a different user
-        # https://github.com/actions/checkout/issues/47
-        # This causes an error like 'fatal: unsafe repository ('/__w/mbed-os/mbed-os' is owned by someone else)'
-        # Other than chown-ing the source directory after the checkout step, it seems like the only fix
-        # is to run the following command if we detect Github Actions
-        if(NOT "$ENV{GITHUB_RUN_ID}" STREQUAL "")
-            execute_process(
-                COMMAND ${GIT_EXECUTABLE} config --global --add safe.directory ${CMAKE_SOURCE_DIR}
-                COMMAND_ERROR_IS_FATAL ANY
-                WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-                COMMAND_ECHO STDOUT
-            )
-        endif()
-
-
         if(MBED_USE_SHALLOW_SUBMODULES)
             set(SHALLOW_ARGS --depth 1)
         else()
@@ -90,7 +111,6 @@ git submodule update --init ${SUBMODULE_PATH}")
                 COMMAND ${GIT_EXECUTABLE} submodule update --init ${SHALLOW_ARGS} ${SUBMODULE_PATH}
                 COMMAND_ERROR_IS_FATAL ANY
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-                COMMAND_ECHO STDOUT
         )
     endif()
 
