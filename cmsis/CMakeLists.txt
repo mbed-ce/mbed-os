@@ -34,6 +34,9 @@ add_subdirectory(device)
 # Components used: CMSIS-Core 6.1.1
 # Path: CMSIS_6/CMSIS/Core
 
+# This include is just for github tests 
+include(${CMAKE_CURRENT_LIST_DIR}/../tools/cmake/mbed_submodule_management.cmake)
+
 # Manage CMSIS_6 submodule
 mbed_setup_submodule(CMSIS_6 CHECK_FILE CMSIS/Core/Include/cmsis_gcc.h)
 
