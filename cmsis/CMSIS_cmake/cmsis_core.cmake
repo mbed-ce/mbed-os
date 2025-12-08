@@ -29,47 +29,43 @@
 # Components used: CMSIS-Core 6.1.1
 # Path: CMSIS_6/CMSIS/Core
 
-
 # Manage CMSIS_6 submodule
-include(${CMAKE_CURRENT_LIST_DIR}/../../tools/cmake/mbed_submodule_management.cmake)
 mbed_setup_submodule(../CMSIS_6 CHECK_FILE CMSIS/Core/Include/cmsis_gcc.h)
 
-message(STATUS "CMSIS-Core 6.1.1")
+# CMSIS_6 base path
+set(CMSIS_BASE_DIR ${CMAKE_CURRENT_LIST_DIR}/../CMSIS_6/)
 
 # Add CMSIS-Core base include directories
 target_include_directories(mbed-core-flags
     INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}/../CMSIS_6/CMSIS/Core/Include 
+        ${CMSIS_BASE_DIR}/CMSIS/Core/Include 
 )
 
 if("CORTEX_A" IN_LIST MBED_TARGET_LABELS)
-    message(STATUS "CMSIS-Core CORTEX-A")
     # Cortex-A startup
     add_library(mbed-cmsis-cortex-a INTERFACE)
 
     target_include_directories(mbed-cmsis-cortex-a
         INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/../CMSIS_6/CMSIS/Core/Include/a-profile
+             ${CMSIS_BASE_DIR}/CMSIS/Core/Include/a-profile
     )
     
     target_sources(mbed-cmsis-cortex-a
         INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/../CMSIS_6/CMSIS/Core/Source/irq_ctrl_gic.c
+             ${CMSIS_BASE_DIR}/CMSIS/Core/Source/irq_ctrl_gic.c
     )
 
 elseif("CORTEX_M" IN_LIST MBED_TARGET_LABELS)
-    message(STATUS "CMSIS-Core CORTEX-M")
     # Cortex-M startup
     add_library(mbed-cmsis-cortex-m INTERFACE)
 
     target_include_directories(mbed-cmsis-cortex-m
         INTERFACE
-            ${CMAKE_CURRENT_LIST_DIR}/../CMSIS_6/CMSIS/Core/Include/m-profile 
+             ${CMSIS_BASE_DIR}/CMSIS/Core/Include/m-profile 
     )
-
+    
     target_sources(mbed-cmsis-cortex-m
         INTERFACE
             ${CMAKE_CURRENT_LIST_DIR}/../device/rtos/source/mbed_tz_context.c
     )
-
 endif()
