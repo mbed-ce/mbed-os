@@ -70,6 +70,7 @@ if(MBED_IS_NATIVE_BUILD)
     # Pick up some include files that are needed later
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/tools/cmake)
     include(mbed_create_distro)
+    include(mbed_submodule_management)
 else()
     include(mbed_set_linker_script)
 endif()

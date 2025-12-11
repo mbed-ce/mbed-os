@@ -34,8 +34,6 @@ add_subdirectory(device)
 # Components used: CMSIS-Core 6.1.1
 # Path: CMSIS_6/CMSIS/Core
 
-include(mbed_submodule_management)
-
 # Manage CMSIS_6 submodule
 mbed_setup_submodule(CMSIS_6 CHECK_FILE CMSIS/Core/Include/cmsis_gcc.h)
 
@@ -205,9 +203,7 @@ if(MBED_RTOS_BACKEND STREQUAL "RTX")
         INTERFACE
         ${CMAKE_CURRENT_LIST_DIR}/device/rtos/source/RTX/mbed_rtos_rtx.c
         ${CMAKE_CURRENT_LIST_DIR}/device/rtos/source/RTX/mbed_rtx_handlers.c
-        ${CMAKE_CURRENT_LIST_DIR}/device/rtos/source/RTX/mbed_rtx_idle.cpp
-        # Old CMSIS-RTOS v1 compatibility layer
-        ${CMAKE_CURRENT_LIST_DIR}/device/rtos/source/cmsis_os1.c     
+        ${CMAKE_CURRENT_LIST_DIR}/device/rtos/source/RTX/mbed_rtx_idle.cpp   
         # Configuration
         ${CMSIS_RTX_BASE_DIR}/Config/RTX_Config.c      
         # RTX kernel sources
