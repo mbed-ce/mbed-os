@@ -145,12 +145,12 @@ __STATIC_FORCEINLINE void r_cache_l1_btac_inv(void)
 
 __STATIC_FORCEINLINE void r_cache_l1_prefetch_enable(void)
 {
-    __set_ACTRL(__get_ACTRL() | ACTLR_L1PE_Msk);
+    __set_ACTLR(__get_ACTLR() | ACTLR_L1PE_Msk);
 }
 
 __STATIC_FORCEINLINE void r_cache_l1_prefetch_disable(void)
 {
-    __set_ACTRL(__get_ACTRL() & (~ACTLR_L1PE_Msk));
+    __set_ACTLR(__get_ACTLR() & (~ACTLR_L1PE_Msk));
 }
 #else
 extern void r_cache_l1_cache_init(void);

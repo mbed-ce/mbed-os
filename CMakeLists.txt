@@ -70,6 +70,7 @@ if(MBED_IS_NATIVE_BUILD)
     # Pick up some include files that are needed later
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/tools/cmake)
     include(mbed_create_distro)
+    include(mbed_submodule_management)
 else()
     include(mbed_set_linker_script)
 endif()
@@ -295,8 +296,6 @@ add_subdirectory(connectivity)
 # The directories below contain optional target libraries
 add_subdirectory(drivers/device_key EXCLUDE_FROM_ALL)
 add_subdirectory(features EXCLUDE_FROM_ALL)
-add_subdirectory(cmsis/CMSIS_5/CMSIS/RTOS2 EXCLUDE_FROM_ALL)
-add_subdirectory(cmsis/device/rtos EXCLUDE_FROM_ALL)
 
 # Create top-level targets  ----------------------------------------------------------------------------------
 

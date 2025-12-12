@@ -68,15 +68,27 @@ git submodule update --init ${SUBMODULE_PATH}")
         # https://github.com/actions/checkout/issues/47
         # This causes an error like 'fatal: unsafe repository ('/__w/mbed-os/mbed-os' is owned by someone else)'
         # Other than chown-ing the source directory after the checkout step, it seems like the only fix
-        # is to run the following command if we detect Github Actions
+        # is to add the repo base dir to the safe directory list.
+        # Since git limits what commands can even be run on an "unsafe" repo, it seems like the best way to actually
+        # determine this directory is to parse the error message.
         if(NOT "$ENV{GITHUB_RUN_ID}" STREQUAL "")
             execute_process(
-                COMMAND ${GIT_EXECUTABLE} config --global --add safe.directory ${CMAKE_SOURCE_DIR}
-                COMMAND_ERROR_IS_FATAL ANY
+                COMMAND ${GIT_EXECUTABLE} status
+                ERROR_VARIABLE GIT_STATUS_ERR_OUTPUT
+                RESULT_VARIABLE GIT_STATUS_RESULT_CODE
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
             )
-        endif()
 
+            if(NOT ${GIT_STATUS_RESULT_CODE} EQUAL 0)
+                if("${GIT_STATUS_ERR_OUTPUT}" MATCHES "fatal: unsafe repository \\('([^']+)' is owned by someone else\\)")
+                    message(STATUS "Github Actions repo ownership issue detected. Adding ${CMAKE_MATCH_1} as safe directory to enable submodule cloning.")
+                    execute_process(
+                        COMMAND ${GIT_EXECUTABLE} config --global --add safe.directory ${CMAKE_MATCH_1}
+                        COMMAND_ERROR_IS_FATAL ANY
+                    )
+                endif()
+            endif()
+        endif()
 
         if(MBED_USE_SHALLOW_SUBMODULES)
             set(SHALLOW_ARGS --depth 1)

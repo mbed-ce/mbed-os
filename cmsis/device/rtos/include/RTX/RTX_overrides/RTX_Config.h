@@ -1,5 +1,19 @@
 /*
- * Copyright (c) 2013-2021 Arm Limited. All rights reserved.
+ * Local RTX configuration (full copy) for Mbed CE integration.
+ *
+ * Origin: Copied from upstream mbed-os/cmsis/CMSIS-RTX/Config/RTX_Config.h (CMSIS-RTX 5.9.0)
+ * Changes:
+ *  - Include mbed_rtx_conf.h early so Mbed-specific defaults can override via #ifndef blocks.
+ *  - Set OS_PRIVILEGE_MODE to 1 (Privileged) to avoid SCB access faults in idle/sleep on Cortex-M7.
+ */
+
+/* Upstream license and configuration content follows with minor edits noted above. */
+
+
+/* Begin upstream content (with local edits) */
+
+/*
+ * Copyright (c) 2013-2023 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -17,7 +31,7 @@
  *
  * -----------------------------------------------------------------------------
  *
- * $Revision:   V5.5.2
+ * $Revision:   V5.9.0
  *
  * Project:     CMSIS-RTOS RTX
  * Title:       RTX Configuration definitions
@@ -65,6 +79,61 @@
 //     <i> Default: 5
 #ifndef OS_ROBIN_TIMEOUT
 #define OS_ROBIN_TIMEOUT            5
+#endif
+ 
+//   </e>
+ 
+//   <e>Safety features (Source variant only)
+//   <i> Enables FuSa related features.
+//   <i> Requires RTX Source variant.
+//   <i> Enables:
+//   <i>  - selected features from this group
+//   <i>  - Thread functions: osThreadProtectPrivileged
+#ifndef OS_SAFETY_FEATURES
+#define OS_SAFETY_FEATURES          0
+#endif
+ 
+//     <q>Safety Class
+//     <i> Threads assigned to lower classes cannot modify higher class threads.
+//     <i> Enables:
+//     <i>  - Object attributes: osSafetyClass
+//     <i>  - Kernel functions: osKernelProtect, osKernelDestroyClass
+//     <i>  - Thread functions: osThreadGetClass, osThreadSuspendClass, osThreadResumeClass
+#ifndef OS_SAFETY_CLASS
+#define OS_SAFETY_CLASS             0
+#endif
+ 
+//     <q>MPU Protected Zone
+//     <i> Access protection via MPU (Spatial isolation).
+//     <i> Enables:
+//     <i>  - Thread attributes: osThreadZone
+//     <i>  - Thread functions: osThreadGetZone, osThreadTerminateZone
+//     <i>  - Zone Management: osZoneSetup_Callback
+#ifndef OS_EXECUTION_ZONE
+#define OS_EXECUTION_ZONE           0
+#endif
+ 
+//     <q>Thread Watchdog
+//     <i> Watchdog alerts ensure timing for critical threads (Temporal isolation).
+//     <i> Enables:
+//     <i>  - Thread functions: osThreadFeedWatchdog
+//     <i>  - Handler functions: osWatchdogAlarm_Handler
+#ifndef OS_THREAD_WATCHDOG
+#define OS_THREAD_WATCHDOG          0
+#endif
+ 
+//     <q>Object Pointer checking
+//     <i> Check object pointer alignment and memory region.
+#ifndef OS_OBJ_PTR_CHECK
+#define OS_OBJ_PTR_CHECK            0
+#endif
+ 
+//     <q>SVC Function Pointer checking
+//     <i> Check SVC function pointer alignment and memory region.
+//     <i> User needs to define a linker execution region RTX_SVC_VENEERS
+//     <i> containing input sections: rtx_*.o (.text.os.svc.veneer.*)
+#ifndef OS_SVC_PTR_CHECK
+#define OS_SVC_PTR_CHECK            0
 #endif
  
 //   </e>
@@ -142,6 +211,20 @@
 #define OS_IDLE_THREAD_TZ_MOD_ID    0
 #endif
  
+//   <o>Idle Thread Safety Class <0-15>
+//   <i> Defines the Safety Class number.
+//   <i> Default: 0
+#ifndef OS_IDLE_THREAD_CLASS
+#define OS_IDLE_THREAD_CLASS        0
+#endif
+ 
+//   <o>Idle Thread Zone <0-127>
+//   <i> Defines Thread Zone.
+//   <i> Default: 0
+#ifndef OS_IDLE_THREAD_ZONE
+#define OS_IDLE_THREAD_ZONE         0
+#endif
+ 
 //   <q>Stack overrun checking
 //   <i> Enables stack overrun check at thread switch (requires RTX source variant).
 //   <i> Enabling this option increases slightly the execution time of a thread switch.
@@ -156,10 +239,10 @@
 #define OS_STACK_WATERMARK          0
 #endif
  
-//   <o>Processor mode for Thread execution
+//   <o>Default Processor mode for Thread execution
 //     <0=> Unprivileged mode
 //     <1=> Privileged mode
-//   <i> Default: Privileged mode
+//   <i> Default: Unprivileged mode
 #ifndef OS_PRIVILEGE_MODE
 #define OS_PRIVILEGE_MODE           1
 #endif
@@ -209,6 +292,20 @@
 //   <i> Default: 0 (not used)
 #ifndef OS_TIMER_THREAD_TZ_MOD_ID
 #define OS_TIMER_THREAD_TZ_MOD_ID   0
+#endif
+ 
+//   <o>Timer Thread Safety Class <0-15>
+//   <i> Defines the Safety Class number.
+//   <i> Default: 0
+#ifndef OS_TIMER_THREAD_CLASS
+#define OS_TIMER_THREAD_CLASS       0
+#endif
+ 
+//   <o>Timer Thread Zone <0-127>
+//   <i> Defines Thread Zone.
+//   <i> Default: 0
+#ifndef OS_TIMER_THREAD_ZONE
+#define OS_TIMER_THREAD_ZONE        0
 #endif
  
 //   <o>Timer Callback Queue entries <0-256>
