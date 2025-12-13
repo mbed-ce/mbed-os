@@ -19,6 +19,9 @@
 #include "stm32f0xx.h"
 #include "cmsis_nvic.h"
 
+// Undefine CAN macro to prevent conflict with Mbed CAN class
+#undef CAN
+
 #ifdef __cplusplus
 extern "C" {
 #endif
