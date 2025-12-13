@@ -37,3 +37,9 @@
 [submodule "targets/TARGET_STM/TARGET_STM32H5/STM32Cube_FW/stm32h5xx-hal-driver"]
 	path = targets/TARGET_STM/TARGET_STM32H5/STM32Cube_FW/stm32h5xx-hal-driver
 	url = https://github.com/STMicroelectronics/stm32h5xx-hal-driver.git
+[submodule "targets/TARGET_STM/TARGET_STM32U5/STM32Cube_FW/cmsis-device-u5"]
+	path = targets/TARGET_STM/TARGET_STM32U5/STM32Cube_FW/cmsis-device-u5
+	url = https://github.com/STMicroelectronics/cmsis-device-u5.git
+[submodule "targets/TARGET_STM/TARGET_STM32U5/STM32Cube_FW/stm32u5xx-hal-driver"]
+	path = targets/TARGET_STM/TARGET_STM32U5/STM32Cube_FW/stm32u5xx-hal-driver
+	url = https://github.com/STMicroelectronics/stm32u5xx-hal-driver.git
