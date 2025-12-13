@@ -61,3 +61,9 @@
 [submodule "targets/TARGET_STM/TARGET_STM32F2/STM32Cube_FW/stm32f2xx-hal-driver"]
 	path = targets/TARGET_STM/TARGET_STM32F2/STM32Cube_FW/stm32f2xx-hal-driver
 	url = https://github.com/STMicroelectronics/stm32f2xx-hal-driver.git
+[submodule "targets/TARGET_STM/TARGET_STM32F3/STM32Cube_FW/cmsis-device-f3"]
+	path = targets/TARGET_STM/TARGET_STM32F3/STM32Cube_FW/cmsis-device-f3
+	url = https://github.com/STMicroelectronics/cmsis-device-f3.git
+[submodule "targets/TARGET_STM/TARGET_STM32F3/STM32Cube_FW/stm32f3xx-hal-driver"]
+	path = targets/TARGET_STM/TARGET_STM32F3/STM32Cube_FW/stm32f3xx-hal-driver
+	url = https://github.com/STMicroelectronics/stm32f3xx-hal-driver.git
