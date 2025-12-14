@@ -73,3 +73,9 @@
 [submodule "targets/TARGET_STM/TARGET_STM32L0/STM32Cube_FW/stm32l0xx-hal-driver"]
 	path = targets/TARGET_STM/TARGET_STM32L0/STM32Cube_FW/stm32l0xx-hal-driver
 	url = https://github.com/STMicroelectronics/stm32l0xx-hal-driver.git
+[submodule "targets/TARGET_STM/TARGET_STM32L1/STM32Cube_FW/cmsis-device-l1"]
+	path = targets/TARGET_STM/TARGET_STM32L1/STM32Cube_FW/cmsis-device-l1
+	url = https://github.com/STMicroelectronics/cmsis-device-l1.git
+[submodule "targets/TARGET_STM/TARGET_STM32L1/STM32Cube_FW/stm32l1xx-hal-driver"]
+	path = targets/TARGET_STM/TARGET_STM32L1/STM32Cube_FW/stm32l1xx-hal-driver
+	url = https://github.com/STMicroelectronics/stm32l1xx-hal-driver.git
