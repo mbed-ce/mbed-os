@@ -33,7 +33,6 @@
 
 #include "stm_dma_utils.h"
 #if MBED_CONF_RTOS_PRESENT
-#include "cmsis_os.h"
 #include "cmsis_os2.h"
 #endif
 
