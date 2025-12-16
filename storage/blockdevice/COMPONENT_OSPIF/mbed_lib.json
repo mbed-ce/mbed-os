@@ -18,7 +18,7 @@
         "OSPI_IO6": "MBED_CONF_DRIVERS_OSPI_IO6",
         "OSPI_IO7": "MBED_CONF_DRIVERS_OSPI_IO7",
         "OSPI_SCK": "MBED_CONF_DRIVERS_OSPI_SCK",
-        "OSPI_CSN": "MBED_CONF_DRIVERS_OSPI_CSN",
+        "Ospi-csN": "MBED_CONF_DRIVERS_Ospi-csN",
         "OSPI_DQS": "MBED_CONF_DRIVERS_OSPI_DQS",
         "OSPI_POLARITY_MODE": 0,
         "OSPI_FREQ": "40000000",
@@ -39,7 +39,7 @@
             "OSPI_IO6": "PH_11",
             "OSPI_IO7": "PH_12",
             "OSPI_SCK": "PF_4",
-            "OSPI_CSN": "PI_5",
+            "Ospi-csN": "PI_5",
             "OSPI_DQS": "PF_12"
         }
     }

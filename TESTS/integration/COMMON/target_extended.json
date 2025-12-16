@@ -2,10 +2,10 @@
     "target_overrides": {
         "NUCLEO_F412ZG": {
             "target.components_add"                     : ["SD", "WIFI_WIZFI310"],
-            "sd.SPI_MOSI"                               : "ARDUINO_UNO_SPI_MOSI",
-            "sd.SPI_MISO"                               : "ARDUINO_UNO_SPI_MISO",
-            "sd.SPI_CLK"                                : "ARDUINO_UNO_SPI_SCK",
-            "sd.SPI_CS"                                 : "ARDUINO_UNO_SPI_CS",
+            "sd.spi-mosi"                               : "ARDUINO_UNO_SPI_MOSI",
+            "sd.spi-miso"                               : "ARDUINO_UNO_SPI_MISO",
+            "sd.spi-clk"                                : "ARDUINO_UNO_SPI_SCK",
+            "sd.spi-cs"                                 : "ARDUINO_UNO_spi-cs",
             "target.network-default-interface-type"     : "WIFI",
             "wizfi310.tx"                               : "PD_5",
             "wizfi310.rx"                               : "PD_6",
@@ -18,39 +18,39 @@
         },
         "NUCLEO_F429ZI": {
             "target.components_add"                     : ["SD"],
-            "sd.SPI_MOSI"                               : "PC_12",
-            "sd.SPI_MISO"                               : "PC_11",
-            "sd.SPI_CLK"                                : "PC_10",
-            "sd.SPI_CS"                                 : "PC_9"
+            "sd.spi-mosi"                               : "PC_12",
+            "sd.spi-miso"                               : "PC_11",
+            "sd.spi-clk"                                : "PC_10",
+            "sd.spi-cs"                                 : "PC_9"
         },
         "NUCLEO_F767ZI": {
             "target.components_add"                     : ["SD"],
-            "sd.SPI_MOSI"                               : "PC_12",
-            "sd.SPI_MISO"                               : "PC_11",
-            "sd.SPI_CLK"                                : "PC_10",
-            "sd.SPI_CS"                                 : "PC_9"
+            "sd.spi-mosi"                               : "PC_12",
+            "sd.spi-miso"                               : "PC_11",
+            "sd.spi-clk"                                : "PC_10",
+            "sd.spi-cs"                                 : "PC_9"
         },
         "NUCLEO_F746ZG": {
             "target.components_add"                     : ["SD"],
-            "sd.SPI_MOSI"                               : "PC_12",
-            "sd.SPI_MISO"                               : "PC_11",
-            "sd.SPI_CLK"                                : "PC_10",
-            "sd.SPI_CS"                                 : "PC_9"
+            "sd.spi-mosi"                               : "PC_12",
+            "sd.spi-miso"                               : "PC_11",
+            "sd.spi-clk"                                : "PC_10",
+            "sd.spi-cs"                                 : "PC_9"
         },
         "NUCLEO_F207ZG": {
             "target.components_add"                     : ["SD"],
-            "sd.SPI_MOSI"                               : "PC_12",
-            "sd.SPI_MISO"                               : "PC_11",
-            "sd.SPI_CLK"                                : "PC_10",
-            "sd.SPI_CS"                                 : "PC_9"
+            "sd.spi-mosi"                               : "PC_12",
+            "sd.spi-miso"                               : "PC_11",
+            "sd.spi-clk"                                : "PC_10",
+            "sd.spi-cs"                                 : "PC_9"
         },
         "NUCLEO_L476RG": {
             "target.macros_remove"                      : ["MBED_TICKLESS"],
             "target.components_add"                     : ["SD", "WIFI_WIZFI310"],
-            "sd.SPI_MOSI"                               : "ARDUINO_UNO_SPI_MOSI",
-            "sd.SPI_MISO"                               : "ARDUINO_UNO_SPI_MIS0",
-            "sd.SPI_CLK"                                : "ARDUINO_UNO_SPI_SCK",
-            "sd.SPI_CS"                                 : "ARDUINO_UNO_SPI_CS",
+            "sd.spi-mosi"                               : "ARDUINO_UNO_SPI_MOSI",
+            "sd.spi-miso"                               : "ARDUINO_UNO_SPI_MIS0",
+            "sd.spi-clk"                                : "ARDUINO_UNO_SPI_SCK",
+            "sd.spi-cs"                                 : "ARDUINO_UNO_spi-cs",
             "target.network-default-interface-type"     : "WIFI",
             "wizfi310.tx"                               : "ARDUINO_UNO_D8",
             "wizfi310.rx"                               : "ARDUINO_UNO_D2",
@@ -65,10 +65,10 @@
         "NUCLEO_L4R5ZI": {
             "target.macros_remove"                      : ["MBED_TICKLESS"],
             "target.components_add"                     : ["SD", "WIFI_WIZFI310"],
-            "sd.SPI_MOSI"                               : "ARDUINO_UNO_SPI_MOSI",
-            "sd.SPI_MISO"                               : "ARDUINO_UNO_SPI_MIS0",
-            "sd.SPI_CLK"                                : "ARDUINO_UNO_SPI_SCK",
-            "sd.SPI_CS"                                 : "ARDUINO_UNO_SPI_CS",
+            "sd.spi-mosi"                               : "ARDUINO_UNO_SPI_MOSI",
+            "sd.spi-miso"                               : "ARDUINO_UNO_SPI_MIS0",
+            "sd.spi-clk"                                : "ARDUINO_UNO_SPI_SCK",
+            "sd.spi-cs"                                 : "ARDUINO_UNO_spi-cs",
             "target.network-default-interface-type"     : "WIFI",
             "wizfi310.tx"                               : "ARDUINO_UNO_UART_TX",
             "wizfi310.rx"                               : "ARDUINO_UNO_UART_RX",
@@ -82,10 +82,10 @@
         "NUCLEO_L496ZG": {
             "target.macros_remove"                      : ["MBED_TICKLESS"],
             "target.components_add"                     : ["SD", "WIFI_WIZFI310"],
-            "sd.SPI_MOSI"                               : "ARDUINO_UNO_SPI_MOSI",
-            "sd.SPI_MISO"                               : "ARDUINO_UNO_SPI_MIS0",
-            "sd.SPI_CLK"                                : "ARDUINO_UNO_SPI_SCK",
-            "sd.SPI_CS"                                 : "ARDUINO_UNO_SPI_CS",
+            "sd.spi-mosi"                               : "ARDUINO_UNO_SPI_MOSI",
+            "sd.spi-miso"                               : "ARDUINO_UNO_SPI_MIS0",
+            "sd.spi-clk"                                : "ARDUINO_UNO_SPI_SCK",
+            "sd.spi-cs"                                 : "ARDUINO_UNO_spi-cs",
             "target.network-default-interface-type"     : "WIFI",
             "wizfi310.tx"                               : "ARDUINO_UNO_UART_TX",
             "wizfi310.rx"                               : "ARDUINO_UNO_UART_RX",
@@ -151,10 +151,10 @@
         },
         "SDT64B": {
             "target.components_add"                     : ["SD"],
-            "sd.SPI_MOSI"                               : "PTB16",
-            "sd.SPI_MISO"                               : "PTB17",
-            "sd.SPI_CLK"                                : "PTB11",
-            "sd.SPI_CS"                                 : "PTB10"
+            "sd.spi-mosi"                               : "PTB16",
+            "sd.spi-miso"                               : "PTB17",
+            "sd.spi-clk"                                : "PTB11",
+            "sd.spi-cs"                                 : "PTB10"
         },
         "GR_LYCHEE": {
             "target.components_add"                     : ["WIFI_ESP32"],
@@ -165,10 +165,10 @@
         },
         "WIO_EMW3166": {
             "target.components_add"                     : ["SPIF"],
-            "spif-driver.SPI_MOSI"                      : "PB_15",
-            "spif-driver.SPI_MISO"                      : "PB_14",
-            "spif-driver.SPI_CLK"                       : "PB_13",
-            "spif-driver.SPI_CS"                        : "PA_10"
+            "spif-driver.spi-mosi"                      : "PB_15",
+            "spif-driver.spi-miso"                      : "PB_14",
+            "spif-driver.spi-clk"                       : "PB_13",
+            "spif-driver.spi-cs"                        : "PA_10"
         },
         "EFM32GG11_STK3701": {
             "target.components_add"                     : ["QSPIF"],
@@ -176,11 +176,11 @@
         },
         "TB_SENSE_12": {
             "target.components_add"                     : ["SPIF"],
-            "spif-driver.SPI_MOSI"                      : "PK0",
-            "spif-driver.SPI_MISO"                      : "PK2",
-            "spif-driver.SPI_CLK"                       : "PF7",
-            "spif-driver.SPI_CS"                        : "PK1",
-            "spif-driver.SPI_FREQ"                      : 10000000,
+            "spif-driver.spi-mosi"                      : "PK0",
+            "spif-driver.spi-miso"                      : "PK2",
+            "spif-driver.spi-clk"                       : "PF7",
+            "spif-driver.spi-cs"                        : "PK1",
+            "spif-driver.spi-freq"                      : 10000000,
             "target.network-default-interface-type"     : "MESH",
             "mbed-mesh-api.thread-config-channel"       : 22,
             "mbed-mesh-api.thread-config-panid"         : "0x0700",
@@ -190,7 +190,7 @@
         },
         "ADV_WISE_1570": {
             "target.components_add"                     : ["SPIF"],
-            "spif-driver.SPI_FREQ"                      : 20000000,
+            "spif-driver.spi-freq"                      : 20000000,
             "target.network-default-interface-type"     : "CELLULAR",
             "cellular.debug-at"                         : false,
             "cellular.use-apn-lookup"                   : false,

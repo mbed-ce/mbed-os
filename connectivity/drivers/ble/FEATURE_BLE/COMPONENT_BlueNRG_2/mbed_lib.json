@@ -1,8 +1,8 @@
 {
     "name": "bluenrg_2",
     "config": {
-        "SPI_MOSI":  "D11",
-        "SPI_MISO":  "D12",
+        "spi-mosi":  "D11",
+        "spi-miso":  "D12",
         "SPI_nCS":   "A1",
         "SPI_RESET": "D7",
         "SPI_IRQ":   "A0",

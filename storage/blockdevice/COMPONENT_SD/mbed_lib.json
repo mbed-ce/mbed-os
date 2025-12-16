@@ -1,10 +1,10 @@
 {
     "name": "sd",
     "config": {
-        "SPI_CS": "ARDUINO_UNO_SPI_CS",
-        "SPI_MOSI": "ARDUINO_UNO_SPI_MOSI",
-        "SPI_MISO": "ARDUINO_UNO_SPI_MISO",
-        "SPI_CLK": "ARDUINO_UNO_SPI_SCK",
+        "spi-cs": "ARDUINO_UNO_spi-cs",
+        "spi-mosi": "ARDUINO_UNO_SPI_MOSI",
+        "spi-miso": "ARDUINO_UNO_SPI_MISO",
+        "spi-clk": "ARDUINO_UNO_SPI_SCK",
         "FSFAT_SDCARD_INSTALLED": 1,
         "CMD_TIMEOUT": 10000,
         "CMD0_IDLE_STATE_RETRIES": 5,
@@ -33,106 +33,106 @@
              "TEST_BUFFER": 4096
         },
         "KL22F": {
-             "SPI_MOSI": "PTD6",
-             "SPI_MISO": "PTD7",
-             "SPI_CLK":  "PTD5",
-             "SPI_CS":   "PTD4"
+             "spi-mosi": "PTD6",
+             "spi-miso": "PTD7",
+             "spi-clk":  "PTD5",
+             "spi-cs":   "PTD4"
         },
         "KL25Z": {
-             "SPI_MOSI": "PTD2",
-             "SPI_MISO": "PTD3",
-             "SPI_CLK":  "PTD1",
-             "SPI_CS":   "PTD0"
+             "spi-mosi": "PTD2",
+             "spi-miso": "PTD3",
+             "spi-clk":  "PTD1",
+             "spi-cs":   "PTD0"
         },
         "KL43Z": {
-             "SPI_MOSI": "PTD6",
-             "SPI_MISO": "PTD7",
-             "SPI_CLK":  "PTD5",
-             "SPI_CS":   "PTD4"
+             "spi-mosi": "PTD6",
+             "spi-miso": "PTD7",
+             "spi-clk":  "PTD5",
+             "spi-cs":   "PTD4"
         },
         "KL46Z": {
-             "SPI_MOSI": "PTD6",
-             "SPI_MISO": "PTD7",
-             "SPI_CLK":  "PTD5",
-             "SPI_CS":   "PTD4"
+             "spi-mosi": "PTD6",
+             "spi-miso": "PTD7",
+             "spi-clk":  "PTD5",
+             "spi-cs":   "PTD4"
         },
         "K64F": {
-            "SPI_CS": "PTE4",
-            "SPI_MOSI": "PTE3",
-            "SPI_MISO": "PTE1",
-            "SPI_CLK": "PTE2"
+            "spi-cs": "PTE4",
+            "spi-mosi": "PTE3",
+            "spi-miso": "PTE1",
+            "spi-clk": "PTE2"
         },
         "K66F": {
-             "SPI_MOSI": "PTE3",
-             "SPI_MISO": "PTE1",
-             "SPI_CLK":  "PTE2",
-             "SPI_CS":   "PTE4"
+             "spi-mosi": "PTE3",
+             "spi-miso": "PTE1",
+             "spi-clk":  "PTE2",
+             "spi-cs":   "PTE4"
         },
         "LPC2368": {
-             "SPI_MOSI": "p11",
-             "SPI_MISO": "p12",
-             "SPI_CLK":  "p13",
-             "SPI_CS":   "p14"
+             "spi-mosi": "p11",
+             "spi-miso": "p12",
+             "spi-clk":  "p13",
+             "spi-cs":   "p14"
         },
         "MAX32630FTHR": {
-             "SPI_MOSI": "P0_5",
-             "SPI_MISO": "P0_6",
-             "SPI_CLK":  "P0_4",
-             "SPI_CS":   "P0_7"
+             "spi-mosi": "P0_5",
+             "spi-miso": "P0_6",
+             "spi-clk":  "P0_4",
+             "spi-cs":   "P0_7"
         },
         "NUMAKER_PFM_M453": {
-             "SPI_MOSI": "PD_13",
-             "SPI_MISO": "PD_14",
-             "SPI_CLK":  "PD_15",
-             "SPI_CS":   "PD_12"
+             "spi-mosi": "PD_13",
+             "spi-miso": "PD_14",
+             "spi-clk":  "PD_15",
+             "spi-cs":   "PD_12"
         },
         "NUMAKER_PFM_NUC472": {
-             "SPI_MOSI": "PF_0",
-             "SPI_MISO": "PD_15",
-             "SPI_CLK":  "PD_14",
-             "SPI_CS":   "PD_13"
+             "spi-mosi": "PF_0",
+             "spi-miso": "PD_15",
+             "spi-clk":  "PD_14",
+             "spi-cs":   "PD_13"
         },
         "RZ_A1H": {
-             "SPI_MOSI": "P8_5",
-             "SPI_MISO": "P8_6",
-             "SPI_CLK":  "P8_3",
-             "SPI_CS":   "P8_4"
+             "spi-mosi": "P8_5",
+             "spi-miso": "P8_6",
+             "spi-clk":  "P8_3",
+             "spi-cs":   "P8_4"
         },
         "GR_LYCHEE": {
-             "SPI_MOSI": "P5_6",
-             "SPI_MISO": "P5_7",
-             "SPI_CLK":  "P5_4",
-             "SPI_CS":   "P5_5"
+             "spi-mosi": "P5_6",
+             "spi-miso": "P5_7",
+             "spi-clk":  "P5_4",
+             "spi-cs":   "P5_5"
         },
         "HEXIWEAR": {
-             "SPI_MOSI": "PTE3",
-             "SPI_MISO": "PTE1",
-             "SPI_CLK":  "PTE2",
-             "SPI_CS":   "PTE4"
+             "spi-mosi": "PTE3",
+             "spi-miso": "PTE1",
+             "spi-clk":  "PTE2",
+             "spi-cs":   "PTE4"
         },
         "TB_SENSE_12": {
-             "SPI_MOSI": "PC6",
-             "SPI_MISO": "PC7",
-             "SPI_CLK": "PC8",
-             "SPI_CS": "PC9"
+             "spi-mosi": "PC6",
+             "spi-miso": "PC7",
+             "spi-clk": "PC8",
+             "spi-cs": "PC9"
         },
         "LPC1768": {
-            "SPI_MOSI": "p5",
-            "SPI_MISO": "p6",
-            "SPI_CLK": "p7",
-            "SPI_CS": "p8"
+            "spi-mosi": "p5",
+            "spi-miso": "p6",
+            "spi-clk": "p7",
+            "spi-cs": "p8"
         },
         "ARCH_MAX": {
-            "SPI_MOSI": "PC_3",
-            "SPI_MISO": "PC_2",
-            "SPI_CLK":  "PB_10",
-            "SPI_CS":   "PE_2"
+            "spi-mosi": "PC_3",
+            "spi-miso": "PC_2",
+            "spi-clk":  "PB_10",
+            "spi-cs":   "PE_2"
         },
         "WIO_BG96": {
-          "SPI_CS": "SPI_CS",
-          "SPI_MOSI": "SPI_MOSI",
-          "SPI_MISO": "SPI_MISO",
-          "SPI_CLK": "SPI_SCK"
+          "spi-cs": "spi-cs",
+          "spi-mosi": "SPI_MOSI",
+          "spi-miso": "SPI_MISO",
+          "spi-clk": "SPI_SCK"
         }
     }
 }
