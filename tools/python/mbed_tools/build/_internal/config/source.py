@@ -78,19 +78,34 @@ def prepare(
     return data
 
 
-def check_and_transform_config_name(context: str, config_name: str) -> str:
+def _to_canonical_json_setting_name(name: str) -> str:
+    """
+    Transform a JSON setting name to its "canonical" form by replacing underscores with dashes and lowercasing.
+
+    This is used for backwards compatibility, so that "canonical" settings can be overridden by old, non-canonical
+    names.
+    """
+    return name.replace("_", "-").lower()
+
+
+def check_and_transform_config_name(context: str, config_namespace: str, config_name: str) -> tuple[str, str]:
     """
     Issue a warning if a config name is not recommended to be used, and transform the name into the recommended format.
 
     :param context: String that will be printed about where this warning comes from. Should be something like
         "file foo.json" or "target MCU_FOO".
+    :param config_namespace: Namespace of this config item.
     :param config_name: Name of config
 
-    :return: New name to use for the config.
+    :return: New namespace and name to use for the config.
     """
     if config_name.lower() != config_name:
         logger.warning(
             f"Config setting '{config_name}' in {context} contains uppercase letters. This style is not recommended and these will be replaced by lowercase letters."
+        )
+    if config_namespace.lower() != config_namespace:
+        logger.warning(
+            f"Config namespace '{config_namespace}' in {context} contains uppercase letters. This style is not recommended and these will be replaced by lowercase letters."
         )
     if "." in config_name:
         logger.warning(
@@ -100,8 +115,12 @@ def check_and_transform_config_name(context: str, config_name: str) -> str:
         logger.warning(
             f"Config setting '{config_name}' in {context} contains an underscore. This style is not recommended as it may cause confusion (config names should be in skewer-case). Underscores are replaced by hyphens when Mbed processes JSON settings."
         )
+    if "_" in config_namespace:
+        logger.warning(
+            f"Config namespace '{config_namespace}' in {context} contains an underscore. This style is not recommended as it may cause confusion (config names should be in skewer-case). Underscores are replaced by hyphens when Mbed processes JSON settings."
+        )
 
-    return config_name.replace("_", "-").lower()
+    return _to_canonical_json_setting_name(config_namespace), _to_canonical_json_setting_name(config_name)
 
 
 def from_mbed_lib_json_file(
@@ -149,12 +168,12 @@ def from_mbed_lib_json_file(
                 continue
 
             # Remove all underscores in the setting name and replace with hyphens, as this makes settings harder to get wrong
-            transformed_config_name = check_and_transform_config_name(context, config_name)
+            transformed_config_namespace, transformed_config_name = check_and_transform_config_name(context, mbed_lib.name, config_name)
 
             logger.debug("Extracting config setting from '%s': '%s'='%s'", mbed_lib.name, config_name, item)
             if isinstance(item, schemas.ConfigEntryDetails):
                 setting = ConfigSetting(
-                    namespace=mbed_lib.name,
+                    namespace=transformed_config_namespace,
                     name=transformed_config_name,
                     macro_name=item.macro_name,
                     help_text=item.help,
@@ -165,7 +184,7 @@ def from_mbed_lib_json_file(
                 )
             else:
                 setting = ConfigSetting(
-                    namespace=mbed_lib.name,
+                    namespace=transformed_config_namespace,
                     name=transformed_config_name,
                     macro_name=None,
                     help_text=None,
@@ -286,10 +305,10 @@ def _extract_config_settings(context: str, namespace: str, config_data: dict) ->
             help_text = None
             value = item
 
-        transformed_name = check_and_transform_config_name(context, name)
+        transformed_namespace, transformed_name = check_and_transform_config_name(context, namespace, name)
 
         setting = ConfigSetting(
-            namespace=namespace, name=transformed_name, macro_name=macro_name, help_text=help_text, value=value
+            namespace=transformed_namespace, name=transformed_name, macro_name=macro_name, help_text=help_text, value=value
         )
         # If the config item is about a certain component or feature
         # being present, avoid adding it to the mbed_config.cmake
@@ -331,8 +350,9 @@ def _extract_overrides(
             override_namespace = namespace
             override_name = name
 
-        # Remove all underscores in the setting name and replace with hyphens, as this makes settings harder to get wrong
-        override_name = override_name.replace("_", "-")
+        # Make the override names canonical, to match the transforms done to the actual settings
+        override_name = _to_canonical_json_setting_name(override_name)
+        override_namespace = _to_canonical_json_setting_name(override_namespace)
 
         if override_namespace not in {namespace, "target"} and namespace != "app":
             msg = (

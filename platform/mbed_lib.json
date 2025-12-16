@@ -125,7 +125,7 @@
             "value": true
         },
 
-        "cthunk_count_max": {
+        "cthunk-count-max": {
             "help": "The maximum CThunk objects used at the same time. This must be greater than 0 and less 256",
             "value": 8
         },

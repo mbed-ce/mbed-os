@@ -95,7 +95,7 @@ def _load_raw_targets_data(program: MbedProgram) -> dict[str, TargetJSON]:
             # We need to do this here, or otherwise warnings will only get printed
             # for the currently selected target instead of any defined target.
             for config_setting in target_json.config:
-                _ = check_and_transform_config_name("target " + target, config_setting)
+                _ = check_and_transform_config_name("target " + target, "target", config_setting)
 
             results[target] = target_json
         except pydantic.ValidationError:
