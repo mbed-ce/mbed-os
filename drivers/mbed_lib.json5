@@ -24,19 +24,19 @@
             "help": "Size of the asynchronous transaction queue for each SPI peripheral on the processor. 0 means no queueing support.  Only takes effect if the mbed target supports async SPI.",
             "value": 2
         },
-        "qspi_io0": {
+        "qspi-io0": {
             "help": "QSPI data I/O 0 pin",
             "value": "QSPI_FLASH1_IO0"
         },
-        "qspi_io1": {
+        "qspi-io1": {
             "help": "QSPI data I/O 1 pin",
             "value": "QSPI_FLASH1_IO1"
         },
-        "qspi_io2": {
+        "qspi-io2": {
             "help": "QSPI data I/O 2 pin",
             "value": "QSPI_FLASH1_IO2"
         },
-        "qspi_io3": {
+        "qspi-io3": {
             "help": "QSPI data I/O 3 pin",
             "value": "QSPI_FLASH1_IO3"
         },
@@ -48,35 +48,35 @@
             "help": "QSPI chip select pin",
             "value": "QSPI_FLASH1_CSN"
         },
-        "ospi_io0": {
+        "ospi-io0": {
             "help": "OSPI data I/O 0 pin",
             "value": "OSPI_FLASH1_IO0"
         },
-        "ospi_io1": {
+        "ospi-io1": {
             "help": "OSPI data I/O 1 pin",
             "value": "OSPI_FLASH1_IO1"
         },
-        "ospi_io2": {
+        "ospi-io2": {
             "help": "OSPI data I/O 2 pin",
             "value": "OSPI_FLASH1_IO2"
         },
-        "ospi_io3": {
+        "ospi-io3": {
             "help": "OSPI data I/O 3 pin",
             "value": "OSPI_FLASH1_IO3"
         },
-        "ospi_io4": {
+        "ospi-io4": {
             "help": "OSPI data I/O 4 pin",
             "value": "OSPI_FLASH1_IO4"
         },
-        "ospi_io5": {
+        "ospi-io5": {
             "help": "OSPI data I/O 5 pin",
             "value": "OSPI_FLASH1_IO5"
         },
-        "ospi_io6": {
+        "ospi-io6": {
             "help": "OSPI data I/O 6 pin",
             "value": "OSPI_FLASH1_IO6"
         },
-        "ospi_io7": {
+        "ospi-io7": {
             "help": "OSPI data I/O 7 pin",
             "value": "OSPI_FLASH1_IO7"
         },
