@@ -91,3 +91,15 @@
 [submodule "targets/TARGET_STM/TARGET_STM32L5/STM32Cube_FW/stm32l5xx-hal-driver"]
 	path = targets/TARGET_STM/TARGET_STM32L5/STM32Cube_FW/stm32l5xx-hal-driver
 	url = https://github.com/STMicroelectronics/stm32l5xx-hal-driver.git
+[submodule "targets/TARGET_STM/TARGET_STM32G0/STM32Cube_FW/cmsis-device-g0"]
+	path = targets/TARGET_STM/TARGET_STM32G0/STM32Cube_FW/cmsis-device-g0
+	url = https://github.com/STMicroelectronics/cmsis-device-g0.git
+[submodule "targets/TARGET_STM/TARGET_STM32G0/STM32Cube_FW/stm32g0xx-hal-driver"]
+	path = targets/TARGET_STM/TARGET_STM32G0/STM32Cube_FW/stm32g0xx-hal-driver
+	url = https://github.com/STMicroelectronics/stm32g0xx-hal-driver.git
+[submodule "targets/TARGET_STM/TARGET_STM32G4/STM32Cube_FW/cmsis-device-g4"]
+	path = targets/TARGET_STM/TARGET_STM32G4/STM32Cube_FW/cmsis-device-g4
+	url = https://github.com/STMicroelectronics/cmsis-device-g4.git
+[submodule "targets/TARGET_STM/TARGET_STM32G4/STM32Cube_FW/stm32g4xx-hal-driver"]
+	path = targets/TARGET_STM/TARGET_STM32G4/STM32Cube_FW/stm32g4xx-hal-driver
+	url = https://github.com/STMicroelectronics/stm32g4xx-hal-driver.git
