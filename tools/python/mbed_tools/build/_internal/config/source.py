@@ -354,7 +354,7 @@ def _extract_overrides(
         override_name = _to_canonical_json_setting_name(override_name)
         override_namespace = _to_canonical_json_setting_name(override_namespace)
 
-        if override_namespace not in {namespace, "target"} and namespace != "app":
+        if override_namespace not in {_to_canonical_json_setting_name(namespace), "target"} and namespace != "app":
             msg = (
                 "mbed_lib.json files may only override their own settings and settings from targets.json5."
                 f"An override was defined by {context} that attempts to override "
