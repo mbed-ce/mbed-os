@@ -115,3 +115,15 @@
 [submodule "targets/TARGET_STM/TARGET_STM32WL/STM32Cube_FW/stm32wlxx-hal-driver"]
 	path = targets/TARGET_STM/TARGET_STM32WL/STM32Cube_FW/stm32wlxx-hal-driver
 	url = https://github.com/STMicroelectronics/stm32wlxx-hal-driver.git
+[submodule "targets/TARGET_STM/TARGET_STM32U3/STM32Cube_FW/cmsis-device-u3"]
+	path = targets/TARGET_STM/TARGET_STM32U3/STM32Cube_FW/cmsis-device-u3
+	url = https://github.com/STMicroelectronics/cmsis-device-u3.git
+[submodule "targets/TARGET_STM/TARGET_STM32U3/STM32Cube_FW/stm32u3xx-hal-driver"]
+	path = targets/TARGET_STM/TARGET_STM32U3/STM32Cube_FW/stm32u3xx-hal-driver
+	url = https://github.com/STMicroelectronics/stm32u3xx-hal-driver.git
+[submodule "targets/TARGET_STM/TARGET_STM32N6/STM32Cube_FW/cmsis-device-n6"]
+	path = targets/TARGET_STM/TARGET_STM32N6/STM32Cube_FW/cmsis-device-n6
+	url = https://github.com/STMicroelectronics/cmsis-device-n6.git
+[submodule "targets/TARGET_STM/TARGET_STM32N6/STM32Cube_FW/stm32n6xx-hal-driver"]
+	path = targets/TARGET_STM/TARGET_STM32N6/STM32Cube_FW/stm32n6xx-hal-driver
+	url = https://github.com/STMicroelectronics/stm32n6xx-hal-driver.git
