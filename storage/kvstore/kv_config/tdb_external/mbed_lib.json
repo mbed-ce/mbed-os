@@ -1,5 +1,5 @@
 {
-    "name": "storage_tdb_external",
+    "name": "storage-tdb-external",
     "config": {
         "rbp-internal-size": {
             "help": "Default is the larger of the last 2 sectors or last 14 pages of flash.",

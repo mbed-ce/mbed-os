@@ -1,7 +1,7 @@
 {
     "name": "nanostack-hal",
     "config": {
-        "event_loop_thread_stack_size": {
+        "event-loop-thread-stack-size": {
             "help": "Define event-loop thread stack size. [bytes]",
             "value": 6144
         },

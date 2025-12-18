@@ -1,5 +1,5 @@
 {
-    "name": "storage_filesystem",
+    "name": "storage-filesystem",
     "config": {
         "rbp-internal-size": {
             "help": "Default is the larger of the last 2 sectors or last 14 pages of flash.",
@@ -25,11 +25,11 @@
             "help": "The default will set start address to address 0",
             "value": "0"
         },
-        "mount_point": {
+        "mount-point": {
             "help": "Where to mount the filesystem.",
             "value": "kv"
         },
-        "folder_path": {
+        "folder-path": {
             "help": "Path for the working directory where the FileSystemStore stores the data",
             "value": "kvstore"
         }

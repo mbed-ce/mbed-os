@@ -1,12 +1,12 @@
 {
   "name": "littlefs",
   "config": {
-    "read_size": {
+    "read-size": {
         "macro_name": "MBED_LFS_READ_SIZE",
         "value": 64,
         "help": "Minimum size of a block read. This determines the size of read buffers. This may be larger than the physical read size to improve performance by caching more of the block device."
     },
-    "prog_size": {
+    "prog-size": {
         "macro_name": "MBED_LFS_PROG_SIZE",
         "value": 64,
         "help": "Minimum size of a block program. This determines the size of program buffers. This may be larger than the physical program size to improve performance by caching more of the block device."

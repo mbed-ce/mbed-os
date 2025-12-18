@@ -1,10 +1,6 @@
 {
     "name": "cellular",
     "config": {
-        "present": {
-            "help": "MBED_CONF_CELLULAR_PRESENT will be defined if cellular is used",
-            "value": 1
-        },
         "use-apn-lookup": {
             "help": "Use APN database lookup",
             "value": false
@@ -13,7 +9,7 @@
             "help": "Enable or disable SMS functionality in Cellular stack.",
             "value": false
         },
-        "random_max_start_delay": {
+        "random-max-start-delay": {
             "help": "Maximum random delay value used in start-up sequence in seconds",
             "value": 0
         },
