@@ -869,7 +869,7 @@ int mbedtls_pk_load_file( const char *path, unsigned char **buf, size_t *n );
  * \return          An Mbed TLS error code otherwise.
  */
 int mbedtls_pk_wrap_as_opaque( mbedtls_pk_context *pk,
-                               psa_key_id_t *key,
+                               psa_key_handle_t *key,
                                psa_algorithm_t hash_alg );
 #endif /* MBEDTLS_USE_PSA_CRYPTO */
 
