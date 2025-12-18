@@ -249,25 +249,28 @@ void rtc_write(time_t t)
 #if TARGET_STM32F1
 
     RtcHandle.Instance = RTC;
-
-    /* Set Initialization mode */
-    if (RTC_EnterInitMode(RtcHandle) != HAL_OK)
-    {
-        error("rtc_write: write init error\n");
-    }
-    else
-    {
-        /* Set RTC COUNTER MSB word */
-        WRITE_REG(RtcHandle.Instance->CNTH, (t >> 16U));
-        /* Set RTC COUNTER LSB word */
-        WRITE_REG(RtcHandle.Instance->CNTL, (t & RTC_CNTL_RTC_CNT));
-
-        /* Wait for synchro */
-        if (RTC_ExitInitMode(RtcHandle) != HAL_OK)
-        {
+    
+    /* STM32F1 RTC uses a 32-bit counter for seconds - write the full timestamp */
+    /* Disable write protection */
+    __HAL_RTC_WRITEPROTECTION_DISABLE(&RtcHandle);
+    
+    /* Enter initialization mode */
+    SET_BIT(RtcHandle.Instance->CRL, RTC_CRL_CNF);
+    
+    /* Write the 32-bit timestamp to the counter registers */
+    WRITE_REG(RtcHandle.Instance->CNTH, (t >> 16U));
+    WRITE_REG(RtcHandle.Instance->CNTL, (t & RTC_CNTL_RTC_CNT));
+    
+    /* Exit initialization mode */
+    CLEAR_BIT(RtcHandle.Instance->CRL, RTC_CRL_CNF);
+    
+    /* Wait for synchronization */
+    if (HAL_RTC_WaitForSynchro(&RtcHandle) != HAL_OK) {
         error("rtc_write: sync error\n");
-        }
     }
+    
+    /* Enable write protection */
+    __HAL_RTC_WRITEPROTECTION_ENABLE(&RtcHandle);
 
 #else /* TARGET_STM32F1 */
 
