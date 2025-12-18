@@ -183,7 +183,21 @@ time_t rtc_read(void)
 #if TARGET_STM32F1
 
     RtcHandle.Instance = RTC;
-    return RTC_ReadTimeCounter(&RtcHandle);
+    /* Read time counter with rollover protection */
+    uint16_t high1 = READ_REG(RtcHandle.Instance->CNTH & RTC_CNTH_RTC_CNT);
+    uint16_t low = READ_REG(RtcHandle.Instance->CNTL & RTC_CNTL_RTC_CNT);
+    uint16_t high2 = READ_REG(RtcHandle.Instance->CNTH & RTC_CNTH_RTC_CNT);
+    
+    uint32_t timecounter;
+    if (high1 != high2) {
+        /* Counter rolled over during read, use high2 with fresh low read */
+        timecounter = (((uint32_t)high2 << 16U) | READ_REG(RtcHandle.Instance->CNTL & RTC_CNTL_RTC_CNT));
+    } else {
+        /* No rollover */
+        timecounter = (((uint32_t)high1 << 16U) | low);
+    }
+    
+    return timecounter;
 
 #else /* TARGET_STM32F1 */
 
@@ -235,8 +249,24 @@ void rtc_write(time_t t)
 #if TARGET_STM32F1
 
     RtcHandle.Instance = RTC;
-    if (RTC_WriteTimeCounter(&RtcHandle, t) != HAL_OK) {
-        error("RTC_WriteTimeCounter error\n");
+
+    /* Set Initialization mode */
+    if (RTC_EnterInitMode(RtcHandle) != HAL_OK)
+    {
+        error("rtc_write: write init error\n");
+    }
+    else
+    {
+        /* Set RTC COUNTER MSB word */
+        WRITE_REG(RtcHandle.Instance->CNTH, (t >> 16U));
+        /* Set RTC COUNTER LSB word */
+        WRITE_REG(RtcHandle.Instance->CNTL, (t & RTC_CNTL_RTC_CNT));
+
+        /* Wait for synchro */
+        if (RTC_ExitInitMode(RtcHandle) != HAL_OK)
+        {
+        error("rtc_write: sync error\n");
+        }
     }
 
 #else /* TARGET_STM32F1 */
