@@ -10,9 +10,14 @@ The hierarchy is also slightly different to the other fields as it is determined
 multiple inheritance, so targets at a lower level will always take precedence over targets at a higher level.
 """
 
+from __future__ import annotations
+
 import itertools
 from collections import deque
-from typing import Any, Deque, Dict, List
+from typing import TYPE_CHECKING, Any, Deque, Dict, List
+
+if TYPE_CHECKING:
+    from mbed_tools.build._internal.config.schemas import TargetJSON
 
 ACCUMULATING_ATTRIBUTES = ("extra_labels", "macros", "device_has", "features", "components")
 MODIFIERS = ("add", "remove")
@@ -21,7 +26,7 @@ ALL_ACCUMULATING_ATTRIBUTES = ACCUMULATING_ATTRIBUTES + tuple(
 )
 
 
-def get_accumulating_attributes_for_target(all_targets_data: Dict[str, Any], target_name: str) -> Dict[str, Any]:
+def get_accumulating_attributes_for_target(all_targets_data: Dict[str, TargetJSON], target_name: str) -> Dict[str, Any]:
     """
     Parses the data for all targets and returns the accumulating attributes for the specified target.
 
@@ -36,7 +41,7 @@ def get_accumulating_attributes_for_target(all_targets_data: Dict[str, Any], tar
     return _determine_accumulated_attributes(accumulating_order)
 
 
-def _targets_accumulate_hierarchy(all_targets_data: Dict[str, Any], target_name: str) -> List[dict]:
+def _targets_accumulate_hierarchy(all_targets_data: Dict[str, TargetJSON], target_name: str) -> List[dict[str, Any]]:
     """
     List all ancestors of a target in order of accumulation inheritance (breadth-first).
 
@@ -61,15 +66,19 @@ def _targets_accumulate_hierarchy(all_targets_data: Dict[str, Any], target_name:
     Returns:
         A list of dicts representing each target in the hierarchy.
     """
-    targets_in_order: List[dict] = []
+    targets_in_order: List[Dict[str, Any]] = []
 
-    still_to_visit: Deque[dict] = deque()
+    still_to_visit: Deque[TargetJSON] = deque()
     still_to_visit.appendleft(all_targets_data[target_name])
 
     while still_to_visit:
         current_target = still_to_visit.popleft()
-        targets_in_order.append(current_target)
-        for parent_target in current_target.get("inherits", []):
+
+        # At this point we need to work with individual attributes, so we need to dump from
+        # Pydantic model to a dict.
+        targets_in_order.append(current_target.model_dump(exclude_unset=True))
+
+        for parent_target in current_target.inherits:
             still_to_visit.append(all_targets_data[parent_target])
 
     return targets_in_order
@@ -88,28 +97,14 @@ def _add_attribute_element(accumulator: Dict[str, Any], attribute_name: str, ele
         accumulator[attribute_name].append(element)
 
 
-def _element_matches(element_to_remove: str, element_to_check: str) -> bool:
-    """
-    Checks if an element meets the criteria to be removed from list.
-
-    Some attribute elements (eg. macros) can be defined with a number value
-    eg. MACRO_SOMETHING=5. If we are then instructed to remove
-    MACRO_SOMETHING then this element needs to be recognised and removed
-    in addition to exact matches.
-
-    Args:
-        element_to_remove: the element as taken from list to be removed from an attribute
-        element_to_check: an element that currently makes up part of an attribute definition
-
-    Returns:
-        A boolean reflecting whether the element is a match and should be removed
-    """
-    return element_to_check == element_to_remove or element_to_check.startswith(f"{element_to_remove}=")
-
-
 def _remove_attribute_element(accumulator: Dict[str, Any], attribute_name: str, elements_to_remove: List[Any]) -> None:
     """
     Removes an attribute element from an attribute.
+
+    Note that macros can be defined with a number value
+    eg. "MACRO_SOMETHING=5". If we are then instructed to remove
+    MACRO_SOMETHING then this element needs to be recognised and removed
+    in addition to exact matches. This logic is specific to the "macros" attribute_name
 
     Args:
         accumulator: a store of attributes to be updated
@@ -120,8 +115,9 @@ def _remove_attribute_element(accumulator: Dict[str, Any], attribute_name: str, 
     combinations_to_check = itertools.product(existing_elements, elements_to_remove)
     checked_elements_to_remove = [
         existing_element
-        for existing_element, element in combinations_to_check
-        if _element_matches(element, existing_element)
+        for existing_element, element_to_remove in combinations_to_check
+        if (attribute_name == "macros" and existing_element.startswith(f"{element_to_remove}="))
+        or (element_to_remove == existing_element)
     ]
 
     for element in checked_elements_to_remove:

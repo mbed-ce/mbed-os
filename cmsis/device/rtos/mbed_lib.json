@@ -1,11 +1,10 @@
 {
     "name": "rtos",
     "config": {
-      "rtos": {
-         "help": "Select RTOS  (RTX or N/A)",
-         "value": "RTX"
-      },
-        "present": 1,
+        "rtos": {
+           "help": "Select RTOS  (RTX or N/A)",
+           "value": "RTX"
+         },
          "main-thread-stack-size": {
             "help": "The size of the main thread's stack",
             "value": 4096

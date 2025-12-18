@@ -1,37 +1,22 @@
 {
     "Target": {
         "core": null,
-        "trustzone": false,
-        "default_toolchain": "ARM",
-        "supported_toolchains": null,
         "extra_labels": [],
         "supported_form_factors": [],
         "components": [],
-        "is_disk_virtual": false,
         "macros": [],
         "device_has": [],
         "features": [],
-        "detect_code": [],
         "public": false,
         "c_lib": "std",
-        "bootloader_supported": false,
-        "static_memory_defines": true,
         "printf_lib": "minimal-printf",
+        "OUTPUT_EXT": "",
         "supported_c_libs": {
-            "arm": [
-                "std"
-            ],
             "gcc_arm": [
                 "std",
                 "small"
-            ],
-            "iar": [
-                "std"
             ]
         },
-        "supported_application_profiles": [
-            "full"
-        ],
         "config": {
             "console-uart": {
                 "help": "Target has UART console on pins CONSOLE_TX, CONSOLE_RX. Value is only significant if target has SERIAL device. Mutually exclusive with target.console-usb.",
@@ -146,11 +131,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros_add": [
             "TFM_MULTI_CORE_MULTI_CLIENT_CALL=1"
         ],
-        "tfm_target_name": "",
-        "tfm_bootloader_supported": "",
-        "tfm_default_toolchain": "ARMCLANG",
-        "tfm_supported_toolchains": null,
-        "tfm_delivery_dir": "",
         "public": false
     },
     "PSA_V8_M": {
@@ -165,68 +145,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has": [
             "TRNG"
         ],
-        "tfm_target_name": "",
-        "tfm_bootloader_supported": "",
-        "tfm_default_toolchain": "ARMCLANG",
-        "tfm_supported_toolchains": null,
-        "tfm_delivery_dir": "",
         "public": false
-    },
-    "CM4_UARM": {
-        "inherits": [
-            "Target"
-        ],
-        "core": "Cortex-M4",
-        "default_toolchain": "uARM",
-        "public": false,
-        "supported_toolchains": [
-            "uARM"
-        ],
-        "default_lib": "small",
-        "detect_code": [
-            "9992"
-        ]
-    },
-    "CM4_ARM": {
-        "inherits": [
-            "Target"
-        ],
-        "core": "Cortex-M4",
-        "public": false,
-        "supported_toolchains": [
-            "ARM"
-        ],
-        "detect_code": [
-            "9993"
-        ]
-    },
-    "CM4F_UARM": {
-        "inherits": [
-            "Target"
-        ],
-        "core": "Cortex-M4F",
-        "default_toolchain": "uARM",
-        "public": false,
-        "supported_toolchains": [
-            "uARM"
-        ],
-        "default_lib": "small",
-        "detect_code": [
-            "9990"
-        ]
-    },
-    "CM4F_ARM": {
-        "inherits": [
-            "Target"
-        ],
-        "core": "Cortex-M4F",
-        "public": false,
-        "supported_toolchains": [
-            "ARM"
-        ],
-        "detect_code": [
-            "9991"
-        ]
     },
 
 // Analog Devices targets ----------------------------------------------------------------------------------------------
@@ -235,9 +154,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Target"
         ],
         "core": "Cortex-M4F",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "macros": [
             "__ADUCM4050__",
             "EV_COG_AD4050LZ"
@@ -263,24 +179,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU"
         ],
         "device_name": "ADuCM4050",
-        "detect_code": [
-            "0603"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "bootloader_supported": true,
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-images/images/ev-cog-ad4050lzangle-web.gif?rev=40854bbeb052442f8c1e3af0ed0cc9aa&sc_lang=en&h=500&thn=1&hash=1CC040DB3294C38F0A712BD1A3D1951D"
     },
     "EV_COG_AD3029LZ": {
@@ -288,9 +186,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Target"
         ],
         "core": "Cortex-M3",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "macros": [
             "__ADUCM3029__",
             "EV_COG_AD3029LZ"
@@ -316,24 +211,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU"
         ],
         "device_name": "ADuCM3029",
-        "detect_code": [
-            "0602"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "bootloader_supported": true,
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-images/images/ev-cog-ad3029lzangle-web.gif?rev=dcc918a6e9b64a60a3ce0fc397a9a88d&sc_lang=en&h=500&thn=1&hash=ED3986B5366C771376C5F062488FE056"
     },
 
@@ -342,9 +219,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "Target"
         ],
-        "post_binary_hook": {
-            "function": "LPCTargetCode.lpc_patch"
-        },
         "public": false
     },
     "LPC1114": {
@@ -352,7 +226,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPCTarget"
         ],
         "core": "Cortex-M0",
-        "default_toolchain": "ARM",
         "extra_labels": [
             "NXP",
             "LPC11XX_11CXX",
@@ -361,9 +234,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros": [
             "CMSIS_VECTAB_VIRTUAL",
             "CMSIS_VECTAB_VIRTUAL_HEADER_FILE=\"cmsis_nvic.h\""
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "device_has": [
             "ANALOGIN",
@@ -384,25 +254,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "tickless-from-us-ticker": true,
             "boot-stack-size": "0x300"
         },
-        "supported_c_libs": {
-            "arm": [
-                "std", "small"
-            ],
-            "gcc_arm": [
-                "std", "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
         "c_lib": "small",
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "device_name": "LPC1114FN28/102",
-        "detect_code": [
-            "1114"
-        ],
         "image_url": "https://os.mbed.com/media/cache/platforms/LPC1114_1_hXXAnmW.jpg.250x250_q85.jpg"
     },
     "MCU_LPC17XX": {
@@ -415,9 +268,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "NXP",
             "LPC17XX",
             "NXP_EMAC"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "macros_add": [
             "MBED_SPLIT_HEAP"
@@ -448,10 +298,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "WATCHDOG",
             "RESET_REASON"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "bootloader_supported": true,
         "config": {
             "us-ticker-timer": {
                 "help": "Chooses which timer (0-3) to use for us_ticker.c",
@@ -469,17 +315,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "network-default-interface-type": "ETHERNET",
         },
-        "supported_c_libs": {
-            "arm": [
-                "std", "small"
-            ],
-            "gcc_arm": [
-                "std", "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true
     },
     "LPC1768": {
@@ -490,9 +325,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_LPC1768",
         ],
         "device_name": "LPC1768",
-        "detect_code": [
-            "1010"
-        ],
         "components_add": [
             "LOCALFILESYSTEM"
         ],
@@ -523,9 +355,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         // "supported_form_factors": [
         //     "ARDUINO_UNO"
         // ],
-        "detect_code": [
-            "9004"
-        ],
         "overrides": {
             "default-adc-vref": 3.3 // Per schematic, Vref is 3.3V
         },
@@ -542,15 +371,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Freescale",
             "KLXX"
         ],
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "inherits": [
             "Target"
-        ],
-        "detect_code": [
-            "0200"
         ],
         "device_has": [
             "USTICKER",
@@ -568,23 +390,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPI",
             "SPISLAVE"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "MKL25Z128xxx4",
         "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
             "gcc_arm": [
                 "std",
                 "small"
             ]
         },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "image_url": "https://os.mbed.com/media/uploads/chris/frd_small.jpg"
     },
     "KL46Z": {
@@ -597,15 +409,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "KLXX",
             "FLASH_CMSIS_ALGO"
         ],
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "inherits": [
             "Target"
-        ],
-        "detect_code": [
-            "0220"
         ],
         "device_has": [
             "USTICKER",
@@ -624,31 +429,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPISLAVE",
             "FLASH"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "MKL46Z256VLL4",
-        "bootloader_supported": true,
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/BOARD-FRDM-KL46Z-PRODUCT-SHOT.png"
     },
     "MCU_K22F512": {
         "core": "Cortex-M4F",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "Freescale",
             "MCUXpresso_MCUS",
@@ -659,7 +444,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "KPSDK_MCUS",
             "KPSDK_CODE"
         ],
-        "is_disk_virtual": true,
         "public": false,
         "macros": [
             "CPU_MK22FN512VLH12",
@@ -668,9 +452,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "inherits": [
             "Target"
-        ],
-        "detect_code": [
-            "0231"
         ],
         "device_has": [
             "USTICKER",
@@ -693,20 +474,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USBDEVICE",
             "FLASH"
         ],
-        "device_name": "MK22FN512VLH12",
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ]
+        "device_name": "MK22FN512VLH12"
     },
     "K22F": {
         "supported_form_factors": [
@@ -715,14 +483,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_K22F512"
         ],
-        "release_versions": [
-            "5"
-        ],
         "extra_labels_add": [
             "FRDM"
-        ],
-        "detect_code": [
-            "0231"
         ],
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-K22F-ANGLE.jpg"
     },
@@ -731,9 +493,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO"
         ],
         "core": "Cortex-M0+",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "Freescale",
             "MCUXpresso_MCUS",
@@ -744,12 +503,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "CPU_MKL43Z256VLH4",
             "FSL_RTOS_MBED"
         ],
-        "is_disk_virtual": true,
         "inherits": [
             "Target"
-        ],
-        "detect_code": [
-            "0262"
         ],
         "device_has": [
             "USTICKER",
@@ -771,23 +526,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USBDEVICE",
             "FLASH"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "MKL43Z256VLH4",
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-KL43Z-BLOCK-DIAGRAM.jpg"
     },
     "KW41Z": {
@@ -795,9 +534,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "core": "Cortex-M0+",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "Freescale",
             "MCUXpresso_MCUS",
@@ -805,7 +541,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FRDM",
             "FRAMEWORK_5_3_3"
         ],
-        "is_disk_virtual": true,
         "macros": [
             "CPU_MKW41Z512VHT4",
             "FSL_RTOS_MBED",
@@ -813,9 +548,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "inherits": [
             "Target"
-        ],
-        "detect_code": [
-            "0201"
         ],
         "device_has": [
             "USTICKER",
@@ -838,11 +570,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH",
             "802_15_4_PHY"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "MKW41Z512xxx4",
-        "bootloader_supported": true,
         "overrides": {
             "network-default-interface-type": "MESH"
         },
@@ -850,9 +578,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "MCU_K64F": {
         "core": "Cortex-M4F",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels_add": [
             "Freescale",
             "MCUXpresso_MCUS",
@@ -898,30 +623,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USBDEVICE",
             "WATCHDOG"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "MK64FN1M0xxx12",
-        "bootloader_supported": true,
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true,
         "public": false
     },
@@ -935,12 +640,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "FRDM"
         ],
-        "is_disk_virtual": true,
         "inherits": [
             "MCU_K64F"
-        ],
-        "detect_code": [
-            "0240"
         ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/407/MFG_FRDM-K64F.JPG"
     },
@@ -952,17 +653,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "K64F"
         ],
         "supported_form_factors": [],
-        "detect_code": [
-            "3105"
-        ],
         "image_url": "https://os.mbed.com/media/cache/platforms/SDT64B_size.png.250x250_q85.png"
     },
     "HEXIWEAR": {
         "inherits": [
             "MCU_K64F"
-        ],
-        "detect_code": [
-            "0214"
         ],
         "image_url": "https://os.mbed.com/media/cache/platforms/Hexiwear_Platform_Image_19Ja2aX_pNSWsjb.png.250x250_q85.png",
     },
@@ -974,9 +669,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SD",
         ],
         "core": "Cortex-M4F",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels_add": [
             "Freescale",
             "MCUXpresso_MCUS",
@@ -984,7 +676,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FRDM",
             "Freescale_EMAC"
         ],
-        "is_disk_virtual": true,
         "macros_add": [
             "CPU_MK66FN2M0VMD18",
             "FSL_RTOS_MBED",
@@ -993,9 +684,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "inherits": [
             "PSA_V7_M"
-        ],
-        "detect_code": [
-            "0311"
         ],
         "device_has_add": [
             "USTICKER",
@@ -1020,30 +708,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TRNG",
             "FLASH"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "MK66FN2M0xxx18",
-        "bootloader_supported": true,
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-K66F-BD.jpg"
     },
     "K82F": { // AKA FRDM-K82F
@@ -1054,16 +722,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPIF",
         ],
         "core": "Cortex-M4F",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "Freescale",
             "MCUXpresso_MCUS",
             "KSDK2_MCUS",
             "FRDM"
         ],
-        "is_disk_virtual": true,
         "macros": [
             "CPU_MK82FN256VDC15",
             "FSL_RTOS_MBED",
@@ -1071,9 +735,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "inherits": [
             "Target"
-        ],
-        "detect_code": [
-            "0217"
         ],
         "device_has": [
             "USTICKER",
@@ -1097,23 +758,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USBDEVICE",
             "QSPI"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "MK82FN256xxx15",
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true,
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/117498-CS_FRDM-K82-Board-Top_Mbed.jpg"
     },
@@ -1127,31 +772,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels": [
             "STM"
         ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
-        "supported_application_profiles": [
-            "full",
-            "bare-metal"
-        ],
         "macros": [
             "USE_HAL_DRIVER",
             "USE_FULL_LL_DRIVER"
         ],
-        "bootloader_supported": true,
         "config": {
             "lse_available": {
                 "help": "Define if a Low Speed External xtal (LSE) is available on the board (0 = No, 1 = Yes). If Yes, the LSE will be used to clock the RTC, LPUART, ... otherwise the Low Speed Internal clock (LSI) will be used",
@@ -1181,9 +805,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "macro_name": "LPTICKER_DELAY_TICKS"
             },
             "lpticker_lptim_clock": {
-                "help": "Default value for LPTIM clock (lpticker_lptim == 1). Value is the dividing factor. Choose 1, 2, 4, 8, 16, 32, 64 or 128",
-                "value": 1,
-                "constraint": "Disclaimers : values from 8 to 128 have impacts on mbed-os timer precision and therefore on scheduling. It's not supported by mbed-os. Use it if you know what you're doing such as long low power sleep."
+                "help": "Default value for LPTIM clock (lpticker_lptim == 1). Value is the dividing factor. Choose 1, 2, 4, 8, 16, 32, 64 or 128. Disclaimer: values from 8 to 128 have impacts on mbed-os timer precision and therefore on scheduling. It's not supported by mbed-os. Use it if you know what you're doing such as long low power sleep.",
+                "value": 1
             },
             "gpio_reset_at_init": {
                 "help": "if value set, all GPIO are reset during init",
@@ -1263,9 +886,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32F030x8"
         ],
@@ -1295,9 +915,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0755"
-        ],
         "device_name": "STM32F070RBTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF261500.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1324,9 +941,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0730"
-        ],
         "device_name": "STM32F072RBTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF261500.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1352,9 +966,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0750"
         ],
         "device_name": "STM32F091RCTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF261500.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -1418,9 +1029,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0700"
         ],
         "device_name": "STM32F103RB",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF259875.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -1545,9 +1153,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
             }
         },
-        "detect_code": [
-            "0835"
-        ],
         "device_has_add": [
             "USBDEVICE"
         ],
@@ -1627,9 +1232,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "clock_source": "USE_PLL_HSI",
             "lse_available": 0
         },
-        "detect_code": [
-            "0775"
-        ],
         "device_name": "STM32F303K8Tx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262544.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1673,9 +1275,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0745"
-        ],
         "device_name": "STM32F303RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1685,9 +1284,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0747"
         ],
         "device_has_add": [
             "USBDEVICE"
@@ -1755,9 +1351,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0720"
-        ],
         "device_name": "STM32F401RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260000.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1785,7 +1378,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "program_cycle_s": 2,
         "components_add": [
             "SD"
         ],
@@ -1803,9 +1395,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "lse_available": 0,
             "network-default-interface-type": "ETHERNET"
         },
-        "detect_code": [
-            "9011"
-        ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/1881/MFG_102110014.jpg"
     },
     "MCU_STM32F411xE": {
@@ -1826,9 +1415,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0740"
         ],
         "device_name": "STM32F411RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -1851,9 +1437,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER"
         ],
         "device_name": "STM32F411RETx",
-        "detect_code": [
-            "0454"
-        ],
         "components_add": [
             "TELIT_HE910"
         ],
@@ -1874,9 +1457,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SERIAL_FC"
         ],
         "device_name": "STM32F411RETx",
-        "detect_code": [
-            "0320"
-        ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/1290/MTDOT-868-X1P-SMA-1.jpg"
     },
     "BLACKPILL_F411CE": {
@@ -1891,10 +1471,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "device_has_add": [
             "USBDEVICE"
-        ],
-        "bootloader_supported": true,
-        "detect_code": [
-            "0740"
         ],
         "device_name": "STM32F411CEYx",
         "image_url": "https://user-images.githubusercontent.com/1301112/69389644-eb5fb080-0ccc-11ea-8002-67d3db851250.png"
@@ -1938,9 +1514,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0826"
-        ],
         "device_has_add": [
             "USBDEVICE"
         ],
@@ -1961,9 +1534,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "clock_source": "USE_PLL_HSI",
             "network-default-interface-type": "WIFI"
         },
-        "detect_code": [
-            "0451"
-        ],
         "image_url": "https://cdn.mxchip.com/mxchip_official_website/img/EMW3166-P-%E7%99%BD-%E6%AD%A3.jpg"
     },
     "MCU_STM32F413xH": {
@@ -2006,9 +1576,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "N25Q128A"
         ],
-        "detect_code": [
-            "0743"
-        ],
         "device_has_add": [
             "QSPI",
             "USBDEVICE"
@@ -2022,9 +1589,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0743"
         ],
         "device_has_add": [
             "USBDEVICE"
@@ -2077,9 +1641,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EMAC",
             "USBDEVICE"
         ],
-        "detect_code": [
-            "0796"
-        ],
         "device_name": "STM32F429ZITx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
@@ -2103,9 +1664,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER"
         ],
         "device_name": "STM32F429ZITx",
-        "detect_code": [
-            "0795"
-        ],
         "image_url": "https://m.media-amazon.com/images/I/71M-Bd6yaJL._AC_UF894,1000_QL80_.jpg"
     },
     "MCU_STM32F439xI": {
@@ -2148,9 +1706,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EMAC",
             "USBDEVICE"
         ],
-        "detect_code": [
-            "0797"
-        ],
         "device_name": "STM32F439ZITx",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
@@ -2180,9 +1735,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0777"
-        ],
         "device_name": "STM32F446RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -2199,9 +1751,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "USE_USB_OTG_FS"
             }
         },
-        "detect_code": [
-            "0778"
-        ],
         "device_has_add": [
             "USBDEVICE"
         ],
@@ -2241,9 +1790,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
         },
-        "detect_code": [
-            "0788"
-        ],
         "device_has_add": [
             "QSPI",
             "USBDEVICE"
@@ -2281,9 +1827,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER"
         ],
         "device_name": "STM32F469NIHx",
-        "detect_code": [
-            "0604"
-        ],
         "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-images/images/eval-sdp-ck1ztop-web.gif?rev=2b0d46c94afe490cb3543819752a0471&sc_lang=en&h=270&thn=1&hash=C1A2567A6E5A569665B40C5DCFE1B8C3"
     },
 
@@ -2351,9 +1894,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0812"
-        ],
         "device_name": "STM32F722ZETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -2381,9 +1921,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
             "network-default-interface-type": "ETHERNET"
         },
-        "detect_code": [
-            "0815"
-        ],
         "macros_add": [
             "STM32F746xx",
             "HSE_VALUE=25000000"
@@ -2417,9 +1954,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0816"
-        ],
         "device_has_add": [
             "EMAC",
             "USBDEVICE"
@@ -2452,9 +1986,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0819"
-        ],
         "device_has_add": [
             "EMAC",
             "USBDEVICE"
@@ -2481,9 +2012,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "STM32F767xx"
-        ],
-        "detect_code": [
-            "9020"
         ],
         "device_has_remove": [
             "SERIAL_FC"
@@ -2515,9 +2043,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "STM32F767xx"
-        ],
-        "detect_code": [
-            "0818"
         ],
         "device_has_add": [
             "EMAC",
@@ -2553,9 +2078,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "USE_USB_OTG_HS"
             }
         },
-        "detect_code": [
-            "0817"
-        ],
         "macros_add": [
             "STM32F769xx",
             "HSE_VALUE=25000000"
@@ -2622,9 +2144,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32G0"
         ],
         "public": false,
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G030x8"
         ],
@@ -2645,9 +2164,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G031x8"
         ],
@@ -2658,9 +2174,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "NUCLEO_G031K8": {
         "inherits": [
             "MCU_STM32G031x8"
-        ],
-        "detect_code": [
-            "0852"
         ],
         "device_name": "STM32G031K8Tx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267508.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2673,9 +2186,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G041x8"
         ],
@@ -2688,9 +2198,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32G0"
         ],
         "public": false,
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G050x8"
         ],
@@ -2711,9 +2218,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G051x8"
         ],
@@ -2732,9 +2236,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "extra_labels_add": [
             "STM32G061x8"
         ],
@@ -2786,9 +2287,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0221"
         ],
         "device_name": "STM32G071RBTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF265386.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2847,9 +2345,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0872"
         ],
         "device_name": "STM32G0B1RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF265386.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2942,9 +2437,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0850"
-        ],
         "overrides": {
             "hse_value": 24000000
         },
@@ -2959,9 +2451,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "clock_source": "USE_PLL_HSI",
         "lse_available":  0
       },
-      "detect_code": [
-        "0851"
-      ],
       "device_name": "STM32G431KBTx",
       "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267030.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -3023,9 +2512,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "hse_value": 24000000
         },
-        "detect_code": [
-            "0841"
-        ],
         "device_name": "STM32G474RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267029.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -3166,9 +2652,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0832"
-        ],
         "device_name": "STM32H503RBTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF274336.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -3206,9 +2689,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0878"
         ],
         "device_name": "STM32H563ZITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF274337.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -3257,9 +2737,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "MX25LM51245G"
         ],
-        "detect_code": [
-            "0831"
-        ],
         "device_has_add": [
             "QSPI",
             "OSPI"
@@ -3292,10 +2769,18 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "RCC_LSEDRIVE_LOW"
             },
             "system_power_supply": {
-                "expected_value1": "PWR_LDO_SUPPLY | PWR_DIRECT_SMPS_SUPPLY",
-                "expected_value2": "PWR_SMPS_1V8_SUPPLIES_LDO | PWR_SMPS_2V5_SUPPLIES_LDO | PWR_SMPS_1V8_SUPPLIES_EXT_AND_LDO | PWR_SMPS_2V5_SUPPLIES_EXT_AND_LDO",
-                "expected_value3": "PWR_SMPS_1V8_SUPPLIES_EXT | PWR_SMPS_2V5_SUPPLIES_EXT | PWR_EXTERNAL_SOURCE_SUPPLY",
-                "value": "NC"
+                accepted_values: [
+                    "PWR_LDO_SUPPLY",
+                    "PWR_DIRECT_SMPS_SUPPLY",
+                    "PWR_SMPS_1V8_SUPPLIES_LDO",
+                    "PWR_SMPS_2V5_SUPPLIES_LDO",
+                    "PWR_SMPS_1V8_SUPPLIES_EXT_AND_LDO",
+                    "PWR_SMPS_2V5_SUPPLIES_EXT_AND_LDO",
+                    "PWR_SMPS_1V8_SUPPLIES_EXT",
+                    "PWR_SMPS_2V5_SUPPLIES_EXT",
+                    "PWR_EXTERNAL_SOURCE_SUPPLY"
+                ],
+                "value": null
             },
             "i2c_timing_value_algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
@@ -3450,9 +2935,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0836"
-        ],
         "device_name": "STM32H743ZITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -3460,14 +2942,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_STM32H723xG"
         ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels_add": [
             "STM32H723ZG"
         ],
         "config": {
-
             "d11_configuration": {
                 "help": "Value: PB_5 for the default board configuration, PA_7 in case of solder bridge update (SB33 on/ SB35 off)",
                 "value": "PB_5",
@@ -3489,9 +2967,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0836"
         ],
         "device_name": "STM32H723ZGTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -3658,9 +3133,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "QSPI"
         ],
-        "detect_code": [
-            "0814"
-        ],
         "device_name": "STM32H747XIHx"
     },
     "DISCO_H747I_CM7": {
@@ -3768,7 +3240,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "ARDUINO_PORTENTA_H7": {
         "public": false,
-        "detect_code": ["0813"],
         inherits: ["STM32H747_ARDUINO"],
         "device_has_add": [
             "EMAC"
@@ -3877,9 +3348,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0860"
-        ],
         "overrides": {
             "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
@@ -3968,9 +3436,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "boot-stack-size": "0x400"
         },
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "device_has_add": [
             "ANALOGOUT",
             "TRNG"
@@ -4025,13 +3490,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32L072xZ"
         ],
         "supported_form_factors": [
-            "ARDUINO_UNO_PART"
+            "ARDUINO_UNO"
         ],
         "components_add": [
             "SX1276"
-        ],
-        "detect_code": [
-            "0833"
         ],
         "device_name": "STM32L072CZTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF264368.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -4058,9 +3520,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0760"
         ],
         "device_name": "STM32L073RZTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -4166,9 +3625,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SERIAL_FC"
         ],
         "device_name": "STM32L151CCTx",
-        "detect_code": [
-            "0350"
-        ],
         "image_url": "https://multitech.com/wp-content/uploads/elementor/thumbs/MT_xDot_Kit_MTMDK-NX-XDOT_clear_hp1000px-qiietlpii6czroara761mb7hrzdtvfj6350luxui2o.png"
     },
     // As of 2024, L-Tek no longer sells the FF1705 as far as I can tell from their webshop.
@@ -4176,9 +3632,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "FF1705_L151CC": { // AKA L-Tek FF1705
         "inherits": [
             "XDOT_L151CC"
-        ],
-        "detect_code": [
-            "8080"
         ],
         "image_url": "https://os.mbed.com/media/cache/platforms/LTEK-xdot.jpg.250x250_q85.jpg"
     },
@@ -4204,9 +3657,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "STM32L152RC"
         ],
-        "detect_code": [
-            "4100"
-        ],
         "device_has_remove": [
             "SERIAL_FC"
         ],
@@ -4231,9 +3681,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0710"
         ],
         "device_name": "STM32L152RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -4321,9 +3768,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_STM32L432xC"
         ],
-        "detect_code": [
-            "0770"
-        ],
         "device_name": "STM32L432KCUx",
         "image_url": "https://eu.mouser.com/images/marketingid/2019/img/168228755.png?v=021424.0917"
     },
@@ -4346,9 +3790,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0779"
         ],
         "device_name": "STM32L433RCTx",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2508/MFG_NUCLEO-L433RC-P.jpg"
@@ -4380,9 +3821,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER"
         ],
         "device_name": "STM32L443RCTx",
-        "detect_code": [
-            "0458"
-        ],
         "image_url": "https://www.mouser.com/images/advantechcorporation/lrg/WISE-1510WMB-SDA1E_DSL.jpg"
     },
     "MCU_STM32L452xE": {
@@ -4404,9 +3842,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0829"
         ],
         "overrides": {
             // ADC vref on this board is connected to 3.3V VDD
@@ -4434,9 +3869,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0312"
         ],
         "components_add": [
             "MULTITECH_DRAGONFLY_NANO_CELLULAR",
@@ -4476,9 +3908,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0764"
-        ],
         "device_has_add": [
             "QSPI",
             "USBDEVICE"
@@ -4512,9 +3941,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0765"
-        ],
         "device_name": "STM32L476RGTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -4527,9 +3953,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "extra_labels_add": [
             "N25Q128A"
-        ],
-        "detect_code": [
-            "0820"
         ],
         "device_has_add": [
             "QSPI",
@@ -4561,9 +3984,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0827"
         ],
         "device_name": "STM32L486RGTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -4599,9 +4019,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "components_add": [
             "QSPIF"
         ],
-        "detect_code": [
-            "0822"
-        ],
         "device_has_add": [
             "USBDEVICE",
             "QSPI"
@@ -4616,9 +4033,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0823"
-        ],
         "device_has_add": [
             "USBDEVICE"
         ],
@@ -4629,9 +4043,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "NUCLEO_L496ZG"
         ],
-        "detect_code": [
-            "0828"
-        ]
     },
     "MCU_STM32L4P5xG": {
         "inherits": [
@@ -4668,9 +4079,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L4R5ZI",
             "STM32L4R5xI"
         ],
-        "detect_code": [
-            "0776"
-        ],
         "device_has_add": [
             "USBDEVICE"
         ],
@@ -4680,9 +4088,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "NUCLEO_L4R5ZI_P": {
         "inherits": [
             "NUCLEO_L4R5ZI"
-        ],
-        "detect_code": [
-            "0781"
         ]
     },
     "MCU_STM32L4R9xI": {
@@ -4715,9 +4120,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "HSE_VALUE=16000000"
-        ],
-        "detect_code": [
-            "0774"
         ],
         "device_has_add": [
             "QSPI",
@@ -4758,9 +4160,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "HSE_VALUE=8000000"
-        ],
-        "detect_code": [
-            "0885"
         ],
         "device_has_add": [
             "USBDEVICE",
@@ -4843,9 +4242,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "device_name": "STM32L552ZETxQ",
-        "detect_code": [
-            "0854"
-        ],
         "image_url": "https://cdn11.bigcommerce.com/s-3fd3md1ghs/images/stencil/500x659/products/30236/11949/NUCLEO-L552ZE-Q__51179.1642762880.jpg?c=2"
     },
     "MCU_STM32L562xE": {
@@ -4886,9 +4282,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "BLE"
         ],
         "device_name": "STM32L562QEIxQ",
-        "detect_code": [
-            "0854"
-        ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF268050.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
     // STM32U0 Targets -------------------------------------------------------------------------------------------------
@@ -4965,9 +4358,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "device_name": "STM32U083RCTx",
-        "detect_code": [
-            "0888"
-        ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF273876.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
 
@@ -5051,9 +4441,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "device_name": "STM32U575ZITx",
-        "detect_code": [
-            "886"
-        ],
         "overrides": {
             // As shipped, this nucleo board connects VREFP to VDD_MCU, and connects VDD_MCU to 3.3V.
             // Jumper JP4 can be used to switch VDD_MCU to 1.8V in which case you should override this setting to 1.8.
@@ -5109,9 +4496,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
-        "detect_code": [
-            "887"
-        ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271412.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
     "MCU_STM32U545xE": {
@@ -5221,9 +4605,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32WB"
         ],
         "public": false,
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "c_lib": "small",
         "extra_labels_add": [
             "STM32WB15xC"
@@ -5249,9 +4630,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0883"
         ],
         "image_url": "https://www.mouser.com/images/stmicroelectronics/hd/NUCLEO-WB15CC_SPL.jpg"
     },
@@ -5282,9 +4660,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0839"
         ],
         "device_has_add": [
             "USBDEVICE"
@@ -5319,9 +4694,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "0884"
         ],
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271050.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
@@ -5388,9 +4760,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
-        "detect_code": [
-            "0866"
-        ],
         "image_url": "https://www.mouser.com/images/marketingid/2020/img/114771861.png?v=012324.0355"
     },
     "MCU_STM32WLE5xC": {
@@ -5412,13 +4781,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     // See here for details: https://github.com/mbed-ce/mbed-os/wiki/MCU-Info-Page:-MIMXRT105x-and-106x
     "MIMXRT105X": {
         "core": "Cortex-M7FD",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "supported_application_profiles": [
-            "full",
-            "bare-metal"
-        ],
         "public": false,
         "extra_labels": [
             "NXP",
@@ -5496,9 +4858,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "FLASH"
         ],
-        "detect_code": [
-            "0227"
-        ],
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
@@ -5531,7 +4890,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "startup": true
             }
         },
-        "bootloader_supported": true,
         "device_name": "MIMXRT1052DVL6A",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/IMX_RT1050-EVKB_TOP-LR.jpg"
     },
@@ -5571,7 +4929,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "start": 0x80000000,
                 "startup": false
             },
-            // MIMXRT1050 EVK uses QSPI flash by default
+            // MIMXRT1060 EVK uses QSPI flash by default
             "EXT_FLASH": {
                 "access": {
                     "execute": true,
@@ -5679,9 +5037,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "core": "Cortex-M7FD",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "NXP",
             "MCUXpresso_MCUS",
@@ -5689,7 +5044,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MIMXRT1170",
             "IMX"
         ],
-        "is_disk_virtual": true,
         "macros": [
             "CPU_MIMXRT1176DVMAA_cm7",
             "FSL_RTOS_MBED",
@@ -5707,9 +5061,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "Target"
         ],
-        "detect_code": [
-            "0228"
-        ],
         "device_has": [
             "ANALOGIN",
             "FLASH",
@@ -5723,20 +5074,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "device_name": "MIMXRT1176DVMAA",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/MIMXRT1170-EVKB-TOP-IMG.jpg"
     },
@@ -5747,9 +5084,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO"
         ],
         "core": "Cortex-M4F",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "NXP",
             "MCUXpresso_MCUS",
@@ -5757,7 +5091,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPCXpresso",
             "LPC"
         ],
-        "is_disk_virtual": true,
         "macros": [
             "CPU_LPC54114J256BD64_cm4",
             "FSL_RTOS_MBED",
@@ -5765,9 +5098,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "inherits": [
             "Target"
-        ],
-        "detect_code": [
-            "1054"
         ],
         "device_has": [
             "USTICKER",
@@ -5790,38 +5120,17 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "tickless-from-us-ticker": true,
             "init-us-ticker-at-boot": true
         },
-        "release_versions": [
-            "5"
-        ],
-        "post_binary_hook": {
-            "function": "LPCTargetCode.lpc_patch"
-        },
         "device_name": "LPC54114J256BD64",
-        "supported_c_libs": {
-            "arm": [
-                "std", "small"
-            ],
-            "gcc_arm": [
-                "std", "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/691/OM13089UL.JPG"
     },
     "MCU_LPC546XX": {
         "core": "Cortex-M4F",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "NXP",
             "MCUXpresso_MCUS",
             "LPC",
             "NXP_EMAC"
         ],
-        "is_disk_virtual": true,
         "public": false,
         "macros": [
             "CPU_LPC54628J512ET180",
@@ -5858,20 +5167,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "init-us-ticker-at-boot": true,
             "network-default-interface-type": "ETHERNET"
         },
-        "post_binary_hook": {
-            "function": "LPCTargetCode.lpc_patch"
-        },
-        "supported_c_libs": {
-            "arm": [
-                "std", "small"
-            ],
-            "gcc_arm": [
-                "std", "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true
     },
     "LPC546XX": { // AKA LPCXpresso54608
@@ -5884,12 +5179,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "LPCXpresso"
         ],
-        "detect_code": [
-            "1056"
-        ],
-        "release_versions": [
-            "5"
-        ],
         "components_add": [
             "QSPIF"
         ],
@@ -5900,14 +5189,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_LPC546XX"
         ],
-        "detect_code": [
-            "8081"
-        ],
         "device_has_remove": [
             "QSPI"
-        ],
-        "release_versions": [
-            "5"
         ],
         // Note: this target has a DataFlash flash on the board, BUT they actually pinned it out wrong:
         // SCLK is connected to SPI3, while MOSI and MISO are connected to SPI5. So, the flash is
@@ -5938,17 +5221,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPISLAVE",
             "TSC"
         ],
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "is_mcu_family_target": true
     },
     "ARM_MPS2_M0": {
@@ -5956,9 +5228,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_MPS2_Target"
         ],
         "core": "Cortex-M0",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "ARM_SSG",
             "MPS2",
@@ -5984,11 +5253,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TSC",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MPS2_M0P": {
@@ -5996,9 +5260,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_MPS2_Target"
         ],
         "core": "Cortex-M0+",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "ARM_SSG",
             "MPS2",
@@ -6022,11 +5283,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TSC",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MPS2_M3": {
@@ -6034,9 +5290,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_MPS2_Target"
         ],
         "core": "Cortex-M3",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "ARM_SSG",
             "MPS2",
@@ -6061,11 +5314,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MPS2_M4": {
@@ -6073,9 +5321,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_MPS2_Target"
         ],
         "core": "Cortex-M4F",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "ARM_SSG",
             "MPS2",
@@ -6100,11 +5345,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MPS2_M7": {
@@ -6112,9 +5352,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_MPS2_Target"
         ],
         "core": "Cortex-M7FD",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "ARM_SSG",
             "MPS2",
@@ -6139,11 +5376,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_IOTSS_Target": {
@@ -6172,9 +5404,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_IOTSS_Target"
         ],
         "core": "Cortex-M3",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "components_add": [
             "SMSC9220"
         ],
@@ -6182,7 +5411,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_SSG",
             "CM3DS_MPS2"
         ],
-        "OUTPUT_EXT": "elf",
         "macros": [
             "CMSDK_CM3DS"
         ],
@@ -6204,35 +5432,19 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USTICKER",
             "MPU"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "copy_method": "mps2",
-        "reset_method": "reboot.txt",
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
-        "detect_code": [
-            "5004"
-        ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2161/MFG_V2M-MPS2-0318C.jpg"
     },
     "ARM_MUSCA_B1": {
         "inherits": [
             "PSA_V8_M"
         ],
-        "default_toolchain": "ARMC6",
         "features_add": [
             "EXPERIMENTAL_API"
         ],
-        "forced_reset_timeout": 20,
-        "release_versions": [
-            "5"
-        ],
         "core": "Cortex-M33-NS",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "device_has_add": [
             "INTERRUPTIN",
             "I2C",
@@ -6255,21 +5467,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_SSG",
             "MUSCA_B1"
         ],
-        "post_binary_hook": {
-            "function": "ArmMuscaB1Code.binary_hook"
-        },
-        "secure_image_filename": "tfm_s.bin",
-        "tfm_target_name": "arm/musca_b1/sse_200",
-        "tfm_bootloader_supported": true,
-        "tfm_default_toolchain": "ARMCLANG",
-        "tfm_supported_toolchains": [
-            "ARMCLANG",
-            "GNUARM"
-        ],
-        "tfm_delivery_dir": "TARGET_ARM_SSG/TARGET_MUSCA_B1",
-        "detect_code": [
-            "5007"
-        ],
         "OUTPUT_EXT": "bin",
         "image_url": "https://www.psacertified.org/app/uploads/2019/01/musca-b1-600x0-c-default.jpg"
     },
@@ -6277,18 +5474,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "PSA_V8_M"
         ],
-        "default_toolchain": "ARMC6",
         "features_add": [
             "EXPERIMENTAL_API"
         ],
-        "forced_reset_timeout": 20,
-        "release_versions": [
-            "5"
-        ],
         "core": "Cortex-M33-NS",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "device_has_add": [
             "INTERRUPTIN",
             "I2C",
@@ -6314,21 +5503,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARM_SSG",
             "MUSCA_S1"
         ],
-        "post_binary_hook": {
-            "function": "ArmMuscaS1Code.binary_hook"
-        },
-        "secure_image_filename": "tfm_s.bin",
-        "tfm_target_name": "arm/musca_s1",
-        "tfm_bootloader_supported": true,
-        "tfm_default_toolchain": "ARMCLANG",
-        "tfm_supported_toolchains": [
-            "ARMCLANG",
-            "GNUARM"
-        ],
-        "tfm_delivery_dir": "TARGET_ARM_SSG/TARGET_MUSCA_S1",
-        "detect_code": [
-            "5009"
-        ],
         "OUTPUT_EXT": "bin",
         "image_url": "https://os.mbed.com/media/cache/platforms/Musca-S1_Rev_B_Board-1_transpant.png.250x250_q85.png"
     },
@@ -6340,9 +5514,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "core": "Cortex-A9",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "extra_labels": [
             "RENESAS",
             "RZ_A1XX"
@@ -6369,20 +5540,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPISLAVE",
             "SPI_ASYNCH"
         ],
-        "program_cycle_s": 2,
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        },
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
         },
         "is_mcu_family_target": true
     },
@@ -6407,11 +5566,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH",
             "LPTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "R7S72100",
-        "bootloader_supported": true,
         // 8MB serial flash on the board
         "memory_banks": {
             "EXT_FLASH": {
@@ -6428,15 +5583,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "startup": true
             }
         },
-        "sectors": [
-            [
-                402653184,
-                4096
-            ]
-        ],
-        "detect_code": [
-            "5500"
-        ],
         "image_url": "https://os.mbed.com/media/cache/platforms/GR-PEACH_C_trans.png.250x250_q85.png"
     },
     "GR_LYCHEE": {
@@ -6462,11 +5608,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_remove": [
             "EMAC"
         ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "R7S72103",
-        "bootloader_supported": true,
         "memory_banks": {
             "EXT_FLASH": {
                 "access": {
@@ -6482,25 +5624,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "startup": true
             }
         },
-        "sectors": [
-            [
-                402653184,
-                4096
-            ]
-        ],
         "overrides": {
             "network-default-interface-type": null
         },
-        "detect_code": [
-            "5501"
-        ],
         "image_url": "https://www.cnx-software.com/wp-content/uploads/2017/06/GR-LYCHEE.jpg"
     },
     "RZ_A2XX": {
         "inherits": ["Target"],
         "public": false,
         "core": "Cortex-A9",
-        "supported_toolchains": ["GCC_ARM"],
         "extra_labels": ["RENESAS", "RZ_A2XX"],
         "device_has": [
             "SLEEP",
@@ -6525,27 +5657,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPI_ASYNCH",
             "USBDEVICE"
         ],
-        "program_cycle_s": 2,
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "is_mcu_family_target": true
     },
     "GR_MANGO": {
         "inherits": ["RZ_A2XX"],
         "extra_labels_add": ["RZA2M", "MBRZA2M", "RENESAS_EMAC"],
         "device_has_add": ["EMAC","FLASH"],
-        "release_versions": ["5"],
         "device_name": "R7S921053",
-        "bootloader_supported": true,
 
         // 16MiB OSPI flash on PCB
         "memory_banks": {
@@ -6563,13 +5681,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "startup": true
             }
         },
-        "sectors": [[1342177280,4096]],
         "overrides": {
             "network-default-interface-type": "ETHERNET"
         },
-        "detect_code": [
-            "5502"
-        ],
         "image_url": "https://www.renesas.com/sites/default/files/media/images/gr-mango-top.png"
     },
 
@@ -6589,9 +5703,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Maxim",
             "MAX32620C"
         ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "device_has": [
             "ANALOGIN",
             "FLASH",
@@ -6609,20 +5720,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USTICKER"
         ],
         "device_name": "MAX32620",
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
         "public": false,
         "is_mcu_family_target": true
     },
@@ -6630,17 +5727,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_MAX32620"
         ],
-        "detect_code": [
-            "0418"
-        ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/895/MFG_MAX32620FTHR.jpg"
     },
     "SDT32620B": {
         "inherits": [
             "MCU_MAX32620"
-        ],
-        "detect_code": [
-            "3101"
         ],
         "image_url": "https://os.mbed.com/media/cache/platforms/SDT32620B_size.png.250x250_q85.png"
     },
@@ -6657,9 +5748,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels": [
             "Maxim",
             "MAX32625"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "device_has": [
             "ANALOGIN",
@@ -6679,28 +5767,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "MAX32625",
         "public": false,
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
         "is_mcu_family_target": true
     },
     "MAX32625MBED": {
         "inherits": [
             "MAX32625_BASE"
-        ],
-        "detect_code": [
-            "0415"
         ],
         "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-maxim-images/max32625mbed.png?rev=cce27b18ca564ddbb28163b4612b7592&h=500&hash=5F057314B14CBC46F7A8EEC655632DCE"
     },
@@ -6708,16 +5779,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MAX32625_BASE"
         ],
-        "detect_code": [
-            "3102"
-        ],
         "image_url": "https://os.mbed.com/media/cache/platforms/SDT32625B_size_ZxsNDPt.png.250x250_q85.png"
     },
     "MAX32625PICO": {
         "inherits": [
             "MAX32625_BASE"
         ],
-        "bootloader_supported": true,
 
         // Reserve the first 64k of flash for the bootloader
         "memory_bank_config": {
@@ -6727,9 +5794,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
 
-        "detect_code": [
-            "0444"
-        ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2592/MAX32625PICO%23.jpg"
     },
     "MAX32630FTHR": {
@@ -6748,9 +5812,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels": [
             "Maxim",
             "MAX32630"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "components_add": [
             "SD"
@@ -6772,23 +5833,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SLEEP",
             "USBDEVICE"
         ],
-        "detect_code": [
-            "0409"
-        ],
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
         "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-maxim-images/max32630fthr.png?rev=38a579856b25448c9369e8f1931bef09&h=270&hash=55F09D9FF86FDDA9FDAE27520485245E"
     },
     "MAX32660": {
@@ -6807,9 +5851,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Maxim",
             "MAX32660"
         ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "device_has": [
             "SERIAL",
             "SERIAL_FC",
@@ -6826,17 +5867,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "WATCHDOG",
             "FLASH"
         ],
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        }
     },
     "MAX32660EVSYS": {
         "inherits": [
@@ -6865,9 +5895,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": null
             }
         },
-        "detect_code": [
-            "0421"
-        ],
         "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-maxim-images/max32660evsys.png?rev=1b007b133cb349f692e1695e7e55de01&h=270&hash=81B37460C25087CDD9A37B6B87FCB0A5"
     },
     "MAX32670": {
@@ -6884,9 +5911,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels": [
             "Maxim",
             "MAX32670"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "device_has": [
             "SERIAL",
@@ -6926,17 +5950,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": 1
             }
         },
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "device_name": "MAX32670",
         "is_mcu_family_target": true
     },
@@ -6950,18 +5963,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels_add": [
             "MAX32670EVKIT"
         ],
-        "detect_code": [
-            "0424"
-        ],
         "image_url": "https://os.mbed.com/media/uploads/sadik_maxim/max32670evkit_daplink_fw_update.png"
     },
     "XDOT_MAX32670": {
         "inherits": [
             "MAX32670"
-        ],
-        "bootloader_supported": true,
-        "detect_code": [
-            "0351"
         ],
         "image_url": "https://os.mbed.com/media/cache/platforms/xDot_Developer_Kit_with_xdot.png.250x250_q85.png"
     },
@@ -7038,20 +6044,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "macro_name": "HFRCO_FREQUENCY"
             }
         },
-        "bootloader_supported": true,
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "public": false,
         "is_mcu_family_target": true
     },
@@ -7078,26 +6070,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros_add": [
             "EFM32GG990F1024"
         ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "EFM32GG990F1024",
-        "public": false,
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ]
+        "public": false
     },
     "EFM32GG_STK3700": { // AKA EFM32 Giant Gecko
         "inherits": [
             "EFM32GG990F1024"
         ],
-        "progen": {
-            "target": "efm32gg-stk"
-        },
-        "forced_reset_timeout": 2,
         "config": {
             "board_controller_enable": {
                 "help": "Pin to pull high for enabling the USB serial port",
@@ -7105,9 +6084,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "macro_name": "EFM_BC_EN"
             }
         },
-        "detect_code": [
-            "2015"
-        ],
         "overrides": {
             "hfrco_clock_freq": "21000000"
         },
@@ -7139,30 +6115,17 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros_add": [
             "EFR32MG12P332F1024GL125"
         ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "EFR32MG12P332F1024GL125",
-        "public": false,
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ]
+        "public": false
     },
     "TB_SENSE_12": { // AKA Thunderboard Sense 2
         "inherits": [
             "EFR32MG12P332F1024GL125"
         ],
-        "forced_reset_timeout": 5,
         "overrides": {
             "network-default-interface-type": "MESH",
             "hfxo_clock_freq": "38400000",
         },
-        "detect_code": [
-            "2041"
-        ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2145/MFG_SLTB004A.jpg"
     },
     "EFM32GG11B820F2048GL192": {
@@ -7191,23 +6154,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros_add": [
             "EFM32GG11B820F2048GL192"
         ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "release_versions": [
-            "5"
-        ],
         "device_name": "EFM32GG11B820F2048GL192",
-        "public": false,
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ]
+        "public": false
     },
     "EFM32GG11_STK3701": {
         "inherits": [
             "EFM32GG11B820F2048GL192"
         ],
-        "forced_reset_timeout": 5,
         "config": {
             "board_controller_enable": {
                 "help": "Pin to pull high for enabling the USB serial port",
@@ -7224,9 +6177,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "network-default-interface-type": "ETHERNET",
             "hfxo_clock_freq": "50000000"
         },
-        "detect_code": [
-            "2042"
-        ],
         "image_url": "https://www.silabs.com/content/dam/siliconlabs/images/products/microcontrollers/32-bit_mcus/giant-gecko-gg11/efr32gg11-starter-kit.jpg"
     },
 
@@ -7305,27 +6255,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": 32
             }
         },
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "public": false,
-        "detect_code": [
-            "1101"
-        ],
-        "program_cycle_s": 6,
-        "bootloader_supported": true,
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "is_mcu_family_target": true
     },
     "NRF52_DK": {
@@ -7334,9 +6264,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "inherits": [
             "MCU_NRF52832"
-        ],
-        "release_versions": [
-            "5"
         ],
         "device_name": "nRF52832_xxAA",
         "device_has_remove": [
@@ -7360,20 +6287,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "NRF52_PAN_63",
             "NRF52_PAN_64"
         ],
-        "detect_code": [
-            "1101"
-        ],
         "image_url": "https://www.nordicsemi.com/-/media/Images/Products/DevKits/nRF52-Series/nRF52-DK/nRF52-DK-render_prod-page.png?h=551&iar=0&mw=350&w=350&hash=DB87685680509C17DF15906A7DC9A289"
     },
     "SDT52832B": {
         "inherits": [
             "MCU_NRF52832"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "detect_code": [
-            "3104"
         ],
         "device_name": "nRF52832_xxAA",
         "image_url": "https://os.mbed.com/media/cache/platforms/SDT52832B_size.png.250x250_q85.png"
@@ -7497,31 +6415,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "mpu-rom-end": "0x1fffffff"
         },
-        "release_versions": [
-            "5"
-        ],
         "device_name": "nRF52840_xxAA",
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "public": false,
-        "detect_code": [
-            "1101"
-        ],
-        "program_cycle_s": 6,
-        "bootloader_supported": true,
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
 
         // This is the target for all boards using NRF52840 chips
         "is_mcu_family_target": true
@@ -7533,9 +6428,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_NRF52840"
         ],
-        "detect_code": [
-            "1102"
-        ],
         "macros_add": [
             "CONFIG_GPIO_AS_PINRESET"
         ],
@@ -7545,9 +6437,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": false
             }
         },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "components_add": [
             "QSPIF"
         ],
@@ -7603,9 +6492,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros_add": [
             "CONFIG_GPIO_AS_PINRESET"
         ],
-        "detect_code": [
-            "2600"
-        ],
         "config": {
             "enable-objects-extensions": {
                 "help": "Enable inclusion of objects_extensions.h",
@@ -7635,7 +6521,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "components_add": ["SPIF", "TELIT_ME310"],
         "components_remove": ["QSPIF"],
-        "release_versions": ["5"],
         "macros_add": [
             "CONFIG_GPIO_AS_PINRESET"
         ],
@@ -7645,26 +6530,21 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     // Nuvoton Targets -------------------------------------------------------------------------------------------------
     "NUMAKER_PFM_NUC472": {
         "core": "Cortex-M4F",
-        "default_toolchain": "ARM",
         "extra_labels": [
             "NUVOTON",
             "NUC472",
             "FLASH_CMSIS_ALGO",
             "NUVOTON_EMAC"
         ],
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "config": {
             "hxt-present": {
                 "help": "High-speed external crystal oscillator HXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": false
             },
             "lxt-present": {
                 "help": "Low-speed external crystal oscillator LXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": true
             },
             "gpio-irq-debounce-enable": {
@@ -7688,7 +6568,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             },
             "ebi-enable": {
                 "help": "Enable EBI for EBI RAM",
-                "options": [false, true]
+                "accepted_values": [false, true]
             },
         },
         "inherits": [
@@ -7725,17 +6605,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "WATCHDOG",
             "USBDEVICE"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "sectors": [
-            [
-                0,
-                2048
-            ]
-        ],
         "device_name": "NUC472HI8AE",
-        "bootloader_supported": true,
         "overrides": {
             "hxt-present": false,
             "lxt-present": true,
@@ -7761,27 +6631,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "startup": false
             }
         },
-        "detect_code": [
-            "1302"
-        ],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "image_url": "https://os.mbed.com/media/uploads/MACRUM/img_9240.jpg"
     },
     "NUMAKER_PFM_M453": {
         "core": "Cortex-M4F",
-        "default_toolchain": "ARM",
         "extra_labels": [
             "NUVOTON",
             "M451",
@@ -7789,19 +6642,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "NUMAKER_PFM_M453",
             "FLASH_CMSIS_ALGO"
         ],
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "config": {
             "hxt-present": {
                 "help": "High-speed external crystal oscillator HXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": false
             },
             "lxt-present": {
                 "help": "Low-speed external crystal oscillator LXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": true
             },
             "gpio-irq-debounce-enable": {
@@ -7830,9 +6679,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros_add": [
             "LPTICKER_DELAY_TICKS=4"
         ],
-        "progen": {
-            "target": "numaker-pfm-m453"
-        },
         "device_has": [
             "USTICKER",
             "LPTICKER",
@@ -7861,66 +6707,32 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "RESET_REASON",
             "USBDEVICE"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
         "c_lib": "small",
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
-        "sectors": [
-            [
-                0,
-                2048
-            ]
-        ],
         "device_name": "M453VG6AE",
-        "bootloader_supported": true,
         "overrides": {
             "hxt-present": false,
             "lxt-present": true,
             "deep-sleep-latency": 1,
             "tickless-from-us-ticker": true
         },
-        "detect_code": [
-            "1303"
-        ],
         "image_url": "https://os.mbed.com/media/cache/platforms/Nu-mbed_M453_board_square.jpg.250x250_q85.jpg"
     },
     "NUMAKER_PFM_NANO130": {
         "core": "Cortex-M0",
-        "default_toolchain": "ARM",
         "extra_labels": [
             "NUVOTON",
             "NANO100",
             "NANO130KE3BN"
         ],
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "config": {
             "hxt-present": {
                 "help": "High-speed external crystal oscillator HXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": false
             },
             "lxt-present": {
                 "help": "Low-speed external crystal oscillator LXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": true
             },
             "gpio-irq-debounce-enable": {
@@ -7982,26 +6794,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "RESET_REASON",
             "USBDEVICE"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
         "c_lib": "small",
-        "supported_application_profiles": [
-            "bare-metal"
-        ],
         "device_name": "NANO130KE3BN",
         "overrides": {
             "hxt-present": false,
@@ -8009,34 +6802,26 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "deep-sleep-latency": 1,
             "tickless-from-us-ticker": true
         },
-        "detect_code": [
-            "1306"
-        ],
         "image_url": "https://www.nuvoton.com/export/sites/nuvoton/images/Microcontrollers/NuMaker-PFM-M487KM.png_576589920.png"
     },
     "MCU_M460": {
         "core": "Cortex-M4F",
-        "default_toolchain": "ARM",
         "public": false,
         "extra_labels": [
             "NUVOTON",
             "M460",
             "FLASH_CMSIS_ALGO",
-        "NUVOTON_EMAC"
-        ],
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
+            "NUVOTON_EMAC"
         ],
         "config": {
             "hxt-present": {
                 "help": "High-speed external crystal oscillator HXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": false
             },
             "lxt-present": {
                 "help": "Low-speed external crystal oscillator LXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": true
             },
             "usb-uart": {
@@ -8084,12 +6869,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             },
             "exclude-uno-spi-from-fpga-ci-test-shield-test": {
                 "help": "Exclude UNO SPI pins (D8/D9/D10/D11/D12/D13) from FPGA CI Test Shield test for wiring to on-board SPI flash",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": false
             },
             "hbi-enable": {
                 "help": "Enable HBI for HyperRAM",
-                "options": [false, true]
+                "accepted_values": [false, true]
             },
             "hbi-mfp-reg-list": {
                 "help": "Comma separated multi-function pin register list to enable HBI for HyperRAM"
@@ -8141,36 +6926,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EMAC",
             "USBDEVICE"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "sectors": [
-            [
-                0,
-                4096
-            ]
-        ],
-        "bootloader_supported": true,
         "overrides": {
             "deep-sleep-latency": 1,
             "tickless-from-us-ticker": true
         },
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ],
-            "iar": [
-                "std"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true
     },
     "NUMAKER_IOT_M467": {
@@ -8182,9 +6941,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "1313"
         ],
         "device_name": "M467HJHAE",
         "overrides": {
@@ -8221,7 +6977,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "MCU_M480": {
         "core": "Cortex-M4F",
-        "default_toolchain": "ARM",
         "public": false,
         "extra_labels": [
             "NUVOTON",
@@ -8229,19 +6984,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH_CMSIS_ALGO",
             "NUVOTON_EMAC"
         ],
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "config": {
             "hxt-present": {
                 "help": "High-speed external crystal oscillator HXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": false
             },
             "lxt-present": {
                 "help": "Low-speed external crystal oscillator LXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": true
             },
             "spim-ccm-enable": {
@@ -8295,9 +7046,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "help": "Select high-speed USB device or not",
                 "value": 0
             },
-	    "wdt-reset-workaround": {
+	        "wdt-reset-workaround": {
                 "help": "Workaround to H/W limit with WDT reset from power-down",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": true
             }
         },
@@ -8335,33 +7086,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "WATCHDOG",
             "USBDEVICE"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "sectors": [
-            [
-                0,
-                4096
-            ]
-        ],
-        "bootloader_supported": true,
         "overrides": {
             "deep-sleep-latency": 1,
             "tickless-from-us-ticker": true
         },
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true
     },
     "NUMAKER_PFM_M487": {
@@ -8372,9 +7100,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBEDTLS_CONFIG_HW_SUPPORT"
         ],
         "device_name": "M487JIDAE",
-        "detect_code": [
-            "1304"
-        ],
         "components_add": [
             "SPIF" // 4MiB SPI flash.
 
@@ -8403,9 +7128,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBEDTLS_CONFIG_HW_SUPPORT"
         ],
         "device_name": "M487JIDAE",
-        "detect_code": [
-            "1308"
-        ],
         "overrides": {
             "hxt-present": false,
             "lxt-present": true,
@@ -8423,10 +7145,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "core": "Cortex-M23-NS",
-        "default_toolchain": "ARMC6",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "features_add": [
             "EXPERIMENTAL_API"
         ],
@@ -8438,11 +7156,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "CMSIS_NVIC_VIRTUAL",
             "LPTICKER_DELAY_TICKS=4"
         ],
-        "is_disk_virtual": true,
         "config": {
             "hxt-present": {
                 "help": "High-speed external crystal oscillator HXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": false
             },
             "usb-uart": {
@@ -8518,20 +7235,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "USBDEVICE"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "sectors": [
-            [
-                0,
-                2048
-            ]
-        ],
-        "bootloader_supported": true,
-        "forced_reset_timeout": 5,
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true
     },
     "NU_M2354": { // AKA NUMAKER-M2354
@@ -8540,9 +7243,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "detect_code": [
-            "1312"
         ],
         "device_name": "M2354KJFAE",
         "overrides": {
@@ -8583,26 +7283,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "components_add": [
             "TFM_S_FW"
         ],
-        "post_binary_hook": {
-            "function": "NuM2354Code.merge_secure"
-        },
-        "secure_image_filename": "tfm_s.bin",
-        "tfm_target_name": "nuvoton/m2354",
-        "tfm_bootloader_supported": true,
-        "tfm_default_toolchain": "GNUARM",
-        "tfm_supported_toolchains": [
-            "ARMCLANG",
-            "GNUARM"
-        ],
-        "tfm_delivery_dir": "TARGET_NUVOTON/TARGET_M2354/TARGET_TFM/TARGET_NU_M2354/COMPONENT_TFM_S_FW",
         "image_url": "https://direct.nuvoton.com/1085-large_default/numaker-m2354.jpg"
     },
     "MCU_M251": {
         "core": "Cortex-M23",
         "public": false,
-        "trustzone": false,
-        "is_disk_virtual": true,
-        "default_toolchain": "ARMC6",
         "extra_labels": [
             "NUVOTON",
             "M251",
@@ -8611,18 +7296,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros_add": [
             "LPTICKER_DELAY_TICKS=4"
         ],
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "config": {
             "hxt-present": {
                 "help": "High-speed external crystal oscillator HXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": false
             },
             "lxt-present": {
                 "help": "Low-speed external crystal oscillator LXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": true
             },
             "usb-uart": {
@@ -8709,38 +7391,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU",
             "WATCHDOG"
         ],
-        "sectors": [
-            [
-                0,
-                512
-            ]
-        ],
-        "bootloader_supported": true,
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true
     },
     "NUMAKER_IOT_M252": { // AKA NuMaker-LoRaD-M252
         "inherits": [
             "MCU_M251"
-        ],
-        "detect_code": [
-            "1309"
-        ],
-        "release_versions": [
-            "2",
-            "5"
         ],
         "device_name": "M252KG6AE",
         "overrides": {
@@ -8752,7 +7407,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "MCU_M261": {
         "core": "Cortex-M23",
-        "default_toolchain": "ARMC6",
         "public": false,
         "extra_labels": [
             "NUVOTON",
@@ -8762,19 +7416,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros": [
             "LPTICKER_DELAY_TICKS=4"
         ],
-        "is_disk_virtual": true,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "config": {
             "hxt-present": {
                 "help": "High-speed external crystal oscillator HXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": false
             },
             "lxt-present": {
                 "help": "Low-speed external crystal oscillator LXT is present",
-                "options": [false, true],
+                "accepted_values": [false, true],
                 "value": true
             },
             "usb-uart": {
@@ -8852,36 +7502,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USBDEVICE",
             "CAN"
         ],
-        "release_versions": [
-            "5"
-        ],
-        "sectors": [
-            [
-                0,
-                2048
-            ]
-        ],
-        "bootloader_supported": true,
         "overrides": {
             "hxt-present": false,
             "lxt-present": true,
             "deep-sleep-latency": 1,
             "tickless-from-us-ticker": true
         },
-        "forced_reset_timeout": 3,
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "is_mcu_family_target": true
     },
     "NUMAKER_IOT_M263A": {
@@ -8889,9 +7515,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_M261"
         ],
         "device_name": "M263KIAAE",
-        "detect_code": [
-            "1310"
-        ],
         "overrides": {
             "usb-uart": "UART_0",
             "usb-uart-tx": "PB_13",
@@ -8912,7 +7535,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "extra_labels": [
             "ARM_FM"
         ],
-        "is_mcu_target_family": true
+        "is_mcu_family_target": true
     },
     "FVP_MPS2": {
         "inherits": [
@@ -8925,10 +7548,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_PSA_SRV"
         ],
         "public": false,
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
-        "OUTPUT_EXT": "elf",
         "device_has": [
             "AACI",
             "ANALOGIN",
@@ -8949,24 +7568,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TRNG",
             "USTICKER"
         ],
-        "release_versions": [
-            "5"
-        ],
         "overrides": {
             "network-default-interface-type": "ETHERNET"
-        },
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
-        "is_mcu_family_target": true
+        }
     },
     "FVP_MPS2_M0": {
         "inherits": [
@@ -9035,7 +7639,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "CYBT_WAKE_ACTIVE_LOW=0",
             "CYBT_WAKE_ACTIVE_HIGH=1",
 
-            // These are named like Mbed components, but actually seem to be a definitions
+            // These are named like Mbed components, but actually seem to be definitions
             // used by the Cypress IDE-generated BSP.  We just want to define them all the time.
             "COMPONENT_PSOC6=1",
             "COMPONENT_PSOC6HAL=1",
@@ -9043,10 +7647,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "COMPONENT_RTX=1",
             "COMPONENT_CAT1=1",
             "COMPONENT_CAT1A=1",
-        ],
-        "default_toolchain": "GCC_ARM",
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "core": "Cortex-M4F",
         "OUTPUT_EXT": "hex",
@@ -9079,16 +7679,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USTICKER",
             "WATCHDOG"
         ],
-        "release_versions": [
-            "5"
-        ],
         "extra_labels_add": [
             "Cypress",
             "PSOC6",
             "MXCRYPTO"
         ],
         "public": false,
-        "forced_reset_timeout": 5,
         "overrides": {
             "deep-sleep-latency": "CY_CFG_PWR_DEEPSLEEP_LATENCY"
         }
@@ -9111,10 +7707,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "COMPONENT_BSP_DESIGN_MODUS=1",
             "COMPONENT_CM4=1",
         ],
-        "public": false,
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ]
+        "public": false
     },
     "MCU_PSOC62_CM4": {
         "inherits": [
@@ -9171,16 +7764,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
 
-        "detect_code": [
-            "1901"
-        ],
-        "bootloader_supported": false,
-        "sectors": [
-            [
-                268435456,
-                512
-            ]
-        ],
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
@@ -9223,9 +7806,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
 
-        "detect_code": [
-            "190B"
-        ],
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
@@ -9266,9 +7846,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
 
-        "detect_code": [
-            "190E"
-        ],
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
@@ -9310,20 +7887,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
 
-        "detect_code": [
-            "1900"
-        ],
-        "bootloader_supported": false,
-        "sectors": [
-            [
-                268435456,
-                512
-            ]
-        ],
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
-        "program_cycle_s": 10,
         "image_url": "https://os.mbed.com/media/cache/platforms/P6_WiFi_Pionner_Kit.PNG.250x250_q85.png"
     },
     "CY8CKIT_062_BLE": { // AKA PSoC 6 BLE Pioneer Kit
@@ -9353,16 +7919,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
 
-        "detect_code": [
-            "1902"
-        ],
-        "sectors": [
-            [
-                268443648,
-                512
-            ]
-        ],
-        "bootloader_supported": false,
         "image_url": "https://os.mbed.com/media/cache/platforms/SS2_3797_with_out_USB_cable.jpg.250x250_q85.jpg"
     },
     "CYW9P62S1_43438EVB_01": { // AKA CYW9P62S1-43438EVB-01 PSoC 62S1 Wi-Fi BT Pioneer Kit
@@ -9401,20 +7957,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
 
-        "detect_code": [
-            "1900"
-        ],
-        "bootloader_supported": false,
-        "sectors": [
-            [
-                268435456,
-                512
-            ]
-        ],
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
-        "program_cycle_s": 10,
 
         // This is not a great picture but it's the best I could find...
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/424/MFG_CY8CKIT-062S2-43012.jpg"
@@ -9458,9 +8003,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
 
-        "detect_code": [
-            "1903"
-        ],
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
@@ -9501,22 +8043,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "CY_IPC_DEFAULT_CFG_DISABLE",
             "CYBSP_WIFI_CAPABLE"
         ],
-        "detect_code": [
-            "1910"
-        ],
-        "forced_reset_timeout": 5,
-        "hex_filename": "psoc6_02_cm0p_secure.hex",
-        "cm0_img_id": 1,
-        "cm4_img_id": 16,
-        "boot_scheme": "single_image",
-        "policy_file": "policy_single_CM0_CM4.json",
-        "post_binary_hook": {
-            "function": "PSOC6Code.sign_image"
-        },
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
-        "program_cycle_s": 10,
         "device_name": "CYB0644ABZI-S2D44",
         "image_url": "https://os.mbed.com/media/cache/platforms/SSP_8683_Ywwh0ix.jpg.250x250_q85.jpg"
     },
@@ -9562,30 +8091,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MXCRYPTO_DISABLED",
             "TFM_MULTI_CORE_MULTI_CLIENT_CALL=1"
         ],
-        "detect_code": [
-            "1910"
-        ],
-        "forced_reset_timeout": 5,
-        "hex_filename": "tfm_s.hex",
-        "cm0_img_id": 1,
-        "cm4_img_id": 16,
-        "boot_scheme": "multi_image",
-        "policy_file": "policy_multi_CM0_CM4_tfm.json",
-        "post_binary_hook": {
-            "function": "PSOC6Code.sign_image"
-        },
         "overrides": {
             "network-default-interface-type": "WIFI"
         },
-        "program_cycle_s": 10,
-        "tfm_target_name": "psoc64",
-        "tfm_bootloader_supported": false,
-        "tfm_default_toolchain": "GNUARM",
-        "tfm_supported_toolchains": [
-            "GNUARM"
-        ],
-        "tfm_delivery_dir": "TARGET_Cypress/TARGET_PSOC6/TARGET_CYTFM_064B0S2_4343W/COMPONENT_TFM_S_FW",
-        "TFM_OUTPUT_EXT": "hex",
         "device_name": "CYB0644ABZI-S2D44",
         "image_url": "https://os.mbed.com/media/cache/platforms/SSP_8683_Ywwh0ix.jpg.250x250_q85.jpg"
     },
@@ -9595,10 +8103,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": ["Target"],
         "core": "Cortex-M4F",
         "features": ["BLE"],
-        "default_toolchain": "GCC_ARM",
-        "supported_toolchains": [
-            "GCC_ARM"
-        ],
         "public": false,
         "extra_labels": [
             "Ambiq_Micro",
@@ -9624,17 +8128,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USE_AMBIQ_DRIVER",
             "MBED_TICKLESS"
         ],
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
 
         "overrides": {
             // Currently the analog in HAL driver sets the voltage reference to the internal 2V reference
@@ -9690,15 +8183,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Target"
         ],
         "core": "Cortex-M4F",
-        "is_disk_virtual": true,
         "extra_labels": [
             "TOSHIBA"
         ],
         "macros": [
             "__TMPM46B__"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "device_has": [
             "USTICKER",
@@ -9723,24 +8212,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SLEEP"
         ],
         "device_name": "TMPM46BF10FG",
-        "detect_code": [
-            "7013"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "bootloader_supported": true,
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "image_url": "https://www.chip1stop.com/img/product/SSST/0109140533_5a544d9d16351.JPG"
     },
     "TMPM4G9": { // AKA AdBun-M4G9
@@ -9748,15 +8219,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Target"
         ],
         "core": "Cortex-M4F",
-        "is_disk_virtual": true,
         "extra_labels": [
             "TOSHIBA"
         ],
         "macros": [
             "__TMPM4G9__"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "device_has": [
             "ANALOGIN",
@@ -9782,24 +8249,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU"
         ],
         "device_name": "TMPM4G9F15FG",
-        "detect_code": [
-            "7015"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "bootloader_supported": true,
-        "supported_application_profiles" : ["full", "bare-metal"],
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "image_url": "https://os.mbed.com/media/cache/platforms/AdBun-TMPM4G9_Wm9FG1c.png.250x250_q85.jpg"
     },
     // As of Jun 2024, this board can still apparently be purchased by sending an email (!!)
@@ -9812,10 +8261,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "TMPM4KN": { // AKA TMPM-M4KN-SBK from ESP Co.
         "inherits": ["Target"],
         "core": "Cortex-M4F",
-        "is_disk_virtual": true,
         "extra_labels": ["TOSHIBA"],
         "macros": ["__TMPM4KN__"],
-        "supported_toolchains": ["GCC_ARM"],
         "device_has": [
             "ANALOGIN",
             "INTERRUPTIN",
@@ -9836,14 +8283,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH"
         ],
         "device_name": "TMPM4KNFYAFG",
-        "detect_code": ["7020"],
-        "release_versions": ["5"],
-        "bootloader_supported": true,
-        "supported_application_profiles" : ["full"],
         "supported_c_libs": {
-            "arm": [
-                "std"
-            ],
             "gcc_arm": [
                 "std"
             ]
@@ -9855,15 +8295,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Target"
         ],
         "core": "Cortex-M4F",
-        "is_disk_virtual": true,
         "extra_labels": [
             "TOSHIBA"
         ],
         "macros": [
             "TMPM4NR"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "device_has": [
             "ANALOGIN",
@@ -9889,23 +8325,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU"
         ],
         "device_name": "TMPM4NRF20FG",
-        "detect_code": [
-            "7022"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "bootloader_supported": true,
-        "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "image_url": "https://wiki.segger.com/images/thumb/8/8a/tmpm4nr.jpg/300px-tmpm4nr.jpg"
     },
     "TMPM4GR": { // AKA AdBun-M4GR
@@ -9913,15 +8332,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Target"
         ],
         "core": "Cortex-M4F",
-        "is_disk_virtual": true,
         "extra_labels": [
             "TOSHIBA"
         ],
         "macros": [
             "__TMPM4GR__"
-        ],
-        "supported_toolchains": [
-            "GCC_ARM"
         ],
         "device_has": [
             "ANALOGIN",
@@ -9947,33 +8362,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MPU"
         ],
         "device_name": "TMPM4GRF20FG",
-        "detect_code": [
-            "7021"
-        ],
-        "release_versions": [
-            "5"
-        ],
-        "bootloader_supported": true,
-         "supported_c_libs": {
-            "arm": [
-                "std",
-                "small"
-            ],
-            "gcc_arm": [
-                "std",
-                "small"
-            ]
-        },
         "image_url": "https://wiki.segger.com/images/thumb/6/68/tmpm4gr.jpg/402px-tmpm4gr.jpg"
     },
     "RP2040": {
         "public": false,
         "inherits": ["Target"],
         "core": "Cortex-M0+",
-        "supported_toolchains": ["GCC_ARM"],
-        "supported_application_profiles": [
-            "full", "bare-metal"
-        ],
         "extra_labels": [
             "RASPBERRYPI",
             "memmap_default"

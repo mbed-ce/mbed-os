@@ -7,13 +7,13 @@
 from unittest import TestCase, mock
 import copy
 
+from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import (
     ALL_ACCUMULATING_ATTRIBUTES,
     get_accumulating_attributes_for_target,
     _targets_accumulate_hierarchy,
     _determine_accumulated_attributes,
     _remove_attribute_element,
-    _element_matches,
 )
 
 
@@ -60,35 +60,42 @@ class TestGetAccumulatingAttributes(TestCase):
 class TestParseHierarchy(TestCase):
     def test_accumulate_hierarchy_single_inheritance(self):
         all_targets_data = {
-            "D": {"attribute_1": ["some things"]},
-            "C": {"inherits": ["D"], "attribute_2": "something else"},
-            "B": {},
-            "A": {"inherits": ["C"], "attribute_3": ["even more things"]},
-        }
-        result = _targets_accumulate_hierarchy(all_targets_data, "A")
-
-        self.assertEqual(result, [all_targets_data["A"], all_targets_data["C"], all_targets_data["D"]])
-
-    def test_accumulate_hierarchy_multiple_inheritance(self):
-        all_targets_data = {
-            "F": {"attribute_1": "some thing"},
-            "E": {"attribute_2": "some other thing"},
-            "D": {"inherits": ["F"]},
-            "C": {"inherits": ["E"]},
-            "B": {"inherits": ["C", "D"]},
-            "A": {"inherits": ["B"]},
+            "D": TargetJSON(),
+            "C": TargetJSON(inherits=["D"]),
+            "B": TargetJSON(),
+            "A": TargetJSON(inherits=["C"]),
         }
         result = _targets_accumulate_hierarchy(all_targets_data, "A")
 
         self.assertEqual(
             result,
             [
-                all_targets_data["A"],
-                all_targets_data["B"],
-                all_targets_data["C"],
-                all_targets_data["D"],
-                all_targets_data["E"],
-                all_targets_data["F"],
+                all_targets_data["A"].model_dump(exclude_unset=True),
+                all_targets_data["C"].model_dump(exclude_unset=True),
+                all_targets_data["D"].model_dump(exclude_unset=True),
+            ],
+        )
+
+    def test_accumulate_hierarchy_multiple_inheritance(self):
+        all_targets_data = {
+            "F": TargetJSON(),
+            "E": TargetJSON(macros=["foo"]),  # Set an attribute so that it does not compare equal to target F
+            "D": TargetJSON(inherits=["F"]),
+            "C": TargetJSON(inherits=["E"]),
+            "B": TargetJSON(inherits=["C", "D"]),
+            "A": TargetJSON(inherits=["B"]),
+        }
+        result = _targets_accumulate_hierarchy(all_targets_data, "A")
+
+        self.assertEqual(
+            result,
+            [
+                all_targets_data["A"].model_dump(exclude_unset=True),
+                all_targets_data["B"].model_dump(exclude_unset=True),
+                all_targets_data["C"].model_dump(exclude_unset=True),
+                all_targets_data["D"].model_dump(exclude_unset=True),
+                all_targets_data["E"].model_dump(exclude_unset=True),
+                all_targets_data["F"].model_dump(exclude_unset=True),
             ],
         )
 
@@ -154,32 +161,6 @@ class TestAccumulatingAttributes(TestCase):
         self.assertEqual(orig_accumulation_order, accumulation_order)
 
 
-class TestElementMatches(TestCase):
-    def test_element_matches_exactly(self):
-        element_to_remove = "SOMETHING"
-        element_to_check = "SOMETHING"
-
-        self.assertTrue(_element_matches(element_to_remove, element_to_check))
-
-    def test_element_no_match(self):
-        element_to_remove = "SOMETHING"
-        element_to_check = "SOMETHING_ELSE"
-
-        self.assertFalse(_element_matches(element_to_remove, element_to_check))
-
-    def test_element_matches_with_number_arg(self):
-        element_to_remove = "SOMETHING"
-        element_to_check = "SOMETHING=5"
-
-        self.assertTrue(_element_matches(element_to_remove, element_to_check))
-
-    def test_element_no_match_with_number_arg(self):
-        element_to_remove = "SOMETHING"
-        element_to_check = "SOMETHING_DIFFERENT=5"
-
-        self.assertFalse(_element_matches(element_to_remove, element_to_check))
-
-
 class TestRemoveAttributeElement(TestCase):
     def test_remove_element_without_numbers(self):
         current_attribute_state = {"attribute_1": ["ONE", "TWO=2", "THREE"]}
@@ -192,7 +173,15 @@ class TestRemoveAttributeElement(TestCase):
     def test_remove_element_with_numbers(self):
         current_attribute_state = {"attribute_1": ["ONE", "TWO=2", "THREE"]}
         elements_to_remove = ["TWO"]
-        expected_result = {"attribute_1": ["ONE", "THREE"]}
+        expected_result = current_attribute_state.copy()
         _remove_attribute_element(current_attribute_state, "attribute_1", elements_to_remove)
+
+        self.assertEqual(current_attribute_state, expected_result)
+
+    def test_remove_macros_with_value(self):
+        current_attribute_state = {"macros": ["ONE", "TWO=2", "THREE"]}
+        elements_to_remove = ["TWO"]
+        expected_result = {"macros": ["ONE", "THREE"]}
+        _remove_attribute_element(current_attribute_state, "macros", elements_to_remove)
 
         self.assertEqual(current_attribute_state, expected_result)

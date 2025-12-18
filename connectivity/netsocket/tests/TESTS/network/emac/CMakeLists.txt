@@ -20,6 +20,10 @@ list(
             emac_test_unicast_long.cpp
 )
 
+if(APPLICATION_PROFILE_CONFIG_BAREMETAL)
+	set(TEST_SKIPPED "This test requires an RTOS!")
+endif()
+
 mbed_greentea_add_test(
     TEST_NAME
         mbed-connectivity-network-emac

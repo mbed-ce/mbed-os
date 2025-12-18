@@ -1,6 +1,11 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+# LwIP needs the RTOS
+if(APPLICATION_PROFILE_CONFIG_BAREMETAL)
+    return()
+endif()
+
 add_library(mbed-lwipstack STATIC EXCLUDE_FROM_ALL)
 
 target_include_directories(mbed-lwipstack

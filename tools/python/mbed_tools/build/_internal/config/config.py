@@ -64,7 +64,7 @@ class Config(UserDict):
                 _apply_override(self.data, override)
                 continue
 
-            setting = next(
+            setting: ConfigSetting | None = next(
                 filter(
                     lambda x: x.name == override.name and x.namespace == override.namespace,
                     self.data.get(CONFIG_SECTION, []),
@@ -73,7 +73,7 @@ class Config(UserDict):
             )
             if setting is None:
                 logger.warning(
-                    f"You are attempting to override an undefined config parameter "
+                    f"{override.context} is attempting to override an undefined config parameter "
                     f"`{override.namespace}.{override.name}`.\n"
                     "It is an error to override an undefined configuration parameter. "
                     "Please check your target_overrides are correct.\n"
@@ -92,6 +92,7 @@ class Config(UserDict):
                     )
             else:
                 setting.value = override.value
+                setting.check_value()
 
     def _update_config_section(self, config_settings: List[ConfigSetting]) -> None:
         for setting in config_settings:
