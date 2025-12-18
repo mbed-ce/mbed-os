@@ -5,6 +5,12 @@ if(NOT "DEVICE_EMAC=1" IN_LIST MBED_TARGET_DEFINITIONS)
     return()
 endif()
 
+# EMAC needs the RTOS
+if(APPLICATION_PROFILE_CONFIG_BAREMETAL)
+    return()
+endif()
+
+
 add_library(mbed-emac STATIC EXCLUDE_FROM_ALL
     sources/CompositeEMAC.cpp
     sources/GenericEthPhy.cpp

@@ -20,17 +20,23 @@ current inheritance level.
 This means a target on a higher level could potentially override one on a lower level.
 """
 
+from __future__ import annotations
+
 from collections import deque
 from functools import reduce
-from typing import Any, Deque, Dict, List, Set
+from typing import TYPE_CHECKING, Any, Deque, Dict, List, Set
 
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import ALL_ACCUMULATING_ATTRIBUTES
 
+if TYPE_CHECKING:
+    from mbed_tools.build._internal.config.schemas import TargetJSON
+
 MERGING_ATTRIBUTES = ("config", "overrides", "memory_banks", "memory_overrides")
-NON_OVERRIDING_ATTRIBUTES = (*ALL_ACCUMULATING_ATTRIBUTES, "public", "inherits")
+NON_INHERITED_ATTRIBUTES = ("public", "inherits", "is_mcu_family_target")
+NON_OVERRIDING_ATTRIBUTES = ALL_ACCUMULATING_ATTRIBUTES + NON_INHERITED_ATTRIBUTES
 
 
-def get_overriding_attributes_for_target(all_targets_data: Dict[str, Any], target_name: str) -> Dict[str, Any]:
+def get_overriding_attributes_for_target(all_targets_data: Dict[str, TargetJSON], target_name: str) -> Dict[str, Any]:
     """
     Parses the data for all targets and returns the overriding attributes for the specified target.
 
@@ -45,7 +51,7 @@ def get_overriding_attributes_for_target(all_targets_data: Dict[str, Any], targe
     return _determine_overridden_attributes(override_order)
 
 
-def get_labels_for_target(all_targets_data: Dict[str, Any], target_name: str) -> Set[str]:
+def get_labels_for_target(all_targets_data: Dict[str, TargetJSON], target_name: str) -> Set[str]:
     """
     The labels for a target are the names of all the boards (public and private) that the board inherits from.
 
@@ -62,7 +68,7 @@ def get_labels_for_target(all_targets_data: Dict[str, Any], target_name: str) ->
     return _extract_target_labels(targets_in_order, target_name)
 
 
-def _targets_override_hierarchy(all_targets_data: Dict[str, Any], target_name: str) -> List[dict]:
+def _targets_override_hierarchy(all_targets_data: Dict[str, TargetJSON], target_name: str) -> List[dict[str, Any]]:
     """
     List all ancestors of a target in order of overriding inheritance (depth-first).
 
@@ -87,15 +93,19 @@ def _targets_override_hierarchy(all_targets_data: Dict[str, Any], target_name: s
     Returns:
         A list of dicts representing each target in the hierarchy.
     """
-    targets_in_order: List[dict] = []
+    targets_in_order: List[dict[str, Any]] = []
 
-    still_to_visit: Deque[dict] = deque()
+    still_to_visit: Deque[TargetJSON] = deque()
     still_to_visit.appendleft(all_targets_data[target_name])
 
     while still_to_visit:
         current_target = still_to_visit.popleft()
-        targets_in_order.append(current_target)
-        for parent_target in reversed(current_target.get("inherits", [])):
+
+        # At this point we need to work with individual attributes, so we need to dump from
+        # Pydantic model to a dict.
+        targets_in_order.append(current_target.model_dump(exclude_unset=True))
+
+        for parent_target in reversed(current_target.inherits):
             still_to_visit.appendleft(all_targets_data[parent_target])
 
     return targets_in_order

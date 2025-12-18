@@ -133,8 +133,8 @@ jobs:
           apt-get update
           apt-get install -y python3-venv
 
+      # Always build with baremetal profile, as it should work with every target
       - name: Build ${{ matrix.target }} with baremetal profile
-        if: ${{ matrix.profile == 'baremetal' }}
         # Note: We have to set a wifi network name and password so that the test will compile on devices that use wifi
         run: |
             rm -rf __build

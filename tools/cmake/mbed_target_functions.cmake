@@ -109,23 +109,6 @@ function(mbed_generate_map_file target)
 endfunction()
 
 #
-# Validate selected application profile.
-#
-function(mbed_validate_application_profile target)
-    get_target_property(app_link_libraries ${target} LINK_LIBRARIES)
-    string(FIND "${app_link_libraries}" "mbed-baremetal" string_found_position)
-    if(${string_found_position} GREATER_EQUAL 0)
-        if(NOT "bare-metal" IN_LIST MBED_TARGET_SUPPORTED_APPLICATION_PROFILES)
-            message(FATAL_ERROR
-                "Use full profile as baremetal profile is not supported for this Mbed target")
-        endif()
-    elseif(NOT "full" IN_LIST MBED_TARGET_SUPPORTED_APPLICATION_PROFILES)
-        message(FATAL_ERROR
-            "The full profile is not supported for this Mbed target")
-    endif()
-endfunction()
-
-#
 # Set post build operations
 #
 # target: the affected target
@@ -180,7 +163,6 @@ function(mbed_set_post_build target)
     )
 
     mbed_configure_memory_map(${target} "${CMAKE_CURRENT_BINARY_DIR}/${target}${CMAKE_EXECUTABLE_SUFFIX}.map")
-    mbed_validate_application_profile(${target})
     mbed_generate_bin_hex(${target})
 
     if(COMMAND mbed_post_build_function)
@@ -201,6 +183,7 @@ function(mbed_finalize_build)
     get_property(FINALIZE_BUILD_CALLED GLOBAL PROPERTY MBED_FINALIZE_BUILD_CALLED SET)
     if("${FINALIZE_BUILD_CALLED}")
         message(WARNING "Mbed: Deprecated: mbed_finalize_build() is now automatically called, so you don't need to call it in CMakeLists.txt")
+        return()
     endif()
 
     mbed_finalize_ide_debug_configurations()

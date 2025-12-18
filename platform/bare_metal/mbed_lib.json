@@ -1,4 +1,3 @@
 {
-  "name": "bare-metal",
-  "requires": ["platform", "drivers", "rtos-api", "mbed-trace", "blockdevice"]
+  "name": "bare-metal"
 }

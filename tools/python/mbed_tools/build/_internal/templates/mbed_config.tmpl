@@ -23,11 +23,6 @@ list(APPEND MBED_TARGET_SUPPORTED_C_LIBS {% for supported_c_lib in supported_c_l
 {%- endfor %}
 )
 
-list(APPEND MBED_TARGET_SUPPORTED_APPLICATION_PROFILES {% for supported_application_profile in supported_application_profiles %}
-    {{supported_application_profile}}
-{%- endfor %}
-)
-
 list(APPEND MBED_TARGET_LABELS{% for label in labels %}
     {{label}}
 {%- endfor %}

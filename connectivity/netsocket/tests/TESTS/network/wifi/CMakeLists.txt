@@ -9,6 +9,10 @@ if(NOT "MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE=WIFI" IN_LIST MBED_CONFI
 	set(TEST_SKIPPED "Requires wi-fi to be the default network interface")
 endif()
 
+if(APPLICATION_PROFILE_CONFIG_BAREMETAL)
+	set(TEST_SKIPPED "This test requires an RTOS!")
+endif()
+
 # Options specific to this test
 set(MBED_GREENTEA_WIFI_MAX_SCAN_SIZE 30 CACHE STRING "How many networks may appear in Wifi scan result")
 set(MBED_GREENTEA_WIFI_SECURE_CHANNEL 1 CACHE STRING "Channel number that the wifi network is on.  Used for channel-specific connection tests, if supported by the wifi driver.")

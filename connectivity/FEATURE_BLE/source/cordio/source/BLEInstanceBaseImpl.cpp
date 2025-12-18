@@ -317,7 +317,7 @@ ble::SecurityManager &BLEInstanceBase::getSecurityManager()
 
 const ble::SecurityManager &BLEInstanceBase::getSecurityManager() const
 {
-    const BLEInstanceBase &self = const_cast<BLEInstanceBase &>(*this);
+    BLEInstanceBase &self = const_cast<BLEInstanceBase &>(*this);
     return const_cast<const ble::SecurityManager &>(self.getSecurityManager());
 }
 #endif // BLE_FEATURE_SECURITY

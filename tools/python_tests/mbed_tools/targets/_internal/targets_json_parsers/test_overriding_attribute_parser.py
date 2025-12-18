@@ -6,6 +6,7 @@
 
 from unittest import TestCase, mock
 
+from mbed_tools.build._internal.config.schemas import TargetJSON
 from mbed_tools.targets._internal.targets_json_parsers.overriding_attribute_parser import (
     get_overriding_attributes_for_target,
     get_labels_for_target,
@@ -37,35 +38,42 @@ class TestGetOverridingAttributes(TestCase):
 class TestParseHierarchy(TestCase):
     def test_overwrite_hierarchy_single_inheritance(self):
         all_targets_data = {
-            "D": {"attribute_1": ["some things"]},
-            "C": {"inherits": ["D"], "attribute_2": "something else"},
-            "B": {},
-            "A": {"inherits": ["C"], "attribute_3": ["even more things"]},
-        }
-        result = _targets_override_hierarchy(all_targets_data, "A")
-
-        self.assertEqual(result, [all_targets_data["A"], all_targets_data["C"], all_targets_data["D"]])
-
-    def test_overwrite_hierarchy_multiple_inheritance(self):
-        all_targets_data = {
-            "F": {"attribute_1": "some thing"},
-            "E": {"attribute_2": "some other thing"},
-            "D": {"inherits": ["F"]},
-            "C": {"inherits": ["E"]},
-            "B": {"inherits": ["C", "D"]},
-            "A": {"inherits": ["B"]},
+            "D": TargetJSON(),
+            "C": TargetJSON(inherits=["D"]),
+            "B": TargetJSON(),
+            "A": TargetJSON(inherits=["C"]),
         }
         result = _targets_override_hierarchy(all_targets_data, "A")
 
         self.assertEqual(
             result,
             [
-                all_targets_data["A"],
-                all_targets_data["B"],
-                all_targets_data["C"],
-                all_targets_data["E"],
-                all_targets_data["D"],
-                all_targets_data["F"],
+                all_targets_data["A"].model_dump(exclude_unset=True),
+                all_targets_data["C"].model_dump(exclude_unset=True),
+                all_targets_data["D"].model_dump(exclude_unset=True),
+            ],
+        )
+
+    def test_overwrite_hierarchy_multiple_inheritance(self):
+        all_targets_data = {
+            "F": TargetJSON(),
+            "E": TargetJSON(macros=["foo"]),  # Set an attribute so that it does not compare equal to target F
+            "D": TargetJSON(inherits=["F"]),
+            "C": TargetJSON(inherits=["E"]),
+            "B": TargetJSON(inherits=["C", "D"]),
+            "A": TargetJSON(inherits=["B"]),
+        }
+        result = _targets_override_hierarchy(all_targets_data, "A")
+
+        self.assertEqual(
+            result,
+            [
+                all_targets_data["A"].model_dump(exclude_unset=True),
+                all_targets_data["B"].model_dump(exclude_unset=True),
+                all_targets_data["C"].model_dump(exclude_unset=True),
+                all_targets_data["E"].model_dump(exclude_unset=True),
+                all_targets_data["D"].model_dump(exclude_unset=True),
+                all_targets_data["F"].model_dump(exclude_unset=True),
             ],
         )
 
@@ -108,10 +116,11 @@ class TestOverridingAttributes(TestCase):
 class TestGetLabelsForTarget(TestCase):
     def test_linear_inheritance(self):
         all_targets_data = {
-            "C": {"attribute_1": ["some things"]},
-            "B": {"inherits": ["C"], "attribute_2": "something else"},
-            "A": {"inherits": ["B"], "attribute_3": ["even more things"]},
+            "C": TargetJSON(),
+            "B": TargetJSON(inherits=["C"]),
+            "A": TargetJSON(inherits=["B"]),
         }
+
         target_name = "A"
         expected_result = {"A", "B", "C"}
         result = get_labels_for_target(all_targets_data, target_name)
@@ -120,12 +129,13 @@ class TestGetLabelsForTarget(TestCase):
 
     def test_multiple_inheritance(self):
         all_targets_data = {
-            "E": {"attribute_1": "some thing"},
-            "D": {"attribute_2": "some other thing"},
-            "C": {"inherits": ["E"]},
-            "B": {"inherits": ["C", "D"]},
-            "A": {"inherits": ["B"]},
+            "E": TargetJSON(),
+            "D": TargetJSON(macros=["foo"]),  # Set an attribute so that it does not compare equal to target E
+            "C": TargetJSON(inherits=["E"]),
+            "B": TargetJSON(inherits=["C", "D"]),
+            "A": TargetJSON(inherits=["B"]),
         }
+
         target_name = "A"
         expected_result = {"A", "B", "C", "D", "E"}
         result = get_labels_for_target(all_targets_data, target_name)
@@ -133,7 +143,7 @@ class TestGetLabelsForTarget(TestCase):
         self.assertSetEqual(result, expected_result)
 
     def test_no_inheritance(self):
-        all_targets_data = {"A": {"attribute_3": ["some things"]}}
+        all_targets_data = {"A": TargetJSON()}
         target_name = "A"
         expected_result = {"A"}
         result = get_labels_for_target(all_targets_data, target_name)
