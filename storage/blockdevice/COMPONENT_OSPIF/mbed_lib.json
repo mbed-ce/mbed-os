@@ -17,17 +17,17 @@
         "ospi-io5": "MBED_CONF_DRIVERS_OSPI_IO5",
         "ospi-io6": "MBED_CONF_DRIVERS_OSPI_IO6",
         "ospi-io7": "MBED_CONF_DRIVERS_OSPI_IO7",
-        "OSPI_SCK": "MBED_CONF_DRIVERS_OSPI_SCK",
-        "Ospi-csN": "MBED_CONF_DRIVERS_Ospi-csN",
-        "OSPI_DQS": "MBED_CONF_DRIVERS_OSPI_DQS",
-        "OSPI_POLARITY_MODE": 0,
-        "OSPI_FREQ": "40000000",
-        "OSPI_MIN_READ_SIZE": "1",
-        "OSPI_MIN_PROG_SIZE": "1"
+        "ospi-sck": "MBED_CONF_DRIVERS_OSPI_SCK",
+        "ospi-csn": "MBED_CONF_DRIVERS_OSPI_CSN",
+        "ospi-dqs": "MBED_CONF_DRIVERS_OSPI_DQS",
+        "ospi-polarity-mode": 0,
+        "ospi-freq": "40000000",
+        "ospi-min-read-size": "1",
+        "ospi-min-prog-size": "1"
     },
     "target_overrides": {
         "MX25LM51245G": {
-            "OSPI_FREQ": "66000000"
+            "ospi-freq": "66000000"
         },
         "B_U585_IOT02A": {
             "ospi-io0": "PF_0",
@@ -38,9 +38,9 @@
             "ospi-io5": "PH_10",
             "ospi-io6": "PH_11",
             "ospi-io7": "PH_12",
-            "OSPI_SCK": "PF_4",
-            "Ospi-csN": "PI_5",
-            "OSPI_DQS": "PF_12"
+            "ospi-sck": "PF_4",
+            "ospi-csn": "PI_5",
+            "ospi-dqs": "PF_12"
         }
     }
 }

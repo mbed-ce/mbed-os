@@ -5,7 +5,7 @@
             "sd.spi-mosi"                               : "ARDUINO_UNO_SPI_MOSI",
             "sd.spi-miso"                               : "ARDUINO_UNO_SPI_MISO",
             "sd.spi-clk"                                : "ARDUINO_UNO_SPI_SCK",
-            "sd.spi-cs"                                 : "ARDUINO_UNO_spi-cs",
+            "sd.spi-cs"                                 : "ARDUINO_UNO_SPI_CS",
             "target.network-default-interface-type"     : "WIFI",
             "wizfi310.tx"                               : "PD_5",
             "wizfi310.rx"                               : "PD_6",
@@ -50,7 +50,7 @@
             "sd.spi-mosi"                               : "ARDUINO_UNO_SPI_MOSI",
             "sd.spi-miso"                               : "ARDUINO_UNO_SPI_MIS0",
             "sd.spi-clk"                                : "ARDUINO_UNO_SPI_SCK",
-            "sd.spi-cs"                                 : "ARDUINO_UNO_spi-cs",
+            "sd.spi-cs"                                 : "ARDUINO_UNO_SPI_CS",
             "target.network-default-interface-type"     : "WIFI",
             "wizfi310.tx"                               : "ARDUINO_UNO_D8",
             "wizfi310.rx"                               : "ARDUINO_UNO_D2",
@@ -68,7 +68,7 @@
             "sd.spi-mosi"                               : "ARDUINO_UNO_SPI_MOSI",
             "sd.spi-miso"                               : "ARDUINO_UNO_SPI_MIS0",
             "sd.spi-clk"                                : "ARDUINO_UNO_SPI_SCK",
-            "sd.spi-cs"                                 : "ARDUINO_UNO_spi-cs",
+            "sd.spi-cs"                                 : "ARDUINO_UNO_SPI_CS",
             "target.network-default-interface-type"     : "WIFI",
             "wizfi310.tx"                               : "ARDUINO_UNO_UART_TX",
             "wizfi310.rx"                               : "ARDUINO_UNO_UART_RX",
@@ -85,7 +85,7 @@
             "sd.spi-mosi"                               : "ARDUINO_UNO_SPI_MOSI",
             "sd.spi-miso"                               : "ARDUINO_UNO_SPI_MIS0",
             "sd.spi-clk"                                : "ARDUINO_UNO_SPI_SCK",
-            "sd.spi-cs"                                 : "ARDUINO_UNO_spi-cs",
+            "sd.spi-cs"                                 : "ARDUINO_UNO_SPI_CS",
             "target.network-default-interface-type"     : "WIFI",
             "wizfi310.tx"                               : "ARDUINO_UNO_UART_TX",
             "wizfi310.rx"                               : "ARDUINO_UNO_UART_RX",
@@ -172,7 +172,7 @@
         },
         "EFM32GG11_STK3701": {
             "target.components_add"                     : ["QSPIF"],
-            "qspif.QSPI_FREQ"                           : 10000000
+            "qspif.qspi-freq"                           : 10000000
         },
         "TB_SENSE_12": {
             "target.components_add"                     : ["SPIF"],

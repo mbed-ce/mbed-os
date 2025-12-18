@@ -1,36 +1,36 @@
 {
     "name": "sd",
     "config": {
-        "spi-cs": "ARDUINO_UNO_spi-cs",
+        "spi-cs": "ARDUINO_UNO_SPI_CS",
         "spi-mosi": "ARDUINO_UNO_SPI_MOSI",
         "spi-miso": "ARDUINO_UNO_SPI_MISO",
         "spi-clk": "ARDUINO_UNO_SPI_SCK",
-        "FSFAT_SDCARD_INSTALLED": 1,
-        "CMD_TIMEOUT": 10000,
-        "CMD0_IDLE_STATE_RETRIES": 5,
-        "INIT_FREQUENCY": 100000,
-        "TRX_FREQUENCY": 1000000,
-        "CRC_ENABLED": 0,
-        "TEST_BUFFER": 8192
+        "fsfat-sdcard-installed": 1,
+        "cmd-timeout": 10000,
+        "cmd0-idle-state-retries": 5,
+        "init-frequency": 100000,
+        "trx-frequency": 1000000,
+        "crc-enabled": 0,
+        "test-buffer": 8192
     },
     "target_overrides": {
         "NUCLEO_F070RB": {
-             "TEST_BUFFER": 4096
+             "test-buffer": 4096
         },
         "NUCLEO_F072RB": {
-             "TEST_BUFFER": 4096
+             "test-buffer": 4096
         },
         "NUCLEO_F103RB": {
-             "TEST_BUFFER": 4096
+             "test-buffer": 4096
         },
         "NUCLEO_L073RZ": {
-             "TEST_BUFFER": 4096
+             "test-buffer": 4096
         },
         "DISCO_L072CZ_LRWAN1": {
-             "TEST_BUFFER": 4096
+             "test-buffer": 4096
         },
         "NUCLEO_F091RC": {
-             "TEST_BUFFER": 4096
+             "test-buffer": 4096
         },
         "KL22F": {
              "spi-mosi": "PTD6",
@@ -129,10 +129,10 @@
             "spi-cs":   "PE_2"
         },
         "WIO_BG96": {
-          "spi-cs": "spi-cs",
+          "spi-cs": "SPI_CS",
           "spi-mosi": "SPI_MOSI",
           "spi-miso": "SPI_MISO",
-          "spi-clk": "SPI_SCK"
+          "spi-clk": "spi-sck"
         }
     }
 }

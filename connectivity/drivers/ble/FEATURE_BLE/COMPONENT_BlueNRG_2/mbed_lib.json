@@ -3,10 +3,10 @@
     "config": {
         "spi-mosi":  "D11",
         "spi-miso":  "D12",
-        "SPI_nCS":   "A1",
-        "SPI_RESET": "D7",
-        "SPI_IRQ":   "A0",
-        "SPI_SCK":   "D3",
+        "spi-ncs":   "A1",
+        "spi-reset": "D7",
+        "spi-irq":   "A0",
+        "spi-sck":   "D3",
         "valid-public-bd-address": {
             "help": "Read the BD public address at startup",
             "value": false
@@ -17,7 +17,7 @@
             "target.macros_add": [ "CORDIO_RPA_SWAP_WORKAROUND=1" ]
         },
         "NUCLEO_F446RE": {
-            "SPI_SCK":   "D13"
+            "spi-sck":   "D13"
         }
     }
 }

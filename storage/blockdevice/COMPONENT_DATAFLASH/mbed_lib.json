@@ -1,7 +1,7 @@
 {
     "name": "dataflash",
     "config": {
-        "spi-mosi": "spi-mosi",
+        "spi-mosi": "SPI_MOSI",
         "spi-miso": "SPI_MISO",
         "spi-clk":  "SPI_SCK",
         "spi-cs":   "SPI_CS",

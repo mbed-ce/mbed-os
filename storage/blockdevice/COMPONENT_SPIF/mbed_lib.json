@@ -1,7 +1,7 @@
 {
     "name": "spif-driver",
     "config": {
-        "spi-mosi": "spi-mosi",
+        "spi-mosi": "SPI_MOSI",
         "spi-miso": "SPI_MISO",
         "spi-clk":  "SPI_SCK",
         "spi-cs":   "SPI_CS",
@@ -60,13 +60,13 @@
            "spi-mosi": "SPI3_MOSI",
            "spi-miso": "SPI3_MISO",
            "spi-clk":  "SPI3_SCK",
-           "spi-cs":   "spi-cs1"
+           "spi-cs":   "SPI_CS1"
        },
        "MTS_DRAGONFLY_F413RH": {
            "spi-mosi": "SPI3_MOSI",
            "spi-miso": "SPI3_MISO",
            "spi-clk":  "SPI3_SCK",
-           "spi-cs":   "spi-cs1"
+           "spi-cs":   "SPI_CS1"
        },
        "ARDUINO_NICLA_SENSE_ME": {
           "spi-cs":   "CS_FLASH"
