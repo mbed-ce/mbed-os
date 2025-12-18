@@ -168,7 +168,9 @@ def from_mbed_lib_json_file(
                 continue
 
             # Remove all underscores in the setting name and replace with hyphens, as this makes settings harder to get wrong
-            transformed_config_namespace, transformed_config_name = check_and_transform_config_name(context, mbed_lib.name, config_name)
+            transformed_config_namespace, transformed_config_name = check_and_transform_config_name(
+                context, mbed_lib.name, config_name
+            )
 
             logger.debug("Extracting config setting from '%s': '%s'='%s'", mbed_lib.name, config_name, item)
             if isinstance(item, schemas.ConfigEntryDetails):
@@ -308,7 +310,11 @@ def _extract_config_settings(context: str, namespace: str, config_data: dict) ->
         transformed_namespace, transformed_name = check_and_transform_config_name(context, namespace, name)
 
         setting = ConfigSetting(
-            namespace=transformed_namespace, name=transformed_name, macro_name=macro_name, help_text=help_text, value=value
+            namespace=transformed_namespace,
+            name=transformed_name,
+            macro_name=macro_name,
+            help_text=help_text,
+            value=value,
         )
         # If the config item is about a certain component or feature
         # being present, avoid adding it to the mbed_config.cmake
