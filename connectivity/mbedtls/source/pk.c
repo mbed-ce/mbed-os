@@ -588,7 +588,7 @@ mbedtls_pk_type_t mbedtls_pk_get_type( const mbedtls_pk_context *ctx )
  * Currently only works for EC private keys.
  */
 int mbedtls_pk_wrap_as_opaque( mbedtls_pk_context *pk,
-                               psa_key_id_t *key,
+                               psa_key_handle_t *key,
                                psa_algorithm_t hash_alg )
 {
 #if !defined(MBEDTLS_ECP_C)
