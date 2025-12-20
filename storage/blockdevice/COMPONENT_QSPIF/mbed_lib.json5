@@ -9,54 +9,54 @@
             "help": "(Legacy SFDP 1.0 ONLY) Reset involves a single command (0xF0)",
             "value": false
         },
-        "QSPI_IO0": "MBED_CONF_DRIVERS_QSPI_IO0",
-        "QSPI_IO1": "MBED_CONF_DRIVERS_QSPI_IO1",
-        "QSPI_IO2": "MBED_CONF_DRIVERS_QSPI_IO2",
-        "QSPI_IO3": "MBED_CONF_DRIVERS_QSPI_IO3",
-        "QSPI_SCK": "MBED_CONF_DRIVERS_QSPI_SCK",
-        "QSPI_CSN": "MBED_CONF_DRIVERS_QSPI_CSN",
-        "QSPI_POLARITY_MODE": 0,
-        "QSPI_FREQ": "40000000",
-        "QSPI_MIN_READ_SIZE": "1",
-        "QSPI_MIN_PROG_SIZE": "1",
-        "QSPI_MACRONIX_NUM_STATUS_REGISTER": {
+        "qspi-io0": "MBED_CONF_DRIVERS_QSPI_IO0",
+        "qspi-io1": "MBED_CONF_DRIVERS_QSPI_IO1",
+        "qspi-io2": "MBED_CONF_DRIVERS_QSPI_IO2",
+        "qspi-io3": "MBED_CONF_DRIVERS_QSPI_IO3",
+        "qspi-sck": "MBED_CONF_DRIVERS_QSPI_SCK",
+        "qspi-csn": "MBED_CONF_DRIVERS_QSPI_CSN",
+        "qspi-polarity-mode": 0,
+        "qspi-freq": "40000000",
+        "qspi-min-read-size": "1",
+        "qspi-min-prog-size": "1",
+        "qspi-macronix-num-status-register": {
             "help": "For most of Macronix QSPI flashes, they only have 2 status registers.  However, some, e.g. MX25R6435F, have 3.  This option can be used to control how many status registers the flash is assumed to have.",
             "value": "2"
         }
     },
     "target_overrides": {
         "MX25R6435F": {
-            "QSPI_FREQ": "8000000",
-	        "QSPI_MACRONIX_NUM_STATUS_REGISTER":"3"
+            "qspi-freq": "8000000",
+	        "qspi-macronix-num-status-register":"3"
         },
         "MX25L51245G": {
-            "QSPI_FREQ": "8000000"
+            "qspi-freq": "8000000"
         },
         "MX25LM51245G": {
-            "QSPI_FREQ": "66000000"
+            "qspi-freq": "66000000"
         },
         "N25Q128A": {
-            "QSPI_FREQ": "80000000",
+            "qspi-freq": "80000000",
             "enable-and-reset": true
         },
         "MCU_NRF52840": {
-            "QSPI_FREQ": "32000000",
-            "QSPI_MIN_READ_SIZE": "4",
-            "QSPI_MIN_PROG_SIZE": "4"
+            "qspi-freq": "32000000",
+            "qspi-min-read-size": "4",
+            "qspi-min-prog-size": "4"
         }, 
         "MCU_PSOC6": {
-            "QSPI_FREQ": "50000000"
+            "qspi-freq": "50000000"
         },
         "EFM32GG11_STK3701": {
-            "QSPI_MIN_READ_SIZE": "4",
-            "QSPI_MIN_PROG_SIZE": "4"
+            "qspi-min-read-size": "4",
+            "qspi-min-prog-size": "4"
         },
         "MCU_LPC546XX": {
-            "QSPI_MIN_READ_SIZE": "4",
-            "QSPI_MIN_PROG_SIZE": "4"
+            "qspi-min-read-size": "4",
+            "qspi-min-prog-size": "4"
         },
         "ARDUINO_GIGA": {
-            "QSPI_POLARITY_MODE": "QSPIF_POLARITY_MODE_1",
+            "qspi-polarity-mode": "QSPIF_POLARITY_MODE_1",
             // The flash on this board (AT25SF128A) is quite old and does not have reset information in its
             // SFDP table.
             "enable-and-reset": true

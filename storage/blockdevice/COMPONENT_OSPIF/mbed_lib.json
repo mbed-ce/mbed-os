@@ -9,38 +9,38 @@
             "help": "(Legacy SFDP 1.0 ONLY) Reset involves a single command (0xF0)",
             "value": false
         },
-        "OSPI_IO0": "MBED_CONF_DRIVERS_OSPI_IO0",
-        "OSPI_IO1": "MBED_CONF_DRIVERS_OSPI_IO1",
-        "OSPI_IO2": "MBED_CONF_DRIVERS_OSPI_IO2",
-        "OSPI_IO3": "MBED_CONF_DRIVERS_OSPI_IO3",
-        "OSPI_IO4": "MBED_CONF_DRIVERS_OSPI_IO4",
-        "OSPI_IO5": "MBED_CONF_DRIVERS_OSPI_IO5",
-        "OSPI_IO6": "MBED_CONF_DRIVERS_OSPI_IO6",
-        "OSPI_IO7": "MBED_CONF_DRIVERS_OSPI_IO7",
-        "OSPI_SCK": "MBED_CONF_DRIVERS_OSPI_SCK",
-        "OSPI_CSN": "MBED_CONF_DRIVERS_OSPI_CSN",
-        "OSPI_DQS": "MBED_CONF_DRIVERS_OSPI_DQS",
-        "OSPI_POLARITY_MODE": 0,
-        "OSPI_FREQ": "40000000",
-        "OSPI_MIN_READ_SIZE": "1",
-        "OSPI_MIN_PROG_SIZE": "1"
+        "ospi-io0": "MBED_CONF_DRIVERS_OSPI_IO0",
+        "ospi-io1": "MBED_CONF_DRIVERS_OSPI_IO1",
+        "ospi-io2": "MBED_CONF_DRIVERS_OSPI_IO2",
+        "ospi-io3": "MBED_CONF_DRIVERS_OSPI_IO3",
+        "ospi-io4": "MBED_CONF_DRIVERS_OSPI_IO4",
+        "ospi-io5": "MBED_CONF_DRIVERS_OSPI_IO5",
+        "ospi-io6": "MBED_CONF_DRIVERS_OSPI_IO6",
+        "ospi-io7": "MBED_CONF_DRIVERS_OSPI_IO7",
+        "ospi-sck": "MBED_CONF_DRIVERS_OSPI_SCK",
+        "ospi-csn": "MBED_CONF_DRIVERS_OSPI_CSN",
+        "ospi-dqs": "MBED_CONF_DRIVERS_OSPI_DQS",
+        "ospi-polarity-mode": 0,
+        "ospi-freq": "40000000",
+        "ospi-min-read-size": "1",
+        "ospi-min-prog-size": "1"
     },
     "target_overrides": {
         "MX25LM51245G": {
-            "OSPI_FREQ": "66000000"
+            "ospi-freq": "66000000"
         },
         "B_U585_IOT02A": {
-            "OSPI_IO0": "PF_0",
-            "OSPI_IO1": "PF_1",
-            "OSPI_IO2": "PF_2",
-            "OSPI_IO3": "PF_3",
-            "OSPI_IO4": "PH_9",
-            "OSPI_IO5": "PH_10",
-            "OSPI_IO6": "PH_11",
-            "OSPI_IO7": "PH_12",
-            "OSPI_SCK": "PF_4",
-            "OSPI_CSN": "PI_5",
-            "OSPI_DQS": "PF_12"
+            "ospi-io0": "PF_0",
+            "ospi-io1": "PF_1",
+            "ospi-io2": "PF_2",
+            "ospi-io3": "PF_3",
+            "ospi-io4": "PH_9",
+            "ospi-io5": "PH_10",
+            "ospi-io6": "PH_11",
+            "ospi-io7": "PH_12",
+            "ospi-sck": "PF_4",
+            "ospi-csn": "PI_5",
+            "ospi-dqs": "PF_12"
         }
     }
 }

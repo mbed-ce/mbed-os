@@ -38,14 +38,6 @@
                 "help": "Time in ms required to go to and wake up from deep sleep (max 10)",
                 "value": 0
             },
-            "app_offset": {
-                "help": "Application start offset in ROM",
-                "value": null
-            },
-            "header_offset": {
-                "help": "Application header offset in ROM",
-                "value": null
-            },
             "boot-stack-size": {
                 "help": "Define the boot stack size in bytes. This value must be a multiple of 8",
                 "value": "0x1000"
@@ -59,7 +51,7 @@
                 "value": null
             },
             "tickless-from-us-ticker": {
-                "help": "Run tickless from the microsecond ticker rather than the low power ticker. Running tickless off of the microsecond ticker improves interrupt latency on targets which use lpticker_delay_ticks",
+                "help": "Run tickless from the microsecond ticker rather than the low power ticker. Running tickless off of the microsecond ticker improves interrupt latency on targets which use lpticker-delay-ticks",
                 "value": false
             },
             "init-us-ticker-at-boot": {
@@ -777,38 +769,38 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USE_FULL_LL_DRIVER"
         ],
         "config": {
-            "lse_available": {
+            "lse-available": {
                 "help": "Define if a Low Speed External xtal (LSE) is available on the board (0 = No, 1 = Yes). If Yes, the LSE will be used to clock the RTC, LPUART, ... otherwise the Low Speed Internal clock (LSI) will be used",
                 "value": "1"
             },
-            "lse_bypass": {
+            "lse-bypass": {
                 "help": "Change to 1 to use a logic level oscillator (not a crystal) on 32k LSE",
                 "value": "0"
             },
-            "rtc_clock_source": {
+            "rtc-clock-source": {
                 "help": "Define the RTC clock source. USE_RTC_CLK_LSE_OR_LSI, USE_RTC_CLK_LSI, USE_RTC_CLK_HSE. LPTICKER is not available for HSE and should be removed from the target configuration.",
                 "value": "USE_RTC_CLK_LSE_OR_LSI"
             },
-            "lpuart_clock_source": {
+            "lpuart-clock-source": {
                 "help": "Define the LPUART clock source. LSE clock source will only be used when baudrate is slow (<= LSE freq / 3).  Mask values: USE_LPUART_CLK_LSE, USE_LPUART_CLK_PCLK1, USE_LPUART_CLK_PCLK3, USE_LPUART_CLK_HSI, USE_LPUART_CLK_SYSCLK.",
                 "value": "USE_LPUART_CLK_LSE|USE_LPUART_CLK_PCLK1|USE_LPUART_CLK_PCLK3|USE_LPUART_CLK_SYSCLK"
             },
-            "stdio_uart_tx": {
+            "stdio-uart-tx": {
                 "help": "default TX STDIO pins is defined in PinNames.h file, but it can be overridden"
             },
-            "stdio_uart_rx": {
+            "stdio-uart-rx": {
                 "help": "default RX STDIO pins is defined in PinNames.h file, but it can be overridden"
             },
-            "lpticker_delay_ticks": {
+            "lpticker-delay-ticks": {
                 "help": "https://os.mbed.com/docs/latest/porting/low-power-ticker.html",
                 "value": 1,
                 "macro_name": "LPTICKER_DELAY_TICKS"
             },
-            "lpticker_lptim_clock": {
-                "help": "Default value for LPTIM clock (lpticker_lptim == 1). Value is the dividing factor. Choose 1, 2, 4, 8, 16, 32, 64 or 128. Disclaimer: values from 8 to 128 have impacts on mbed-os timer precision and therefore on scheduling. It's not supported by mbed-os. Use it if you know what you're doing such as long low power sleep.",
+            "lpticker-lptim-clock": {
+                "help": "Default value for LPTIM clock (lpticker-lptim == 1). Value is the dividing factor. Choose 1, 2, 4, 8, 16, 32, 64 or 128. Disclaimer: values from 8 to 128 have impacts on mbed-os timer precision and therefore on scheduling. It's not supported by mbed-os. Use it if you know what you're doing such as long low power sleep.",
                 "value": 1
             },
-            "gpio_reset_at_init": {
+            "gpio-reset-at-init": {
                 "help": "if value set, all GPIO are reset during init",
                 "value": false
             }
@@ -853,16 +845,16 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F0"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If set to true, I2C timing algorithm is enabled. Enabling may lead to performance issues. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
@@ -983,7 +975,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F1"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSE_XTAL|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
@@ -1104,7 +1096,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F2"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
@@ -1147,7 +1139,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "config": {
-            "d11_configuration": {
+            "d11-configuration": {
                 "help": "Value: PA_7 for the default board configuration, PB_5 in case of solder bridge update (SB121 off/ SB122 on)",
                 "value": "PA_7",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
@@ -1174,16 +1166,16 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F3"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
@@ -1229,8 +1221,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32F303x8"
         ],
         "overrides": {
-            "clock_source": "USE_PLL_HSI",
-            "lse_available": 0
+            "clock-source": "USE_PLL_HSI",
+            "lse-available": 0
         },
         "device_name": "STM32F303K8Tx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262544.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -1316,7 +1308,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F4"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
@@ -1391,8 +1383,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F407VETx",
         "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL",
-            "lse_available": 0,
+            "clock-source": "USE_PLL_HSE_XTAL",
+            "lse-available": 0,
             "network-default-interface-type": "ETHERNET"
         },
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/1881/MFG_102110014.jpg"
@@ -1427,7 +1419,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "overrides": {
-            "lse_available": 0
+            "lse-available": 0
         },
         "macros_add": [
             "HSE_VALUE=26000000"
@@ -1450,7 +1442,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "HSE_VALUE=26000000"
         ],
         "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL"
+            "clock-source": "USE_PLL_HSE_XTAL"
         },
         "device_has_remove": [
             "FLASH",
@@ -1467,7 +1459,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "HSE_VALUE=25000000U"
         ],
         "overrides": {
-            "clock_source": "USE_PLL_HSI | USE_PLL_HSE_XTAL"
+            "clock-source": "USE_PLL_HSI | USE_PLL_HSE_XTAL"
         },
         "device_has_add": [
             "USBDEVICE"
@@ -1531,7 +1523,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F412ZGTx",
         "overrides": {
-            "clock_source": "USE_PLL_HSI",
+            "clock-source": "USE_PLL_HSI",
             "network-default-interface-type": "WIFI"
         },
         "image_url": "https://cdn.mxchip.com/mxchip_official_website/img/EMW3166-P-%E7%99%BD-%E6%AD%A3.jpg"
@@ -1545,13 +1537,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F413xH"
         ],
         "config": {
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             }
         },
         "overrides": {
-            "lpticker_delay_ticks": 4
+            "lpticker-delay-ticks": 4
         },
         "macros_add": [
             "STM32F413xx",
@@ -1621,12 +1613,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "config": {
-            "d11_configuration": {
+            "d11-configuration": {
                 "help": "Value: PA_7 for the default board configuration, PB_5 in case of solder bridge update (SB121 off/ SB122 on)",
                 "value": "PA_7",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
             },
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_FS"
             }
@@ -1652,13 +1644,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32F429xI"
         ],
         "config": {
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_HS_IN_FS"
             }
         },
         "overrides": {
-            "lse_available": 0
+            "lse-available": 0
         },
         "device_has_remove": [
             "LPTICKER"
@@ -1692,12 +1684,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "config": {
-            "d11_configuration": {
+            "d11-configuration": {
                 "help": "Value: PA_7 for the default board configuration, PB_5 in case of solder bridge update (SB121 off/ SB122 on)",
                 "value": "PA_7",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
             },
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_FS"
             }
@@ -1746,7 +1738,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "config": {
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_FS"
             }
@@ -1788,7 +1780,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "N25Q128A"
         ],
         "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
+            "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
         },
         "device_has_add": [
             "QSPI",
@@ -1805,19 +1797,19 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "config": {
-            "clock_freq": {
+            "clock-freq": {
                 "help": "Clock frequency in Mhz",
                 "value": "8",
                 "macro_name": "CLOCK_FREQUENCY_MHZ"
             },
-            "usb_speed":  {
+            "usb-speed":  {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_HS"
             }
         },
         "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
-            "lse_available": 0
+            "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
+            "lse-available": 0
         },
         "device_has_add": [
             "QSPI",
@@ -1841,26 +1833,26 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F7"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
         },
         "overrides": {
-            "lpticker_delay_ticks": 0,
+            "lpticker-delay-ticks": 0,
             "internal-flash-uniform-sectors": false
         },
         "macros_add": [
@@ -1912,13 +1904,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "config": {
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_FS"
             }
         },
         "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
+            "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
             "network-default-interface-type": "ETHERNET"
         },
         "macros_add": [
@@ -1942,7 +1934,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F746ZG"
         ],
         "config": {
-            "d11_configuration": {
+            "d11-configuration": {
                 "help": "Value: PA_7 for the default board configuration, PB_5 in case of solder bridge update (SB121 off/ SB122 on)",
                 "value": "PA_7",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
@@ -1973,7 +1965,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F756ZG"
         ],
         "config": {
-            "d11_configuration": {
+            "d11-configuration": {
                 "help": "Value: PA_7 for the default board configuration, PB_5 in case of solder bridge update (SB121 off/ SB122 on)",
                 "value": "PA_7",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
@@ -2004,7 +1996,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F767xI"
         ],
         "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL",
+            "clock-source": "USE_PLL_HSE_XTAL",
             "network-default-interface-type": "WIFI"
         },
         "components_add": [
@@ -2028,11 +2020,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F767ZI"
         ],
         "config": {
-            "flash_dual_bank": {
+            "flash-dual-bank": {
                 "help": "Default board configuration is Single Bank Flash. If you enable Dual Bank with ST Link Utility, set value to 1",
                 "value": "0"
             },
-            "d11_configuration": {
+            "d11-configuration": {
                 "help": "Value: PA_7 for the default board configuration, PB_5 in case of solder bridge update (SB121 off/ SB122 on)",
                 "value": "PA_7",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
@@ -2069,11 +2061,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "config": {
-            "flash_dual_bank": {
+            "flash-dual-bank": {
                 "help": "Default board configuration is Single Bank Flash. If you enable Dual Bank with ST Link Utility, set value to 1",
                 "value": "0"
             },
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_HS"
             }
@@ -2103,20 +2095,20 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "core": "Cortex-M0+",
         "c_lib": "small",
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
@@ -2129,8 +2121,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_TICKLESS"
         ],
         "overrides": {
-            "lpuart_clock_source": "USE_LPUART_CLK_HSI",
-            "lpticker_delay_ticks": 0
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI",
+            "lpticker-delay-ticks": 0
         },
         "device_has_add": [
             "SERIAL_ASYNCH",
@@ -2151,8 +2143,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32G030xx"
         ],
         "overrides": {
-            "lpticker_delay_ticks": 1,
-            "lpticker_lptim": "0",
+            "lpticker-delay-ticks": 1,
+            "lpticker-lptim": "0",
             "boot-stack-size": "0x400"
         }
     },
@@ -2205,8 +2197,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32G050xx"
         ],
         "overrides": {
-            "lpticker_delay_ticks": 1,
-            "lpticker_lptim": "0",
+            "lpticker-delay-ticks": 1,
+            "lpticker-lptim": "0",
             "boot-stack-size": "0x400"
         }
     },
@@ -2262,8 +2254,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_TICKLESS"
         ],
         "overrides": {
-            "lpticker_delay_ticks": 1,
-            "lpticker_lptim": "0"
+            "lpticker-delay-ticks": 1,
+            "lpticker-lptim": "0"
         }
     },
     "MCU_STM32G071xB": {
@@ -2318,8 +2310,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32G0B0xx"
         ],
         "overrides": {
-            "lpticker_delay_ticks": 1,
-            "lpticker_lptim": "0"
+            "lpticker-delay-ticks": 1,
+            "lpticker-lptim": "0"
         }
     },
     "MCU_STM32G0B1xE": {
@@ -2373,25 +2365,25 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "core": "Cortex-M4F",
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "hse_value": {
+            "hse-value": {
                 "help": "HSE default value is 8MHz in stm32g4xx_hal_conf.h",
                 "value": "8000000",
                 "macro_name": "HSE_VALUE"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
@@ -2404,7 +2396,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_TICKLESS"
         ],
         "overrides": {
-            "lpticker_delay_ticks": 0
+            "lpticker-delay-ticks": 0
         },
         "device_has_add": [
             "ANALOGOUT",
@@ -2438,7 +2430,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "overrides": {
-            "hse_value": 24000000
+            "hse-value": 24000000
         },
         "device_name": "STM32G431RBTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267029.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2448,8 +2440,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32G431xB"
         ],
       "overrides": {
-        "clock_source": "USE_PLL_HSI",
-        "lse_available":  0
+        "clock-source": "USE_PLL_HSI",
+        "lse-available":  0
       },
       "device_name": "STM32G431KBTx",
       "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267030.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2510,7 +2502,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "overrides": {
-            "hse_value": 24000000
+            "hse-value": 24000000
         },
         "device_name": "STM32G474RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF267029.en.feature-description-include-personalized-no-cpn-medium.jpg"
@@ -2574,31 +2566,31 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32H5"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI|USE_PLL_HSE_XTAL",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "hse_value": {
+            "hse-value": {
                 "help": "Frequency in MHz of external oscillator / crystal.  Will be used to compute PLL parameters.",
                 "value": "8000000",
                 "macro_name": "HSE_VALUE"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
         },
         "overrides": {
-            "lpticker_delay_ticks": 0
+            "lpticker-delay-ticks": 0
         },
         "macros_add": [
             "EXTRA_IDLE_STACK_REQUIRED",
@@ -2638,9 +2630,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32H503xB"
         ],
         "overrides": {
-            "hse_value": 24000000,
-            "lse_available":  1,
-            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
+            "hse-value": 24000000,
+            "lse-available":  1,
+            "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
 
             // ADC reference voltage is same as MCU VDD.
             // MCU VDD defaults to 3.3V though can be changed to 1.8V based on JP2 setting on nucleo board.
@@ -2680,8 +2672,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32H563xI"
         ],
         "overrides": {
-            "lse_available":  1,
-            "clock_source": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
+            "lse-available":  1,
+            "clock-source": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
 
             // ADC reference voltage is same as MCU VDD.
             // MCU VDD defaults to 3.3V though can be changed to 1.8V based on JP4 setting on nucleo board.
@@ -2718,9 +2710,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32H573xI"
         ],
         "overrides": {
-            "hse_value": 25000000,
-            "lse_available":  1,
-            "clock_source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
+            "hse-value": 25000000,
+            "lse-available":  1,
+            "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
 
             // ADC reference voltage is same as MCU VDD.
             // MCU VDD defaults to 3.3V though can be changed to 1.8V based on JP2 setting.
@@ -2755,20 +2747,20 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32H7"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC | USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "system_power_supply": {
+            "system-power-supply": {
                 accepted_values: [
                     "PWR_LDO_SUPPLY",
                     "PWR_DIRECT_SMPS_SUPPLY",
@@ -2782,7 +2774,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 ],
                 "value": null
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             },
@@ -2790,7 +2782,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "help": "Enable 'overdrive mode' (also known as VOS0) and raise core clock to the maximum value.  Only supported when the internal LDO is used for core voltage source.  Reduces the temperature range of the chip, see datasheet for details.",
                 "value": 1
             },
-            "hse_value": {
+            "hse-value": {
                 "help": "Frequency in MHz of external oscillator / crystal.  Will be used to compute PLL parameters.",
                 "value": "8000000",
                 "macro_name": "HSE_VALUE"
@@ -2802,9 +2794,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "DATA_IN_D2_SRAM" // Flag to HAL Layer to initialize clock for D2 SRAM on boot
         ],
         "overrides": {
-            "lpticker_delay_ticks": 0,
+            "lpticker-delay-ticks": 0,
             // Mbed's clock code does not initialize PLL2, so we have to disable USE_LPUART_CLK_PCLK1 here.
-            "lpuart_clock_source": "USE_LPUART_CLK_LSE|USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+            "lpuart-clock-source": "USE_LPUART_CLK_LSE|USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
         },
         "device_has_add": [
             "ANALOGOUT",
@@ -2833,7 +2825,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32H723xx",
         ],
         "overrides": {
-            "system_power_supply": "PWR_LDO_SUPPLY"
+            "system-power-supply": "PWR_LDO_SUPPLY"
         }
     },
     "MCU_STM32H725xE": {
@@ -2851,7 +2843,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32H725xx"
         ],
         "overrides": {
-            "system_power_supply": "PWR_LDO_SUPPLY"
+            "system-power-supply": "PWR_LDO_SUPPLY"
         }
     },
     "WIO_H725AE": { // AKA "Seeed Wio Lite AI"
@@ -2859,7 +2851,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32H725xE"
         ],
         "config": {
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_HS_IN_FS"
             }
@@ -2868,10 +2860,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USBDEVICE"
         ],
         "overrides": {
-            "lse_available":  1,
-            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
-            "clock_source": "USE_PLL_HSI | USE_PLL_HSE_XTAL",
-            "lse_drive_load_level": "RCC_LSEDRIVE_MEDIUMLOW",
+            "lse-available":  1,
+            "system-power-supply": "PWR_DIRECT_SMPS_SUPPLY",
+            "clock-source": "USE_PLL_HSI | USE_PLL_HSE_XTAL",
+            "lse-drive-load-level": "RCC_LSEDRIVE_MEDIUMLOW",
             "enable-overdrive-mode": 0
         },
         "device_name": "STM32H725AEIx",
@@ -2892,7 +2884,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_SPLIT_HEAP"
         ],
         "overrides": {
-            "system_power_supply": "PWR_LDO_SUPPLY"
+            "system-power-supply": "PWR_LDO_SUPPLY"
         },
         "device_name": "STM32H735AGIx"
     },
@@ -2911,7 +2903,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_SPLIT_HEAP"
         ],
         "overrides": {
-            "system_power_supply": "PWR_LDO_SUPPLY"
+            "system-power-supply": "PWR_LDO_SUPPLY"
         }
     },
     "NUCLEO_H743ZI2": {
@@ -2919,7 +2911,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32H743xI"
         ],
         "config": {
-            "d11_configuration": {
+            "d11-configuration": {
                 "help": "Value: PB_5 for the default board configuration, PA_7 in case of solder bridge update (SB33 on/ SB35 off)",
                 "value": "PB_5",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
@@ -2946,12 +2938,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32H723ZG"
         ],
         "config": {
-            "d11_configuration": {
+            "d11-configuration": {
                 "help": "Value: PB_5 for the default board configuration, PA_7 in case of solder bridge update (SB33 on/ SB35 off)",
                 "value": "PB_5",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
             },
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_HS_IN_FS"
             }
@@ -2961,8 +2953,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USBDEVICE"
         ],
         "overrides": {
-            "clock_source": "USE_PLL_HSE_EXTC",
-            "lse_available": 1,
+            "clock-source": "USE_PLL_HSE_EXTC",
+            "lse-available": 1,
             "network-default-interface-type": "ETHERNET"
         },
         "supported_form_factors": [
@@ -3029,12 +3021,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "config": {
-            "d11_configuration": {
+            "d11-configuration": {
                 "help": "Value: PB_5 for the default board configuration, PA_7 in case of solder bridge update (SB33 on/ SB35 off)",
                 "value": "PB_5",
                 "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
             },
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_FS"
             },
@@ -3044,7 +3036,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "overrides": {
             "network-default-interface-type": "ETHERNET",
-            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
+            "system-power-supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
             "enable-overdrive-mode": 0
         },
@@ -3115,7 +3107,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
 		"inherits": ["MCU_STM32H747xI"],
         "overrides": {
-            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
+            "system-power-supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
             "enable-overdrive-mode": 0
         },
@@ -3154,11 +3146,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "inherits": ["MCU_STM32H747xI"],
         "config": {
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_OTG_HS"
             },
-            "wifi_driver_in_qspi_flash": {
+            "wifi-driver-in-qspi-flash": {
                 help: "If this is false, and wifi is used in the application, the wifi chip firmware will be included in the application firmware (+411kiB code size).  If true, then the wifi firmware is loaded from the external QSPI flash instead, and you must install it using the Arduino IDE sketch for this purpose.",
                 value: false
             }
@@ -3185,9 +3177,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "QSPI"
         ],
         "overrides": {
-            "lse_available": 1,
-            "lpticker_delay_ticks": 0,
-            "i2c_timing_value_algo": true
+            "lse-available": 1,
+            "lpticker-delay-ticks": 0,
+            "i2c-timing-value-algo": true
         },
         "device_name": "STM32H747XIHx"
     },
@@ -3195,18 +3187,18 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         public: false,
         inherits: ["STM32H747_ARDUINO"],
         overrides: {
-            system_power_supply: "PWR_LDO_SUPPLY",
+            "system-power-supply": "PWR_LDO_SUPPLY",
             "enable-overdrive-mode": 1,
-            clock_source: "USE_PLL_HSE_XTAL | USE_PLL_HSI",
+            "clock-source": "USE_PLL_HSE_XTAL | USE_PLL_HSI",
             "network-default-interface-type": "WIFI",
-            lpuart_clock_source: "USE_LPUART_CLK_HSI",
-            "hse_value": 16000000,
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI",
+            "hse-value": 16000000,
 
             // Arduino Giga connects the primary USB port (USB-C port) to the USB Full Speed pins.
             // TODO eventually this needs to be runtime configurable so that the two USB ports
             // can use different speeds.  With the current setting, Mbed will not be able to use
             // the host mode port as that port uses high speed.
-            "usb_speed": "USE_USB_OTG_FS",
+            "usb-speed": "USE_USB_OTG_FS",
         },
         macros_add: [
             "BT_UART_NO_3M_SUPPORT"
@@ -3245,11 +3237,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EMAC"
         ],
         "overrides": {
-            "system_power_supply": "PWR_SMPS_1V8_SUPPLIES_LDO",
-            "clock_source": "USE_PLL_HSE_EXTC",
-            "lse_bypass": 1,
+            "system-power-supply": "PWR_SMPS_1V8_SUPPLIES_LDO",
+            "clock-source": "USE_PLL_HSE_EXTC",
+            "lse-bypass": 1,
             "network-default-interface-type": "ETHERNET",
-            "hse_value": 25000000,
+            "hse-value": 25000000,
             // Can use overdrive because LDO is regulating core voltage (even though
             // the LDO power comes from the SMPS).
             "enable-overdrive-mode": 1,
@@ -3303,7 +3295,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_SPLIT_HEAP"
         ],
         "overrides": {
-            "system_power_supply": "PWR_LDO_SUPPLY"
+            "system-power-supply": "PWR_LDO_SUPPLY"
         },
         "device_name": "STM32H750ZBTx"
     },
@@ -3322,7 +3314,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_SPLIT_HEAP"
         ],
         "overrides": {
-            "system_power_supply": "PWR_LDO_SUPPLY"
+            "system-power-supply": "PWR_LDO_SUPPLY"
         }
     },
     "MCU_STM32H7A3xIQ": {
@@ -3349,7 +3341,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "overrides": {
-            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
+            "system-power-supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
             "enable-overdrive-mode": 0
         },
@@ -3371,7 +3363,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32H7B3ZITxQ",
         "overrides": {
-            "system_power_supply": "PWR_DIRECT_SMPS_SUPPLY",
+            "system-power-supply": "PWR_DIRECT_SMPS_SUPPLY",
             // Cannot enable overdrive mode because the default power supply is SMPS
             "enable-overdrive-mode": 0
         }
@@ -3388,20 +3380,20 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L0"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
@@ -3411,7 +3403,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EXTRA_IDLE_STACK_REQUIRED"
         ],
         "overrides": {
-            "lpticker_delay_ticks": 0
+            "lpticker-delay-ticks": 0
         },
         "device_has_add": [
             "CRC",
@@ -3477,8 +3469,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L072xx"
         ],
         "overrides": {
-            "clock_source": "USE_PLL_HSI",
-            "lpticker_delay_ticks": 0
+            "clock-source": "USE_PLL_HSI",
+            "lpticker-delay-ticks": 0
         },
         "device_has_add": [
             "ANALOGOUT",
@@ -3552,14 +3544,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L1"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             }
         },
         "overrides": {
-            "gpio_reset_at_init": true
+            "gpio-reset-at-init": true
         },
         "device_has_add": [
             "ANALOGOUT",
@@ -3616,7 +3608,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L151CC"
         ],
         "config": {
-            "hse_value": {
+            "hse-value": {
                 "value": "24000000",
                 "macro_name": "HSE_VALUE"
             }
@@ -3697,20 +3689,20 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L4"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
                 "value": "USE_PLL_MSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
@@ -3720,7 +3712,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EXTRA_IDLE_STACK_REQUIRED"
         ],
         "overrides": {
-            "lpticker_delay_ticks": 0
+            "lpticker-delay-ticks": 0
         },
         "device_has_add": [
             "ANALOGOUT",
@@ -3814,8 +3806,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32L443xC"
         ],
         "overrides": {
-            "clock_source": "USE_PLL_HSI",
-            "lse_available": 0
+            "clock-source": "USE_PLL_HSI",
+            "lse-available": 0
         },
         "device_has_remove": [
             "LPTICKER"
@@ -3885,7 +3877,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L475xG"
         ],
         "overrides": {
-            "lpuart_clock_source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
         },
         "macros_add": [
             "STM32L475xx",
@@ -3927,7 +3919,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L476xG"
         ],
         "overrides": {
-            "lpuart_clock_source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
         },
         "macros_add": [
             "STM32L476xx",
@@ -3970,7 +3962,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L486xG"
         ],
         "overrides": {
-            "lpuart_clock_source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
         },
         "macros_add": [
             "STM32L486xx",
@@ -3997,7 +3989,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L496xG"
         ],
         "overrides": {
-            "lpuart_clock_source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
         },
         "macros_add": [
             "STM32L496xx",
@@ -4188,26 +4180,26 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EXTRA_IDLE_STACK_REQUIRED"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
                 "value": "USE_PLL_MSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
         },
         "overrides": {
-            "lpticker_delay_ticks": 0
+            "lpticker-delay-ticks": 0
         },
         "device_has_add": [
             "ANALOGOUT",
@@ -4298,30 +4290,30 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_TICKLESS"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
                 "value": "USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             },
-            "usb_speed": {
+            "usb-speed": {
                 "help": "USE_USB_OTG_FS or USE_USB_OTG_HS or USE_USB_HS_IN_FS",
                 "value": "USE_USB_NO_OTG"
             }
         },
         "overrides": {
-            "lpticker_delay_ticks": 0
+            "lpticker-delay-ticks": 0
         },
         "device_has_add": [
             "CRC",
@@ -4350,8 +4342,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32U083xC"
         ],
 		 "overrides": {
-            "clock_source": "USE_PLL_HSI", // Use HSI by default, other options require hardware changes
-            "lse_available":  1,
+            "clock-source": "USE_PLL_HSI", // Use HSI by default, other options require hardware changes
+            "lse-available":  1,
             "default-adc-vref": 3.3
         },
         "supported_form_factors": [
@@ -4376,37 +4368,37 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EXTRA_IDLE_STACK_REQUIRED"
         ],
         "config": {
-            "clock_source": {
+            "clock-source": {
                 "help": "Mask value : USE_PLL_HSE_EXTC (need HW patch) | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI | USE_PLL_MSI",
                 "value": "USE_PLL_MSI",
                 "macro_name": "CLOCK_SOURCE"
             },
-            "hse_value": {
+            "hse-value": {
                 "help": "HSE default value is 16MHz in stm32u5xx_hal_conf.h, The effective value is within the range of 4MHz to 50MHz and can be divided by 4MHz or 5MHz.",
                 "value": "16000000",
                 "macro_name": "HSE_VALUE"
             },
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             },
-            "qspi_ospim_ioport_high": {
+            "qspi-ospim-ioport-high": {
                 "help": "When using the OSPI peripheral in QSPI mode, set value 1 to use IO 7~4 for data, or 0 to use IO 3~0. Affects both OCTOSPI1 and OCTOSPI2 instances.",
                 "value": 0,
                 "macro_name": "QSPI_OSPIM_IOPORT_HIGH"
             }
         },
         "overrides": {
-            "lpticker_delay_ticks": 0,
-            "lpuart_clock_source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+            "lpticker-delay-ticks": 0,
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
         },
         "device_has_add": [
             "ANALOGOUT",
@@ -4568,15 +4560,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "CORDIO"
         ],
         "config": {
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
@@ -4586,7 +4578,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EXTRA_IDLE_STACK_REQUIRED"
         ],
         "overrides": {
-            "lpticker_delay_ticks": 0
+            "lpticker-delay-ticks": 0
         },
         "device_has_add": [
             "CRC",
@@ -4709,15 +4701,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32WL"
         ],
         "config": {
-            "lpticker_lptim": {
+            "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
-            "lse_drive_load_level": {
+            "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
-            "i2c_timing_value_algo": {
+            "i2c-timing-value-algo": {
                 "help": "If value was set to true I2C timing algorithm is enabled. Enabling may leads to performance issue. Keeping this false and changing system clock will trigger assert.)",
                 "value": false
             }
@@ -4727,7 +4719,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EXTRA_IDLE_STACK_REQUIRED"
         ],
         "overrides": {
-            "lpticker_delay_ticks": 0
+            "lpticker-delay-ticks": 0
         },
         "device_has_add": [
             "MPU",
@@ -5882,15 +5874,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MAX32660EVSYS"
         ],
         "config": {
-            "stdio_uart": {
+            "stdio-uart": {
                 "help": "default STDIO port is defined in PeripheralNames.h file, but it can be overridden, default UART_1",
                 "value": null
             },
-            "stdio_uart_tx": {
+            "stdio-uart-tx": {
                 "help": "default TX STDIO pins is defined in PinNames.h file, but it can be overridden, default P0_10",
                 "value": null
             },
-            "stdio_uart_rx": {
+            "stdio-uart-rx": {
                 "help": "default RX STDIO pins is defined in PinNames.h file, but it can be overridden, default P0_11",
                 "value": null
             }
@@ -5929,23 +5921,23 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH"
         ],
         "config": {
-            "stdio_uart": {
+            "stdio-uart": {
                 "help": "default STDIO port is defined in PeripheralNames.h file, but it can be overridden, default UART_0",
                 "value": null
             },
-            "stdio_uart_tx": {
+            "stdio-uart-tx": {
                 "help": "default TX STDIO pins is defined in PinNames.h file, but it can be overridden, default P0_9",
                 "value": null
             },
-            "stdio_uart_rx": {
+            "stdio-uart-rx": {
                 "help": "default RX STDIO pins is defined in PinNames.h file, but it can be overridden, default P0_8",
                 "value": null
             },
-            "us_ticker_timer": {
+            "us-ticker-timer": {
                 "help": "Select which timer (0-3) to use for us_ticker.c",
                 "value": 1
             },
-            "lp_ticker_timer": {
+            "lp-ticker-timer": {
                 "help": "Select which low power timer (0-1) to use for lp_ticker.c",
                 "value": 1
             }
@@ -6018,28 +6010,28 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "WATCHDOG"
         ],
         "config": {
-            "hf_clock_src": {
+            "hf-clock-src": {
                 "help": "Value: HFXO for external crystal, HFRCO for internal RC oscillator",
                 "value": "HFXO",
                 "macro_name": "CORE_CLOCK_SOURCE"
             },
-            "hfxo_clock_freq": {
+            "hfxo-clock-freq": {
                 "help": "Value: External crystal frequency in hertz",
                 "value": "48000000",
                 "macro_name": "HFXO_FREQUENCY"
             },
-            "lf_clock_src": {
+            "lf-clock-src": {
                 "help": "Value: LFXO for external crystal, LFRCO for internal RC oscillator, ULFRCO for internal 1KHz RC oscillator",
                 "value": "LFXO",
                 "macro_name": "LOW_ENERGY_CLOCK_SOURCE"
             },
-            "lfxo_clock_freq": {
+            "lfxo-clock-freq": {
                 "help": "Value: External crystal frequency in hertz",
                 "value": "32768",
                 "macro_name": "LFXO_FREQUENCY"
             },
-            "hfrco_clock_freq": {
-                "help": "Value: Frequency in hertz, must correspond to setting of hfrco_band_select",
+            "hfrco-clock-freq": {
+                "help": "Value: Frequency in hertz, must correspond to setting of hfrco-band-select",
                 "value": "32000000",
                 "macro_name": "HFRCO_FREQUENCY"
             }
@@ -6060,8 +6052,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ANALOGOUT"
         ],
         "config": {
-            "hfrco_band_select": {
-                "help": "Value: One of _CMU_HFRCOCTRL_BAND_28MHZ, _CMU_HFRCOCTRL_BAND_21MHZ, _CMU_HFRCOCTRL_BAND_14MHZ, _CMU_HFRCOCTRL_BAND_11MHZ, _CMU_HFRCOCTRL_BAND_7MHZ, _CMU_HFRCOCTRL_BAND_1MHZ. Be sure to set hfrco_clock_freq accordingly!",
+            "hfrco-band-select": {
+                "help": "Value: One of _CMU_HFRCOCTRL_BAND_28MHZ, _CMU_HFRCOCTRL_BAND_21MHZ, _CMU_HFRCOCTRL_BAND_14MHZ, _CMU_HFRCOCTRL_BAND_11MHZ, _CMU_HFRCOCTRL_BAND_7MHZ, _CMU_HFRCOCTRL_BAND_1MHZ. Be sure to set hfrco-clock-freq accordingly!",
                 "value": "_CMU_HFRCOCTRL_BAND_21MHZ",
                 "macro_name": "HFRCO_FREQUENCY_ENUM"
             }
@@ -6078,14 +6070,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EFM32GG990F1024"
         ],
         "config": {
-            "board_controller_enable": {
+            "board-controller-enable": {
                 "help": "Pin to pull high for enabling the USB serial port",
                 "value": "PF7",
                 "macro_name": "EFM_BC_EN"
             }
         },
         "overrides": {
-            "hfrco_clock_freq": "21000000"
+            "hfrco-clock-freq": "21000000"
         },
         "image_url": "https://www.silabs.com/content/dam/siliconlabs/images/products/microcontrollers/32-bit_mcus/giant_gecko/giant-gecko-starter-kit.jpg"
     },
@@ -6105,8 +6097,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "CRC"
         ],
         "config": {
-            "hfrco_band_select": {
-                "help": "Value: One of cmuHFRCOFreq_1M0Hz, cmuHFRCOFreq_2M0Hz, cmuHFRCOFreq_4M0Hz, cmuHFRCOFreq_7M0Hz, cmuHFRCOFreq_13M0Hz, cmuHFRCOFreq_16M0Hz, cmuHFRCOFreq_19M0Hz, cmuHFRCOFreq_26M0Hz, cmuHFRCOFreq_32M0Hz, cmuHFRCOFreq_38M0Hz. Be sure to set hfrco_clock_freq accordingly!",
+            "hfrco-band-select": {
+                "help": "Value: One of cmuHFRCOFreq_1M0Hz, cmuHFRCOFreq_2M0Hz, cmuHFRCOFreq_4M0Hz, cmuHFRCOFreq_7M0Hz, cmuHFRCOFreq_13M0Hz, cmuHFRCOFreq_16M0Hz, cmuHFRCOFreq_19M0Hz, cmuHFRCOFreq_26M0Hz, cmuHFRCOFreq_32M0Hz, cmuHFRCOFreq_38M0Hz. Be sure to set hfrco-clock-freq accordingly!",
                 "value": "cmuHFRCOFreq_32M0Hz",
                 "macro_name": "HFRCO_FREQUENCY_ENUM"
             }
@@ -6124,7 +6116,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "overrides": {
             "network-default-interface-type": "MESH",
-            "hfxo_clock_freq": "38400000",
+            "hfxo-clock-freq": "38400000",
         },
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/2145/MFG_SLTB004A.jpg"
     },
@@ -6144,8 +6136,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ITM"
         ],
         "config": {
-            "hfrco_band_select": {
-                "help": "Value: One of cmuHFRCOFreq_1M0Hz, cmuHFRCOFreq_2M0Hz, cmuHFRCOFreq_4M0Hz, cmuHFRCOFreq_7M0Hz, cmuHFRCOFreq_13M0Hz, cmuHFRCOFreq_16M0Hz, cmuHFRCOFreq_19M0Hz, cmuHFRCOFreq_26M0Hz, cmuHFRCOFreq_32M0Hz, cmuHFRCOFreq_38M0Hz. Be sure to set hfrco_clock_freq accordingly!",
+            "hfrco-band-select": {
+                "help": "Value: One of cmuHFRCOFreq_1M0Hz, cmuHFRCOFreq_2M0Hz, cmuHFRCOFreq_4M0Hz, cmuHFRCOFreq_7M0Hz, cmuHFRCOFreq_13M0Hz, cmuHFRCOFreq_16M0Hz, cmuHFRCOFreq_19M0Hz, cmuHFRCOFreq_26M0Hz, cmuHFRCOFreq_32M0Hz, cmuHFRCOFreq_38M0Hz. Be sure to set hfrco-clock-freq accordingly!",
                 "value": "cmuHFRCOFreq_32M0Hz",
                 "macro_name": "HFRCO_FREQUENCY_ENUM"
             }
@@ -6162,12 +6154,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "EFM32GG11B820F2048GL192"
         ],
         "config": {
-            "board_controller_enable": {
+            "board-controller-enable": {
                 "help": "Pin to pull high for enabling the USB serial port",
                 "value": "PE1",
                 "macro_name": "EFM_BC_EN"
             },
-            "qspi_flash_enable": {
+            "qspi-flash-enable": {
                 "help": "Pin to pull high for enabling the on-board QSPI flash",
                 "value": "PG13",
                 "macro_name": "QSPI_FLASH_EN"
@@ -6175,7 +6167,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "overrides": {
             "network-default-interface-type": "ETHERNET",
-            "hfxo_clock_freq": "50000000"
+            "hfxo-clock-freq": "50000000"
         },
         "image_url": "https://www.silabs.com/content/dam/siliconlabs/images/products/microcontrollers/32-bit_mcus/giant-gecko-gg11/efr32gg11-starter-kit.jpg"
     },
@@ -6233,24 +6225,24 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "NORDIC_CORDIO"
         ],
         "config": {
-            "lf_clock_src": {
+            "lf-clock-src": {
                 "macro_name": "MBED_CONF_NORDIC_NRF_LF_CLOCK_SRC",
                 "help": "Select Low Frequency clock source. Options: NRF_LF_SRC_XTAL, NRF_LF_SRC_SYNTH, and NRF_LF_SRC_RC",
                 "value": "NRF_LF_SRC_XTAL"
             },
-            "lf_clock_rc_calib_timer_interval": {
+            "lf-clock-rc-calib-timer-interval": {
                 "macro_name": "MBED_CONF_NORDIC_NRF_LF_CLOCK_CALIB_TIMER_INTERVAL",
                 "value": 16
             },
-            "lf_clock_rc_calib_mode_config": {
+            "lf-clock-rc-calib-mode-config": {
                 "macro_name": "MBED_CONF_NORDIC_NRF_LF_CLOCK_CALIB_MODE_CONFIG",
                 "value": 0
             },
-            "uart_0_fifo_size": {
+            "uart-0-fifo-size": {
                 "help": "UART0 FIFO buffer. FIFO buffer is filled from DMA buffer.",
                 "value": 32
             },
-            "uart_1_fifo_size": {
+            "uart-1-fifo-size": {
                 "help": "UART1 FIFO buffer. FIFO buffer is filled from DMA buffer.",
                 "value": 32
             }
@@ -6385,28 +6377,28 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "NORDIC_CORDIO"
         ],
         "config": {
-            "lf_clock_src": {
+            "lf-clock-src": {
                 "macro_name": "MBED_CONF_NORDIC_NRF_LF_CLOCK_SRC",
                 "help": "Select Low Frequency clock source. Options: NRF_LF_SRC_XTAL, NRF_LF_SRC_SYNTH, and NRF_LF_SRC_RC",
                 "value": "NRF_LF_SRC_XTAL"
             },
-            "lf_clock_rc_calib_timer_interval": {
+            "lf-clock-rc-calib-timer-interval": {
                 "macro_name": "MBED_CONF_NORDIC_NRF_LF_CLOCK_CALIB_TIMER_INTERVAL",
                 "value": 16
             },
-            "lf_clock_rc_calib_mode_config": {
+            "lf-clock-rc-calib-mode-config": {
                 "macro_name": "MBED_CONF_NORDIC_NRF_LF_CLOCK_CALIB_MODE_CONFIG",
                 "value": 0
             },
-            "uart_0_fifo_size": {
+            "uart-0-fifo-size": {
                 "help": "UART0 FIFO buffer. FIFO buffer is filled from DMA buffer.",
                 "value": 32
             },
-            "uart_1_fifo_size": {
+            "uart-1-fifo-size": {
                 "help": "UART1 FIFO buffer. FIFO buffer is filled from DMA buffer.",
                 "value": 32
             },
-            "qspif_sfdp_data_len": {
+            "qspif-sfdp-data-len": {
                 "help": "length of Flash SFDP DATA",
                 "value": 128,
                 "macro_name": "QSPIF_SFDP_DATA_LEN"
@@ -6508,12 +6500,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "nRF52840_xxAA",
         "supported_form_factors": [],
         "config": {
-            "modem_is_on_board": {
+            "modem-is-on-board": {
                 "help": "Value: Tells the build system that the modem is on-board as oppose to a plug-in shield/module.",
                 "value": 1,
                 "macro_name": "MODEM_ON_BOARD"
             },
-            "modem_data_connection_type": {
+            "modem-data-connection-type": {
                 "help": "Value: Defines how an on-board modem is wired up to the MCU, e.g., data connection can be a UART or USB and so forth.",
                 "value": 1,
                 "macro_name": "MODEM_ON_BOARD_UART"

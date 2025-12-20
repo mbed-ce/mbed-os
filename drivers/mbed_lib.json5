@@ -16,79 +16,79 @@
             "help": "Number of entries in each of MbedCRC's pre-computed software tables. Higher values increase speed, but also increase image size. The value has no effect if the target performs the CRC in hardware. Permitted values are 0, 16 or 256.",
             "value": 16
         },
-        "spi_count_max": {
+        "spi-count-max": {
             "help": "The maximum number of SPI peripherals used at the same time. Determines RAM allocated for SPI peripheral management. If null, limit determined by hardware.",
             "value": null
         },
-        "spi_transaction_queue_len": {
+        "spi-transaction-queue-len": {
             "help": "Size of the asynchronous transaction queue for each SPI peripheral on the processor. 0 means no queueing support.  Only takes effect if the mbed target supports async SPI.",
             "value": 2
         },
-        "qspi_io0": {
+        "qspi-io0": {
             "help": "QSPI data I/O 0 pin",
             "value": "QSPI_FLASH1_IO0"
         },
-        "qspi_io1": {
+        "qspi-io1": {
             "help": "QSPI data I/O 1 pin",
             "value": "QSPI_FLASH1_IO1"
         },
-        "qspi_io2": {
+        "qspi-io2": {
             "help": "QSPI data I/O 2 pin",
             "value": "QSPI_FLASH1_IO2"
         },
-        "qspi_io3": {
+        "qspi-io3": {
             "help": "QSPI data I/O 3 pin",
             "value": "QSPI_FLASH1_IO3"
         },
-        "qspi_sck": {
+        "qspi-sck": {
             "help": "QSPI clock pin",
             "value": "QSPI_FLASH1_SCK"
         },
-        "qspi_csn": {
+        "qspi-csn": {
             "help": "QSPI chip select pin",
             "value": "QSPI_FLASH1_CSN"
         },
-        "ospi_io0": {
+        "ospi-io0": {
             "help": "OSPI data I/O 0 pin",
             "value": "OSPI_FLASH1_IO0"
         },
-        "ospi_io1": {
+        "ospi-io1": {
             "help": "OSPI data I/O 1 pin",
             "value": "OSPI_FLASH1_IO1"
         },
-        "ospi_io2": {
+        "ospi-io2": {
             "help": "OSPI data I/O 2 pin",
             "value": "OSPI_FLASH1_IO2"
         },
-        "ospi_io3": {
+        "ospi-io3": {
             "help": "OSPI data I/O 3 pin",
             "value": "OSPI_FLASH1_IO3"
         },
-        "ospi_io4": {
+        "ospi-io4": {
             "help": "OSPI data I/O 4 pin",
             "value": "OSPI_FLASH1_IO4"
         },
-        "ospi_io5": {
+        "ospi-io5": {
             "help": "OSPI data I/O 5 pin",
             "value": "OSPI_FLASH1_IO5"
         },
-        "ospi_io6": {
+        "ospi-io6": {
             "help": "OSPI data I/O 6 pin",
             "value": "OSPI_FLASH1_IO6"
         },
-        "ospi_io7": {
+        "ospi-io7": {
             "help": "OSPI data I/O 7 pin",
             "value": "OSPI_FLASH1_IO7"
         },
-        "ospi_sck": {
+        "ospi-sck": {
             "help": "OSPI clock pin",
             "value": "OSPI_FLASH1_SCK"
         },
-        "ospi_csn": {
+        "ospi-csn": {
             "help": "OSPI chip select pin",
             "value": "OSPI_FLASH1_CSN"
         },
-        "ospi_dqs": {
+        "ospi-dqs": {
             "help": "OSPI dqs pin",
             "value": "OSPI_FLASH1_DQS"
         }

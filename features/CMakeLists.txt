@@ -6,7 +6,6 @@ add_library(mbed-fpga-ci-test-shield INTERFACE)
 add_library(mbed-client-cli INTERFACE)
 
 add_subdirectory(frameworks/COMPONENT_FPGA_CI_TEST_SHIELD)
-add_subdirectory(frameworks/mbed-client-cli)
 add_subdirectory(frameworks/cy_rtos_rtx_adapter)
 
 if(MBED_ENABLE_TESTING)

@@ -10,7 +10,7 @@
             "value": "NC"
         },
         "wifi-mosi": {
-            "help": "SPI-MOSI connection to external device",
+            "help": "spi-mosi connection to external device",
             "value": "NC"
         },
         "wifi-sclk": {
