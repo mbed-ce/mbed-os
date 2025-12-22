@@ -88,6 +88,13 @@ watchdog_status_t hal_watchdog_init(const watchdog_config_t *config)
 
         SYS_UnlockReg();
 
+        /* See mbed_sdk_init (mbed_override.c) on workaround to
+         * H/W limit with WDT reset from PD.
+         */
+#if MBED_CONF_TARGET_WDT_RESET_WORKAROUND
+        CLK->PMUSTS |= (CLK_PMUSTS_CLRWK_Msk | CLK_PMUSTS_TMRWK_Msk);
+#endif
+
         /* Enable IP module clock */
         CLK_EnableModuleClock(WDT_MODULE);
 
