@@ -20,10 +20,6 @@ target_sources(mbed-stm32f2
 target_include_directories(mbed-stm32f2
     INTERFACE
         .
-        ./STM32Cube_FW
-        ./STM32Cube_FW/CMSIS
-        ./STM32Cube_FW/STM32F2xx_HAL_Driver
-        ./STM32Cube_FW/STM32F2xx_HAL_Driver/Legacy
 )
 
 target_link_libraries(mbed-stm32f2 INTERFACE mbed-stm mbed-stm32f2cube-fw)
