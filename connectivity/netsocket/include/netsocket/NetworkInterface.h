@@ -183,10 +183,15 @@ public:
      */
     virtual nsapi_error_t get_gateway(SocketAddress *address);
 
-    /** Get the network interface name
+    /**
+     * @brief Get the network interface name
      *
-     *  @return         Null-terminated representation of the network interface name
-     *                  or null if  interface not exists
+     * Note that for LwIP, interface names are always 3-4 characters and look like "st0" or "en0".
+     * For Nanostack, interface names are always 4-5 characters and look like "ETH0".
+     *
+     * @param interface_name Pointer to char array where the interface name will be stored.
+     *
+     * @return The passed pointer if successful, or null if not implemented or another error occurs.
      */
     virtual char *get_interface_name(char *interface_name);
 
@@ -377,10 +382,11 @@ public:
      *
      *  @param index    Index of the DNS server, starts from zero
      *  @param address  Destination for the host address
-     *  @param interface_name  Network interface name
+     *  @param interface_name  Network interface name. Note that for some stacks this can be left as nullptr to
+     *     display all DNS servers, but for LwIP this needs to be set.
      *  @return         NSAPI_ERROR_OK on success, negative error code on failure
      */
-    virtual nsapi_error_t get_dns_server(int index, SocketAddress *address, const char *interface_name = NULL);
+    virtual nsapi_error_t get_dns_server(int index, SocketAddress *address, const char *interface_name = nullptr);
 
     /** Register callback for status reporting.
      *
