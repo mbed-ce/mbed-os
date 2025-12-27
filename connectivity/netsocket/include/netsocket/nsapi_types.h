@@ -115,7 +115,7 @@ enum nsapi_error {
  *
  * @return String corresponding to the error code, or nullptr if an invalid enum value is passed.
  */
-char const *nsapi_strerror(nsapi_error error);
+char const *nsapi_strerror(enum nsapi_error error);
 
 /** Enum of connection status types
  *
