@@ -11,7 +11,8 @@ if(MBED_ENABLE_OS_INTERNAL_TESTS)
     endif()
 endif()
 
-add_library(mbed-netsocket-api STATIC EXCLUDE_FROM_ALL)
+add_library(mbed-netsocket-api STATIC EXCLUDE_FROM_ALL
+        source/nsapi_types.cpp)
 
 target_include_directories(mbed-netsocket-api
     PUBLIC
@@ -44,6 +45,7 @@ target_sources(mbed-netsocket-api
         source/WiFiAccessPoint.cpp
         source/nsapi_dns.cpp
         source/nsapi_ppp.cpp
+        source/nsapi_types.cpp
 )
 
 target_compile_definitions(mbed-netsocket-api
