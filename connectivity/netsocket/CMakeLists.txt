@@ -11,8 +11,7 @@ if(MBED_ENABLE_OS_INTERNAL_TESTS)
     endif()
 endif()
 
-add_library(mbed-netsocket-api STATIC EXCLUDE_FROM_ALL
-        source/nsapi_types.cpp)
+add_library(mbed-netsocket-api STATIC EXCLUDE_FROM_ALL)
 
 target_include_directories(mbed-netsocket-api
     PUBLIC
