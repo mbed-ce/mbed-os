@@ -115,7 +115,7 @@ enum nsapi_error {
  *
  * @return String corresponding to the error code, or nullptr if an invalid enum value is passed.
  */
-char const * nsapi_strerror(nsapi_error error);
+char const *nsapi_strerror(nsapi_error error);
 
 /** Enum of connection status types
  *
@@ -201,7 +201,7 @@ typedef enum nsapi_security {
  *
  * @return String value of the security type, or NULL if an unknown enum value is passed.
  */
-char const * nsapi_security_to_string(nsapi_security_t sec);
+char const *nsapi_security_to_string(nsapi_security_t sec);
 
 /**
  * @brief Convert the (short) string name of a wifi security type to \c the corresponding nsapi_security_t value.
