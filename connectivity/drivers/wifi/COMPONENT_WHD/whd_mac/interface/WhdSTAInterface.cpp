@@ -514,6 +514,7 @@ int WhdSTAInterface::internal_scan(WiFiAccessPoint *aps, unsigned count, scan_re
 
     // initialize wiced, this is noop if already init
     if (!_whd_emac.powered_up) {
+        _whd_emac.set_memory_manager(_stack.get_memory_manager());
         if(!_whd_emac.power_up()) {
             return NSAPI_ERROR_DEVICE_ERROR;
         }

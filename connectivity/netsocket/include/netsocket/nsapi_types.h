@@ -105,6 +105,17 @@ enum nsapi_error {
     NSAPI_ERROR_BUSY                = -3020,     /*!< device is busy and cannot accept new operation */
 };
 
+/**
+ * @brief Convert an nsapi_error value into a string corresponding to its name.
+ *
+ * For example, \c nsapi_strerror(NSAPI_ERROR_TIMEOUT) will return a char* pointing to the string
+ * constant "TIMEOUT"
+ *
+ * @param error Error code to operate on
+ *
+ * @return String corresponding to the error code, or nullptr if an invalid enum value is passed.
+ */
+char const *nsapi_strerror(enum nsapi_error error);
 
 /** Enum of connection status types
  *
@@ -179,6 +190,29 @@ typedef enum nsapi_security {
     NSAPI_SECURITY_WPA3_WPA2    = 0xB,      /*!< phrase conforms to WPA3_WPA2 */
     NSAPI_SECURITY_UNKNOWN      = 0xFF,     /*!< unknown/unsupported security in scan results */
 } nsapi_security_t;
+
+/**
+ * @brief Convert an \c nsapi_security_t to its (short) string name
+ *
+ * For example, \c nsapi_security_to_string(NSAPI_SECURITY_WPA3) returns a string constant
+ * pointing to the string "WPA3".
+ *
+ * @param sec Security type to operate on
+ *
+ * @return String value of the security type, or NULL if an unknown enum value is passed.
+ */
+char const *nsapi_security_to_string(nsapi_security_t sec);
+
+/**
+ * @brief Convert the (short) string name of a wifi security type to \c the corresponding nsapi_security_t value.
+ *
+ * For example, \c nsapi_security_to_string("WPA3") returns \c NSAPI_SECURITY_WPA3
+ *
+ * @param str String to operate on
+ *
+ * @return Security enum value, or NSAPI_SECURITY_UNKNOWN if none match
+ */
+nsapi_security_t nsapi_string_to_security(char const *str);
 
 /** Size of  2 char network interface name from driver
  */

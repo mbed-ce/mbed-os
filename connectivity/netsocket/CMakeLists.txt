@@ -44,6 +44,7 @@ target_sources(mbed-netsocket-api
         source/WiFiAccessPoint.cpp
         source/nsapi_dns.cpp
         source/nsapi_ppp.cpp
+        source/nsapi_types.cpp
 )
 
 target_compile_definitions(mbed-netsocket-api
