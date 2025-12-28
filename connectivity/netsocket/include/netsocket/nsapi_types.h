@@ -212,7 +212,7 @@ char const *nsapi_security_to_string(nsapi_security_t sec);
  *
  * @return Security enum value, or NSAPI_SECURITY_UNKNOWN if none match
  */
-nsapi_security_t nsapi_string_to_security(char const * str);
+nsapi_security_t nsapi_string_to_security(char const *str);
 
 /** Size of  2 char network interface name from driver
  */

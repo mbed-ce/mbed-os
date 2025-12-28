@@ -103,7 +103,7 @@ char const *nsapi_security_to_string(nsapi_security_t sec)
     }
 }
 
-nsapi_security_t nsapi_string_to_security(char const * str)
+nsapi_security_t nsapi_string_to_security(char const *str)
 {
     if (strcmp(str, "NONE") == 0) {
         return NSAPI_SECURITY_NONE;
