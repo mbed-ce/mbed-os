@@ -43,8 +43,6 @@ target_sources(mbed-stm32h7cube-fw
         stm32h7xx-hal-driver/Src/stm32h7xx_hal_dma_ex.c
         stm32h7xx-hal-driver/Src/stm32h7xx_hal_dsi.c
         stm32h7xx-hal-driver/Src/stm32h7xx_hal_dts.c
-        stm32h7xx-hal-driver/Src/stm32h7xx_hal_eth.c
-        stm32h7xx-hal-driver/Src/stm32h7xx_hal_eth_ex.c
         stm32h7xx-hal-driver/Src/stm32h7xx_hal_exti.c
         stm32h7xx-hal-driver/Src/stm32h7xx_hal_fdcan.c
         stm32h7xx-hal-driver/Src/stm32h7xx_hal_flash.c

@@ -33,7 +33,6 @@ target_sources(mbed-stm32f1cube-fw
         stm32f1xx-hal-driver/Src/stm32f1xx_hal_dac.c
         stm32f1xx-hal-driver/Src/stm32f1xx_hal_dac_ex.c
         stm32f1xx-hal-driver/Src/stm32f1xx_hal_dma.c
-        stm32f1xx-hal-driver/Src/stm32f1xx_hal_eth.c
         stm32f1xx-hal-driver/Src/stm32f1xx_hal_exti.c
         stm32f1xx-hal-driver/Src/stm32f1xx_hal_flash.c
         stm32f1xx-hal-driver/Src/stm32f1xx_hal_flash_ex.c

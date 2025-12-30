@@ -41,8 +41,6 @@ target_sources(mbed-stm32h5cube-fw
         stm32h5xx-hal-driver/Src/stm32h5xx_hal_dma.c
         stm32h5xx-hal-driver/Src/stm32h5xx_hal_dma_ex.c
         stm32h5xx-hal-driver/Src/stm32h5xx_hal_dts.c
-        stm32h5xx-hal-driver/Src/stm32h5xx_hal_eth.c
-        stm32h5xx-hal-driver/Src/stm32h5xx_hal_eth_ex.c
         stm32h5xx-hal-driver/Src/stm32h5xx_hal_exti.c
         stm32h5xx-hal-driver/Src/stm32h5xx_hal_fdcan.c
         stm32h5xx-hal-driver/Src/stm32h5xx_hal_flash.c
