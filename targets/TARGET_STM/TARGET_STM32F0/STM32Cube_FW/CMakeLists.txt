@@ -82,7 +82,9 @@ target_sources(mbed-stm32f0cube-fw
         stm32f0xx-hal-driver/Src/stm32f0xx_ll_usart.c
         stm32f0xx-hal-driver/Src/stm32f0xx_ll_usb.c
         stm32f0xx-hal-driver/Src/stm32f0xx_ll_utils.c
-        system_stm32f0xx.c
+
+        # For now we use this file unmodified, so we can get it directly from the submodule
+        cmsis-device-f0/Source/Templates/system_stm32f0xx.c
 )
 
 target_include_directories(mbed-stm32f0cube-fw

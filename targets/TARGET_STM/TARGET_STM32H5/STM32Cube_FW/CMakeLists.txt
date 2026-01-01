@@ -22,7 +22,6 @@ add_library(mbed-stm32h5cube-fw INTERFACE)
 
 target_sources(mbed-stm32h5cube-fw
     INTERFACE
-	system_stm32h5xx.c
         stm32h5xx-hal-driver/Src/stm32h5xx_hal.c
         stm32h5xx-hal-driver/Src/stm32h5xx_hal_adc.c
         stm32h5xx-hal-driver/Src/stm32h5xx_hal_adc_ex.c
@@ -131,6 +130,9 @@ target_sources(mbed-stm32h5cube-fw
 
         # NOTE: Don't compile stm32h5xx_ll_i3c.c, it does not build if the
         # HAL driver for i3c is enabled due to a circular include issue.
+
+        # For now we use this file unmodified, so we can get it directly from the submodule
+        cmsis-device-h5/Source/Templates/system_stm32h5xx.c
 )
 
 target_include_directories(mbed-stm32h5cube-fw
