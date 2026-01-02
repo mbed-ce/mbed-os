@@ -9,7 +9,6 @@
 #    board in DFU mode.
 # 3. On Linux, you will need to add a udev rule to be able to upload over DFU:
 #    SUBSYSTEM=="usb", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0364", MODE="664", GROUP="plugdev"
-# 4. All upload methods below except DFU are untested and thus possibly non-functional
 
 
 # General config parameters
