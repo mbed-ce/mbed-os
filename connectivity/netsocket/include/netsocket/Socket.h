@@ -25,6 +25,7 @@
 
 #include "netsocket/SocketAddress.h"
 #include "Callback.h"
+#include "rtos/Kernel.h"
 
 /** Socket interface.
  *
@@ -240,7 +241,8 @@ public:
      */
     virtual void set_blocking(bool blocking) = 0;
 
-    /** Set timeout on blocking socket operations.
+    /**
+     * @brief Set timeout on blocking socket operations.
      *
      *  Initially all sockets have unbounded timeouts. NSAPI_ERROR_WOULD_BLOCK
      *  is returned if a blocking operation takes longer than the specified
@@ -253,6 +255,23 @@ public:
      *  @param timeout  Timeout in milliseconds
      */
     virtual void set_timeout(int timeout) = 0;
+
+    /**
+     * @brief Set timeout on blocking socket operations.
+     *
+     * Initially all sockets have unbounded timeouts. NSAPI_ERROR_WOULD_BLOCK
+     * is returned if a blocking operation takes longer than the specified
+     * timeout. A timeout of 0 removes the timeout from the socket. A negative
+     * value gives the socket an unbounded timeout.
+     *
+     * set_timeout(0ms) is equivalent to set_blocking(false)
+     * set_timeout(-1ms) is equivalent to set_blocking(true)
+     *
+     * @param timeout  Timeout in milliseconds
+     */
+    void set_timeout(const rtos::Kernel::Clock::duration timeout) {
+        set_timeout(static_cast<int>(timeout.count()));
+    }
 
     /** Register a callback on state change of the socket.
      *

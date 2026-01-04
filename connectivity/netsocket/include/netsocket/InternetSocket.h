@@ -138,6 +138,9 @@ public:
      */
     void set_timeout(int timeout) override;
 
+    // Pull in duration overload of set_timeout
+    using Socket::set_timeout;
+
     /** @copydoc Socket::setsockopt
      */
     nsapi_error_t setsockopt(int level, int optname, const void *optval, unsigned optlen) override;
