@@ -56,6 +56,7 @@ git submodule update --init ${SUBMODULE_PATH}")
         endif()
 
         # Not managing submodules so as long as it exists, ¯\_(ツ)_/¯
+        return()
     endif()
 
     # Now we need git
@@ -73,7 +74,7 @@ git submodule update --init ${SUBMODULE_PATH}")
         # determine this directory is to parse the error message.
         if(NOT "$ENV{GITHUB_RUN_ID}" STREQUAL "")
             execute_process(
-                COMMAND ${GIT_EXECUTABLE} status
+                COMMAND ${GIT_EXECUTABLE} submodule status ${SUBMODULE_PATH}
                 ERROR_VARIABLE GIT_STATUS_ERR_OUTPUT
                 RESULT_VARIABLE GIT_STATUS_RESULT_CODE
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
@@ -86,6 +87,8 @@ git submodule update --init ${SUBMODULE_PATH}")
                         COMMAND ${GIT_EXECUTABLE} config --global --add safe.directory ${CMAKE_MATCH_1}
                         COMMAND_ERROR_IS_FATAL ANY
                     )
+                else()
+                    message(FATAL_ERROR "Unable to `git submodule status` the submodule ${SUBMODULE_PATH}")
                 endif()
             endif()
         endif()
