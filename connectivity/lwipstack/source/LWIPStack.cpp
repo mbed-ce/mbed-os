@@ -538,6 +538,11 @@ nsapi_size_or_error_t LWIP::socket_sendto_control(nsapi_socket_t handle, const S
         netif_ = netif_get_by_index(s->conn->pcb.ip->netif_idx);
     }
     if (!netif_) {
+        if (default_interface == nullptr) {
+            // No interfaces added yet
+            return NSAPI_ERROR_NO_CONNECTION;
+        }
+
         netif_ = &default_interface->netif;
     }
 

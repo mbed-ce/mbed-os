@@ -105,18 +105,6 @@ enum nsapi_error {
     NSAPI_ERROR_BUSY                = -3020,     /*!< device is busy and cannot accept new operation */
 };
 
-/**
- * @brief Convert an nsapi_error value into a string corresponding to its name.
- *
- * For example, \c nsapi_strerror(NSAPI_ERROR_TIMEOUT) will return a char* pointing to the string
- * constant "TIMEOUT"
- *
- * @param error Error code to operate on
- *
- * @return String corresponding to the error code, or nullptr if an invalid enum value is passed.
- */
-char const *nsapi_strerror(enum nsapi_error error);
-
 /** Enum of connection status types
  *
  *  Valid error codes have negative values.
@@ -190,6 +178,18 @@ typedef enum nsapi_security {
     NSAPI_SECURITY_WPA3_WPA2    = 0xB,      /*!< phrase conforms to WPA3_WPA2 */
     NSAPI_SECURITY_UNKNOWN      = 0xFF,     /*!< unknown/unsupported security in scan results */
 } nsapi_security_t;
+
+/**
+ * @brief Convert an nsapi_error value into a string corresponding to its name.
+ *
+ * For example, \c nsapi_strerror(NSAPI_ERROR_TIMEOUT) will return a char* pointing to the string
+ * constant "TIMEOUT"
+ *
+ * @param error Error code to operate on
+ *
+ * @return String corresponding to the error code, or nullptr if an invalid enum value is passed.
+ */
+char const *nsapi_strerror(nsapi_error_t error);
 
 /**
  * @brief Convert an \c nsapi_security_t to its (short) string name

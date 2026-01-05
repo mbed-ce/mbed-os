@@ -356,9 +356,21 @@ def _extract_overrides(
             override_namespace = namespace
             override_name = name
 
-        # Make the override names canonical, to match the transforms done to the actual settings
-        override_name = _to_canonical_json_setting_name(override_name)
-        override_namespace = _to_canonical_json_setting_name(override_namespace)
+        # Is this an app JSON trying to override a target json property, as opposed to
+        # a config setting?
+        # Example would be putting `"target.printf_lib": "std"` in mbed_app.json's overrides section. This is
+        # trying to override the `printf_lib` JSON property in target JSON. It is gross but it's
+        # one of those things that "just worked" before due to everything being condensed into a
+        # big ball of JSON at the end.
+        # If this looks like that situation, we don't want to canonicalize the name as that will
+        # prevent this from working as intended.
+        if namespace == "app" and override_namespace == "target" and override_name in schemas.TargetJSON.model_fields:
+            # Don't mess with the name
+            pass
+        else:
+            # Make the override names canonical, to match the transforms done to the actual settings
+            override_name = _to_canonical_json_setting_name(override_name)
+            override_namespace = _to_canonical_json_setting_name(override_namespace)
 
         if override_namespace not in {_to_canonical_json_setting_name(namespace), "target"} and namespace != "app":
             msg = (

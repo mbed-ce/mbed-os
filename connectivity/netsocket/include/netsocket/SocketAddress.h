@@ -30,13 +30,17 @@
 class NetworkStack;
 class NetworkInterface;
 
-/** SocketAddress class
+/**
+ * @brief Representation of an IP (v4 or v6) address and port pair.
  *
- *  Representation of an IP address and port pair.
+ * Each SocketAddress contains the IP address bytes and the port number. Also, when the IP address
+ * is first used as a string (e.g. for \c get_ip_address() ), a character string is allocated on the heap via
+ * a unique_ptr inside the SocketAddress. This character string as long as the SocketAddress does, but not longer.
  */
 class SocketAddress {
 public:
-    /** Create an unspecified SocketAddress
+    /**
+     * @brief Create an empty SocketAddress
      */
     constexpr SocketAddress() = default;
 
@@ -49,10 +53,14 @@ public:
      */
     SocketAddress(const nsapi_addr_t &addr, uint16_t port = 0);
 
-    /** Create a SocketAddress from an IP address and port
+    /**
+     * @brief Create a SocketAddress from an IP address and port
      *
-     *  @param addr     Null-terminated representation of the IP address
-     *  @param port     Optional 16-bit port, defaults to 0
+     * If the string is not a parseable IP address, an empty SocketAddress is returned (see
+     * \c is_empty() below).
+     *
+     * @param addr     Null-terminated string representation of the IP address
+     * @param port     Optional 16-bit port, defaults to 0
      */
     SocketAddress(const char *addr, uint16_t port = 0);
 
@@ -64,11 +72,21 @@ public:
      */
     SocketAddress(const void *bytes, nsapi_version_t version, uint16_t port = 0);
 
-    /** Create a SocketAddress from another SocketAddress
+    /**
+     * Create a SocketAddress from another SocketAddress
      *
-     *  @param addr  SocketAddress to copy
+     * @param addr  SocketAddress to copy
      */
     SocketAddress(const SocketAddress &addr);
+
+    /**
+     * @brief Create a SocketAddress by moving another SocketAddress.
+     *
+     * This transfers ownership of the string data, if allocated.
+     *
+     * @param addr  SocketAddress to move from
+     */
+    SocketAddress(SocketAddress &&addr) = default;
 
     /** Destructor */
     ~SocketAddress() = default;
@@ -148,11 +166,20 @@ public:
         return _port;
     }
 
-    /** Test if address is zero
+    /**
+     * @brief Test if address is zero or empty
      *
-     *  @return         True if address is not zero
+     * @return True if address is not empty and not zero
      */
     explicit operator bool() const;
+
+    /**
+     * @return True iff this IP address is empty (does not contain a valid value).
+     */
+    bool is_empty() const
+    {
+        return _addr.version == NSAPI_UNSPEC;
+    }
 
     /** Copy address from another SocketAddress
      *

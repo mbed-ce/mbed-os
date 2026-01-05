@@ -19,7 +19,7 @@
 
 #include <cstring>
 
-char const *nsapi_strerror(nsapi_error error)
+char const *nsapi_strerror(nsapi_error_t error)
 {
     switch (error) {
         case NSAPI_ERROR_OK:
