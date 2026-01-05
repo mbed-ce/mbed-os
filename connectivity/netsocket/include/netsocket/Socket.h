@@ -269,7 +269,8 @@ public:
      *
      * @param timeout  Timeout in milliseconds
      */
-    void set_timeout(const rtos::Kernel::Clock::duration timeout) {
+    void set_timeout(const rtos::Kernel::Clock::duration timeout)
+    {
         set_timeout(static_cast<int>(timeout.count()));
     }
 

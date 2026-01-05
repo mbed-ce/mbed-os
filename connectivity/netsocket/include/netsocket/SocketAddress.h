@@ -176,7 +176,8 @@ public:
     /**
      * @return True iff this IP address is empty (does not contain a valid value).
      */
-    bool is_empty() const {
+    bool is_empty() const
+    {
         return _addr.version == NSAPI_UNSPEC;
     }
 
