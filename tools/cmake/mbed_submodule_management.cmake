@@ -71,7 +71,7 @@ git submodule update --init ${SUBMODULE_PATH}")
     # determine this directory is to parse the error message.
     if(NOT "$ENV{GITHUB_RUN_ID}" STREQUAL "")
         execute_process(
-                COMMAND ${GIT_EXECUTABLE} submodule status ${SUBMODULE_PATH}
+                COMMAND ${GIT_EXECUTABLE} status
                 ERROR_VARIABLE GIT_STATUS_ERR_OUTPUT
                 RESULT_VARIABLE GIT_STATUS_RESULT_CODE
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
