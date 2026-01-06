@@ -286,22 +286,19 @@ app_link_libraries = extract_link_libraries(app_target_json)
 
 ## Linker flags --------------------------------------------------------------------------------------------------------
 
-# Start by linking libraries. Optional libraries should come before libmbed-os.a on the link line.
-link_args = [str(lib) for lib in app_link_libraries]
-for lib in app_link_libraries:
-    _ = env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", str(lib))
-
 # Link the main Mbed OS library using -Wl,--whole-archive. This is needed for the resolution of weak symbols
 # within this archive.
 mbed_ce_lib_path = pathlib.Path("$BUILD_DIR") / "mbed-os" / "libmbed-os.a"
-link_args.extend(("-Wl,--whole-archive", '"' + str(mbed_ce_lib_path) + '"', "-Wl,--no-whole-archive"))
+link_args = ["-Wl,--whole-archive", '"' + str(mbed_ce_lib_path) + '"', "-Wl,--no-whole-archive"]
 _ = env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", str(mbed_ce_lib_path))
 
-# Try to handle circular references between Mbed and optional libraries. This is difficult/impossible to handle
-# perfectly, but we can at least cover many common cases by repeating the optional libraries again on the
-# link line after libmbed-os.a.
-# This is enough to handle the case where libmbed-os.a depends on libmbed-usb.a for the USB serial port functionality.
-link_args.extend([str(lib) for lib in app_link_libraries])
+# Now link optional libraries. Note that according to normal link order rules, we'd link the optional libraries
+# first since they reference libmbed-os.a. However, mbed-os can also reference the optional libraries
+# (e.g. usb for USB serial support), and all of libmbed-os.a is already being considered for linking thanks
+# to --whole-archive. So we actually want to link these second.
+for lib in app_link_libraries:
+    link_args.append(str(lib))
+    _ = env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", str(lib))
 
 # Get other linker flags from Mbed. We want these to appear after the application objects and Mbed libraries
 # because they contain the C/C++ library link flags.
