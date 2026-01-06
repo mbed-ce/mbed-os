@@ -56,6 +56,7 @@ from mbed_platformio.cmake_to_scons_converter import (
     extract_flags,
     extract_includes,
     extract_link_args,
+    extract_link_libraries,
     find_included_files,
 )
 from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
@@ -281,14 +282,26 @@ app_target_json = target_configs.get("PIODummyExecutable", {})
 project_defines = get_app_defines(app_target_json)
 project_flags = extract_flags(app_target_json)
 app_includes = extract_includes(app_target_json)
+app_link_libraries = extract_link_libraries(app_target_json)
 
 ## Linker flags --------------------------------------------------------------------------------------------------------
+
+# Start by linking libraries. Optional libraries should come before libmbed-os.a on the link line.
+link_args = [str(lib) for lib in app_link_libraries]
+for lib in app_link_libraries:
+    _ = env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", str(lib))
 
 # Link the main Mbed OS library using -Wl,--whole-archive. This is needed for the resolution of weak symbols
 # within this archive.
 mbed_ce_lib_path = pathlib.Path("$BUILD_DIR") / "mbed-os" / "libmbed-os.a"
-link_args = ["-Wl,--whole-archive", '"' + str(mbed_ce_lib_path) + '"', "-Wl,--no-whole-archive"]
+link_args.extend(("-Wl,--whole-archive", '"' + str(mbed_ce_lib_path) + '"', "-Wl,--no-whole-archive"))
 _ = env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", str(mbed_ce_lib_path))
+
+# Try to handle circular references between Mbed and optional libraries. This is difficult/impossible to handle
+# perfectly, but we can at least cover many common cases by repeating the optional libraries again on the
+# link line after libmbed-os.a.
+# This is enough to handle the case where libmbed-os.a depends on libmbed-usb.a for the USB serial port functionality.
+link_args.extend([str(lib) for lib in app_link_libraries])
 
 # Get other linker flags from Mbed. We want these to appear after the application objects and Mbed libraries
 # because they contain the C/C++ library link flags.

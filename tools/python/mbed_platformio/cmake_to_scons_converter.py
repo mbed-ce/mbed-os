@@ -141,8 +141,6 @@ def build_library(
     lib_path = lib_config["paths"]["build"]
     lib_objects = compile_source_files(lib_config, default_env, project_src_dir, framework_dir, framework_obj_dir)
 
-    # print(f"Created build rule for " + str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name))
-
     return default_env.Library(target=str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name), source=lib_objects)
 
 
@@ -221,3 +219,16 @@ def extract_link_args(target_json: dict) -> list[str]:
             result.extend(args)
 
     return result
+
+
+def extract_link_libraries(target_json: dict) -> list[pathlib.Path]:
+    """
+    Extract the link libraries from a CMake target and return a list of libraries to link, in order.
+
+    Note that this is currently set up to handle only static libraries.
+    """
+    return [
+        pathlib.Path("$BUILD_DIR") / (fragment["fragment"])
+        for fragment in target_json.get("link", {}).get("commandFragments", [])
+        if fragment["role"] == "libraries"
+    ]

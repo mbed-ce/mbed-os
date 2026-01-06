@@ -314,4 +314,7 @@ if(NOT MBED_IS_NATIVE_BUILD)
     # Make sure that things linking mbed-core-flags can also get the target-specific include dirs and flags.
     mbed_extract_flags(${MBED_TARGET_CMAKE_NAME}-flags ${MBED_TARGET_CMAKE_NAME})
     target_link_libraries(mbed-core-flags INTERFACE ${MBED_TARGET_CMAKE_NAME}-flags)
+
+    # If the user specified default link libraries in their mbed_app.json, link those to mbed-os
+    target_link_libraries(${MBED_OS_CORE_LIB_NAME} INTERFACE ${MBED_DEFAULT_LINK_LIBRARIES})
 endif()

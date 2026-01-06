@@ -619,6 +619,17 @@ class MbedAppJSON(BaseJSONConfig):
     results may not be what you expect.
     """
 
+    link_libraries: list[str] = Field(default_factory=list)
+    """
+    Default link libraries to link along with the base ``mbed-os`` (or ``mbed-baremetal``) library to your application.
+
+    This should be a set to a list of strings containing CMake library names built in to Mbed to link, such as
+    "mbed-netsocket" or "mbed-storage".
+
+    This is simply a shortcut for linking libraries in CMake, if you don't want to or can't
+    (e.g. because you are using PlatformIO so you don't have direct access to CMake scripts).
+    """
+
     @model_validator(mode="after")
     def verify_target_memory_bank_config_used_where_appropriate(self) -> Self:
         for overrides in self.target_overrides.values():

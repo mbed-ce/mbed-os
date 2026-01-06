@@ -10,6 +10,7 @@ set(MBED_C_LIB "{{c_lib}}")
 set(MBED_PRINTF_LIB "{{printf_lib}}")
 set(MBED_OUTPUT_EXT "{{OUTPUT_EXT}}")
 set(MBED_GREENTEA_TEST_RESET_TIMEOUT "{{forced_reset_timeout}}")
+set(MBED_DEFAULT_LINK_LIBRARIES {% for lib in link_libraries %} {{lib}} {%- endfor %})
 
 # JSON files used to generate this config.  If any of these change, the Python config generation
 # scripts must be rerun.
