@@ -141,6 +141,8 @@ def build_library(
     lib_path = lib_config["paths"]["build"]
     lib_objects = compile_source_files(lib_config, default_env, project_src_dir, framework_dir, framework_obj_dir)
 
+    # print(f"Created build rule for " + str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name))
+
     return default_env.Library(target=str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name), source=lib_objects)
 
 
