@@ -39,7 +39,6 @@ target_sources(mbed-stm32f7cube-fw
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dcmi.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dcmi_ex.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dfsdm.c
-        stm32f7xx-hal-driver/Src/stm32f7xx_hal_dma.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dma2d.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dma_ex.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dsi.c
@@ -110,6 +109,7 @@ target_sources(mbed-stm32f7cube-fw
         stm32f7xx-hal-driver/Src/stm32f7xx_ll_usart.c
         stm32f7xx-hal-driver/Src/stm32f7xx_ll_usb.c
         stm32f7xx-hal-driver/Src/stm32f7xx_ll_utils.c
+        Mbed_HAL_overrides/stm32f7xx_hal_dma.c
 )
 
 target_include_directories(mbed-stm32f7cube-fw
