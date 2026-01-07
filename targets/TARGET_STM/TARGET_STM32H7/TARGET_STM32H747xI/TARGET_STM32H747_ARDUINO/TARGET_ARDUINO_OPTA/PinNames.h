@@ -341,7 +341,7 @@ typedef enum {
     //Led mappings
     LED_RED = PH_11,  //Red
     LED_GREEN = PH_12,  //Green
-    //LED_BLUE = PK_7,  //Blue
+    LED_BLUE = PE_5,  //Blue, only available on Arduino Opta WiFi (AFX00002)
 
     LED_SYS_1 = PH_11,
     LED_SYS_2 = PH_12,
@@ -441,7 +441,7 @@ typedef enum {
 #define LED1     LED_RED
 #define LED2     LED_GREEN
 #define LED3     LED_BLUE
-#define BUTTON1  PC_13
+#define BUTTON1  PE_4
 
 #ifdef __cplusplus
 }

@@ -3283,13 +3283,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "ARDUINO_OPTA": {
         "public": false,
         "inherits": ["STM32H747_ARDUINO"],
-        "config": {
-            "lse-bypass": {
-                "help": "1 to use an oscillator (not a crystal) on 32k LSE",
-                "value": "1"
-            },
-        },
         "overrides": {
+            "lse-bypass": 1,
             "hse-value": 25000000,
             "usb-speed": "USE_USB_OTG_FS",
             "system-power-supply": "PWR_SMPS_1V8_SUPPLIES_LDO",
@@ -3303,7 +3298,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://store.arduino.cc/cdn/shop/products/AFX00003_01.iso_1200x900.jpg?v=1696337866"
     },
     "ARDUINO_OPTA_M7": {
-        "inherits": ["ARDUINO_OPTA"],
+        "inherits": ["MCU_STM32H747xI_CM7", "ARDUINO_OPTA"],
         "core": "Cortex-M7FD",
         "memory_bank_config": {
             "IROM1": {
@@ -3319,7 +3314,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ]
     },
     "ARDUINO_OPTA_M4": {
-        "inherits": ["ARDUINO_OPTA"],
+        "inherits": ["MCU_STM32H747xI_CM4", "ARDUINO_OPTA"],
         "core": "Cortex-M4F",
         "memory_bank_config": {
             "IROM1": {
@@ -3331,11 +3326,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32H747xI_CM4"
         ],
         "macros_add": [
-            "CORE_CM4",
-            "MBED_MPU_CUSTOM"
-        ],
-        "device_has_remove": [
-            "MPU"
+            "CORE_CM4"
         ]
     },
     "MCU_STM32H750xB": {

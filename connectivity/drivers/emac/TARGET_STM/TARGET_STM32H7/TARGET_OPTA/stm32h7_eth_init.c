@@ -75,9 +75,6 @@ void EthInitPinmappings(void)
     __HAL_RCC_ETH1TX_CLK_ENABLE();
     __HAL_RCC_ETH1RX_CLK_ENABLE();
 
-    /* Set pinstrap for 100mbit */
-    // TODO
-
     /* Reset ETH Phy */
     __HAL_RCC_GPIOJ_CLK_ENABLE();
     GPIO_InitTypeDef  gpio_eth_rst_init_structure;
