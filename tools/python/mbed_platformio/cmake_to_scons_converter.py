@@ -221,3 +221,16 @@ def extract_link_args(target_json: dict) -> list[str]:
             result.extend(args)
 
     return result
+
+
+def extract_link_libraries(target_json: dict) -> list[pathlib.Path]:
+    """
+    Extract the link libraries from a CMake target and return a list of libraries to link, in order.
+
+    Note that this is currently set up to handle only static libraries.
+    """
+    return [
+        pathlib.Path("$BUILD_DIR") / (fragment["fragment"])
+        for fragment in target_json.get("link", {}).get("commandFragments", [])
+        if fragment["role"] == "libraries"
+    ]

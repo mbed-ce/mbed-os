@@ -25,4 +25,5 @@ PIO_VARIANT_TO_MBED_TARGET = {
     "nucleo_h743zi": "NUCLEO_H743ZI2",
     "genericSTM32F103RB": "NUCLEO_F103RB",
     "disco_h747xi": "DISCO_H747I",
+    "rpipico": "RASPBERRY_PI_PICO",
 }
