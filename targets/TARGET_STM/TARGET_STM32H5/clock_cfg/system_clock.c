@@ -103,7 +103,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
         RCC_OscInitStruct.HSEState = RCC_HSE_ON;
     }
 
-#if (HSE_VALUE < 4000000) || (HSE_VALUE > 50000000) && !((HSE_VALUE % 2000000 != 0) || (HSE_VALUE % 5000000 != 0))
+#if (HSE_VALUE < 4000000) || (HSE_VALUE > 50000000) || !((HSE_VALUE % 2000000 == 0) || (HSE_VALUE % 5000000 == 0))
 #error HSE value must be >= 4MHz and <= 50MHz, and must be divisible by either 2 or 5!
 #endif
 if(HSE_VALUE % 2000000 == 0)

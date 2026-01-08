@@ -2,19 +2,16 @@
   ******************************************************************************
   * @file    stm32l0xx_hal_conf.h
   * @author  MCD Application Team
-  * @brief   HAL configuration template file. 
-  *          This file should be copied to the application folder and renamed
-  *          to stm32l0xx_hal_conf.h.
+  * @brief   HAL configuration file. 
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics. 
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2016 STMicroelectronics. 
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the 
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */ 
@@ -162,78 +159,24 @@
   *        for possible callback identifiers defined in HAL_PPP_CallbackIDTypeDef
   *        for each PPP peripheral).
   */
-
-#if !defined  (USE_HAL_ADC_REGISTER_CALLBACKS)
 #define USE_HAL_ADC_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_COMP_REGISTER_CALLBACKS)
 #define USE_HAL_COMP_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_DAC_REGISTER_CALLBACKS)
 #define USE_HAL_DAC_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_I2C_REGISTER_CALLBACKS)
 #define USE_HAL_I2C_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_I2S_REGISTER_CALLBACKS)
 #define USE_HAL_I2S_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_IRDA_REGISTER_CALLBACKS)
 #define USE_HAL_IRDA_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_LPTIM_REGISTER_CALLBACKS)
 #define USE_HAL_LPTIM_REGISTER_CALLBACKS      0U
-#endif
-
-#if !defined  (USE_HAL_PCD_REGISTER_CALLBACKS)
 #define USE_HAL_PCD_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_RNG_REGISTER_CALLBACKS)
 #define USE_HAL_RNG_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_RTC_REGISTER_CALLBACKS)
 #define USE_HAL_RTC_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_SMARTCARD_REGISTER_CALLBACKS)
 #define USE_HAL_SMARTCARD_REGISTER_CALLBACKS  0U
-#endif
-
-#if !defined  (USE_HAL_SMBUS_REGISTER_CALLBACKS)
 #define USE_HAL_SMBUS_REGISTER_CALLBACKS      0U
-#endif
-
-#if !defined  (USE_HAL_SPI_REGISTER_CALLBACKS)
 #define USE_HAL_SPI_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_TIM_REGISTER_CALLBACKS)
 #define USE_HAL_TIM_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_TSC_REGISTER_CALLBACKS)
 #define USE_HAL_TSC_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_UART_REGISTER_CALLBACKS)
 #define USE_HAL_UART_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_USART_REGISTER_CALLBACKS)
 #define USE_HAL_USART_REGISTER_CALLBACKS      0U
-#endif
-
-#if !defined  (USE_HAL_WWDG_REGISTER_CALLBACKS)
 #define USE_HAL_WWDG_REGISTER_CALLBACKS       0U
-#endif
 
 /* ################## SPI peripheral configuration ########################## */
 
@@ -381,7 +324,3 @@
 #endif
 
 #endif /* __STM32L0xx_HAL_CONF_H */
- 
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

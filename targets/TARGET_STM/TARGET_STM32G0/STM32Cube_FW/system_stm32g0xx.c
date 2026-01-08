@@ -182,10 +182,11 @@
   * @param  None
   * @retval None
   */
-__WEAK void SystemInit(void)
+void SystemInit(void)
 {
-#include "nvic_addr.h"                   // MBED
-  SCB->VTOR = NVIC_FLASH_VECTOR_ADDRESS; // MBED
+  /* Mbed patch */
+#include "nvic_addr.h"
+  SCB->VTOR = NVIC_FLASH_VECTOR_ADDRESS;
 }
 
 /**
@@ -298,5 +299,3 @@ void SystemCoreClockUpdate(void)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

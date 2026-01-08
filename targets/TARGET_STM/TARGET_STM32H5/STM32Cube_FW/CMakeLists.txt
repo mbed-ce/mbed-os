@@ -1,127 +1,144 @@
-# Copyright (c) 2023 ARM Limited. All rights reserved.
+# Copyright (c) 2025 MbedCE Community Contributors (Jan Kamidra)
 # SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Created by: Jan Kamidra with GitHub Copilot
+
+mbed_setup_submodule(cmsis-device-h5      CHECK_FILE Source/Templates/system_stm32h5xx.c    IF_LABEL MCU_STM32H5)
+mbed_setup_submodule(stm32h5xx-hal-driver CHECK_FILE Src/stm32h5xx_hal.c                    IF_LABEL MCU_STM32H5)
 
 add_library(mbed-stm32h5cube-fw INTERFACE)
 
 target_sources(mbed-stm32h5cube-fw
     INTERFACE
-	system_stm32h5xx.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_adc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_adc_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_cec.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_comp.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_cordic.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_cortex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_crc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_crc_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_cryp.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_cryp_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_dac.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_dac_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_dcache.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_dcmi.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_dma.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_dma_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_dts.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_eth.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_eth_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_exti.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_fdcan.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_flash.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_flash_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_fmac.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_gpio.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_gtzc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_hash.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_hcd.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_i2c.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_i2c_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_i2s.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_i2s_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_i3c.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_icache.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_irda.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_iwdg.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_lptim.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_mmc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_mmc_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_nand.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_nor.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_opamp.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_opamp_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_otfdec.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_pcd.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_pcd_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_pka.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_pssi.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_pwr.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_pwr_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_ramcfg.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_rcc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_rcc_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_rng.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_rng_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_rtc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_rtc_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_sai.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_sai_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_sd.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_sdram.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_sd_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_smartcard.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_smartcard_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_smbus.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_smbus_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_spi.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_spi_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_sram.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_tim.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_tim_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_uart.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_uart_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_usart.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_usart_ex.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_wwdg.c
-        STM32H5xx_HAL_Driver/stm32h5xx_hal_xspi.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_adc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_comp.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_cordic.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_crc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_crs.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_dac.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_dlyb.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_dma.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_exti.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_fmac.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_fmc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_gpio.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_i2c.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_icache.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_lptim.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_lpuart.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_opamp.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_pka.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_pwr.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_rcc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_rng.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_rtc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_sdmmc.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_spi.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_tim.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_usart.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_usb.c
-        STM32H5xx_HAL_Driver/stm32h5xx_ll_utils.c
-        STM32H5xx_HAL_Driver/stm32h5xx_util_i3c.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_adc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_adc_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_cec.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_comp.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_cordic.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_cortex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_crc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_crc_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_cryp.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_cryp_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_dac.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_dac_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_dcache.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_dcmi.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_dma.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_dma_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_dts.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_exti.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_fdcan.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_flash.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_flash_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_fmac.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_gpio.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_gtzc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_hash.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_hcd.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_i2c.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_i2c_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_i2s.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_i2s_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_i3c.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_icache.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_irda.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_iwdg.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_lptim.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_mmc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_mmc_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_nand.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_nor.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_opamp.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_opamp_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_otfdec.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_pcd.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_pcd_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_pka.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_pssi.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_pwr.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_pwr_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_ramcfg.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_rcc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_rcc_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_rng.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_rng_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_rtc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_rtc_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_sai.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_sai_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_sd.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_sdram.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_sd_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_smartcard.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_smartcard_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_smbus.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_smbus_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_spi.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_spi_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_sram.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_tim.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_tim_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_uart.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_uart_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_usart.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_usart_ex.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_wwdg.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_hal_xspi.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_adc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_comp.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_cordic.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_crc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_crs.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_dac.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_dlyb.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_dma.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_exti.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_fmac.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_fmc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_gpio.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_i2c.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_icache.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_lptim.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_lpuart.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_opamp.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_pka.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_pwr.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_rcc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_rng.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_rtc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_sdmmc.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_spi.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_tim.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_usart.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_usb.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_ll_utils.c
+        stm32h5xx-hal-driver/Src/stm32h5xx_util_i3c.c
 
         # NOTE: Don't compile stm32h5xx_ll_i3c.c, it does not build if the
         # HAL driver for i3c is enabled due to a circular include issue.
+
+        # For now we use this file unmodified, so we can get it directly from the submodule
+        cmsis-device-h5/Source/Templates/system_stm32h5xx.c
 )
 
 target_include_directories(mbed-stm32h5cube-fw
     INTERFACE
         .
-        CMSIS
-        STM32H5xx_HAL_Driver
-        STM32H5xx_HAL_Driver/Legacy
+        cmsis-device-h5/Include
+        stm32h5xx-hal-driver/Inc
+        stm32h5xx-hal-driver/Inc/Legacy
 )

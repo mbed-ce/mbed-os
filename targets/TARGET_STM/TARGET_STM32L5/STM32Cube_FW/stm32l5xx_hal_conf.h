@@ -2,19 +2,16 @@
   ******************************************************************************
   * @file    stm32l5xx_hal_conf.h
   * @author  MCD Application Team
-  * @brief   HAL configuration template file.
-  *          This file should be copied to the application folder and renamed
-  *          to stm32l5xx_hal_conf.h.
+  * @brief   HAL configuration file.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2019 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -188,129 +185,37 @@ in voltage and temperature.*/
   *        for possible callback identifiers defined in HAL_PPP_CallbackIDTypeDef
   *        for each PPP peripheral).
   */
-#if !defined  (USE_HAL_ADC_REGISTER_CALLBACKS)
 #define USE_HAL_ADC_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_COMP_REGISTER_CALLBACKS)
 #define USE_HAL_COMP_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_CRYP_REGISTER_CALLBACKS)
 #define USE_HAL_CRYP_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_DAC_REGISTER_CALLBACKS)
 #define USE_HAL_DAC_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_DFSDM_REGISTER_CALLBACKS)
 #define USE_HAL_DFSDM_REGISTER_CALLBACKS      0U
-#endif
-
-#if !defined  (USE_HAL_FDCAN_REGISTER_CALLBACKS)
 #define USE_HAL_FDCAN_REGISTER_CALLBACKS      0U
-#endif
-
-#if !defined  (USE_HAL_HASH_REGISTER_CALLBACKS)
 #define USE_HAL_HASH_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_I2C_REGISTER_CALLBACKS)
 #define USE_HAL_I2C_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_IRDA_REGISTER_CALLBACKS)
 #define USE_HAL_IRDA_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_LPTIM_REGISTER_CALLBACKS)
 #define USE_HAL_LPTIM_REGISTER_CALLBACKS      0U
-#endif
-
-#if !defined  (USE_HAL_MMC_REGISTER_CALLBACKS)
 #define USE_HAL_MMC_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_NAND_REGISTER_CALLBACKS)
 #define USE_HAL_NAND_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_NOR_REGISTER_CALLBACKS)
 #define USE_HAL_NOR_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_OPAMP_REGISTER_CALLBACKS)
 #define USE_HAL_OPAMP_REGISTER_CALLBACKS      0U
-#endif
-
-#if !defined  (USE_HAL_OSPI_REGISTER_CALLBACKS)
 #define USE_HAL_OSPI_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_OTFDEC_REGISTER_CALLBACKS)
 #define USE_HAL_OTFDEC_REGISTER_CALLBACKS     0U
-#endif
-
-#if !defined  (USE_HAL_PCD_REGISTER_CALLBACKS)
 #define USE_HAL_PCD_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_PKA_REGISTER_CALLBACKS)
 #define USE_HAL_PKA_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_RNG_REGISTER_CALLBACKS)
 #define USE_HAL_RNG_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_RTC_REGISTER_CALLBACKS)
 #define USE_HAL_RTC_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_SAI_REGISTER_CALLBACKS)
 #define USE_HAL_SAI_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_SD_REGISTER_CALLBACKS)
 #define USE_HAL_SD_REGISTER_CALLBACKS         0U
-#endif
-
-#if !defined  (USE_HAL_SMARTCARD_REGISTER_CALLBACKS)
 #define USE_HAL_SMARTCARD_REGISTER_CALLBACKS  0U
-#endif
-
-#if !defined  (USE_HAL_SMBUS_REGISTER_CALLBACKS)
 #define USE_HAL_SMBUS_REGISTER_CALLBACKS      0U
-#endif
-
-#if !defined  (USE_HAL_SPI_REGISTER_CALLBACKS)
 #define USE_HAL_SPI_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_SRAM_REGISTER_CALLBACKS)
 #define USE_HAL_SRAM_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_TIM_REGISTER_CALLBACKS)
 #define USE_HAL_TIM_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_TSC_REGISTER_CALLBACKS)
 #define USE_HAL_TSC_REGISTER_CALLBACKS        0U
-#endif
-
-#if !defined  (USE_HAL_UART_REGISTER_CALLBACKS)
 #define USE_HAL_UART_REGISTER_CALLBACKS       0U
-#endif
-
-#if !defined  (USE_HAL_USART_REGISTER_CALLBACKS)
 #define USE_HAL_USART_REGISTER_CALLBACKS      0U
-#endif
-
-#if !defined  (USE_HAL_WWDG_REGISTER_CALLBACKS)
 #define USE_HAL_WWDG_REGISTER_CALLBACKS       0U
-#endif
 
 /* ################## SPI peripheral configuration ########################## */
 
@@ -516,6 +421,3 @@ in voltage and temperature.*/
 #endif
 
 #endif /* STM32L5xx_HAL_CONF_H */
-
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

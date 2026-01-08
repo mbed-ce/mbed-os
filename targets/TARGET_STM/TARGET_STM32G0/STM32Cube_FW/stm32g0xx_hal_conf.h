@@ -2,9 +2,7 @@
   ******************************************************************************
   * @file    stm32g0xx_hal_conf.h
   * @author  MCD Application Team
-  * @brief   HAL configuration template file.
-  *          This file should be copied to the application folder and renamed
-  *          to stm32g0xx_hal_conf.h.
+  * @brief   HAL configuration file.
   ******************************************************************************
   * @attention
   *
@@ -70,69 +68,27 @@ extern "C" {
 /**
   * @brief This is the list of modules where register callback can be used
   */
-#if !defined  (USE_HAL_ADC_REGISTER_CALLBACKS)
 #define USE_HAL_ADC_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_CEC_REGISTER_CALLBACKS)
 #define USE_HAL_CEC_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_COMP_REGISTER_CALLBACKS)
 #define USE_HAL_COMP_REGISTER_CALLBACKS       0u
-#endif
-#if !defined  (USE_HAL_CRYP_REGISTER_CALLBACKS)
 #define USE_HAL_CRYP_REGISTER_CALLBACKS       0u
-#endif
-#if !defined  (USE_HAL_DAC_REGISTER_CALLBACKS)
 #define USE_HAL_DAC_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_FDCAN_REGISTER_CALLBACKS)
 #define USE_HAL_FDCAN_REGISTER_CALLBACKS      0u
-#endif
-#if !defined  (USE_HAL_I2C_REGISTER_CALLBACKS)
 #define USE_HAL_I2C_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_I2S_REGISTER_CALLBACKS)
 #define USE_HAL_I2S_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_IRDA_REGISTER_CALLBACKS)
 #define USE_HAL_IRDA_REGISTER_CALLBACKS       0u
-#endif
-#if !defined  (USE_HAL_LPTIM_REGISTER_CALLBACKS)
 #define USE_HAL_LPTIM_REGISTER_CALLBACKS      0u
-#endif
-#if !defined  (USE_HAL_HCD_REGISTER_CALLBACKS)
 #define USE_HAL_HCD_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_PCD_REGISTER_CALLBACKS)
 #define USE_HAL_PCD_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_RNG_REGISTER_CALLBACKS)
 #define USE_HAL_RNG_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_RTC_REGISTER_CALLBACKS)
 #define USE_HAL_RTC_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_SMARTCARD_REGISTER_CALLBACKS)
 #define USE_HAL_SMARTCARD_REGISTER_CALLBACKS  0u
-#endif
-#if !defined  (USE_HAL_SMBUS_REGISTER_CALLBACKS)
 #define USE_HAL_SMBUS_REGISTER_CALLBACKS      0u
-#endif
-#if !defined  (USE_HAL_SPI_REGISTER_CALLBACKS)
 #define USE_HAL_SPI_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_TIM_REGISTER_CALLBACKS)
 #define USE_HAL_TIM_REGISTER_CALLBACKS        0u
-#endif
-#if !defined  (USE_HAL_UART_REGISTER_CALLBACKS)
 #define USE_HAL_UART_REGISTER_CALLBACKS       0u
-#endif
-#if !defined  (USE_HAL_USART_REGISTER_CALLBACKS)
 #define USE_HAL_USART_REGISTER_CALLBACKS      0u
-#endif
-#if !defined  (USE_HAL_WWDG_REGISTER_CALLBACKS)
 #define USE_HAL_WWDG_REGISTER_CALLBACKS       0u
-#endif
 
 /* ########################## Oscillator Values adaptation ####################*/
 /**
@@ -235,9 +191,7 @@ in voltage and temperature.*/
 
 /* ################## CRYP peripheral configuration ########################## */
 
-#if !defined  (USE_HAL_CRYP_SUSPEND_RESUME)
 #define USE_HAL_CRYP_SUSPEND_RESUME     1U
-#endif
 
 
 /* ########################## Assert Selection ############################## */
@@ -385,6 +339,3 @@ in voltage and temperature.*/
 #endif
 
 #endif /* STM32G0xx_HAL_CONF_H */
-
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
