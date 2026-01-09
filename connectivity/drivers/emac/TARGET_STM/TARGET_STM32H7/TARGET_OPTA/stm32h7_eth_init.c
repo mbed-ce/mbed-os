@@ -63,6 +63,11 @@ void EthInitPinmappings(void)
     GPIO_InitTypeDef GPIO_InitStruct;
     enableEthPowerSupply();
 
+#if !(defined(DUAL_CORE) && defined(CORE_CM4))
+    /* Disable DCache for STM32H7 family */
+    SCB_DisableDCache();
+#endif
+
     /* GPIO Ports Clock Enable */
     __HAL_RCC_GPIOA_CLK_ENABLE();
     // __HAL_RCC_GPIOB_CLK_ENABLE();

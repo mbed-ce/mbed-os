@@ -9,7 +9,7 @@
 #    board in DFU mode.
 # 3. On Linux, you will need to add a udev rule to be able to upload over DFU:
 #    SUBSYSTEM=="usb", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0364", MODE="664", GROUP="plugdev"
-
+# 4. The diabled upload methods below are unverfied and need futher investigation before being enabled.
 
 # General config parameters
 # -------------------------------------------------------------
@@ -26,21 +26,21 @@ set(JLINK_UPLOAD_INTERFACE SWD)
 # Config options for PYOCD
 # -------------------------------------------------------------
 
-set(PYOCD_UPLOAD_ENABLED TRUE)
+set(PYOCD_UPLOAD_ENABLED FALSE)
 set(PYOCD_TARGET_NAME STM32H747XIHx)
 set(PYOCD_CLOCK_SPEED 4000k)
 
 # Config options for OPENOCD
 # -------------------------------------------------------------
 
-set(OPENOCD_UPLOAD_ENABLED TRUE)
+set(OPENOCD_UPLOAD_ENABLED FALSE)
 set(OPENOCD_CHIP_CONFIG_COMMANDS
         -f ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/stm32h747.cfg)
 
 # Config options for STM32Cube
 # -------------------------------------------------------------
 
-set(STM32CUBE_UPLOAD_ENABLED TRUE)
+set(STM32CUBE_UPLOAD_ENABLED FALSE)
 set(STM32CUBE_CONNECT_COMMAND -c port=SWD reset=HWrst)
 set(STM32CUBE_GDBSERVER_ARGS --swd --initialize-reset --apid 0)
 
@@ -53,7 +53,7 @@ set(STM32CUBE_DFU_CONNECT_COMMAND -c port=USB vid=0x2341 pid=0x0364)
 # Config options for stlink
 # -------------------------------------------------------------
 
-set(STLINK_UPLOAD_ENABLED TRUE)
+set(STLINK_UPLOAD_ENABLED FALSE)
 set(STLINK_ARGS --connect-under-reset)
 
 # Config options for dfu-util
