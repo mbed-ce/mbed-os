@@ -10,3 +10,5 @@ target_sources(mbed-stm32h747-arduino INTERFACE
 
 add_subdirectory(TARGET_ARDUINO_PORTENTA_H7)
 add_subdirectory(TARGET_ARDUINO_GIGA)
+add_subdirectory(TARGET_ARDUINO_OPTA)
+
