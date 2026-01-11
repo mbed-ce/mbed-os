@@ -59,9 +59,18 @@ if(MBED_IS_STANDALONE AND NOT MBED_IS_NATIVE_BUILD)
     include(${CMAKE_CURRENT_LIST_DIR}/tools/cmake/mbed_toolchain_setup.cmake)
 endif()
 
-# Create project and find compilers (if not already found)
-project(mbed-os LANGUAGES C CXX ASM)
+# Get version and create project in CMake.
+# This will also find the compilers (if not already found)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/VERSION MBED_VERSION_FILE_CONTENTS)
+project(mbed-os LANGUAGES C CXX ASM VERSION ${MBED_VERSION_FILE_CONTENTS})
 
+message(STATUS "Mbed: This is Mbed OS Community Edition version ${mbed-os_VERSION}.")
+if(mbed-os_VERSION_PATCH EQUAL 99)
+    message(STATUS "Mbed: This is a development version from the main branch and might contain unexpected or incomplete changes.")
+    message(STATUS "Mbed: Ordinary users are recommended to use the latest release from the `release` branch.")
+endif()
+
+# Now do the setup that has to happen after the project() call
 if(MBED_IS_STANDALONE AND NOT MBED_IS_NATIVE_BUILD)
     include(mbed_project_setup)
 endif()
@@ -253,12 +262,15 @@ if(MBED_IS_NATIVE_BUILD)
 endif()
 
 # Generate target config header and include it in all files
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated-headers)
 if(NOT MBED_IS_NATIVE_BUILD)
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated-headers)
     mbed_write_target_config_header(${CMAKE_CURRENT_BINARY_DIR}/generated-headers/mbed-target-config.h MBED_TARGET_DEFINITIONS MBED_CONFIG_DEFINITIONS)
     target_compile_options(mbed-core-flags INTERFACE -include ${CMAKE_CURRENT_BINARY_DIR}/generated-headers/mbed-target-config.h)
     target_include_directories(mbed-core-flags INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated-headers)
 endif()
+
+# Also generate version header
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mbed_version.h.in ${CMAKE_CURRENT_BINARY_DIR}/generated-headers/mbed_version.h)
 
 # Include mbed.h and config from generate folder
 target_include_directories(mbed-core-flags
