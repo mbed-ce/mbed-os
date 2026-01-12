@@ -27,6 +27,12 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
+/**
+ * Mbed patch https://github.com/mbed-ce/mbed-os/pull/152
+ * define QUADSPI IP version for all STM32F7
+ */
+#define QSPI1_V1_0
+
 /* ########################## Module Selection ############################## */
 /**
   * @brief This is the list of modules to be used in the HAL driver 
