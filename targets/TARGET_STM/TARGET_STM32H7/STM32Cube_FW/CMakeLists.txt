@@ -148,3 +148,6 @@ target_include_directories(mbed-stm32h7cube-fw
         stm32h7xx-hal-driver/Inc
         stm32h7xx-hal-driver/Inc/Legacy
 )
+
+# Add system init files
+add_subdirectory(system_init_files)

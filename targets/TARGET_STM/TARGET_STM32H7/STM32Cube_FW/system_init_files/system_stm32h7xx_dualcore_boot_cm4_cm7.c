@@ -3,6 +3,7 @@
   * @file    system_stm32h7xx_dualcore_boot_cm4_cm7.c
   * @author  MCD Application Team
   * @brief   CMSIS Cortex-Mx Device Peripheral Access Layer System Source File.
+  * SPDX-License-Identifier: Apache-2.0
   *          This provides system initialization template function is case of
   *          an application using a dual core STM32H7 device where
   *          Cortex-M7 and Cortex-M4 boot are enabled at the FLASH option bytes

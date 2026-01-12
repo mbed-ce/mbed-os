@@ -3,6 +3,7 @@
   * @file    system_stm32h7xx.c
   * @author  MCD Application Team
   * @brief   CMSIS Cortex-M7 Device Peripheral Access Layer System Source File.
+  * SPDX-License-Identifier: Apache-2.0
   *          This provides system initialization template function is case of
   *          an application using a single core STM32H7 device
   *
