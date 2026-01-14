@@ -2574,8 +2574,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "hse-value": {
                 "help": "Frequency in MHz of external oscillator / crystal.  Will be used to compute PLL parameters. May be any value that is between 4MHz and 50MHz and is divisible by 2MHz or 5MHz",
                 "value": 8000000,
-                "minimum": 4000000,
-                "maximum": 50000000,
+                "value_min": 4000000,
+                "value_max": 50000000,
                 "macro_name": "HSE_VALUE"
             },
             "lpticker-lptim": {
@@ -2787,8 +2787,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "hse-value": {
                 "help": "Frequency in MHz of external oscillator / crystal.  Will be used to compute PLL parameters. May be any value that is between 4MHz and 50MHz and is divisible by 2MHz or 5MHz",
                 "value": 8000000,
-                "minimum": 4000000,
-                "maximum": 50000000,
+                "value_min": 4000000,
+                "value_max": 50000000,
                 "macro_name": "HSE_VALUE"
             },
         },
@@ -4380,8 +4380,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "hse-value": {
                 "help": "Frequency in MHz of external oscillator / crystal.  Will be used to compute PLL parameters. May be any value that is between 4MHz and 50MHz and is divisible by 4MHz or 5MHz",
                 "value": 16000000,
-                "minimum": 4000000,
-                "maximum": 50000000,
+                "value_min": 4000000,
+                "value_max": 50000000,
                 "macro_name": "HSE_VALUE"
             },
             "lpticker-lptim": {
