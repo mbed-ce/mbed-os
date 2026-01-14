@@ -1,5 +1,5 @@
 # This workflow automatically creates a GitHub release for the project on successful version update.
-# From here: https://github.com/Diapolo10/python-poetry-template/blob/main/.github/workflows/github_release.yml
+# Based on: https://github.com/Diapolo10/python-poetry-template/blob/main/.github/workflows/github_release.yml
 
 name: Create a GitHub release
 

@@ -1,4 +1,8 @@
 #!/bin/bash -e
+#
+# Copyright (c) 2026 Jamie Smith
+# SPDX-License-Identifier: Apache-2.0
+#
 
 # Script to upload a PlatformIO release of Mbed.
 # Note that you need to `pio account login` before running this script.
