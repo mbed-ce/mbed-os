@@ -86,11 +86,13 @@ _______________________________________________________________________________
 - All JSON config options are required to be in `skewer-case`. If an option is found that is not in skewer-case, it is converted (for compatibility) and a warning is printed
 - All JSON files are now validated against a Pydantic schema when being loaded to ensure they contain valid data. Currently, invalid mbed_app.json's are still allowed even if they don't pass the schema for compatibility.
 - `I2C` class updated to use enums for return codes, and to rename the single byte read/write functions to clearer names.
-- Sleep and external RAM disabled (for now) on MIMRT105x/6x targets to improve reliability
+- Update CMSIS to version 6 and include it as a submodule, rather than by copying in the source to the mbed-os repo.
 - `PORTENTA_H7_CM[7/4]` targets renamed to `ARDUINO_PORTENTA_H7_CM[7/4]` for consistency
 - On many Arduino target boards with wi-fi support, a large (300kB+) firmware blob needs to be available to load into the wi-fi chip. Previously, this was always read from an external QSPI flash, with no way built-in to Mbed to actually load this image. Now, unless the `target.wifi-driver-in-qspi-flash` option is set to true, the binary will be included with the main application so that things work out of the box (at the cost of some program flash). 
 - `Apollo3` MCU family: PinMode open-drain values now use standard names (`OpenDrain`, `OpenDrainPullUp`, etc) and are properly documented
-- NXP `MIMXRT105x` MCU family: Fix always using the slow (528MHz) clock speed. This is now controlled by a new `target.enable-overdrive-mode` which can be changed to 0 to run at the slower clock speed (needs to be done for certain chip part numbers) 
+- NXP `MIMXRT105x` MCU family: 
+    - Fix always using the slow (528MHz) clock speed. This is now controlled by a new `target.enable-overdrive-mode` which can be changed to 0 to run at the slower clock speed (needs to be done for certain chip part numbers)
+    - Sleep and external RAM disabled (for now) to improve reliability
 - Add destructor to `SPISlave` which calls `spi_free()`. This makes sure that resources used by the SPI slave can actually be cleaned up when it is destroyed.
 - Implement missing reference counting code in `SPI` destructor that would actually free the SPI bus and its associated resources. This fixes problems across multiple targets where the SPI peripheral and/or its DMA channels were not released, so destroying and re-creating an SPI class would fail.
 - If you called `SPI::select()` to manually select an SPI device, then did an async transfer, previously the device would always be deselected at the end of the async transfer. Now it is not, allowing an asynchronous operation to be used as only _part_ of a larger transfer, which opens up some new ways to use SPI.
