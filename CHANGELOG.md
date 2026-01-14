@@ -70,6 +70,7 @@ _______________________________________________________________________________
 - All JSON files can now be written as JSON5 instead, allowing comments and hex values to be used (yesssss)
 - Add an `nsapi_strerror()` function to convert an nsapi_error_t to a string
 - `Apollo3` MCU family: Add support for analog inputs and PWM outputs
+- `LPC546XX` MCU family: Add support in linker script for crash capture RAM and use of SRAMX bank as additional heap
 - `STM32H7`: 
     - Added `target.enable-overdrive-mode` option to control whether the CPU core runs at the highest clock speed or not. The default depends on the specific target. Previously this was always enabled, violating the datasheet specifications on targets where the power scheme for the CPU prevents using overdrive mode.
     - External oscillator frequency range expanded to support any frequency between 4MHz and 50MHz that is divisible by 2MHz or 5MHz
@@ -77,6 +78,7 @@ _______________________________________________________________________________
     - External oscillator frequency range expanded to support any frequency between 4MHz and 50MHz that is divisible by 4MHz or 5MHz
 - Add support for using an ESP32 chip as an external wifi-fi interface via [ESP AT firmware](https://github.com/espressif/esp-at). This functionality can be accessed by adding the `ESPRESSIF_ESP32` component to your application.
 - `SDBlockDevice` can now use async SPI, allowing other threads to execute while large SD card transfers are ongoing
+- `CacheAlignedBuffer` class added, providing a way to manage DMA buffers on cores that have a CPU cache
 
 ### Changed
 
@@ -116,6 +118,7 @@ _______________________________________________________________________________
   - Fix UART Rx FIFO threshold being set incorrectly, meaning if you send only a few bytes, it may never show up on the Mbed side
   - Fix setting interrupts for both rise and fall on the same pin causing no interrupts to be delivered
   - Fix bug where calling InterruptIn::read() after constructing the InterruptIn but before calling rise() or fall() would always return 0 instead of the actual logic level on the pin
+- `LPC546xx` MCU family: Fix default MPU configuration that erroneously write-protected the SRAMX memory bank
 - `LPC17xx` MCU family:
   - Support for open drain pin modes
   - Fix the blue LED not blinking on fatal error in Mbed 6 due to missing LED #define's
@@ -175,6 +178,8 @@ _______________________________________________________________________________
 
 ### Security
 - Fix several CVEs that could cause memory corruption / code execution by a malicious Bluetooth chip connected to the HCI interface. See the PRs ([1](https://github.com/mbed-ce/mbed-os/pull/384), [2](https://github.com/mbed-ce/mbed-os/pull/385), [3](https://github.com/mbed-ce/mbed-os/pull/386), [4](https://github.com/mbed-ce/mbed-os/pull/387), [5](https://github.com/mbed-ce/mbed-os/pull/388), [6](https://github.com/mbed-ce/mbed-os/pull/374)) for details.
+
+_______________________________________________________________________________
 
 [CHANGELOG.md]: https://keepachangelog.com/en/1.1.0/
 [Semantic Versioning]: http://semver.org/
