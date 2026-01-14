@@ -85,7 +85,7 @@ _______________________________________________________________________________
 - CMake is now the only way to build Mbed. CMake build system has been substantially rewritten and extended.
 - All JSON config options are required to be in `skewer-case`. If an option is found that is not in skewer-case, it is converted (for compatibility) and a warning is printed
 - All JSON files are now validated against a Pydantic schema when being loaded to ensure they contain valid data. Currently, invalid mbed_app.json's are still allowed even if they don't pass the schema for compatibility.
-- `I2C` class updated to use enums for return codes
+- `I2C` class updated to use enums for return codes, and to rename the single byte read/write functions to clearer names.
 - Sleep and external RAM disabled (for now) on MIMRT105x/6x targets to improve reliability
 - `PORTENTA_H7_CM[7/4]` targets renamed to `ARDUINO_PORTENTA_H7_CM[7/4]` for consistency
 - On many Arduino target boards with wi-fi support, a large (300kB+) firmware blob needs to be available to load into the wi-fi chip. Previously, this was always read from an external QSPI flash, with no way built-in to Mbed to actually load this image. Now, unless the `target.wifi-driver-in-qspi-flash` option is set to true, the binary will be included with the main application so that things work out of the box (at the cost of some program flash). 
