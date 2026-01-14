@@ -17,7 +17,7 @@
 #include "platform/mbed_assert.h"
 #include "platform/mbed_stats.h"
 #include "platform/mbed_power_mgmt.h"
-#include "platform/mbed_version.h"
+#include "mbed_version.h"
 #include <string.h>
 #include <stdlib.h>
 

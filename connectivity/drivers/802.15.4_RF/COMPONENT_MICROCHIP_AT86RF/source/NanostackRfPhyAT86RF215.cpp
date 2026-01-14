@@ -31,7 +31,7 @@
 #include <Timer.h>
 #include "Timeout.h"
 #include "SPI.h"
-#include "platform/mbed_version.h"
+#include "mbed_version.h"
 
 #define TRACE_GROUP "AtRF"
 
