@@ -60,13 +60,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics. 
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2019-2021 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under Apache License, Version 2.0,
-  * the "License"; You may not use this file except in compliance with the 
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/Apache-2.0
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -102,7 +101,11 @@
 #endif /* LSI_VALUE */ 
 
 #if !defined  (LSE_VALUE)
-  #define LSE_VALUE    (32768UL)    /*!< Value of LSE in Hz*/
+#if defined(STM32WB5Mxx)
+  #define LSE_VALUE    32774U     /*!< Value of the LSE oscillator in Hz */
+#else
+  #define LSE_VALUE    32768U     /*!< Value of the LSE oscillator in Hz */
+#endif /* STM32WB5Mxx */
 #endif /* LSE_VALUE */
 
 /**
@@ -128,21 +131,27 @@
      at address 0x00 which correspond to automatic remap of boot address selected */
 /* #define USER_VECT_TAB_ADDRESS */
 #if defined(USER_VECT_TAB_ADDRESS)
- /*!< Uncomment this line for user vector table remap in Sram else user remap
-      will be done in Flash. */
+/*!< Uncomment this line for user vector table remap in Sram else user remap
+     will be done in Flash. */
 /* #define VECT_TAB_SRAM */
 #if defined(VECT_TAB_SRAM)
 #define VECT_TAB_BASE_ADDRESS   SRAM1_BASE      /*!< Vector Table base address field.
                                                      This value must be a multiple of 0x200. */
-#define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table base offset field.
+#if !defined(VECT_TAB_OFFSET)
+#define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table offset field.
                                                      This value must be a multiple of 0x200. */
+#endif /* VECT_TAB_OFFSET */
+
 #else
 #define VECT_TAB_BASE_ADDRESS   FLASH_BASE      /*!< Vector Table base address field.
                                                      This value must be a multiple of 0x200. */
-#define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table base offset field.
+#if !defined(VECT_TAB_OFFSET)
+#define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table offset field.
                                                      This value must be a multiple of 0x200. */
-#endif
-#endif
+#endif /* VECT_TAB_OFFSET */
+
+#endif /* VECT_TAB_SRAM */
+#endif /* USER_VECT_TAB_ADDRESS */
 
 /**
   * @}
@@ -167,21 +176,22 @@
                is no need to call the 2 first functions listed above, since SystemCoreClock
                variable is updated automatically.
   */
-  uint32_t SystemCoreClock  = 4000000UL ; /*CPU1: M4 on MSI clock after startup (4MHz)*/
+uint32_t SystemCoreClock  = 4000000UL ; /*CPU1: M4 on MSI clock after startup (4MHz)*/
 
-  const uint32_t AHBPrescTable[16UL] = {1UL, 3UL, 5UL, 1UL, 1UL, 6UL, 10UL, 32UL, 2UL, 4UL, 8UL, 16UL, 64UL, 128UL, 256UL, 512UL};
+const uint32_t AHBPrescTable[16UL] = {1UL, 3UL, 5UL, 1UL, 1UL, 6UL, 10UL, 32UL, 2UL, 4UL, 8UL, 16UL, 64UL, 128UL, 256UL, 512UL};
 
-  const uint32_t APBPrescTable[8UL]  = {0UL, 0UL, 0UL, 0UL, 1UL, 2UL, 3UL, 4UL};
+const uint32_t APBPrescTable[8UL]  = {0UL, 0UL, 0UL, 0UL, 1UL, 2UL, 3UL, 4UL};
 
-  const uint32_t MSIRangeTable[16UL] = {100000UL, 200000UL, 400000UL, 800000UL, 1000000UL, 2000000UL, \
-                                      4000000UL, 8000000UL, 16000000UL, 24000000UL, 32000000UL, 48000000UL, 0UL, 0UL, 0UL, 0UL}; /* 0UL values are incorrect cases */
+const uint32_t MSIRangeTable[16UL] = {100000UL, 200000UL, 400000UL, 800000UL, 1000000UL, 2000000UL, \
+                                      4000000UL, 8000000UL, 16000000UL, 24000000UL, 32000000UL, 48000000UL, 0UL, 0UL, 0UL, 0UL
+                                    }; /* 0UL values are incorrect cases */
 
 #if defined(STM32WB55xx) || defined(STM32WB5Mxx) || defined(STM32WB35xx) || defined (STM32WB15xx) || defined (STM32WB10xx)
   const uint32_t SmpsPrescalerTable[4UL][6UL]={{1UL,3UL,2UL,2UL,1UL,2UL}, \
                                         {2UL,6UL,4UL,3UL,2UL,4UL}, \
                                         {4UL,12UL,8UL,6UL,4UL,8UL}, \
                                         {4UL,12UL,8UL,6UL,4UL,8UL}};
-#endif
+#endif /* STM32WB55xx || STM32WB5Mxx || STM32WB35xx || STM32WB15xx || STM32WB1Mxx */
 
 /**
   * @}
@@ -204,18 +214,20 @@
   * @param  None
   * @retval None
   */
-__WEAK void SystemInit(void)
+void SystemInit(void)
 {
-#include "nvic_addr.h"                   // MBED
-  SCB->VTOR = NVIC_FLASH_VECTOR_ADDRESS; // MBED
 #if defined(USER_VECT_TAB_ADDRESS)
   /* Configure the Vector Table location add offset address ------------------*/
+#else
+// Mbed patch
+#include "nvic_addr.h"
+  SCB->VTOR = NVIC_FLASH_VECTOR_ADDRESS;
 #endif
 
   /* FPU settings ------------------------------------------------------------*/
-  #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-    SCB->CPACR |= ((3UL << (10UL*2UL))|(3UL << (11UL*2UL)));  /* set CP10 and CP11 Full Access */
-  #endif
+#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
+  SCB->CPACR |= ((3UL << (10UL * 2UL)) | (3UL << (11UL * 2UL))); /* set CP10 and CP11 Full Access */
+#endif /* FPU */
   
   /* Reset the RCC clock configuration to the default reset state ------------*/
   /* Set MSION bit */
@@ -239,7 +251,7 @@ __WEAK void SystemInit(void)
 #if defined(STM32WB55xx) || defined(STM32WB5Mxx)
   /* Reset PLLSAI1CFGR register */
   RCC->PLLSAI1CFGR = 0x22041000U;
-#endif
+#endif /* STM32WB55xx || STM32WB5Mxx */
   
   /* Reset HSEBYP bit */
   RCC->CR &= 0xFFFBFFFFU;
@@ -292,7 +304,7 @@ __WEAK void SystemInit(void)
   */
 void SystemCoreClockUpdate(void)
 {
-  uint32_t tmp, msirange, pllvco, pllr, pllsource , pllm;
+  uint32_t tmp, msirange, pllvco, pllr, pllsource, pllm;
 
   /* Get MSI Range frequency--------------------------------------------------*/
 
@@ -302,11 +314,11 @@ void SystemCoreClockUpdate(void)
   /* Get SYSCLK source -------------------------------------------------------*/
   switch (RCC->CFGR & RCC_CFGR_SWS)
   {
-    case 0x00:   /* MSI used as system clock source */
+    case 0x00: /* MSI used as system clock source */
       SystemCoreClock = msirange;
       break;
 
-    case 0x04:  /* HSI used as system clock source */
+    case 0x04: /* HSI used as system clock source */
       /* HSI used as system clock source */
         SystemCoreClock = HSI_VALUE;
       break;
@@ -322,11 +334,11 @@ void SystemCoreClockUpdate(void)
       pllsource = (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC);
       pllm = ((RCC->PLLCFGR & RCC_PLLCFGR_PLLM) >> RCC_PLLCFGR_PLLM_Pos) + 1UL ;
 
-      if(pllsource == 0x02UL) /* HSI used as PLL clock source */
+      if (pllsource == 0x02UL) /* HSI used as PLL clock source */
       {
         pllvco = (HSI_VALUE / pllm);
       }
-      else if(pllsource == 0x03UL) /* HSE used as PLL clock source */
+      else if (pllsource == 0x03UL) /* HSE used as PLL clock source */
       {
         pllvco = (HSE_VALUE / pllm);
       }
@@ -338,7 +350,7 @@ void SystemCoreClockUpdate(void)
       pllvco = pllvco * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos);
       pllr = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLR) >> RCC_PLLCFGR_PLLR_Pos) + 1UL);
       
-      SystemCoreClock = pllvco/pllr;
+      SystemCoreClock = pllvco / pllr;
       break;
 
     default:
@@ -349,9 +361,9 @@ void SystemCoreClockUpdate(void)
   /* Compute HCLK clock frequency --------------------------------------------*/
   /* Get HCLK1 prescaler */
   tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> RCC_CFGR_HPRE_Pos)];
+
   /* HCLK clock frequency */
   SystemCoreClock = SystemCoreClock / tmp;
-
 }
 
 
@@ -366,5 +378,3 @@ void SystemCoreClockUpdate(void)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

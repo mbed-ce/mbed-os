@@ -22,7 +22,6 @@ function(mbed_set_cpu_core_definitions target)
         INTERFACE
             __CORTEX_M4
             ARM_MATH_CM4
-            __FPU_PRESENT=1
             __CMSIS_RTOS
     )
 endfunction()

@@ -84,7 +84,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     /** HSE settings is prepared for values between 4MHz and <= 40MHz and must 
      *  be divisible by either 4 or 5! Different values must be set manually.
      */
-#if (HSE_VALUE < 4000000) || (HSE_VALUE > 40000000) && !((HSE_VALUE % 4000000 != 0) || (HSE_VALUE % 5000000 != 0))
+#if (HSE_VALUE < 4000000) || (HSE_VALUE > 50000000) || !((HSE_VALUE % 2000000 == 0) || (HSE_VALUE % 5000000 == 0))
 #error HSE value must be >= 4MHz and <= 40MHz, and must be divisible by either 4 or 5!
 #endif
 
