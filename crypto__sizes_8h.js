@@ -1,0 +1,25 @@
+var crypto__sizes_8h =
+[
+    [ "PSA_HASH_SIZE", "crypto__sizes_8h.html#aef340331ce3cba2b57e1fc5624bf1f99", null ],
+    [ "PSA_HASH_MAX_SIZE", "crypto__sizes_8h.html#a6ce1014efbbc0bcca286ef7f9a72cb29", null ],
+    [ "PSA_MAC_MAX_SIZE", "crypto__sizes_8h.html#a4681cc4f6226883a2160122c562ca682", null ],
+    [ "PSA_AEAD_TAG_LENGTH", "crypto__sizes_8h.html#a8e3079b2e624cb8d32b94843cddada49", null ],
+    [ "PSA_ALG_TLS12_PSK_TO_MS_MAX_PSK_LEN", "crypto__sizes_8h.html#ab589ea3b86f2bfa18880459299c58f8a", null ],
+    [ "PSA_MAX_BLOCK_CIPHER_BLOCK_SIZE", "crypto__sizes_8h.html#aa3cfcff0291d6da279fec8fe834d5dec", null ],
+    [ "PSA_MAC_FINAL_SIZE", "crypto__sizes_8h.html#aa84c5fb384ac7cb1bfc52adde96588ee", null ],
+    [ "PSA_AEAD_ENCRYPT_OUTPUT_SIZE", "crypto__sizes_8h.html#a85667d47a7aa6c7b99a80e5273671266", null ],
+    [ "PSA_AEAD_DECRYPT_OUTPUT_SIZE", "crypto__sizes_8h.html#a1d057796166c16eb673ad1997e48a60b", null ],
+    [ "PSA_AEAD_UPDATE_OUTPUT_SIZE", "crypto__sizes_8h.html#a4c863dfac8c7aa8c5431fe5450206b65", null ],
+    [ "PSA_AEAD_FINISH_OUTPUT_SIZE", "crypto__sizes_8h.html#ab097f6e054f1a73e975d597ade9029a6", null ],
+    [ "PSA_AEAD_VERIFY_OUTPUT_SIZE", "crypto__sizes_8h.html#a45ff81d10465219f310065dee4db23f2", null ],
+    [ "PSA_ECDSA_SIGNATURE_SIZE", "crypto__sizes_8h.html#a10c472a35f04051add6b20cc228ffc11", null ],
+    [ "PSA_SIGN_OUTPUT_SIZE", "crypto__sizes_8h.html#a31021bbd8bb365fc350532b5fd18a25a", null ],
+    [ "PSA_SIGNATURE_MAX_SIZE", "crypto__sizes_8h.html#a687a317642db9486fda38ea553900a1e", null ],
+    [ "PSA_ASYMMETRIC_ENCRYPT_OUTPUT_SIZE", "crypto__sizes_8h.html#a66ba3bd93e5ec52870ccc3848778bad8", null ],
+    [ "PSA_ASYMMETRIC_DECRYPT_OUTPUT_SIZE", "crypto__sizes_8h.html#a61a246f3eac41989821d982e56fea6c1", null ],
+    [ "PSA_KEY_EXPORT_MAX_SIZE", "crypto__sizes_8h.html#a0aae885cc8ff92e00fb5248420b939c3", null ],
+    [ "PSA_AEAD_NONCE_LENGTH", "crypto__sizes_8h.html#a3dcd505a4e70a63708c05bd8591a4782", null ],
+    [ "PSA_AEAD_NONCE_MAX_SIZE", "crypto__sizes_8h.html#ac2a332765ba4ccfc24935d6f7f48fcc7", null ],
+    [ "PSA_CIPHER_IV_LENGTH", "crypto__sizes_8h.html#adaeef0383905487313ccbfaf1b73c95e", null ],
+    [ "PSA_CIPHER_IV_MAX_SIZE", "crypto__sizes_8h.html#ad5630c60148421b334b1bb3962bd4f86", null ]
+];
