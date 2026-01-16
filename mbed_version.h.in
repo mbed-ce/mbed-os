@@ -28,29 +28,25 @@
 
 /** MBED_MAJOR_VERSION
   * Mbed OS major version
-  *
-  * @note 99 is default value for development version (master branch)
   */
-#define MBED_MAJOR_VERSION 6
+#define MBED_MAJOR_VERSION ${mbed-os_VERSION_MAJOR}
 
 /** MBED_MINOR_VERSION
   * Mbed OS minor version
-  *
-  * @note 99 is default value for development version (master branch)
   */
-#define MBED_MINOR_VERSION 17
+#define MBED_MINOR_VERSION ${mbed-os_VERSION_MINOR}
 
 /** MBED_PATCH_VERSION
   * Mbed OS patch version
   *
-  * @note 99 is default value for development version (master branch)
+  * @note 99 is default value for development version (main branch)
   */
-#define MBED_PATCH_VERSION 0
+#define MBED_PATCH_VERSION ${mbed-os_VERSION_PATCH}
 
 #define MBED_ENCODE_VERSION(major, minor, patch) ((major)*10000 + (minor)*100 + (patch))
 
 /** MBED_VERSION
-  * Mbed OS 5 version (MMmmpp - M(Major); m(minor); p(patch))
+  * Mbed OS version (MMmmpp - M(Major); m(minor); p(patch))
   *
   * @note 999999 is default value for development version (master branch)
   */

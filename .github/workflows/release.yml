@@ -1,0 +1,43 @@
+# This workflow automatically creates a GitHub release for the project on successful version update.
+# Based on: https://github.com/Diapolo10/python-poetry-template/blob/main/.github/workflows/github_release.yml
+
+name: Create a GitHub release
+
+on:
+  push:
+    tags:
+      - 'mbed-os-*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Check Version
+        uses: nowsprinting/check-version-format-action@v4
+        id: version
+        with:
+          prefix: 'mbed-os-'
+
+      - name: Get Newest Changelog
+        run: |
+          python -c "import re; from pathlib import Path; text=re.sub('<!--(.*?)-->', '', (Path.cwd() / 'CHANGELOG.md').read_text(), flags=re.DOTALL); start=text.find('_' * 79); (Path.cwd() / 'TEMP_CHANGELOG.md').write_text(text[start:text.find('_' * 79, start+1)])"
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release ${{ steps.version.outputs.full_without_prefix }}
+          draft: false
+          body_path: ./TEMP_CHANGELOG.md

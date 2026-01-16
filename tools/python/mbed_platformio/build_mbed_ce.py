@@ -259,6 +259,7 @@ project_codemodel = get_cmake_code_model(
         "-DPLATFORMIO_PROJECT_PATH=" + str(PROJECT_DIR.as_posix()),
         "-DMBED_TARGET=" + get_mbed_target(),
         "-DUPLOAD_METHOD=NONE",  # Disable Mbed CE upload method system as PlatformIO has its own
+        "-DMBED_MANAGE_SUBMODULES=FALSE",  # Don't try to use git
         # Add in any extra options from higher layers
         *split_arg_string(board.get("build.cmake_extra_args", "")),
     ]

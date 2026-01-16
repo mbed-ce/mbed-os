@@ -22,7 +22,7 @@
 // In that case, we should manually include the target config header here.
 #include "mbed-target-config.h"
 
-#include "platform/mbed_version.h"
+#include "mbed_version.h"
 
 #if MBED_CONF_RTOS_API_PRESENT
 #include "rtos/rtos.h"

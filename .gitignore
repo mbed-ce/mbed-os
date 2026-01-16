@@ -112,3 +112,6 @@ cmake-build-*/
 # Test executor runs
 test-executor-build/
 test-executor-results/
+
+# PlatformIO package.json
+package.json

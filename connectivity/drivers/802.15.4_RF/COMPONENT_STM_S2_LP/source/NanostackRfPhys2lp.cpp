@@ -32,7 +32,7 @@
 #include "Thread.h"
 #include "mbed_wait_api.h"
 #include "platform/mbed_error.h"
-#include "platform/mbed_version.h"
+#include "mbed_version.h"
 
 #if (MBED_VERSION > MBED_ENCODE_VERSION(6, 0, 0))
 /* Mbed OS 6.0 introduces support for chrono time management */

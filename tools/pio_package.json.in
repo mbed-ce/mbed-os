@@ -1,6 +1,6 @@
 {
   "name": "framework-mbed-ce",
-  "version": "6.99.0",
+  "version": "VERSION_NUMBER_GOES_HERE",
   "title": "Mbed OS Community Edition",
   "description": "Mbed CE is a platform operating system designed for the internet of things",
   "keywords": [
