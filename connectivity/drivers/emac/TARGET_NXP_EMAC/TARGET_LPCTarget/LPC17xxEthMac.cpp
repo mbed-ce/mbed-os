@@ -229,7 +229,7 @@ namespace mbed {
         /* Setup pointers to TX structures */
         base->TxDescriptor = reinterpret_cast<uint32_t>(txDescs);
         base->TxStatus = reinterpret_cast<uint32_t>(txStatusDescs);
-        base->TxDescriptorNumber = TX_NUM_DESCS;
+        base->TxDescriptorNumber = TX_NUM_DESCS - 1; // minus 1 encoded!
 
         // We're going to produce index 0 next
         base->TxProduceIndex = 0;
@@ -290,7 +290,7 @@ namespace mbed {
         /* Setup pointers to RX structures */
         base->RxDescriptor = reinterpret_cast<uint32_t>(rxDescs);
         base->RxStatus = reinterpret_cast<uint32_t>(rxStatusDescs);
-        base->RxDescriptorNumber = RX_NUM_DESCS;
+        base->RxDescriptorNumber = RX_NUM_DESCS - 1; // minus 1 encoded!
 
         // We're going to consume index 0 next
         base->RxConsumeIndex = 0;
