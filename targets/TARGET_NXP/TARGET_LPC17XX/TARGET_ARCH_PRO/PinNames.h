@@ -120,6 +120,8 @@ typedef enum {
 #define SPI_SCK  P0_7
 #define SPI_CS   P0_6
 
+#define ETH_PHY_RESET P1_28
+
 typedef enum {
     PullUp = 0,
     PullDown = 3,

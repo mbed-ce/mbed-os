@@ -1,0 +1,36 @@
+{
+  name: "ephy",
+  config: {
+    "model": {
+      "help": "Model of the Ethernet PHY on the board. Should correspond to a driver defined in PhyDrivers.cpp",
+      "value": null
+    },
+    "mdio-address": {
+      "help": "MDIO address of the phy chip. Usually set with strapping pins. NOTE: 0 is *supposed* to be reserved as the general call address but lots of phy chips use it anyway.",
+      "value": null
+    },
+    "poll-period": {
+      "help": "How often (in ms) to poll the Ethernet PHY and check for link status changes.",
+      "value": 100
+    }
+  },
+  target_overrides: {
+    "MCU_STM32": {
+      // First-party STM32 boards generally use a LAN8742 PHY at MDIO address 0
+      "model": "LAN87XX",
+      "mdio-address": 0
+    },
+    "MCU_M480": {
+      "model": "IP101G",
+      "mdio-address": 1,
+    },
+    "LPC1768": {
+      "model": "DP8384X",
+      "mdio-address": 1
+    },
+    "LPCXPRESSO_LPC1769": {
+      "model": "LAN87XX",
+      "mdio-address": 1
+    }
+  }
+}

@@ -255,7 +255,7 @@ namespace mbed {
                 neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             }
 
-            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+            tr_info("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
                 memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), packetDescsUsed);
 
             // Step 3: Wait for needed amount of buffers to be available.
@@ -332,7 +332,7 @@ namespace mbed {
         static constexpr size_t RX_POOL_EXTRA_BUFFERS = 3;
 
         /// Number of entries in the Rx descriptor ring
-        /// Note: + 1 because for some EMACs (STM32 v2) we have to always keep one descriptor owned by the application
+        /// Note: + 1 because for some EMACs (e.g. STM32 v2) we have to always keep one descriptor owned by the application
         // TODO: When we add multiple Ethernet support, this calculation may need to be changed, because the pool buffers will be split between multiple EMACs
         static constexpr size_t RX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS - RX_POOL_EXTRA_BUFFERS + 1;
 
@@ -344,6 +344,10 @@ namespace mbed {
         static constexpr size_t RX_BUFFER_ALIGN = sizeof(uint32_t);
 #endif
     protected:
+        /// Whether the hardware has a first descriptor flag. If this is false, isFirstDesc() will always
+        /// return false. This reduces our ability to detect bad data in the DMA buffer.
+        const bool supportsFirstDescFlag;
+
         /// Pointer to the network stack buffer associated with the corresponding Rx descriptor.
         net_stack_mem_buf_t * rxDescStackBufs[RX_NUM_DESCS];
 
@@ -358,7 +362,9 @@ namespace mbed {
         size_t rxPoolPayloadSize;
 
         /// Constructor. Subclass must allocate descriptor array of size RX_NUM_DESCS
-        GenericRxDMARing() = default;
+        GenericRxDMARing(bool supportsFirstDescFlag = true):
+        supportsFirstDescFlag(supportsFirstDescFlag)
+        {}
 
         /// Configure DMA registers to point to the DMA ring,
         /// and enable DMA. This is done before the MAC itself is enabled, and before any descriptors
@@ -382,11 +388,11 @@ namespace mbed {
         virtual bool isFirstDesc(size_t descIdx) = 0;
 
         /// Does the given descriptor contain the end of a packet?
-        /// /// Note that the descriptor will already have been invalidated in cache if needed.
+        /// Note that the descriptor will already have been invalidated in cache if needed.
         virtual bool isLastDesc(size_t descIdx) = 0;
 
         /// Is the given descriptor an error descriptor?
-        /// /// Note that the descriptor will already have been invalidated in cache if needed.
+        /// Note that the descriptor will already have been invalidated in cache if needed.
         virtual bool isErrorDesc(size_t descIdx) = 0;
 
         /// Return a descriptor to DMA so that DMA can receive into it.
@@ -457,7 +463,7 @@ namespace mbed {
                 rxBuildIndex = (rxBuildIndex + 1) % RX_NUM_DESCS;
             }
 
-            tr_debug("buildRxDescriptors(): Returned %zu descriptors.", origRxDescsOwnedByApplication - rxDescsOwnedByApplication);
+            tr_info("buildRxDescriptors(): Returned %zu descriptors.", origRxDescsOwnedByApplication - rxDescsOwnedByApplication);
         }
 
         bool rxHasPackets_ISR() override {
@@ -486,7 +492,13 @@ namespace mbed {
                     // Descriptor owned by DMA.  We are out of descriptors to process.
                     return false;
                 }
-                if(isFirstDesc(descIdx))
+
+                // Check first descriptor-ness
+                if (!supportsFirstDescFlag) {
+                    // Assume this is a first descriptor
+                    seenFirstDesc = true;
+                }
+                else if(isFirstDesc(descIdx))
                 {
                     if(seenFirstDesc)
                     {
@@ -558,33 +570,50 @@ namespace mbed {
                 const bool isFirst = isFirstDesc(descIdx);
                 const bool isLast = isLastDesc(descIdx);
 
-                if (!firstDescIdx.has_value() && (isError || !isFirst)) {
-                    // Error or non-first-descriptor before a first descriptor
-                    // (could be caused by incomplete packets/junk in the DMA buffer).
-                    // Ignore, free associated memory, and schedule for rebuild.
-                    discardRxDescs(descIdx, (descIdx + 1) % RX_NUM_DESCS);
-                    continue;
+                if(isError) {
+                    if (!firstDescIdx.has_value()) {
+                        // Error before a first descriptor.
+                        // (could be caused by incomplete packets/junk in the DMA buffer).
+                        // Ignore, free associated memory, and schedule for rebuild.
+                        discardRxDescs(descIdx, (descIdx + 1) % RX_NUM_DESCS);
+                        continue;
+                    }
+                    else {
+                        // Already seen a first descriptor, but we have an error descriptor.
+                        // So, delete the in-progress packet up to this point.
+                        discardRxDescs(*firstDescIdx, (descIdx + 1) % RX_NUM_DESCS);
+                        firstDescIdx.reset();
+                        continue;
+                    }
                 }
-                else if(firstDescIdx.has_value() && isError)
-                {
-                    // Already seen a first descriptor, but we have an error descriptor.
-                    // So, delete the in-progress packet up to this point. 
-                    discardRxDescs(*firstDescIdx, (descIdx + 1) % RX_NUM_DESCS);
-                    firstDescIdx.reset();
-                    continue;
+
+                if (supportsFirstDescFlag) {
+                    if (!firstDescIdx.has_value() && !isFirst) {
+                        // Non-first-descriptor before a first descriptor
+                        // (could be caused by incomplete packets/junk in the DMA buffer).
+                        // Ignore, free associated memory, and schedule for rebuild.
+                        discardRxDescs(descIdx, (descIdx + 1) % RX_NUM_DESCS);
+                        continue;
+                    }
+                    else if(firstDescIdx.has_value() && isFirst)
+                    {
+                        // Already seen a first descriptor, but we have another first descriptor.
+                        // Some MACs do this if they run out of Rx descs when halfway through a packet.
+                        // Delete the in-progress packet up to this point and start over from descIdx.
+                        discardRxDescs(*firstDescIdx, descIdx);
+                        firstDescIdx = descIdx;
+                    }
+                    else if(isFirst)
+                    {
+                        // Normal first descriptor.
+                        firstDescIdx = descIdx;
+                    }
                 }
-                else if(firstDescIdx.has_value() && isFirst)
-                {
-                    // Already seen a first descriptor, but we have another first descriptor.
-                    // Some MACs do this if they run out of Rx descs when halfway through a packet.
-                    // Delete the in-progress packet up to this point and start over from descIdx.
-                    discardRxDescs(*firstDescIdx, descIdx);
-                    firstDescIdx = descIdx;
-                }
-                else if(isFirst)
-                {
-                    // Normal first descriptor.
-                    firstDescIdx = descIdx;
+                else {
+                    // Without more information, assume the first desc we see is the first descriptor
+                    if(!firstDescIdx.has_value()) {
+                        firstDescIdx = descIdx;
+                    }
                 }
 
                 if(isLast) {
@@ -597,7 +626,7 @@ namespace mbed {
                 // No complete packet identified.
                 // Take the chance to rebuild any available descriptors, then return.
                 rebuildDescriptors();
-                tr_debug("No complete packets in Rx descs\n");
+                tr_info("No complete packets in Rx descs\n");
                 return nullptr;
             }
 
@@ -641,7 +670,7 @@ namespace mbed {
             }
 #endif
 
-            tr_debug("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu\n",
+            tr_info("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu\n",
                    memory_manager->get_total_len(headBuffer), memory_manager->get_ptr(headBuffer), *firstDescIdx, *lastDescIdx);
 
             return headBuffer;
