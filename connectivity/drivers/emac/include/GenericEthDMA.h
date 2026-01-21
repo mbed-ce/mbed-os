@@ -181,7 +181,7 @@ namespace mbed {
                 txReclaimIndex = (txReclaimIndex + 1) % TX_NUM_DESCS;
                 ++txDescsOwnedByApplication;
 
-                tr_debug("Reclaimed descriptor %zu", txReclaimIndex);
+                tr_debug("Reclaimed Tx descriptor %zu", txReclaimIndex);
 
                 returnedAnyDescriptors = true;
             }
@@ -493,12 +493,7 @@ namespace mbed {
                     return false;
                 }
 
-                // Check first descriptor-ness
-                if (!supportsFirstDescFlag) {
-                    // Assume this is a first descriptor
-                    seenFirstDesc = true;
-                }
-                else if(isFirstDesc(descIdx))
+                if(supportsFirstDescFlag && isFirstDesc(descIdx))
                 {
                     if(seenFirstDesc)
                     {
@@ -622,11 +617,17 @@ namespace mbed {
                 }
             }
 
-            if (!lastDescIdx.has_value()) {
+            if (!firstDescIdx.has_value() || !lastDescIdx.has_value()) {
                 // No complete packet identified.
                 // Take the chance to rebuild any available descriptors, then return.
                 rebuildDescriptors();
-                tr_info("No complete packets in Rx descs\n");
+                if(!firstDescIdx.has_value()) {
+                    tr_info("No packet at all seen in Rx descs\n");
+                }
+                else {
+                    tr_info("No last descriptor was seen for packet beginning at descriptor %zu\n", *firstDescIdx);
+                }
+
                 return nullptr;
             }
 
