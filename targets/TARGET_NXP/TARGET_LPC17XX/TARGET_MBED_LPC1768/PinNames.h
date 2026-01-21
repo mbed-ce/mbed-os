@@ -121,6 +121,9 @@ typedef enum {
 #define I2C_SCL I2C_SCL2
 #define I2C_SDA I2C_SDA2
 
+#define ETH_PHY_RESET P1_28
+#define ETH_CLOCK_ENABLE P1_27 // App must bring this pin high to enable 50MHz clock for Ethernet
+
 typedef enum {
     PullUp = 0, ///< Pull up to VDD with internal resistor of between 59kOhm and 333kOhm. This is the default mode.
     PullDown = 3, ///< Pull down to GND with internal resistor of between 33kOhm and 500kOhm.

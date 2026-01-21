@@ -17,7 +17,7 @@
 #ifndef MBED_OS_GENERICETHPHY_H
 #define MBED_OS_GENERICETHPHY_H
 
-#include "CompositeEMAC.h"
+#include "../emac/include/CompositeEMAC.h"
 #include "DigitalOut.h"
 
 #include <optional>

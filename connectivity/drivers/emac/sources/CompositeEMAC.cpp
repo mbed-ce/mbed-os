@@ -239,7 +239,7 @@ namespace mbed {
         state = PowerState::ON_NO_LINK;
 
         // Start phy task
-        phyTaskHandle = mbed_event_queue()->call_every(std::chrono::milliseconds(MBED_CONF_NSAPI_EMAC_PHY_POLL_PERIOD),
+        phyTaskHandle = mbed_event_queue()->call_every(std::chrono::milliseconds(MBED_CONF_EPHY_POLL_PERIOD),
                 callback(this, &CompositeEMAC::phyTask));
 
         // Start MAC thread.
