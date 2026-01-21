@@ -67,6 +67,11 @@ namespace mbed {
         // Enable interrupts for packet Rx, packet Tx, and fatal errors
         base->IntEnable = EMAC_Int_RX_ERR | EMAC_Int_RX_DONE | EMAC_Int_TX_ERR | EMAC_Int_TX_DONE | EMAC_Int_RX_OVERRUN | EMAC_Int_TX_UNDERRUN;
 
+        // Enable IRQ
+        NVIC_SetVector(ENET_IRQn, reinterpret_cast<uint32_t>(LPC17xxEthMAC::irqHandler));
+        NVIC_SetPriority(ENET_IRQn, ((0x01 << 3) | 0x01));
+        NVIC_EnableIRQ(ENET_IRQn);
+
         return ErrCode::SUCCESS;
     }
 
@@ -310,8 +315,8 @@ namespace mbed {
     bool LPC17xxEthMAC::RxDMA::descOwnedByDMA(const size_t descIdx) {
 
         // Read registers once (since they might change during the function call)
-        const uint32_t consumeIdx = base->TxConsumeIndex;
-        const uint32_t produceIdx = base->TxProduceIndex;
+        const uint32_t consumeIdx = base->RxConsumeIndex;
+        const uint32_t produceIdx = base->RxProduceIndex;
 
         // Case 1: produce index > consume index (no wrapping)
         if(produceIdx > consumeIdx) {
@@ -349,6 +354,7 @@ namespace mbed {
         rxDescs[descIdx].data = buffer;
         rxDescs[descIdx].size = rxPoolPayloadSize;
         rxDescs[descIdx].interrupt = true;
+        printf("base->RxConsumeIndex = %zu\n", (descIdx + 1) % RX_NUM_DESCS);
         base->RxConsumeIndex = (descIdx + 1) % RX_NUM_DESCS;
     }
 
@@ -356,7 +362,9 @@ namespace mbed {
         size_t totalSize = 0;
         for(size_t descIdx = firstDescIdx; descIdx != (lastDescIdx + 1) % RX_NUM_DESCS; descIdx = (descIdx + 1) % RX_NUM_DESCS) {
             totalSize += rxStatusDescs[descIdx].actualSize + 1; // size is minus 1 encoded
+            printf("desc %zu has packet with size %hu\n", descIdx, rxStatusDescs[descIdx].actualSize + 1);
         }
+        totalSize -= 4; // Packet size returned by the MAC includes the CRC
         return totalSize;
     }
 
@@ -377,7 +385,7 @@ namespace mbed {
         if(emacInst->base->IntStatus & (EMAC_Int_RX_DONE | EMAC_Int_RX_ERR))
         {
             // Clear Rx interrupts
-            emacInst->base->IntStatus = EMAC_Int_RX_DONE | EMAC_Int_RX_ERR;
+            emacInst->base->IntClear = EMAC_Int_RX_DONE | EMAC_Int_RX_ERR;
 
             emacInst->rxISR();
         }
@@ -386,7 +394,7 @@ namespace mbed {
         if(emacInst->base->IntStatus & (EMAC_Int_TX_DONE | EMAC_Int_TX_ERR))
         {
             // Clear Tx interrupts
-            emacInst->base->IntStatus = EMAC_Int_TX_DONE | EMAC_Int_TX_ERR;
+            emacInst->base->IntClear = EMAC_Int_TX_DONE | EMAC_Int_TX_ERR;
 
             emacInst->txISR();
         }
