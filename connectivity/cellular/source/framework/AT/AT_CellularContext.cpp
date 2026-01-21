@@ -109,6 +109,19 @@ nsapi_error_t AT_CellularContext::connect()
     }
     call_network_cb(NSAPI_STATUS_CONNECTING);
 
+    set_device_ready();
+
+    _at.lock();
+    bool valid_context = get_context();
+    _at.unlock();
+    if(!valid_context) {
+        set_new_context(_cid);
+    }
+
+    do_user_authentication();
+
+    enable_access_technology();
+
     nsapi_error_t err = _device->attach_to_network();
     _cb_data.error = check_operation(err, OP_CONNECT);
     _retry_count = 0;
@@ -276,6 +289,11 @@ void AT_CellularContext::set_credentials(const char *apn, const char *uname, con
     _apn = apn;
     _uname = uname;
     _pwd = pwd;
+}
+
+void AT_CellularContext::set_access_technology(RadioAccessTechnologyType rat)
+{
+    _rat = rat;
 }
 
 // PDP Context handling

@@ -100,16 +100,108 @@ void GEMALTO_CINTERION_CellularStack::urc_sisr()
     sisr_urc_handler(sock_id, urc_code);
 }
 
+void GEMALTO_CINTERION_CellularStack::urc_sysstart()
+{
+    // close sockets if open
+    _at.lock();
+    for (int i = 0; i < _device.get_property(AT_CellularDevice::PROPERTY_SOCKET_COUNT); i++) {
+        _at.clear_error();
+        socket_close_impl(i);
+    }
+    _at.clear_error();
+    _at.unlock();
+}
+
 void GEMALTO_CINTERION_CellularStack::sisr_urc_handler(int sock_id, int urc_code)
 {
     CellularSocket *sock = find_socket(sock_id);
     if (sock) {
-        if (urc_code == 1) { // data available
+        if (urc_code > 0) { // data available
             if (sock->_cb) {
-                sock->pending_bytes = 1;
+                sock->pending_bytes = urc_code;
                 sock->_cb(sock->_data);
             }
         }
+    }
+}
+
+void GEMALTO_CINTERION_CellularStack::urc_gnss() {
+    char gnss_string[100] = {'$', 'G'};
+    if (_gnss_cb) {
+        _at.set_delimiter('\n');
+        _at.read_string(&gnss_string[2], 98);
+        _at.set_default_delimiter();
+        _gnss_cb(gnss_string);
+    }
+}
+
+void GEMALTO_CINTERION_CellularStack::beginGNSS(mbed::Callback<void(char*)> gnss_cb) {
+    _at.lock();
+    _gnss_cb = gnss_cb;
+    _at.at_cmd_discard("^SGPSC", "=", "%s%d", "Engine/StartMode", 0);
+    _at.at_cmd_discard("^SGPSC", "=", "%s%d", "Engine", 0);
+    _at.at_cmd_discard("^SGPSC", "=", "%s%s", "Nmea/Urc", "off");
+
+    // Set up LNA_ENABLE GPIO
+    _at.at_cmd_discard("^SPIO", "=", "%d", 1);
+    _at.at_cmd_discard("^SCPIN", "=", "%d%d%d%d", 1, 7, 1, 0);
+    _at.clear_error();
+    _at.unlock();
+}
+
+void GEMALTO_CINTERION_CellularStack::endGNSS() {
+    _at.lock();
+    _at.at_cmd_discard("^SSIO", "=", "%d%d", 7, 0);
+    _gnss_cb = nullptr;
+    _at.clear_error();
+    _at.unlock();
+}
+
+void GEMALTO_CINTERION_CellularStack::enableCmux()
+{
+    _at.at_cmd_discard("+CMUX", "=0");
+}
+
+int GEMALTO_CINTERION_CellularStack::startGNSS() {
+    _at.lock();
+    _engine = false;
+    _at.at_cmd_discard("^SSIO", "=", "%d%d", 7, 1);
+    _at.cmd_start_stop("^SGPSC", "=", "%s%d", "Engine", 3);
+    _at.resp_start("^SGPSC: \"Engine\",");
+
+    char respEng[2];
+    int resp_len = _at.read_string(respEng, sizeof(respEng));
+    if (strcmp(respEng, "3") != 0) {
+        _engine = false;
+        _at.at_cmd_discard("^SGPSC", "=", "%s%d", "Engine", 0);
+        _at.at_cmd_discard("^SGPSC", "=", "%s%s", "Nmea/Urc", "off");
+        return 0;
+    }
+    _engine = true;
+    _at.at_cmd_discard("^SGPSC", "=", "%s%s", "Nmea/Urc", "on");
+    _at.clear_error();
+    _at.unlock();
+
+    return 1;
+}
+
+void GEMALTO_CINTERION_CellularStack::stopGNSS() {
+    if(_engine) {
+        _at.lock();
+        _at.at_cmd_discard("^SGPSC", "=", "%s%s", "Nmea/Urc", "off");
+        _at.at_cmd_discard("^SGPSC", "=", "%s%d", "Engine", 0);
+        _at.clear_error();
+        _at.unlock();
+        _engine = false;
+    }
+}
+
+void GEMALTO_CINTERION_CellularStack::setGNSS_PSM(bool const enable) {
+    if(_engine) {
+        _at.lock();
+        _at.at_cmd_discard("^SGPSC", "=", "%s%d", "Power/Psm", enable);
+        _at.clear_error();
+        _at.unlock();
     }
 }
 
@@ -121,6 +213,9 @@ nsapi_error_t GEMALTO_CINTERION_CellularStack::socket_stack_init()
         _at.set_urc_handler("^SIS:", mbed::Callback<void()>(this, &GEMALTO_CINTERION_CellularStack::urc_sis));
         _at.set_urc_handler("^SISW:", mbed::Callback<void()>(this, &GEMALTO_CINTERION_CellularStack::urc_sisw));
         _at.set_urc_handler("^SISR:", mbed::Callback<void()>(this, &GEMALTO_CINTERION_CellularStack::urc_sisr));
+        _at.set_urc_handler("^SYSSTART", mbed::Callback<void()>(this, &GEMALTO_CINTERION_CellularStack::urc_sysstart));
+        _at.set_urc_handler("^SGPSE", mbed::Callback<void()>(this, &GEMALTO_CINTERION_CellularStack::urc_gnss));
+        _at.set_urc_handler("$G", mbed::Callback<void()>(this, &GEMALTO_CINTERION_CellularStack::urc_gnss));
     } else { // recovery cleanup
         // close all Internet and connection profiles
         for (int i = 0; i < _device.get_property(AT_CellularDevice::PROPERTY_SOCKET_COUNT); i++) {
@@ -151,6 +246,46 @@ nsapi_error_t GEMALTO_CINTERION_CellularStack::socket_close_impl(int sock_id)
     return _at.get_last_error();
 }
 
+#ifdef MBED_CONF_CELLULAR_OFFLOAD_DNS_QUERIES
+nsapi_error_t GEMALTO_CINTERION_CellularStack::gethostbyname(const char *host, SocketAddress *address,
+                                                        nsapi_version_t version, const char *interface_name)
+{
+    (void) interface_name;
+    MBED_ASSERT(host);
+    MBED_ASSERT(address);
+
+    _at.lock();
+
+    if (_dns_callback) {
+        _at.unlock();
+        return NSAPI_ERROR_BUSY;
+    }
+
+    if (!address->set_ip_address(host)) {
+        //_at.set_at_timeout(1min);
+        _at.cmd_start_stop("^SISX" , "=" , "%s%d%s", "HostByName" , _cid, host);
+        _at.resp_start("^SISX: \"HostByName\",");
+        char ipAddress[NSAPI_IP_SIZE];
+        int size = _at.read_string(ipAddress, sizeof(ipAddress));
+        if (size > 0) {
+            //Valid string received
+            tr_info("Read %d bytes. Valid string: %s\n", size, ipAddress);
+            _at.restore_at_timeout();
+            if (!address->set_ip_address(ipAddress)) {
+                _at.unlock();
+                return NSAPI_ERROR_DNS_FAILURE;
+            }
+        } else {
+            //Null string received
+            tr_info("Read %d bytes. Null string\n", size);
+            return NSAPI_ERROR_NO_ADDRESS;
+        }
+    }
+
+    return _at.unlock_return_error();
+}
+#endif
+
 nsapi_error_t GEMALTO_CINTERION_CellularStack::socket_open_defer(CellularSocket *socket, const SocketAddress *address)
 {
     int retry_open = 1;
@@ -159,6 +294,7 @@ retry_open:
     int internet_service_id = find_socket_index(socket);
     bool foundSrvType = false;
     bool foundConIdType = false;
+
     _at.cmd_start_stop("^SISS", "?");
     _at.resp_start("^SISS:");
     /*
@@ -393,6 +529,7 @@ nsapi_size_or_error_t GEMALTO_CINTERION_CellularStack::socket_recvfrom_impl(Cell
         size = UDP_PACKET_SIZE;
     }
 
+    tr_info("requesting %d bytes\n", size);
     _at.cmd_start_stop("^SISR", "=", "%d%d", socket->id, size);
 
 sisr_retry:
@@ -421,26 +558,63 @@ sisr_retry:
         return NSAPI_ERROR_WOULD_BLOCK;
     }
     if (len == -1) {
+        if (GEMALTO_CINTERION::get_module() == GEMALTO_CINTERION::ModuleTX62 && _at.get_last_read_error() == -2) {
+            _at.process_oob();
+            tr_error("Socket %d recvfrom finished!", socket->id);
+            socket->pending_bytes = 0;
+            return NSAPI_ERROR_OK;
+        }
         tr_error("Socket %d recvfrom failed!", socket->id);
         return NSAPI_ERROR_DEVICE_ERROR;
     }
-    socket->pending_bytes = 0;
     if (len >= (nsapi_size_or_error_t)size) {
         len = (nsapi_size_or_error_t)size;
-        int remain_len = _at.read_int();
-        if (remain_len > 0) {
-            socket->pending_bytes = 1;
-        }
     }
 
     // UDP Udp_RemClient
     if (socket->proto == NSAPI_UDP && GEMALTO_CINTERION::get_module() != GEMALTO_CINTERION::ModuleBGS2) {
-        char ip_address[NSAPI_IPv6_SIZE + sizeof("[]:12345") - 1 + 1];
-        int ip_len = _at.read_string(ip_address, sizeof(ip_address));
-        if (ip_len <= 0) {
-            tr_error("Socket %d recvfrom addr (len %d)", socket->id, ip_len);
-            return NSAPI_ERROR_DEVICE_ERROR;
-        }
+        size_t ip_address_len = NSAPI_IPv6_SIZE + sizeof("[]:12345") - 1 + 1;
+        char ip_address[ip_address_len];
+
+        if (GEMALTO_CINTERION::get_module() == GEMALTO_CINTERION::ModuleTX62) {
+            // Local buffer for parsing Udp_RemClient for TX62
+            uint8_t at_buf[ip_address_len];
+            size_t ip_len = 0;
+
+            // Skip <remainUdpPacketLength>
+            nsapi_size_or_error_t rem_len = _at.read_int();
+
+            // Wait for full <Udp_RemClient> in the _at buffer
+            do {
+                int len = _at.read_bytes(at_buf + ip_len, 1);
+                if (len <= 0) {
+                    tr_error("Socket %d recvfrom addr (len %d)", socket->id, ip_len);
+                    return NSAPI_ERROR_DEVICE_ERROR;
+                }
+                ip_len += len;
+            } while (ip_len < ip_address_len && at_buf[ip_len - 2] != '\r' && at_buf[ip_len - 1] != '\n');
+
+            // if (ip_len < sizeof("0.0.0.0:0")) {
+            if (ip_len < sizeof("[]:0")) {
+                tr_error("Socket %d has no address", socket->id);
+                goto sisr_retry;
+            }
+
+            // at_buf contains remote client IP information
+            // in the format "<ip address>:<port>"\r\n.
+
+            // Terminate the C string at the closing quotation mark
+            at_buf[ip_len - 3] = '\0';
+            // Skip the opening quotation mark
+            memcpy(ip_address, at_buf + 1, ip_len - 4);
+            tr_info("ip_address %s (%d)", ip_address, ip_len - 4);
+        } else {
+            int ip_len = _at.read_string(ip_address, sizeof(ip_address));
+            if (ip_len <= 0) {
+                tr_error("Socket %d recvfrom addr (len %d)", socket->id, ip_len);
+                return NSAPI_ERROR_DEVICE_ERROR;
+            }
+         }
         if (address) {
             char *ip_start = ip_address;
             char *ip_stop;
@@ -472,6 +646,10 @@ sisr_retry:
     }
 
     nsapi_size_or_error_t recv_len = _at.read_bytes((uint8_t *)buffer, len);
+
+    if (recv_len < len) {
+        goto sisr_retry;
+    }
 
     _at.resp_stop();
 

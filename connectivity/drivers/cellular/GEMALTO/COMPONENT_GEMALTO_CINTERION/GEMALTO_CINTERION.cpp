@@ -17,6 +17,7 @@
 
 #include "GEMALTO_CINTERION_CellularContext.h"
 #include "GEMALTO_CINTERION_CellularInformation.h"
+#include "GEMALTO_CINTERION_CellularNetwork.h"
 #include "GEMALTO_CINTERION.h"
 #include "AT_CellularNetwork.h"
 #include "CellularLog.h"
@@ -30,6 +31,79 @@ GEMALTO_CINTERION::GEMALTO_CINTERION(FileHandle *fh) : AT_CellularDevice(fh)
 {
 }
 
+time_t GEMALTO_CINTERION::get_time()
+{
+    tr_info("GEMALTO_CINTERION::get_time\n");
+
+    _at.lock();
+
+    //"+CCLK: \"%y/%m/%d,%H:%M:%S+ZZ"
+    _at.cmd_start_stop("+CCLK", "?");
+    _at.resp_start("+CCLK:");
+
+    char time_str[50];
+    time_t now = 0;
+    while (_at.info_resp()) {
+        int date_len = _at.read_string(time_str, sizeof(time_str));
+        tr_debug("Read %d bytes for the date\n", date_len);
+        if (date_len > 0) {
+            now = parse_time(time_str);
+        }
+    }
+    _at.resp_stop();
+
+    _at.unlock();
+
+    // adjust for timezone offset which is +/- in 15 minute increments
+    time_t delta = ((time_str[18] - '0') * 10 + (time_str[19] - '0')) * (15 * 60);
+
+    if (time_str[17] == '-') {
+        now = now + delta;
+    } else if (time_str[17] == '+') {
+        now = now - delta;
+    }
+
+    return now;
+}
+
+time_t GEMALTO_CINTERION::get_local_time()
+{
+    tr_info("GEMALTO_CINTERION::get_local_time\n");
+
+    _at.lock();
+
+    //"+CCLK: \"%y/%m/%d,%H:%M:%S"
+    _at.cmd_start_stop("+CCLK", "?");
+    _at.resp_start("+CCLK:");
+
+    char time_str[50];
+    time_t now;
+    while (_at.info_resp()) {
+        int date_len = _at.read_string(time_str, sizeof(time_str));
+        tr_debug("Read %d bytes for the date\n", date_len);
+        if (date_len > 0) {
+            now = parse_time(time_str);
+        }
+    }
+    _at.resp_stop();
+
+    _at.unlock();
+
+    return now;
+}
+
+void GEMALTO_CINTERION::set_time(time_t const epoch, int const timezone)
+{
+    char time_buf[21];
+    strftime(time_buf, sizeof(time_buf), "%g/%m/%d,%H:%M:%S", gmtime(&epoch));
+    snprintf(time_buf + 17, 4, "%+03d", timezone);
+
+    _at.lock();
+    _at.at_cmd_discard("+CCLK", "=", "%s", time_buf);
+    _at.unlock();
+}
+
+
 AT_CellularContext *GEMALTO_CINTERION::create_context_impl(ATHandler &at, const char *apn, bool cp_req, bool nonip_req)
 {
     return new GEMALTO_CINTERION_CellularContext(at, this, apn, cp_req, nonip_req);
@@ -41,6 +115,11 @@ AT_CellularInformation *GEMALTO_CINTERION::open_information_impl(ATHandler &at)
         return new GEMALTO_CINTERION_CellularInformation(at, *this);
     }
     return AT_CellularDevice::open_information_impl(at);
+}
+
+AT_CellularNetwork *GEMALTO_CINTERION::open_network_impl(ATHandler &at)
+{
+    return new GEMALTO_CINTERION_CellularNetwork(at, *this, _module);
 }
 
 nsapi_error_t GEMALTO_CINTERION::init()
@@ -70,6 +149,8 @@ nsapi_error_t GEMALTO_CINTERION::init()
         init_module_ems31();
     } else if (memcmp(model, "EHS5-E", sizeof("EHS5-E") - 1) == 0) {
         init_module_ehs5e();
+    } else if (memcmp(model, "TX62", sizeof("TX62") - 1) == 0) {
+        init_module_tx62();
     } else {
         tr_error("Cinterion model unsupported %s", model);
         return NSAPI_ERROR_UNSUPPORTED;
@@ -200,6 +281,58 @@ void GEMALTO_CINTERION::init_module_ehs5e()
     };
     set_cellular_properties(cellular_properties);
     _module = ModuleEHS5E;
+}
+
+void GEMALTO_CINTERION::init_module_tx62()
+{
+    // TX-62
+    static const intptr_t cellular_properties[AT_CellularDevice::PROPERTY_MAX] = {
+        AT_CellularNetwork::RegistrationModeLAC,// C_EREG
+        AT_CellularNetwork::RegistrationModeDisable,    // C_GREG
+        AT_CellularNetwork::RegistrationModeDisable,    // C_REG
+        0,  // AT_CGSN_WITH_TYPE
+        0,  // AT_CGDATA
+        1,  // AT_CGAUTH
+        1,  // AT_CNMI
+        1,  // AT_CSMP
+        1,  // AT_CMGF
+        1,  // AT_CSDH
+        1,  // PROPERTY_IPV4_STACK
+        0,  // PROPERTY_IPV6_STACK
+        0,  // PROPERTY_IPV4V6_STACK
+        0,  // PROPERTY_NON_IP_PDP_TYPE
+        1,  // PROPERTY_AT_CGEREP
+        1,  // PROPERTY_AT_COPS_FALLBACK_AUTO
+        7,  // PROPERTY_SOCKET_COUNT
+        1,  // PROPERTY_IP_TCP
+        1,  // PROPERTY_IP_UDP
+        0,  // PROPERTY_AT_SEND_DELAY
+    };
+    set_cellular_properties(cellular_properties);
+    _module = ModuleTX62;
+
+    // Enable network time zone updates
+    _at.at_cmd_discard("+CTZU", "=", "%d", 1);
+}
+
+time_t GEMALTO_CINTERION::parse_time(char const *time_str) {
+    struct tm now;
+
+    now.tm_year = std::strtol(time_str, NULL, 10) + 100; // mktime starts from 1900
+    time_str += 3; // Skip '/'
+    now.tm_mon = std::strtol(time_str, NULL, 10);
+    time_str += 3; // Skip '/'
+    now.tm_mday = std::strtol(time_str, NULL, 10);
+    time_str += 3; // Skip ','
+    now.tm_hour = std::strtol(time_str, NULL, 10);
+    time_str += 3; // Skip ':'
+    now.tm_min = std::strtol(time_str, NULL, 10);
+    time_str += 3;
+    now.tm_sec = std::strtol(time_str, NULL, 10);
+
+    tr_debug("Year: %d, month: %d, day:%d, hour:%d, minute:%d, second:%d\n", now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec);
+
+    return mktime(&now);
 }
 
 #if MBED_CONF_GEMALTO_CINTERION_PROVIDE_DEFAULT

@@ -363,6 +363,12 @@ public:
      */
     void write_hex_string(const char *str, size_t size, bool quote_string = true);
 
+    /** Get the error detected during read_int()
+     *
+     *  @return the latest negative integer error got from read_int().
+     */
+    int32_t get_last_read_error() const;
+
     /** Reads as string and converts result to integer. Supports only non-negative integers.
      *
      *  @return the non-negative integer or -1 in case of error.
@@ -599,6 +605,7 @@ private: //Member variables
     nsapi_error_t _last_err;
     int _last_3gpp_error;
     device_err_t  _last_at_err;
+    int32_t _last_read_error{};
     uint16_t _oob_string_max_length;
     char *_output_delimiter;
 

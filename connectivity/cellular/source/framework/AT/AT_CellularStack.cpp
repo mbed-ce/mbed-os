@@ -332,7 +332,7 @@ nsapi_size_or_error_t AT_CellularStack::socket_recvfrom(nsapi_socket_t handle, S
 
     if (socket->closed) {
         tr_info("recvfrom socket %d closed", socket->id);
-        return 0;
+        return NSAPI_ERROR_NO_CONNECTION;
     }
 
     nsapi_size_or_error_t ret_val = NSAPI_ERROR_OK;

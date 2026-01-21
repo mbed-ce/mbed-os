@@ -130,6 +130,8 @@ public:
 
     virtual nsapi_error_t set_baud_rate(int baud_rate);
 
+    nsapi_error_t enable_cmux() override;
+
 #if MBED_CONF_CELLULAR_USE_SMS
     virtual CellularSMS *open_sms();
 

@@ -44,15 +44,38 @@ public:
         ModuleBGS2,
         ModuleEMS31,
         ModuleEHS5E,
+        ModuleTX62,
     };
     static Module get_module();
+
+    /**
+     * @brief Get the RTC time from the Cinterion, as a UNIX seconds timestamp in UTC
+     */
+    time_t get_time();
+
+    /**
+     * @brief Get the RTC time from the Cinterion, as a UNIX seconds timestamp in the local time zone
+     */
+    time_t get_local_time();
+
+    /**
+     * @brief Set the RTC time on the Cinterion.
+     *
+     * Note that any time set will be overwritten once the modem can get time from a cellular network
+     *
+     * @param timestamp UNIX timestamp to set, in the local time zone
+     * @param timezone Local time zone, as a signed number of 15-minute increments from UTC time. Example:
+     *       passing -8 would indicate UTC-2.
+     */
+    virtual void set_time(time_t timestamp, int const timezone = 0);
 
 protected: // AT_CellularDevice
     virtual AT_CellularContext *create_context_impl(ATHandler &at, const char *apn, bool cp_req = false, bool nonip_req = false);
     virtual AT_CellularInformation *open_information_impl(ATHandler &at);
+    AT_CellularNetwork *open_network_impl(ATHandler &at) override;
 
-protected:
-    virtual nsapi_error_t init();
+public:
+    nsapi_error_t init() override;
 
 private:
     static Module _module;
@@ -60,6 +83,10 @@ private:
     void init_module_els61();
     void init_module_ems31();
     void init_module_ehs5e();
+    void init_module_tx62();
+
+    /// Convert time & date string returned by the modem into time_t
+    time_t parse_time(char const * time_str);
 };
 
 } // namespace mbed
