@@ -181,6 +181,7 @@ def from_mbed_lib_json_file(
                     help_text=item.help,
                     value=item.value,
                     accepted_values=set(item.accepted_values) if item.accepted_values is not None else None,
+                    required=item.required,
                     value_max=item.value_max,
                     value_min=item.value_min,
                 )
@@ -192,6 +193,7 @@ def from_mbed_lib_json_file(
                     help_text=None,
                     value=item,
                     accepted_values=None,
+                    required=None,
                     value_max=None,
                     value_min=None,
                 )
@@ -233,6 +235,7 @@ class ConfigSetting:
     help_text: Optional[str] = None
     macro_name: Optional[str] = None
     accepted_values: set[schemas.ConfigSettingValue] | None = None
+    required: bool | None = None
     value_max: int | float | None = None
     value_min: int | float | None = None
 
@@ -266,6 +269,11 @@ class ConfigSetting:
                 logger.warning(
                     f"Value set for {self.namespace}.{self.name} ({self.value}) does not appear to be valid. Cannot be less than {self.value_min}"
                 )
+
+    def check_value_required(self) -> None:
+        """Issue a warning if the value is required but doesn't appear."""
+        if self.required and self.value is None:
+            logger.warning(f"Configuration setting {self.namespace}.{self.name} is required but not set")
 
 
 @dataclass

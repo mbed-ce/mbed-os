@@ -110,6 +110,11 @@ def _assemble_config_from_sources(
         )
         config.update(app_data)
 
+    # Check configuration option which must be set
+    config_settings = config.get("config", [])
+    for setting in config_settings:
+        setting.check_value_required()
+
     return config, filtered_files
 
 
