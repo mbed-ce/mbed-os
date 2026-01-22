@@ -122,7 +122,7 @@ class LPC17xxEthMAC : public CompositeEMAC
 
     public:
         explicit RxDMA(LPC_EMAC_TypeDef * const base):
-        GenericRxDMARing(false),
+        GenericRxDMARing(false, true),
         base(base)
         {}
     };

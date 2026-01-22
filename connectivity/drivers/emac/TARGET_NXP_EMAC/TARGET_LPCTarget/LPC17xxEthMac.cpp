@@ -257,8 +257,8 @@ namespace mbed {
         const uint32_t consumeIdx = base->TxConsumeIndex;
         const uint32_t produceIdx = base->TxProduceIndex;
 
-        // Case 1: produce index > consume index (no wrapping)
-        if(produceIdx > consumeIdx) {
+        // Case 1: produce index >= consume index (no wrapping)
+        if(produceIdx >= consumeIdx) {
             // Examples:
             // If TxConsumeIndex = 3 and TxProduceIndex = 5, descIdxes 3 and 4 are owned by DMA
             const bool ownedByDMA = descIdx >= consumeIdx && descIdx < produceIdx;
@@ -283,7 +283,7 @@ namespace mbed {
         bool lastDesc) {
         // Fill in descriptor
         txDescs[descIdx].data = buffer;
-        txDescs[descIdx].size = len;
+        txDescs[descIdx].size = len - 1; // minus 1 encoded
         txDescs[descIdx].interrupt = true;
         txDescs[descIdx].lastDescriptor = lastDesc;
 
@@ -297,8 +297,10 @@ namespace mbed {
         base->RxStatus = reinterpret_cast<uint32_t>(rxStatusDescs);
         base->RxDescriptorNumber = RX_NUM_DESCS - 1; // minus 1 encoded!
 
-        // We're going to consume index 0 next
-        base->RxConsumeIndex = 0;
+        // Things are a little easier if we build the initial set of descriptors before starting DMA.
+        // That way, the receive buffer can be full and the RxConsumeIndex will start at 0 to match
+        // RxProduceIndex.
+        rebuildDescriptors();
 
         // Enable Rx DMA
         base->Command |= EMAC_Command_RX_EN;
@@ -318,8 +320,8 @@ namespace mbed {
         const uint32_t consumeIdx = base->RxConsumeIndex;
         const uint32_t produceIdx = base->RxProduceIndex;
 
-        // Case 1: produce index > consume index (no wrapping)
-        if(produceIdx > consumeIdx) {
+        // Case 1: produce index >= consume index (no wrapping)
+        if(produceIdx >= consumeIdx) {
             // Examples:
             // If RxConsumeIndex = 3 and RxProduceIndex = 5, descIdxes 3 and 4 are owned by us
             const bool ownedByMCU = descIdx >= consumeIdx && descIdx < produceIdx;
@@ -347,14 +349,16 @@ namespace mbed {
             rxStatusDescs[descIdx].hadSymbolError ||
             rxStatusDescs[descIdx].alignmentError ||
             rxStatusDescs[descIdx].rxOverrun ||
-            rxStatusDescs[descIdx].noDescriptorError;
+            rxStatusDescs[descIdx].noDescriptorError ||
+            // TODO why does the MAC sometimes give us valid-looking descriptors with 0 length??
+            rxStatusDescs[descIdx].actualSize == 0;
     }
 
     void LPC17xxEthMAC::RxDMA::returnDescriptor(const size_t descIdx, uint8_t * const buffer) {
         rxDescs[descIdx].data = buffer;
-        rxDescs[descIdx].size = rxPoolPayloadSize;
+        rxDescs[descIdx].size = rxPoolPayloadSize - 1; // minus 1 encoded
         rxDescs[descIdx].interrupt = true;
-        printf("base->RxConsumeIndex = %zu\n", (descIdx + 1) % RX_NUM_DESCS);
+        //printf("base->RxConsumeIndex = %zu\n", (descIdx + 1) % RX_NUM_DESCS);
         base->RxConsumeIndex = (descIdx + 1) % RX_NUM_DESCS;
     }
 
@@ -362,7 +366,7 @@ namespace mbed {
         size_t totalSize = 0;
         for(size_t descIdx = firstDescIdx; descIdx != (lastDescIdx + 1) % RX_NUM_DESCS; descIdx = (descIdx + 1) % RX_NUM_DESCS) {
             totalSize += rxStatusDescs[descIdx].actualSize + 1; // size is minus 1 encoded
-            printf("desc %zu has packet with size %hu\n", descIdx, rxStatusDescs[descIdx].actualSize + 1);
+            //printf("desc %zu has packet with size %hu\n", descIdx, rxStatusDescs[descIdx].actualSize + 1);
         }
         totalSize -= 4; // Packet size returned by the MAC includes the CRC
         return totalSize;

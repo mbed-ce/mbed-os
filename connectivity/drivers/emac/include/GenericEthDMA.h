@@ -348,6 +348,10 @@ namespace mbed {
         /// return false. This reduces our ability to detect bad data in the DMA buffer.
         const bool supportsFirstDescFlag;
 
+        /// Whether it is possible to return all Ethernet Rx descriptors to the MAC at the same time.
+        /// Some DMA arrangements do not support this.
+        const bool canReturnAllDescriptors;
+
         /// Pointer to the network stack buffer associated with the corresponding Rx descriptor.
         net_stack_mem_buf_t * rxDescStackBufs[RX_NUM_DESCS];
 
@@ -362,8 +366,9 @@ namespace mbed {
         size_t rxPoolPayloadSize;
 
         /// Constructor. Subclass must allocate descriptor array of size RX_NUM_DESCS
-        GenericRxDMARing(bool supportsFirstDescFlag = true):
-        supportsFirstDescFlag(supportsFirstDescFlag)
+        GenericRxDMARing(bool supportsFirstDescFlag = true, bool canReturnAllDescriptors = false):
+        supportsFirstDescFlag(supportsFirstDescFlag),
+        canReturnAllDescriptors(canReturnAllDescriptors)
         {}
 
         /// Configure DMA registers to point to the DMA ring,
@@ -444,7 +449,7 @@ namespace mbed {
 
             // Note: With some Ethernet peripherals, you can never give back every single descriptor to
             // the hardware, because then it thinks there are 0 descriptors left.
-            while (rxDescsOwnedByApplication > 1) {
+            while (rxDescsOwnedByApplication > (canReturnAllDescriptors ? 0 : 1)) {
                 // Allocate new buffer
                 auto *const buffer = memory_manager->alloc_pool(rxPoolPayloadSize, RX_BUFFER_ALIGN);
                 if (buffer == nullptr) {
@@ -547,6 +552,8 @@ namespace mbed {
             // we can process.
             const size_t maxDescsToProcess = RX_NUM_DESCS - rxDescsOwnedByApplication;
 
+            //tr_debug("RxProduceIdx = %lu\n", LPC_EMAC->RxProduceIndex);
+
             const size_t startIdx = rxNextIndex;
 
             for (size_t descCount = 0; descCount < maxDescsToProcess && !lastDescIdx.has_value(); descCount++) {
@@ -571,12 +578,14 @@ namespace mbed {
                         // (could be caused by incomplete packets/junk in the DMA buffer).
                         // Ignore, free associated memory, and schedule for rebuild.
                         discardRxDescs(descIdx, (descIdx + 1) % RX_NUM_DESCS);
+                        tr_info("Rx descriptor %zu has error, discarding...\n", descIdx);
                         continue;
                     }
                     else {
                         // Already seen a first descriptor, but we have an error descriptor.
                         // So, delete the in-progress packet up to this point.
                         discardRxDescs(*firstDescIdx, (descIdx + 1) % RX_NUM_DESCS);
+                        tr_info("Rx descriptor %zu has error, discarding packet starting at index %zu...\n", descIdx, *firstDescIdx);
                         firstDescIdx.reset();
                         continue;
                     }
