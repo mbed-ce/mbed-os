@@ -20,11 +20,27 @@
 #include "LPC17xxEthMacRegisters.h"
 #include "MbedCRC.h"
 #include "mbed_error.h"
+#include "mbed_wait_api.h"
 
 namespace mbed {
     LPC17xxEthMAC * LPC17xxEthMAC::instance;
 
     constexpr uint32_t CLKPWR_PCONP_PCENET = 1<<30;
+
+    // Note: The reference manual *says* these can be in any RAM bank, but I was running into a lot of weird issues
+    // where the DMA would just seem to get stuck and stop transmitting/receiving. Moving all the descriptors
+    // into AHBSRAM (like the original Mbed driver) fixed this issue. I suspect the issue is that if the Ethernet
+    // peripheral is blocked from accessing its descriptors in a timely manner by the CPU constantly using the main
+    // SRAM bank, bad stuff happens. See also blockUntilRxStatusValid() below. However, this isn't a perfect fix
+    // as there is no guarantee that the application won't also be using AHBSRAM...
+
+    // Tx and Rx status descriptors (MAC to application).
+    __attribute__((section("AHBSRAM"))) volatile LPC17xxEthTxStatusDescriptor txStatusDescs[GenericTxDMARing::TX_NUM_DESCS]{};
+    __attribute__((section("AHBSRAM"))) volatile LPC17xxEthRxStatusDescriptor rxStatusDescs[GenericRxDMARing::RX_NUM_DESCS]{};
+
+    // Tx and Rx descriptors (Application to MAC)
+    __attribute__((section("AHBSRAM"))) volatile LPC17xxEthTxDescriptor txDescs[GenericTxDMARing::TX_NUM_DESCS]{};
+    __attribute__((section("AHBSRAM"))) volatile LPC17xxEthRxDescriptor rxDescs[GenericRxDMARing::RX_NUM_DESCS]{};
 
     CompositeEMAC::ErrCode LPC17xxEthMAC::MACDriver::init() {
         /* Enable MII clocking */
@@ -340,24 +356,42 @@ namespace mbed {
         return false; // Not supported
     }
 
+    static void blockUntilRxStatusValid(const size_t descIdx) {
+        // I was running into weird issues where the MAC would never write back the status descriptor,
+        // leaving the packet size as 0 even after marking a packet as received. However, it WOULD work under the
+        // debugger or if I added printfs at certain places.
+        // I suspect that what was going on was that the CPU was continually accessing the main SRAM each cycle,
+        // preventing the ethernet DMA from writing to it. To fix this, we move the Rx status to AHBSRAM,
+        // but also we wait here until a valid size appears in the Rx status descriptor.
+        // The Rx size can never legally be 0 since we do not have runt frames enabled in the MAC config,
+        // unless the packet had an error in which case the error flag will be set.
+        while(rxStatusDescs[descIdx].actualSize == 0 && !rxStatusDescs[descIdx].anyError) {
+            wait_ns(1000); // cycle based delay which hopefully doesn't use RAM for some cycles
+        }
+    }
+
     bool LPC17xxEthMAC::RxDMA::isLastDesc(const size_t descIdx) {
+        blockUntilRxStatusValid(descIdx);
         return rxStatusDescs[descIdx].lastDescriptor;
     }
 
     bool LPC17xxEthMAC::RxDMA::isErrorDesc(const size_t descIdx) {
+        blockUntilRxStatusValid(descIdx);
         return rxStatusDescs[descIdx].hadCRCError ||
             rxStatusDescs[descIdx].hadSymbolError ||
             rxStatusDescs[descIdx].alignmentError ||
             rxStatusDescs[descIdx].rxOverrun ||
-            rxStatusDescs[descIdx].noDescriptorError ||
-            // TODO why does the MAC sometimes give us valid-looking descriptors with 0 length??
-            rxStatusDescs[descIdx].actualSize == 0;
+            rxStatusDescs[descIdx].noDescriptorError;
     }
 
     void LPC17xxEthMAC::RxDMA::returnDescriptor(const size_t descIdx, uint8_t * const buffer) {
+        // Reset status descriptor to 0 for blockUntilRxStatusValid()
+        memset(const_cast<void*>(reinterpret_cast<volatile void*>(&rxStatusDescs[descIdx])), 0, sizeof(LPC17xxEthRxStatusDescriptor));
+
         rxDescs[descIdx].data = buffer;
         rxDescs[descIdx].size = rxPoolPayloadSize - 1; // minus 1 encoded
         rxDescs[descIdx].interrupt = true;
+
         //printf("base->RxConsumeIndex = %zu\n", (descIdx + 1) % RX_NUM_DESCS);
         base->RxConsumeIndex = (descIdx + 1) % RX_NUM_DESCS;
     }

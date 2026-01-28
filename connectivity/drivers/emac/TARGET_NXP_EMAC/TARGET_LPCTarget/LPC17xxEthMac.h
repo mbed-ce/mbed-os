@@ -72,12 +72,6 @@ class LPC17xxEthMAC : public CompositeEMAC
     protected:
         LPC_EMAC_TypeDef * const base; // Base address of Ethernet peripheral
 
-        // Tx descriptors (Application to MAC)
-        volatile LPC17xxEthTxDescriptor txDescs[TX_NUM_DESCS]{};
-
-        // Gx status descriptors (MAC to application)
-        volatile LPC17xxEthTxStatusDescriptor txStatusDescs[TX_NUM_DESCS]{};
-
         void startDMA() override;
 
         void stopDMA() override;
@@ -97,12 +91,6 @@ class LPC17xxEthMAC : public CompositeEMAC
     class RxDMA : public GenericRxDMARing {
     protected:
         LPC_EMAC_TypeDef * const base; // Base address of Ethernet peripheral
-
-        // Rx descriptors (Application to MAC)
-        volatile LPC17xxEthRxDescriptor rxDescs[RX_NUM_DESCS]{};
-
-        // Rx status descriptors (MAC to application)
-        volatile LPC17xxEthRxStatusDescriptor rxStatusDescs[RX_NUM_DESCS]{};
 
         void startDMA() override;
 
