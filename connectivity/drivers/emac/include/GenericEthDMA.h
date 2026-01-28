@@ -35,10 +35,11 @@ namespace mbed {
      */
     class GenericTxDMARing : public CompositeEMAC::TxDMA
     {
-    protected:
+    public:
         /// Number of entries in the Tx descriptor ring
         static constexpr size_t TX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
 
+    protected:
         /// Extra, unfilled Tx descs to leave in the DMA ring at all times.
         /// This is used to support Eth MACs that don't allow enqueuing every single descriptor at a time.
         const size_t extraTxDescsToLeave;
@@ -255,7 +256,7 @@ namespace mbed {
                 neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             }
 
-            tr_info("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
+            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
                 memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), packetDescsUsed);
 
             // Step 3: Wait for needed amount of buffers to be available.
@@ -468,7 +469,7 @@ namespace mbed {
                 rxBuildIndex = (rxBuildIndex + 1) % RX_NUM_DESCS;
             }
 
-            tr_info("buildRxDescriptors(): Returned %zu descriptors.", origRxDescsOwnedByApplication - rxDescsOwnedByApplication);
+            tr_debug("buildRxDescriptors(): Returned %zu descriptors.", origRxDescsOwnedByApplication - rxDescsOwnedByApplication);
         }
 
         bool rxHasPackets_ISR() override {
@@ -476,7 +477,7 @@ namespace mbed {
             // has its last descriptor flag or error flag set, indicating we have received at least one complete packet
             // or there is an error descriptor that can be reclaimed by the application.
             // Note that we want to bias towards false positives here, because false positives just waste CPU time,
-            // while false negatives would cause packets to be dropped.
+            // while false negatives would cause packets to be missed.
             // So, for simplicity, we just check every descriptor currently owned by the application until we
             // find one with the FS bit set or the error bits set.
             // This could potentially produce a false positive if we do this in the middle of receiving
@@ -552,8 +553,6 @@ namespace mbed {
             // we can process.
             const size_t maxDescsToProcess = RX_NUM_DESCS - rxDescsOwnedByApplication;
 
-            //tr_debug("RxProduceIdx = %lu\n", LPC_EMAC->RxProduceIndex);
-
             const size_t startIdx = rxNextIndex;
 
             for (size_t descCount = 0; descCount < maxDescsToProcess && !lastDescIdx.has_value(); descCount++) {
@@ -578,14 +577,14 @@ namespace mbed {
                         // (could be caused by incomplete packets/junk in the DMA buffer).
                         // Ignore, free associated memory, and schedule for rebuild.
                         discardRxDescs(descIdx, (descIdx + 1) % RX_NUM_DESCS);
-                        tr_info("Rx descriptor %zu has error, discarding...\n", descIdx);
+                        tr_debug("Rx descriptor %zu has error, discarding...\n", descIdx);
                         continue;
                     }
                     else {
                         // Already seen a first descriptor, but we have an error descriptor.
                         // So, delete the in-progress packet up to this point.
                         discardRxDescs(*firstDescIdx, (descIdx + 1) % RX_NUM_DESCS);
-                        tr_info("Rx descriptor %zu has error, discarding packet starting at index %zu...\n", descIdx, *firstDescIdx);
+                        tr_debug("Rx descriptor %zu has error, discarding packet starting at index %zu...\n", descIdx, *firstDescIdx);
                         firstDescIdx.reset();
                         continue;
                     }
@@ -631,10 +630,10 @@ namespace mbed {
                 // Take the chance to rebuild any available descriptors, then return.
                 rebuildDescriptors();
                 if(!firstDescIdx.has_value()) {
-                    tr_info("No packet at all seen in Rx descs\n");
+                    tr_debug("No packet at all seen in Rx descs\n");
                 }
                 else {
-                    tr_info("No last descriptor was seen for packet beginning at descriptor %zu\n", *firstDescIdx);
+                    tr_debug("No last descriptor was seen for packet beginning at descriptor %zu\n", *firstDescIdx);
                 }
 
                 return nullptr;
@@ -680,7 +679,7 @@ namespace mbed {
             }
 #endif
 
-            tr_info("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu\n",
+            tr_debug("Returning packet of length %lu, start %p from Rx descriptors %zu-%zu\n",
                    memory_manager->get_total_len(headBuffer), memory_manager->get_ptr(headBuffer), *firstDescIdx, *lastDescIdx);
 
             return headBuffer;
