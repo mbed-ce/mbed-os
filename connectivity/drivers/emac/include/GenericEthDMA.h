@@ -353,6 +353,10 @@ namespace mbed {
         /// Some DMA arrangements do not support this.
         const bool canReturnAllDescriptors;
 
+        /// This many bytes at the end of the packet will be discarded. This is used for EMACs which append
+        /// extra data to the end of the received Ethernet frame, such as the CRC.
+        const size_t packetEndDiscardSize;
+
         /// Pointer to the network stack buffer associated with the corresponding Rx descriptor.
         net_stack_mem_buf_t * rxDescStackBufs[RX_NUM_DESCS];
 
@@ -367,9 +371,10 @@ namespace mbed {
         size_t rxPoolPayloadSize;
 
         /// Constructor. Subclass must allocate descriptor array of size RX_NUM_DESCS
-        GenericRxDMARing(bool supportsFirstDescFlag = true, bool canReturnAllDescriptors = false):
+        GenericRxDMARing(const bool supportsFirstDescFlag = true, const bool canReturnAllDescriptors = false, const size_t packetEndDiscardSize = 0):
         supportsFirstDescFlag(supportsFirstDescFlag),
-        canReturnAllDescriptors(canReturnAllDescriptors)
+        canReturnAllDescriptors(canReturnAllDescriptors),
+        packetEndDiscardSize(packetEndDiscardSize)
         {}
 
         /// Configure DMA registers to point to the DMA ring,
@@ -546,9 +551,6 @@ namespace mbed {
             // Indices of the first and last descriptors for the packet will be saved here
             std::optional<size_t> firstDescIdx, lastDescIdx;
 
-            // Packet length is stored here once we check it
-            size_t pktLen{};
-
             // Prevent looping around into descriptors waiting for rebuild by limiting how many
             // we can process.
             const size_t maxDescsToProcess = RX_NUM_DESCS - rxDescsOwnedByApplication;
@@ -620,7 +622,6 @@ namespace mbed {
                 }
 
                 if(isLast) {
-                    pktLen = getTotalLen(*firstDescIdx, descIdx);
                     lastDescIdx = descIdx;
                 }
             }
@@ -643,9 +644,13 @@ namespace mbed {
             // Update this now to tell the ISR to search for descriptors after lastDescIdx only.
             rxNextIndex = (*lastDescIdx + 1) % RX_NUM_DESCS;
 
+            // Calculate packet length
+            size_t pktLen = getTotalLen(*firstDescIdx, *lastDescIdx);
+            MBED_ASSERT(pktLen > packetEndDiscardSize);
+            pktLen -= packetEndDiscardSize;
+
             // Set length of first buffer
             net_stack_mem_buf_t *const headBuffer = rxDescStackBufs[*firstDescIdx];
-            
             memory_manager->set_len(headBuffer, std::min(pktLen, rxPoolPayloadSize));
             size_t lenRemaining = pktLen - std::min(pktLen, rxPoolPayloadSize);
 
@@ -659,12 +664,20 @@ namespace mbed {
                  descIdx != (*lastDescIdx + 1) % RX_NUM_DESCS;
                  descIdx = (descIdx + 1) % RX_NUM_DESCS) {
 
-                // We have to set the buffer length first before concatenating it to the chain
-                MBED_ASSERT(lenRemaining > 0);
-                memory_manager->set_len(rxDescStackBufs[descIdx], std::min(lenRemaining, rxPoolPayloadSize));
-                lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
+                if(lenRemaining == 0) {
+                    // No real data bytes left to keep. This can happen because of the end discard size, i.e.
+                    // if there is a final descriptor containing only the last few bytes we want to discard.
+                    // In this case just free the buffer.
+                    memory_manager->free(rxDescStackBufs[descIdx]);
+                }
+                else {
+                    // Otherwise, append this buffer to the chain
+                    memory_manager->set_len(rxDescStackBufs[descIdx], std::min(lenRemaining, rxPoolPayloadSize));
+                    lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
 
-                memory_manager->cat(headBuffer, rxDescStackBufs[descIdx]);
+                    memory_manager->cat(headBuffer, rxDescStackBufs[descIdx]);
+                }
+
                 rxDescStackBufs[descIdx] = nullptr;
                 ++rxDescsOwnedByApplication;
             }

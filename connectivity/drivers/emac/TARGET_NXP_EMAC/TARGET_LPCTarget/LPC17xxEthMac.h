@@ -108,9 +108,12 @@ class LPC17xxEthMAC : public CompositeEMAC
 
         size_t getTotalLen(size_t firstDescIdx, size_t lastDescIdx) override;
 
+        static constexpr size_t END_DISCARD_SIZE = 4;
+
     public:
+
         explicit RxDMA(LPC_EMAC_TypeDef * const base):
-        GenericRxDMARing(false, true),
+        GenericRxDMARing(false, true, END_DISCARD_SIZE),
         base(base)
         {}
     };

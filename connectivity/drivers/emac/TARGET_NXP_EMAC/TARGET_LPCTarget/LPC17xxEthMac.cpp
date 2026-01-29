@@ -363,9 +363,11 @@ namespace mbed {
         // I suspect that what was going on was that the CPU was continually accessing the main SRAM each cycle,
         // preventing the ethernet DMA from writing to it. To fix this, we move the Rx status to AHBSRAM,
         // but also we wait here until a valid size appears in the Rx status descriptor.
-        // The Rx size can never legally be 0 since we do not have runt frames enabled in the MAC config,
+        // The Rx size SHOULD never legally be 0 for a complete packet since we do not have runt frames enabled in the MAC config,
         // unless the packet had an error in which case the error flag will be set.
-        while(rxStatusDescs[descIdx].actualSize == 0 && !rxStatusDescs[descIdx].anyError) {
+        // For a partial packet, the Rx size can be 0 if this is the last descriptor and there is only 1 byte left,
+        // so we check that flag too.
+        while(rxStatusDescs[descIdx].actualSize == 0 && !rxStatusDescs[descIdx].anyError && !rxStatusDescs[descIdx].lastDescriptor) {
             wait_ns(1000); // cycle based delay which hopefully doesn't use RAM for some cycles
         }
     }
@@ -402,7 +404,6 @@ namespace mbed {
             totalSize += rxStatusDescs[descIdx].actualSize + 1; // size is minus 1 encoded
             //printf("desc %zu has packet with size %hu\n", descIdx, rxStatusDescs[descIdx].actualSize + 1);
         }
-        totalSize -= 4; // Packet size returned by the MAC includes the CRC
         return totalSize;
     }
 
