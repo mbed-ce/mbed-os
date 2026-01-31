@@ -186,6 +186,7 @@ static void net_bringdown()
 // Test setup
 utest::v1::status_t test_setup(const size_t number_of_cases)
 {
+    mbed_trace_init();
     GREENTEA_SETUP(dns_global::TESTS_TIMEOUT, "default_auto");
     net_bringup();
     return verbose_test_setup_handler(number_of_cases);

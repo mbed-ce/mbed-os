@@ -107,7 +107,7 @@ namespace mbed {
                 // Case 1: buffer begins before bank
                 return (startAddrInt + size) > bankStartAddr;
             }
-            else if(startAddrInt >= bankStartAddr && startAddrInt < (bankStartAddr + bankSize)) {
+            else if(startAddrInt < (bankStartAddr + bankSize)) {
                 // Case 2: buffer begins inside bank
                 return true;
             }
@@ -256,8 +256,8 @@ namespace mbed {
                 neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             }
 
-            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
-                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), packetDescsUsed);
+            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs (starting at %zu)\n",
+                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), packetDescsUsed, txSendIndex);
 
             // Step 3: Wait for needed amount of buffers to be available.
             // Note that, in my experience, it's better to block here, as dropping the packet

@@ -18,9 +18,13 @@
 
 #include "DigitalOut.h"
 #include "LPC17xxEthMacRegisters.h"
-#include "MbedCRC.h"
 #include "mbed_error.h"
 #include "mbed_wait_api.h"
+#include "mbed_trace.h"
+
+#include <cinttypes>
+
+#define TRACE_GROUP "LPC17xx EMAC"
 
 namespace mbed {
     LPC17xxEthMAC * LPC17xxEthMAC::instance;
@@ -42,7 +46,50 @@ namespace mbed {
     __attribute__((section("AHBSRAM"))) volatile LPC17xxEthTxDescriptor txDescs[GenericTxDMARing::TX_NUM_DESCS]{};
     __attribute__((section("AHBSRAM"))) volatile LPC17xxEthRxDescriptor rxDescs[GenericRxDMARing::RX_NUM_DESCS]{};
 
+    uint32_t LPC17xxEthMAC::MACDriver::computeMacAddrCRC(MACAddress const &mac) {
+        // Note: This logic is taken from the NXP SDK, e.g. here
+        // https://gitlab.enssat.fr/dbellanger/base_muc_info2/-/blob/main/Libraries/LCP1768_StdPeriph_Driver/source/lpc17xx_emac.c#L227
+        // Despite my best efforts, I have been completely unable to figure out what CRC parameters this is using
+        // and replicate it with a regular CRC generator.
+        // There is also virtually no documentation on what CRC the hardware is performing -- perhaps it is doing
+        // something nonstandard?
+
+        uint32_t crc = 0xFFFFFFFF; 	// CRC result
+
+        for (size_t i = 0; i < mac.size(); i++) {
+            uint8_t byte = mac[i];
+            for (size_t j = 0; j < 2; j++) {
+                uint32_t q0, q1, q2, q3; // temporary variables
+
+                if (((crc >> 28) ^ (byte >> 3)) & 0x00000001) {
+                    q3 = 0x04C11DB7;
+                } else {
+                    q3 = 0x00000000;
+                }
+                if (((crc >> 29) ^ (byte >> 2)) & 0x00000001) {
+                    q2 = 0x09823B6E;
+                } else {
+                    q2 = 0x00000000;
+                }
+                if (((crc >> 30) ^ (byte >> 1)) & 0x00000001) {
+                    q1 = 0x130476DC;
+                } else {
+                    q1 = 0x00000000;
+                }
+                if (((crc >> 31) ^ (byte >> 0)) & 0x00000001) {
+                    q0 = 0x2608EDB8;
+                } else {
+                    q0 = 0x00000000;
+                }
+                crc = (crc << 4) ^ q3 ^ q2 ^ q1 ^ q0;
+                byte >>= 4;
+            }
+        }
+        return crc;
+    }
+
     CompositeEMAC::ErrCode LPC17xxEthMAC::MACDriver::init() {
+
         /* Enable MII clocking */
         LPC_SC->PCONP |= CLKPWR_PCONP_PCENET;
 
@@ -54,6 +101,17 @@ namespace mbed {
         /* Enable P1 Ethernet Pins. */
         LPC_PINCON->PINSEL2 = 0x50150105;
         LPC_PINCON->PINSEL3 = (LPC_PINCON->PINSEL3 & ~0x0000000F) | 0x00000005;
+
+        // Reset all MAC modules and wait for a little bit.
+        // Note that the datasheet seems to imply this isn't needed, but without it I would get intermittent
+        // issues where the entire chip would hang when trying to initialize the MAC, which the datasheet
+        // says can happen if it isn't properly getting a clock from HW.
+        // Sooo we just copy what the NXP example code does here.
+        base->MAC1 = EMAC_MAC1_RES_TX | EMAC_MAC1_RES_MCS_TX | EMAC_MAC1_RES_RX |
+                        EMAC_MAC1_RES_MCS_RX | EMAC_MAC1_SIM_RES | EMAC_MAC1_SOFT_RES;
+        base->Command = EMAC_Command_REG_RES | EMAC_Command_TX_RES | EMAC_Command_RX_RES | EMAC_Command_PASS_RUNT_FRM;
+
+        wait_us(10);
 
         // Bring MAC out of reset
         base->MAC1 = 0;
@@ -193,14 +251,13 @@ namespace mbed {
         // the hash table: it is used as an index in the 64-bit HashFilter register that has been
         // programmed with accept values. If the selected accept value is 1, the frame is
         // accepted.
-        MbedCRC<POLY_32BIT_ANSI, 32> crcCalc;
-        uint32_t crc;
-        if (!crcCalc.compute(mac.data(), mac.size(), &crc) != 0) {
-            return ErrCode::INVALID_USAGE;
-        }
+        const uint32_t crc = computeMacAddrCRC(mac);
 
         // Grab correct index for hash table
         const uint8_t hashTableIndex = (crc >> 23) & 0b111111;
+
+        tr_debug("Adding multicast MAC %" PRIx8 ":%" PRIx8 ":%" PRIx8 ":%" PRIx8 ":%" PRIx8 ":%" PRIx8 ", CRC is 0x%" PRIx32 ", hash table index = %" PRIu8,
+            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], crc, hashTableIndex);
 
         // Set correct bit in hash table
         if (hashTableIndex >= 32) {
@@ -366,7 +423,7 @@ namespace mbed {
         // The Rx size SHOULD never legally be 0 for a complete packet since we do not have runt frames enabled in the MAC config,
         // unless the packet had an error in which case the error flag will be set.
         // For a partial packet, the Rx size can be 0 if this is the last descriptor and there is only 1 byte left,
-        // so we check that flag too.
+        // so we check the last desc9 flag too.
         while(rxStatusDescs[descIdx].actualSize == 0 && !rxStatusDescs[descIdx].anyError && !rxStatusDescs[descIdx].lastDescriptor) {
             wait_ns(1000); // cycle based delay which hopefully doesn't use RAM for some cycles
         }

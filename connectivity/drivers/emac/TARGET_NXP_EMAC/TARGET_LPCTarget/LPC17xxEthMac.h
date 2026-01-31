@@ -36,6 +36,9 @@ class LPC17xxEthMAC : public CompositeEMAC
 
         DigitalOut ethClockEnablePin;
 
+        // Compute the CRC of a MAC address for the purposes of hash filtering
+        uint32_t computeMacAddrCRC(MACAddress const & mac);
+
     public:
         explicit MACDriver(LPC_EMAC_TypeDef * const base):
         base(base),
