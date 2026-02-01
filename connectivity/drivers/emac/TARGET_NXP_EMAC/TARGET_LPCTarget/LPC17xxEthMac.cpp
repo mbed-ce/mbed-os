@@ -24,6 +24,8 @@
 
 #include <cinttypes>
 
+#include "ThisThread.h"
+
 #define TRACE_GROUP "LPC17xx EMAC"
 
 namespace mbed {
@@ -109,7 +111,7 @@ namespace mbed {
         // Sooo we just copy what the NXP example code does here.
         base->MAC1 = EMAC_MAC1_RES_TX | EMAC_MAC1_RES_MCS_TX | EMAC_MAC1_RES_RX |
                         EMAC_MAC1_RES_MCS_RX | EMAC_MAC1_SIM_RES | EMAC_MAC1_SOFT_RES;
-        base->Command = EMAC_Command_REG_RES | EMAC_Command_TX_RES | EMAC_Command_RX_RES | EMAC_Command_PASS_RUNT_FRM;
+        base->Command = EMAC_Command_REG_RES | EMAC_Command_TX_RES | EMAC_Command_RX_RES;
 
         wait_us(10);
 
@@ -117,7 +119,7 @@ namespace mbed {
         base->MAC1 = 0;
 
         // Enable CRC offload and padding
-        base->MAC2 = EMAC_MAC2_CRC_EN | EMAC_MAC2_PAD_EN;
+        base->MAC2 = 0;
 
         // Set max frame length (this field includes the CRC)
         base->MAXF = 1518;
@@ -360,8 +362,12 @@ namespace mbed {
         txDescs[descIdx].interrupt = true;
         txDescs[descIdx].lastDescriptor = lastDesc;
 
-        // Have DMA process it
-        base->TxProduceIndex = (descIdx + 1) % TX_NUM_DESCS;
+        // If this is the last descriptor, tell the DMA to start processing the packet.
+        // Note that if we update this before the last descriptor is ready, the DMA seems to transmit a corrupt packet.
+        if(lastDesc) {
+            base->TxProduceIndex = (descIdx + 1) % TX_NUM_DESCS;
+        }
+
     }
 
     void LPC17xxEthMAC::RxDMA::startDMA() {

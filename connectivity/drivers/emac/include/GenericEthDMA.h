@@ -20,6 +20,7 @@
 #include "CompositeEMAC.h"
 #include "mbed_trace.h"
 #include "CacheAlignedBuffer.h"
+#include "MbedCRC.h"
 #include "mbed_critical.h"
 #include <atomic>
 #include <optional>
@@ -48,6 +49,14 @@ namespace mbed {
         /// packet that's split across multiple buffers.
         const bool supportsDescChaining;
 
+        /// Whether we need to manually append the CRC at the end of the frame being transmitted.
+        /// Most MACs do this automatically but on some it is bugged (e.g. LPC1768)
+        const bool appendCRC;
+
+        /// Whether we need to manually pad short Ethernet frames up to 60 bytes.
+        /// Most MACs can do this in HW, but not LPC1768!
+        const bool padFrames;
+
         /// Pointer to first memory buffer in the chain associated with descriptor n.
         /// The buffer address shall only be set for the *last* descriptor, so that the entire chain is freed
         /// when the last descriptor is returned.
@@ -55,6 +64,9 @@ namespace mbed {
 
         /// EventFlag used to signal when a Tx descriptor becomes available
         rtos::EventFlags txDescAvailFlag;
+
+        /// CRC generator. Only used if appendCRC is true.
+        MbedCRC<POLY_32BIT_ANSI, 32> crcGenerator;
 
         // Indexes for descriptor rings.
         // NOTE: when working with these indices, it's important to consider the case where e.g. the send and reclaim indexes are
@@ -65,9 +77,15 @@ namespace mbed {
         size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the mac thread calling reclaimTxDescs().
 
         /// Construct, passing a value for extraTxDescsToLeave
-        GenericTxDMARing(size_t extraTxDescsToLeave = 0, bool supportsDescChaining = true):
+        GenericTxDMARing(size_t extraTxDescsToLeave = 0, bool supportsDescChaining = true, bool appendCRC = false, bool padFrames = false):
         extraTxDescsToLeave(extraTxDescsToLeave),
-        supportsDescChaining(supportsDescChaining)
+        supportsDescChaining(supportsDescChaining),
+        appendCRC(appendCRC),
+        padFrames(padFrames),
+
+        // Per Wikipedia and SO, we want input and output reflect on due to Ethernet transmitting
+        // the CRC with backwards bit order compared to the rest of the data.
+        crcGenerator(0xFFFFFFFF, 0xFFFFFFFF, true, true)
         {}
 
         /// Configure DMA registers to point to the DMA ring,
@@ -178,11 +196,11 @@ namespace mbed {
                     descStackBuffers[txReclaimIndex] = nullptr;
                 }
 
+                tr_debug("Reclaimed Tx descriptor %zu", txReclaimIndex);
+
                 // Update counters
                 txReclaimIndex = (txReclaimIndex + 1) % TX_NUM_DESCS;
                 ++txDescsOwnedByApplication;
-
-                tr_debug("Reclaimed Tx descriptor %zu", txReclaimIndex);
 
                 returnedAnyDescriptors = true;
             }
@@ -195,6 +213,49 @@ namespace mbed {
         }
 
         CompositeEMAC::ErrCode txPacket(net_stack_mem_buf_t * buf) {
+
+            // Step -1: Pad to 60 bytes (not including CRC) if needed
+            constexpr size_t ETH_MIN_SIZE = 60; // Ethernet packet, not including CRC at end, must be padded to at least this size
+            if(padFrames && memory_manager->get_total_len(buf) < ETH_MIN_SIZE) {
+                size_t numPaddingBytes = ETH_MIN_SIZE - memory_manager->get_total_len(buf);
+                buf = memory_manager->realloc_heap(buf, 0, ETH_MIN_SIZE);
+                if(buf == nullptr)
+                {
+                    // No free memory, drop packet
+                    return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
+                }
+
+                // Just memcpy the little-endian CRC onto the end of the message.
+                // Per here, that should give correct results:
+                // https://stackoverflow.com/a/65108067/7083698
+                memset(static_cast<uint8_t *>(memory_manager->get_ptr(buf)) + (ETH_MIN_SIZE - numPaddingBytes), 0, numPaddingBytes);
+            }
+
+            // Step 0: Append CRC (if needed)
+            if(appendCRC) {
+                // Iterate over all data in the packet and compute the CRC
+                net_stack_mem_buf_t * currCRCBuf = buf;
+                uint32_t crc;
+                crcGenerator.compute_partial_start(&crc);
+                do {
+                    crcGenerator.compute_partial(memory_manager->get_ptr(currCRCBuf), memory_manager->get_len(currCRCBuf), &crc);
+                    currCRCBuf = memory_manager->get_next(currCRCBuf);
+                }
+                while(currCRCBuf != nullptr);
+                crcGenerator.compute_partial_stop(&crc);
+
+                // Append a new buffer to the end with a CRC
+                auto * crcBuf = memory_manager->alloc_heap(sizeof(uint32_t), 0);
+                if(crcBuf == nullptr)
+                {
+                    // No free memory, drop packet
+                    memory_manager->free(buf);
+                    return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
+                }
+                memcpy(memory_manager->get_ptr(crcBuf), &crc, sizeof(uint32_t));
+                memory_manager->cat(buf, crcBuf);
+            }
+
             // Step 1: Figure out if we can send this zero-copy, or if we need to copy it.
             size_t packetDescsUsed = memory_manager->count_buffers(buf);
             size_t neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
@@ -256,8 +317,8 @@ namespace mbed {
                 neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             }
 
-            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs (starting at %zu)\n",
-                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), packetDescsUsed, txSendIndex);
+            tr_debug("Transmitting packet of length %lu in %zu buffers (starting at 0x%" PRIx32 ") and %zu descs (starting at %zu)",
+                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), reinterpret_cast<uint32_t>(memory_manager->get_ptr(buf)), packetDescsUsed, txSendIndex);
 
             // Step 3: Wait for needed amount of buffers to be available.
             // Note that, in my experience, it's better to block here, as dropping the packet
