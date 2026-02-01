@@ -307,7 +307,7 @@ CompositeEMAC::ErrCode STM32EthMACv1::MACDriver::init() {
 
 #if ENABLE_ERRATA_2_21_6_WORKAROUND
     // Start RMII watchdog task
-    rmiiWatchdogHandle = mbed_event_queue()->call_every(std::chrono::milliseconds(MBED_CONF_NSAPI_EMAC_PHY_POLL_PERIOD),
+    rmiiWatchdogHandle = mbed_event_queue()->call_every(std::chrono::milliseconds(MBED_CONF_EPHY_POLL_PERIOD),
                 callback(this, &STM32EthMACv1::MACDriver::rmiiWatchdog));
     rmiiWatchdogRunning = true;
 #endif
