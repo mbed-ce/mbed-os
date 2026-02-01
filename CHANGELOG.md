@@ -130,6 +130,7 @@ _______________________________________________________________________________
   - Rewrite I2C slave HAL to behave as documented (e.g. I2CSlave::read() would return one more byte than actually read)
   - Fix destroying a PwmOut not stopping the PWM signal
   - Fix reading the pulse width and period from a PwmOut just returning raw register values rather than correctly scaled numbers
+  - Ethernet driver completely rewritten. It now supports multicast and uses memory more efficiently, and is more resilient against several HW bugs on LPC17xx
 - Nuvoton `M480` MCU family:
   - Rewrite Ethernet driver to use new driver framework
   - Fix I2C slave NACKing the last byte from the master when receiving
