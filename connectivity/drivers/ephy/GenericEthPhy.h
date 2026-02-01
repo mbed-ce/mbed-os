@@ -25,51 +25,51 @@
 namespace mbed {
 
 namespace GenPhyRegs {
-    /// Generic Ethernet phy register definitions
-    /// @{
-    inline constexpr uint8_t BMCR = 0; ///< Basic Mode Control Register
+/// Generic Ethernet phy register definitions
+/// @{
+inline constexpr uint8_t BMCR = 0; ///< Basic Mode Control Register
 
-    inline constexpr size_t BMCR_SW_RST_Pos = 15;
-    inline constexpr uint16_t BMCR_SW_RST_Msk = 1 << BMCR_SW_RST_Pos;
+inline constexpr size_t BMCR_SW_RST_Pos = 15;
+inline constexpr uint16_t BMCR_SW_RST_Msk = 1 << BMCR_SW_RST_Pos;
 
-    inline constexpr size_t BMCR_SPEED_100M_Pos = 13;
-    inline constexpr uint16_t BMCR_SPEED_100M_Msk = 1 << BMCR_SPEED_100M_Pos;
+inline constexpr size_t BMCR_SPEED_100M_Pos = 13;
+inline constexpr uint16_t BMCR_SPEED_100M_Msk = 1 << BMCR_SPEED_100M_Pos;
 
-    inline constexpr size_t BMCR_ANEG_EN_Pos = 12;
-    inline constexpr uint16_t BMCR_ANEG_EN_Msk = 1 << BMCR_ANEG_EN_Pos;
+inline constexpr size_t BMCR_ANEG_EN_Pos = 12;
+inline constexpr uint16_t BMCR_ANEG_EN_Msk = 1 << BMCR_ANEG_EN_Pos;
 
-    inline constexpr size_t BMCR_ANEG_RESTART_Pos = 9;
-    inline constexpr uint16_t BMCR_ANEG_RESTART_Msk = 1 << BMCR_ANEG_RESTART_Pos;
+inline constexpr size_t BMCR_ANEG_RESTART_Pos = 9;
+inline constexpr uint16_t BMCR_ANEG_RESTART_Msk = 1 << BMCR_ANEG_RESTART_Pos;
 
-    inline constexpr size_t BMCR_DUPLEX_FULL_Pos = 8;
-    inline constexpr uint16_t BMCR_DUPLEX_FULL_Msk = 1 << BMCR_DUPLEX_FULL_Pos;
+inline constexpr size_t BMCR_DUPLEX_FULL_Pos = 8;
+inline constexpr uint16_t BMCR_DUPLEX_FULL_Msk = 1 << BMCR_DUPLEX_FULL_Pos;
 
-    inline constexpr uint8_t BMSR = 1; ///< Basic Mode Status Register
+inline constexpr uint8_t BMSR = 1; ///< Basic Mode Status Register
 
-    inline constexpr size_t BMCR_LINK_UP_Pos = 2;
-    inline constexpr uint16_t BMCR_LINK_UP_Msk = 1 << BMCR_LINK_UP_Pos;
+inline constexpr size_t BMCR_LINK_UP_Pos = 2;
+inline constexpr uint16_t BMCR_LINK_UP_Msk = 1 << BMCR_LINK_UP_Pos;
 
-    inline constexpr uint8_t PHYIDR1 = 2; ///< PHY ID Register 1
-    inline constexpr uint8_t PHYIDR2 = 3; ///< PHY ID Register 2
-    inline constexpr uint8_t ANAR = 4; ///< AutoNegotiation Advertisement Register
+inline constexpr uint8_t PHYIDR1 = 2; ///< PHY ID Register 1
+inline constexpr uint8_t PHYIDR2 = 3; ///< PHY ID Register 2
+inline constexpr uint8_t ANAR = 4; ///< AutoNegotiation Advertisement Register
 
-    inline constexpr size_t ANAR_100BTX_FD_Pos = 8;
-    inline constexpr uint16_t ANAR_100BTX_FD_Msk = 1 << ANAR_100BTX_FD_Pos;
+inline constexpr size_t ANAR_100BTX_FD_Pos = 8;
+inline constexpr uint16_t ANAR_100BTX_FD_Msk = 1 << ANAR_100BTX_FD_Pos;
 
-    inline constexpr size_t ANAR_100BTX_Pos = 7;
-    inline constexpr uint16_t ANAR_100BTX_Msk = 1 << ANAR_100BTX_Pos;
+inline constexpr size_t ANAR_100BTX_Pos = 7;
+inline constexpr uint16_t ANAR_100BTX_Msk = 1 << ANAR_100BTX_Pos;
 
-    inline constexpr size_t ANAR_10BT_FD_Pos = 6;
-    inline constexpr uint16_t ANAR_10BT_FD_Msk = 1 << ANAR_10BT_FD_Pos;
+inline constexpr size_t ANAR_10BT_FD_Pos = 6;
+inline constexpr uint16_t ANAR_10BT_FD_Msk = 1 << ANAR_10BT_FD_Pos;
 
-    inline constexpr size_t ANAR_10BT_Pos = 5;
-    inline constexpr uint16_t ANAR_10BT_Msk = 1 << ANAR_10BT_Pos;
+inline constexpr size_t ANAR_10BT_Pos = 5;
+inline constexpr uint16_t ANAR_10BT_Msk = 1 << ANAR_10BT_Pos;
 
-    /// Value for ANAR[4:0] that specifies Ethernet as the protocol
-    inline constexpr uint16_t ANAR_PROTOCOL_IEE_802_3U_Val = 1;
+/// Value for ANAR[4:0] that specifies Ethernet as the protocol
+inline constexpr uint16_t ANAR_PROTOCOL_IEE_802_3U_Val = 1;
 
-    inline constexpr uint8_t ANLPAR = 5; ///< AutoNegotiation Link Partner Advertisement Register
-    /// @}
+inline constexpr uint8_t ANLPAR = 5; ///< AutoNegotiation Link Partner Advertisement Register
+/// @}
 }
 
 /**
@@ -129,13 +129,13 @@ public:
 
 protected:
 
-    Config const & config;
+    Config const &config;
 
     std::optional<DigitalOut> resetDigitalOut;
 
 public:
-    GenericEthPhy(Config const & config):
-    config(config)
+    GenericEthPhy(Config const &config):
+        config(config)
     {}
 
     CompositeEMAC::ErrCode init() override;

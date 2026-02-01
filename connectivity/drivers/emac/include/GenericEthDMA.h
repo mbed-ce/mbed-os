@@ -225,9 +225,7 @@ namespace mbed {
                     return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
                 }
 
-                // Just memcpy the little-endian CRC onto the end of the message.
-                // Per here, that should give correct results:
-                // https://stackoverflow.com/a/65108067/7083698
+                // Clear to zeros
                 memset(static_cast<uint8_t *>(memory_manager->get_ptr(buf)) + (ETH_MIN_SIZE - numPaddingBytes), 0, numPaddingBytes);
             }
 
@@ -252,6 +250,10 @@ namespace mbed {
                     memory_manager->free(buf);
                     return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
                 }
+
+                // Just memcpy the little-endian CRC onto the end of the message.
+                // Per here, that should give correct results:
+                // https://stackoverflow.com/a/65108067/7083698
                 memcpy(memory_manager->get_ptr(crcBuf), &crc, sizeof(uint32_t));
                 memory_manager->cat(buf, crcBuf);
             }

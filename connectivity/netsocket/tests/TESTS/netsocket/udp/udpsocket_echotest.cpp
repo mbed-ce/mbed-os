@@ -244,7 +244,7 @@ void UDPSOCKET_ECHOTEST_NONBLOCK_impl(bool use_sendto)
                     if (tc_exec_time.elapsed_time() >= time_allotted) {
                         break;
                     }
-                    if(individual_pkt_time.elapsed_time() > 1s) {
+                    if (individual_pkt_time.elapsed_time() > 1s) {
                         tr_warn("Timeout waiting for response, retrying");
                         break;
                     }
