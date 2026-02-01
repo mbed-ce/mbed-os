@@ -110,7 +110,9 @@ MBED_NORETURN void assert_printf(const char *msg, int line, const char *file);
 
 /* Plaform specific diagnostic output */
 #define LWIP_PLATFORM_DIAG(vars) printf vars
-#define LWIP_PLATFORM_ASSERT(msg) mbed_error(MBED_MAKE_SYSTEM_ERROR(MBED_MODULE_NETWORK_STACK, MBED_ERROR_CODE_ASSERTION_FAILED), (msg), 0, __FILE__, __LINE__)
+// Note: Sometimes there's diagnostic output printed right before an assert, so flush stdout to make sure it
+// actually gets printed.
+#define LWIP_PLATFORM_ASSERT(msg) fflush(stdout); mbed_error(MBED_MAKE_SYSTEM_ERROR(MBED_MODULE_NETWORK_STACK, MBED_ERROR_CODE_ASSERTION_FAILED), (msg), 0, __FILE__, __LINE__)
 #endif // MBED_CONF_LWIP_USE_MBED_TRACE
 #endif
 
