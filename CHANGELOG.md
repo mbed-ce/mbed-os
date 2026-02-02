@@ -79,6 +79,7 @@ _______________________________________________________________________________
 - Add support for using an ESP32 chip as an external wifi-fi interface via [ESP AT firmware](https://github.com/espressif/esp-at). This functionality can be accessed by adding the `ESPRESSIF_ESP32` component to your application.
 - `SDBlockDevice` can now use async SPI, allowing other threads to execute while large SD card transfers are ongoing
 - `CacheAlignedBuffer` class added, providing a way to manage DMA buffers on cores that have a CPU cache
+- LwIP stack assertions can now be turned on through a new `lwip.asserts-enabled` JSON option, which can help you find issues and invalid configurations more easily.
 
 ### Changed
 

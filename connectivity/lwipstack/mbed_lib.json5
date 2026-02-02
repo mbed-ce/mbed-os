@@ -34,7 +34,11 @@
             "value": false
         },
         "debug-enabled": {
-            "help": "Enable debug trace support",
+            "help": "Enable debug trace support. Also enables asserts.",
+            "value": false
+        },
+        "asserts-enabled": {
+            "help": "Enabled LwIP asserts, which can help more easily detect issues at the cost of some flash space.",
             "value": false
         },
         "ppp-enabled": {

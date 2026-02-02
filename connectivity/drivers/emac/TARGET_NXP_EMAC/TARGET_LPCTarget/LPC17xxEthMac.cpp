@@ -118,7 +118,10 @@ namespace mbed {
         // Bring MAC out of reset
         base->MAC1 = 0;
 
-        // Enable CRC offload and padding
+        // Disable CRC and padding (CRC doesn't work properly so we have to do it manually).
+        // Note that even with this disabled, the MAC still seems to sometimes add its own CRC... because of
+        // reasons. But that's actually OK, because then the packet just has a second CRC at the end
+        // which is still a valid CRC of the contents.
         base->MAC2 = 0;
 
         // Set max frame length (this field includes the CRC)

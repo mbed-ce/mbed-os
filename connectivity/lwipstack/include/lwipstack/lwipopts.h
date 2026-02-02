@@ -253,8 +253,11 @@
 #define LWIP_DBG_TYPES_ON           LWIP_DBG_ON
 #define LWIP_DBG_MIN_LEVEL          LWIP_DBG_LEVEL_ALL
 #else
-#define LWIP_NOASSERT               1
 #define LWIP_STATS                  0
+#endif
+
+#if !defined(LWIP_DEBUG) && !MBED_CONF_LWIP_ASSERTS_ENABLED
+#define LWIP_NOASSERT               1
 #endif
 
 #define TRACE_TO_ASCII_HEX_DUMP     0

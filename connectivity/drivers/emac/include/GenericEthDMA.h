@@ -214,106 +214,87 @@ namespace mbed {
 
         CompositeEMAC::ErrCode txPacket(net_stack_mem_buf_t * buf) {
 
-            // Step -1: Pad to 60 bytes (not including CRC) if needed
+            // Whether we had to copy the packet. If we copied the packet,
+            // it will be copied to one contiguous buffer and will have room for the CRC at the end (if needed)
+            bool packetCopied = false;
+
+            // Step 0: Pad to 60/64 bytes (if appending CRC) if needed
             constexpr size_t ETH_MIN_SIZE = 60; // Ethernet packet, not including CRC at end, must be padded to at least this size
             if(padFrames && memory_manager->get_total_len(buf) < ETH_MIN_SIZE) {
-                size_t numPaddingBytes = ETH_MIN_SIZE - memory_manager->get_total_len(buf);
-                buf = memory_manager->realloc_heap(buf, 0, ETH_MIN_SIZE);
+                const size_t sizeToPadTo = ETH_MIN_SIZE + (appendCRC ? sizeof(uint32_t) : 0);
+                const size_t numPaddingBytes = sizeToPadTo - memory_manager->get_total_len(buf);
+
+                buf = memory_manager->realloc_heap(buf, 0, sizeToPadTo);
                 if(buf == nullptr)
                 {
                     // No free memory, drop packet
                     return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
                 }
+                packetCopied = true;
 
                 // Clear to zeros
-                memset(static_cast<uint8_t *>(memory_manager->get_ptr(buf)) + (ETH_MIN_SIZE - numPaddingBytes), 0, numPaddingBytes);
-            }
-
-            // Step 0: Append CRC (if needed)
-            if(appendCRC) {
-                // Iterate over all data in the packet and compute the CRC
-                net_stack_mem_buf_t * currCRCBuf = buf;
-                uint32_t crc;
-                crcGenerator.compute_partial_start(&crc);
-                do {
-                    crcGenerator.compute_partial(memory_manager->get_ptr(currCRCBuf), memory_manager->get_len(currCRCBuf), &crc);
-                    currCRCBuf = memory_manager->get_next(currCRCBuf);
-                }
-                while(currCRCBuf != nullptr);
-                crcGenerator.compute_partial_stop(&crc);
-
-                // Append a new buffer to the end with a CRC
-                auto * crcBuf = memory_manager->alloc_heap(sizeof(uint32_t), 0);
-                if(crcBuf == nullptr)
-                {
-                    // No free memory, drop packet
-                    memory_manager->free(buf);
-                    return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
-                }
-
-                // Just memcpy the little-endian CRC onto the end of the message.
-                // Per here, that should give correct results:
-                // https://stackoverflow.com/a/65108067/7083698
-                memcpy(memory_manager->get_ptr(crcBuf), &crc, sizeof(uint32_t));
-                memory_manager->cat(buf, crcBuf);
+                memset(static_cast<uint8_t *>(memory_manager->get_ptr(buf)) + (sizeToPadTo - numPaddingBytes), 0, numPaddingBytes);
             }
 
             // Step 1: Figure out if we can send this zero-copy, or if we need to copy it.
             size_t packetDescsUsed = memory_manager->count_buffers(buf);
             size_t neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             bool needToCopy = false;
+            if(!packetCopied) {
+                if(packetDescsUsed > 1 && !supportsDescChaining)
+                {
+                    /// Packet uses more than 1 descriptor and the hardware doesn't support that so
+                    /// we have to copy it into one single descriptor.
+                    needToCopy = true;
+                }
 
-            if(packetDescsUsed > 1 && !supportsDescChaining)
-            {
-                /// Packet uses more than 1 descriptor and the hardware doesn't support that so
-                /// we have to copy it into one single descriptor.
-                needToCopy = true;
-            }
+                if(neededFreeDescs >= TX_NUM_DESCS)
+                {
+                    // Packet uses too many buffers, we have to copy it into a continuous buffer.
+                    // Note: Some Eth DMAs (e.g. STM32 v2) cannot enqueue all the descs in the ring at the same time
+                    // so we can't use every single descriptor to send the packet.
+                    needToCopy = true;
+                }
 
-            if(neededFreeDescs >= TX_NUM_DESCS)
-            {
-                // Packet uses too many buffers, we have to copy it into a continuous buffer.
-                // Note: Some Eth DMAs (e.g. STM32 v2) cannot enqueue all the descs in the ring at the same time
-                // so we can't use every single descriptor to send the packet.
-                needToCopy = true;
-            }
+                if(!needToCopy && (neededFreeDescs > txDescsOwnedByApplication && txDescsOwnedByApplication > extraTxDescsToLeave)) {
+                    // Packet uses more buffers than we have descriptors, but we can send it immediately if we copy
+                    // it into a single buffer.
+                    needToCopy = true;
+                }
 
-            if(!needToCopy && (neededFreeDescs > txDescsOwnedByApplication && txDescsOwnedByApplication > extraTxDescsToLeave)) {
-                // Packet uses more buffers than we have descriptors, but we can send it immediately if we copy
-                // it into a single buffer.
-                needToCopy = true;
-            }
+                if(!needToCopy) {
+                    net_stack_mem_buf_t * currBuf = buf;
+                    while(currBuf != nullptr) {
+                        // If this buffer is passed down direct from the application, we will need to
+                        // copy the packet.
+                        if(memory_manager->get_lifetime(currBuf) == NetStackMemoryManager::Lifetime::VOLATILE)
+                        {
+                            needToCopy = true;
+                            break;
+                        }
 
-            if(!needToCopy) {
-                net_stack_mem_buf_t * currBuf = buf;
-                while(currBuf != nullptr) {
-                    // If this buffer is passed down direct from the application, we will need to
-                    // copy the packet.
-                    if(memory_manager->get_lifetime(currBuf) == NetStackMemoryManager::Lifetime::VOLATILE)
-                    {
-                        needToCopy = true;
-                        break;
+                        // Or, if the buffer is in DMA-inaccessible RAM, we will need to copy it
+                        if(!isDMAReadableBuffer(static_cast<uint8_t *>(memory_manager->get_ptr(currBuf)), memory_manager->get_len(currBuf))) {
+                            needToCopy = true;
+                            break;
+                        }
+
+                        currBuf = memory_manager->get_next(currBuf);
                     }
-
-                    // Or, if the buffer is in DMA-inaccessible RAM, we will need to copy it
-                    if(!isDMAReadableBuffer(static_cast<uint8_t *>(memory_manager->get_ptr(currBuf)), memory_manager->get_len(currBuf))) {
-                        needToCopy = true;
-                        break;
-                    }
-
-                    currBuf = memory_manager->get_next(currBuf);
                 }
             }
 
             // Step 2: Copy packet if needed
             if(needToCopy)
             {
-                buf = memory_manager->realloc_heap(buf, 0);
+                const size_t newLen = memory_manager->get_total_len(buf) + (appendCRC ? sizeof(uint32_t) : 0);
+                buf = memory_manager->realloc_heap(buf, 0, newLen);
                 if(buf == nullptr)
                 {
                     // No free memory, drop packet
                     return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
                 }
+                packetCopied = true;
 
                 packetDescsUsed = 1;
                 neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
@@ -322,7 +303,56 @@ namespace mbed {
             tr_debug("Transmitting packet of length %lu in %zu buffers (starting at 0x%" PRIx32 ") and %zu descs (starting at %zu)",
                 memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), reinterpret_cast<uint32_t>(memory_manager->get_ptr(buf)), packetDescsUsed, txSendIndex);
 
-            // Step 3: Wait for needed amount of buffers to be available.
+            // Step 3: Calculate CRC and add to packet if possible.
+            // If we did not copy the packet, we are not allowed to modify the buffer sent from the network stack
+            // (as it may be e.g. kept by the stack for TCP retransmission later) so we have to tack on the CRC
+            // via another descriptor.
+            uint32_t crc;
+            net_stack_mem_buf_t * crcBuf = nullptr; // CRC is saved here if it needs to be appended later
+            if(appendCRC) {
+                if(packetCopied) {
+                    // Compute the CRC. Easy since we have a contiguous buffer, we just need to not do it over
+                    // the last 4 bytes.
+                    crcGenerator.compute(memory_manager->get_ptr(buf), memory_manager->get_len(buf) - sizeof(uint32_t), &crc);
+
+                    // Just memcpy the little-endian CRC onto the end of the message.
+                    // Per here, that should give correct results:
+                    // https://stackoverflow.com/a/65108067/7083698
+                    memcpy(static_cast<uint8_t *>(memory_manager->get_ptr(buf)) + memory_manager->get_len(buf) - sizeof(uint32_t),
+                        &crc, sizeof(uint32_t));
+                    tr_debug("Appending calculated Ethernet CRC 0x%08" PRIx32 " into copied buffer.", crc);
+                }
+                else {
+                    // Iterate over all data in the packet and compute the CRC
+                    net_stack_mem_buf_t * bufBeingChecksummed = buf;
+
+                    crcGenerator.compute_partial_start(&crc);
+                    do {
+                        crcGenerator.compute_partial(memory_manager->get_ptr(bufBeingChecksummed), memory_manager->get_len(bufBeingChecksummed), &crc);
+                        bufBeingChecksummed = memory_manager->get_next(bufBeingChecksummed);
+                    }
+                    while(bufBeingChecksummed != nullptr);
+                    crcGenerator.compute_partial_stop(&crc);
+
+                    // Allocate a new buffer at the end for the CRC.
+                    // We need to do this now because we need to be able to bail if the allocation fails,
+                    // and we can't do that if we already enqueued the rest of the packet
+                    crcBuf = memory_manager->alloc_heap(sizeof(uint32_t), 0);
+                    if(crcBuf == nullptr)
+                    {
+                        // No free memory, drop packet
+                        memory_manager->free(buf);
+                        return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
+                    }
+                    memcpy(memory_manager->get_ptr(crcBuf), &crc, sizeof(uint32_t));
+
+                    // We will need one more descriptor
+                    ++neededFreeDescs;
+                }
+            }
+
+
+            // Step 4: Wait for needed amount of buffers to be available.
             // Note that, in my experience, it's better to block here, as dropping the packet
             // due to not having enough buffers can create weird effects when the application sends
             // lots of packets at once.
@@ -331,7 +361,7 @@ namespace mbed {
                 txDescAvailFlag.wait_any_for(1, rtos::Kernel::wait_for_u32_forever);
             }
 
-            // Step 4: Load buffer into descriptors and send
+            // Step 5: Load buffer into descriptors and send
             net_stack_mem_buf_t * currBuf = buf;
             for(size_t descCount = 0; descCount < packetDescsUsed; descCount++)
             {
@@ -361,17 +391,36 @@ namespace mbed {
                 // the counters.
                 core_util_critical_section_enter();
 
-                // Configure settings.
-                giveToDMA(txSendIndex, bufferPtr, bufferLen, descCount == 0, nextBuf == nullptr);
+                // Give the packet to DMA.
+                // If we are in appendCRC mode AND the packet was not copied, suppress the last desc flag
+                // since we need to enqueue one more later.
+                const bool isLast = nextBuf == nullptr && !(appendCRC && !packetCopied);
+                giveToDMA(txSendIndex, bufferPtr, bufferLen, descCount == 0, isLast);
 
                 // Update descriptor count and index
                 --txDescsOwnedByApplication;
-                txSendIndex = (txSendIndex + 1) % MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
+                txSendIndex = (txSendIndex + 1) % TX_NUM_DESCS;
 
                 core_util_critical_section_exit();
 
                 // Move to next buffer
                 currBuf = nextBuf;
+            }
+
+            // Step 6: Append CRC descriptor (if needed)
+            // We do this by appending one more descriptor to the end of the packet in the Tx ring containing
+            // the CRC. Logic here works the same as above.
+            if(appendCRC && !packetCopied) {
+                descStackBuffers[txSendIndex] = crcBuf;
+                const auto bufferPtr = static_cast<uint8_t *>(memory_manager->get_ptr(crcBuf));
+
+                tr_debug("Appending calculated Ethernet CRC 0x%08" PRIx32 " via Tx descriptor %zu", crc, txSendIndex);
+
+                core_util_critical_section_enter();
+                giveToDMA(txSendIndex, bufferPtr, sizeof(uint32_t), false, true);
+                --txDescsOwnedByApplication;
+                txSendIndex = (txSendIndex + 1) % TX_NUM_DESCS;
+                core_util_critical_section_exit();
             }
 
             return CompositeEMAC::ErrCode::SUCCESS;
