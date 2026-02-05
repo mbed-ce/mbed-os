@@ -48,6 +48,9 @@ class ConfigEntryDetails(BaseModel):
     a value not in this list.
     """
 
+    required: bool | None = None
+    """If set to true, the option value must be configured or has a default."""
+
     value_max: int | float | None = None
     """
     For integer or floating point values, this gives the maximum allowed value.
@@ -123,7 +126,7 @@ class BaseJSONConfig(BaseModel):
     In target JSON, this is an accumulating attribute.
     """
 
-    overrides: dict[str, ConfigSettingValue | MemoryBankConfiguration] = Field(default_factory=dict)
+    overrides: dict[str, ConfigSettingValue | dict[str, MemoryBankConfiguration]] = Field(default_factory=dict)
     """
     List of overrides to unconditionally apply when this lib is included.
 
@@ -156,11 +159,17 @@ class BaseJSONConfig(BaseModel):
                 if not isinstance(self, MbedAppJSON):
                     msg = 'target.memory_bank_config is only allowed in "overrides" mbed_app.json5!'
                     raise ValueError(msg)
-                if not isinstance(value, MemoryBankConfiguration):
-                    msg = 'target.memory_bank_config in "overrides" must be a MemoryBankConfiguration schema element!'
+                if not isinstance(value, dict):
+                    msg = 'target.memory_bank_config in "overrides" must be a dict!'
                     raise ValueError(msg)
+                for _, mem_bank_value in value.items():
+                    if not isinstance(mem_bank_value, MemoryBankConfiguration):
+                        msg = (
+                            'target.memory_bank_config in "overrides" must be a MemoryBankConfiguration schema element!'
+                        )
+                        raise ValueError(msg)
             else:
-                if isinstance(value, MemoryBankConfiguration):
+                if isinstance(value, dict):
                     msg = 'Only target.memory_bank_config in "overrides" may be a dict! Everything else must be a primitive type!'
                     raise ValueError(msg)
         return self
@@ -593,7 +602,9 @@ class MbedAppJSON(BaseJSONConfig):
     # Throw an error during validation if there are extra fields
     model_config = ConfigDict(extra="forbid")
 
-    target_overrides: dict[str, dict[str, ConfigSettingValue | MemoryBankConfiguration]] = Field(default_factory=dict)
+    target_overrides: dict[str, dict[str, ConfigSettingValue | dict[str, MemoryBankConfiguration] | list[str]]] = Field(
+        default_factory=dict
+    )
     """
     List of overrides applied based on target labels. This is similar to the "overrides" section,
     but allows applying the override only if the target has a specific label. Labels generally
@@ -635,11 +646,18 @@ class MbedAppJSON(BaseJSONConfig):
         for overrides in self.target_overrides.values():
             for name, value in overrides.items():
                 if name == "target.memory_bank_config":
-                    if not isinstance(value, MemoryBankConfiguration):
-                        msg = 'target.memory_bank_config in "target_overrides" must be a MemoryBankConfiguration schema element!'
+                    if not isinstance(value, dict):
+                        msg = 'target.memory_bank_config in "target_overrides" must be a dict'
                         raise ValueError(msg)
+                    for _, mem_bank_value in value.items():
+                        if not isinstance(mem_bank_value, MemoryBankConfiguration):
+                            msg = (
+                                'target.memory_bank_config in "target_overrides" must be a '
+                                "MemoryBankConfiguration schema element!"
+                            )
+                            raise ValueError(msg)
                 else:
-                    if isinstance(value, MemoryBankConfiguration):
+                    if isinstance(value, dict):
                         msg = 'Only target.memory_bank_config in "target_overrides" may be a dict! Everything else must be a primitive type!'
                         raise ValueError(msg)
         return self
