@@ -6,13 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2016 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -34,7 +33,8 @@
   */
 #define HAL_MODULE_ENABLED
 #define HAL_ADC_MODULE_ENABLED
-/* #define HAL_CAN_MODULE_ENABLED */
+/* MBED: use the legacy CAN module for now */ 
+// #define HAL_CAN_MODULE_ENABLED
 #define HAL_CAN_LEGACY_MODULE_ENABLED
 #define HAL_CEC_MODULE_ENABLED
 #define HAL_COMP_MODULE_ENABLED
@@ -155,77 +155,24 @@
 #define  DATA_CACHE_ENABLE            0U
 #define  USE_SPI_CRC                  1U
 
-#if !defined  (USE_HAL_ADC_REGISTER_CALLBACKS)
-  #define  USE_HAL_ADC_REGISTER_CALLBACKS         0U /* ADC register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_CAN_REGISTER_CALLBACKS)
-  #define  USE_HAL_CAN_REGISTER_CALLBACKS         0U /* CAN register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_COMP_REGISTER_CALLBACKS)
-  #define  USE_HAL_COMP_REGISTER_CALLBACKS        0U /* COMP register callback disabled      */
-#endif
-
-#if !defined  (USE_HAL_CEC_REGISTER_CALLBACKS)
-  #define  USE_HAL_CEC_REGISTER_CALLBACKS         0U /* CEC register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_DAC_REGISTER_CALLBACKS)
-  #define  USE_HAL_DAC_REGISTER_CALLBACKS         0U /* DAC register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_I2C_REGISTER_CALLBACKS)
-  #define  USE_HAL_I2C_REGISTER_CALLBACKS         0U /* I2C register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_SMBUS_REGISTER_CALLBACKS)
-  #define  USE_HAL_SMBUS_REGISTER_CALLBACKS       0U /* SMBUS register callback disabled     */
-#endif
-
-#if !defined  (USE_HAL_UART_REGISTER_CALLBACKS)
-  #define  USE_HAL_UART_REGISTER_CALLBACKS        0U /* UART register callback disabled      */
-#endif
-
-#if !defined  (USE_HAL_USART_REGISTER_CALLBACKS)
-  #define  USE_HAL_USART_REGISTER_CALLBACKS       0U /* USART register callback disabled     */
-#endif
-
-#if !defined  (USE_HAL_IRDA_REGISTER_CALLBACKS)
-  #define  USE_HAL_IRDA_REGISTER_CALLBACKS        0U /* IRDA register callback disabled      */
-#endif
-
-#if !defined  (USE_HAL_SMARTCARD_REGISTER_CALLBACKS)
-  #define  USE_HAL_SMARTCARD_REGISTER_CALLBACKS   0U /* SMARTCARD register callback disabled */
-#endif
-
-#if !defined  (USE_HAL_WWDG_REGISTER_CALLBACKS)
-  #define  USE_HAL_WWDG_REGISTER_CALLBACKS        0U /* WWDG register callback disabled      */
-#endif
-
-#if !defined  (USE_HAL_RTC_REGISTER_CALLBACKS)
-  #define  USE_HAL_RTC_REGISTER_CALLBACKS         0U /* RTC register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_SPI_REGISTER_CALLBACKS)
-  #define  USE_HAL_SPI_REGISTER_CALLBACKS         0U /* SPI register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_I2S_REGISTER_CALLBACKS)
-  #define  USE_HAL_I2S_REGISTER_CALLBACKS         0U /* I2S register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_TIM_REGISTER_CALLBACKS)
-  #define  USE_HAL_TIM_REGISTER_CALLBACKS         0U /* TIM register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_TSC_REGISTER_CALLBACKS)
-  #define  USE_HAL_TSC_REGISTER_CALLBACKS         0U /* TSC register callback disabled       */
-#endif
-
-#if !defined  (USE_HAL_PCD_REGISTER_CALLBACKS)
-  #define  USE_HAL_PCD_REGISTER_CALLBACKS         0U /* PCD register callback disabled       */
-#endif
+#define  USE_HAL_ADC_REGISTER_CALLBACKS         0U /* ADC register callback disabled       */
+#define  USE_HAL_CAN_REGISTER_CALLBACKS         0U /* CAN register callback disabled       */
+#define  USE_HAL_COMP_REGISTER_CALLBACKS        0U /* COMP register callback disabled      */
+#define  USE_HAL_CEC_REGISTER_CALLBACKS         0U /* CEC register callback disabled       */
+#define  USE_HAL_DAC_REGISTER_CALLBACKS         0U /* DAC register callback disabled       */
+#define  USE_HAL_I2C_REGISTER_CALLBACKS         0U /* I2C register callback disabled       */
+#define  USE_HAL_SMBUS_REGISTER_CALLBACKS       0U /* SMBUS register callback disabled     */
+#define  USE_HAL_UART_REGISTER_CALLBACKS        0U /* UART register callback disabled      */
+#define  USE_HAL_USART_REGISTER_CALLBACKS       0U /* USART register callback disabled     */
+#define  USE_HAL_IRDA_REGISTER_CALLBACKS        0U /* IRDA register callback disabled      */
+#define  USE_HAL_SMARTCARD_REGISTER_CALLBACKS   0U /* SMARTCARD register callback disabled */
+#define  USE_HAL_WWDG_REGISTER_CALLBACKS        0U /* WWDG register callback disabled      */
+#define  USE_HAL_RTC_REGISTER_CALLBACKS         0U /* RTC register callback disabled       */
+#define  USE_HAL_SPI_REGISTER_CALLBACKS         0U /* SPI register callback disabled       */
+#define  USE_HAL_I2S_REGISTER_CALLBACKS         0U /* I2S register callback disabled       */
+#define  USE_HAL_TIM_REGISTER_CALLBACKS         0U /* TIM register callback disabled       */
+#define  USE_HAL_TSC_REGISTER_CALLBACKS         0U /* TSC register callback disabled       */
+#define  USE_HAL_PCD_REGISTER_CALLBACKS         0U /* PCD register callback disabled       */
 
 /* ########################## Assert Selection ############################## */
 /**
@@ -363,7 +310,3 @@
 #endif
 
 #endif /* __STM32F0xx_HAL_CONF_H */
-
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

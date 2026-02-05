@@ -2,6 +2,7 @@
  *******************************************************************************
  * Copyright (c) 2018, STMicroelectronics
  * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -183,7 +184,21 @@ time_t rtc_read(void)
 #if TARGET_STM32F1
 
     RtcHandle.Instance = RTC;
-    return RTC_ReadTimeCounter(&RtcHandle);
+    /* Read time counter with rollover protection */
+    uint16_t high1 = READ_REG(RtcHandle.Instance->CNTH & RTC_CNTH_RTC_CNT);
+    uint16_t low = READ_REG(RtcHandle.Instance->CNTL & RTC_CNTL_RTC_CNT);
+    uint16_t high2 = READ_REG(RtcHandle.Instance->CNTH & RTC_CNTH_RTC_CNT);
+    
+    uint32_t timecounter;
+    if (high1 != high2) {
+        /* Counter rolled over during read, use high2 with fresh low read */
+        timecounter = (((uint32_t)high2 << 16U) | READ_REG(RtcHandle.Instance->CNTL & RTC_CNTL_RTC_CNT));
+    } else {
+        /* No rollover */
+        timecounter = (((uint32_t)high1 << 16U) | low);
+    }
+    
+    return timecounter;
 
 #else /* TARGET_STM32F1 */
 
@@ -235,9 +250,28 @@ void rtc_write(time_t t)
 #if TARGET_STM32F1
 
     RtcHandle.Instance = RTC;
-    if (RTC_WriteTimeCounter(&RtcHandle, t) != HAL_OK) {
-        error("RTC_WriteTimeCounter error\n");
+    
+    /* STM32F1 RTC uses a 32-bit counter for seconds - write the full timestamp */
+    /* Disable write protection */
+    __HAL_RTC_WRITEPROTECTION_DISABLE(&RtcHandle);
+    
+    /* Enter initialization mode */
+    SET_BIT(RtcHandle.Instance->CRL, RTC_CRL_CNF);
+    
+    /* Write the 32-bit timestamp to the counter registers */
+    WRITE_REG(RtcHandle.Instance->CNTH, (t >> 16U));
+    WRITE_REG(RtcHandle.Instance->CNTL, (t & RTC_CNTL_RTC_CNT));
+    
+    /* Exit initialization mode */
+    CLEAR_BIT(RtcHandle.Instance->CRL, RTC_CRL_CNF);
+    
+    /* Wait for synchronization */
+    if (HAL_RTC_WaitForSynchro(&RtcHandle) != HAL_OK) {
+        error("rtc_write: sync error\n");
     }
+    
+    /* Enable write protection */
+    __HAL_RTC_WRITEPROTECTION_ENABLE(&RtcHandle);
 
 #else /* TARGET_STM32F1 */
 

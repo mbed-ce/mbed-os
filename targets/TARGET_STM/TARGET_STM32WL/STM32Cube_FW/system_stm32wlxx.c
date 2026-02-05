@@ -3,7 +3,18 @@
   * @file    system_stm32wlxx.c
   * @author  MCD Application Team
   * @brief   CMSIS Cortex Device Peripheral Access Layer System Source File
+  * 
+  ******************************************************************************
+  * @attention
   *
+  * Copyright (c) 2020-2021 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
   *   This file provides two functions and one global variable to be called from
   *   user application:
   *      - SystemInit(): This function is called at startup just after reset and
@@ -57,17 +68,6 @@
   *        SDIO and RNG clock                     |
   *-----------------------------------------------------------------------------
   *=============================================================================
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
   */
 
 /** @addtogroup CMSIS
@@ -134,13 +134,19 @@
 #if defined(VECT_TAB_SRAM)
 #define VECT_TAB_BASE_ADDRESS   SRAM2_BASE      /*!< Vector Table base address field.
                                                      This value must be a multiple of 0x100. */
+#if !defined(VECT_TAB_OFFSET)
 #define VECT_TAB_OFFSET         0x00008000U     /*!< Vector Table base offset field.
                                                      This value must be a multiple of 0x100. */
+#endif /* VECT_TAB_OFFSET */
+
 #else
 #define VECT_TAB_BASE_ADDRESS   FLASH_BASE      /*!< Vector Table base address field.
                                                      This value must be a multiple of 0x100. */
-#define VECT_TAB_OFFSET         0x00020000U        /*!< Vector Table base offset field.
+#if !defined(VECT_TAB_OFFSET)
+#define VECT_TAB_OFFSET         0x00020000U     /*!< Vector Table base offset field.
                                                      This value must be a multiple of 0x100. */
+#endif /* VECT_TAB_OFFSET */
+
 #endif
 #else /* CORE_CM4 */
  /*!< Uncomment this line for user vector table remap in Sram else user remap
@@ -149,14 +155,15 @@
 #if defined(VECT_TAB_SRAM)
 #define VECT_TAB_BASE_ADDRESS   SRAM1_BASE      /*!< Vector Table base address field.
                                                      This value must be a multiple of 0x200. */
-#define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table base offset field.
-                                                     This value must be a multiple of 0x200. */
 #else
 #define VECT_TAB_BASE_ADDRESS   FLASH_BASE      /*!< Vector Table base address field.
                                                      This value must be a multiple of 0x200. */
-#define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table base offset field.
-                                                     This value must be a multiple of 0x200. */
-#endif
+#endif   
+
+#if !defined(VECT_TAB_OFFSET)
+#define VECT_TAB_OFFSET         0x00000000U      /*!< Vector Table base offset field.
+                                                      This value must be a multiple of 0x200. */
+#endif /* VECT_TAB_OFFSET */
 #endif
 #endif
 
@@ -208,12 +215,14 @@
   * @param  None
   * @retval None
   */
-__WEAK void SystemInit(void)
+__weak void SystemInit(void)
 {
-#include "nvic_addr.h"                   // MBED
-  SCB->VTOR = NVIC_FLASH_VECTOR_ADDRESS; // MBED
 #if defined(USER_VECT_TAB_ADDRESS)
   /* Configure the Vector Table location add offset address ------------------*/
+#else
+// Mbed patch
+#include "nvic_addr.h"
+  SCB->VTOR = NVIC_FLASH_VECTOR_ADDRESS;
 #endif
 
   /* FPU settings ------------------------------------------------------------*/
@@ -356,5 +365,4 @@ void SystemCoreClockUpdate(void)
 /**
   * @}
   */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+ 

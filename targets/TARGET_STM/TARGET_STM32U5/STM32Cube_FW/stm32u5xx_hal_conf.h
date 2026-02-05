@@ -1,14 +1,12 @@
 /**
   ******************************************************************************
-  * @file    stm32u5xx_hal_conf_template.h
+  * @file    stm32u5xx_hal_conf.h
   * @author  MCD Application Team
-  * @brief   HAL configuration template file.
-  *          This file should be copied to the application folder and renamed
-  *          to stm32u5xx_hal_conf.h.
+  * @brief   HAL configuration file.
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2021 STMicroelectronics.
+  * Copyright (c) 2021-2023 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -51,6 +49,7 @@ extern "C" {
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_FMAC_MODULE_ENABLED
 #define HAL_GFXMMU_MODULE_ENABLED
+#define HAL_GFXTIM_MODULE_ENABLED
 #define HAL_GPIO_MODULE_ENABLED
 #define HAL_GPU2D_MODULE_ENABLED
 #define HAL_GTZC_MODULE_ENABLED
@@ -60,6 +59,7 @@ extern "C" {
 #define HAL_ICACHE_MODULE_ENABLED
 #define HAL_IRDA_MODULE_ENABLED
 #define HAL_IWDG_MODULE_ENABLED
+#define HAL_JPEG_MODULE_ENABLED
 #define HAL_LPTIM_MODULE_ENABLED
 #define HAL_LTDC_MODULE_ENABLED
 #define HAL_MDF_MODULE_ENABLED
@@ -79,6 +79,7 @@ extern "C" {
 #define HAL_RTC_MODULE_ENABLED
 #define HAL_SAI_MODULE_ENABLED
 #define HAL_SD_MODULE_ENABLED
+#define HAL_SDIO_MODULE_ENABLED
 #define HAL_SMARTCARD_MODULE_ENABLED
 #define HAL_SMBUS_MODULE_ENABLED
 #define HAL_SPI_MODULE_ENABLED
@@ -142,7 +143,7 @@ extern "C" {
 vary depending on the variations in voltage and temperature.*/
 
 #if !defined  (LSI_STARTUP_TIMEOUT)
-#define LSI_STARTUP_TIMEOUT    130UL      /*!< Time out for LSI start up, in ms */
+#define LSI_STARTUP_TIMEOUT    130UL      /*!< Time out for LSI start up, in us */
 #endif /* LSI_STARTUP_TIMEOUT */
 
 /**
@@ -203,16 +204,17 @@ vary depending on the variations in voltage and temperature.*/
 #define  USE_HAL_DCMI_REGISTER_CALLBACKS       0U /* DCMI register callback disabled      */
 #define  USE_HAL_DMA2D_REGISTER_CALLBACKS      0U /* DMA2D register callback disabled     */
 #define  USE_HAL_DSI_REGISTER_CALLBACKS        0U /* DSI register callback disabled       */
-#define  USE_HAL_ETH_REGISTER_CALLBACKS        0U /* ETH register callback disabled       */
 #define  USE_HAL_FDCAN_REGISTER_CALLBACKS      0U /* FDCAN register callback disabled     */
 #define  USE_HAL_FMAC_REGISTER_CALLBACKS       0U /* FMAC register callback disabled      */
 #define  USE_HAL_GFXMMU_REGISTER_CALLBACKS     0U /* GFXMMU register callback disabled    */
+#define  USE_HAL_GFXTIM_REGISTER_CALLBACKS     0U /* GFXTIM register callback disabled    */
 #define  USE_HAL_GPU2D_REGISTER_CALLBACKS      0U /* GPU2D register callback disabled     */
 #define  USE_HAL_HASH_REGISTER_CALLBACKS       0U /* HASH register callback disabled      */
 #define  USE_HAL_HCD_REGISTER_CALLBACKS        0U /* HCD register callback disabled       */
 #define  USE_HAL_I2C_REGISTER_CALLBACKS        0U /* I2C register callback disabled       */
 #define  USE_HAL_IWDG_REGISTER_CALLBACKS       0U /* IWDG register callback disabled      */
 #define  USE_HAL_IRDA_REGISTER_CALLBACKS       0U /* IRDA register callback disabled      */
+#define  USE_HAL_JPEG_REGISTER_CALLBACKS       0U /* JPEG register callback disabled      */
 #define  USE_HAL_LPTIM_REGISTER_CALLBACKS      0U /* LPTIM register callback disabled     */
 #define  USE_HAL_LTDC_REGISTER_CALLBACKS       0U /* LTDC register callback disabled      */
 #define  USE_HAL_MDF_REGISTER_CALLBACKS        0U /* MDF register callback disabled       */
@@ -229,6 +231,7 @@ vary depending on the variations in voltage and temperature.*/
 #define  USE_HAL_RTC_REGISTER_CALLBACKS        0U /* RTC register callback disabled       */
 #define  USE_HAL_SAI_REGISTER_CALLBACKS        0U /* SAI register callback disabled       */
 #define  USE_HAL_SD_REGISTER_CALLBACKS         0U /* SD register callback disabled        */
+#define  USE_HAL_SDIO_REGISTER_CALLBACKS       0U /* SDIO register callback disabled      */
 #define  USE_HAL_SDRAM_REGISTER_CALLBACKS      0U /* SDRAM register callback disabled     */
 #define  USE_HAL_SMARTCARD_REGISTER_CALLBACKS  0U /* SMARTCARD register callback disabled */
 #define  USE_HAL_SMBUS_REGISTER_CALLBACKS      0U /* SMBUS register callback disabled     */
@@ -250,9 +253,11 @@ vary depending on the variations in voltage and temperature.*/
 #define USE_SPI_CRC                   1U
 
 /* ################## SDMMC peripheral configuration ######################### */
-
 #define USE_SD_TRANSCEIVER            0U
 
+/* ################## SDIO peripheral configuration ########################## */
+#define USE_SDIO_TRANSCEIVER          0U
+#define SDIO_MAX_IO_NUMBER            7U /*!< SDIO device support maximum IO number */
 
 /* Includes ------------------------------------------------------------------*/
 /**
@@ -327,6 +332,10 @@ vary depending on the variations in voltage and temperature.*/
 #include "stm32u5xx_hal_gfxmmu.h"
 #endif /* HAL_GFXMMU_MODULE_ENABLED */
 
+#ifdef HAL_GFXTIM_MODULE_ENABLED
+#include "stm32u5xx_hal_gfxtim.h"
+#endif /* HAL_GFXTIM_MODULE_ENABLED */
+
 #ifdef HAL_HASH_MODULE_ENABLED
 #include "stm32u5xx_hal_hash.h"
 #endif /* HAL_HASH_MODULE_ENABLED */
@@ -354,6 +363,10 @@ vary depending on the variations in voltage and temperature.*/
 #ifdef HAL_IWDG_MODULE_ENABLED
 #include "stm32u5xx_hal_iwdg.h"
 #endif /* HAL_IWDG_MODULE_ENABLED */
+
+#ifdef HAL_JPEG_MODULE_ENABLED
+#include "stm32u5xx_hal_jpeg.h"
+#endif /* HAL_JPEG_MODULE_ENABLED */
 
 #ifdef HAL_LPTIM_MODULE_ENABLED
 #include "stm32u5xx_hal_lptim.h"
@@ -390,6 +403,10 @@ vary depending on the variations in voltage and temperature.*/
 #ifdef HAL_SD_MODULE_ENABLED
 #include "stm32u5xx_hal_sd.h"
 #endif /* HAL_SD_MODULE_ENABLED */
+
+#ifdef HAL_SDIO_MODULE_ENABLED
+#include "stm32u5xx_hal_sdio.h"
+#endif /* HAL_SDIO_MODULE_ENABLED */
 
 #ifdef HAL_SMBUS_MODULE_ENABLED
 #include "stm32u5xx_hal_smbus.h"
@@ -491,4 +508,3 @@ vary depending on the variations in voltage and temperature.*/
 #endif
 
 #endif /* STM32U5xx_HAL_CONF_H */
-
