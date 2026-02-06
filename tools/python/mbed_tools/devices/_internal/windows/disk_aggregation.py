@@ -179,14 +179,14 @@ class SystemDiskInformation:
         """Gets system's disk data by serial number."""
         if not self._disk_data_by_serial_number:
             self._load_data()
-        return self._disk_data_by_serial_number if self._disk_data_by_serial_number else {}
+        return self._disk_data_by_serial_number or {}
 
     @property
     def disk_data_by_label(self) -> dict:
         """Gets system's disk data by label."""
         if not self._disk_data_by_label:
             self._load_data()
-        return self._disk_data_by_label if self._disk_data_by_label else {}
+        return self._disk_data_by_label or {}
 
     def get_disk_information(self, uid: WindowsUID) -> List[AggregatedDiskData]:
         """Gets all disk information for a given UID."""

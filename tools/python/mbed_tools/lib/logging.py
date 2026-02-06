@@ -8,6 +8,8 @@ import logging
 from types import TracebackType
 from typing import Optional, Type, cast
 
+from typing_extensions import Self
+
 from mbed_tools.lib.exceptions import ToolsError
 
 LOGGING_FORMAT = "%(levelname)s: %(message)s"
@@ -39,7 +41,7 @@ class MbedToolsHandler:
         self._traceback = traceback
         self.exit_code = 0
 
-    def __enter__(self) -> "MbedToolsHandler":
+    def __enter__(self) -> Self:
         """Return the Context Manager."""
         return self
 

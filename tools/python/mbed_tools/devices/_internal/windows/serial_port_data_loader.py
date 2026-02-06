@@ -29,7 +29,7 @@ class SystemSerialPortInformation:
         """Gets system's serial ports by usb id."""
         if not self._serial_port_by_usb_id:
             self._load_data()
-        return self._serial_port_by_usb_id if self._serial_port_by_usb_id else {}
+        return self._serial_port_by_usb_id or {}
 
     def get_serial_port_information(self, usb_id: UsbIdentifier) -> List[SerialPort]:
         """Gets all disk information for a given serial number."""
