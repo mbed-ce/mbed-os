@@ -178,7 +178,7 @@ public:
      * Concatenate two memory buffer chains
      *
      * Concatenates buffer chain to end of the other buffer chain. Concatenated-to buffer total length
-     * is adjusted accordingly. cat_buf must point to the start of a the chain. After concatenation
+     * is adjusted accordingly. cat_buf must point to the start of the chain. After concatenation
      * to_buf's chain now owns those buffers, and they will be freed when the to_buf chain is freed.
      *
      * @warning It is forbidden for \c cat_buf to have skipped header bytes.

@@ -83,7 +83,12 @@
         },
         "emac-rx-pool-num-bufs": {
             "help": "Number of buffers (of size netsocket.emac-rx-pool-buf-size) in the EMAC receive pool. This controls how much memory is preallocated for Ethernet reception. A larger number means that more Ethernet packets can be received per second without dropping any. Some EMACs need up to 4 extra buffers, so this should be set such that (this value minus 4) times the buffer size is at least 1514 (so we can receive one full Ethernet frame).",
-            "value": 7
+
+            // Note: In testing, this seems to be a reasonable number to help slower MCUs like LPC1768 pass
+            // the TCP and UDP stress tests. In particular, this makes sure we have more Rx buffer space than
+            // the TCP window size (which defaults to 3 max size packets = 12 592-byte buffers), which is
+            // important because we need to be able to receive an entire TCP window without dropping packets.
+            "value": 14
         },
         "emac-tx-num-descs": {
             "help": "Number of Tx descriptors in the Ethernet MAC DMA ring. This affects how much data can be queued for Tx at one time",
@@ -93,32 +98,14 @@
             "help" : "Maximum supported number of multicast addresses that the application can subscribe to. If this limit is reached, we give up and enable all mcast groups.",
             "value" : 8
         },
-        "emac-phy-model": {
-            "help": "Model of the Ethernet PHY on the board. Should correspond to a driver defined in PhyDrivers.cpp",
-            "value": null
-        },
-        "emac-phy-mdio-address": {
-            "help": "MDIO address of the phy chip. Usually set with strapping pins. NOTE: 0 is *supposed* to be reserved as the general call address but lots of phy chips use it anyway.",
-            "value": null
-        },
-        "emac-phy-poll-period": {
-            "help": "How often (in ms) to poll the Ethernet PHY and check for link status changes.",
-            "value": 100
-        }
+
     },
     "target_overrides": {
         "TB_SENSE_12": {
-            "nsapi.default-mesh-type": "LOWPAN"
-        },
-        "MCU_STM32": {
-            // First-party STM32 boards generally use a LAN8742 PHY at MDIO address 0
-            "nsapi.emac-phy-model": "LAN87XX",
-            "nsapi.emac-phy-mdio-address": 0
+            "default-mesh-type": "LOWPAN"
         },
         "MCU_M480": {
-            "nsapi.emac-phy-model": "IP101G",
-            "nsapi.emac-phy-mdio-address": 1,
-            "nsapi.emac-max-mcast-subscribes": 14, // Max supported by hardware
+            "emac-max-mcast-subscribes": 14, // Max supported by hardware
 
             // The M480 EMAC sadly does not support splitting one frame across multiple Rx descriptors.
             // So, we need to make each Rx descriptor large enough to fit a max size Ethernet packet.
@@ -126,6 +113,9 @@
             // receives the CRC and length at the end of the packet, with no way to turn it off. So, we need an extra 6 
             // bytes padding that can be clobbered here.
             "emac-rx-pool-buf-size": 1524,
+
+            // Somewhat reduce number of buffers due to increasing their size above
+            "emac-rx-pool-num-bufs": 7
         }
     }
 }

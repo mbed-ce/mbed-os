@@ -79,6 +79,7 @@ _______________________________________________________________________________
 - Add support for using an ESP32 chip as an external wifi-fi interface via [ESP AT firmware](https://github.com/espressif/esp-at). This functionality can be accessed by adding the `ESPRESSIF_ESP32` component to your application.
 - `SDBlockDevice` can now use async SPI, allowing other threads to execute while large SD card transfers are ongoing
 - `CacheAlignedBuffer` class added, providing a way to manage DMA buffers on cores that have a CPU cache
+- LwIP stack assertions can now be turned on through a new `lwip.asserts-enabled` JSON option, which can help you find issues and invalid configurations more easily.
 
 ### Changed
 
@@ -130,6 +131,7 @@ _______________________________________________________________________________
   - Rewrite I2C slave HAL to behave as documented (e.g. I2CSlave::read() would return one more byte than actually read)
   - Fix destroying a PwmOut not stopping the PWM signal
   - Fix reading the pulse width and period from a PwmOut just returning raw register values rather than correctly scaled numbers
+  - Ethernet driver completely rewritten. It now supports multicast and uses memory more efficiently, and is more resilient against several HW bugs on LPC17xx
 - Nuvoton `M480` MCU family:
   - Rewrite Ethernet driver to use new driver framework
   - Fix I2C slave NACKing the last byte from the master when receiving

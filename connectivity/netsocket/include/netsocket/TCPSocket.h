@@ -68,8 +68,8 @@ public:
      *  bytes sent from the buffer.
      *
      *  By default, send blocks until all data is sent. If socket is set to
-     *  non-blocking or times out, a partial amount can be written.
-     *  NSAPI_ERROR_WOULD_BLOCK is returned if no data was written.
+     *  non-blocking or times out, a partial amount can be read.
+     *  NSAPI_ERROR_WOULD_BLOCK is returned if no data was read.
      *
      *  @param data     Buffer of data to send to the host
      *  @param size     Size of the buffer in bytes

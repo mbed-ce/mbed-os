@@ -200,6 +200,11 @@ void UDPSOCKET_ECHOTEST_NONBLOCK_impl(bool use_sendto)
         for (int retry_cnt = 0; retry_cnt <= RETRIES; retry_cnt++) {
             fill_tx_buffer_ascii(tx_buffer, pkt_s);
 
+            Timer individual_pkt_time;
+            individual_pkt_time.start();
+
+            tr_info("Sending pkt no. %u with size %d", s_idx, pkt_s);
+
             if (use_sendto) {
                 sent = sock->sendto(udp_addr, tx_buffer, pkt_s);
             } else {
@@ -239,9 +244,13 @@ void UDPSOCKET_ECHOTEST_NONBLOCK_impl(bool use_sendto)
                     if (tc_exec_time.elapsed_time() >= time_allotted) {
                         break;
                     }
-                    signals.wait_all(
+                    if (individual_pkt_time.elapsed_time() > 1s) {
+                        tr_warn("Timeout waiting for response, retrying");
+                        break;
+                    }
+                    signals.wait_all_for(
                         SIGNAL_SIGIO_RX,
-                        milliseconds(SIGIO_TIMEOUT).count()
+                        500ms
                     );
                     --retry_recv;
                     continue;
@@ -250,6 +259,10 @@ void UDPSOCKET_ECHOTEST_NONBLOCK_impl(bool use_sendto)
                     TEST_FAIL();
                     break;
                 } else if (recvd == pkt_s) {
+                    tr_info("Received response for pkt no. %u", s_idx);
+                    break;
+                } else {
+                    tr_warn("Received response with wrong size!");
                     break;
                 }
             }

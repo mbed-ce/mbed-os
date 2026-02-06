@@ -161,17 +161,17 @@ class BaseJSONConfig(BaseModel):
                     raise ValueError(msg)
                 if not isinstance(value, dict):
                     msg = 'target.memory_bank_config in "overrides" must be a dict!'
-                    raise ValueError(msg)
-                for _, mem_bank_value in value.items():
+                    raise TypeError(msg)
+                for mem_bank_value in value.values():
                     if not isinstance(mem_bank_value, MemoryBankConfiguration):
                         msg = (
                             'target.memory_bank_config in "overrides" must be a MemoryBankConfiguration schema element!'
                         )
-                        raise ValueError(msg)
+                        raise TypeError(msg)
             else:
                 if isinstance(value, dict):
                     msg = 'Only target.memory_bank_config in "overrides" may be a dict! Everything else must be a primitive type!'
-                    raise ValueError(msg)
+                    raise TypeError(msg)
         return self
 
 
@@ -648,16 +648,16 @@ class MbedAppJSON(BaseJSONConfig):
                 if name == "target.memory_bank_config":
                     if not isinstance(value, dict):
                         msg = 'target.memory_bank_config in "target_overrides" must be a dict'
-                        raise ValueError(msg)
-                    for _, mem_bank_value in value.items():
+                        raise TypeError(msg)
+                    for mem_bank_value in value.values():
                         if not isinstance(mem_bank_value, MemoryBankConfiguration):
                             msg = (
                                 'target.memory_bank_config in "target_overrides" must be a '
                                 "MemoryBankConfiguration schema element!"
                             )
-                            raise ValueError(msg)
+                            raise TypeError(msg)
                 else:
                     if isinstance(value, dict):
                         msg = 'Only target.memory_bank_config in "target_overrides" may be a dict! Everything else must be a primitive type!'
-                        raise ValueError(msg)
+                        raise TypeError(msg)
         return self

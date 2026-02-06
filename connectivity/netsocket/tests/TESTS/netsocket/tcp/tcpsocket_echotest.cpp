@@ -67,6 +67,9 @@ void TCPSOCKET_ECHOTEST()
     }
     tr_info("Connected to echo server");
 
+    // 5 seconds should be a reasonable timeout for responses from the server
+    sock.set_timeout(5s);
+
     int recvd;
     int sent;
     for (unsigned int s_idx = 0; s_idx < sizeof(pkt_sizes) / sizeof(*pkt_sizes); s_idx++) {
@@ -76,7 +79,7 @@ void TCPSOCKET_ECHOTEST()
         fill_tx_buffer_ascii(tcp_global::tx_buffer, BUFF_SIZE);
         sent = sock.send(tcp_global::tx_buffer, pkt_s);
         if (sent < 0) {
-            tr_error("[Round#%02d] network error %d", s_idx, sent);
+            tr_error("[Round#%02d] network error %s", s_idx, nsapi_strerror(sent));
             TEST_FAIL();
             break;
         } else if (sent != pkt_s) {

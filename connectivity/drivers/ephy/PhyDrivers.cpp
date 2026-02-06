@@ -36,8 +36,8 @@ inline constexpr GenericEthPhy::Config DefaultConfig = {
 
 class Driver : public GenericEthPhy {
 public:
-    explicit Driver(GenericEthPhy::Config const & config = DefaultConfig):
-    GenericEthPhy(config)
+    explicit Driver(GenericEthPhy::Config const &config = DefaultConfig):
+        GenericEthPhy(config)
     {}
 };
 
@@ -48,52 +48,54 @@ public:
 
 namespace IP101G {
 
-    /// Driver for the IC+ IP101Gx PHY
-    /// Datasheet: https://www.lcsc.com/datasheet/lcsc_datasheet_IC-Plus-IP101GR_C79324.pdf
-    /// @{
+/// Driver for the IC+ IP101Gx PHY
+/// Datasheet: https://www.lcsc.com/datasheet/lcsc_datasheet_IC-Plus-IP101GR_C79324.pdf
+/// @{
 
-    inline constexpr GenericEthPhy::Config DefaultConfig = {
-        .OUI = 0x90C3,
-        .model_min = 0x5,
-        .model_max = 0x5,
-        .address = 1, // Address set via strapping pins, 1 is used on Nuvoton boards
-    };
+inline constexpr GenericEthPhy::Config DefaultConfig = {
+    .OUI = 0x90C3,
+    .model_min = 0x5,
+    .model_max = 0x5,
+    .address = 1, // Address set via strapping pins, 1 is used on Nuvoton boards
+};
 
-    class Driver : public GenericEthPhy {
-    public:
-        explicit Driver(GenericEthPhy::Config const & config = DefaultConfig):
+class Driver : public GenericEthPhy {
+public:
+    explicit Driver(GenericEthPhy::Config const &config = DefaultConfig):
         GenericEthPhy(config)
-        {}
-    };
+    {}
+};
 
 
-    /// @}
+/// @}
 
 }
 
 namespace DP8384X {
 
-    /// Driver for the  DP8384X PHY
-    /// Datasheet: https://www.ti.com/lit/ds/symlink/dp83848c.pdf
-    ///            https://www.ti.com/lit/ds/symlink/dp83849i.pdf
-    /// @{
+/// Driver for the  DP8384X PHY
+/// Datasheet: https://www.ti.com/lit/ds/symlink/dp83848c.pdf
+///            https://www.ti.com/lit/ds/symlink/dp83849i.pdf
+/// @{
 
-    inline constexpr GenericEthPhy::Config DefaultConfig = {
-        .OUI = 0x80017,
-        .model_min = 0x09, // DP83848VV, DP83849I
-        .model_max = 0x0A, // DP83848C/I/VYB/YB
-        .address = 1, // Address set via PHYAD[0] strap.
-    };
+inline constexpr GenericEthPhy::Config DefaultConfig = {
+    .OUI = 0x80017,
+    .model_min = 0x09, // DP83848VV, DP83849I
+    .model_max = 0x0A, // DP83848C/I/VYB/YB
+    .address = 1, // Address set via PHYAD[0] strap.
+    .resetLowTime = std::chrono::microseconds(100),
+    .resetHighTime = std::chrono::milliseconds(167) // Cold reset time, per DP83848 datasheet section 4.7.1
+};
 
-    class Driver : public GenericEthPhy {
-    public:
-        explicit Driver(GenericEthPhy::Config const & config = DefaultConfig):
+class Driver : public GenericEthPhy {
+public:
+    explicit Driver(GenericEthPhy::Config const &config = DefaultConfig):
         GenericEthPhy(config)
-        {}
-    };
+    {}
+};
 
 
-    /// @}
+/// @}
 
 }
 
@@ -106,14 +108,14 @@ namespace DP8384X {
  *
  * @return Phy driver class instance, or nullptr if none is configured.
  */
-MBED_WEAK CompositeEMAC::PHYDriver * get_eth_phy_driver()
+MBED_WEAK CompositeEMAC::PHYDriver *get_eth_phy_driver()
 {
-#ifdef MBED_CONF_NSAPI_EMAC_PHY_MODEL
-    static GenericEthPhy::Config driverConfig = MBED_CONF_NSAPI_EMAC_PHY_MODEL::DefaultConfig;
-#ifdef MBED_CONF_NSAPI_EMAC_PHY_MDIO_ADDRESS
-    driverConfig.address = MBED_CONF_NSAPI_EMAC_PHY_MDIO_ADDRESS;
+#ifdef MBED_CONF_EPHY_MODEL
+    static GenericEthPhy::Config driverConfig = MBED_CONF_EPHY_MODEL::DefaultConfig;
+#ifdef MBED_CONF_EPHY_MDIO_ADDRESS
+    driverConfig.address = MBED_CONF_EPHY_MDIO_ADDRESS;
 #endif
-    static MBED_CONF_NSAPI_EMAC_PHY_MODEL::Driver driver(driverConfig);
+    static MBED_CONF_EPHY_MODEL::Driver driver(driverConfig);
     return &driver;
 #else
     return nullptr;

@@ -101,6 +101,9 @@ typedef enum {
 #define I2C_SCL I2C_SCL0
 #define I2C_SDA I2C_SDA0
 
+#define ETH_PHY_RESET NC // Ethernet PHY reset pin connected to MCU reset line on this board
+#define ETH_CLOCK_ENABLE NC
+
 typedef enum {
     PullUp = 0,
     PullDown = 3,

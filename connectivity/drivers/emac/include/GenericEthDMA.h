@@ -20,6 +20,7 @@
 #include "CompositeEMAC.h"
 #include "mbed_trace.h"
 #include "CacheAlignedBuffer.h"
+#include "MbedCRC.h"
 #include "mbed_critical.h"
 #include <atomic>
 #include <optional>
@@ -35,10 +36,11 @@ namespace mbed {
      */
     class GenericTxDMARing : public CompositeEMAC::TxDMA
     {
-    protected:
+    public:
         /// Number of entries in the Tx descriptor ring
         static constexpr size_t TX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
 
+    protected:
         /// Extra, unfilled Tx descs to leave in the DMA ring at all times.
         /// This is used to support Eth MACs that don't allow enqueuing every single descriptor at a time.
         const size_t extraTxDescsToLeave;
@@ -47,6 +49,14 @@ namespace mbed {
         /// packet that's split across multiple buffers.
         const bool supportsDescChaining;
 
+        /// Whether we need to manually append the CRC at the end of the frame being transmitted.
+        /// Most MACs do this automatically but on some it is bugged (e.g. LPC1768)
+        const bool appendCRC;
+
+        /// Whether we need to manually pad short Ethernet frames up to 60 bytes.
+        /// Most MACs can do this in HW, but not LPC1768!
+        const bool padFrames;
+
         /// Pointer to first memory buffer in the chain associated with descriptor n.
         /// The buffer address shall only be set for the *last* descriptor, so that the entire chain is freed
         /// when the last descriptor is returned.
@@ -54,6 +64,9 @@ namespace mbed {
 
         /// EventFlag used to signal when a Tx descriptor becomes available
         rtos::EventFlags txDescAvailFlag;
+
+        /// CRC generator. Only used if appendCRC is true.
+        MbedCRC<POLY_32BIT_ANSI, 32> crcGenerator;
 
         // Indexes for descriptor rings.
         // NOTE: when working with these indices, it's important to consider the case where e.g. the send and reclaim indexes are
@@ -64,9 +77,15 @@ namespace mbed {
         size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the mac thread calling reclaimTxDescs().
 
         /// Construct, passing a value for extraTxDescsToLeave
-        GenericTxDMARing(size_t extraTxDescsToLeave = 0, bool supportsDescChaining = true):
+        GenericTxDMARing(size_t extraTxDescsToLeave = 0, bool supportsDescChaining = true, bool appendCRC = false, bool padFrames = false):
         extraTxDescsToLeave(extraTxDescsToLeave),
-        supportsDescChaining(supportsDescChaining)
+        supportsDescChaining(supportsDescChaining),
+        appendCRC(appendCRC),
+        padFrames(padFrames),
+
+        // Per Wikipedia and SO, we want input and output reflect on due to Ethernet transmitting
+        // the CRC with backwards bit order compared to the rest of the data.
+        crcGenerator(0xFFFFFFFF, 0xFFFFFFFF, true, true)
         {}
 
         /// Configure DMA registers to point to the DMA ring,
@@ -106,7 +125,7 @@ namespace mbed {
                 // Case 1: buffer begins before bank
                 return (startAddrInt + size) > bankStartAddr;
             }
-            else if(startAddrInt >= bankStartAddr && startAddrInt < (bankStartAddr + bankSize)) {
+            else if(startAddrInt < (bankStartAddr + bankSize)) {
                 // Case 2: buffer begins inside bank
                 return true;
             }
@@ -177,11 +196,11 @@ namespace mbed {
                     descStackBuffers[txReclaimIndex] = nullptr;
                 }
 
+                tr_debug("Reclaimed Tx descriptor %zu", txReclaimIndex);
+
                 // Update counters
                 txReclaimIndex = (txReclaimIndex + 1) % TX_NUM_DESCS;
                 ++txDescsOwnedByApplication;
-
-                tr_debug("Reclaimed descriptor %zu", txReclaimIndex);
 
                 returnedAnyDescriptors = true;
             }
@@ -194,71 +213,146 @@ namespace mbed {
         }
 
         CompositeEMAC::ErrCode txPacket(net_stack_mem_buf_t * buf) {
+
+            // Whether we had to copy the packet. If we copied the packet,
+            // it will be copied to one contiguous buffer and will have room for the CRC at the end (if needed)
+            bool packetCopied = false;
+
+            // Step 0: Pad to 60/64 bytes (if appending CRC) if needed
+            constexpr size_t ETH_MIN_SIZE = 60; // Ethernet packet, not including CRC at end, must be padded to at least this size
+            if(padFrames && memory_manager->get_total_len(buf) < ETH_MIN_SIZE) {
+                const size_t sizeToPadTo = ETH_MIN_SIZE + (appendCRC ? sizeof(uint32_t) : 0);
+                const size_t numPaddingBytes = sizeToPadTo - memory_manager->get_total_len(buf);
+
+                buf = memory_manager->realloc_heap(buf, 0, sizeToPadTo);
+                if(buf == nullptr)
+                {
+                    // No free memory, drop packet
+                    return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
+                }
+                packetCopied = true;
+
+                // Clear to zeros
+                memset(static_cast<uint8_t *>(memory_manager->get_ptr(buf)) + (sizeToPadTo - numPaddingBytes), 0, numPaddingBytes);
+            }
+
             // Step 1: Figure out if we can send this zero-copy, or if we need to copy it.
             size_t packetDescsUsed = memory_manager->count_buffers(buf);
             size_t neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             bool needToCopy = false;
+            if(!packetCopied) {
+                if(packetDescsUsed > 1 && !supportsDescChaining)
+                {
+                    /// Packet uses more than 1 descriptor and the hardware doesn't support that so
+                    /// we have to copy it into one single descriptor.
+                    needToCopy = true;
+                }
 
-            if(packetDescsUsed > 1 && !supportsDescChaining)
-            {
-                /// Packet uses more than 1 descriptor and the hardware doesn't support that so
-                /// we have to copy it into one single descriptor.
-                needToCopy = true;
-            }
+                if(neededFreeDescs >= TX_NUM_DESCS)
+                {
+                    // Packet uses too many buffers, we have to copy it into a continuous buffer.
+                    // Note: Some Eth DMAs (e.g. STM32 v2) cannot enqueue all the descs in the ring at the same time
+                    // so we can't use every single descriptor to send the packet.
+                    needToCopy = true;
+                }
 
-            if(neededFreeDescs >= TX_NUM_DESCS)
-            {
-                // Packet uses too many buffers, we have to copy it into a continuous buffer.
-                // Note: Some Eth DMAs (e.g. STM32 v2) cannot enqueue all the descs in the ring at the same time
-                // so we can't use every single descriptor to send the packet.
-                needToCopy = true;
-            }
+                if(!needToCopy && (neededFreeDescs > txDescsOwnedByApplication && txDescsOwnedByApplication > extraTxDescsToLeave)) {
+                    // Packet uses more buffers than we have descriptors, but we can send it immediately if we copy
+                    // it into a single buffer.
+                    needToCopy = true;
+                }
 
-            if(!needToCopy && (neededFreeDescs > txDescsOwnedByApplication && txDescsOwnedByApplication > extraTxDescsToLeave)) {
-                // Packet uses more buffers than we have descriptors, but we can send it immediately if we copy
-                // it into a single buffer.
-                needToCopy = true;
-            }
+                if(!needToCopy) {
+                    net_stack_mem_buf_t * currBuf = buf;
+                    while(currBuf != nullptr) {
+                        // If this buffer is passed down direct from the application, we will need to
+                        // copy the packet.
+                        if(memory_manager->get_lifetime(currBuf) == NetStackMemoryManager::Lifetime::VOLATILE)
+                        {
+                            needToCopy = true;
+                            break;
+                        }
 
-            if(!needToCopy) {
-                net_stack_mem_buf_t * currBuf = buf;
-                while(currBuf != nullptr) {
-                    // If this buffer is passed down direct from the application, we will need to
-                    // copy the packet.
-                    if(memory_manager->get_lifetime(currBuf) == NetStackMemoryManager::Lifetime::VOLATILE)
-                    {
-                        needToCopy = true;
-                        break;
+                        // Or, if the buffer is in DMA-inaccessible RAM, we will need to copy it
+                        if(!isDMAReadableBuffer(static_cast<uint8_t *>(memory_manager->get_ptr(currBuf)), memory_manager->get_len(currBuf))) {
+                            needToCopy = true;
+                            break;
+                        }
+
+                        currBuf = memory_manager->get_next(currBuf);
                     }
-
-                    // Or, if the buffer is in DMA-inaccessible RAM, we will need to copy it
-                    if(!isDMAReadableBuffer(static_cast<uint8_t *>(memory_manager->get_ptr(currBuf)), memory_manager->get_len(currBuf))) {
-                        needToCopy = true;
-                        break;
-                    }
-
-                    currBuf = memory_manager->get_next(currBuf);
                 }
             }
 
             // Step 2: Copy packet if needed
             if(needToCopy)
             {
-                buf = memory_manager->realloc_heap(buf, 0);
+                const size_t newLen = memory_manager->get_total_len(buf) + (appendCRC ? sizeof(uint32_t) : 0);
+                buf = memory_manager->realloc_heap(buf, 0, newLen);
                 if(buf == nullptr)
                 {
                     // No free memory, drop packet
                     return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
                 }
+                packetCopied = true;
 
                 packetDescsUsed = 1;
                 neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
             }
 
-            tr_debug("Transmitting packet of length %lu in %zu buffers and %zu descs\n",
-                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), packetDescsUsed);
+            tr_debug("Transmitting packet of length %lu in %zu buffers (starting at 0x%" PRIx32 ") and %zu descs (starting at %zu)",
+                memory_manager->get_total_len(buf), memory_manager->count_buffers(buf), reinterpret_cast<uint32_t>(memory_manager->get_ptr(buf)), packetDescsUsed, txSendIndex);
 
-            // Step 3: Wait for needed amount of buffers to be available.
+            // Step 3: Calculate CRC and add to packet if possible.
+            // If we did not copy the packet, we are not allowed to modify the buffer sent from the network stack
+            // (as it may be e.g. kept by the stack for TCP retransmission later) so we have to tack on the CRC
+            // via another descriptor.
+            uint32_t crc;
+            net_stack_mem_buf_t * crcBuf = nullptr; // CRC is saved here if it needs to be appended later
+            if(appendCRC) {
+                if(packetCopied) {
+                    // Compute the CRC. Easy since we have a contiguous buffer, we just need to not do it over
+                    // the last 4 bytes.
+                    crcGenerator.compute(memory_manager->get_ptr(buf), memory_manager->get_len(buf) - sizeof(uint32_t), &crc);
+
+                    // Just memcpy the little-endian CRC onto the end of the message.
+                    // Per here, that should give correct results:
+                    // https://stackoverflow.com/a/65108067/7083698
+                    memcpy(static_cast<uint8_t *>(memory_manager->get_ptr(buf)) + memory_manager->get_len(buf) - sizeof(uint32_t),
+                        &crc, sizeof(uint32_t));
+                    tr_debug("Appending calculated Ethernet CRC 0x%08" PRIx32 " into copied buffer.", crc);
+                }
+                else {
+                    // Iterate over all data in the packet and compute the CRC
+                    net_stack_mem_buf_t * bufBeingChecksummed = buf;
+
+                    crcGenerator.compute_partial_start(&crc);
+                    do {
+                        crcGenerator.compute_partial(memory_manager->get_ptr(bufBeingChecksummed), memory_manager->get_len(bufBeingChecksummed), &crc);
+                        bufBeingChecksummed = memory_manager->get_next(bufBeingChecksummed);
+                    }
+                    while(bufBeingChecksummed != nullptr);
+                    crcGenerator.compute_partial_stop(&crc);
+
+                    // Allocate a new buffer at the end for the CRC.
+                    // We need to do this now because we need to be able to bail if the allocation fails,
+                    // and we can't do that if we already enqueued the rest of the packet
+                    crcBuf = memory_manager->alloc_heap(sizeof(uint32_t), 0);
+                    if(crcBuf == nullptr)
+                    {
+                        // No free memory, drop packet
+                        memory_manager->free(buf);
+                        return CompositeEMAC::ErrCode::OUT_OF_MEMORY;
+                    }
+                    memcpy(memory_manager->get_ptr(crcBuf), &crc, sizeof(uint32_t));
+
+                    // We will need one more descriptor
+                    ++neededFreeDescs;
+                }
+            }
+
+
+            // Step 4: Wait for needed amount of buffers to be available.
             // Note that, in my experience, it's better to block here, as dropping the packet
             // due to not having enough buffers can create weird effects when the application sends
             // lots of packets at once.
@@ -267,7 +361,7 @@ namespace mbed {
                 txDescAvailFlag.wait_any_for(1, rtos::Kernel::wait_for_u32_forever);
             }
 
-            // Step 4: Load buffer into descriptors and send
+            // Step 5: Load buffer into descriptors and send
             net_stack_mem_buf_t * currBuf = buf;
             for(size_t descCount = 0; descCount < packetDescsUsed; descCount++)
             {
@@ -297,17 +391,36 @@ namespace mbed {
                 // the counters.
                 core_util_critical_section_enter();
 
-                // Configure settings.
-                giveToDMA(txSendIndex, bufferPtr, bufferLen, descCount == 0, nextBuf == nullptr);
+                // Give the packet to DMA.
+                // If we are in appendCRC mode AND the packet was not copied, suppress the last desc flag
+                // since we need to enqueue one more later.
+                const bool isLast = nextBuf == nullptr && !(appendCRC && !packetCopied);
+                giveToDMA(txSendIndex, bufferPtr, bufferLen, descCount == 0, isLast);
 
                 // Update descriptor count and index
                 --txDescsOwnedByApplication;
-                txSendIndex = (txSendIndex + 1) % MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
+                txSendIndex = (txSendIndex + 1) % TX_NUM_DESCS;
 
                 core_util_critical_section_exit();
 
                 // Move to next buffer
                 currBuf = nextBuf;
+            }
+
+            // Step 6: Append CRC descriptor (if needed)
+            // We do this by appending one more descriptor to the end of the packet in the Tx ring containing
+            // the CRC. Logic here works the same as above.
+            if(appendCRC && !packetCopied) {
+                descStackBuffers[txSendIndex] = crcBuf;
+                const auto bufferPtr = static_cast<uint8_t *>(memory_manager->get_ptr(crcBuf));
+
+                tr_debug("Appending calculated Ethernet CRC 0x%08" PRIx32 " via Tx descriptor %zu", crc, txSendIndex);
+
+                core_util_critical_section_enter();
+                giveToDMA(txSendIndex, bufferPtr, sizeof(uint32_t), false, true);
+                --txDescsOwnedByApplication;
+                txSendIndex = (txSendIndex + 1) % TX_NUM_DESCS;
+                core_util_critical_section_exit();
             }
 
             return CompositeEMAC::ErrCode::SUCCESS;
@@ -332,7 +445,7 @@ namespace mbed {
         static constexpr size_t RX_POOL_EXTRA_BUFFERS = 3;
 
         /// Number of entries in the Rx descriptor ring
-        /// Note: + 1 because for some EMACs (STM32 v2) we have to always keep one descriptor owned by the application
+        /// Note: + 1 because for some EMACs (e.g. STM32 v2) we have to always keep one descriptor owned by the application
         // TODO: When we add multiple Ethernet support, this calculation may need to be changed, because the pool buffers will be split between multiple EMACs
         static constexpr size_t RX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_RX_POOL_NUM_BUFS - RX_POOL_EXTRA_BUFFERS + 1;
 
@@ -344,6 +457,18 @@ namespace mbed {
         static constexpr size_t RX_BUFFER_ALIGN = sizeof(uint32_t);
 #endif
     protected:
+        /// Whether the hardware has a first descriptor flag. If this is false, isFirstDesc() will always
+        /// return false. This reduces our ability to detect bad data in the DMA buffer.
+        const bool supportsFirstDescFlag;
+
+        /// Whether it is possible to return all Ethernet Rx descriptors to the MAC at the same time.
+        /// Some DMA arrangements do not support this.
+        const bool canReturnAllDescriptors;
+
+        /// This many bytes at the end of the packet will be discarded. This is used for EMACs which append
+        /// extra data to the end of the received Ethernet frame, such as the CRC.
+        const size_t packetEndDiscardSize;
+
         /// Pointer to the network stack buffer associated with the corresponding Rx descriptor.
         net_stack_mem_buf_t * rxDescStackBufs[RX_NUM_DESCS];
 
@@ -358,7 +483,11 @@ namespace mbed {
         size_t rxPoolPayloadSize;
 
         /// Constructor. Subclass must allocate descriptor array of size RX_NUM_DESCS
-        GenericRxDMARing() = default;
+        GenericRxDMARing(const bool supportsFirstDescFlag = true, const bool canReturnAllDescriptors = false, const size_t packetEndDiscardSize = 0):
+        supportsFirstDescFlag(supportsFirstDescFlag),
+        canReturnAllDescriptors(canReturnAllDescriptors),
+        packetEndDiscardSize(packetEndDiscardSize)
+        {}
 
         /// Configure DMA registers to point to the DMA ring,
         /// and enable DMA. This is done before the MAC itself is enabled, and before any descriptors
@@ -382,11 +511,11 @@ namespace mbed {
         virtual bool isFirstDesc(size_t descIdx) = 0;
 
         /// Does the given descriptor contain the end of a packet?
-        /// /// Note that the descriptor will already have been invalidated in cache if needed.
+        /// Note that the descriptor will already have been invalidated in cache if needed.
         virtual bool isLastDesc(size_t descIdx) = 0;
 
         /// Is the given descriptor an error descriptor?
-        /// /// Note that the descriptor will already have been invalidated in cache if needed.
+        /// Note that the descriptor will already have been invalidated in cache if needed.
         virtual bool isErrorDesc(size_t descIdx) = 0;
 
         /// Return a descriptor to DMA so that DMA can receive into it.
@@ -438,7 +567,7 @@ namespace mbed {
 
             // Note: With some Ethernet peripherals, you can never give back every single descriptor to
             // the hardware, because then it thinks there are 0 descriptors left.
-            while (rxDescsOwnedByApplication > 1) {
+            while (rxDescsOwnedByApplication > (canReturnAllDescriptors ? 0 : 1)) {
                 // Allocate new buffer
                 auto *const buffer = memory_manager->alloc_pool(rxPoolPayloadSize, RX_BUFFER_ALIGN);
                 if (buffer == nullptr) {
@@ -465,7 +594,7 @@ namespace mbed {
             // has its last descriptor flag or error flag set, indicating we have received at least one complete packet
             // or there is an error descriptor that can be reclaimed by the application.
             // Note that we want to bias towards false positives here, because false positives just waste CPU time,
-            // while false negatives would cause packets to be dropped.
+            // while false negatives would cause packets to be missed.
             // So, for simplicity, we just check every descriptor currently owned by the application until we
             // find one with the FS bit set or the error bits set.
             // This could potentially produce a false positive if we do this in the middle of receiving
@@ -486,7 +615,8 @@ namespace mbed {
                     // Descriptor owned by DMA.  We are out of descriptors to process.
                     return false;
                 }
-                if(isFirstDesc(descIdx))
+
+                if(supportsFirstDescFlag && isFirstDesc(descIdx))
                 {
                     if(seenFirstDesc)
                     {
@@ -533,9 +663,6 @@ namespace mbed {
             // Indices of the first and last descriptors for the packet will be saved here
             std::optional<size_t> firstDescIdx, lastDescIdx;
 
-            // Packet length is stored here once we check it
-            size_t pktLen{};
-
             // Prevent looping around into descriptors waiting for rebuild by limiting how many
             // we can process.
             const size_t maxDescsToProcess = RX_NUM_DESCS - rxDescsOwnedByApplication;
@@ -558,46 +685,70 @@ namespace mbed {
                 const bool isFirst = isFirstDesc(descIdx);
                 const bool isLast = isLastDesc(descIdx);
 
-                if (!firstDescIdx.has_value() && (isError || !isFirst)) {
-                    // Error or non-first-descriptor before a first descriptor
-                    // (could be caused by incomplete packets/junk in the DMA buffer).
-                    // Ignore, free associated memory, and schedule for rebuild.
-                    discardRxDescs(descIdx, (descIdx + 1) % RX_NUM_DESCS);
-                    continue;
+                if(isError) {
+                    if (!firstDescIdx.has_value()) {
+                        // Error before a first descriptor.
+                        // (could be caused by incomplete packets/junk in the DMA buffer).
+                        // Ignore, free associated memory, and schedule for rebuild.
+                        discardRxDescs(descIdx, (descIdx + 1) % RX_NUM_DESCS);
+                        tr_debug("Rx descriptor %zu has error, discarding...\n", descIdx);
+                        continue;
+                    }
+                    else {
+                        // Already seen a first descriptor, but we have an error descriptor.
+                        // So, delete the in-progress packet up to this point.
+                        discardRxDescs(*firstDescIdx, (descIdx + 1) % RX_NUM_DESCS);
+                        tr_debug("Rx descriptor %zu has error, discarding packet starting at index %zu...\n", descIdx, *firstDescIdx);
+                        firstDescIdx.reset();
+                        continue;
+                    }
                 }
-                else if(firstDescIdx.has_value() && isError)
-                {
-                    // Already seen a first descriptor, but we have an error descriptor.
-                    // So, delete the in-progress packet up to this point. 
-                    discardRxDescs(*firstDescIdx, (descIdx + 1) % RX_NUM_DESCS);
-                    firstDescIdx.reset();
-                    continue;
+
+                if (supportsFirstDescFlag) {
+                    if (!firstDescIdx.has_value() && !isFirst) {
+                        // Non-first-descriptor before a first descriptor
+                        // (could be caused by incomplete packets/junk in the DMA buffer).
+                        // Ignore, free associated memory, and schedule for rebuild.
+                        discardRxDescs(descIdx, (descIdx + 1) % RX_NUM_DESCS);
+                        continue;
+                    }
+                    else if(firstDescIdx.has_value() && isFirst)
+                    {
+                        // Already seen a first descriptor, but we have another first descriptor.
+                        // Some MACs do this if they run out of Rx descs when halfway through a packet.
+                        // Delete the in-progress packet up to this point and start over from descIdx.
+                        discardRxDescs(*firstDescIdx, descIdx);
+                        firstDescIdx = descIdx;
+                    }
+                    else if(isFirst)
+                    {
+                        // Normal first descriptor.
+                        firstDescIdx = descIdx;
+                    }
                 }
-                else if(firstDescIdx.has_value() && isFirst)
-                {
-                    // Already seen a first descriptor, but we have another first descriptor.
-                    // Some MACs do this if they run out of Rx descs when halfway through a packet.
-                    // Delete the in-progress packet up to this point and start over from descIdx.
-                    discardRxDescs(*firstDescIdx, descIdx);
-                    firstDescIdx = descIdx;
-                }
-                else if(isFirst)
-                {
-                    // Normal first descriptor.
-                    firstDescIdx = descIdx;
+                else {
+                    // Without more information, assume the first desc we see is the first descriptor
+                    if(!firstDescIdx.has_value()) {
+                        firstDescIdx = descIdx;
+                    }
                 }
 
                 if(isLast) {
-                    pktLen = getTotalLen(*firstDescIdx, descIdx);
                     lastDescIdx = descIdx;
                 }
             }
 
-            if (!lastDescIdx.has_value()) {
+            if (!firstDescIdx.has_value() || !lastDescIdx.has_value()) {
                 // No complete packet identified.
                 // Take the chance to rebuild any available descriptors, then return.
                 rebuildDescriptors();
-                tr_debug("No complete packets in Rx descs\n");
+                if(!firstDescIdx.has_value()) {
+                    tr_debug("No packet at all seen in Rx descs\n");
+                }
+                else {
+                    tr_debug("No last descriptor was seen for packet beginning at descriptor %zu\n", *firstDescIdx);
+                }
+
                 return nullptr;
             }
 
@@ -605,9 +756,13 @@ namespace mbed {
             // Update this now to tell the ISR to search for descriptors after lastDescIdx only.
             rxNextIndex = (*lastDescIdx + 1) % RX_NUM_DESCS;
 
+            // Calculate packet length
+            size_t pktLen = getTotalLen(*firstDescIdx, *lastDescIdx);
+            MBED_ASSERT(pktLen > packetEndDiscardSize);
+            pktLen -= packetEndDiscardSize;
+
             // Set length of first buffer
             net_stack_mem_buf_t *const headBuffer = rxDescStackBufs[*firstDescIdx];
-            
             memory_manager->set_len(headBuffer, std::min(pktLen, rxPoolPayloadSize));
             size_t lenRemaining = pktLen - std::min(pktLen, rxPoolPayloadSize);
 
@@ -621,12 +776,20 @@ namespace mbed {
                  descIdx != (*lastDescIdx + 1) % RX_NUM_DESCS;
                  descIdx = (descIdx + 1) % RX_NUM_DESCS) {
 
-                // We have to set the buffer length first before concatenating it to the chain
-                MBED_ASSERT(lenRemaining > 0);
-                memory_manager->set_len(rxDescStackBufs[descIdx], std::min(lenRemaining, rxPoolPayloadSize));
-                lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
+                if(lenRemaining == 0) {
+                    // No real data bytes left to keep. This can happen because of the end discard size, i.e.
+                    // if there is a final descriptor containing only the last few bytes we want to discard.
+                    // In this case just free the buffer.
+                    memory_manager->free(rxDescStackBufs[descIdx]);
+                }
+                else {
+                    // Otherwise, append this buffer to the chain
+                    memory_manager->set_len(rxDescStackBufs[descIdx], std::min(lenRemaining, rxPoolPayloadSize));
+                    lenRemaining -= std::min(lenRemaining, rxPoolPayloadSize);
 
-                memory_manager->cat(headBuffer, rxDescStackBufs[descIdx]);
+                    memory_manager->cat(headBuffer, rxDescStackBufs[descIdx]);
+                }
+
                 rxDescStackBufs[descIdx] = nullptr;
                 ++rxDescsOwnedByApplication;
             }

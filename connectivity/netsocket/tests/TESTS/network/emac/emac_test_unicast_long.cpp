@@ -37,6 +37,7 @@ void test_emac_unicast_long_cb(int opt)
 
     // Timeout
     if (opt == TIMEOUT && send_request) {
+        printf("Sending packet of length %d\n", msg_len);
         CTP_MSG_SEND(msg_len, emac_if_get_echo_server_addr(0), emac_if_get_own_addr(), emac_if_get_own_addr(), 0);
         send_request = false;
         no_response_cnt = 0;

@@ -8,6 +8,5 @@ target_include_directories(mbed-emac
 
 target_sources(mbed-emac
     PRIVATE
-        lpc17_emac.cpp
-        lpc_phy_dp83848.cpp
+        LPC17xxEthMac.cpp
 )
