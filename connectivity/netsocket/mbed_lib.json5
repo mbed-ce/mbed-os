@@ -83,7 +83,12 @@
         },
         "emac-rx-pool-num-bufs": {
             "help": "Number of buffers (of size netsocket.emac-rx-pool-buf-size) in the EMAC receive pool. This controls how much memory is preallocated for Ethernet reception. A larger number means that more Ethernet packets can be received per second without dropping any. Some EMACs need up to 4 extra buffers, so this should be set such that (this value minus 4) times the buffer size is at least 1514 (so we can receive one full Ethernet frame).",
-            "value": 7
+
+            // Note: In testing, this seems to be a reasonable number to help slower MCUs like LPC1768 pass
+            // the TCP and UDP stress tests. In particular, this makes sure we have more Rx buffer space than
+            // the TCP window size (which defaults to 3 max size packets = 12 592-byte buffers), which is
+            // important because we need to be able to receive an entire TCP window without dropping packets.
+            "value": 14
         },
         "emac-tx-num-descs": {
             "help": "Number of Tx descriptors in the Ethernet MAC DMA ring. This affects how much data can be queued for Tx at one time",
@@ -97,10 +102,10 @@
     },
     "target_overrides": {
         "TB_SENSE_12": {
-            "nsapi.default-mesh-type": "LOWPAN"
+            "default-mesh-type": "LOWPAN"
         },
         "MCU_M480": {
-            "nsapi.emac-max-mcast-subscribes": 14, // Max supported by hardware
+            "emac-max-mcast-subscribes": 14, // Max supported by hardware
 
             // The M480 EMAC sadly does not support splitting one frame across multiple Rx descriptors.
             // So, we need to make each Rx descriptor large enough to fit a max size Ethernet packet.
@@ -108,6 +113,9 @@
             // receives the CRC and length at the end of the packet, with no way to turn it off. So, we need an extra 6 
             // bytes padding that can be clobbered here.
             "emac-rx-pool-buf-size": 1524,
+
+            // Somewhat reduce number of buffers due to increasing their size above
+            "emac-rx-pool-num-bufs": 7
         }
     }
 }

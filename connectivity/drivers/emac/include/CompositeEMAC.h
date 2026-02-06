@@ -299,6 +299,9 @@ public:
         /// *takes ownership of* the passed packet and must free it either now or after
         /// it's been transmitted.
         /// Should block until there is space to transmit the packet.
+        /// Note that this function may NOT modify the packet, as in some cases the network stack may
+        /// still hold on to a reference to the packet and may still need the data unmodified. For example,
+        /// LwIP keeps TCP payloads in memory until they are acknowledged.
         virtual ErrCode txPacket(net_stack_mem_buf_t * buf) = 0;
     };
 

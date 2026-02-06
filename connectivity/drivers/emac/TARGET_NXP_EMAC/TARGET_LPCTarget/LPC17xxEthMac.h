@@ -86,7 +86,7 @@ class LPC17xxEthMAC : public CompositeEMAC
         void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
     public:
         explicit TxDMA(LPC_EMAC_TypeDef * const base):
-        GenericTxDMARing(0, true, true, true),
+        GenericTxDMARing(1, true, true, true),
         base(base)
         {}
     };
