@@ -56,6 +56,7 @@ git submodule update --init ${SUBMODULE_PATH}")
         endif()
 
         # Not managing submodules so as long as it exists, ¯\_(ツ)_/¯
+        return()
     endif()
 
     # Now we need git
