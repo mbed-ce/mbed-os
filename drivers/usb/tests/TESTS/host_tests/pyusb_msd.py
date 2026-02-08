@@ -210,7 +210,17 @@ class MSDUtils(object):
                     # Ask the OS to mount it under our user account.
                     # Note: This requires that no other processes are trying to automount disks at the same
                     # time -- this often requires changing file manager settings.
-                    subprocess.check_call(['udisksctl', 'mount', '-b', fields[1]])
+                    # Also note that there seems to be a race condition here -- the disk may have been mounted
+                    # in the background between the lsblk call and here.
+                    # In this case, udisksctl will exit with an error and we need to ignore that.
+                    completed_process = subprocess.run(['udisksctl', 'mount', '-b', fields[1]], stderr=subprocess.PIPE, text=True)
+                    if completed_process.returncode != 0:
+                        if "already mounted" in completed_process.stderr:
+                            self.log("udisksctl says it's already mounted, trying again...")
+                        else:
+                            self.report_error("'udisksctl mount' failed with: " + completed_process.stderr)
+                            self.notify_complete(False)
+
 
                     # The OS will now mount the disk.  Return so that the query can be run again and we'll get it
                     # next time.

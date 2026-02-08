@@ -27,8 +27,8 @@ def decode_json_file(path: Path) -> Any:
     elif path.suffix == ".json5":
         logger.debug(f"Loading JSON file {path}")
         try:
-            with path.open() as json_file:
-                return pyjson5.decode_io(json_file)  # pyright: ignore[reportArgumentType]
+            # Note: Using decode_utf8 to work around https://github.com/Kijewski/pyjson5/issues/131
+            pyjson5.decode_utf8(path.read_bytes())
         except pyjson5.Json5Exception as ex:
             # Parsing failed. pyjson5 produces completely useless error messages, so reparse the file with
             # json5 for a better one (slow!).

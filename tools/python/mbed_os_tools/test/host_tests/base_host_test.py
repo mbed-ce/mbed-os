@@ -127,6 +127,10 @@ def event_callback(key):
 
 
 class HostTestCallbackBase(BaseHostTestAbstract):
+
+    # Name of the current test case is stored here, if a test case is in progress
+    current_test_case_name: str | None = None
+
     def __init__(self):
         BaseHostTestAbstract.__init__(self)
         self.__callbacks = {}
@@ -141,8 +145,6 @@ class HostTestCallbackBase(BaseHostTestAbstract):
 
         self.__consume_by_default = [
             "__coverage_start",
-            "__testcase_start",
-            "__testcase_finish",
             "__testcase_count",
             "__testcase_name",
             "__testcase_summary",
@@ -177,6 +179,12 @@ class HostTestCallbackBase(BaseHostTestAbstract):
         self.log("Detected target fatal error. Failing test...")
         self.notify_complete(False)
 
+    def __test_case_start_callback(self, key: str, value: str, timestamp: float):
+        self.current_test_case_name = value
+
+    def __test_case_end_callback(self, key: str, value: str, timestamp: float):
+        self.current_test_case_name = None
+
     def __assign_default_callbacks(self):
         """! Assigns default callback handlers"""
         for key in self.__consume_by_default:
@@ -190,6 +198,10 @@ class HostTestCallbackBase(BaseHostTestAbstract):
         self.register_callback("mbed_error_code", self.__callback_default)
         self.register_callback("mbed_error_message", self.__callback_default)
         self.register_callback("mbed_error_location", self.__callback_default)
+
+        # Register callbacks to track the test case name
+        self.register_callback("__testcase_start", self.__test_case_start_callback, force=True)
+        self.register_callback("__testcase_end", self.__test_case_end_callback, force=True)
 
     def __assign_decorated_callbacks(self):
         """
