@@ -127,7 +127,6 @@ def event_callback(key):
 
 
 class HostTestCallbackBase(BaseHostTestAbstract):
-
     # Name of the current test case is stored here, if a test case is in progress
     current_test_case_name: str | None = None
 
