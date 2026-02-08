@@ -339,7 +339,7 @@ int SPI::transfer_internal(const void *tx_buffer, int tx_length, void *rx_buffer
 
 int SPI::transfer_and_wait_internal(const void *tx_buffer, int tx_length, void *rx_buffer, int rx_length, rtos::Kernel::Clock::duration_u32 timeout)
 {
-    // Simple callback from the transfer that sets the EventFlags using the I2C result event
+    // Simple callback from the transfer that sets the EventFlags using the SPI result event
     event_callback_t transferCallback([&](int event) {
         _transfer_and_wait_flags.set(event);
     });

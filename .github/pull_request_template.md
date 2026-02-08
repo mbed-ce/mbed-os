@@ -14,11 +14,14 @@
 <!-- 
     If there are any implications for users taking this change then they must be 
     provided here. For Major PR types this field is MANDATORY.
+
+    Please add a short summary of this field to the release notes at the top of CHANGELOG.md.
 -->
 
 #### Migration actions required <!-- Optional -->
 <!-- 
     This should only be applicable in Major PR types for which this field is MANDATORY.
+    Again, please include this information in the changelog for the next release.
 -->
 
 ### Documentation <!-- Required -->
@@ -31,6 +34,7 @@
 -->
 
 ----------------------------------------------------------------------------------------------------------------
+
 ### Pull request type <!-- Required -->
 
 <!--
@@ -41,6 +45,7 @@
     [] Major update (Breaking change E.g. Return code change / API behaviour change)
 
 ----------------------------------------------------------------------------------------------------------------
+
 ### Test results <!-- Required -->
 
 <!--
