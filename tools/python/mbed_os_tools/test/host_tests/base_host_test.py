@@ -32,11 +32,6 @@ class HostTestConfig:
     Baudrate of communication with the DUT
     """
 
-    mcu: str | None
-    """
-    CMSIS name of the MCU being tested, if configured in targets.json
-    """
-
     mbed_target: str
     """
     Mbed target being tested
@@ -60,11 +55,6 @@ class HostTestConfig:
     Define delay in seconds between __sync packet (Default is 5 seconds)
     """
 
-    sync_predelay: float
-    """
-    Wait this amount of time (in floating point seconds) after opening the serial port before sending sync.
-    """
-
     test_name: str
     """
     Name of the test, e.g. test-mbed-hal-common-tickers
@@ -75,14 +65,24 @@ class HostTestConfig:
     Timeout in sec for readiness of mount point and serial port of local or remote device. Default 60 sec
     """
 
-    reset_type: str | None
+    post_reset_delay: float
+    """
+    Delay to wait after resetting the target
+    """
+
+    sync_predelay: float = 0
+    """
+    Wait this amount of time (in floating point seconds) after opening the serial port before sending sync.
+    """
+
+    reset_type: str | None = None
     """
     If set, forces use of a specific reset plugin. If unset, the default method will be used, which sends a serial break.
     """
 
-    post_reset_delay: float
+    mcu: str | None = None
     """
-    Delay to wait after resetting the target
+    CMSIS name of the MCU being tested, if configured in targets.json
     """
 
 

@@ -505,16 +505,6 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         self.logger.prn_inf(self.get_hello_string())
 
         try:
-            # Copy image to device
-            if self.options.skip_flashing:
-                self.logger.prn_inf("copy image onto target... SKIPPED!")
-            else:
-                self.logger.prn_inf("copy image onto target...")
-                result = self.mbed.copy_image()
-                if not result:
-                    result = self.RESULT_IOERR_COPY
-                    return self.get_test_result_int(result)
-
             # Execute test if flashing was successful or skipped
             test_result = self.run_test()
 

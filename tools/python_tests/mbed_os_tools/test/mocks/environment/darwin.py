@@ -30,12 +30,3 @@ class MockTestEnvironmentDarwin(MockTestEnvironmentPosix):
 
         if value:
             return False
-
-        # Assert for proper image copy
-        mocked_call = self.patches["mbed_os_tools.test.host_tests_plugins.host_test_plugins.call"]
-
-        second_call_args = mocked_call.call_args_list[1][0][0]
-        self._test_case.assertEqual(second_call_args, ["sync"])
-
-        # Ensure only two subprocesses were started
-        self._test_case.assertEqual(len(mocked_call.call_args_list), 2)

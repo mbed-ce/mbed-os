@@ -56,12 +56,12 @@ def init_host_test_cli_params() -> Any:
 
     parser.add_argument("-m", "--micro", dest="micro", help="Target microcontroller name", metavar="MICRO")
 
-    parser.add_argument("-p", "--port", dest="port", help="Serial port of the target", metavar="PORT")
+    parser.add_argument("-p", "--port", dest="port", help="Serial port of the target", metavar="PORT", required=True)
 
     parser.add_argument("-d", "--disk", dest="disk", help="Target disk (mount point) path", metavar="DISK_PATH")
 
     parser.add_argument(
-        "-t", "--mbed-target", dest="target_id", help="Mbed target name of this board", metavar="TARGET_ID"
+        "-t", "--mbed-target", dest="target_id", help="Mbed target name of this board", metavar="TARGET"
     )
 
     parser.add_argument(
@@ -189,14 +189,6 @@ def init_host_test_cli_params() -> Any:
         default=False,
         action="store_true",
         help="Runs binary image on target (workflow: flash, reset, output console)",
-    )
-
-    parser.add_argument(
-        "--skip-flashing",
-        dest="skip_flashing",
-        default=False,
-        action="store_true",
-        help="Skips use of copy/flash plugin. Note: target will not be reflashed",
     )
 
     parser.add_argument(

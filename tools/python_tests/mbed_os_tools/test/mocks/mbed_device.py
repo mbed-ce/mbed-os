@@ -17,7 +17,7 @@ import re
 
 
 class MockMbedDevice(object):
-    KV_REGEX = re.compile("\{\{([\w\d_-]+);([^\}]+)\}\}")
+    KV_REGEX = re.compile("{{([\w\d_-]+);([^}]+)}}")
 
     def __init__(self, serial):
         self._synced = False

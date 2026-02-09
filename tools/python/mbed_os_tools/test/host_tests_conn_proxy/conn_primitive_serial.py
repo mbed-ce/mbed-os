@@ -32,7 +32,6 @@ class SerialConnectorPrimitive(ConnectorPrimitive):
         self.read_timeout = 0.01  # 10 milli sec
         self.write_timeout = 5
         self.config = config
-        self.target_id = self.config.mbed_target
         self.mcu = self.config.mcu
         self.polling_timeout = config.polling_timeout
         self.post_reset_delay = config.post_reset_delay
@@ -45,22 +44,10 @@ class SerialConnectorPrimitive(ConnectorPrimitive):
         # missing a mount point). Do not attempt to check if the serial port
         # for given target_id changed. We will attempt to open the port and
         # pass the already opened port object (not name) to the reset plugin.
-        serial_port = None
-        if self.port is not None:
-            # A serial port was provided.
-            # Don't pass in the target_id, so that no change in serial port via
-            # auto-discovery happens.
-            self.logger.prn_inf("using specified port '%s'" % (self.port))
-            serial_port = HostTestPluginBase().check_serial_port_ready(
-                self.port, target_id=None, timeout=self.polling_timeout
-            )
-        else:
-            # No serial port was provided.
-            # Fallback to auto-discovery via target_id.
-            self.logger.prn_inf("getting serial port via mbedls)")
-            serial_port = HostTestPluginBase().check_serial_port_ready(
-                self.port, target_id=self.target_id, timeout=self.polling_timeout
-            )
+        self.logger.prn_inf("using specified port '%s'" % (self.port))
+        serial_port = HostTestPluginBase().check_serial_port_ready(
+            self.port, target_id=None, timeout=self.polling_timeout
+        )
 
         if serial_port is None:
             raise ConnectorPrimitiveException("Serial port not ready!")
@@ -98,7 +85,7 @@ class SerialConnectorPrimitive(ConnectorPrimitive):
                 break
             time.sleep(1)
 
-    def reset_dev_via_serial(self, delay=1):
+    def reset_dev_via_serial(self, delay: float = 1):
         """! Reset device using selected method, calls one of the reset plugins"""
         reset_type = self.config.reset_type
         if not reset_type:
@@ -111,7 +98,6 @@ class SerialConnectorPrimitive(ConnectorPrimitive):
             serial=self.serial,
             disk=None,
             mcu=self.mcu,
-            target_id=self.target_id,
             polling_timeout=self.polling_timeout,
         )
         # Post-reset sleep
