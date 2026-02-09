@@ -48,7 +48,7 @@ class ConnPrimitiveSerialTestCase(unittest.TestCase):
             sync_timeout=5,
             test_name="test-something",
             polling_timeout=60,
-            post_reset_delay=1
+            post_reset_delay=1,
         )
         connector = SerialConnectorPrimitive("SERI", port, baudrate, config=config)
 

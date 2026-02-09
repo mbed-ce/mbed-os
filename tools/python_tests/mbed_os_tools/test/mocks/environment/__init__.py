@@ -50,7 +50,7 @@ class MockTestEnvironment(object):
                 self._platform_info["platform_name"],
                 self._platform_info["serial_port"],
                 self._image_path,
-                self._platform_info["mount_point"]
+                self._platform_info["mount_point"],
             )
             .split()
         )
