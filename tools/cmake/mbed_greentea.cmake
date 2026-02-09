@@ -170,10 +170,6 @@ function(mbed_greentea_add_test)
         list(APPEND MBED_HTRUN_ARGUMENTS "-e;${MBED_GREENTEA_HOST_TESTS_DIR}")
     endif()
 
-    if(DEFINED MBED_TARGET)
-        list(APPEND MBED_HTRUN_ARGUMENTS "-m;${MBED_TARGET}")
-    endif()
-
     # Pass CMSIS device name if available
     if(NOT "${MBED_CMSIS_DEVICE_NAME}" STREQUAL "")
         list(APPEND MBED_HTRUN_ARGUMENTS --micro ${MBED_CMSIS_DEVICE_NAME})

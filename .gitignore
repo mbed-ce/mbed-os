@@ -16,6 +16,7 @@ mbed_settings.py
 venv/
 
 # Mbedls
+.mbedls-mock
 .mbedls-mock.lock
 
 # Eclipse Project Files
