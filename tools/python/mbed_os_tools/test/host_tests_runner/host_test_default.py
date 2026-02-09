@@ -158,7 +158,10 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             skip_reset=self.options.skip_reset,
             sync_timeout=self.options.sync_timeout,
             sync_predelay=self.options.sync_predelay,
-            test_name=self.options.test_name
+            test_name=self.options.test_name,
+            polling_timeout=self.options.polling_timeout,
+            reset_type=self.options.forced_reset_type,
+            post_reset_delay=self.options.forced_reset_timeout,
         )
 
         def start_conn_process():
@@ -207,12 +210,8 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         p = start_conn_process()
         conn_process_started = False
         try:
-            # Wait for the start event. Process start timeout does not apply in
-            # Global resource manager case as it may take a while for resource
-            # to be available.
-            (key, value, timestamp) = event_queue.get(
-                timeout=None if self.options.global_resource_mgr else self.options.process_start_timeout
-            )
+            # Wait for the start event.
+            (key, value, timestamp) = event_queue.get(self.options.process_start_timeout)
 
             if key == "__conn_process_start":
                 conn_process_started = True

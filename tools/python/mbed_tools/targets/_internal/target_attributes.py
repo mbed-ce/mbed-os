@@ -15,9 +15,9 @@ import logging
 import pathlib
 from typing import Any, Dict, Optional, Set
 
-from mbed_tools.schemas import TargetJSON
 from mbed_tools.lib.exceptions import ToolsError
 from mbed_tools.lib.json_helpers import decode_json_file
+from mbed_tools.schemas import TargetJSON
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import (
     get_accumulating_attributes_for_target,
 )

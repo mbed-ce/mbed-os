@@ -27,6 +27,10 @@ else
   exit 1
 fi
 
+if ! python -c 'import coverage' >/dev/null 2>&1; then
+  echo "Unit tests optional dependency of Mbed not installed. Please run 'cd mbed-os && venv/bin/pip install -e ./tools[unit-tests]'."
+fi
+
 PYTHON=python
 
 # Comma separated list of directories to exclude from coverage

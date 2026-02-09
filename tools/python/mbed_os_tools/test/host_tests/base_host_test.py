@@ -19,6 +19,7 @@ from inspect import isfunction, ismethod
 
 import dataclasses
 
+
 @dataclasses.dataclass
 class HostTestConfig:
     port: str
@@ -69,6 +70,21 @@ class HostTestConfig:
     Name of the test, e.g. test-mbed-hal-common-tickers
     """
 
+    polling_timeout: int
+    """
+    Timeout in sec for readiness of mount point and serial port of local or remote device. Default 60 sec
+    """
+
+    reset_type: str | None
+    """
+    If set, forces use of a specific reset plugin. If unset, the default method will be used, which sends a serial break.
+    """
+
+    post_reset_delay: float
+    """
+    Delay to wait after resetting the target
+    """
+
 
 class BaseHostTestAbstract(object):
     """Base class for each host-test test cases with standard
@@ -79,7 +95,7 @@ class BaseHostTestAbstract(object):
     __event_queue = None  # To main even loop
     __dut_event_queue = None  # To DUT
     script_location = None  # Path to source file used to load host test
-    
+
     config: HostTestConfig
 
     def __notify_prn(self, text):

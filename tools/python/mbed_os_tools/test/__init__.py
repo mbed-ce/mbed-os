@@ -61,7 +61,7 @@ def init_host_test_cli_params() -> Any:
     parser.add_argument("-d", "--disk", dest="disk", help="Target disk (mount point) path", metavar="DISK_PATH")
 
     parser.add_argument(
-        "-t", "--target-id", dest="target_id", help="Unique Target Id or mbed platform", metavar="TARGET_ID"
+        "-t", "--mbed-target", dest="target_id", help="Mbed target name of this board", metavar="TARGET_ID"
     )
 
     parser.add_argument(
@@ -125,7 +125,7 @@ def init_host_test_cli_params() -> Any:
 
     parser.add_argument(
         "-C",
-        "--program_cycle_s",
+        "--program-cycle-s",
         dest="program_cycle_s",
         default=4,
         help=(
@@ -258,7 +258,13 @@ def init_host_test_cli_params() -> Any:
 
     parser.add_argument("--format", dest="format", help="Image file format passed to pyocd (elf, bin, hex, axf...).")
 
-    parser.add_argument("--test-name", "-n", dest="test_name", required=True, help="Name of the test being run in the build system. This is passed to the test script.")
+    parser.add_argument(
+        "--test-name",
+        "-n",
+        dest="test_name",
+        required=True,
+        help="Name of the test being run in the build system. This is passed to the test script.",
+    )
 
     parser.description = """Flash, reset and perform host supervised tests on mbed platforms"""
     parser.epilog = """Example: mbedhtrun -d E: -p COM5 -f "test-mbed-hal-common-tickers.bin" -C 4 -c shell -m K64F -n test-mbed-hal-common-tickers"""

@@ -41,17 +41,16 @@ class MockTestEnvironment(object):
 
         args = (
             (
-                "mbedhtrun -m {} -p {}:9600 -f "
-                '"{}" -e "TESTS/host_tests" -d {} -c default '
-                "-t {} -r default "
-                "-C 4 --sync 5 -P 60"
+                "mbedhtrun --mbed-target {} --port {}:9600 --image-path "
+                '"{}" --enum-host-tests "TESTS/host_tests" --disk {} --copy default '
+                "--reset default --test-name test-some-feature "
+                "--program-cycle-s 4 --sync 5 --polling-timeout 15"
             )
             .format(
                 self._platform_info["platform_name"],
                 self._platform_info["serial_port"],
                 self._image_path,
-                self._platform_info["mount_point"],
-                self._platform_info["target_id"],
+                self._platform_info["mount_point"]
             )
             .split()
         )

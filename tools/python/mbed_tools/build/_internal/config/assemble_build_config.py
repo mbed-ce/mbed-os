@@ -14,9 +14,9 @@ import pydantic
 
 from mbed_tools.build._internal.config import source
 from mbed_tools.build._internal.config.config import Config
-from mbed_tools.schemas import MbedAppJSON
 from mbed_tools.build._internal.find_files import LabelFilter, filter_files, find_files
 from mbed_tools.lib.json_helpers import decode_json_file
+from mbed_tools.schemas import MbedAppJSON
 
 if TYPE_CHECKING:
     from pathlib import Path

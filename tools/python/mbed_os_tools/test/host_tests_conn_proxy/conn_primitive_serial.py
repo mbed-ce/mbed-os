@@ -17,24 +17,26 @@
 import time
 from serial import Serial, SerialException
 
+from mbed_os_tools.test.host_tests.base_host_test import HostTestConfig
+
 from .. import host_tests_plugins
 from ..host_tests_plugins.host_test_plugins import HostTestPluginBase
 from .conn_primitive import ConnectorPrimitive, ConnectorPrimitiveException
 
 
 class SerialConnectorPrimitive(ConnectorPrimitive):
-    def __init__(self, name, port, baudrate, config):
+    def __init__(self, name, port, baudrate, config: HostTestConfig):
         ConnectorPrimitive.__init__(self, name)
         self.port = port
         self.baudrate = int(baudrate)
         self.read_timeout = 0.01  # 10 milli sec
         self.write_timeout = 5
         self.config = config
-        self.target_id = self.config.get("target_id", None)
-        self.mcu = self.config.get("mcu", None)
-        self.polling_timeout = config.get("polling_timeout", 60)
-        self.forced_reset_timeout = config.get("forced_reset_timeout", 1)
-        self.skip_reset = config.get("skip_reset", False)
+        self.target_id = self.config.mbed_target
+        self.mcu = self.config.mcu
+        self.polling_timeout = config.polling_timeout
+        self.post_reset_delay = config.post_reset_delay
+        self.skip_reset = config.skip_reset
         self.serial = None
 
         # Assume the provided serial port is good. Don't attempt to use the
@@ -92,26 +94,25 @@ class SerialConnectorPrimitive(ConnectorPrimitive):
                 self.logger.prn_err("Retry after 1 sec until %s seconds" % self.polling_timeout)
             else:
                 if not self.skip_reset:
-                    self.reset_dev_via_serial(delay=self.forced_reset_timeout)
+                    self.reset_dev_via_serial(delay=self.post_reset_delay)
                 break
             time.sleep(1)
 
     def reset_dev_via_serial(self, delay=1):
         """! Reset device using selected method, calls one of the reset plugins"""
-        reset_type = self.config.get("reset_type", "default")
+        reset_type = self.config.reset_type
         if not reset_type:
             reset_type = "default"
-        disk = self.config.get("disk", None)
 
         self.logger.prn_inf("reset device using '%s' plugin..." % reset_type)
         result = host_tests_plugins.call_plugin(
             "ResetMethod",
             reset_type,
             serial=self.serial,
-            disk=disk,
+            disk=None,
             mcu=self.mcu,
             target_id=self.target_id,
-            polling_timeout=self.config.get("polling_timeout"),
+            polling_timeout=self.polling_timeout,
         )
         # Post-reset sleep
         if delay:

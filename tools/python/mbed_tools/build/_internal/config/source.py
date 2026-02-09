@@ -13,10 +13,10 @@ from typing import Any, Iterable, List, Literal, Optional, Union
 
 import pydantic
 
+from mbed_tools import schemas
 from mbed_tools.build.exceptions import InvalidConfigOverrideError
 from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.lib.python_helpers import flatten_nested
-from mbed_tools import schemas
 from mbed_tools.schemas import ConfigSettingValue
 
 if typing.TYPE_CHECKING:
