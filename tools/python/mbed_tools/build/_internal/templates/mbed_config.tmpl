@@ -12,6 +12,12 @@ set(MBED_OUTPUT_EXT "{{OUTPUT_EXT}}")
 set(MBED_GREENTEA_TEST_RESET_TIMEOUT "{{forced_reset_timeout}}")
 set(MBED_DEFAULT_LINK_LIBRARIES {% for lib in link_libraries %} {{lib}} {%- endfor %})
 
+{%- if device_name is defined %}
+set(MBED_CMSIS_DEVICE_NAME {{device_name}})
+{%- else %}
+set(MBED_CMSIS_DEVICE_NAME ) # device_name not defined in target JSON
+{%- endif %}
+
 # JSON files used to generate this config.  If any of these change, the Python config generation
 # scripts must be rerun.
 set(MBED_CONFIG_JSON_SOURCE_FILES {% for json_source in json_sources | sort %}
@@ -78,15 +84,14 @@ set(MBED_CONFIG_DEFINITIONS
     {%- if setting.value is not none -%}
     "{{setting_name}}={{value}}"
     {% endif -%}
-{%- endfor -%}
-
+{%- endfor %}
     # Macros from JSON
-{% for macro in macros %}
+{%- for macro in macros %}
     "{{macro|replace("\"", "\\\"")}}"
 {%- endfor %}
 
     # Memory bank macros
-{% for macro in memory_bank_macros | sort %}
+{%- for macro in memory_bank_macros | sort %}
     {{macro}}
 {%- endfor %}
 )

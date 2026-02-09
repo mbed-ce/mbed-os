@@ -17,6 +17,58 @@ import inspect
 from time import time
 from inspect import isfunction, ismethod
 
+import dataclasses
+
+@dataclasses.dataclass
+class HostTestConfig:
+    port: str
+    """
+    Name of serial port used by the DUT
+    """
+
+    baudrate: int
+    """
+    Baudrate of communication with the DUT
+    """
+
+    mcu: str | None
+    """
+    CMSIS name of the MCU being tested, if configured in targets.json
+    """
+
+    mbed_target: str
+    """
+    Mbed target being tested
+    """
+
+    sync_behavior: int
+    """
+    Defines how many times __sync packet will be sent to device.
+    0: none
+    -1: forever
+    1,2,3... - number of times (Default 2 times)
+    """
+
+    skip_reset: bool
+    """
+    Skips use of reset plugin. Note: target will not be reset
+    """
+
+    sync_timeout: int
+    """
+    Define delay in seconds between __sync packet (Default is 5 seconds)
+    """
+
+    sync_predelay: float
+    """
+    Wait this amount of time (in floating point seconds) after opening the serial port before sending sync.
+    """
+
+    test_name: str
+    """
+    Name of the test, e.g. test-mbed-hal-common-tickers
+    """
+
 
 class BaseHostTestAbstract(object):
     """Base class for each host-test test cases with standard
@@ -27,7 +79,8 @@ class BaseHostTestAbstract(object):
     __event_queue = None  # To main even loop
     __dut_event_queue = None  # To DUT
     script_location = None  # Path to source file used to load host test
-    __config = {}
+    
+    config: HostTestConfig
 
     def __notify_prn(self, text):
         if self.__event_queue:
@@ -83,20 +136,22 @@ class BaseHostTestAbstract(object):
         """! Send Key-Value data to DUT"""
         self.__notify_dut(key, value)
 
-    def setup_communication(self, event_queue, dut_event_queue, config={}):
+    def setup_communication(self, event_queue, dut_event_queue, config: HostTestConfig):
         """! Setup queues used for IPC"""
         self.__event_queue = event_queue  # To main even loop
         self.__dut_event_queue = dut_event_queue  # To DUT
-        self.__config = config
+        self.config = config
 
     def get_config_item(self, name):
         """
         Return test config
 
+        Note: This is deprecated, instead access the config member variable for type-safe access.
+
         :param name:
         :return:
         """
-        return self.__config.get(name, None)
+        return self.config.__get__(name, None)
 
     def setup(self):
         """! Setup your tests and callbacks"""
@@ -200,7 +255,7 @@ class HostTestCallbackBase(BaseHostTestAbstract):
 
         # Register callbacks to track the test case name
         self.register_callback("__testcase_start", self.__test_case_start_callback, force=True)
-        self.register_callback("__testcase_end", self.__test_case_end_callback, force=True)
+        self.register_callback("__testcase_finish", self.__test_case_end_callback, force=True)
 
     def __assign_decorated_callbacks(self):
         """

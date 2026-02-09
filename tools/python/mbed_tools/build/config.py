@@ -14,7 +14,7 @@ import pydantic
 
 from mbed_tools.build._internal.cmake_file import render_mbed_config_cmake_template
 from mbed_tools.build._internal.config.assemble_build_config import assemble_config
-from mbed_tools.build._internal.config.schemas import TargetJSON
+from mbed_tools.schemas import TargetJSON
 from mbed_tools.build._internal.config.source import check_and_transform_config_name
 from mbed_tools.build._internal.memory_banks import incorporate_memory_bank_data_from_cmsis, process_memory_banks
 from mbed_tools.build._internal.write_files import write_file

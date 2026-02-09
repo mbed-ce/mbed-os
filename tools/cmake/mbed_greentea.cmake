@@ -138,9 +138,12 @@ function(mbed_greentea_add_test)
 
     mbed_set_post_build(${MBED_GREENTEA_TEST_NAME})
 
-    # User can set this cache variable to supply extra arguments to greentea.
-    # such as: -d to set the drive path
-    list(APPEND MBED_HTRUN_ARGUMENTS -p ${MBED_GREENTEA_SERIAL_PORT})
+    # User can set MBED_HTRUN_ARGUMENTS cache variable to supply extra arguments to greentea.
+    # such as: -d to set the drive path. This shadows the cache variable with a local variable.
+    list(APPEND MBED_HTRUN_ARGUMENTS -p 
+        ${MBED_GREENTEA_SERIAL_PORT} 
+        --test-name ${MBED_GREENTEA_TEST_NAME}
+        --target-id ${MBED_TARGET})
 
     # All of the upload methods already reset the chip after uploading so we don't need to reset via
     # the serial port.  Doing that type of reset also seems to give the Pitaya-Link probe trouble.
@@ -169,6 +172,11 @@ function(mbed_greentea_add_test)
 
     if(DEFINED MBED_TARGET)
         list(APPEND MBED_HTRUN_ARGUMENTS "-m;${MBED_TARGET}")
+    endif()
+
+    # Pass CMSIS device name if available
+    if(NOT "${MBED_CMSIS_DEVICE_NAME}" STREQUAL "")
+        list(APPEND MBED_HTRUN_ARGUMENTS --micro ${MBED_CMSIS_DEVICE_NAME})
     endif()
 
     if(NOT "${MBED_GREENTEA_TEST_RESET_TIMEOUT}" STREQUAL "")
