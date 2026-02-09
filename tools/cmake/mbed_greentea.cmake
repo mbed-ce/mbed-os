@@ -143,7 +143,7 @@ function(mbed_greentea_add_test)
     list(APPEND MBED_HTRUN_ARGUMENTS -p 
         ${MBED_GREENTEA_SERIAL_PORT} 
         --test-name ${MBED_GREENTEA_TEST_NAME}
-        --target-id ${MBED_TARGET})
+        --mbed-target ${MBED_TARGET})
 
     # All of the upload methods already reset the chip after uploading so we don't need to reset via
     # the serial port.  Doing that type of reset also seems to give the Pitaya-Link probe trouble.
