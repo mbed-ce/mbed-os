@@ -61,8 +61,7 @@ class CrashReportingTest(BaseHostTest):
         system_reset = yield
         self.reset = False
 
-        wait_after_reset = self.get_config_item('forced_reset_timeout')
-        wait_after_reset = wait_after_reset if wait_after_reset is not None else DEFAULT_CYCLE_PERIOD
+        wait_after_reset = self.config.post_reset_delay
 
         #Wait 2 seconds for system to init
         time.sleep(7.0)

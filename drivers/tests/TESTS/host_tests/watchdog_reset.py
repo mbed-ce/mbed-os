@@ -93,8 +93,7 @@ class WatchdogReset(BaseHostTest):
         self.current_case = TestCaseData(self.current_case.index, dev_data)
 
     def setup(self):
-        sync_delay = self.get_config_item('forced_reset_timeout')
-        self.sync_delay = sync_delay if sync_delay is not None else DEFAULT_SYNC_DELAY
+        self.sync_delay = self.config.post_reset_delay
         self.register_callback(MSG_KEY_DEVICE_READY, self.cb_device_ready)
         self.register_callback(MSG_KEY_DEVICE_RESET, self.cb_device_reset)
         self.register_callback(MSG_KEY_HEARTBEAT, self.cb_heartbeat)

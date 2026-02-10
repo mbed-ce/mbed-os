@@ -160,17 +160,6 @@ class BaseHostTestAbstract(object):
         self.__dut_event_queue = dut_event_queue  # To DUT
         self.config = config
 
-    def get_config_item(self, name):
-        """
-        Return test config
-
-        Note: This is deprecated, instead access the config member variable for type-safe access.
-
-        :param name:
-        :return:
-        """
-        return self.config.__get__(name, None)
-
     def setup(self):
         """! Setup your tests and callbacks"""
         raise NotImplementedError
