@@ -148,7 +148,7 @@ class SerialConnectorPrimitive(ConnectorPrimitive):
             self.serial.close()
 
     def reset(self):
-        self.reset_dev_via_serial(self.forced_reset_timeout)
+        self.reset_dev_via_serial(self.config.post_reset_delay)
 
     def __del__(self):
         self.finish()

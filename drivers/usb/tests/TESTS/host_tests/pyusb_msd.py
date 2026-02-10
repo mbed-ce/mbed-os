@@ -50,7 +50,7 @@ class PyusbMSDTest(BaseHostTest):
 
         """
         folder_name, file_name, file_content = value.split(' ')
-        msd_disk = MSDUtils.disk_path(self.serial_number)
+        msd_disk = self.disk_path(self.serial_number)
         file_path = os.path.join(msd_disk, folder_name, file_name)
         try:
             file = open(file_path, 'r')
@@ -70,7 +70,7 @@ class PyusbMSDTest(BaseHostTest):
 
         """
         dir_name, file_name = value.split(' ')
-        msd_disk = MSDUtils.disk_path(self.serial_number)
+        msd_disk = self.disk_path(self.serial_number)
         try:
             os.remove(os.path.join(msd_disk, dir_name, file_name))
         except:
@@ -85,7 +85,7 @@ class PyusbMSDTest(BaseHostTest):
         """
         wait_time = self.MOUNT_WAIT_TIME
         while wait_time != 0:
-            msd_disk = MSDUtils.disk_path(self.serial_number)
+            msd_disk = self.disk_path(self.serial_number)
             if msd_disk is not None:
                 # MSD disk found
                 time.sleep(2)  # wait for msd communication done
@@ -101,7 +101,7 @@ class PyusbMSDTest(BaseHostTest):
         """
         wait_time = self.MOUNT_WAIT_TIME
         while wait_time != 0:
-            msd_disk = MSDUtils.disk_path(self.serial_number)
+            msd_disk = self.disk_path(self.serial_number)
             if msd_disk is None:
                 #self.msd_disk = None
                 time.sleep(2)  # wait for msd communication done
@@ -115,20 +115,19 @@ class PyusbMSDTest(BaseHostTest):
         """Record visible filesystem size.
 
         """
-        stats = psutil.disk_usage(MSDUtils.disk_path(self.serial_number))
+        stats = psutil.disk_usage(self.disk_path(self.serial_number))
         self.send_kv("{}".format(stats.total), "0")
 
     def _callback_unmount(self, key, value, timestamp):
         """Disk unmount.
 
         """
-        if MSDUtils.unmount(serial=self.serial_number):
+        if self.unmount(serno=self.serial_number):
             self.report_success()
         else:
             self.report_error("unmount")
 
     def _callback_os_type(self, key, value, timestamp):
-        system_name = platform.system()
         if system_name == "Windows":
             self.send_kv("os_type", 1)
         elif system_name == "Linux":
@@ -159,29 +158,22 @@ class PyusbMSDTest(BaseHostTest):
     def teardown(self):
         pass
 
-
-class MSDUtils(object):
-
-    @staticmethod
-    def disk_path(serial):
-        system_name = platform.system()
+    def disk_path(self, serno):
         if system_name == "Windows":
-            return MSDUtils._disk_path_windows(serial)
+            return self._disk_path_windows(serno)
         elif system_name == "Linux":
-            return MSDUtils._disk_path_linux(serial)
+            return self._disk_path_linux(serno)
         elif system_name == "Darwin":
-            return MSDUtils._disk_path_mac(serial)
+            return self._disk_path_mac(serno)
         return None
 
-    @staticmethod
-    def unmount(serial):
-        system_name = platform.system()
+    def unmount(self, serno):
         if system_name == "Windows":
-            return MSDUtils._unmount_windows(serial)
+            return self._unmount_windows(serno)
         elif system_name == "Linux":
-            return MSDUtils._unmount_linux(serial)
+            return self._unmount_linux(serno)
         elif system_name == "Darwin":
-            return MSDUtils._unmount_mac(serial)
+            return self._unmount_mac(serno)
         return False
 
     @staticmethod
@@ -194,15 +186,14 @@ class MSDUtils(object):
                         return logical_disk.Caption
         return None
 
-    @staticmethod
-    def _disk_path_linux(serial):
+    def _disk_path_linux(self, serno):
 
         # This generates a table of serial number, mount point (e.g. /media/foo/DISK), and path (e.g. /dev/sdd)
         output = subprocess.check_output(['lsblk', '-dnoserial,mountpoint,path']).decode("UTF-8").split('\n')
         for line in output:
             fields = line.split()
 
-            if len(fields) >= 2 and fields[0] == str(serial):
+            if len(fields) >= 2 and fields[0] == str(serno):
                 # Found the correct device
 
                 if len(fields) == 2:
@@ -238,9 +229,8 @@ class MSDUtils(object):
         #     add implementation
         return None
 
-    @staticmethod
-    def _unmount_windows(serial):
-        disk_path = MSDUtils._disk_path_windows(serial)
+    def _unmount_windows(self, serno):
+        disk_path = PyusbMSDTest._disk_path_windows(serno)
         cmd_string = r'(New-Object -comObject Shell.Application).Namespace(17).ParseName("{}").InvokeVerb("Eject")'.format(disk_path)
 
         try_count = 10
@@ -248,21 +238,20 @@ class MSDUtils(object):
             p = subprocess.Popen(["powershell.exe", cmd_string], stdout=sys.stdout)
             p.communicate()
             try_count -= 1
-            if MSDUtils._disk_path_windows(serial) is None:
+            if self._disk_path_windows(serno) is None:
                 return True
             time.sleep(1)
 
         return False
 
-    @staticmethod
-    def _unmount_linux(serial):
-        disk_path = MSDUtils._disk_path_linux(serial)
+    def _unmount_linux(self, serno):
+        disk_path = self._disk_path_linux(serno)
         os.system("umount " + disk_path)
-        return MSDUtils._disk_path_linux(serial) is None
+        return self._disk_path_linux(serno) is None
 
     @staticmethod
-    def _unmount_mac(serial):
-        disk_path = MSDUtils._disk_path_mac(serial)
+    def _unmount_mac(self, serno):
+        disk_path = self._disk_path_mac(serno)
         os.system("diskutil unmount " + disk_path)
-        disks = set(MSDUtils._disks_mac())
-        return MSDUtils._disk_path_mac(serial) is None
+        disks = set(self._disks_mac())
+        return self._disk_path_mac(serno) is None
