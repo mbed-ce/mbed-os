@@ -86,7 +86,7 @@
 
             // Note: In testing, this seems to be a reasonable number to help slower MCUs like LPC1768 pass
             // the TCP and UDP stress tests. In particular, this makes sure we have more Rx buffer space than
-            // the TCP window size (which defaults to 3 max size packets = 12 592-byte buffers), which is
+            // the TCP window size (which defaults to 4 max size packets = 12 592-byte buffers), which is
             // important because we need to be able to receive an entire TCP window without dropping packets.
             "value": 14
         },
