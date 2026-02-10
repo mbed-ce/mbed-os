@@ -122,7 +122,7 @@
             "value": "osPriorityHigh"
         },
         "mem-size": {
-            "help": "Size of heap (bytes) - used for outgoing packets, and also used by some drivers for reception, see LWIP's opt.h for more information.",
+            "help": "Size of heap (bytes) - used for outgoing packets, and also used by some drivers for reception, see LWIP's opt.h for more information. Note that the total number of network buffer RAM used is approximately equal to (lwip.mem-size + nsapi.emac-rx-pool-num-bufs * emac-rx-pool-buf-size)",
             "value": 4000
         },
         "tcpip-thread-stacksize": {
@@ -165,6 +165,9 @@
     "target_overrides": {
         "Freescale": {
             "mem-size": 33270
+        },
+        "MCU_LPC17XX": {
+            "mem-size": 12288
         },
         "LPC546XX": {
             "mem-size": 36496
