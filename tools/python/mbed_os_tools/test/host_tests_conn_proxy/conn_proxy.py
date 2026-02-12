@@ -20,10 +20,10 @@ import re
 import sys
 import uuid
 from time import time, sleep
+
+from mbed_os_tools.test.host_tests.base_host_test import HostTestConfig
 from ..host_tests_logger import HtrunLogger
 from .conn_primitive_serial import SerialConnectorPrimitive
-from .conn_primitive_remote import RemoteConnectorPrimitive
-from .conn_primitive_fastmodel import FastmodelConnectorPrimitive
 from queue import Empty as QueueEmpty  # Queue here refers to the module, not a class
 
 
@@ -89,7 +89,7 @@ class KiViBufferWalker:
         return None, None, time()
 
 
-def conn_primitive_factory(conn_resource, config, event_queue, logger):
+def conn_primitive_factory(conn_resource, config: HostTestConfig, event_queue, logger):
     """! Factory producing connectors based on type and config
     @param conn_resource Name of connection primitive (e.g. 'serial' for
            local serial port connection or 'grm' for global resource manager)
@@ -98,7 +98,7 @@ def conn_primitive_factory(conn_resource, config, event_queue, logger):
     @param logger Host Test logger instance
     @return Object of type <ConnectorPrimitive> or None if type of connection primitive unknown (conn_resource)
     """
-    polling_timeout = int(config.get("polling_timeout", 60))
+    polling_timeout = config.polling_timeout
     logger.prn_inf("notify event queue about extra %d sec timeout for serial port pooling" % polling_timeout)
     event_queue.put(("__timeout", polling_timeout, time()))
 
@@ -107,19 +107,11 @@ def conn_primitive_factory(conn_resource, config, event_queue, logger):
         # Notify event queue we will wait additional time for serial port to be ready
 
         # Get extra configuration related to serial port
-        port = config.get("port")
-        baudrate = config.get("baudrate")
+        port = config.port
+        baudrate = config.baudrate
 
         logger.prn_inf("initializing serial port listener... ")
         connector = SerialConnectorPrimitive("SERI", port, baudrate, config=config)
-    elif conn_resource == "grm":
-        # Start GRM (Gloabal Resource Mgr) collection
-        logger.prn_inf("initializing global resource mgr listener... ")
-        connector = RemoteConnectorPrimitive("GLRM", config=config)
-    elif conn_resource == "fmc":
-        # Start Fast Model Connection collection
-        logger.prn_inf("initializing fast model connection")
-        connector = FastmodelConnectorPrimitive("FSMD", config=config)
     else:
         logger.pn_err("unknown connection resource!")
         raise NotImplementedError("ConnectorPrimitive factory: unknown connection resource '%s'!" % conn_resource)
@@ -127,7 +119,7 @@ def conn_primitive_factory(conn_resource, config, event_queue, logger):
     return connector
 
 
-def conn_process(event_queue, dut_event_queue, config: dict[str, Any]):
+def conn_process(event_queue, dut_event_queue, config: HostTestConfig):
     def __notify_conn_lost():
         error_msg = connector.error()
         connector.finish()
@@ -146,10 +138,10 @@ def conn_process(event_queue, dut_event_queue, config: dict[str, Any]):
     event_queue.put(("__conn_process_start", 1, time()))
 
     # Configuration of conn_opriocess behaviour
-    sync_behavior = int(config.get("sync_behavior", 1))
-    sync_timeout = config.get("sync_timeout", 1.0)
-    sync_predelay: float = config["sync_predelay"]
-    conn_resource = config.get("conn_resource", "serial")
+    sync_behavior = config.sync_behavior
+    sync_timeout = config.sync_timeout
+    sync_predelay = config.sync_predelay
+    conn_resource = "serial"
     syncs_sent = 0
 
     # Create connector instance with proper configuration

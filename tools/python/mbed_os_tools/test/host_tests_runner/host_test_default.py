@@ -21,6 +21,8 @@ from time import time
 from sre_compile import error
 
 from multiprocessing import Process, Queue
+
+from mbed_os_tools.test.host_tests.base_host_test import HostTestConfig
 from .. import host_tests_plugins, BaseHostTest
 from ..host_tests_registry import HostRegistry
 
@@ -38,10 +40,7 @@ from ..host_tests_logger import HtrunLogger
 from ..host_tests_conn_proxy import conn_process
 from ..host_tests_toolbox.host_functional import handle_send_break_cmd
 
-if sys.version_info > (3, 0):
-    from queue import Empty as QueueEmpty
-else:
-    from Queue import Empty as QueueEmpty
+from queue import Empty as QueueEmpty
 
 
 class DefaultTestSelector(DefaultTestSelectorBase):
@@ -79,12 +78,6 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             if options.list_plugins:  # --plugins option
                 host_tests_plugins.print_plugin_info()
                 sys.exit(0)
-
-            if options.global_resource_mgr or options.fast_model_connection:
-                # If Global/Simulator Resource Mgr is working it will handle reset/flashing workflow
-                # So local plugins are offline
-                self.options.skip_reset = True
-                self.options.skip_flashing = True
 
         if options.compare_log:
             with open(options.compare_log, "r") as f:
@@ -156,33 +149,20 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         self.logger.prn_inf("starting host test process...")
 
         # Create device info here as it may change after restart.
-        config = {
-            "digest": "serial",
-            "port": self.mbed.port,
-            "baudrate": self.mbed.serial_baud,
-            "mcu": self.mbed.mcu,
-            "program_cycle_s": self.options.program_cycle_s,
-            "reset_type": self.options.forced_reset_type,
-            "target_id": self.options.target_id,
-            "disk": self.options.disk,
-            "polling_timeout": self.options.polling_timeout,
-            "forced_reset_timeout": self.options.forced_reset_timeout,
-            "sync_behavior": self.options.sync_behavior,
-            "platform_name": self.options.micro,
-            "image_path": self.mbed.image_path,
-            "skip_reset": self.options.skip_reset,
-            "tags": self.options.tag_filters,
-            "sync_timeout": self.options.sync_timeout,
-            "sync_predelay": self.options.sync_predelay,
-        }
-
-        if self.options.global_resource_mgr:
-            grm_config = self._parse_grm(self.options.global_resource_mgr)
-            grm_config["conn_resource"] = "grm"
-            config.update(grm_config)
-
-        if self.options.fast_model_connection:
-            config.update({"conn_resource": "fmc", "fm_config": self.options.fast_model_connection})
+        config = HostTestConfig(
+            port=self.mbed.port,
+            baudrate=self.mbed.serial_baud,
+            mcu=self.mbed.mcu,
+            mbed_target=self.options.target_id,
+            sync_behavior=self.options.sync_behavior,
+            skip_reset=self.options.skip_reset,
+            sync_timeout=self.options.sync_timeout,
+            sync_predelay=self.options.sync_predelay,
+            test_name=self.options.test_name,
+            polling_timeout=self.options.polling_timeout,
+            reset_type=self.options.forced_reset_type,
+            post_reset_delay=self.options.forced_reset_timeout,
+        )
 
         def start_conn_process():
             # DUT-host communication process
@@ -230,12 +210,8 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         p = start_conn_process()
         conn_process_started = False
         try:
-            # Wait for the start event. Process start timeout does not apply in
-            # Global resource manager case as it may take a while for resource
-            # to be available.
-            (key, value, timestamp) = event_queue.get(
-                timeout=None if self.options.global_resource_mgr else self.options.process_start_timeout
-            )
+            # Wait for the start event.
+            (key, value, timestamp) = event_queue.get(self.options.process_start_timeout)
 
             if key == "__conn_process_start":
                 conn_process_started = True
@@ -529,16 +505,6 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         self.logger.prn_inf(self.get_hello_string())
 
         try:
-            # Copy image to device
-            if self.options.skip_flashing:
-                self.logger.prn_inf("copy image onto target... SKIPPED!")
-            else:
-                self.logger.prn_inf("copy image onto target...")
-                result = self.mbed.copy_image()
-                if not result:
-                    result = self.RESULT_IOERR_COPY
-                    return self.get_test_result_int(result)
-
             # Execute test if flashing was successful or skipped
             test_result = self.run_test()
 
@@ -576,18 +542,3 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                 # May not be a regular expression
                 return False
         return self.compare_log_idx == len(self.compare_log)
-
-    @staticmethod
-    def _parse_grm(grm_arg):
-        grm_module, leftover = grm_arg.split(":", 1)
-        parts = leftover.rsplit(":", 1)
-
-        try:
-            grm_host, grm_port = parts
-            _ = int(grm_port)
-        except ValueError:
-            # No valid port was found, so assume no port was supplied
-            grm_host = leftover
-            grm_port = None
-
-        return {"grm_module": grm_module, "grm_host": grm_host, "grm_port": grm_port}

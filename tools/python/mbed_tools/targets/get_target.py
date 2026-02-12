@@ -17,7 +17,7 @@ from mbed_tools.targets._internal import target_attributes
 from mbed_tools.targets.exceptions import TargetError
 
 if TYPE_CHECKING:
-    from mbed_tools.build._internal.config.schemas import TargetJSON
+    from mbed_tools.schemas import TargetJSON
 
 
 def get_target_by_name(name: str, targets_json_data: dict[str, TargetJSON]) -> dict:

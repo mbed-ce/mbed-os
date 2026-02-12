@@ -18,6 +18,7 @@ limitations under the License.
 from __future__ import print_function
 import functools
 import itertools
+import termios
 import time
 import threading
 import uuid
@@ -213,8 +214,10 @@ class USBSerialTest(mbed_host_tests.BaseHostTest):
                 # Discard input buffer content. The data received from the
                 # device during the concurrent rx/tx test is irrelevant.
                 mbed_serial.reset_input_buffer()
-            except serial.SerialException as exc:
+            except (serial.SerialException, termios.error) as exc:
                 self.log('TEST ERROR: {}'.format(exc))
+                import traceback
+                traceback.print_exc()
                 self.notify_complete(False)
                 return
         while mbed_serial.out_waiting > 0:

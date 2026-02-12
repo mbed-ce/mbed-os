@@ -6,7 +6,7 @@
 
 from unittest import TestCase, mock
 
-from mbed_tools.build._internal.config.schemas import TargetJSON
+from mbed_tools.schemas import TargetJSON
 from mbed_tools.targets._internal.targets_json_parsers.overriding_attribute_parser import (
     get_overriding_attributes_for_target,
     get_labels_for_target,

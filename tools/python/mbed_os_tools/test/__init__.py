@@ -56,12 +56,12 @@ def init_host_test_cli_params() -> Any:
 
     parser.add_argument("-m", "--micro", dest="micro", help="Target microcontroller name", metavar="MICRO")
 
-    parser.add_argument("-p", "--port", dest="port", help="Serial port of the target", metavar="PORT")
+    parser.add_argument("-p", "--port", dest="port", help="Serial port of the target", metavar="PORT", required=True)
 
     parser.add_argument("-d", "--disk", dest="disk", help="Target disk (mount point) path", metavar="DISK_PATH")
 
     parser.add_argument(
-        "-t", "--target-id", dest="target_id", help="Unique Target Id or mbed platform", metavar="TARGET_ID"
+        "-t", "--mbed-target", dest="target_id", help="Mbed target name of this board", metavar="TARGET"
     )
 
     parser.add_argument(
@@ -117,18 +117,6 @@ def init_host_test_cli_params() -> Any:
         metavar="RETRY_COPY",
     )
 
-    parser.add_argument(
-        "--tag-filters",
-        dest="tag_filters",
-        default="",
-        type=str,
-        help=(
-            "Comma seperated list of device tags used when allocating a target "
-            "to specify required hardware or attributes [--tag-filters tag1,tag2]"
-        ),
-        metavar="TAG_FILTERS",
-    )
-
     reset_methods_str = "Plugin support: " + ", ".join(host_tests_plugins.get_plugin_caps("ResetMethod"))
 
     parser.add_argument(
@@ -137,7 +125,7 @@ def init_host_test_cli_params() -> Any:
 
     parser.add_argument(
         "-C",
-        "--program_cycle_s",
+        "--program-cycle-s",
         dest="program_cycle_s",
         default=4,
         help=(
@@ -196,40 +184,11 @@ def init_host_test_cli_params() -> Any:
     )
 
     parser.add_argument(
-        "-g",
-        "--grm",
-        dest="global_resource_mgr",
-        help=(
-            'Global resource manager: "<remote mgr module>:<host url or IP address>'
-            '[:<port>]", Ex. "module_name:10.2.123.43:3334", '
-            'module_name:https://example.com"'
-        ),
-    )
-
-    # Show --fm option only if "fm_agent" module installed
-    fm_help = SUPPRESS
-    try:
-        if importlib.util.find_spec("fm_agent") is not None:
-            fm_help = 'Fast Model connection, This option requires mbed-fastmodel-agent module installed, list CONFIGs via "mbedfm"'
-    except ModuleNotFoundError:
-        pass
-
-    parser.add_argument("--fm", dest="fast_model_connection", metavar="CONFIG", default=None, help=fm_help)
-
-    parser.add_argument(
         "--run",
         dest="run_binary",
         default=False,
         action="store_true",
         help="Runs binary image on target (workflow: flash, reset, output console)",
-    )
-
-    parser.add_argument(
-        "--skip-flashing",
-        dest="skip_flashing",
-        default=False,
-        action="store_true",
-        help="Skips use of copy/flash plugin. Note: target will not be reflashed",
     )
 
     parser.add_argument(
@@ -291,8 +250,16 @@ def init_host_test_cli_params() -> Any:
 
     parser.add_argument("--format", dest="format", help="Image file format passed to pyocd (elf, bin, hex, axf...).")
 
+    parser.add_argument(
+        "--test-name",
+        "-n",
+        dest="test_name",
+        required=True,
+        help="Name of the test being run in the build system. This is passed to the test script.",
+    )
+
     parser.description = """Flash, reset and perform host supervised tests on mbed platforms"""
-    parser.epilog = """Example: mbedhtrun -d E: -p COM5 -f "test.bin" -C 4 -c shell -m K64F"""
+    parser.epilog = """Example: mbedhtrun -d E: -p COM5 -f "test-mbed-hal-common-tickers.bin" -C 4 -c shell -m K64F -n test-mbed-hal-common-tickers"""
 
     if len(sys.argv) == 1:
         parser.print_help()

@@ -6,7 +6,7 @@
 
 from unittest import TestCase, mock
 
-from mbed_tools.build._internal.config.schemas import TargetJSON
+from mbed_tools.schemas import TargetJSON
 from mbed_tools.targets._internal.target_attributes import (
     TargetNotFoundError,
     get_target_attributes,

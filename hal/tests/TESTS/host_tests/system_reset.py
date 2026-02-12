@@ -61,11 +61,8 @@ class SystemResetTest(BaseHostTest):
         system_reset = yield
         self.reset = False
 
-        wait_after_reset = self.get_config_item('forced_reset_timeout')
-        wait_after_reset = wait_after_reset if wait_after_reset is not None else DEFAULT_CYCLE_PERIOD
-
         self.send_kv(MSG_KEY_DEVICE_RESET, MSG_VALUE_DUMMY)
-        time.sleep(wait_after_reset)
+        time.sleep(self.config.post_reset_delay)
         self.send_kv(MSG_KEY_SYNC, MSG_VALUE_DUMMY)
 
         system_reset = yield

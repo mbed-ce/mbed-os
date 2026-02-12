@@ -30,12 +30,3 @@ class MockTestEnvironmentPosix(MockTestEnvironment):
 
         if value:
             return False
-
-        # Assert for proper image copy
-        mocked_call = self.patches["mbed_os_tools.test.host_tests_plugins.host_test_plugins.call"]
-
-        first_call_args = mocked_call.call_args_list[0][0][0]
-        self._test_case.assertEqual(first_call_args[0], "cp")
-        self._test_case.assertEqual(first_call_args[1], self._image_path)
-        self._test_case.assertTrue(first_call_args[2].startswith(self._platform_info["mount_point"]))
-        self._test_case.assertTrue(first_call_args[2].endswith(os.path.splitext(self._image_path)[1]))

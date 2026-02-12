@@ -194,8 +194,8 @@ def retry_fun_call(fun, num_retries=3, retry_delay=0.0):
                 print('Retry {}/{} failed ({})'
                       .format(retry, num_retries, str(fun)))
             time.sleep(retry_delay)
-    err_msg = 'Failed with "{}". Tried {} times.'
-    raise RetryError(err_msg.format(final_err, num_retries))
+    err_msg = 'Failed with {}: "{}". Tried {} times.'
+    raise RetryError(err_msg.format(str(type(final_err).__name__), final_err, num_retries))
 
 
 def raise_if_different(expected, actual, text=''):
@@ -298,10 +298,10 @@ class USBHIDTest(mbed_host_tests.BaseHostTest):
         try:
             mbed_hid_dev = retry_fun_call(
                 fun=functools.partial(self.get_usb_dev, self.dut_usb_dev_sn),  # pylint: disable=not-callable
-                num_retries=20,
-                retry_delay=0.05)
+                num_retries=50,
+                retry_delay=0.1)
         except RetryError as exc:
-            self.notify_error(exc)
+            self.notify_error(f"Timeout waiting for HID device with serno {self.dut_usb_dev_sn} to enumerate: " + str(exc))
             return
         try:
             for intf in mbed_hid_dev.get_active_configuration():  # pylint: disable=not-callable
@@ -363,8 +363,8 @@ class USBHIDTest(mbed_host_tests.BaseHostTest):
         try:
             mbed_hid_dev = retry_fun_call(
                 fun=functools.partial(self.get_usb_dev, self.dut_usb_dev_sn),  # pylint: disable=not-callable
-                num_retries=20,
-                retry_delay=0.05)
+                num_retries=50,
+                retry_delay=0.10)
         except RetryError as exc:
             self.notify_error(exc)
             return

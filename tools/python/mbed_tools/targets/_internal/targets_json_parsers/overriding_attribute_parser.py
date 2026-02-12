@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Any, Deque, Dict, List, Set
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import ALL_ACCUMULATING_ATTRIBUTES
 
 if TYPE_CHECKING:
-    from mbed_tools.build._internal.config.schemas import TargetJSON
+    from mbed_tools.schemas import TargetJSON
 
 MERGING_ATTRIBUTES = ("config", "overrides", "memory_banks", "memory_overrides")
 NON_INHERITED_ATTRIBUTES = ("public", "inherits", "is_mcu_family_target")

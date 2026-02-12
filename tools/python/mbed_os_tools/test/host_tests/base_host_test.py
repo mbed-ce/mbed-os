@@ -13,9 +13,79 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 import inspect
 from time import time
 from inspect import isfunction, ismethod
+
+import dataclasses
+
+
+@dataclasses.dataclass
+class HostTestConfig:
+    port: str
+    """
+    Name of serial port used by the DUT
+    """
+
+    baudrate: int
+    """
+    Baudrate of communication with the DUT
+    """
+
+    mbed_target: str
+    """
+    Mbed target being tested
+    """
+
+    sync_behavior: int
+    """
+    Defines how many times __sync packet will be sent to device.
+    0: none
+    -1: forever
+    1,2,3... - number of times (Default 2 times)
+    """
+
+    skip_reset: bool
+    """
+    Skips use of reset plugin. Note: target will not be reset
+    """
+
+    sync_timeout: int
+    """
+    Define delay in seconds between __sync packet (Default is 5 seconds)
+    """
+
+    test_name: str
+    """
+    Name of the test, e.g. test-mbed-hal-common-tickers
+    """
+
+    polling_timeout: int
+    """
+    Timeout in sec for readiness of mount point and serial port of local or remote device. Default 60 sec
+    """
+
+    post_reset_delay: float
+    """
+    Delay to wait after resetting the target
+    """
+
+    sync_predelay: float = 0
+    """
+    Wait this amount of time (in floating point seconds) after opening the serial port before sending sync.
+    """
+
+    reset_type: str | None = None
+    """
+    If set, forces use of a specific reset plugin. If unset, the default method will be used, which sends a serial break.
+    """
+
+    mcu: str | None = None
+    """
+    CMSIS name of the MCU being tested, if configured in targets.json
+    """
 
 
 class BaseHostTestAbstract(object):
@@ -27,7 +97,8 @@ class BaseHostTestAbstract(object):
     __event_queue = None  # To main even loop
     __dut_event_queue = None  # To DUT
     script_location = None  # Path to source file used to load host test
-    __config = {}
+
+    config: HostTestConfig
 
     def __notify_prn(self, text):
         if self.__event_queue:
@@ -83,20 +154,11 @@ class BaseHostTestAbstract(object):
         """! Send Key-Value data to DUT"""
         self.__notify_dut(key, value)
 
-    def setup_communication(self, event_queue, dut_event_queue, config={}):
+    def setup_communication(self, event_queue, dut_event_queue, config: HostTestConfig):
         """! Setup queues used for IPC"""
         self.__event_queue = event_queue  # To main even loop
         self.__dut_event_queue = dut_event_queue  # To DUT
-        self.__config = config
-
-    def get_config_item(self, name):
-        """
-        Return test config
-
-        :param name:
-        :return:
-        """
-        return self.__config.get(name, None)
+        self.config = config
 
     def setup(self):
         """! Setup your tests and callbacks"""
@@ -127,6 +189,9 @@ def event_callback(key):
 
 
 class HostTestCallbackBase(BaseHostTestAbstract):
+    # Name of the current test case is stored here, if a test case is in progress
+    current_test_case_name: str | None = None
+
     def __init__(self):
         BaseHostTestAbstract.__init__(self)
         self.__callbacks = {}
@@ -141,8 +206,6 @@ class HostTestCallbackBase(BaseHostTestAbstract):
 
         self.__consume_by_default = [
             "__coverage_start",
-            "__testcase_start",
-            "__testcase_finish",
             "__testcase_count",
             "__testcase_name",
             "__testcase_summary",
@@ -177,6 +240,12 @@ class HostTestCallbackBase(BaseHostTestAbstract):
         self.log("Detected target fatal error. Failing test...")
         self.notify_complete(False)
 
+    def __test_case_start_callback(self, key: str, value: str, timestamp: float):
+        self.current_test_case_name = value
+
+    def __test_case_end_callback(self, key: str, value: str, timestamp: float):
+        self.current_test_case_name = None
+
     def __assign_default_callbacks(self):
         """! Assigns default callback handlers"""
         for key in self.__consume_by_default:
@@ -190,6 +259,10 @@ class HostTestCallbackBase(BaseHostTestAbstract):
         self.register_callback("mbed_error_code", self.__callback_default)
         self.register_callback("mbed_error_message", self.__callback_default)
         self.register_callback("mbed_error_location", self.__callback_default)
+
+        # Register callbacks to track the test case name
+        self.register_callback("__testcase_start", self.__test_case_start_callback, force=True)
+        self.register_callback("__testcase_finish", self.__test_case_end_callback, force=True)
 
     def __assign_decorated_callbacks(self):
         """

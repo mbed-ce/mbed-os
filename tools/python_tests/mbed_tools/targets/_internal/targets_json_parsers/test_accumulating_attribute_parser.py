@@ -7,7 +7,7 @@
 from unittest import TestCase, mock
 import copy
 
-from mbed_tools.build._internal.config.schemas import TargetJSON
+from mbed_tools.schemas import TargetJSON
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import (
     ALL_ACCUMULATING_ATTRIBUTES,
     get_accumulating_attributes_for_target,

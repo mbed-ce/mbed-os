@@ -14,4 +14,4 @@
 # limitations under the License.
 
 # Mbed CE: added hardcoded version
-VERSION = "0.0.16"
+VERSION = "0.1.0"
