@@ -80,6 +80,19 @@ def _assemble_config_from_sources(
     target_attributes: dict, mbed_lib_files: List[Path], mbed_app_file: Optional[Path] = None
 ) -> tuple[Config, list[Path]]:
     config = Config(**source.prepare("merged target JSON", target_attributes, source_name="target"))
+    mbed_app_json_dict = None
+    app_data = None
+
+    if mbed_app_file:
+        # We need to obtain the file filter data from mbed_app.json so we can select the correct set of mbed_lib.json
+        # files to include in the config. We don't want to update the config object with all of the app settings yet
+        # as we won't be able to apply overrides correctly until all relevant mbed_lib.json files have been parsed.
+        mbed_app_json_dict = decode_json_file(mbed_app_file)
+        filter_data = FileFilterData.from_config(config)
+        app_data = source.prepare(
+            "mbed_app.json5", mbed_app_json_dict, source_name="app", target_filters=filter_data.labels
+        )
+        _get_app_filter_labels(app_data, config)
 
     # Process mbed_lib.json files according to the filter.
     filter_data = FileFilterData.from_config(config)
@@ -91,9 +104,7 @@ def _assemble_config_from_sources(
         mbed_lib_files.remove(config_file)
 
     # Apply mbed_app.json data last so config parameters are overridden in the correct order.
-    if mbed_app_file:
-        mbed_app_json_dict = decode_json_file(mbed_app_file)
-
+    if mbed_app_file and mbed_app_json_dict and app_data:
         # For right now, we check that mbed_app.json does validate against the schema, but we don't fail configuration
         # if it does not pass the schema. This provides compatibility with older projects, as mbed_app.json has
         # historically been a total wild west where any internal Mbed state could potentially be overridden.
@@ -105,9 +116,6 @@ def _assemble_config_from_sources(
             )
             logger.warning("Error was: %s", str(ex))
 
-        app_data = source.prepare(
-            "mbed_app.json5", mbed_app_json_dict, source_name="app", target_filters=filter_data.labels
-        )
         config.update(app_data)
 
     # Check configuration option which must be set
@@ -118,6 +126,14 @@ def _assemble_config_from_sources(
     return config, filtered_files
 
 
+def _get_app_filter_labels(mbed_app_data: dict, config: Config) -> None:
+    config.update(_get_file_filter_overrides(mbed_app_data))
+
+
+def _get_file_filter_overrides(mbed_app_data: dict) -> dict:
+    return {"overrides": [override for override in mbed_app_data.get("overrides", []) if override.modifier]}
+
+
 @dataclass(frozen=True)
 class FileFilterData:
     """Data used to navigate mbed-os directories for config files."""
@@ -125,7 +141,6 @@ class FileFilterData:
     labels: Set[str]
     features: Set[str]
     components: Set[str]
-    requires: Set[str]
 
     @classmethod
     def from_config(cls, config: Config) -> FileFilterData:
@@ -134,7 +149,6 @@ class FileFilterData:
             labels=config.get("labels", set()) | config.get("extra_labels", set()),
             features=set(config.get("features", set())),
             components=set(config.get("components", set())),
-            requires=set(config.get("requires", set())),
         )
 
 
