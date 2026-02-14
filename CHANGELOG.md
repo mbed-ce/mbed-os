@@ -48,7 +48,7 @@ Lorem Ipsum dolor sit amet.
 
 _______________________________________________________________________________
 
-## [7.0.0] - 2025-x-x
+## [7.0.0] - 2025-2-14
 
 ### Added
 - New upload method system allows flashing boards as part of a CMake build, using one of a number of available debug tools
