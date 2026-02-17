@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Pull base image
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 # ------------------------------------------------------------------------------
 # set locale
@@ -36,7 +36,7 @@ RUN set -x \
     ccache \
     gcovr \
     && apt clean && rm -rf /var/lib/apt/lists \
-    && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1 \
+    && update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 \
     && : # last line
 
 RUN set -x \
