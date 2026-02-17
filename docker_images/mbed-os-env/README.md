@@ -2,7 +2,7 @@
 
 This Docker image is the official Mbed OS development environment.
 
-* It is based on Ubuntu 20.04
+* It is based on Ubuntu 24.04
 * Python and CMake are installed
 * Arm-none-eabi-gcc toolchain is installed
 * Latest released version of mbed-cli and mbed-greentea are installed
