@@ -5872,7 +5872,7 @@
                 "start": 536870912,
                 "startup": false
             },
-            "IROM1": {
+            "ROM_VIA_AXIM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -5887,7 +5887,7 @@
                 "start": 134217728,
                 "startup": true
             },
-            "IROM2": {
+            "ROM_VIA_ITCM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6050,7 +6050,7 @@
                 "start": 536870912,
                 "startup": false
             },
-            "IROM1": {
+            "ROM_VIA_AXIM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6065,7 +6065,7 @@
                 "start": 134217728,
                 "startup": true
             },
-            "IROM2": {
+            "ROM_VIA_ITCM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6240,7 +6240,7 @@
                 "start": 536870912,
                 "startup": false
             },
-            "IROM1": {
+            "ROM_VIA_AXIM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6255,7 +6255,7 @@
                 "start": 134217728,
                 "startup": true
             },
-            "IROM2": {
+            "ROM_VIA_ITCM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6430,7 +6430,7 @@
                 "start": 536870912,
                 "startup": false
             },
-            "IROM1": {
+            "ROM_VIA_AXIM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6445,7 +6445,7 @@
                 "start": 134217728,
                 "startup": true
             },
-            "IROM2": {
+            "ROM_VIA_ITCM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6636,7 +6636,7 @@
                 "start": 536870912,
                 "startup": false
             },
-            "IROM1": {
+            "ROM_VIA_AXIM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6651,7 +6651,7 @@
                 "start": 134217728,
                 "startup": true
             },
-            "IROM2": {
+            "ROM_VIA_ITCM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -6890,24 +6890,9 @@
                 "start": 536870912,
                 "startup": false
             },
-
+            
             // We have 2 views of the same memory bank, one via ITCM for instruction access and one
             // via AXIM for data access.
-            "ROM_VIA_ITCM_BUS": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": false
-                },
-                "default": false,
-                "size": 0x200000,
-                "start": 0x200000,
-                "startup": false
-            },
             "ROM_VIA_AXIM_BUS": {
                 "access": {
                     "execute": true,
@@ -6922,6 +6907,21 @@
                 "size": 0x200000,
                 "start": 0x8000000,
                 "startup": true
+            },
+            "ROM_VIA_ITCM_BUS": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": false,
+                "size": 0x200000,
+                "start": 0x200000,
+                "startup": false
             }
         },
         "name": "STM32F767ZITx",
@@ -7087,7 +7087,7 @@
                 "start": 536870912,
                 "startup": false
             },
-            "IROM1": {
+            "ROM_VIA_AXIM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -7102,7 +7102,7 @@
                 "start": 134217728,
                 "startup": true
             },
-            "IROM2": {
+            "ROM_VIA_ITCM_BUS": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
