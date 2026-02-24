@@ -94,6 +94,7 @@ greentea = [
     "hidapi>=0.7.99",
     "pyusb>=1.2.0",
     "wmi>=1.5; platform_system == 'Windows'",
+    "psutil"
 ]
 
 # Install this optional dependency group to get IDE completion for packages used by the mbed_platformio package.
