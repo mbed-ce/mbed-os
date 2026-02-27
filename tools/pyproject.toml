@@ -94,7 +94,11 @@ greentea = [
     "hidapi>=0.7.99",
     "pyusb>=1.2.0",
     "wmi>=1.5; platform_system == 'Windows'",
-    "psutil"
+    "psutil",
+    
+    # For CI shield host tests
+    "cy_serial_bridge>=0.3",
+    "libusb1",
 ]
 
 # Install this optional dependency group to get IDE completion for packages used by the mbed_platformio package.
