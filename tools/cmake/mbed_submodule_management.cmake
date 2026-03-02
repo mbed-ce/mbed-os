@@ -47,6 +47,8 @@ function(mbed_setup_submodule SUBMODULE_PATH)
         set(SUBMODULE_CLONED FALSE)
     endif()
 
+    message("Processing submodule ${SOURCE_DIR_REL_SUBMODULE_PATH}")
+
     if(NOT MBED_MANAGE_SUBMODULES)
         if(NOT SUBMODULE_CLONED)
             message(FATAL_ERROR "Missing submodule at ${FULL_SUBMODULE_PATH}, and MBED_MANAGE_SUBMODULES is disabled so we cannot fix this automatically.\
@@ -79,6 +81,8 @@ git submodule update --init ${SUBMODULE_PATH}")
                 RESULT_VARIABLE GIT_STATUS_RESULT_CODE
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
             )
+
+            message("GIT_STATUS_RESULT_CODE = ${GIT_STATUS_RESULT_CODE}, GIT_STATUS_ERR_OUTPUT = ${GIT_STATUS_ERR_OUTPUT}")
 
             if(NOT ${GIT_STATUS_RESULT_CODE} EQUAL 0)
                 if("${GIT_STATUS_ERR_OUTPUT}" MATCHES "fatal: unsafe repository \\('([^']+)' is owned by someone else\\)")
