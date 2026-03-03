@@ -180,6 +180,13 @@ elseif(MBED_GENERATE_VS_CODE_DEBUG_CFGS)
 			\"label\": \"Build ${CMAKE_TARGET} and start GDB server\",
 			\"dependsOn\": [\"Build ${CMAKE_TARGET}\", \"GDB Server\"],
 			\"dependsOrder\": \"sequence\",
+		},
+		// Flash ${CMAKE_TARGET} without debugging (builds first via the flash-${CMAKE_TARGET} CMake target)
+		{
+			\"label\": \"Flash ${CMAKE_TARGET}\",
+			\"type\": \"shell\",
+			\"command\": \"${CMAKE_COMMAND}\",
+			\"args\": [\"--build\", \"${CMAKE_BINARY_DIR}\", \"--target\", \"flash-${CMAKE_TARGET}\"],
 		},")
 
 	endfunction(mbed_generate_ide_debug_configuration)
