@@ -30,5 +30,10 @@ target_include_directories(mbed-stm32f7
 
 target_link_libraries(mbed-stm32f7 INTERFACE mbed-stm mbed-stm32f7cube-fw)
 
+# Use shared F7 clock configuration for all F7 targets except UHURU_RAVEN.
+if(NOT "UHURU_RAVEN" IN_LIST MBED_TARGET_LABELS)
+    target_sources(mbed-stm32f7 INTERFACE clock_cfg/system_clock.c)
+endif()
+
 # Add linker scripts
 add_subdirectory(linker_scripts)

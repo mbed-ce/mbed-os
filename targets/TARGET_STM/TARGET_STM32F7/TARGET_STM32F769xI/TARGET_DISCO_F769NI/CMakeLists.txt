@@ -5,8 +5,7 @@ add_library(mbed-disco-f769ni INTERFACE)
 
 target_sources(mbed-disco-f769ni
     INTERFACE
-        PeripheralPins.c
-        system_clock.c
+    PeripheralPins.c
 )
 
 target_include_directories(mbed-disco-f769ni

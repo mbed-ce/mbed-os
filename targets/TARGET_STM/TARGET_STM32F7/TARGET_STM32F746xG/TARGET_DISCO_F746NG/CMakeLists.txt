@@ -5,8 +5,7 @@ add_library(mbed-disco-f746ng INTERFACE)
 
 target_sources(mbed-disco-f746ng
     INTERFACE
-        PeripheralPins.c
-        system_clock.c
+    PeripheralPins.c
 )
 
 target_include_directories(mbed-disco-f746ng

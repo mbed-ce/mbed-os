@@ -5,8 +5,7 @@ add_library(mbed-nucleo-f722ze INTERFACE)
 
 target_sources(mbed-nucleo-f722ze
     INTERFACE
-        PeripheralPins.c
-        system_clock.c
+    PeripheralPins.c
 )
 
 target_include_directories(mbed-nucleo-f722ze
