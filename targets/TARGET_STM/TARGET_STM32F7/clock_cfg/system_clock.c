@@ -35,11 +35,6 @@
 #include "stm32f7xx.h"
 #include "mbed_error.h"
 
-// HSE default value if nothing else is set in targets.json5 config
-#ifndef HSE_VALUE
-#define HSE_VALUE 8000000U 
-#endif
-
 // guards to ensure HSE_VALUE is valid for PLL configuration
 #if (HSE_VALUE < 4000000U) || (HSE_VALUE > 50000000U)
 #error HSE_VALUE must be >= 4MHz and <= 50MHz for STM32F7 common clock config
