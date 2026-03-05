@@ -19,6 +19,7 @@ A message that notes the main changes in the update.
 ### Deprecated
 
 ### Fixed
+- MIMXRT1050_EVK: Fixed build error due to typos
 
 ### Removed
 
