@@ -50,12 +50,6 @@
              "spi-cs":   "PB_12",
              "spi-freq": "20000000"
        },
-       "UHURU_RAVEN": {
-             "spi-mosi": "PE_14",
-             "spi-miso": "PE_13",
-             "spi-clk":  "PE_12",
-             "spi-cs":   "PE_11"
-       },
        "MTS_DRAGONFLY_F411RE": {
            "spi-mosi": "SPI3_MOSI",
            "spi-miso": "SPI3_MISO",
