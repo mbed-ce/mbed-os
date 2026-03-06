@@ -12,13 +12,13 @@ This Docker image is the official Mbed OS development environment.
 
 ## Pull the Docker image
 ```bash
-docker pull ghcr.io/armmbed/mbed-os-env:<label>
+docker pull ghcr.io/mbed-ce/mbed-os-env:<label>
 ```
 
 ## Run Mbed OS environment without HW support (build Mbed images only)
 Launch the Docker image by
 ```bash
-docker run -it ghcr.io/armmbed/mbed-os-env:<label>
+docker run -it ghcr.io/mbed-ce/mbed-os-env:<label>
 ```
 Then you will have a container with an Mbed OS development environment.
 You should be able to compile Mbed commands/examples as recommended in the documentation
@@ -34,7 +34,7 @@ mbed-tools compile -m <TARGET> -t GCC_ARM
 
 If you want to use this Docker image to connect and flash your targets, you will need some extra command line option to pass-through your USB devices.
 ```bash
-sudo docker run -it --privileged -v /dev/disk/by-id:/dev/disk/by-id -v /dev/serial/by-id:/dev/serial/by-id ghcr.io/armmbed/mbed-os-env:<label>
+sudo docker run -it --privileged -v /dev/disk/by-id:/dev/disk/by-id -v /dev/serial/by-id:/dev/serial/by-id ghcr.io/mbed-ce/mbed-os-env:<label>
 ```
 Then you will have a container with an Mbed OS development environment.
 To make sure your Mbed targets have been detected, you might want to manually run the mount command and `mbedls` to check

@@ -13,7 +13,7 @@ jobs:
   license-check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/armmbed/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-os-env:master-latest
 
     steps:
       - name: Checkout repo
@@ -65,7 +65,7 @@ jobs:
   include-check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/armmbed/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-os-env:master-latest
 
     steps:
       - name: Checkout repo
@@ -222,7 +222,7 @@ jobs:
   pin-validation:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/armmbed/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-os-env:master-latest
     steps:
       -
         name: Checkout repo
@@ -244,7 +244,7 @@ jobs:
   cmake-native-unit-tests:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/armmbed/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-os-env:master-latest
     steps:
       -
         name: Checkout repo

@@ -1,0 +1,26 @@
+name: Detect Docker Changes
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  detect-docker-changes:
+    runs-on: ubuntu-latest
+
+    outputs:
+      docker_changed: ${{ steps.filter.outputs.docker }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect Docker changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            docker:
+              - 'docker_images/**'
+              - '.github/workflows/docker_management.*'
+              - '.github/workflows/ci_scripts/**'
+              - '**/Dockerfile'

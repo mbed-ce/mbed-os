@@ -4,7 +4,7 @@ on: [pull_request]
 jobs:
   build-greentea:
     runs-on: ubuntu-latest
-    container: ghcr.io/armmbed/mbed-os-env:master-latest
+    container: ghcr.io/mbed-ce/mbed-os-env:master-latest
 
     strategy:
       matrix:
