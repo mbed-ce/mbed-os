@@ -15,12 +15,24 @@ A message that notes the main changes in the update.
 ### Added
 
 ### Changed
+- STM32F7
+  - HAL driver update to `stm32f7xx-hal-driver` v1.3.3 (2025), now integrated as a submodule.
+  - CMSIS device update to `cmsis-device-f7` v1.2.10 (2025), now integrated as a submodule.
+  - Standardized ROM names in `cmsis_mcu_descriptions` across STM32F7 targets.
+  - Replaced per-target linker scripts with one common STM32F7 linker script.
+  - Replaced most STM32F7 `system_clock.c` files with one common clock configuration (UHURU RAVEN remains separate by design).
+  - Added target metadata cleanup (`adc-vref` for all F7 targets).
+  - Updated STM32F7 config/init files by consolidating Mbed changes with latest upstream templates.
+  - Removed unused Ethernet HAL sections from config (Mbed does not use ST Ethernet stack here).
+  - Applied interim local HAL fixes until upstream release includes them: https://github.com/STMicroelectronics/stm32f7xx-hal-driver/issues/23
 
 ### Deprecated
 
 ### Fixed
+- Added fixes aimed at improving Greentea stability for KV/FlashIAP (STM32F7) and USBSerial paths.
 
 ### Removed
+- Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7)
 
 ### Security
 
