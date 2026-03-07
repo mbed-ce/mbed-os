@@ -29,3 +29,9 @@ target_include_directories(mbed-stm32f7
 )
 
 target_link_libraries(mbed-stm32f7 INTERFACE mbed-stm mbed-stm32f7cube-fw)
+
+# Use shared F7 clock configuration for all F7 targets.
+target_sources(mbed-stm32f7 INTERFACE clock_cfg/system_clock.c)
+
+# Add linker scripts
+add_subdirectory(linker_scripts)

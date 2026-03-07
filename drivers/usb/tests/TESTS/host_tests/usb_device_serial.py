@@ -18,11 +18,16 @@ limitations under the License.
 from __future__ import print_function
 import functools
 import itertools
-import termios
 import time
 import threading
 import uuid
 import sys
+
+if sys.platform.startswith('linux'):
+    import termios
+else:
+    termios = None
+
 import serial
 import serial.tools.list_ports as stlp
 import six
@@ -54,8 +59,18 @@ TERM_CLOSE_DELAY = 0.01
 # during terminal reopen test.
 TERM_REOPEN_DELAY = 0.1
 
+USB_ENUM_RETRIES = 20
+USB_ENUM_RETRY_DELAY = 0.2
+USB_OPEN_RETRIES = 20
+USB_OPEN_RETRY_DELAY = 0.2
+
 LINE_CODING_SEP = ','
 LINE_CODING_DELIM = ';'
+
+if termios is None:
+    SERIAL_WRITE_EXCEPTIONS = (serial.SerialException, OSError)
+else:
+    SERIAL_WRITE_EXCEPTIONS = (serial.SerialException, termios.error)
 
 
 def usb_serial_name(serial_number):
@@ -135,6 +150,16 @@ class USBSerialTest(mbed_host_tests.BaseHostTest):
         self.__bg_task = None
         self.dut_usb_dev_sn = uuid.uuid4().hex  # 32 hex digit string
 
+    def _open_serial_with_retry(self, mbed_serial, lookup_retry_delay=USB_ENUM_RETRY_DELAY):
+        mbed_serial.port = retry_fun_call(
+            fun=functools.partial(self.get_usb_serial_name, self.dut_usb_dev_sn),  # pylint: disable=not-callable
+            num_retries=USB_ENUM_RETRIES,
+            retry_delay=lookup_retry_delay)
+        retry_fun_call(
+            fun=mbed_serial.open,
+            num_retries=USB_OPEN_RETRIES,
+            retry_delay=USB_OPEN_RETRY_DELAY)
+
     def port_open_wait(self):
         """Open the serial and wait until it's closed by the device."""
 
@@ -144,14 +169,7 @@ class USBSerialTest(mbed_host_tests.BaseHostTest):
 
         mbed_serial.dtr = False
         try:
-            mbed_serial.port = retry_fun_call(
-                fun=functools.partial(self.get_usb_serial_name, self.dut_usb_dev_sn),  # pylint: disable=not-callable
-                num_retries=20,
-                retry_delay=0.05)
-            retry_fun_call(
-                fun=mbed_serial.open,
-                num_retries=20,
-                retry_delay=0.05)
+            self._open_serial_with_retry(mbed_serial, lookup_retry_delay=1.0)
         except RetryError as exc:
             self.log('TEST ERROR: {}'.format(exc))
             self.notify_complete(False)
@@ -167,14 +185,7 @@ class USBSerialTest(mbed_host_tests.BaseHostTest):
         mbed_serial = serial.Serial(timeout=0.5, write_timeout=0.1, dsrdtr=True)
         mbed_serial.dtr = False
         try:
-            mbed_serial.port = retry_fun_call(
-                fun=functools.partial(self.get_usb_serial_name, self.dut_usb_dev_sn),  # pylint: disable=not-callable
-                num_retries=20,
-                retry_delay=0.05)
-            retry_fun_call(
-                fun=mbed_serial.open,
-                num_retries=20,
-                retry_delay=0.05)
+            self._open_serial_with_retry(mbed_serial)
         except RetryError as exc:
             self.log('TEST ERROR: {}'.format(exc))
             self.notify_complete(False)
@@ -192,14 +203,7 @@ class USBSerialTest(mbed_host_tests.BaseHostTest):
         """
         mbed_serial = serial.Serial(write_timeout=0.1, dsrdtr=True)
         try:
-            mbed_serial.port = retry_fun_call(
-                fun=functools.partial(self.get_usb_serial_name, self.dut_usb_dev_sn),  # pylint: disable=not-callable
-                num_retries=20,
-                retry_delay=0.05)
-            retry_fun_call(
-                fun=mbed_serial.open,
-                num_retries=20,
-                retry_delay=0.05)
+            self._open_serial_with_retry(mbed_serial)
         except RetryError as exc:
             self.log('TEST ERROR: {}'.format(exc))
             self.notify_complete(False)
@@ -214,7 +218,7 @@ class USBSerialTest(mbed_host_tests.BaseHostTest):
                 # Discard input buffer content. The data received from the
                 # device during the concurrent rx/tx test is irrelevant.
                 mbed_serial.reset_input_buffer()
-            except (serial.SerialException, termios.error) as exc:
+            except SERIAL_WRITE_EXCEPTIONS as exc:
                 self.log('TEST ERROR: {}'.format(exc))
                 import traceback
                 traceback.print_exc()
@@ -230,14 +234,7 @@ class USBSerialTest(mbed_host_tests.BaseHostTest):
         mbed_serial = serial.Serial(timeout=0.5, write_timeout=0.1, dsrdtr=True)
         mbed_serial.dtr = False
         try:
-            mbed_serial.port = retry_fun_call(
-                fun=functools.partial(self.get_usb_serial_name, self.dut_usb_dev_sn),  # pylint: disable=not-callable
-                num_retries=20,
-                retry_delay=0.05)
-            retry_fun_call(
-                fun=mbed_serial.open,
-                num_retries=20,
-                retry_delay=0.05)
+            self._open_serial_with_retry(mbed_serial)
         except RetryError as exc:
             self.log('TEST ERROR: {}'.format(exc))
             self.notify_complete(False)
@@ -267,14 +264,7 @@ class USBSerialTest(mbed_host_tests.BaseHostTest):
         mbed_serial = serial.Serial(timeout=0.5, dsrdtr=True)
         mbed_serial.dtr = False
         try:
-            mbed_serial.port = retry_fun_call(
-                fun=functools.partial(self.get_usb_serial_name, self.dut_usb_dev_sn),  # pylint: disable=not-callable
-                num_retries=20,
-                retry_delay=0.05)
-            retry_fun_call(
-                fun=mbed_serial.open,
-                num_retries=20,
-                retry_delay=0.05)
+            self._open_serial_with_retry(mbed_serial)
         except RetryError as exc:
             self.log('TEST ERROR: {}'.format(exc))
             self.notify_complete(False)

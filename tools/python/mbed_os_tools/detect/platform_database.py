@@ -349,7 +349,6 @@ DEFAULT_PLATFORM_DB = {
         "9014": "WIO_3G",
         "9015": "WIO_BG96",
         "9017": "WIO_EMW3166",
-        "9020": "UHURU_RAVEN",
         "9900": "NRF51_MICROBIT",
         "C002": "VK_RZ_A1H",
         "C005": "MTM_MTCONNECT04S",
