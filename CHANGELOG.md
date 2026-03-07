@@ -20,7 +20,7 @@ A message that notes the main changes in the update.
   - CMSIS device update to `cmsis-device-f7` v1.2.10 (2025), now integrated as a submodule.
   - Standardized ROM names in `cmsis_mcu_descriptions` across STM32F7 targets.
   - Replaced per-target linker scripts with one common STM32F7 linker script.
-  - Replaced most STM32F7 `system_clock.c` files with one common clock configuration (UHURU RAVEN remains separate by design).
+  - Replaced most STM32F7 `system_clock.c` files with one common clock configuration.
   - Added target metadata cleanup (`adc-vref` for all F7 targets).
   - Updated STM32F7 config/init files by consolidating Mbed changes with latest upstream templates.
   - Removed unused Ethernet HAL sections from config (Mbed does not use ST Ethernet stack here).
@@ -60,7 +60,7 @@ Lorem Ipsum dolor sit amet.
 
 _______________________________________________________________________________
 
-## [7.0.0] - 2025-2-14
+## [7.0.0] - 2026-2-14
 
 ### Added
 - New upload method system allows flashing boards as part of a CMake build, using one of a number of available debug tools
