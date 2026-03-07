@@ -365,9 +365,9 @@ SECTIONS
   .heap (NOLOAD):
   {
       PROVIDE(__mbed_sbrk_start = .);
-      . = __CRASH_DATA_RAM_START__;
+      . = ORIGIN(m_ocram) + LENGTH(m_ocram) - M_CRASH_DATA_RAM_SIZE;
       PROVIDE(__mbed_krbs_start = .);
-  } > m_ocram2
+  } > m_ocram
 #endif
 
   .crash_data_ram __CRASH_DATA_RAM_START__ :
