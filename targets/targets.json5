@@ -1922,14 +1922,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "overrides": {
             "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
+            "hse-value": 25000000,
             "network-default-interface-type": "ETHERNET",
 
             // ADC reference voltage is same as MCU VDD.
             "default-adc-vref": 3.3
         },
         "macros_add": [
-            "STM32F746xx",
-            "HSE_VALUE=25000000"
+            "STM32F746xx"
         ],
         "device_has_add": [
             "EMAC",
@@ -2071,8 +2071,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "macros_add": [
-            "STM32F769xx",
-            "HSE_VALUE=25000000"
+            "STM32F769xx"
         ],
         "device_has_add": [
             "EMAC",
@@ -2081,6 +2080,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F769NIHx",
         "overrides": {
+            "hse-value": 25000000,
             "network-default-interface-type": "ETHERNET",
 
             // ADC reference voltage is same as MCU VDD.
