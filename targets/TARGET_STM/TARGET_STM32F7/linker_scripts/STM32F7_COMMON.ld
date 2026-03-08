@@ -19,10 +19,6 @@
 
 #include "cmsis_nvic.h"
 
-/* Note: Use default configured ROM bank for F7.
- * If a project needs a specific flash alias view (ITCM/AXIM),
- * provide a custom linker script and set it via mbed_set_linker_script(). */
-
 M_CRASH_DATA_RAM_SIZE = 0x100;
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
@@ -35,15 +31,17 @@ STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 /* Round up MBED_VECTTABLE_RAM_SIZE to 8 bytes */
 #define MBED_VECTTABLE_RAM_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
 
-/* F7 SRAM is split in two banks; reserve vectors at start of IRAM2 and use
- * the combined contiguous IRAM2+IRAM1 range for runtime RAM. */
-#define MBED_MAIN_RAM_START  (MBED_CONFIGURED_RAM_BANK_IRAM2_START + MBED_VECTTABLE_RAM_SIZE)
-#define MBED_MAIN_RAM_SIZE   (MBED_CONFIGURED_RAM_BANK_IRAM1_SIZE + MBED_CONFIGURED_RAM_BANK_IRAM2_SIZE - MBED_VECTTABLE_RAM_SIZE)
+/** Notes: 
+ *  -   Use default configured ROM bank for F7.
+ *      If a project needs a specific flash alias view (ITCM/AXIM),
+ *      provide a custom linker script and set it via mbed_set_linker_script().
+ *  -   SRAM consists of two banks IRAM2 + IRAM1 in this order.
+ */
 
 MEMORY
 {
     FLASH (rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_ROM_VIA_AXIM_BUS_START, LENGTH = MBED_CONFIGURED_ROM_BANK_ROM_VIA_AXIM_BUS_SIZE
-    RAM (rwx)  : ORIGIN = MBED_MAIN_RAM_START, LENGTH = MBED_MAIN_RAM_SIZE
+    RAM (rwx)  : ORIGIN = MBED_RAM_BANK_SRAM_START + MBED_VECTTABLE_RAM_SIZE, LENGTH = MBED_RAM_BANK_SRAM_SIZE - MBED_VECTTABLE_RAM_SIZE
 }
 
 /* Linker script to place sections and symbol values. Should be used together
