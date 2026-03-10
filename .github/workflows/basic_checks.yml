@@ -7,17 +7,17 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   license-check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           
@@ -65,11 +65,11 @@ jobs:
   include-check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -88,7 +88,7 @@ jobs:
     steps:
 
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -137,10 +137,10 @@ jobs:
           find  -name "*.s" | tee BUILD/badasm |
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
-      # Set up the oldest python version that's currently still supported by Python (as of Fall 2025)
+      # Set up the oldest python version that's currently still supported by Python (as of Winter 2026)
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Install Python packages
         run: |
@@ -164,7 +164,7 @@ jobs:
     steps:
 
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: recursive
@@ -174,7 +174,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/BUILD
 
       - name: Doxygen Action
-        uses: mattnotmitt/doxygen-action@v1.9.5
+        uses: mattnotmitt/doxygen-action@v1
         with:
           doxyfile-path: ./doxyfile_options
 
@@ -182,12 +182,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
-      # Set up the oldest python version that's currently still supported by Python (as of Fall 2025)
+      # Set up the oldest python version that's currently still supported by Python (as of Winter 2026)
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Install Python packages
         run: |
@@ -201,12 +201,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
-      # Set up the oldest python version that's currently still supported by Python (as of Fall 2025)
+      # Set up the oldest python version that's currently still supported by Python (as of Winter 2026)
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Install Python packages
         run: |
@@ -222,11 +222,11 @@ jobs:
   pin-validation:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
     steps:
       -
         name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -244,11 +244,11 @@ jobs:
   cmake-native-unit-tests:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
     steps:
       -
         name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install python3-venv
         run: |

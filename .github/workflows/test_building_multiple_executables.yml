@@ -5,10 +5,10 @@ on: [pull_request]
 jobs:
   multiple-executables-example:
     runs-on: ubuntu-latest
-    container: ghcr.io/mbed-ce/mbed-os-env:master-latest
+    container: ghcr.io/mbed-ce/mbed-os-env:main-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Python packages
         # Note: pip>=20.3 is needed to install dependencies of cysecuretools

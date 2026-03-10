@@ -4,7 +4,7 @@ on: [pull_request]
 jobs:
   build-greentea:
     runs-on: ubuntu-latest
-    container: ghcr.io/mbed-ce/mbed-os-env:master-latest
+    container: ghcr.io/mbed-ce/mbed-os-env:main-latest
 
     strategy:
       matrix:
@@ -126,7 +126,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install python3-venv
         run: |

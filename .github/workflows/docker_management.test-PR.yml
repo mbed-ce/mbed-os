@@ -6,7 +6,7 @@ name: Build docker image
 
 on:
   pull_request:
-    branches: [master]
+    branches: [main]
     paths:
       - docker_images/mbed-os-env/**
       - .github/workflows/docker_management.*
@@ -29,7 +29,7 @@ jobs:
 
       # for PR tests, development branch of blinky is used
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           repository: mbed-ce/mbed-os-example-blinky
           path: mbed-os-example-blinky
@@ -42,7 +42,7 @@ jobs:
           rm -rf mbed-os
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           path: mbed-os-example-blinky/mbed-os
 
@@ -58,7 +58,7 @@ jobs:
 
       - name: test the container
         id: test
-        uses: addnab/docker-run-action@v2
+        uses: addnab/docker-run-action@v3
         with:
           options: -v ${{ github.workspace }}:/work -w=/work
           image: mbed-os-env:a_pr_test

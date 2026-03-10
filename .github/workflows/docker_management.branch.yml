@@ -6,10 +6,10 @@ on:
   schedule:
     - cron: "15 4 * * 6"
 
-  # build on master branch when there is changes for active update
+  # build on main branch when there is changes for active update
   push:
     branches:
-      - master
+      - main
 
     paths:
       - requirements.txt
@@ -30,7 +30,7 @@ jobs:
         id: extract_branch
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -54,7 +54,7 @@ jobs:
           echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]' > build_info/repository_owner
 
       - name: Archive information
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: build-info
           path: build_info
@@ -68,7 +68,7 @@ jobs:
 
     steps:
       - name: unarchive artefacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v8
         with:
           name: build-info
 
@@ -102,7 +102,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Build docker containers
         uses: docker/build-push-action@v7
@@ -123,7 +123,7 @@ jobs:
 
     steps:
       - name: unarchive artefacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v8
         with:
           name: build-info
 
@@ -145,7 +145,7 @@ jobs:
           echo "REPO_OWNER=$value" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Find DEV DOCKER DIGEST
         id: docker_info_dev
@@ -154,10 +154,10 @@ jobs:
           echo "DIGEST=$DIGEST" >> "$GITHUB_OUTPUT"
           echo "Docker DIGEST: $DIGEST"
 
-      # as the dev images are created only for master branch, run test against
+      # as the dev images are created only for main branch, run test against
       # development branch of blinky
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           repository: mbed-ce/mbed-os-example-blinky
           path: mbed-os-example-blinky
@@ -192,7 +192,7 @@ jobs:
 
     steps:
       - name: unarchive artefacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v8
         with:
           name: build-info
 

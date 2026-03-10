@@ -1,3 +1,5 @@
+# This workflow detects if any Docker-related files have changed. New Mbed CE Docker containers will only be pushed to
+# the GitHub Container Registry from PRs only in the event of changes to the Docker environment.
 name: Detect Docker Changes
 
 on:
@@ -9,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      docker_changed: ${{ steps.filter.outputs.docker }}
+      docker_changed: ${{ steps.changes.outputs.docker }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Detect Docker changes
         uses: dorny/paths-filter@v3
-        id: filter
+        id: changes
         with:
           filters: |
             docker:

@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -71,7 +71,7 @@ jobs:
           echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]' > build_info/repository_owner
 
       - name: Archive information
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: build-info
           path: build_info
@@ -86,7 +86,7 @@ jobs:
 
     steps:
       - name: unarchive artefacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v8
         with:
           name: build-info
 
@@ -122,7 +122,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
@@ -158,7 +158,7 @@ jobs:
 
     steps:
       - name: unarchive artefacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v8
         with:
           name: build-info
 
@@ -177,10 +177,10 @@ jobs:
           value=`cat repository_owner`
           echo "REPO_OWNER=$value" >> "$GITHUB_OUTPUT"
 
-      # as the dev images are created only for master branch, run test against
+      # as the dev images are created only for main branch, run test against
       # development branch of blinky
       - name: Checkout example blinky
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           repository: mbed-ce/mbed-os-example-blinky
           path: mbed-os-example-blinky
@@ -203,7 +203,7 @@ jobs:
           git checkout ${EXAMPLE_VERSION}
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
           path: mbed-os-example-blinky/mbed-os
@@ -243,7 +243,7 @@ jobs:
     needs: test-container
     steps:
       - name: unarchive artefacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v8
         with:
           name: build-info
 

@@ -22,6 +22,7 @@ RUN set -x \
     python3 \
     python3-dev \
     python3-setuptools \
+    python3-wheel \
     python3-pip \
     build-essential \
     astyle \
@@ -40,25 +41,25 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && pip3 install -U cmake
+    && --mount=type=cache,target=/root/.cache/pip pip3 install -U cmake
 
 # Set up Mbed environment
 WORKDIR /tmp/
 COPY tools/requirements.txt .
 RUN set -x \
-    && pip3 install -r requirements.txt  \
+    && --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements.txt  \
     && : # last line
 
 COPY tools/requirements-ci-build.txt .
 RUN set -x \
-    && pip3 install -r requirements-ci-build.txt  \
+    && --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements-ci-build.txt  \
     && : # last line
 
 
 # ------------------------------------------------------------------------------
 # Install Python modules (which are not included in requirements.txt)
 RUN set -x \
-    && pip3 install -U \
+    && --mount=type=cache,target=/root/.cache/pip pip3 install -U \
     mbed-cli \
     && : # last line
 
@@ -67,16 +68,16 @@ RUN set -x \
 WORKDIR /opt/mbed-os-toolchain
 RUN set -x \
     && [ "$(uname -m)" = "aarch64" ] && \
-        TARBALL="gcc-arm-none-eabi-10.3-2021.07-aarch64-linux.tar.bz2" || \
-        TARBALL="gcc-arm-none-eabi-10.3-2021.07-x86_64-linux.tar.bz2" \
-    && wget -q https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.07/${TARBALL} \
+        TARBALL="gcc-arm-none-eabi-10.3-2021.10-aarch64-linux.tar.bz2" || \
+        TARBALL="gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2" \
+    && wget -q https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/${TARBALL} \
     && tar -xjf ${TARBALL} \
     && rm ${TARBALL} \
     && : # last line
 
 # ------------------------------------------------------------------------------
 # Configure environment variables
-ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi-10.3-2021.07/bin/
+ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi-10.3-2021.10/bin/
 ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}"
 
 # ------------------------------------------------------------------------------
