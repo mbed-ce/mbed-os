@@ -24,6 +24,7 @@ RUN set -x \
     python3-setuptools \
     python3-wheel \
     python3-pip \
+    python-is-python3 \
     build-essential \
     astyle \
     mercurial \
@@ -37,29 +38,28 @@ RUN set -x \
     ccache \
     gcovr \
     && apt clean && rm -rf /var/lib/apt/lists \
-    && update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 \
     && : # last line
 
 RUN set -x \
-    && --mount=type=cache,target=/root/.cache/pip pip3 install -U cmake
+    && pip3 install -U cmake
 
 # Set up Mbed environment
 WORKDIR /tmp/
 COPY tools/requirements.txt .
 RUN set -x \
-    && --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements.txt  \
+    && pip3 install -r requirements.txt  \
     && : # last line
 
 COPY tools/requirements-ci-build.txt .
 RUN set -x \
-    && --mount=type=cache,target=/root/.cache/pip pip3 install -r requirements-ci-build.txt  \
+    && pip3 install -r requirements-ci-build.txt  \
     && : # last line
 
 
 # ------------------------------------------------------------------------------
 # Install Python modules (which are not included in requirements.txt)
 RUN set -x \
-    && --mount=type=cache,target=/root/.cache/pip pip3 install -U \
+    && pip3 install -U \
     mbed-cli \
     && : # last line
 

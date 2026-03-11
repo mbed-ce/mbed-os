@@ -12,8 +12,7 @@ on:
 jobs:
   license-check:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
+    container: ${{ needs.select-container.outputs.container }}
 
     steps:
       - name: Checkout repo

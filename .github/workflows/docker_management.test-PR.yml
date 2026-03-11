@@ -12,6 +12,10 @@ on:
       - .github/workflows/docker_management.*
       - requirements.txt
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-container:
     runs-on: ubuntu-latest
@@ -31,7 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          repository: mbed-ce/mbed-os-example-blinky
+          repository: ARMmbed/mbed-os-example-blinky
           path: mbed-os-example-blinky
           ref: development
 
@@ -46,6 +50,13 @@ jobs:
         with:
           path: mbed-os-example-blinky/mbed-os
 
+      - name: Login to ghcr.io
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build container
         uses: docker/build-push-action@v7
         id: docker_build_dev
@@ -53,8 +64,8 @@ jobs:
           context: ./mbed-os-example-blinky/mbed-os
           platforms: ${{ matrix.platform }}
           file: ./mbed-os-example-blinky/mbed-os/docker_images/mbed-os-env/Dockerfile
-          load: true
-          tags: mbed-os-env:a_pr_test
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/mbed-os-env-tmp:pr-${{ github.event.number }}-${{ github.sha }}
 
       - name: test the container
         id: test

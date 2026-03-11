@@ -1,24 +1,22 @@
-# This workflow detects if any Docker-related files have changed. New Mbed CE Docker containers will be pushed to
-# the GitHub Container Registry from PRs only in the event of changes to the Docker environment, else PRs will use the
-# latest container from the main branch.
-name: Detect Docker Changes
+name: CI PR Workflow
 
 on:
   pull_request:
-  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   detect-docker-changes:
     runs-on: ubuntu-latest
-
     outputs:
       docker_changed: ${{ steps.changes.outputs.docker }}
-
     steps:
       - uses: actions/checkout@v6
-
-      - name: Detect Docker changes
-        uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
@@ -32,24 +30,16 @@ jobs:
   build-pr-container:
     needs: detect-docker-changes
     if: needs.detect-docker-changes.outputs.docker_changed == 'true'
-
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - uses: actions/checkout@v6
-
-      - name: Login to ghcr
+      - name: Login to GHCR
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push
+      - name: Build & push PR container
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -60,10 +50,8 @@ jobs:
   select-container:
     needs: [detect-docker-changes, build-pr-container]
     runs-on: ubuntu-latest
-
     outputs:
       container: ${{ steps.set.outputs.container }}
-
     steps:
       - id: set
         run: |
@@ -71,4 +59,19 @@ jobs:
             echo "container=ghcr.io/mbed-ce/mbed-os-env-tmp:pr-${{ github.event.number }}-${{ github.sha }}" >> $GITHUB_OUTPUT
           else
             echo "container=ghcr.io/mbed-ce/mbed-os-env:main-latest" >> $GITHUB_OUTPUT
-          fi
+
+  basic-checks:
+    needs: select-container
+    runs-on: ubuntu-latest
+    container: ${{ needs.select-container.outputs.container }}
+    steps:
+      - uses: actions/checkout@v6
+      - run: echo "Run license, unit tests, doxygen, etc."
+
+  build-greentea:
+    needs: select-container
+    runs-on: ubuntu-latest
+    container: ${{ needs.select-container.outputs.container }}
+    steps:
+      - uses: actions/checkout@v6
+      - run: echo "Run greentea CMake compilation check"

@@ -5,7 +5,7 @@ name: Release or update docker image for a released mbed-os version
 on:
   push:
     tags:
-      - mbed-os-6.[0-9]+.[0-9]+
+      - mbed-os-7.[0-9]+.[0-9]+
 
   schedule:
     - cron: "15 4 * * 6"
@@ -182,7 +182,7 @@ jobs:
       - name: Checkout example blinky
         uses: actions/checkout@v6
         with:
-          repository: mbed-ce/mbed-os-example-blinky
+          repository: ARMmbed/mbed-os-example-blinky
           path: mbed-os-example-blinky
           fetch-depth: 0
 
