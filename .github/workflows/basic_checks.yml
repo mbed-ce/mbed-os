@@ -10,13 +10,14 @@ on:
       - main
 
 env:
-  CI_CONTAINER: ${{ github.event_name == 'pull_request' && format('ghcr.io/mbed-ce/mbed-os-env-tmp:pr-{0}-{1}', github.event.number, github.sha) || 'ghcr.io/mbed-ce/mbed-os-env:main-latest' }}
+  # Set up the oldest python version that's currently still supported by Python (as of Winter 2026)
+  PYTHON_VERSION: '3.10'
 
 jobs:
   license-check:
     runs-on: ubuntu-latest
     container:
-      image: ${{ env.CI_CONTAINER }}
+      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
 
     steps:
       - name: Checkout repo
@@ -68,7 +69,7 @@ jobs:
   include-check:
     runs-on: ubuntu-latest
     container:
-      image: ${{ env.CI_CONTAINER }}
+      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
 
     steps:
       - name: Checkout repo
@@ -140,10 +141,9 @@ jobs:
           find  -name "*.s" | tee BUILD/badasm |
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
-      # Set up the oldest python version that's currently still supported by Python (as of Winter 2026)
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python packages
         run: |
@@ -177,7 +177,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/BUILD
 
       - name: Doxygen Action
-        uses: mattnotmitt/doxygen-action@v1
+        uses: mattnotmitt/doxygen-action@v1.12.0
         with:
           doxyfile-path: ./doxyfile_options
 
@@ -187,10 +187,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v6
 
-      # Set up the oldest python version that's currently still supported by Python (as of Winter 2026)
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python packages
         run: |
@@ -206,10 +205,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v6
 
-      # Set up the oldest python version that's currently still supported by Python (as of Winter 2026)
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python packages
         run: |
@@ -225,7 +223,7 @@ jobs:
   pin-validation:
     runs-on: ubuntu-latest
     container:
-      image: ${{ env.CI_CONTAINER }}
+      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
     steps:
       -
         name: Checkout repo
@@ -247,7 +245,7 @@ jobs:
   cmake-native-unit-tests:
     runs-on: ubuntu-latest
     container:
-      image: ${{ env.CI_CONTAINER }}
+      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
     steps:
       -
         name: Checkout repo

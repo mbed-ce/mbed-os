@@ -22,7 +22,7 @@ import json
 import subprocess
 
 """
-This file contains ghcr utlity wrapper used for:
+This file contains ghcr utility wrapper used for:
 - retrieving digest of docker image
 - deleting images in ghcr
 """
@@ -41,7 +41,7 @@ def get_digest(ctx, repository, tag, platform=None):
     :param tag: docker tag
     :param platform: platform for e.g, linux/arm64
     """
-    command = f"docker run quay.io/skopeo/stable:v1.4.1 inspect --creds={ctx.obj['username']}:{ctx.obj['passwd']} docker://ghcr.io/{ctx.obj['username']}/{repository}:{tag} --raw"
+    command = f"docker run quay.io/skopeo/stable:v1.22.0 inspect --creds={ctx.obj['username']}:{ctx.obj['passwd']} docker://ghcr.io/{ctx.obj['username']}/{repository}:{tag} --raw"
     output = subprocess.run(
         command.split(), stdout=subprocess.PIPE, check=True
     ).stdout.decode("utf-8")
