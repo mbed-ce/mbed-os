@@ -16,6 +16,10 @@ on:
         description: "mbed-os release version for which you want to update docker image."
         required: true
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   # this job finds the necessary tags to be applied to docker image
   prepare-tags:

@@ -9,10 +9,14 @@ on:
     branches:
       - main
 
+env:
+  CI_CONTAINER: ${{ github.event_name == 'pull_request' && format('ghcr.io/mbed-ce/mbed-os-env-tmp:pr-{0}-{1}', github.event.number, github.sha) || 'ghcr.io/mbed-ce/mbed-os-env:main-latest' }}
+
 jobs:
   license-check:
     runs-on: ubuntu-latest
-    container: ${{ needs.select-container.outputs.container }}
+    container:
+      image: ${{ env.CI_CONTAINER }}
 
     steps:
       - name: Checkout repo
@@ -64,7 +68,7 @@ jobs:
   include-check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
+      image: ${{ env.CI_CONTAINER }}
 
     steps:
       - name: Checkout repo
@@ -221,7 +225,7 @@ jobs:
   pin-validation:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
+      image: ${{ env.CI_CONTAINER }}
     steps:
       -
         name: Checkout repo
@@ -243,7 +247,7 @@ jobs:
   cmake-native-unit-tests:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
+      image: ${{ env.CI_CONTAINER }}
     steps:
       -
         name: Checkout repo

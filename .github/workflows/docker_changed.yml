@@ -7,6 +7,10 @@ on:
   pull_request:
   push:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   detect-docker-changes:
     runs-on: ubuntu-latest
@@ -35,10 +39,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - uses: actions/checkout@v6
 
@@ -57,8 +57,28 @@ jobs:
           push: true
           tags: ghcr.io/mbed-ce/mbed-os-env-tmp:pr-${{ github.event.number }}-${{ github.sha }}
 
+  test-pr-container:
+    needs: build-pr-container
+    if: needs.detect-docker-changes.outputs.docker_changed == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout blinky example
+        uses: actions/checkout@v6
+        with:
+          repository: ARMmbed/mbed-os-example-blinky
+          path: blinky
+
+      - name: Run compile test in PR container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/blinky:/workspace \
+            -w /workspace \
+            ghcr.io/mbed-ce/mbed-os-env-tmp:pr-${{ github.event.number }}-${{ github.sha }} \
+            mbed-tools compile -m K64F -t GCC_ARM
+
   select-container:
-    needs: [detect-docker-changes, build-pr-container]
+    needs: [detect-docker-changes, build-pr-container, test-pr-container]
     runs-on: ubuntu-latest
 
     outputs:

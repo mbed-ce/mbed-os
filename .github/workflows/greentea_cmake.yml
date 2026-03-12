@@ -1,10 +1,14 @@
 name: Compile Check
 on: [pull_request]
 
+env:
+  CI_CONTAINER: ${{ github.event_name == 'pull_request' && format('ghcr.io/mbed-ce/mbed-os-env-tmp:pr-{0}-{1}', github.event.number, github.sha) || 'ghcr.io/mbed-ce/mbed-os-env:main-latest' }}
+
 jobs:
   build-greentea:
     runs-on: ubuntu-latest
-    container: ${{ needs.select-container.outputs.container }}
+    container:
+      image: ${{ env.CI_CONTAINER }}
 
     strategy:
       matrix:
