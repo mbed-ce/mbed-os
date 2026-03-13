@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "branch='${GITHUB_REF#refs/heads/}'" >> "$GITHUB_OUTPUT"
         id: extract_branch
 
       - name: Checkout
@@ -105,7 +105,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v6
 
       - name: Build docker containers
@@ -148,7 +148,7 @@ jobs:
           value=`cat repository_owner`
           echo "REPO_OWNER=$value" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v6
 
       - name: Find DEV DOCKER DIGEST
@@ -158,14 +158,23 @@ jobs:
           echo "DIGEST=$DIGEST" >> "$GITHUB_OUTPUT"
           echo "Docker DIGEST: $DIGEST"
 
-      # as the dev images are created only for main branch, run test against
-      # development branch of blinky
-      - name: Checkout
+      - name: Checkout Hello World repo
         uses: actions/checkout@v6
         with:
-          repository: ARMmbed/mbed-os-example-blinky
-          path: mbed-os-example-blinky
-          ref: development
+          repository: mbed-ce/mbed-ce-hello-world
+          path: mbed-ce-hello-world
+
+      - name: Remove mbed-os from example-application
+        shell: bash
+        run: |
+          cd mbed-ce-hello-world
+          rm -rf mbed-os
+
+      - name: Checkout mbed-os submodule
+        uses: actions/checkout@v6
+        with:
+          path: mbed-ce-hello-world/mbed-os
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
 
@@ -182,13 +191,10 @@ jobs:
 
           run: |
             uname -m
-            cd mbed-os-example-blinky
-            mbed deploy
-            # build using CLI1
-            mbed compile -m K64F -t GCC_ARM
-
-            # build using CLI2
-            mbed-tools compile -m K64F -t GCC_ARM
+            cd mbed-ce-hello-world
+            mkdir -p build && cd build
+            cmake .. -GNinja -DCMAKE_BUILD_TYPE=Develop -DMBED_TARGET=K64F
+            ninja || exit 1
 
   deploy-container:
     runs-on: ubuntu-latest
@@ -217,6 +223,6 @@ jobs:
 
       - name: copy dev tag to prod
         run: |
-          docker run quay.io/skopeo/stable:v1.4.1 copy --src-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --all docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env:latest
-          docker run quay.io/skopeo/stable:v1.4.1 copy --src-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --all docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
-          docker run quay.io/skopeo/stable:v1.4.1 copy --src-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --all docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}
+          docker run quay.io/skopeo/stable:v1.22.0 copy --src-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --all docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env:latest
+          docker run quay.io/skopeo/stable:v1.22.0 copy --src-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --all docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
+          docker run quay.io/skopeo/stable:v1.22.0 copy --src-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }} --all docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ steps.build_info.outputs.REPO_OWNER }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}

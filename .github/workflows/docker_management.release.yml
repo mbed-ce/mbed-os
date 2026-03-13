@@ -32,8 +32,8 @@ jobs:
           fetch-depth: 0
 
       - # if manually triggered makes sure that input tag exists on the branch selected
-        # this is to avoid silly mistakes, for example: mbed-os-7.0.16-latest docker image
-        # getting released on mbed-os-6 branch
+        # this is to avoid silly mistakes, for example: mbed-os-8.0.16-latest docker image
+        # getting released on mbed-os-7 branch
         if: ${{ github.event_name == 'workflow_dispatch' }}
         name: Sanity check tag of manual trigger
         shell: bash

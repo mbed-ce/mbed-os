@@ -13,11 +13,13 @@ env:
   # Set up the oldest python version that's currently still supported by Python (as of Winter 2026)
   PYTHON_VERSION: '3.10'
 
+  MBED_OS_ENV_IMAGE: ghcr.io/mbed-ce/mbed-os-env:main-latest
+
 jobs:
   license-check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
+      image: ${{ env.MBED_OS_ENV_IMAGE }}
 
     steps:
       - name: Checkout repo
@@ -69,7 +71,7 @@ jobs:
   include-check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
+      image: ${{ env.MBED_OS_ENV_IMAGE }}
 
     steps:
       - name: Checkout repo
@@ -223,7 +225,7 @@ jobs:
   pin-validation:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
+      image: ${{ env.MBED_OS_ENV_IMAGE }}
     steps:
       -
         name: Checkout repo
@@ -245,7 +247,7 @@ jobs:
   cmake-native-unit-tests:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/mbed-ce/mbed-os-env:main-latest
+      image: ${{ env.MBED_OS_ENV_IMAGE }}
     steps:
       -
         name: Checkout repo
