@@ -21,7 +21,7 @@ mbed_setup_submodule(stm32f7xx-hal-driver CHECK_FILE Src/stm32f7xx_hal.c        
 add_library(mbed-stm32f7cube-fw INTERFACE)
 
 target_sources(mbed-stm32f7cube-fw
-    INTERFACE
+    INTERFACE    
         system_stm32f7xx.c
         stm32f7xx-hal-driver/Src/Legacy/stm32f7xx_hal_can.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal.c
@@ -39,6 +39,7 @@ target_sources(mbed-stm32f7cube-fw
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dcmi.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dcmi_ex.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dfsdm.c
+        #stm32f7xx-hal-driver/Src/stm32f7xx_hal_dma.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dma2d.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dma_ex.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_dsi.c
@@ -66,7 +67,7 @@ target_sources(mbed-stm32f7cube-fw
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_pcd_ex.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_pwr.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_pwr_ex.c
-        stm32f7xx-hal-driver/Src/stm32f7xx_hal_qspi.c
+        #stm32f7xx-hal-driver/Src/stm32f7xx_hal_qspi.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_rcc.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_rcc_ex.c
         stm32f7xx-hal-driver/Src/stm32f7xx_hal_rng.c
@@ -110,11 +111,13 @@ target_sources(mbed-stm32f7cube-fw
         stm32f7xx-hal-driver/Src/stm32f7xx_ll_usb.c
         stm32f7xx-hal-driver/Src/stm32f7xx_ll_utils.c
         Mbed_HAL_overrides/stm32f7xx_hal_dma.c
+        Mbed_HAL_overrides/stm32f7xx_hal_qspi.c
 )
 
 target_include_directories(mbed-stm32f7cube-fw
     INTERFACE
         .
+        Mbed_HAL_overrides
         cmsis-device-f7/Include
         stm32f7xx-hal-driver/Inc
         stm32f7xx-hal-driver/Inc/Legacy
