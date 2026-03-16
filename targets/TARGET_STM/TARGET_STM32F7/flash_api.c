@@ -83,9 +83,10 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
        you have to make sure that these data are rewritten before they are accessed during code
        execution. If this cannot be done safely, it is recommended to flush the caches by setting the
        DCRST and ICRST bits in the FLASH_CR register. */
-    __HAL_FLASH_ART_DISABLE();
-    __HAL_FLASH_ART_RESET();
-    __HAL_FLASH_ART_ENABLE();
+    CLEAR_BIT(FLASH->ACR, FLASH_ACR_ARTEN);
+    SET_BIT(FLASH->ACR, FLASH_ACR_ARTRST);
+    CLEAR_BIT(FLASH->ACR, FLASH_ACR_ARTRST);
+    SET_BIT(FLASH->ACR, FLASH_ACR_ARTEN);
 
     /* Get the 1st sector to erase */
     SectorId = GetSector(address);
@@ -130,10 +131,11 @@ int32_t flash_program_page(flash_t *obj, uint32_t address, const uint8_t *data,
     /* Note: If an erase operation in Flash memory also concerns data in the data or instruction cache,
        you have to make sure that these data are rewritten before they are accessed during code
        execution. If this cannot be done safely, it is recommended to flush the caches by setting the
-       DCRST and ICRST bits in the FLASH_CR register. */
-    __HAL_FLASH_ART_DISABLE();
-    __HAL_FLASH_ART_RESET();
-    __HAL_FLASH_ART_ENABLE();
+        DCRST and ICRST bits in the FLASH_CR register. */
+    CLEAR_BIT(FLASH->ACR, FLASH_ACR_ARTEN);
+    SET_BIT(FLASH->ACR, FLASH_ACR_ARTRST);
+    CLEAR_BIT(FLASH->ACR, FLASH_ACR_ARTRST);
+    SET_BIT(FLASH->ACR, FLASH_ACR_ARTEN);
 
     while ((size > 0) && (status == 0)) {
         if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE,

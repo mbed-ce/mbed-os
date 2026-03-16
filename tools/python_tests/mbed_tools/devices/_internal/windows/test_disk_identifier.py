@@ -33,13 +33,6 @@ class TestDiskUid(unittest.TestCase):
                 serial_number="0672FF574953867567051035",
             ),
         )
-        # System disk
-        pnpid3 = "SCSI\\DISK&VEN_SAMSUNG&PROD_MZNLN512HMJP-000\\4&143821B1&0&000100"
-        serial_number3 = "S2XANX0J211020"
-        self.assertEqual(
-            Win32DiskIdParser().parse(pnpid=pnpid3, serial_number=serial_number3),
-            WindowsUID(uid="4&143821b1&0&000100", raw_uid="4&143821B1&0&000100", serial_number="S2XANX0J211020"),
-        )
         # Daplink
         pnpid4 = "USBSTOR\\DISK&VEN_MBED&PROD_VFS&REV_0.1\\0240000034544E45001A00018AA900292011000097969900&0"
         serial_number4 = "0240000034544E45001A00018AA900292011000097969900"

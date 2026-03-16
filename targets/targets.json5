@@ -1838,12 +1838,19 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
             },
+            "hse-value": {
+                "help": "Frequency in MHz of external oscillator / crystal.  Will be used to compute PLL parameters. May be any value that is between 4MHz and 50MHz and is divisible by 1MHz",
+                "value": 8000000,
+                "value_min": 4000000,
+                "value_max": 50000000,
+                "macro_name": "HSE_VALUE"
+            },
             "lpticker-lptim": {
                 "help": "This target supports LPTIM. Set value 1 to use LPTIM for LPTICKER, or 0 to use RTC wakeup timer",
                 "value": 1
             },
             "lse-drive-load-level": {
-                "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
+                "help": "LSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
             "i2c-timing-value-algo": {
@@ -1883,6 +1890,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "USBDEVICE"
         ],
+        "overrides": {
+            // ADC reference voltage is same as MCU VDD.
+            "default-adc-vref": 3.3
+        },
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
@@ -1911,11 +1922,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "overrides": {
             "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
-            "network-default-interface-type": "ETHERNET"
+            "hse-value": 25000000,
+            "network-default-interface-type": "ETHERNET",
+
+            // ADC reference voltage is same as MCU VDD.
+            "default-adc-vref": 3.3
         },
         "macros_add": [
-            "STM32F746xx",
-            "HSE_VALUE=25000000"
+            "STM32F746xx"
         ],
         "device_has_add": [
             "EMAC",
@@ -1952,7 +1966,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F746ZGTx",
         "overrides": {
-            "network-default-interface-type": "ETHERNET"
+            "network-default-interface-type": "ETHERNET",
+
+            // ADC reference voltage is same as MCU VDD.
+            "default-adc-vref": 3.3
         },
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1984,32 +2001,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F756ZGTx",
         "overrides": {
-            "network-default-interface-type": "ETHERNET"
+            "network-default-interface-type": "ETHERNET",
+            
+            // ADC reference voltage is same as MCU VDD.
+            "default-adc-vref": 3.3
         },
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
-    },
-    "UHURU_RAVEN": {
-        "inherits": [
-            "MCU_STM32F7"
-        ],
-        "extra_labels_add": [
-            "STM32F767xI"
-        ],
-        "overrides": {
-            "clock-source": "USE_PLL_HSE_XTAL",
-            "network-default-interface-type": "WIFI"
-        },
-        "components_add": [
-            "SPIF"
-        ],
-        "macros_add": [
-            "STM32F767xx"
-        ],
-        "device_has_remove": [
-            "SERIAL_FC"
-        ],
-        "device_name": "STM32F767VITx",
-        "image_url": "https://uhuru.co.jp/wp-content/uploads/2019/02/20190222_pr_raven_02.jpg"
     },
     "NUCLEO_F767ZI": {
         "inherits": [
@@ -2042,7 +2039,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F767ZITx",
         "overrides": {
-            "network-default-interface-type": "ETHERNET"
+            "network-default-interface-type": "ETHERNET",
+            
+            // ADC reference voltage is same as MCU VDD.
+            "default-adc-vref": 3.3
         },
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -2071,8 +2071,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "macros_add": [
-            "STM32F769xx",
-            "HSE_VALUE=25000000"
+            "STM32F769xx"
         ],
         "device_has_add": [
             "EMAC",
@@ -2081,7 +2080,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F769NIHx",
         "overrides": {
-            "network-default-interface-type": "ETHERNET"
+            "hse-value": 25000000,
+            "network-default-interface-type": "ETHERNET",
+
+            // ADC reference voltage is same as MCU VDD.
+            "default-adc-vref": 3.3
         },
         "image_url": "https://www.mouser.com/images/marketingid/2016/img/167234246_STMicro_32F769IDISCOVERYDiscoveryKit.png?v=070223.0222"
     },
