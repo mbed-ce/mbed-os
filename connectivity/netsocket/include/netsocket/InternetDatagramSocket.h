@@ -30,177 +30,189 @@
  */
 class InternetDatagramSocket : public InternetSocket {
 public:
-    /** Send data to the specified address.
+    /**
+     * @brief Send data to the specified address.
      *
-     *  By default, sendto blocks until data is sent. If socket is set to
-     *  nonblocking or times out, NSAPI_ERROR_WOULD_BLOCK is returned
-     *  immediately.
+     * By default, sendto blocks until data is sent. If socket is set to
+     * nonblocking or times out, NSAPI_ERROR_WOULD_BLOCK is returned
+     * immediately.
      *
-     *  It uses sendto_control with zero ancillary data
-     *  @param address  The SocketAddress of the remote host.
-     *  @param data     Buffer of data to send to the host.
-     *  @param size     Size of the buffer in bytes.
-     *  @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
-     *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
-     *                  and send cannot be performed immediately.
-     *  @retval         int Other negative error codes for stack-related failures.
-     *                  See \ref NetworkStack::socket_send.
+     * It uses sendto_control with zero ancillary data.
+     *
+     * @param address  The SocketAddress of the remote host.
+     * @param data     Buffer of data to send to the host.
+     * @param size     Size of the buffer in bytes.
+     * @retval         Number of sent bytes on success.
+     * @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
+     * @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
+     *                 and send cannot be performed immediately.
+     * @retval         int Other negative error codes for stack-related failures.
+     *                 See \ref NetworkStack::socket_send.
      */
     nsapi_size_or_error_t sendto(const SocketAddress &address,
                                  const void *data, nsapi_size_t size) override;
 
-    /** Receive a datagram and store the source address in address if it's not NULL.
+    /**
+     * @brief Receive a datagram and store the source address in address if it's not NULL.
      *
-     *  By default, recvfrom blocks until a datagram is received. If socket is set to
-     *  nonblocking or times out with no datagram, NSAPI_ERROR_WOULD_BLOCK
-     *  is returned.
+     * By default, recvfrom blocks until a datagram is received. If socket is set to
+     * nonblocking or times out with no datagram, NSAPI_ERROR_WOULD_BLOCK
+     * is returned.
      *
-     *  @note If the datagram is larger than the buffer, the excess data is silently discarded.
+     * @note If the datagram is larger than the buffer, the excess data is silently discarded.
      *
-     *  @note If socket is connected, only packets coming from connected peer address
-     *  are accepted.
+     * @note If socket is connected, only packets coming from connected peer address
+     * are accepted.
      *
-     *  @note recvfrom() is allowed write to address and data buffers even if error occurs.
-     *  It uses recvfrom_control with zero ancillary data
-     *  @param address  Destination for the source address or NULL.
-     *  @param data     Destination buffer for RAW data to be received from the host.
-     *  @param size     Size of the buffer in bytes.
-     *  @retval         Number of received bytes on success.
-     *  @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
-     *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
-     *                  and send cannot be performed immediately.
-     *  @retval         Other negative error codes for stack-related failures.
-     *                  See \ref NetworkStack::socket_recv.
+     * @note recvfrom() is allowed write to address and data buffers even if error occurs.
+     * It uses recvfrom_control with zero ancillary data
+     * @param address  Destination for the source address or NULL.
+     * @param data     Destination buffer for RAW data to be received from the host.
+     * @param size     Size of the buffer in bytes.
+     * @retval         Number of received bytes on success.
+     * @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
+     * @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
+     *                 and receive cannot be performed immediately.
+     * @retval         Other negative error codes for stack-related failures.
+     *                 See \ref NetworkStack::socket_recv.
      */
     nsapi_size_or_error_t recvfrom(SocketAddress *address,
                                    void *data, nsapi_size_t size) override;
 
-    /** Send datagram and ancillary data to the specified address.
+    /**
+     * @brief Send datagram and ancillary data to the specified address.
      *
-     *  By default, sendto blocks until data is sent. If socket is set to
-     *  nonblocking or times out, NSAPI_ERROR_WOULD_BLOCK is returned
-     *  immediately.
+     * By default, sendto blocks until data is sent. If socket is set to
+     * nonblocking or times out, NSAPI_ERROR_WOULD_BLOCK is returned
+     * immediately.
      *
-     *  @param address  The SocketAddress of the remote host.
-     *  @param data     Buffer of data to send to the host.
-     *  @param size     Size of the buffer in bytes.
-     *  @param control  Control data, for instance a populated #nsapi_pktinfo structure.
-     *  @param control_size Size of \c control in bytes.
-     *  @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
-     *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
-     *                  and send cannot be performed immediately.
-     *  @retval         int Other negative error codes for stack-related failures.
-     *                  See \ref NetworkStack::socket_send.
+     * @param address  The SocketAddress of the remote host.
+     * @param data     Buffer of data to send to the host.
+     * @param size     Size of the buffer in bytes.
+     * @param control  Control data, for instance a populated #nsapi_pktinfo structure.
+     * @param control_size Size of \c control in bytes.
+     * @retval         Number of received bytes on success.
+     * @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
+     * @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
+     *                 and send cannot be performed immediately.
+     * @retval         int Other negative error codes for stack-related failures.
+     *                 See \ref NetworkStack::socket_send.
      */
     nsapi_size_or_error_t sendto_control(const SocketAddress &address,
                                          const void *data, nsapi_size_t size,
                                          nsapi_msghdr_t *control, nsapi_size_t control_size) override;
 
-
-    /** Receive a datagram with ancillary data and store the source address in address if it's not NULL.
+   /**
+    * @brief Receive a datagram with ancillary data and store the source address in address if it's not NULL.
     *
-    *  By default, recvfrom blocks until a datagram is received. If socket is set to
-    *  nonblocking or times out with no datagram, NSAPI_ERROR_WOULD_BLOCK
-    *  is returned.
+    * By default, recvfrom blocks until a datagram is received. If socket is set to
+    * nonblocking or times out with no datagram, NSAPI_ERROR_WOULD_BLOCK
+    * is returned.
     *
-    *  Ancillary data is stored into \c control.  The caller needs to allocate a buffer
-    *  that is large enough to contain the data they want to receive, then pass the pointer in
-    *  through the \c control member.  The data will be filled into \c control, beginning with a header
-    *  specifying what data was received.  See #MsgHeaderIterator for how to parse this data.
+    * Ancillary data is stored into \c control.  The caller needs to allocate a buffer
+    * that is large enough to contain the data they want to receive, then pass the pointer in
+    * through the \c control member.  The data will be filled into \c control, beginning with a header
+    * specifying what data was received.  See #MsgHeaderIterator for how to parse this data.
     *
-    *  @note If the datagram is larger than the buffer, the excess data is silently discarded.
+    * @note If the datagram is larger than the buffer, the excess data is silently discarded.
     *
-    *  @note If socket is connected, only packets coming from connected peer address
-    *  are accepted.
+    * @note If socket is connected, only packets coming from connected peer address
+    * are accepted.
     *
-    *  @note recvfrom_control() is allowed write to address and data buffers even if error occurs.
+    * @note recvfrom_control() is allowed write to address and data buffers even if error occurs.
     *
-    *  @param address  Destination for the source address or NULL.
-    *  @param data     Destination buffer for RAW data to be received from the host.
-    *  @param size     Size of the buffer in bytes.
-    *  @param control  Caller-allocated buffer to store ancillary data.
-    *  @param control_size Size of the \c control buffer that the caller has allocated.
-    *  @retval         Number of received bytes on success.
-    *  @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
-    *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
-    *                  and send cannot be performed immediately.
-    *  @retval         Other negative error codes for stack-related failures.
-    *                  See \ref NetworkStack::socket_recv.
+    * @param address  Destination for the source address or NULL.
+    * @param data     Destination buffer for RAW data to be received from the host.
+    * @param size     Size of the buffer in bytes.
+    * @param control  Caller-allocated buffer to store ancillary data.
+    * @param control_size Size of the \c control buffer that the caller has allocated.
+    * @retval         Number of received bytes on success.
+    * @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
+    * @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
+    *                 and send cannot be performed immediately.
+    * @retval         Other negative error codes for stack-related failures.
+    *                 See \ref NetworkStack::socket_recv.
     */
     nsapi_size_or_error_t recvfrom_control(SocketAddress *address,
                                            void *data, nsapi_size_t size,
                                            nsapi_msghdr_t *control, nsapi_size_t control_size) override;
 
-    /** Set the remote address for next send() call and filtering
-     *  of incoming packets. To reset the address, zero initialized
-     *  SocketAddress must be in the address parameter.
+    /**
+     * @brief Set the remote address for next send() call and filtering of incoming packets.
      *
-     *  @param address  The SocketAddress of the remote host.
-     *  @return         NSAPI_ERROR_OK on success.
+     * To reset the address, zero initialized SocketAddress must be in the address parameter.
+     *
+     * @param address  The SocketAddress of the remote host.
+     * @return         NSAPI_ERROR_OK on success.
      */
     nsapi_error_t connect(const SocketAddress &address) override;
 
-    /** Send a raw data to connected remote address.
+    /**
+     * @brief Send a raw data to connected remote address.
      *
-     *  By default, send blocks until all data is sent. If socket is set to
-     *  nonblocking or times out, a partial amount can be written.
-     *  NSAPI_ERROR_WOULD_BLOCK is returned if no data was written.
+     * By default, send blocks until all data is sent. If socket is set to
+     * nonblocking or times out, a partial amount can be written.
+     * NSAPI_ERROR_WOULD_BLOCK is returned if no data was written.
      *
-     *  @note The socket must be connected to a remote host before send() call.
+     * @note The socket must be connected to a remote host before send() call.
      *
-     *  @param data     Buffer of data to send to the host.
-     *  @param size     Size of the buffer in bytes.
-     *  @retval         Number of sent bytes on success.
-     *  @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
-     *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
-     *                  and send cannot be performed immediately.
-     *  @retval         NSAPI_ERROR_NO_ADDRESS if the address was not set with connect().
-     *  @retval         Other negative error codes for stack-related failures.
-     *                  See \ref NetworkStack::socket_send.
+     * @param data     Buffer of data to send to the host.
+     * @param size     Size of the buffer in bytes.
+     * @retval         Number of sent bytes on success.
+     * @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
+     * @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
+     *                 and send cannot be performed immediately.
+     * @retval         NSAPI_ERROR_NO_ADDRESS if the address was not set with connect().
+     * @retval         Other negative error codes for stack-related failures.
+     *                 See \ref NetworkStack::socket_send.
      */
     nsapi_size_or_error_t send(const void *data, nsapi_size_t size) override;
 
-    /** Receive data from a socket.
+    /**
+     * @brief Receive data from a socket.
      *
-     *  This is equivalent to calling recvfrom(NULL, data, size).
+     * This is equivalent to calling recvfrom(NULL, data, size).
      *
-     *  By default, recv blocks until some data is received. If socket is set to
-     *  nonblocking or times out, NSAPI_ERROR_WOULD_BLOCK can be returned to
-     *  indicate no data.
+     * By default, recv blocks until some data is received. If socket is set to
+     * nonblocking or times out, NSAPI_ERROR_WOULD_BLOCK can be returned to
+     * indicate no data.
      *
-     *  @note recv() is allowed write to data buffer even if error occurs.
+     * @note recv() is allowed write to data buffer even if error occurs.
      *
-     *  @param data     Pointer to buffer for data received from the host.
-     *  @param size     Size of the buffer in bytes.
-     *  @retval         Number of received bytes on success.
-     *  @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
-     *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
-     *                  and send cannot be performed immediately.
-     *  @retval         Other negative error codes for stack-related failures.
-     *                  See \ref NetworkStack::socket_recv.
+     * @param data     Pointer to buffer for data received from the host.
+     * @param size     Size of the buffer in bytes.
+     * @retval         Number of received bytes on success.
+     * @retval         NSAPI_ERROR_NO_SOCKET in case socket was not created correctly.
+     * @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
+     *                 and receive cannot be performed immediately.
+     * @retval         Other negative error codes for stack-related failures.
+     *                 See \ref NetworkStack::socket_recv.
      */
     nsapi_size_or_error_t recv(void *data, nsapi_size_t size) override;
 
-    /** Not implemented for InternetDatagramSocket.
+    /**
+     * @brief Not implemented for InternetDatagramSocket.
      *
-     *  @param error      Not used.
-     *  @return           NSAPI_ERROR_UNSUPPORTED
+     * @param error      Not used.
+     * @return           NSAPI_ERROR_UNSUPPORTED
      */
     Socket *accept(nsapi_error_t *error = nullptr) override;
 
-    /** Not implemented for InternetDatagramSocket.
+    /**
+     * @brief Not implemented for InternetDatagramSocket.
      *
-     *  @param backlog    Not used.
-     *  @return           NSAPI_ERROR_UNSUPPORTED
+     * @param backlog    Not used.
+     * @return           NSAPI_ERROR_UNSUPPORTED
      */
     nsapi_error_t listen(int backlog = 1) override;
 #if !defined(DOXYGEN_ONLY)
 
 protected:
 
-    /** Create an uninitialized socket.
+    /**
+     * @brief Create an uninitialized socket.
      *
-     *  @note Must call open to initialize the socket on a network stack.
+     * @note Must call open to initialize the socket on a network stack.
      */
     InternetDatagramSocket() = default;
 
