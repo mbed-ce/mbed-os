@@ -122,12 +122,6 @@
             "spi-clk": "p7",
             "spi-cs": "p8"
         },
-        "ARCH_MAX": {
-            "spi-mosi": "PC_3",
-            "spi-miso": "PC_2",
-            "spi-clk":  "PB_10",
-            "spi-cs":   "PE_2"
-        },
         "WIO_BG96": {
           "spi-cs": "SPI_CS",
           "spi-mosi": "SPI_MOSI",

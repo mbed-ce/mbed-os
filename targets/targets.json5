@@ -1363,32 +1363,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TRNG"
         ]
     },
-    "ARCH_MAX": {
-        "inherits": [
-            "MCU_STM32F407xE"
-        ],
-        "supported_form_factors": [
-            "ARDUINO_UNO"
-        ],
-        "components_add": [
-            "SD"
-        ],
-        "device_has_add": [
-            "EMAC"
-        ],
-        "device_has_remove": [
-            "CAN",
-            "LPTICKER",
-            "SERIAL_FC"
-        ],
-        "device_name": "STM32F407VETx",
-        "overrides": {
-            "clock-source": "USE_PLL_HSE_XTAL",
-            "lse-available": 0,
-            "network-default-interface-type": "ETHERNET"
-        },
-        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/1881/MFG_102110014.jpg"
-    },
     "MCU_STM32F411xE": {
         "inherits": [
             "MCU_STM32F4"

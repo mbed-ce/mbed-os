@@ -10,7 +10,6 @@ SPDX-License-Identifier: Apache-2.0
 
 PIO_VARIANT_TO_MBED_TARGET = {
     "seeedArchPro": "ARCH_PRO",
-    "seeedArchMax": "ARCH_MAX",
     "frdm_kl25z": "KL25Z",
     "frdm_kl43z": "KL43Z",
     "frdm_kl46z": "KL46Z",
