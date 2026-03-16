@@ -344,7 +344,6 @@ DEFAULT_PLATFORM_DB = {
         "9008": "XADOW_M0",
         "9009": "ARCH_BLE",
         "9010": "ARCH_GPRS",
-        "9011": "ARCH_MAX",
         "9012": "SEEED_TINY_BLE",
         "9014": "WIO_3G",
         "9015": "WIO_BG96",
