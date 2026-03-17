@@ -3941,7 +3941,7 @@
                 "file_name": "CMSIS/Flash/STM32F0xx_128.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728
             },
             {
@@ -3987,7 +3987,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728,
                 "startup": true
             }
@@ -4021,7 +4021,7 @@
                 "file_name": "CMSIS/Flash/STM32F0xx_128.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728
             },
             {
@@ -4067,7 +4067,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728,
                 "startup": true
             }
@@ -4101,7 +4101,7 @@
                 "file_name": "CMSIS/Flash/STM32F0xx_256.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728
             },
             {
@@ -4147,7 +4147,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "startup": true
             }
@@ -4181,7 +4181,7 @@
                 "file_name": "Flash/STM32F10x_128.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728
             },
             {
@@ -4227,7 +4227,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728,
                 "startup": true
             }
@@ -4261,7 +4261,7 @@
                 "file_name": "CMSIS/Flash/STM32F2xx_1024.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             },
             {
@@ -4270,14 +4270,14 @@
                 "ram_size": null,
                 "ram_start": null,
                 "size": 16,
-                "start": 536854528
+                "start": 0x1FFFC000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F2xx_OTP.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 528,
+                "size": 0x210,
                 "start": 536836096
             }
         ],
@@ -4300,7 +4300,7 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 536870912,
                 "startup": false
             },
@@ -4315,7 +4315,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -4339,15 +4339,15 @@
                 65536
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ],
             [
                 536836096,
-                528
+                0x210
             ],
             [
-                536854528,
+                0x1FFFC000,
                 16
             ]
         ],
@@ -4595,7 +4595,7 @@
         "vendor": "STMicroelectronics:13"
     },
 
-    // --------------------------- STM32F4 ---------------------------
+// --------------------------- STM32F4 ---------------------------
     "STM32F401RETx": {
         "algorithms": [
             {
@@ -4603,24 +4603,24 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_512.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 524288,
-                "start": 134217728
+                "size": 0x80000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F401xx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 4,
-                "start": 536854528
+                "size": 0x4,
+                "start": 0x1FFFC000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F4xx_OTP.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 528,
-                "start": 536836096
+                "size": 0x210,
+                "start": 0x1FFF7800
             }
         ],
         "family": "STM32F4 Series",
@@ -4631,7 +4631,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -4642,11 +4642,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 98304,
-                "start": 536870912,
+                "size": 0x18000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -4657,8 +4657,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 524288,
-                "start": 134217728,
+                "size": 0x80000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -4673,16 +4673,16 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ]
         ],
         "sub_family": "STM32F401",
@@ -4695,24 +4695,24 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_512.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 524288,
-                "start": 134217728
+                "size": 0x80000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F411xx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 4,
-                "start": 536854528
+                "size": 0x4,
+                "start": 0x1FFFC000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F4xx_OTP.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 528,
-                "start": 536836096
+                "size": 0x210,
+                "start": 0x1FFF7800
             }
         ],
         "family": "STM32F4 Series",
@@ -4723,7 +4723,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -4734,11 +4734,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x20000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -4749,8 +4749,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 524288,
-                "start": 134217728,
+                "size": 0x80000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -4765,16 +4765,16 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ]
         ],
         "sub_family": "STM32F411",
@@ -4787,24 +4787,24 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_512.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 524288,
-                "start": 134217728
+                "size": 0x80000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F411xx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 4,
-                "start": 536854528
+                "size": 0x4,
+                "start": 0x1FFFC000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F4xx_OTP.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 528,
-                "start": 536836096
+                "size": 0x210,
+                "start": 0x1FFF7800
             }
         ],
         "family": "STM32F4 Series",
@@ -4815,7 +4815,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -4826,11 +4826,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x20000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -4841,8 +4841,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 524288,
-                "start": 134217728,
+                "size": 0x80000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -4857,24 +4857,24 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ],
             [
-                536836096,
-                528
+                0x1FFF7800,
+                0x210
             ],
             [
-                536854528,
-                4
+                0x1FFFC000,
+                0x4
             ]
         ],
         "sub_family": "STM32F411",
@@ -4887,24 +4887,24 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_1024.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
-                "start": 134217728
+                "size": 0x100000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F410xx_412xx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 4,
-                "start": 536854528
+                "size": 0x4,
+                "start": 0x1FFFC000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F4xx_OTP.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 528,
-                "start": 536836096
+                "size": 0x210,
+                "start": 0x1FFF7800
             }
         ],
         "family": "STM32F4 Series",
@@ -4915,7 +4915,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -4926,11 +4926,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 262144,
-                "start": 536870912,
+                "size": 0x40000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -4941,8 +4941,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
-                "start": 134217728,
+                "size": 0x100000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -4957,24 +4957,24 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ],
             [
-                536836096,
-                528
+                0x1FFF7800,
+                0x210
             ],
             [
-                536854528,
-                4
+                0x1FFFC000,
+                0x4
             ]
         ],
         "sub_family": "STM32F412",
@@ -4987,16 +4987,16 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_1536.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1572864,
-                "start": 134217728
+                "size": 0x180000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F413xx_423xx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 4,
-                "start": 536854528
+                "size": 0x4,
+                "start": 0x1FFFC000
             }
         ],
         "family": "STM32F4 Series",
@@ -5007,7 +5007,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -5018,11 +5018,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 327680,
-                "start": 536870912,
+                "size": 0x50000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -5033,8 +5033,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1572864,
-                "start": 134217728,
+                "size": 0x180000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -5049,20 +5049,20 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ],
             [
-                536854528,
-                4
+                0x1FFFC000,
+                0x4
             ]
         ],
         "sub_family": "STM32F413",
@@ -5075,24 +5075,24 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_2048.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
-                "start": 134217728
+                "size": 0x200000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F42xxx_43xxx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 8,
-                "start": 536854528
+                "size": 0x8,
+                "start": 0x1FFFC000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F4xx_OTP.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 528,
-                "start": 536836096
+                "size": 0x210,
+                "start": 0x1FFF7800
             }
         ],
         "family": "STM32F4 Series",
@@ -5103,7 +5103,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -5114,11 +5114,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 196608,
-                "start": 536870912,
+                "size": 0x30000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IRAM2": {
+            "CCM_RAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -5129,11 +5129,11 @@
                     "write": true
                 },
                 "default": false,
-                "size": 65536,
-                "start": 268435456,
+                "size": 0x10000,
+                "start": 0x10000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -5144,8 +5144,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
-                "start": 134217728,
+                "size": 0x200000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -5160,36 +5160,36 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ],
             [
-                135266304,
-                16384
+                0x8100000,
+                0x4000
             ],
             [
-                135331840,
-                65536
+                0x8110000,
+                0x10000
             ],
             [
-                135397376,
-                131072
+                0x8120000,
+                0x20000
             ],
             [
-                536836096,
-                528
+                0x1FFF7800,
+                0x210
             ],
             [
-                536854528,
-                8
+                0x1FFFC000,
+                0x8
             ]
         ],
         "sub_family": "STM32F429",
@@ -5202,24 +5202,24 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_2048.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
-                "start": 134217728
+                "size": 0x200000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F42xxx_43xxx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 8,
-                "start": 536854528
+                "size": 0x8,
+                "start": 0x1FFFC000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F4xx_OTP.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 528,
-                "start": 536836096
+                "size": 0x210,
+                "start": 0x1FFF7800
             }
         ],
         "family": "STM32F4 Series",
@@ -5230,7 +5230,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -5241,11 +5241,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 196608,
-                "start": 536870912,
+                "size": 0x30000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IRAM2": {
+            "CCM_RAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -5256,11 +5256,11 @@
                     "write": true
                 },
                 "default": false,
-                "size": 65536,
-                "start": 268435456,
+                "size": 0x10000,
+                "start": 0x10000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -5271,8 +5271,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
-                "start": 134217728,
+                "size": 0x200000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -5287,36 +5287,36 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ],
             [
-                135266304,
-                16384
+                0x8100000,
+                0x4000
             ],
             [
-                135331840,
-                65536
+                0x8110000,
+                0x10000
             ],
             [
-                135397376,
-                131072
+                0x8120000,
+                0x20000
             ],
             [
-                536836096,
-                528
+                0x1FFF7800,
+                0x210
             ],
             [
-                536854528,
-                8
+                0x1FFFC000,
+                0x8
             ]
         ],
         "sub_family": "STM32F439",
@@ -5329,24 +5329,24 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_512.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 524288,
-                "start": 134217728
+                "size": 0x80000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F446xx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 4,
-                "start": 536854528
+                "size": 0x4,
+                "start": 0x1FFFC000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F4xx_OTP.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 528,
-                "start": 536836096
+                "size": 0x210,
+                "start": 0x1FFF7800
             }
         ],
         "family": "STM32F4 Series",
@@ -5357,7 +5357,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -5368,11 +5368,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x20000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -5383,8 +5383,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 524288,
-                "start": 134217728,
+                "size": 0x80000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -5399,24 +5399,24 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ],
             [
-                536836096,
-                528
+                0x1FFF7800,
+                0x210
             ],
             [
-                536854528,
-                4
+                0x1FFFC000,
+                0x4
             ]
         ],
         "sub_family": "STM32F446",
@@ -5429,24 +5429,24 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_512.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 524288,
-                "start": 134217728
+                "size": 0x80000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F446xx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 4,
-                "start": 536854528
+                "size": 0x4,
+                "start": 0x1FFFC000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F4xx_OTP.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 528,
-                "start": 536836096
+                "size": 0x210,
+                "start": 0x1FFF7800
             }
         ],
         "family": "STM32F4 Series",
@@ -5457,7 +5457,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -5468,11 +5468,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
-                "start": 536870912,
+                "size": 0x20000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -5483,8 +5483,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 524288,
-                "start": 134217728,
+                "size": 0x80000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -5499,36 +5499,36 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134234112,
-                16384
+                0x8004000,
+                0x4000
             ],
             [
-                134250496,
-                16384
+                0x8008000,
+                0x4000
             ],
             [
-                134266880,
-                16384
+                0x800C000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ],
             [
-                134479872,
-                131072
+                0x8040000,
+                0x20000
             ],
             [
-                134610944,
-                131072
+                0x8060000,
+                0x20000
             ]
         ],
         "sub_family": "STM32F446",
@@ -5541,24 +5541,24 @@
                 "file_name": "CMSIS/Flash/STM32F4xx_2048.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
-                "start": 134217728
+                "size": 0x200000,
+                "start": 0x8000000
             },
             {
                 "default": false,
                 "file_name": "CMSIS/Flash/STM32F469xx_479xx_OPT.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 8,
-                "start": 536854528
+                "size": 0x8,
+                "start": 0x1FFFC000
             },
             {
                 "default": true,
                 "file_name": "CMSIS/Flash/STM32F469_Quad_SPI.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 33554432,
-                "start": 2415919104
+                "size": 0x2000000,
+                "start": 0x90000000
             }
         ],
         "family": "STM32F4 Series",
@@ -5569,7 +5569,7 @@
             "version": "2.13.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -5580,11 +5580,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 327680,
-                "start": 536870912,
+                "size": 0x50000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IROM1": {
+            "ROM": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -5595,8 +5595,8 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
-                "start": 134217728,
+                "size": 0x200000,
+                "start": 0x8000000,
                 "startup": true
             }
         },
@@ -5611,43 +5611,43 @@
         },
         "sectors": [
             [
-                134217728,
-                16384
+                0x8000000,
+                0x4000
             ],
             [
-                134283264,
-                65536
+                0x8010000,
+                0x10000
             ],
             [
-                134348800,
-                131072
+                0x8020000,
+                0x20000
             ],
             [
-                135266304,
-                16384
+                0x8100000,
+                0x4000
             ],
             [
-                135331840,
-                65536
+                0x8110000,
+                0x10000
             ],
             [
-                135397376,
-                131072
+                0x8120000,
+                0x20000
             ],
             [
-                536854528,
-                8
+                0x1FFFC000,
+                0x8
             ],
             [
-                2415919104,
-                65536
+                0x90000000,
+                0x10000
             ]
         ],
         "sub_family": "STM32F469",
         "vendor": "STMicroelectronics:13"
     },
     
-    // --------------------------- STM32F7 ---------------------------
+// --------------------------- STM32F7 ---------------------------
     // Notes:
     //  - ROM is possible to use in single and also in dual bank mode
     //  - ROM has 2 views of the same memory bank
@@ -6887,7 +6887,7 @@
                 "file_name": "CMSIS/Flash/STM32G0xx_128.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728
             },
             {
@@ -6941,7 +6941,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728,
                 "startup": true
             }
@@ -7047,7 +7047,7 @@
                 "file_name": "CMSIS/Flash/STM32G4xx_128.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728
             }
         ],
@@ -7085,7 +7085,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728,
                 "startup": true
             }
@@ -7115,7 +7115,7 @@
                 "file_name": "CMSIS/Flash/STM32G4xx_128.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728
             }
         ],
@@ -7153,7 +7153,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728,
                 "startup": true
             }
@@ -7214,7 +7214,7 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 536870912,
                 "startup": false
             },
@@ -7263,7 +7263,7 @@
                 "file_name": "CMSIS/Flash/STM32H503_128k_0800.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728,
                 "style": "Keil"
             }
@@ -7288,7 +7288,7 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728,
                 "startup": true
             },
@@ -7351,7 +7351,7 @@
                 "file_name": "CMSIS/Flash/STM32H5xx_2M_0800.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "style": "Keil"
             },
@@ -7360,7 +7360,7 @@
                 "file_name": "CMSIS/Flash/STM32H5xx_2M_0C00.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 201326592,
                 "style": "Keil"
             }
@@ -7385,7 +7385,7 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "startup": true
             },
@@ -7450,7 +7450,7 @@
                 "file_name": "CMSIS/Flash/STM32H5xx_2M_0800.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "style": "Keil"
             },
@@ -7459,7 +7459,7 @@
                 "file_name": "CMSIS/Flash/STM32H5xx_2M_0C00.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 201326592,
                 "style": "Keil"
             }
@@ -7484,7 +7484,7 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "startup": true
             },
@@ -7547,9 +7547,9 @@
             {
                 "default": true,
                 "file_name": "CMSIS/Flash/STM32H72x-73x_1024.FLM",
-                "ram_size": 131072,
+                "ram_size": 0x20000,
                 "ram_start": 536870912,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             }
         ],
@@ -7678,7 +7678,7 @@
         "sectors": [
             [
                 134217728,
-                131072
+                0x20000
             ]
         ],
         "sub_family": "STM32H723",
@@ -7689,7 +7689,7 @@
             {
                 "default": true,
                 "file_name": "CMSIS/Flash/STM32H72x-73x_1024.FLM",
-                "ram_size": 131072,
+                "ram_size": 0x20000,
                 "ram_start": 536870912,
                 "size": 524288,
                 "start": 134217728
@@ -7820,7 +7820,7 @@
         "sectors": [
             [
                 134217728,
-                131072
+                0x20000
             ]
         ],
         "sub_family": "STM32H725",
@@ -7833,7 +7833,7 @@
                 "file_name": "CMSIS/Flash/STM32H72x-73x_1024.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "style": "Keil"
             },
@@ -7852,7 +7852,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7870,7 +7870,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7879,7 +7879,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7888,7 +7888,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7906,7 +7906,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7915,7 +7915,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7924,7 +7924,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7933,7 +7933,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7942,7 +7942,7 @@
                 "ram_size": 65524,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7951,7 +7951,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -7960,7 +7960,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             }
         ],
@@ -8103,7 +8103,7 @@
                 "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             }
         ],
@@ -8232,27 +8232,27 @@
         "sectors": [
             [
                 134217728,
-                131072
+                0x20000
             ],
             [
                 1610612736,
-                131072
+                0x20000
             ],
             [
-                2415919104,
+                0x90000000,
                 65536
             ],
             [
-                2415919104,
+                0x90000000,
                 65536
             ],
             [
-                2415919104,
-                131072
+                0x90000000,
+                0x20000
             ],
             [
-                2415919104,
-                131072
+                0x90000000,
+                0x20000
             ]
         ],
         "sub_family": "STM32H743",
@@ -8265,7 +8265,7 @@
                 "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -8273,7 +8273,7 @@
                 "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
                 "ram_size": 32768,
                 "ram_start": 268435456,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -8282,7 +8282,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 67108864,
-                "start": 2415919104
+                "start": 0x90000000
             },
             {
                 "default": false,
@@ -8290,7 +8290,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104
+                "start": 0x90000000
             },
             {
                 "default": false,
@@ -8298,7 +8298,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104
+                "start": 0x90000000
             },
             {
                 "default": false,
@@ -8306,7 +8306,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104
+                "start": 0x90000000
             },
             {
                 "default": false,
@@ -8452,31 +8452,31 @@
         "sectors": [
             [
                 134217728,
-                131072
+                0x20000
             ],
             [
                 134217728,
-                131072
+                0x20000
             ],
             [
                 1610612736,
-                131072
+                0x20000
             ],
             [
-                2415919104,
+                0x90000000,
                 65536
             ],
             [
-                2415919104,
+                0x90000000,
                 65536
             ],
             [
-                2415919104,
-                131072
+                0x90000000,
+                0x20000
             ],
             [
-                2415919104,
-                131072
+                0x90000000,
+                0x20000
             ]
         ],
         "sub_family": "STM32H745",
@@ -8489,7 +8489,7 @@
                 "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -8497,7 +8497,7 @@
                 "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
                 "ram_size": 32768,
                 "ram_start": 268435456,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -8506,7 +8506,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 67108864,
-                "start": 2415919104
+                "start": 0x90000000
             },
             {
                 "default": false,
@@ -8514,7 +8514,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104
+                "start": 0x90000000
             },
             {
                 "default": false,
@@ -8522,7 +8522,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104
+                "start": 0x90000000
             },
             {
                 "default": false,
@@ -8530,7 +8530,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104
+                "start": 0x90000000
             },
             {
                 "default": false,
@@ -8676,31 +8676,31 @@
         "sectors": [
             [
                 134217728,
-                131072
+                0x20000
             ],
             [
                 134217728,
-                131072
+                0x20000
             ],
             [
                 1610612736,
-                131072
+                0x20000
             ],
             [
-                2415919104,
+                0x90000000,
                 65536
             ],
             [
-                2415919104,
+                0x90000000,
                 65536
             ],
             [
-                2415919104,
-                131072
+                0x90000000,
+                0x20000
             ],
             [
-                2415919104,
-                131072
+                0x90000000,
+                0x20000
             ]
         ],
         "sub_family": "STM32H747",
@@ -8713,7 +8713,7 @@
                 "file_name": "CMSIS/Flash/STM32H7x_128k.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 134217728,
                 "style": "Keil"
             },
@@ -8732,7 +8732,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8750,7 +8750,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8759,7 +8759,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8768,7 +8768,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8786,7 +8786,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8795,7 +8795,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8804,7 +8804,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8813,7 +8813,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8822,7 +8822,7 @@
                 "ram_size": 65524,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8831,7 +8831,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -8840,7 +8840,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             }
         ],
@@ -8983,7 +8983,7 @@
                 "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             }
         ],
@@ -9112,7 +9112,7 @@
         "sectors": [
             [
                 134217728,
-                131072
+                0x20000
             ]
         ],
         "sub_family": "STM32H7A3",
@@ -9125,7 +9125,7 @@
                 "file_name": "CMSIS/Flash/STM32H7A-B3_Flash_2M.FLM",
                 "ram_size": 65524,
                 "ram_start": 536870912,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "style": "Keil"
             },
@@ -9144,7 +9144,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9162,7 +9162,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9171,7 +9171,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9180,7 +9180,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9198,7 +9198,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9207,7 +9207,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9216,7 +9216,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9225,7 +9225,7 @@
                 "ram_size": 655360,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9234,7 +9234,7 @@
                 "ram_size": 65524,
                 "ram_start": 603979776,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9243,7 +9243,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             },
             {
@@ -9252,7 +9252,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 134217728,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             }
         ],
@@ -9587,7 +9587,7 @@
                 "file_name": "Flash/STM32L1xx_256.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728
             },
             {
@@ -9641,7 +9641,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "startup": true
             }
@@ -9679,7 +9679,7 @@
                 "file_name": "Flash/STM32L1xx_256.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728
             },
             {
@@ -9733,7 +9733,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "startup": true
             }
@@ -9863,7 +9863,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_256.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728
             },
             {
@@ -9924,7 +9924,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "startup": true
             }
@@ -9954,7 +9954,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_256.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728
             },
             {
@@ -10015,7 +10015,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10045,7 +10045,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_256.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728
             },
             {
@@ -10106,7 +10106,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10167,7 +10167,7 @@
                     "write": true
                 },
                 "default": true,
-                "size": 131072,
+                "size": 0x20000,
                 "start": 536870912,
                 "startup": false
             },
@@ -10227,7 +10227,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_1024.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             },
             {
@@ -10288,7 +10288,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10318,7 +10318,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_1024.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             },
             {
@@ -10379,7 +10379,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10409,7 +10409,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_1024.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             },
             {
@@ -10470,7 +10470,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10500,7 +10500,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_1024.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             },
             {
@@ -10561,7 +10561,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10591,7 +10591,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_1024.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             },
             {
@@ -10652,7 +10652,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10682,7 +10682,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_1024.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             },
             {
@@ -10713,7 +10713,7 @@
                     "write": true
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 536870912,
                 "startup": false
             },
@@ -10743,7 +10743,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10773,7 +10773,7 @@
                 "file_name": "CMSIS/Flash/STM32L4xx_1024.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             },
             {
@@ -10804,7 +10804,7 @@
                     "write": true
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 536870912,
                 "startup": false
             },
@@ -10834,7 +10834,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10864,7 +10864,7 @@
                 "file_name": "CMSIS/Flash/STM32L4Rx_2048.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -10872,7 +10872,7 @@
                 "file_name": "CMSIS/Flash/STM32L4Rx_2048_Dual.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -10926,7 +10926,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "startup": true
             }
@@ -10956,7 +10956,7 @@
                 "file_name": "CMSIS/Flash/STM32L4Rx_2048.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -10964,7 +10964,7 @@
                 "file_name": "CMSIS/Flash/STM32L4Rx_2048_Dual.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -10973,7 +10973,7 @@
                 "ram_size": null,
                 "ram_start": null,
                 "size": 67108864,
-                "start": 2415919104
+                "start": 0x90000000
             },
             {
                 "default": false,
@@ -11026,7 +11026,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "startup": true
             }
@@ -11056,7 +11056,7 @@
                 "file_name": "CMSIS/Flash/STM32L4Rx_2048.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -11064,7 +11064,7 @@
                 "file_name": "CMSIS/Flash/STM32L4Rx_2048_Dual.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             },
             {
@@ -11118,7 +11118,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "startup": true
             }
@@ -11171,7 +11171,7 @@
                     "write": true
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 536870912,
                 "startup": false
             },
@@ -11239,7 +11239,7 @@
                     "write": true
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 536870912,
                 "startup": false
             },
@@ -11284,7 +11284,7 @@
                 "file_name": "CMSIS/Flash/STM32U0xx_256k.FLM",
                 "ram_size": 8192,
                 "ram_start": 536870912,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "style": "Keil"
             }
@@ -11309,7 +11309,7 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "startup": true
             },
@@ -11372,7 +11372,7 @@
                 "file_name": "CMSIS/Flash/STM32U5xx_2M_0800.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             }
         ],
@@ -11410,7 +11410,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "startup": true
             }
@@ -11440,7 +11440,7 @@
                 "file_name": "CMSIS/Flash/STM32U5xx_2M_0800.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728
             }
         ],
@@ -11478,7 +11478,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 2097152,
+                "size": 0x200000,
                 "start": 134217728,
                 "startup": true
             }
@@ -11545,7 +11545,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             }
         ],
@@ -11585,7 +11585,7 @@
                 },
                 "default": true,
                 "p_name": null,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 536870912,
                 "startup": false
             },
@@ -11669,7 +11669,7 @@
                 "ram_size": 65524,
                 "ram_start": 536870912,
                 "size": 67108864,
-                "start": 2415919104,
+                "start": 0x90000000,
                 "style": "Keil"
             }
         ],
@@ -11772,7 +11772,7 @@
                 "file_name": "CMSIS/Flash/STM32WB_M4.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             }
         ],
@@ -11810,7 +11810,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 327680,
+                "size": 0x50000,
                 "start": 134217728,
                 "startup": true
             }
@@ -11840,7 +11840,7 @@
                 "file_name": "CMSIS/Flash/STM32WB_M4.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             }
         ],
@@ -11863,7 +11863,7 @@
                     "write": true
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 536870912,
                 "startup": false
             },
@@ -11878,7 +11878,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -11910,7 +11910,7 @@
                 4096
             ],
             [
-                134234112,
+                0x8004000,
                 4096
             ],
             [
@@ -11926,7 +11926,7 @@
                 4096
             ],
             [
-                134250496,
+                0x8008000,
                 4096
             ],
             [
@@ -11942,7 +11942,7 @@
                 4096
             ],
             [
-                134266880,
+                0x800C000,
                 4096
             ],
             [
@@ -12022,7 +12022,7 @@
                 4096
             ],
             [
-                134348800,
+                0x8020000,
                 4096
             ],
             [
@@ -12150,7 +12150,7 @@
                 4096
             ],
             [
-                134479872,
+                0x8040000,
                 4096
             ],
             [
@@ -12278,7 +12278,7 @@
                 4096
             ],
             [
-                134610944,
+                0x8060000,
                 4096
             ],
             [
@@ -12928,7 +12928,7 @@
                 "file_name": "CMSIS/Flash/STM32WB_M4.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728
             }
         ],
@@ -12951,7 +12951,7 @@
                     "write": true
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 536870912,
                 "startup": false
             },
@@ -12966,7 +12966,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 1048576,
+                "size": 0x100000,
                 "start": 134217728,
                 "startup": true
             }
@@ -12998,7 +12998,7 @@
                 4096
             ],
             [
-                134234112,
+                0x8004000,
                 4096
             ],
             [
@@ -13014,7 +13014,7 @@
                 4096
             ],
             [
-                134250496,
+                0x8008000,
                 4096
             ],
             [
@@ -13030,7 +13030,7 @@
                 4096
             ],
             [
-                134266880,
+                0x800C000,
                 4096
             ],
             [
@@ -13110,7 +13110,7 @@
                 4096
             ],
             [
-                134348800,
+                0x8020000,
                 4096
             ],
             [
@@ -13238,7 +13238,7 @@
                 4096
             ],
             [
-                134479872,
+                0x8040000,
                 4096
             ],
             [
@@ -13366,7 +13366,7 @@
                 4096
             ],
             [
-                134610944,
+                0x8060000,
                 4096
             ],
             [
@@ -14016,7 +14016,7 @@
                 "file_name": "CMSIS/Flash/STM32WLxx_CM4.FLM",
                 "ram_size": null,
                 "ram_start": null,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728
             }
         ],
@@ -14054,7 +14054,7 @@
                     "write": false
                 },
                 "default": true,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "startup": true
             }
@@ -14084,7 +14084,7 @@
                 "file_name": "CMSIS/Flash/STM32WLxx_CM4.FLM",
                 "ram_size": 32768,
                 "ram_start": 536870912,
-                "size": 262144,
+                "size": 0x40000,
                 "start": 134217728,
                 "style": "Keil"
             }
