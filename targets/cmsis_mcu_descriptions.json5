@@ -4594,6 +4594,8 @@
         "sub_family": "STM32F303",
         "vendor": "STMicroelectronics:13"
     },
+
+    // --------------------------- STM32F4 ---------------------------
     "STM32F401RETx": {
         "algorithms": [
             {
@@ -4684,113 +4686,6 @@
             ]
         ],
         "sub_family": "STM32F401",
-        "vendor": "STMicroelectronics:13"
-    },
-    "STM32F407VETx": {
-        "algorithms": [
-            {
-                "default": true,
-                "file_name": "CMSIS/Flash/STM32F4xx_512.FLM",
-                "ram_size": null,
-                "ram_start": null,
-                "size": 524288,
-                "start": 134217728
-            },
-            {
-                "default": false,
-                "file_name": "CMSIS/Flash/STM32F40xxx_41xxx_OPT.FLM",
-                "ram_size": null,
-                "ram_start": null,
-                "size": 4,
-                "start": 536854528
-            },
-            {
-                "default": false,
-                "file_name": "CMSIS/Flash/STM32F4xx_OTP.FLM",
-                "ram_size": null,
-                "ram_start": null,
-                "size": 528,
-                "start": 536836096
-            }
-        ],
-        "family": "STM32F4 Series",
-        "from_pack": {
-            "pack": "STM32F4xx_DFP",
-            "url": "http://www.keil.com/pack",
-            "vendor": "Keil",
-            "version": "2.13.0"
-        },
-        "memories": {
-            "IRAM1": {
-                "access": {
-                    "execute": false,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": true,
-                "size": 131072,
-                "start": 536870912,
-                "startup": false
-            },
-            "IRAM2": {
-                "access": {
-                    "execute": false,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": false,
-                "size": 65536,
-                "start": 268435456,
-                "startup": false
-            },
-            "IROM1": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": false
-                },
-                "default": true,
-                "size": 524288,
-                "start": 134217728,
-                "startup": true
-            }
-        },
-        "name": "STM32F407VETx",
-        "processor": {
-            "Symmetric": {
-                "core": "CortexM4",
-                "fpu": "SinglePrecision",
-                "mpu": "Present",
-                "units": 1
-            }
-        },
-        "sectors": [
-            [
-                134217728,
-                16384
-            ],
-            [
-                134283264,
-                65536
-            ],
-            [
-                134348800,
-                131072
-            ]
-        ],
-        "sub_family": "STM32F407",
         "vendor": "STMicroelectronics:13"
     },
     "STM32F411CEYx": {

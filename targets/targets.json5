@@ -1346,23 +1346,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "STM32F401RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260000.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
-    "MCU_STM32F407xE": {
-        "inherits": [
-            "MCU_STM32F4"
-        ],
-        "public": false,
-        "extra_labels_add": [
-            "STM32F407xE"
-        ],
-        "macros_add": [
-            "STM32F407xx"
-        ],
-        "device_has_add": [
-            "ANALOGOUT",
-            "CAN",
-            "TRNG"
-        ]
-    },
     "MCU_STM32F411xE": {
         "inherits": [
             "MCU_STM32F4"
@@ -1440,22 +1423,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F411CEYx",
         "image_url": "https://user-images.githubusercontent.com/1301112/69389644-eb5fb080-0ccc-11ea-8002-67d3db851250.png"
-    },
-    "MCU_STM32F412xE": {
-        "inherits": [
-            "MCU_STM32F4"
-        ],
-        "public": false,
-        "extra_labels_add": [
-            "STM32F412xE"
-        ],
-        "macros_add": [
-            "STM32F412Zx"
-        ],
-        "device_has_add": [
-            "CAN",
-            "TRNG"
-        ]
     },
     "MCU_STM32F412xG": {
         "inherits": [
