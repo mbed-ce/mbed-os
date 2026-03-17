@@ -1297,7 +1297,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ]
     },
 
-    // STM32F4 Targets -------------------------------------------------------------------------------------------------
+// STM32F4 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F4": {
         "inherits": [
             "MCU_STM32"
@@ -1312,7 +1312,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
-            }
+            },
+            "hse-value": {
+                "help": "Frequency in MHz of external oscillator / crystal.  Will be used to compute PLL parameters. May be any value that is between 4MHz and 50MHz and is divisible by 1MHz",
+                "value": 8000000,
+                "value_min": 4000000,
+                "value_max": 50000000,
+                "macro_name": "HSE_VALUE"
+            },
         },
         "overrides": {
             "internal-flash-uniform-sectors": false
@@ -1330,7 +1337,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "extra_labels_add": [
-            "STM32F401xE"
+            "STM32F401xE",
+            "STM32F4_84MHZ"
         ],
         "macros_add": [
             "STM32F401xE"
@@ -1355,7 +1363,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32F411xE"
         ],
         "extra_labels_add": [
-            "STM32F411xE"
+            "STM32F411xE",
+            "STM32F4_96_100MHZ"
         ]
     },
     "NUCLEO_F411RE": {
@@ -1376,11 +1385,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "overrides": {
+            "hse-value": 26000000,
             "lse-available": 0
         },
-        "macros_add": [
-            "HSE_VALUE=26000000"
-        ],
         "device_has_remove": [
             "SERIAL_FC",
             "LPTICKER"
@@ -1395,11 +1402,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_STM32F411xE"
         ],
-        "macros_add": [
-            "HSE_VALUE=26000000"
-        ],
         "overrides": {
-            "clock-source": "USE_PLL_HSE_XTAL"
+            "clock-source": "USE_PLL_HSE_XTAL",
+            "hse-value": 26000000
         },
         "device_has_remove": [
             "FLASH",
@@ -1412,11 +1417,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_STM32F411xE"
         ],
-        "macros_add": [
-            "HSE_VALUE=25000000U"
-        ],
         "overrides": {
-            "clock-source": "USE_PLL_HSI | USE_PLL_HSE_XTAL"
+            "clock-source": "USE_PLL_HSI | USE_PLL_HSE_XTAL",
+            "hse-value": 25000000
         },
         "device_has_add": [
             "USBDEVICE"
@@ -1430,7 +1433,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "extra_labels_add": [
-            "STM32F412xG"
+            "STM32F412xG",
+            "STM32F4_100MHZ"
         ],
         "macros_add": [
             "STM32F412Zx"
@@ -1475,7 +1479,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "extra_labels_add": [
-            "STM32F413xH"
+            "STM32F413xH",
+            "STM32F4_100MHZ"
         ],
         "config": {
             "lpticker-lptim": {
@@ -1535,10 +1540,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "extra_labels_add": [
-            "STM32F429xI"
+            "STM32F429xI",
+            "STM32F4_168_180MHZ"
         ],
         "macros_add": [
-            "STM32F429xx"
+            "STM32F429xx",
+            "CCM_RAM"
         ],
         "device_has_add": [
             "ANALOGOUT",
@@ -1605,10 +1612,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "extra_labels_add": [
-            "STM32F439xI"
+            "STM32F439xI",
+            "STM32F4_168_180MHZ"
         ],
         "macros_add": [
             "STM32F439xx",
+            "CCM_RAM",
             "MBEDTLS_CONFIG_HW_SUPPORT"
         ],
         "device_has_add": [
@@ -1651,7 +1660,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "extra_labels_add": [
-            "STM32F446xE"
+            "STM32F446xE",
+            "STM32F4_180MHZ"
         ],
         "macros_add": [
             "STM32F446xx"
@@ -1696,7 +1706,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "extra_labels_add": [
-            "STM32F469xI"
+            "STM32F469xI",
+            "STM32F4_180MHZ"
         ],
         "macros_add": [
             "STM32F469xx"
@@ -1763,7 +1774,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-images/images/eval-sdp-ck1ztop-web.gif?rev=2b0d46c94afe490cb3543819752a0471&sc_lang=en&h=270&thn=1&hash=C1A2567A6E5A569665B40C5DCFE1B8C3"
     },
 
-    // STM32F7 Targets -------------------------------------------------------------------------------------------------
+// STM32F7 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F7": {
         "inherits": [
             "MCU_STM32"
