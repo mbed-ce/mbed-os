@@ -1,4 +1,4 @@
-# Copyright (c) 2020 ARM Limited. All rights reserved.
+# Copyright (c) 2025 MbedCE Community Contributors (Jan Kamidra)
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(TARGET_STM32F401xE EXCLUDE_FROM_ALL)
@@ -33,25 +33,18 @@ target_sources(mbed-stm32f4
 target_link_libraries(mbed-stm32f4 INTERFACE mbed-stm mbed-stm32f4cube-fw)
 
 # Add clock file depending on the frequency
-if("STM32F4_84MHZ" IN_LIST MBED_TARGET_LABELS)
-    target_sources(mbed-stm32f4 INTERFACE clock_cfg/TARGET_STM32F4_84MHZ/system_clock.c)
-elseif("STM32F4_96_100MHZ" IN_LIST MBED_TARGET_LABELS)
-    target_sources(mbed-stm32f4 INTERFACE clock_cfg/TARGET_STM32F4_96_100MHZ/system_clock.c)
-elseif("STM32F4_100MHZ" IN_LIST MBED_TARGET_LABELS)
-    target_sources(mbed-stm32f4 INTERFACE clock_cfg/TARGET_STM32F4_100MHZ/system_clock.c)
-elseif("STM32F4_168_180MHZ" IN_LIST MBED_TARGET_LABELS)
-    target_sources(mbed-stm32f4 INTERFACE clock_cfg/TARGET_STM32F4_168_180MHZ/system_clock.c)
-elseif("STM32F4_180MHZ" IN_LIST MBED_TARGET_LABELS)
-    target_sources(mbed-stm32f4 INTERFACE clock_cfg/TARGET_STM32F4_180MHZ/system_clock.c)
-endif()
+get_system_clock_file(SYSTEM_CLOCK_FILE ${_stm32_family})
+target_sources(mbed-stm32f4 INTERFACE ${SYSTEM_CLOCK_FILE})
 
 if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
-    mbed_set_linker_script(mbed-stm32f401xe linker_scripts/STM32F4_COMMON.ld)
-    mbed_set_linker_script(mbed-stm32f411xe linker_scripts/STM32F4_COMMON.ld)
-    mbed_set_linker_script(mbed-stm32f412xg linker_scripts/STM32F4_COMMON.ld)
-    mbed_set_linker_script(mbed-stm32f413xh linker_scripts/STM32F4_COMMON.ld)
-    mbed_set_linker_script(mbed-stm32f429xi linker_scripts/STM32F4_COMMON.ld)
-    mbed_set_linker_script(mbed-stm32f439xi linker_scripts/STM32F4_COMMON.ld)
-    mbed_set_linker_script(mbed-stm32f446xe linker_scripts/STM32F4_COMMON.ld)
-    mbed_set_linker_script(mbed-stm32f469xi linker_scripts/STM32F4_COMMON.ld)
+    get_startup_file(STARTUP_FILE "STM32Cube_FW/cmsis-device-f4/Source/Templates/gcc")
+
+    patch_startup_file(STARTUP_FILE_GEN "${STARTUP_FILE}")
+
+    target_sources(mbed-stm32f4
+        INTERFACE
+        ${STARTUP_FILE_GEN}
+    )
+
+    mbed_set_linker_script(mbed-stm32f4 linker_scripts/STM32F4_COMMON.ld)
 endif()
