@@ -1329,6 +1329,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH",
             "MPU"
         ],
+        "macros_add": [
+            "NVIC_NUM_VECTORS_SKIP"
+        ],
         "is_mcu_family_target": true
     },
     "MCU_STM32F401xE": {
@@ -1338,6 +1341,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "extra_labels_add": [
             "STM32F401xE",
+            "STARTUP_STM32F401xe",
             "STM32F4_84MHZ"
         ],
         "macros_add": [
@@ -1364,6 +1368,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "extra_labels_add": [
             "STM32F411xE",
+            "STARTUP_STM32F411xe",
             "STM32F4_96_100MHZ"
         ]
     },
@@ -1434,6 +1439,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "extra_labels_add": [
             "STM32F412xG",
+            "STARTUP_STM32F412zx",
             "STM32F4_100MHZ"
         ],
         "macros_add": [
@@ -1480,6 +1486,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "extra_labels_add": [
             "STM32F413xH",
+            "STARTUP_STM32F413xx",
             "STM32F4_100MHZ"
         ],
         "config": {
@@ -1541,6 +1548,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "extra_labels_add": [
             "STM32F429xI",
+            "STARTUP_STM32F429xx",
             "STM32F4_168_180MHZ"
         ],
         "macros_add": [
@@ -1613,6 +1621,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "extra_labels_add": [
             "STM32F439xI",
+            "STARTUP_STM32F439xx",
             "STM32F4_168_180MHZ"
         ],
         "macros_add": [
@@ -1661,6 +1670,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "extra_labels_add": [
             "STM32F446xE",
+            "STARTUP_STM32F446xx",
             "STM32F4_180MHZ"
         ],
         "macros_add": [
@@ -1707,6 +1717,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "extra_labels_add": [
             "STM32F469xI",
+            "STARTUP_STM32F469xx",
             "STM32F4_180MHZ"
         ],
         "macros_add": [
