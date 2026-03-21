@@ -17,8 +17,6 @@
  * Created by: Jan Kamidra with GitHub Copilot
  */
 
-#include "cmsis_nvic.h"
-
 M_CRASH_DATA_RAM_SIZE = 0x100;
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
@@ -28,15 +26,11 @@ M_CRASH_DATA_RAM_SIZE = 0x100;
 #endif
 STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 
-/* Round up MBED_VECTTABLE_RAM_SIZE to 8 bytes */
-#define MBED_VECTTABLE_RAM_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
-
-
 MEMORY
 {
     FLASH (rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_ROM_START, LENGTH = MBED_CONFIGURED_ROM_BANK_ROM_SIZE
-    RAM (rwx)  : ORIGIN = MBED_RAM_BANK_SRAM_START + MBED_VECTTABLE_RAM_SIZE, LENGTH = MBED_RAM_BANK_SRAM_SIZE - MBED_VECTTABLE_RAM_SIZE
-#if defined(CMM_RAM)  
+    RAM (rwx)  : ORIGIN = MBED_RAM_BANK_SRAM_START, LENGTH = MBED_RAM_BANK_SRAM_SIZE
+#if defined(CCM_RAM)
     CCM (rwx)  : ORIGIN = MBED_CONFIGURED_RAM_BANK_CCM_RAM_START, LENGTH = MBED_CONFIGURED_RAM_BANK_CCM_RAM_SIZE
 #endif
 }
@@ -74,7 +68,11 @@ SECTIONS
 {
     .text :
     {
+        . = ALIGN(8);
+        __vector_flash_start__ = ABSOLUTE(.);
         KEEP(*(.isr_vector))
+        __vector_flash_end__ = ABSOLUTE(.);
+        __vector_table_ram_size__ = ABSOLUTE(((__vector_flash_end__ - __vector_flash_start__) + 7) & 0xFFFFFFF8);
         *(.text*)
 
         KEEP(*(.init))
@@ -113,7 +111,7 @@ SECTIONS
 
     __etext = .;
     _sidata = .;
-
+    
     /**
      * CCM (core coupled memory) data RAM section.
      * The section is marked as NOLOAD so it's not loaded at runtime. This
@@ -121,6 +119,7 @@ SECTIONS
      * It is usable like:
      * std::uint8_t __attribute__((section(".ccm_data_ram"))) ccm_buffer[64 * 1024];
      */
+#if defined(CCM_RAM)
     .ccm_data_ram 0x10000000 (NOLOAD) :
     {
         /** Align on 4 byte boundary. */
@@ -129,6 +128,15 @@ SECTIONS
         /** Keep the variable even if it is not referenced. */
         KEEP(*(.ccm_data_ram))
     } > CCM
+#endif
+
+    .vector_ram (NOLOAD) :
+    {
+        . = ALIGN(8);
+        __vector_ram_start__ = .;
+        . += __vector_table_ram_size__;
+        __vector_ram_end__ = .;
+    } > RAM
 
     .crash_data_ram :
     {
