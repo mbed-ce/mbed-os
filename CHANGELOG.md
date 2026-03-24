@@ -31,6 +31,7 @@ A message that notes the main changes in the update.
 ### Fixed
 - Added fixes aimed at improving Greentea stability for KV/FlashIAP (STM32F7) and USBSerial paths.
 - MIMXRT1050_EVK: Fixed build error due to typos
+- Fixed memory leak with Nanostack memory manager that caused the stack to run of memory when used with zero-copy Ethernet drivers
 
 ### Removed
 - Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7)
