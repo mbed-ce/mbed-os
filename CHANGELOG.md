@@ -160,7 +160,7 @@ _______________________________________________________________________________
   - Fix all DMA SPI transactions being done twice due to incorrect ISR logic
 - NXP `MIMXRT105x` MCU family:
   - Fix setting the serial format putting the UART peripheral in an invalid configuration due to trying to store an 32-bit register value in a 8-bit integer
-  - Fix using a higher core voltage than needed when running at 528MHz, easting energy
+  - Fix using a higher core voltage than needed when running at 528MHz, wasting energy
   - Fix CPU clock always changing to 600MHz when exiting deep sleep, even if configured for 528MHz
 - `K64F` and `MIMXRT105x` MCU families: Fix SPI frequency being reset back to default if you called `SPI::format()` after `SPI::frequency()`
 - Infineon WHD wi-fi driver now uses the Mbed memory manager instead of directly depending on LwIP. This means it can now be used with Nanostack ([kind of](https://github.com/mbed-ce/mbed-os/issues/505)) and the EMAC unit tests
