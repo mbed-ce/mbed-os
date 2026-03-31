@@ -3,6 +3,7 @@
  ******************************************************************************
  *
  * Copyright (c) 2015-2021 STMicroelectronics.
+ * Copyright (c) 2026 MbedCE Contributors.
  * All rights reserved.
  *
  * This software component is licensed by ST under BSD 3-Clause license,
@@ -16,7 +17,7 @@
 /**
   * This file configures the system clock as follows:
   *-----------------------------------------------------------------------------------
-  * System clock source   | 1- USE_PLL_HSE_EXTC (external 8 MHz clock) |
+  * System clock source   | 1- USE_PLL_HSE_EXTC (external clock)       |
   *                       | 2- USE_PLL_HSE_XTAL (external xtal)        | DEVICE_USBDEVICE=1
   *                       | 3- USE_PLL_HSI (internal 16 MHz clock)     |
   *-----------------------------------------------------------------------------------
@@ -31,10 +32,30 @@
 #include "stm32f4xx.h"
 #include "mbed_error.h"
 
+// guards to ensure HSE_VALUE is valid for PLL configuration
+#if (HSE_VALUE < 4000000U) || (HSE_VALUE > 50000000U)
+#error HSE_VALUE must be >= 4MHz and <= 50MHz for STM32F4 common clock config
+#endif
+
+#if ((HSE_VALUE % 1000000U) != 0U)
+#error HSE_VALUE must be an integer multiple of 1MHz for STM32F4 common clock config
+#endif
+
+#define PLLM_HSE_CLOCK_SETTINGS (HSE_VALUE / 1000000U)
+
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC    0x8  // Use external clock (ST Link MCO)
 #define USE_PLL_HSE_XTAL    0x4  // Use external xtal (X3 on board - not provided by default)
 #define USE_PLL_HSI         0x2  // Use HSI internal clock
+
+#if !DEVICE_USBDEVICE && (RCC_MAX_FREQUENCY > 168000000U)
+#define STM32F4_168_180_SYSCLK   180000000U
+#else
+#define STM32F4_168_180_SYSCLK   168000000U
+#endif
+
+#define STM32F4_168_180_HSE_PLLN ((STM32F4_168_180_SYSCLK / 1000000U) * 2U)
+#define STM32F4_168_180_HSI_PLLN  (STM32F4_168_180_SYSCLK / 1000000U)
 
 #if ( ((CLOCK_SOURCE) & USE_PLL_HSE_XTAL) || ((CLOCK_SOURCE) & USE_PLL_HSE_EXTC) )
 uint8_t SetSysClock_PLL_HSE(uint8_t bypass);
@@ -103,28 +124,24 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     if (RCC_OscInitStruct.PLL.PLLState != RCC_PLL_ON) {
 
         // Enable HSE oscillator and activate PLL with HSE as source
-        RCC_OscInitStruct.OscillatorType        = RCC_OSCILLATORTYPE_HSE;
+        RCC_OscInitStruct.OscillatorType    = RCC_OSCILLATORTYPE_HSE;
         if (bypass == 0) {
-            RCC_OscInitStruct.HSEState          = RCC_HSE_ON; // External 8 MHz xtal on OSC_IN/OSC_OUT
+            RCC_OscInitStruct.HSEState      = RCC_HSE_ON; // External xtal on OSC_IN/OSC_OUT
         } else {
-            RCC_OscInitStruct.HSEState          = RCC_HSE_BYPASS; // External 8 MHz clock on OSC_IN
+            RCC_OscInitStruct.HSEState      = RCC_HSE_BYPASS; // External clock on OSC_IN
         }
 
         RCC_OscInitStruct.PLL.PLLState  = RCC_PLL_ON;
         RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-        RCC_OscInitStruct.PLL.PLLM      = HSE_VALUE / 1000000;  // VCO input clock = 1 MHz (HSE MHz / HSE_VALUE)
-#if (DEVICE_USBDEVICE)
-        RCC_OscInitStruct.PLL.PLLN      = 336;                  // VCO output clock = 336 MHz (1 MHz * 336)
-#else
-        RCC_OscInitStruct.PLL.PLLN      = 360;                  // VCO output clock = 360 MHz (1 MHz * 360)
-#endif
-        RCC_OscInitStruct.PLL.PLLP      = RCC_PLLP_DIV2;        // 180 MHz or 168 MHz if DEVICE_USBDEVICE defined
-        RCC_OscInitStruct.PLL.PLLQ      = 7;                    //  48 MHz if DEVICE_USBDEVICE defined
+        RCC_OscInitStruct.PLL.PLLM      = PLLM_HSE_CLOCK_SETTINGS;  // VCO input clock = 1 MHz (HSE MHz / HSE_VALUE)
+        RCC_OscInitStruct.PLL.PLLN      = STM32F4_168_180_HSE_PLLN; // VCO output clock = 336 or 360 MHz
+        RCC_OscInitStruct.PLL.PLLP      = RCC_PLLP_DIV2;            // PLLCLK = 168 or 180 MHz
+        RCC_OscInitStruct.PLL.PLLQ      = 7;                        // 48 MHz when SYSCLK is 168 MHz
         if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
             return 0; // FAIL
         }
     }
-#if (!DEVICE_USBDEVICE)
+#if (STM32F4_168_180_SYSCLK > 168000000U)
     // Activate the OverDrive to reach the 180 MHz Frequency
     if (HAL_PWREx_EnableOverDrive() != HAL_OK) {
         return 0; // FAIL
@@ -170,21 +187,19 @@ uint8_t SetSysClock_PLL_HSI(void)
     RCC_OscInitStruct.PLL.PLLState          = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource         = RCC_PLLSOURCE_HSI;
     RCC_OscInitStruct.PLL.PLLM              = 8;
-#if (DEVICE_USBDEVICE)
-    RCC_OscInitStruct.PLL.PLLN              = 168;
-#else
-    RCC_OscInitStruct.PLL.PLLN              = 180;
-#endif
-    RCC_OscInitStruct.PLL.PLLP              = RCC_PLLP_DIV2; // 180 MHz or 168 MHz if DEVICE_USBDEVICE defined
-    RCC_OscInitStruct.PLL.PLLQ              = 7;             //  48 MHz if DEVICE_USBDEVICE defined
+    RCC_OscInitStruct.PLL.PLLN              = STM32F4_168_180_HSI_PLLN;
+    RCC_OscInitStruct.PLL.PLLP              = RCC_PLLP_DIV2; // 168 or 180 MHz depending on MCU capability
+    RCC_OscInitStruct.PLL.PLLQ              = 7;             // 48 MHz when SYSCLK is 168 MHz
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         return 0; // FAIL
     }
 
+#if (STM32F4_168_180_SYSCLK > 168000000U)
     // Activate the OverDrive to reach the 180 MHz Frequency
     if (HAL_PWREx_EnableOverDrive() != HAL_OK) {
         return 0; // FAIL
     }
+#endif
 
     /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 clocks dividers */
     RCC_ClkInitStruct.ClockType         = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);

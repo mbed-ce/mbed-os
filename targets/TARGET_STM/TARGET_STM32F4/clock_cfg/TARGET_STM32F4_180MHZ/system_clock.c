@@ -16,7 +16,7 @@
 /**
   * This file configures the system clock as follows:
   *-----------------------------------------------------------------------------
-  * System clock source | 1- USE_PLL_HSE_EXTC (external 8 MHz clock)
+  * System clock source | 1- USE_PLL_HSE_EXTC (external clock)
   *                     | 2- USE_PLL_HSE_XTAL (external xtal)
   *                     | 3- USE_PLL_HSI (internal 16 MHz)
   *-----------------------------------------------------------------------------
@@ -30,6 +30,17 @@
 
 #include "stm32f4xx.h"
 #include "mbed_error.h"
+
+// guards to ensure HSE_VALUE is valid for PLL configuration
+#if (HSE_VALUE < 4000000U) || (HSE_VALUE > 50000000U)
+#error HSE_VALUE must be >= 4MHz and <= 50MHz for STM32F4 common clock config
+#endif
+
+#if ((HSE_VALUE % 1000000U) != 0U)
+#error HSE_VALUE must be an integer multiple of 1MHz for STM32F4 common clock config
+#endif
+
+#define PLLM_HSE_CLOCK_SETTINGS (HSE_VALUE / 1000000U)
 
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC 0x8 // Use external clock (ST Link MCO)
@@ -102,17 +113,17 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     /* PLL could be already configured by bootlader */
     if (RCC_OscInitStruct.PLL.PLLState != RCC_PLL_ON) {
         // Enable HSE oscillator and activate PLL with HSE as source
-        RCC_OscInitStruct.OscillatorType        = RCC_OSCILLATORTYPE_HSE;
+        RCC_OscInitStruct.OscillatorType    = RCC_OSCILLATORTYPE_HSE;
         if (bypass == 0) {
-            RCC_OscInitStruct.HSEState          = RCC_HSE_ON;       // External xtal on OSC_IN/OSC_OUT
+            RCC_OscInitStruct.HSEState      = RCC_HSE_ON;       // External xtal on OSC_IN/OSC_OUT
         } else {
-            RCC_OscInitStruct.HSEState          = RCC_HSE_BYPASS;   // External 8 MHz clock on OSC_IN
+            RCC_OscInitStruct.HSEState      = RCC_HSE_BYPASS;   // External clock on OSC_IN
         }
         RCC_OscInitStruct.PLL.PLLState  = RCC_PLL_ON;
         RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-        RCC_OscInitStruct.PLL.PLLM      = HSE_VALUE / 1000000;  // VCO input clock = 1 MHz (HSE MHz / HSE_VALUE)
-        RCC_OscInitStruct.PLL.PLLN      = 360;                  // VCO output clock = 360 MHz (1 MHz * 360)
-        RCC_OscInitStruct.PLL.PLLP      = RCC_PLLP_DIV2;        // PLLCLK = 180 MHz (360 MHz / 2)
+        RCC_OscInitStruct.PLL.PLLM      = PLLM_HSE_CLOCK_SETTINGS;  // VCO input clock = 1 MHz (HSE MHz / HSE_VALUE)
+        RCC_OscInitStruct.PLL.PLLN      = 360;                      // VCO output clock = 360 MHz (1 MHz * 360)
+        RCC_OscInitStruct.PLL.PLLP      = RCC_PLLP_DIV2;            // PLLCLK = 180 MHz (360 MHz / 2)
         RCC_OscInitStruct.PLL.PLLQ      = 2;
         RCC_OscInitStruct.PLL.PLLR      = 2;
         if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
@@ -128,7 +139,9 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 #if DEVICE_USBDEVICE
     // Select PLLSAI output as USB clock source
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
-    PeriphClkInitStruct.PLLSAI.PLLSAIM          = HSE_VALUE / 1000000;
+#if defined(STM32F446xx)
+    PeriphClkInitStruct.PLLSAI.PLLSAIM          = PLLM_HSE_CLOCK_SETTINGS;
+#endif
     PeriphClkInitStruct.PLLSAI.PLLSAIN          = 192;
     PeriphClkInitStruct.PLLSAI.PLLSAIP          = RCC_PLLSAIP_DIV4;
     PeriphClkInitStruct.PeriphClockSelection    = RCC_PERIPHCLK_CLK48;
@@ -176,10 +189,10 @@ uint8_t SetSysClock_PLL_HSI(void)
     RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
     RCC_OscInitStruct.PLL.PLLState        = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource       = RCC_PLLSOURCE_HSI;
-    RCC_OscInitStruct.PLL.PLLM            = 8;              // VCO input clock = 2 MHz (16 MHz / 8)
-    RCC_OscInitStruct.PLL.PLLN            = 180;            // VCO output clock = 360 MHz (2 MHz * 180)
-    RCC_OscInitStruct.PLL.PLLP            = RCC_PLLP_DIV2;  // PLLCLK = 180 MHz (360 MHz / 2)
-    RCC_OscInitStruct.PLL.PLLQ            = 2;
+    RCC_OscInitStruct.PLL.PLLM            = 16;                     // VCO input clock = 1 MHz (16 MHz / 16)
+    RCC_OscInitStruct.PLL.PLLN            = 360;                    // VCO output clock = 360 MHz (1 MHz * 360)
+    RCC_OscInitStruct.PLL.PLLP            = RCC_PLLP_DIV2;          // PLLCLK = 180 MHz (360 MHz / 2)
+    RCC_OscInitStruct.PLL.PLLQ            = 6;
     RCC_OscInitStruct.PLL.PLLR            = 2;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         return 0; // FAIL
@@ -193,9 +206,11 @@ uint8_t SetSysClock_PLL_HSI(void)
 #if DEVICE_USBDEVICE
     // Select PLLSAI output as USB clock source
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
-    PeriphClkInitStruct.PLLSAI.PLLSAIM          = 8;
+#if defined(STM32F446xx)
+    PeriphClkInitStruct.PLLSAI.PLLSAIM          = 16;
+#endif
     PeriphClkInitStruct.PLLSAI.PLLSAIN          = 192;
-    PeriphClkInitStruct.PLLSAI.PLLSAIP          = RCC_PLLSAIP_DIV8;
+    PeriphClkInitStruct.PLLSAI.PLLSAIP          = RCC_PLLSAIP_DIV4;
     PeriphClkInitStruct.PeriphClockSelection    = RCC_PERIPHCLK_CLK48;
     PeriphClkInitStruct.Clk48ClockSelection     = RCC_CLK48CLKSOURCE_PLLSAIP;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {

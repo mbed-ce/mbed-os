@@ -3,6 +3,7 @@
  ******************************************************************************
  *
  * Copyright (c) 2015-2021 STMicroelectronics.
+ * Copyright (c) 2026 MbedCE Contributors.
  * All rights reserved.
  *
  * This software component is licensed by ST under BSD 3-Clause license,
@@ -16,8 +17,8 @@
 /**
   * This file configures the system clock as follows:
   *-----------------------------------------------------------------------------
-  * System clock source | 1- USE_PLL_HSE_EXTC (external 8 MHz clock)
-  *                     | 2- USE_PLL_HSE_XTAL
+  * System clock source | 1- USE_PLL_HSE_EXTC (external clock)
+  *                     | 2- USE_PLL_HSE_XTAL (external xtal)
   *                     | 3- USE_PLL_HSI (internal 16 MHz)
   *-----------------------------------------------------------------------------
   * SYSCLK(MHz)         | 84
@@ -30,6 +31,17 @@
 
 #include "stm32f4xx.h"
 #include "mbed_error.h"
+
+// guards to ensure HSE_VALUE is valid for PLL configuration
+#if (HSE_VALUE < 4000000U) || (HSE_VALUE > 50000000U)
+#error HSE_VALUE must be >= 4MHz and <= 50MHz for STM32F4 common clock config
+#endif
+
+#if ((HSE_VALUE % 1000000U) != 0U)
+#error HSE_VALUE must be an integer multiple of 1MHz for STM32F4 common clock config
+#endif
+
+#define PLLM_HSE_CLOCK_SETTINGS (HSE_VALUE / 1000000U)
 
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC     0x8  // Use external clock (ST Link MCO)
@@ -102,26 +114,26 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     if (RCC_OscInitStruct.PLL.PLLState != RCC_PLL_ON) {
 
         // Enable HSE oscillator and activate PLL with HSE as source
-        RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSE;
+        RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
         if (bypass == 0) {
-            RCC_OscInitStruct.HSEState          = RCC_HSE_ON; // External 8 MHz xtal on OSC_IN/OSC_OUT
+            RCC_OscInitStruct.HSEState  = RCC_HSE_ON;       // External xtal on OSC_IN/OSC_OUT
         } else {
-            RCC_OscInitStruct.HSEState          = RCC_HSE_BYPASS; // External 8 MHz clock on OSC_IN
+            RCC_OscInitStruct.HSEState  = RCC_HSE_BYPASS;   // External clock on OSC_IN
         }
 
-        RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+        RCC_OscInitStruct.PLL.PLLState  = RCC_PLL_ON;
         RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-        RCC_OscInitStruct.PLL.PLLM            = 8;             // VCO input clock = 1 MHz (8 MHz / 8)
-        RCC_OscInitStruct.PLL.PLLN            = 336;           // VCO output clock = 336 MHz (1 MHz * 336)
-        RCC_OscInitStruct.PLL.PLLP            = RCC_PLLP_DIV4; // PLLCLK = 84 MHz (336 MHz / 4)
-        RCC_OscInitStruct.PLL.PLLQ            = 7;             // USB clock = 48 MHz (336 MHz / 7) --> OK for USB
+        RCC_OscInitStruct.PLL.PLLM      = PLLM_HSE_CLOCK_SETTINGS;    // VCO input clock = 1 MHz
+        RCC_OscInitStruct.PLL.PLLN      = 336;                        // VCO output clock = 336 MHz (1 MHz * 336)
+        RCC_OscInitStruct.PLL.PLLP      = RCC_PLLP_DIV4;              // PLLCLK = 84 MHz (336 MHz / 4)
+        RCC_OscInitStruct.PLL.PLLQ      = 7;                          // USB clock = 48 MHz (336 MHz / 7) --> OK for USB
         if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
             return 0; // FAIL
         }
     }
 
     // Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 clocks dividers
-    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+    RCC_ClkInitStruct.ClockType      = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
     RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_PLLCLK; // 84 MHz
     RCC_ClkInitStruct.AHBCLKDivider  = RCC_SYSCLK_DIV1;         // 84 MHz
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;           // 42 MHz
