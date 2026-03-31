@@ -3,6 +3,7 @@
  ******************************************************************************
  *
  * Copyright (c) 2015-2021 STMicroelectronics.
+ * Copyright (c) 2026 MbedCE Contributors.
  * All rights reserved.
  *
  * This software component is licensed by ST under BSD 3-Clause license,
@@ -30,6 +31,17 @@
 
 #include "stm32f4xx.h"
 #include "mbed_error.h"
+
+// guards to ensure HSE_VALUE is valid for PLL configuration
+#if (HSE_VALUE < 4000000U) || (HSE_VALUE > 50000000U)
+#error HSE_VALUE must be >= 4MHz and <= 50MHz for STM32F4 common clock config
+#endif
+
+#if ((HSE_VALUE % 1000000U) != 0U)
+#error HSE_VALUE must be an integer multiple of 1MHz for STM32F4 common clock config
+#endif
+
+#define PLLM_HSE_CLOCK_SETTINGS (HSE_VALUE / 1000000U)
 
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC    0x8  // Use external clock (ST Link MCO)
@@ -101,17 +113,17 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     /* PLL could be already configured by bootlader */
     if (RCC_OscInitStruct.PLL.PLLState != RCC_PLL_ON) {
         /* Enable HSE oscillator and activate PLL with HSE as source */
-        RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSE;
+        RCC_OscInitStruct.OscillatorType    = RCC_OSCILLATORTYPE_HSE;
         if (bypass == 0) {
-            RCC_OscInitStruct.HSEState        = RCC_HSE_ON;             // External xtal on OSC_IN/OSC_OUT
+            RCC_OscInitStruct.HSEState      = RCC_HSE_ON;             // External xtal on OSC_IN/OSC_OUT
         } else {
-            RCC_OscInitStruct.HSEState        = RCC_HSE_BYPASS;         // External 8 MHz clock on OSC_IN
+            RCC_OscInitStruct.HSEState      = RCC_HSE_BYPASS;         // External 8 MHz clock on OSC_IN
         }
         RCC_OscInitStruct.PLL.PLLState  = RCC_PLL_ON;
         RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-        RCC_OscInitStruct.PLL.PLLM      = HSE_VALUE / 1000000;    // VCO input clock = 1 MHz (8 MHz / 8)
-        RCC_OscInitStruct.PLL.PLLN      = 200;                    // VCO output clock = 200 MHz (1 MHz * 200)
-        RCC_OscInitStruct.PLL.PLLP      = RCC_PLLP_DIV2;          // PLLCLK = 100 MHz (200 MHz / 2)
+        RCC_OscInitStruct.PLL.PLLM      = PLLM_HSE_CLOCK_SETTINGS;  // VCO input clock = 1 MHz (8 MHz / 8)
+        RCC_OscInitStruct.PLL.PLLN      = 200;                      // VCO output clock = 200 MHz (1 MHz * 200)
+        RCC_OscInitStruct.PLL.PLLP      = RCC_PLLP_DIV2;            // PLLCLK = 100 MHz (200 MHz / 2)
         RCC_OscInitStruct.PLL.PLLQ      = 7;
         RCC_OscInitStruct.PLL.PLLR      = 2;
         if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
@@ -124,7 +136,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
     PeriphClkInitStruct.PeriphClockSelection    = RCC_PERIPHCLK_CLK48;
     PeriphClkInitStruct.Clk48ClockSelection     = RCC_CLK48CLKSOURCE_PLLI2SQ;
-    PeriphClkInitStruct.PLLI2S.PLLI2SM          = HSE_VALUE / 1000000;
+    PeriphClkInitStruct.PLLI2S.PLLI2SM          = PLLM_HSE_CLOCK_SETTINGS;
     PeriphClkInitStruct.PLLI2S.PLLI2SQ          = 4;
     PeriphClkInitStruct.PLLI2S.PLLI2SN          = 192;
     PeriphClkInitStruct.PLLI2S.PLLI2SR          = 2;

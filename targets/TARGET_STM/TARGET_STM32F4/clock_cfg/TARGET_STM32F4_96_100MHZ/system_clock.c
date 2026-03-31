@@ -3,6 +3,7 @@
  ******************************************************************************
  *
  * Copyright (c) 2015-2021 STMicroelectronics.
+ * Copyright (c) 2026 MbedCE Contributors.
  * All rights reserved.
  *
  * This software component is licensed by ST under BSD 3-Clause license,
@@ -16,8 +17,8 @@
 /**
   * This file configures the system clock as follows:
   *-----------------------------------------------------------------------------
-  * System clock source | 1- USE_PLL_HSE_EXTC (external 8 MHz clock) | DEVICE_USBDEVICE=1
-  *                     | 2- USE_PLL_HSE_XTAL (external 8 MHz xtal)  |
+  * System clock source | 1- USE_PLL_HSE_EXTC (external clock)       | DEVICE_USBDEVICE=1
+  *                     | 2- USE_PLL_HSE_XTAL (external xtal)        |
   *                     | 3- USE_PLL_HSI (internal 16 MHz)           |
   *-----------------------------------------------------------------------------
   * SYSCLK(MHz)         | 100                                        | 96
@@ -30,6 +31,15 @@
 
 #include "stm32f4xx.h"
 #include "mbed_error.h"
+
+// guards to ensure HSE_VALUE is valid for PLL configuration
+#if (HSE_VALUE < 4000000U) || (HSE_VALUE > 50000000U)
+#error HSE_VALUE must be >= 4MHz and <= 50MHz for STM32F4 common clock config
+#endif
+
+#if ((HSE_VALUE % 1000000U) != 0U)
+#error HSE_VALUE must be an integer multiple of 1MHz for STM32F4 common clock config
+#endif
 
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC     0x8  // Use external clock (ST Link MCO)
@@ -106,18 +116,18 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
         // Enable HSE oscillator and activate PLL with HSE as source
         RCC_OscInitStruct.OscillatorType    = RCC_OSCILLATORTYPE_HSE;
         if (bypass == 0) {
-            RCC_OscInitStruct.HSEState      = RCC_HSE_ON;       // External 8 MHz xtal on OSC_IN/OSC_OUT
+            RCC_OscInitStruct.HSEState      = RCC_HSE_ON;       // External xtal on OSC_IN/OSC_OUT
         } else {
-            RCC_OscInitStruct.HSEState      = RCC_HSE_BYPASS;   // External 8 MHz clock on OSC_IN
+            RCC_OscInitStruct.HSEState      = RCC_HSE_BYPASS;   // External clock on OSC_IN
         }
 
         RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
         RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-        RCC_OscInitStruct.PLL.PLLM          = 4;                // VCO input clock = 2 MHz (8 MHz / 4)
+        RCC_OscInitStruct.PLL.PLLM          = HSE_VALUE / 1000000; // VCO input clock = 1 MHz
 #if (DEVICE_USBDEVICE)
-        RCC_OscInitStruct.PLL.PLLN          = 192;              // VCO output clock = 384 MHz (2 MHz * 192)
+        RCC_OscInitStruct.PLL.PLLN          = 384;              // VCO output clock = 384 MHz (1 MHz * 384)
 #else /* DEVICE_USBDEVICE */
-        RCC_OscInitStruct.PLL.PLLN          = 200;              // VCO output clock = 400 MHz (2 MHz * 200)
+        RCC_OscInitStruct.PLL.PLLN          = 400;              // VCO output clock = 400 MHz (1 MHz * 400)
 #endif /* DEVICE_USBDEVICE */
         RCC_OscInitStruct.PLL.PLLP          = RCC_PLLP_DIV4;    // PLLCLK = 100 MHz or 96 MHz (depending on DEVICE_USBDEVICE)
         RCC_OscInitStruct.PLL.PLLQ          = 8;                // USB clock = 48 MHz (DEVICE_USBDEVICE=1)
