@@ -62,7 +62,18 @@ void mbed_copy_nvic(void)
     responsible for correctly handling the vectors.
     */
 #if !defined(__CORTEX_M0) && !defined(__CORTEX_A)
-#ifdef NVIC_RAM_VECTOR_ADDRESS
+#if defined(NVIC_NUM_VECTORS_SKIP)
+    extern uint32_t __vector_table_ram_size__;
+    extern uint32_t __vector_ram_start__;
+    uint32_t mbed_nvic_vector_count = ((uint32_t)(uintptr_t)&__vector_table_ram_size__) / sizeof(uint32_t);
+
+    uint32_t *old_vectors = (uint32_t *)SCB->VTOR;
+    uint32_t *vectors = (uint32_t *)&__vector_ram_start__;
+    for (uint32_t i = 0; i < mbed_nvic_vector_count; i++) {
+        vectors[i] = old_vectors[i];
+    }
+    SCB->VTOR = (uint32_t)&__vector_ram_start__;
+#elif defined(NVIC_RAM_VECTOR_ADDRESS)
     uint32_t *old_vectors = (uint32_t *)SCB->VTOR;
     uint32_t *vectors = (uint32_t *)NVIC_RAM_VECTOR_ADDRESS;
     for (int i = 0; i < NVIC_NUM_VECTORS; i++) {

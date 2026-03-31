@@ -1,41 +1,14 @@
-# Copyright (c) 2020 ARM Limited. All rights reserved.
+# Copyright (c) 2025 MbedCE Community Contributors (Jan Kamidra)
 # SPDX-License-Identifier: Apache-2.0
 
-add_subdirectory(TARGET_STM32F401xC EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F401xB EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F401xE EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F401xD EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F405xG EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F405xE EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F407xE EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F407xG EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F410x8 EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F410xB EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F411xE EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F411xC EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F412xE EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F412xG EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F413xH EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F413xG EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F415xx EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F417xE EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F417xG EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F423xx EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F427xI EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F427xG EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F429xG EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F429xI EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F437xI EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F437xG EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F439xG EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F439xI EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F446xC EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F446xE EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F469xI EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F469xG EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F469xE EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F479xI EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F479xG EXCLUDE_FROM_ALL)
 
 add_subdirectory(STM32Cube_FW EXCLUDE_FROM_ALL)
 
@@ -58,3 +31,20 @@ target_sources(mbed-stm32f4
 )
 
 target_link_libraries(mbed-stm32f4 INTERFACE mbed-stm mbed-stm32f4cube-fw)
+
+# Add clock file depending on the frequency
+get_system_clock_file(SYSTEM_CLOCK_FILE ${_stm32_family})
+target_sources(mbed-stm32f4 INTERFACE ${SYSTEM_CLOCK_FILE})
+
+if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
+    get_startup_file(STARTUP_FILE "STM32Cube_FW/cmsis-device-f4/Source/Templates/gcc")
+
+    patch_startup_file(STARTUP_FILE_GEN "${STARTUP_FILE}")
+
+    target_sources(mbed-stm32f4
+        INTERFACE
+        ${STARTUP_FILE_GEN}
+    )
+
+    mbed_set_linker_script(mbed-stm32f4 linker_scripts/STM32F4_COMMON.ld)
+endif()
