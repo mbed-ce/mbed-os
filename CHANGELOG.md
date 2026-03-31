@@ -31,6 +31,7 @@ A message that notes the main changes in the update.
 ### Fixed
 - Added fixes aimed at improving Greentea stability for KV/FlashIAP (STM32F7) and USBSerial paths.
 - MIMXRT1050_EVK: Fixed build error due to typos
+- Fixed memory leak with Nanostack memory manager that caused the stack to run of memory when used with zero-copy Ethernet drivers
 
 ### Removed
 - Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7)
@@ -160,7 +161,7 @@ _______________________________________________________________________________
   - Fix all DMA SPI transactions being done twice due to incorrect ISR logic
 - NXP `MIMXRT105x` MCU family:
   - Fix setting the serial format putting the UART peripheral in an invalid configuration due to trying to store an 32-bit register value in a 8-bit integer
-  - Fix using a higher core voltage than needed when running at 528MHz, easting energy
+  - Fix using a higher core voltage than needed when running at 528MHz, wasting energy
   - Fix CPU clock always changing to 600MHz when exiting deep sleep, even if configured for 528MHz
 - `K64F` and `MIMXRT105x` MCU families: Fix SPI frequency being reset back to default if you called `SPI::format()` after `SPI::frequency()`
 - Infineon WHD wi-fi driver now uses the Mbed memory manager instead of directly depending on LwIP. This means it can now be used with Nanostack ([kind of](https://github.com/mbed-ce/mbed-os/issues/505)) and the EMAC unit tests

@@ -69,7 +69,13 @@ uint32_t NanostackMemoryManager::get_pool_alloc_unit(uint32_t align) const
 
 void NanostackMemoryManager::free(emac_mem_buf_t *mem)
 {
-    ns_dyn_mem_free(mem);
+    ns_stack_mem_t *currBuf = static_cast<ns_stack_mem_t *>(mem);
+
+    while (currBuf != nullptr) {
+        ns_stack_mem_t *nextBuf = currBuf->next;
+        ns_dyn_mem_free(currBuf);
+        currBuf = nextBuf;
+    }
 }
 
 uint32_t NanostackMemoryManager::get_total_len(const emac_mem_buf_t *buf) const
