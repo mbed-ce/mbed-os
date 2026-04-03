@@ -191,9 +191,9 @@ SECTIONS
         *(.stack*)
     } > SRAM_D2
 
-    /* Set stack top to end of RAM_D2, and stack limit move down by
+    /* Set stack top to end of SRAM_D2, and stack limit move down by
      * size of stack_dummy section */
-    __StackTop = ORIGIN(RAM_D2) + LENGTH(RAM_D2);
+    __StackTop = ORIGIN(SRAM_D2) + LENGTH(SRAM_D2);
     _estack = __StackTop;
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
     PROVIDE(__stack = __StackTop);
