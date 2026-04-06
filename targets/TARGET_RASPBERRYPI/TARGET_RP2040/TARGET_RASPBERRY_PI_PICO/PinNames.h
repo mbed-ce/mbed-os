@@ -5,6 +5,7 @@
 #define MBED_PINNAMES_H
 
 #include "PeripheralNames.h"
+#include "pico.h"
 #include "boards/pico.h"
 
 #ifdef __cplusplus

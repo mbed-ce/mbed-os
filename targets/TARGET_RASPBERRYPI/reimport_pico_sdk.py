@@ -82,25 +82,39 @@ FILES_DIRS_TO_COPY: List[pathlib.Path] = [
     pathlib.Path("src") / "rp2_common" / "hardware_pll",
     pathlib.Path("src") / "rp2_common" / "hardware_watchdog",
     pathlib.Path("src") / "rp2_common" / "hardware_clocks",
-    pathlib.Path("src") / "rp2_common" / "hardware_claim",
     pathlib.Path("src") / "rp2_common" / "hardware_timer",
     pathlib.Path("src") / "rp2_common" / "hardware_sync",
     pathlib.Path("src") / "rp2_common" / "hardware_rtc",
     pathlib.Path("src") / "rp2_common" / "hardware_pio",
     pathlib.Path("src") / "rp2_common" / "hardware_dma",
+    pathlib.Path("src") / "rp2_common" / "hardware_sync_spin_lock",
+    pathlib.Path("src") / "rp2_common" / "hardware_boot_lock",
+    pathlib.Path("src") / "rp2_common" / "hardware_xip_cache",
     pathlib.Path("src") / "rp2_common" / "pico_bootrom",
-    pathlib.Path("src") / "rp2_common" / "pico_platform",
     pathlib.Path("src") / "rp2_common" / "pico_float",
     pathlib.Path("src") / "rp2_common" / "cmsis" / "stub",
+    pathlib.Path("src") / "rp2_common" / "pico_platform_common",
+    pathlib.Path("src") / "rp2_common" / "pico_platform_compiler",
+    pathlib.Path("src") / "rp2_common" / "pico_platform_panic",
+    pathlib.Path("src") / "rp2_common" / "pico_platform_sections",
+    pathlib.Path("src") / "rp2_common" / "pico_runtime_init",
+    pathlib.Path("src") / "rp2_common" / "pico_runtime",
+    pathlib.Path("src") / "rp2_common" / "pico_flash",
+    pathlib.Path("src") / "rp2_common" / "boot_bootrom_headers",
     pathlib.Path("src") / "common" / "pico_time",
     pathlib.Path("src") / "common" / "pico_sync",
-    pathlib.Path("src") / "common" / "pico_base",
-    pathlib.Path("src") / "common" / "pico_base" / "include" / "pico" / "version.h.in",
+    pathlib.Path("src") / "common" / "pico_base_headers",
+    pathlib.Path("src") / "common" / "pico_base_headers" / "include" / "pico" / "version.h.in",
     pathlib.Path("src") / "common" / "pico_binary_info",
     pathlib.Path("src") / "common" / "pico_util",
+    pathlib.Path("src") / "common" / "hardware_claim",
     pathlib.Path("src") / "rp2_common" / "pico_fix" / "rp2040_usb_device_enumeration",
     pathlib.Path("src") / "rp2040" / "hardware_structs",
     pathlib.Path("src") / "rp2040" / "hardware_regs",
+    pathlib.Path("src") / "rp2040" / "pico_platform",
+    pathlib.Path("src") / "rp2350" / "hardware_structs",
+    pathlib.Path("src") / "rp2350" / "hardware_regs",
+    pathlib.Path("src") / "rp2350" / "pico_platform",
     pathlib.Path("src") / "boards" / "include" / "boards" / "pico.h",
 ]
 
@@ -145,7 +159,7 @@ for source_file_path in files_to_copy:
     # Perform replacements
     for old_identifier, new_identifier in IDENTIFIERS_TO_RENAME:
         # Always require one non-word character before each replacement so we can do a full word match
-        source_file_contents = re.sub(r"(\W)" + old_identifier, r"\1" + new_identifier, source_file_contents)
+        source_file_contents = re.sub(r"(\W)" + old_identifier, r"\1" + new_identifier, source_file_contents, flags=re.DOTALL)
 
     # Figure out new path
     relative_path = source_file_path.relative_to(sdk_path)

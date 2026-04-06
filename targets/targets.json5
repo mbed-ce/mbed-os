@@ -8393,15 +8393,21 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "RTC"
         ],
         "device_name": "RP2040",
-        "is_mcu_family_target": true
-    },
-    "RASPBERRY_PI_PICO": {
-        "inherits": ["RP2040"],
+        "is_mcu_family_target": true,
         "macros_add": [
+            "PICO_RP2040=1",
             "PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1",
             "MBED_MPU_CUSTOM",
             "PICO_TIME_DEFAULT_ALARM_POOL_DISABLED",
             "PICO_ON_DEVICE=1",
+            "PICO_NO_HARDWARE=0",
+            "PICO_32BIT=1"
+        ]
+    },
+    "RASPBERRY_PI_PICO": {
+        "inherits": ["RP2040"],
+        "macros_add": [
+
             "PICO_UART_ENABLE_CRLF_SUPPORT=0"
         ],
         "overrides": {

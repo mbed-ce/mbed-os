@@ -7,6 +7,7 @@
 #include "hardware/clocks.h"
 #include "hardware/sync.h"
 #include "pico/binary_info.h"
+#include "pico/runtime_init.h"
 
 #include <stdarg.h>
 
@@ -42,7 +43,7 @@ void mbed_sdk_init()
 
     // After calling preinit we have enough runtime to do the exciting maths
     // in clocks_init
-    clocks_init();
+    runtime_init_clocks();
     SystemCoreClockUpdate();
 
     // Peripheral clocks should now all be running

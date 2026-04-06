@@ -10,7 +10,7 @@ add_library(mbed-raspberrypi INTERFACE)
 # Helpfully, that info lives in its own file, so we can just include it.
 include(pico-sdk/pico_sdk_version.cmake)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pico-sdk-generated/pico)
-configure_file(pico-sdk/src/common/pico_base/include/pico/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/pico-sdk-generated/pico/version.h)
+configure_file(pico-sdk/src/common/pico_base_headers/include/pico/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/pico-sdk-generated/pico/version.h)
 
 # Autogen config header.
 # The below settings discovered by analyzing the build system.
@@ -125,19 +125,30 @@ target_include_directories(mbed-raspberrypi
 		pico-sdk/src/rp2_common/hardware_xosc/include
 		pico-sdk/src/rp2_common/hardware_pio/include
 		pico-sdk/src/rp2_common/hardware_dma/include
-		pico-sdk/src/rp2_common/pico_platform/include
+		pico-sdk/src/rp2_common/hardware_sync_spin_lock/include
+		pico-sdk/src/rp2_common/hardware_boot_lock/include
+		pico-sdk/src/rp2_common/hardware_xip_cache/include
 		pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include/
 		pico-sdk/src/rp2_common/pico_bootrom/include
 		pico-sdk/src/rp2_common/pico_float/include
 		pico-sdk/src/rp2_common/hardware_claim/include
+		pico-sdk/src/rp2_common/pico_platform_common/include
+		pico-sdk/src/rp2_common/pico_platform_compiler/include
+		pico-sdk/src/rp2_common/pico_platform_panic/include
+		pico-sdk/src/rp2_common/pico_platform_sections/include
+		pico-sdk/src/rp2_common/pico_runtime_init/include
+		pico-sdk/src/rp2_common/pico_runtime/include
+		pico-sdk/src/rp2_common/pico_flash/include
+		pico-sdk/src/rp2_common/boot_bootrom_headers/include
 		pico-sdk/src/common/pico_sync/include
 		pico-sdk/src/common/pico_time/include
-		pico-sdk/src/common/pico_base/include
+		pico-sdk/src/common/pico_base_headers/include
 		pico-sdk/src/common/pico_binary_info/include
 		pico-sdk/src/common/pico_util/include
+		pico-sdk/src/common/hardware_claim/include
 		pico-sdk/src/boards/include
 		pico-sdk/src/generated
-		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RaspberryPi/RP2040/Include
+		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Include
 		pico-sdk/src/rp2_common/cmsis/include
 	    ${CMAKE_CURRENT_BINARY_DIR}/pico-sdk-generated/
 )
@@ -156,22 +167,19 @@ target_sources(mbed-raspberrypi
 		pico-sdk/src/rp2_common/hardware_pll/pll.c
 		pico-sdk/src/rp2_common/hardware_watchdog/watchdog.c
 		pico-sdk/src/rp2_common/hardware_clocks/clocks.c
-		pico-sdk/src/rp2_common/hardware_claim/claim.c
 		pico-sdk/src/rp2_common/hardware_timer/timer.c
 		pico-sdk/src/rp2_common/hardware_sync/sync.c
 		pico-sdk/src/rp2_common/hardware_rtc/rtc.c
 		pico-sdk/src/rp2_common/hardware_pio/pio.c
 		pico-sdk/src/rp2_common/hardware_dma/dma.c
+		pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c
+		pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c
 		pico-sdk/src/rp2_common/pico_bootrom/bootrom.c
-		pico-sdk/src/rp2_common/pico_platform/platform.c
+		pico-sdk/src/rp2_common/pico_platform_common/common.c
+		pico-sdk/src/rp2_common/pico_flash/flash.c
 		pico-sdk/src/common/pico_time/time.c
 		pico-sdk/src/common/pico_sync/lock_core.c
-		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RaspberryPi/RP2040/Source/system_RP2040.c
-		pico-sdk/src/rp2_common/pico_float/float_aeabi.S
-		pico-sdk/src/rp2_common/pico_float/float_init_rom.c
-		pico-sdk/src/rp2_common/pico_float/float_math.c
-		pico-sdk/src/rp2_common/pico_float/float_v1_rom_shim.S
-		pico-sdk/src/rp2_common/hardware_divider/divider.S
+		pico-sdk/src/common/hardware_claim/claim.c
 )
 
 target_compile_definitions(mbed-raspberrypi
@@ -187,10 +195,20 @@ target_include_directories(mbed-rp2040
 	INTERFACE
 		pico-sdk/src/rp2040/hardware_structs/include
 		pico-sdk/src/rp2040/hardware_regs/include
+		pico-sdk/src/rp2040/pico_platform/include
 )
 target_sources(mbed-rp2040
 	INTERFACE
 		pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c
+		pico-sdk/src/rp2040/pico_platform/platform.c
+		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Source/system_RP2040.c
+
+		# floating point helper routines
+		pico-sdk/src/rp2_common/pico_float/float_aeabi_rp2040.S
+		pico-sdk/src/rp2_common/pico_float/float_init_rom_rp2040.c
+		pico-sdk/src/rp2_common/pico_float/float_math.c
+		pico-sdk/src/rp2_common/pico_float/float_v1_rom_shim_rp2040.S
+		pico-sdk/src/rp2_common/hardware_divider/divider.S
 )
 
 # Enable usage of the RPi Pico optimized floating point routines
