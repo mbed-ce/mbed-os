@@ -164,7 +164,7 @@ for source_file_path in files_to_copy:
     # Perform replacements
     for old_identifier, new_identifier in IDENTIFIERS_TO_RENAME:
         # Always require one non-word character before each replacement so we can do a full word match
-        source_file_contents = re.sub(r"(\W)" + old_identifier, r"\1" + new_identifier, source_file_contents, flags=re.DOTALL)
+        source_file_contents = re.sub(r"(\W)" + old_identifier, r"\1" + new_identifier, source_file_contents)
 
     # Figure out new path
     relative_path = source_file_path.relative_to(sdk_path)
