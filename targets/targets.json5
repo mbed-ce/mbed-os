@@ -1428,7 +1428,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "overrides": {
             "clock-source": "USE_PLL_HSI | USE_PLL_HSE_XTAL",
-            "hse-value": 25000000
+            "hse-value": 25000000,
+            "default-adc-vref": 3.3
         },
         "device_has_add": [
             "USBDEVICE"
@@ -1542,6 +1543,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "USBDEVICE"
         ],
+        "overrides": {
+            "default-adc-vref": 3.3
+        },
         "device_name": "STM32F413ZHTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1595,7 +1599,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F429ZITx",
         "overrides": {
-            "network-default-interface-type": "ETHERNET"
+            "network-default-interface-type": "ETHERNET",
+            "default-adc-vref": 3.3
         },
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1610,7 +1615,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "overrides": {
-            "lse-available": 0
+            "lse-available": 0,
+            "default-adc-vref": 3.3
         },
         "device_has_remove": [
             "LPTICKER"
@@ -1663,7 +1669,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32F439ZITx",
         "overrides": {
-            "network-default-interface-type": "ETHERNET"
+            "network-default-interface-type": "ETHERNET",
+            "default-adc-vref": 3.3
         },
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1692,6 +1699,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
+        "overrides": {
+            "default-adc-vref": 3.3
+        },
         "device_name": "STM32F446RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1711,6 +1721,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "USBDEVICE"
         ],
+        "overrides": {
+            "default-adc-vref": 3.3
+        },
         "device_name": "STM32F446ZETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1747,7 +1760,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "N25Q128A"
         ],
         "overrides": {
-            "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI"
+            "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
+            "default-adc-vref": 3.3
         },
         "device_has_add": [
             "QSPI",
