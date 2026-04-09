@@ -154,7 +154,6 @@ target_include_directories(mbed-raspberrypi
 		pico-sdk/src/boards/include
 		pico-sdk/src/generated
 		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Include
-		pico-sdk/src/rp2_common/cmsis/include
 	    ${CMAKE_CURRENT_BINARY_DIR}/pico-sdk-generated/
 )
 

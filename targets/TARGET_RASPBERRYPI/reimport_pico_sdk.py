@@ -94,7 +94,7 @@ FILES_DIRS_TO_COPY: List[pathlib.Path] = [
     pathlib.Path("src") / "rp2_common" / "hardware_vreg",
     pathlib.Path("src") / "rp2_common" / "pico_bootrom",
     pathlib.Path("src") / "rp2_common" / "pico_float",
-    pathlib.Path("src") / "rp2_common" / "cmsis" / "stub",
+    pathlib.Path("src") / "rp2_common" / "cmsis" / "stub" / "CMSIS" / "Device",
     pathlib.Path("src") / "rp2_common" / "pico_platform_common",
     pathlib.Path("src") / "rp2_common" / "pico_platform_compiler",
     pathlib.Path("src") / "rp2_common" / "pico_platform_panic",
