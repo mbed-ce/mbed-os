@@ -35,7 +35,6 @@ IGNORE_PATH_REGEXES = [
     # We don't want to have to modify all their code to add SPDX license IDs every time
     # it gets updated, so we ignore everything under STM32Cube_FW
     re.compile(r"TARGET_STM/.*STM32Cube_FW"),
-
     # There are also a few Pico SDK files missing headers
     re.compile(r"TARGET_RASPBERRYPI/pico-sdk"),
 ]
