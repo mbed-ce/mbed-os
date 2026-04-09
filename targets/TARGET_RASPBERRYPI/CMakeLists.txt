@@ -128,10 +128,12 @@ target_include_directories(mbed-raspberrypi
 		pico-sdk/src/rp2_common/hardware_sync_spin_lock/include
 		pico-sdk/src/rp2_common/hardware_boot_lock/include
 		pico-sdk/src/rp2_common/hardware_xip_cache/include
+		pico-sdk/src/rp2_common/hardware_claim/include
+		pico-sdk/src/rp2_common/hardware_ticks/include
+		pico-sdk/src/rp2_common/hardware_vreg/include
 		pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include/
 		pico-sdk/src/rp2_common/pico_bootrom/include
 		pico-sdk/src/rp2_common/pico_float/include
-		pico-sdk/src/rp2_common/hardware_claim/include
 		pico-sdk/src/rp2_common/pico_platform_common/include
 		pico-sdk/src/rp2_common/pico_platform_compiler/include
 		pico-sdk/src/rp2_common/pico_platform_panic/include
@@ -139,12 +141,15 @@ target_include_directories(mbed-raspberrypi
 		pico-sdk/src/rp2_common/pico_runtime_init/include
 		pico-sdk/src/rp2_common/pico_runtime/include
 		pico-sdk/src/rp2_common/pico_flash/include
+		pico-sdk/src/rp2_common/pico_time_adapter/include
 		pico-sdk/src/rp2_common/boot_bootrom_headers/include
 		pico-sdk/src/common/pico_sync/include
 		pico-sdk/src/common/pico_time/include
 		pico-sdk/src/common/pico_base_headers/include
 		pico-sdk/src/common/pico_binary_info/include
 		pico-sdk/src/common/pico_util/include
+		pico-sdk/src/common/boot_picoboot_headers/include
+		pico-sdk/src/common/boot_picobin_headers/include
 		pico-sdk/src/common/hardware_claim/include
 		pico-sdk/src/boards/include
 		pico-sdk/src/generated
@@ -174,9 +179,13 @@ target_sources(mbed-raspberrypi
 		pico-sdk/src/rp2_common/hardware_dma/dma.c
 		pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c
 		pico-sdk/src/rp2_common/hardware_xip_cache/xip_cache.c
+		pico-sdk/src/rp2_common/hardware_ticks/ticks.c
+		pico-sdk/src/rp2_common/hardware_vreg/vreg.c
 		pico-sdk/src/rp2_common/pico_bootrom/bootrom.c
 		pico-sdk/src/rp2_common/pico_platform_common/common.c
 		pico-sdk/src/rp2_common/pico_flash/flash.c
+		pico-sdk/src/rp2_common/pico_runtime_init/runtime_init.c
+		pico-sdk/src/rp2_common/pico_runtime_init/runtime_init_clocks.c
 		pico-sdk/src/common/pico_time/time.c
 		pico-sdk/src/common/pico_sync/lock_core.c
 		pico-sdk/src/common/hardware_claim/claim.c
@@ -185,6 +194,18 @@ target_sources(mbed-raspberrypi
 target_compile_definitions(mbed-raspberrypi
 	INTERFACE
 		LIB_CMSIS_CORE # Enables renaming interrupt vectors to their CMSIS names
+
+		# Don't automatically register init stuff as global constructors. We call these manually in mbed_sdk_init()
+		PICO_RUNTIME_SKIP_INIT_BOOTROM_RESET
+		PICO_RUNTIME_SKIP_INIT_PER_CORE_BOOTROM_RESET
+		PICO_RUNTIME_SKIP_INIT_EARLY_RESETS
+		PICO_RUNTIME_SKIP_INIT_USB_POWER_DOWN
+		PICO_RUNTIME_SKIP_INIT_PER_CORE_ENABLE_COPROCESSORS
+		PICO_RUNTIME_SKIP_INIT_CLOCKS
+		PICO_RUNTIME_SKIP_INIT_POST_CLOCK_RESETS
+		PICO_RUNTIME_SKIP_INIT_RP2040_GPIO_IE_DISABLE
+		PICO_RUNTIME_SKIP_INIT_SPIN_LOCKS_RESET
+		PICO_RUNTIME_SKIP_INIT_INSTALL_RAM_VECTOR_TABLE
 )
 
 target_link_libraries(mbed-raspberrypi INTERFACE mbed-cmsis-cortex-m)
