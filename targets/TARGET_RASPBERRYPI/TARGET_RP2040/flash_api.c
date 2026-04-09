@@ -24,6 +24,7 @@
 #include "mbed_critical.h"
 #include "hal/flash_api.h"
 #include "hardware/flash.h"
+#include "hardware/xip_cache.h"
 
 /******************************************************************************
  * CONSTANT
@@ -61,6 +62,7 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
 
     core_util_critical_section_enter();
     flash_range_erase(address, FLASH_SECTOR_SIZE);
+    xip_cache_invalidate_range(address, FLASH_SECTOR_SIZE);
     core_util_critical_section_exit();
 
     return 0;
@@ -95,6 +97,7 @@ int32_t flash_program_page(flash_t *obj, uint32_t address, const uint8_t *data, 
 
     core_util_critical_section_enter();
     flash_range_program(address, data, FLASH_PAGE_SIZE * pages);
+    xip_cache_invalidate_range(address, FLASH_PAGE_SIZE * pages);
     core_util_critical_section_exit();
 
     return 0;
