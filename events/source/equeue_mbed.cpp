@@ -23,7 +23,7 @@
 
 #include <stdbool.h>
 #include <string.h>
-#include "cmsis.h"
+#include "../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/cmsis.h"
 #include "platform/mbed_critical.h"
 #include "platform/mbed_power_mgmt.h"
 #include "drivers/Timer.h"

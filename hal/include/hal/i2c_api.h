@@ -20,7 +20,7 @@
 #ifndef MBED_I2C_API_H
 #define MBED_I2C_API_H
 
-#include "device.h"
+#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
 #include "pinmap.h"
 #include "hal/buffer.h"
 

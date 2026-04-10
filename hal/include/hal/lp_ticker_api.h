@@ -20,7 +20,7 @@
 #ifndef MBED_LPTICKER_API_H
 #define MBED_LPTICKER_API_H
 
-#include "device.h"
+#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
 
 #if DEVICE_LPTICKER
 

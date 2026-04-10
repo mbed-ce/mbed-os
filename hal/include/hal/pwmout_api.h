@@ -20,7 +20,7 @@
 #ifndef MBED_PWMOUT_API_H
 #define MBED_PWMOUT_API_H
 
-#include "device.h"
+#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
 #include "pinmap.h"
 
 #if DEVICE_PWMOUT

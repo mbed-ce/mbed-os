@@ -8365,7 +8365,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "TMPM4GRF20FG",
         "image_url": "https://wiki.segger.com/images/thumb/6/68/tmpm4gr.jpg/402px-tmpm4gr.jpg"
     },
-    "RP2040": {
+
+    // Target family for all Raspberry Pi RP2xxx MCUs
+    "MCU_RP2": {
         "public": false,
         "inherits": ["Target"],
         "core": "Cortex-M0+",
@@ -8374,7 +8376,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "memmap_default"
         ],
         "overrides": {
-            "xip-enable": true
+            "xip-enable": true,
+
+            // ADC_VDD sets the ADC reference voltage on this chip.
+            // Most RP2xxx boards set this pin to 3.3V.
+            // Note that if the I/O voltage is set to less than the ADC reference voltage,
+            // voltages higher than the I/O voltage are illegal for the analog pins
+            // (so the ADC can never read 100%).
+            "default-adc-vref": 3.3
         },
         "device_has": [
             "ANALOGIN",
@@ -8395,31 +8404,41 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "RP2040",
         "is_mcu_family_target": true,
         "macros_add": [
-            "PICO_RP2040=1",
-            "PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1",
-            "MBED_MPU_CUSTOM",
             "PICO_TIME_DEFAULT_ALARM_POOL_DISABLED",
             "PICO_ON_DEVICE=1",
             "PICO_NO_HARDWARE=0",
-            "PICO_32BIT=1"
+            "PICO_32BIT=1",
+
+            // Do not translate CRLF to LF in UART Pico SDK driver
+            "PICO_UART_ENABLE_CRLF_SUPPORT=0"
         ]
     },
-    "RASPBERRY_PI_PICO": {
-        "inherits": ["RP2040"],
-        "macros_add": [
 
-            "PICO_UART_ENABLE_CRLF_SUPPORT=0"
+    // Target for RP2040 MCU
+    "MCU_RP2040": {
+        "inherits": ["MCU_RP2"],
+        "device_name": "RP2040",
+        "macros_add": [
+            "PICO_RP2040=1",
+            "PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1",
+            "MBED_MPU_CUSTOM"
         ],
+
+        // For backwards compatibility with Mbed CE 7.0 and earlier, also make this match
+        // the target label "RP2040" in addition to "MCU_RP2040".
+        "extra_labels": [
+            "RP2040",
+        ]
+    },
+
+    // Target for Raspberry Pi Pico board using the RP2040 MCU.
+    // Will also work for some 3rd party compatible boards as well.
+    "RASPBERRY_PI_PICO": {
+        "inherits": ["MCU_RP2040"],
         "overrides": {
+            // Use USB serial for the default console on this board instead of the UART
             "console-usb": true,
             "console-uart": false,
-
-            // ADC_VDD sets the ADC reference voltage on this chip.
-            // Most RP2040 boards set this pin to 3.3V.
-            // Note that if the I/O voltage is set to less than the ADC reference voltage,
-            // voltages higher than the I/O voltage are illegal for the analog pins
-            // (so the ADC can never read 100%).
-            "default-adc-vref": 3.3
         },
         "memory_banks": {
             "QSPI_FLASH": {
@@ -8437,12 +8456,5 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "image_url": "https://cdn11.bigcommerce.com/s-2fbyfnm8ev/images/stencil/1280x1280/products/1212/4275/Pico3__75642.1611086462.jpg?c=2"
-    },
-    "RASPBERRY_PI_PICO_SWD": {
-        "inherits": ["RASPBERRY_PI_PICO"],
-        "overrides": {
-            "console-usb": false,
-            "console-uart": true
-        }
     }
 }

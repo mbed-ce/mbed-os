@@ -29,6 +29,13 @@
         "nanostack.configuration": "ethernet_host",
 
         // Enable asserts in LwIP for better debugging
-        "lwip.asserts-enabled": true
+        "lwip.asserts-enabled": true,
+
+        // Some boards default to having the serial console on the USB port instead of a UART.
+        // Disable this behavior as greentea always needs to run over the UART (for now anyways).
+        // This assumes that such boards (e.g. RASPBERRY_PI_PICO) have an external USB-serial
+        // adapter connected.
+        "target.console-usb": false,
+        "target.console-uart": true
     }
 }

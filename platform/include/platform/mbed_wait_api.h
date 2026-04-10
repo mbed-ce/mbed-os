@@ -19,7 +19,7 @@
 
 #include "platform/mbed_toolchain.h"
 #include "platform/mbed_atomic.h"
-#include "device.h"
+#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
 
 #ifdef __cplusplus
 extern "C" {

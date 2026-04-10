@@ -25,7 +25,7 @@
 #include <cinttypes>
 
 #include "mbed.h"
-#include "cmsis.h"
+#include "../../../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/cmsis.h"
 #include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"

@@ -20,7 +20,7 @@
 #include "mbed_boot.h"
 #include <stdlib.h>
 #include <stdint.h>
-#include "cmsis.h"
+#include "../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/cmsis.h"
 #include "hal/us_ticker_api.h"
 
 /* This startup is for baremetal. There is no RTOS in baremetal,

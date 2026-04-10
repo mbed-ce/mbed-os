@@ -19,7 +19,7 @@
 #include "hal/pinmap.h"
 #include "platform/mbed_toolchain.h"
 #include "platform/mbed_assert.h"
-#include "device.h"
+#include "../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
 #include "hal/serial_api.h"
 #include "hal/PinNameAliases.h"
 

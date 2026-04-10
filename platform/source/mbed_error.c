@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include "device.h"
+#include "../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
 #include "platform/source/mbed_crash_data_offsets.h"
 #include "platform/mbed_atomic.h"
 #include "platform/mbed_critical.h"

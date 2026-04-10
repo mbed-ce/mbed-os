@@ -46,8 +46,9 @@ endfunction()
 
 #
 # Parse toolchain generated map file of `target` and display a readable table format.
+# Expects the memory map to be located at <current binary dir>/${target}${CMAKE_EXECUTABLE_SUFFIX}.map
 #
-function(mbed_generate_map_file target)
+function(mbed_show_memap_after_build target)
     # set default args for memap.py
     set(MBED_MEMAP_DEPTH "2" CACHE STRING "directory depth level to display report")
     set(MBED_MEMAP_CREATE_JSON FALSE CACHE BOOL "create report in json file")
@@ -169,7 +170,7 @@ function(mbed_set_post_build target)
         mbed_post_build_function(${target})
     endif()
 
-    mbed_generate_map_file(${target})
+    mbed_show_memap_after_build(${target})
     mbed_generate_upload_target(${target})
     mbed_generate_ide_debug_configuration(${target})
 endfunction()

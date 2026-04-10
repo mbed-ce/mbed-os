@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "device.h"
+#include "../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
 #ifdef MBED_CONF_RTOS_PRESENT
 #include "cmsis_os2.h"
 #elif defined(MBED_STACK_STATS_ENABLED) || defined(MBED_THREAD_STATS_ENABLED)

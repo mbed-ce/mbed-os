@@ -21,7 +21,7 @@
 #include "platform/mbed_atomic.h"
 #include "drivers/TimerEvent.h"
 #include <chrono>
-#include "cmsis.h"
+#include "../../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/cmsis.h"
 
 extern "C" {
 #if defined(TARGET_CORTEX_A)

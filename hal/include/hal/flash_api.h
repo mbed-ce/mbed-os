@@ -20,7 +20,7 @@
 #ifndef MBED_FLASH_API_H
 #define MBED_FLASH_API_H
 
-#include "device.h"
+#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
 #include <stdint.h>
 
 #if DEVICE_FLASH

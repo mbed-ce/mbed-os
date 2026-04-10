@@ -63,7 +63,7 @@ IDENTIFIERS_TO_RENAME: List[Tuple[str, str]] = [
 ]
 
 # List of files and directories which need to be copied into Mbed.
-# From directories, only .c, .h, and .S files will be copied, nothing else.
+# From directories, only .c, .h, .ld, and .S files will be copied, nothing else.
 FILES_DIRS_TO_COPY: List[pathlib.Path] = [
     pathlib.Path("LICENSE.txt"),
     pathlib.Path("pico_sdk_version.cmake"),
@@ -117,10 +117,13 @@ FILES_DIRS_TO_COPY: List[pathlib.Path] = [
     pathlib.Path("src") / "rp2040" / "hardware_structs",
     pathlib.Path("src") / "rp2040" / "hardware_regs",
     pathlib.Path("src") / "rp2040" / "pico_platform",
+    pathlib.Path("src") / "rp2040" / "boot_stage2",
+    pathlib.Path("src") / "rp2040" / "boot_stage2" / "pad_checksum",
     pathlib.Path("src") / "rp2350" / "hardware_structs",
     pathlib.Path("src") / "rp2350" / "hardware_regs",
     pathlib.Path("src") / "rp2350" / "pico_platform",
     pathlib.Path("src") / "boards" / "include" / "boards" / "pico.h",
+    pathlib.Path("src") / "boards" / "include" / "boards" / "pico_w.h",
 ]
 
 if len(sys.argv) != 2:
@@ -140,6 +143,7 @@ for file_or_dir in FILES_DIRS_TO_COPY:
         files_in_folder = list((sdk_path / file_or_dir).rglob("*.c"))
         files_in_folder.extend((sdk_path / file_or_dir).rglob("*.h"))
         files_in_folder.extend((sdk_path / file_or_dir).rglob("*.S"))
+        files_in_folder.extend((sdk_path / file_or_dir).rglob("*.ld"))
 
         if len(files_in_folder) == 0:
             print(f"Warning: No copyable files found in directory {file_or_dir}.")
