@@ -29,56 +29,104 @@ extern "C" {
 #endif
 
 typedef enum {
-    p0  = 0,
-    p1  = 1,
-    p2  = 2,
-    p3  = 3,
-    p4  = 4,
-    p5  = 5,
-    p6  = 6,
-    p7  = 7,
-    p8  = 8,
-    p9  = 9,
-    p10 = 10,
-    p11 = 11,
-    p12 = 12,
-    p13 = 13,
-    p14 = 14,
-    p15 = 15,
-    p16 = 16,
-    p17 = 17,
-    p18 = 18,
-    p19 = 19,
-    p20 = 20,
-    p21 = 21,
-    p22 = 22,
-    p23 = 23,
-    p24 = 24,
-    p25 = 25,
-    p26 = 26,
-    p27 = 27,
-    p28 = 28,
-    p29 = 29,
+    // RP2040 I/O pins
+    IO_0  = 0,
+    IO_1  = 1,
+    IO_2  = 2,
+    IO_3  = 3,
+    IO_4  = 4,
+    IO_5  = 5,
+    IO_6  = 6,
+    IO_7  = 7,
+    IO_8  = 8,
+    IO_9  = 9,
+    IO_10 = 10,
+    IO_11 = 11,
+    IO_12 = 12,
+    IO_13 = 13,
+    IO_14 = 14,
+    IO_15 = 15,
+    IO_16 = 16,
+    IO_17 = 17,
+    IO_18 = 18,
+    IO_19 = 19,
+    IO_20 = 20,
+    IO_21 = 21,
+    IO_22 = 22,
+    IO_23 = 23,
+    IO_24 = 24,
+    IO_25 = 25,
+    IO_26 = 26,
+    IO_27 = 27,
+    IO_28 = 28,
+    IO_29 = 29,
 
     // ADC internal channels
     ADC_TEMP = 0xF0,
     ADC_VREF = 0xF1,
 
+    // Analog pins
 #ifndef ARDUINO_ARCH_MBED
-    A0          = 26,
-    A1          = 27,
-    A2          = 28,
-    A3          = 29,
+    A0          = IO_26,
+    A1          = IO_27,
+    A2          = IO_28,
+    A3          = IO_29,
 #endif
 
-    CONSOLE_TX = p0,
-    CONSOLE_RX = p1,
+    CONSOLE_TX = IO_0,
+    CONSOLE_RX = IO_1,
+
+    // Raspberry Pi Pico PCB pin numbering.
+    // See diagram here: https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html#layout_non-wireless
+    // This follows the innermost (grey) numbers.
+    PICO_P0 = IO_0,
+    PICO_P1 = IO_1,
+    PICO_P4 = IO_2,
+    PICO_P5 = IO_3,
+    PICO_P6 = IO_4,
+    PICO_P7 = IO_5,
+    PICO_P9 = IO_6,
+    PICO_P10 = IO_7,
+    PICO_P11 = IO_8,
+    PICO_P12 = IO_9,
+    PICO_P14 = IO_10,
+    PICO_P15 = IO_11,
+    PICO_P16 = IO_12,
+    PICO_P17 = IO_13,
+    PICO_P19 = IO_14,
+    PICO_P20 = IO_15,
+    PICO_P21 = IO_16,
+    PICO_P22 = IO_17,
+    PICO_P24 = IO_18,
+    PICO_P25 = IO_19,
+    PICO_P26 = IO_20,
+    PICO_P27 = IO_21,
+    PICO_P29 = IO_22,
+    PICO_P31 = IO_26,
+    PICO_P32 = IO_27,
+    PICO_P34 = IO_28,
+
+    // These three pins (plus the LED defined below) are connected internally on the Raspberry Pi Pico
+    // rather than being pinned out
+    BUCK_REG_PWM_MODE = IO_23,
+    USB_VBUS_PRESENT = IO_24,
+    VSYS_MEAS = IO_29,
 
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
 
-#define LED1 p25
+// Onboard LED
+#define LED1 IO_25
+
+// Default communication pins
+#define I2C_SCL IO_5
+#define I2C_SDA IO_4
+
+#define SPI_SCLK IO_18
+#define SPI_MOSI IO_19
+#define SPI_MISO IO_16
+#define SPI_CS IO_17
 
 #ifdef __cplusplus
 }

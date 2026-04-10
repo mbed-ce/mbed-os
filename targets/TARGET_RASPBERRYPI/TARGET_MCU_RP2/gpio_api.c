@@ -97,7 +97,7 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uintpt
     m_channel_ids[pin]          = context;
     m_irq_handler               = handler;
 
-    obj->irq_n = IO_IRQ_BANK0;
+    obj->irq_n = IO_IRQ_BANK0_IRQn;
     obj->pin = pin;
     obj->irq_index = context;
 

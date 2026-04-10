@@ -8455,6 +8455,32 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "start": 0x10000000
             }
         },
-        "image_url": "https://cdn11.bigcommerce.com/s-2fbyfnm8ev/images/stencil/1280x1280/products/1212/4275/Pico3__75642.1611086462.jpg?c=2"
+        "image_url": "https://akizukidenshi.com/img/goods/L/116132.jpg"
+    },
+
+    // Target for Raspberry Pi Pico W board using the RP2040 MCU.
+    "RASPBERRY_PI_PICO_W": {
+        "inherits": ["MCU_RP2040"],
+        "overrides": {
+            // Use USB serial for the default console on this board instead of the UART
+            "console-usb": true,
+            "console-uart": false,
+        },
+        "memory_banks": {
+            "QSPI_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "startup": true,
+                "size": 0x200000, // 2MiB
+                "start": 0x10000000
+            }
+        },
+        "image_url": "https://akizukidenshi.com/img/goods/L/117947.jpg"
     }
 }
