@@ -11,7 +11,7 @@ project(greentea
 
 include(GNUInstallDirs)
 
-add_library(greentea_client_userio
+add_library(greentea_client_userio EXCLUDE_FROM_ALL
     source/greentea_test_env.cpp
 )
 target_include_directories(greentea_client_userio
@@ -20,7 +20,7 @@ target_include_directories(greentea_client_userio
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-add_library(greentea_client
+add_library(greentea_client EXCLUDE_FROM_ALL
     source/greentea_test_env.cpp
     source/greentea_test_io.c
 )
