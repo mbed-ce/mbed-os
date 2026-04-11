@@ -27,6 +27,8 @@ A message that notes the main changes in the update.
   - Applied interim local HAL fixes until upstream release includes them: https://github.com/STMicroelectronics/stm32f7xx-hal-driver/issues/23
 - RP2xxx
   - SDK updated from 1.5.1 to 2.2.0
+  - Pin naming scheme changed. Now the MCU I/O pins are named as `IO_xx` instead of `pxx`. Additionally, `PICO_Pxx` constants are added which match the numbering of the header pins on the PCB.
+  - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board is limited).
 
 ### Deprecated
 

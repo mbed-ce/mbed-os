@@ -19,3 +19,4 @@ if(MCU_RP2040 IN_LIST MBED_TARGET_LABELS)
 endif()
 
 add_subdirectory(TARGET_RASPBERRY_PI_PICO)
+add_subdirectory(TARGET_RASPBERRY_PI_PICO_W)

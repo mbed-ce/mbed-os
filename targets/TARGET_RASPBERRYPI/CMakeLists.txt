@@ -20,7 +20,7 @@ if(MCU_RP2 IN_LIST MBED_TARGET_LABELS)
 	include(pico-sdk/pico_sdk_version.cmake)
 	set(PICO_GENERATED_HEADERS_DIR ${CMAKE_CURRENT_BINARY_DIR}/pico-sdk-generated)
 	file(MAKE_DIRECTORY ${PICO_GENERATED_HEADERS_DIR}/pico)
-	configure_file(pico-sdk/src/common/pico_base_headers/include/pico/version.h.in ${PICO_GENERATED_HEADERS_DIR}pico/version.h)
+	configure_file(pico-sdk/src/common/pico_base_headers/include/pico/version.h.in ${PICO_GENERATED_HEADERS_DIR}/pico/version.h)
 
 	if(MBED_TARGET STREQUAL "RASPBERRY_PI_PICO")
 		set(MBED_PICO_CONFIG_HEADER_FILE boards/pico.h)

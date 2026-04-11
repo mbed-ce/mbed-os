@@ -106,18 +106,14 @@ typedef enum {
     PICO_P32 = IO_27,
     PICO_P34 = IO_28,
 
-    // These three pins (plus the LED defined below) are connected internally on the Raspberry Pi Pico
-    // rather than being pinned out
-    BUCK_REG_PWM_MODE = IO_23,
-    USB_VBUS_PRESENT = IO_24,
+    // Measures VSYS divided by 3. Shared with Wi-Fi interface, do not use as analog pin if using wi-fi.
     VSYS_MEAS = IO_29,
 
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
 
-// Onboard LED
-#define LED1 IO_25
+// No onboard LED directly accessible by MCU, LED is connected to wi-fi module GPIO
 
 // Default communication pins
 #define I2C_SCL IO_5
@@ -127,6 +123,13 @@ typedef enum {
 #define SPI_MOSI IO_19
 #define SPI_MISO IO_16
 #define SPI_CS IO_17
+
+// Wi-Fi module communication pins
+// For more background on these, I found here to be a good resource https://iosoft.blog/2022/12/06/picowi_part1/
+#define CYW43439_WL_ON IO_23
+#define CYW43439_D IO_24 // Combination MISO/MOSI/IRQ/MODE SELECT
+#define CYW43439_CS IO_25
+#define CYW43439_SCLK IO_29
 
 #ifdef __cplusplus
 }
