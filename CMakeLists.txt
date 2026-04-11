@@ -305,7 +305,7 @@ add_subdirectory(connectivity)
 
 # The directories below contain optional target libraries
 add_subdirectory(drivers/device_key EXCLUDE_FROM_ALL)
-add_subdirectory(features EXCLUDE_FROM_ALL)
+add_subdirectory(features)
 
 # Create top-level targets  ----------------------------------------------------------------------------------
 
