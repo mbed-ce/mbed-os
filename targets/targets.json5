@@ -8482,5 +8482,31 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "image_url": "https://akizukidenshi.com/img/goods/L/117947.jpg"
+    },
+
+    // Target for SparkFun Thing Plus RP2040 board using the RP2040 MCU.
+    "SFE_THING_PLUS_RP2040": {
+        "inherits": ["MCU_RP2040"],
+        "overrides": {
+            // Use USB serial for the default console on this board instead of the UART
+            "console-usb": true,
+            "console-uart": false,
+        },
+        "memory_banks": {
+            "QSPI_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "startup": true,
+                "size": 0x1000000, // 16MiB
+                "start": 0x10000000
+            }
+        },
+        "image_url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/7/17745-SparkFun_Thing_Plus_-_RP2040-01a.jpg"
     }
 }

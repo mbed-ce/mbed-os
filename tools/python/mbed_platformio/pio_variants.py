@@ -26,4 +26,6 @@ PIO_VARIANT_TO_MBED_TARGET = {
     "genericSTM32F103RB": "NUCLEO_F103RB",
     "disco_h747xi": "DISCO_H747I",
     "rpipico": "RASPBERRY_PI_PICO",
+    "rpipicow": "RASPBERRY_PI_PICO_W",
+    "sparkfun_thingplusrp2040": "SFE_THING_PLUS_RP2040",
 }

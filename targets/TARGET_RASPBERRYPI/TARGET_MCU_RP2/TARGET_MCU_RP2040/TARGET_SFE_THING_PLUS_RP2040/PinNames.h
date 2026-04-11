@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: RASPBERRY_PI_PICO_W */
+/* MBED TARGET LIST: SFE_THING_PLUS_RP2040 */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H
@@ -76,60 +76,59 @@ typedef enum {
     CONSOLE_TX = IO_0,
     CONSOLE_RX = IO_1,
 
-    // Raspberry Pi Pico PCB header pin numbering.
-    // See diagram here: https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html#layout_non-wireless
-    // This follows the innermost (grey) numbers.
-    PICO_P0 = IO_0,
-    PICO_P1 = IO_1,
-    PICO_P4 = IO_2,
-    PICO_P5 = IO_3,
-    PICO_P6 = IO_4,
-    PICO_P7 = IO_5,
-    PICO_P9 = IO_6,
-    PICO_P10 = IO_7,
-    PICO_P11 = IO_8,
-    PICO_P12 = IO_9,
-    PICO_P14 = IO_10,
-    PICO_P15 = IO_11,
-    PICO_P16 = IO_12,
-    PICO_P17 = IO_13,
-    PICO_P19 = IO_14,
-    PICO_P20 = IO_15,
-    PICO_P21 = IO_16,
-    PICO_P22 = IO_17,
-    PICO_P24 = IO_18,
-    PICO_P25 = IO_19,
-    PICO_P26 = IO_20,
-    PICO_P27 = IO_21,
-    PICO_P29 = IO_22,
-    PICO_P31 = IO_26,
-    PICO_P32 = IO_27,
-    PICO_P34 = IO_28,
+    // Header pin numbering.
+    // This should match the labels on the board.
+    HDR_P26_ADC0 = IO_26,
+    HDR_P27_ADC1 = IO_27,
+    HDR_P28_ADC2 = IO_28,
+    HDR_P29_ADC3 = IO_29,
+    HDR_P2_SCK = IO_2,
+    HDR_P3_COPI = IO_3,
+    HDR_P4_CIPO = IO_4,
+    HDR_P1_RX = IO_1,
+    HDR_P0_TX = IO_0,
+    HDR_P16 = IO_16,
+    HDR_P17 = IO_17,
+    HDR_P18 = IO_18,
+    HDR_P19 = IO_19,
+    HDR_P20 = IO_20,
+    HDR_P21 = IO_21,
+    HDR_P22 = IO_22,
 
-    // Measures VSYS divided by 3. Shared with Wi-Fi interface, do not use as analog pin if using wi-fi.
-    VSYS_MEAS = IO_29,
+    // Pins 7 and 23 shorted together on this header pin
+    HDR_SCL_P7 = IO_7,
+    HDR_SCL_P23 = IO_23,
+
+    HDR_SDA_P6 = IO_6,
+
+    // Internal multicolor LED
+    ONBOARD_WS2812_DI = IO_8,
+
+    // Connected to MAX17048 fuel gauge ~ALRT pin
+    BATT_ALERT = IO_24,
 
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
 
-// No onboard LED directly accessible by MCU, LED is connected to wi-fi module GPIO
+// Onboard LED
+#define LED1 IO_25
 
 // Default communication pins
-#define I2C_SCL IO_5
-#define I2C_SDA IO_4
+#define I2C_SCL IO_7
+#define I2C_SDA IO_6
 
-#define SPI_SCLK IO_18
-#define SPI_MOSI IO_19
-#define SPI_MISO IO_16
-#define SPI_CS IO_17
+#define SPI_SCLK IO_2
+#define SPI_MOSI IO_3
+#define SPI_MISO IO_4
 
-// Wi-Fi module communication pins
-// For more background on these, I found here to be a good resource https://iosoft.blog/2022/12/06/picowi_part1/
-#define CYW43439_WL_ON IO_23
-#define CYW43439_D IO_24 // Combination MISO/MOSI/IRQ/MODE SELECT
-#define CYW43439_CS IO_25
-#define CYW43439_SCLK IO_29
+// MicroSD connector
+#define SD_CMD_MOSI IO_18
+#define SD_CLK IO_17
+#define SD_DAT0_MISO IO_12
+#define SD_DAT1 IO_11
+#define SD_DAT2 IO_10
+#define SD_DAT3_CS IO_9
 
 #ifdef __cplusplus
 }

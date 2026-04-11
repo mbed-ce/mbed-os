@@ -14,6 +14,10 @@ A message that notes the main changes in the update.
 
 ### Added
 
+- RP2xxx
+  - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board compared to the non-W version is limited).
+  - `SFE_THING_PLUS_RP2040` board target added for the [SparkFun Thing Plus RP2040 board](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html)
+
 ### Changed
 - STM32F7
   - HAL driver update to `stm32f7xx-hal-driver` v1.3.3 (2025), now integrated as a submodule.
@@ -28,7 +32,6 @@ A message that notes the main changes in the update.
 - RP2xxx
   - SDK updated from 1.5.1 to 2.2.0
   - Pin naming scheme changed. Now the MCU I/O pins are named as `IO_xx` instead of `pxx`. Additionally, `PICO_Pxx` constants are added which match the numbering of the header pins on the PCB.
-  - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board is limited).
 
 ### Deprecated
 

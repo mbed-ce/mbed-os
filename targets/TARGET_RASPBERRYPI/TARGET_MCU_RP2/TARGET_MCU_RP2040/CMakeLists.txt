@@ -20,3 +20,4 @@ endif()
 
 add_subdirectory(TARGET_RASPBERRY_PI_PICO)
 add_subdirectory(TARGET_RASPBERRY_PI_PICO_W)
+add_subdirectory(TARGET_SFE_THING_PLUS_RP2040)
