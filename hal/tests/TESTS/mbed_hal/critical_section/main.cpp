@@ -20,7 +20,7 @@
 #include "unity/unity.h"
 #include "greentea-client/test_env.h"
 #include "mbed.h"
-#include "../../../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/cmsis.h"
+#include "cmsis.h"
 #if defined(TARGET_NRF5x) // for all NRF5x targets
 #include "nrf_nvic.h" // for __NRF_NVIC_APP_IRQS_0 / __NRF_NVIC_APP_IRQS_1
 #endif

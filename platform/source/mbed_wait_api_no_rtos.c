@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/cmsis.h"
+#include "cmsis.h"
 #include "platform/mbed_toolchain.h"
 #include "platform/mbed_wait_api.h"
 

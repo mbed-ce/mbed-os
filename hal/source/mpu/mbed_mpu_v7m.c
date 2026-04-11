@@ -16,7 +16,7 @@
  */
 #include "hal/mpu_api.h"
 #include "platform/mbed_assert.h"
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/cmsis.h"
+#include "cmsis.h"
 
 #if ((__ARM_ARCH_7M__ == 1U) || (__ARM_ARCH_7EM__ == 1U) || (__ARM_ARCH_6M__ == 1U)) && \
     defined (__MPU_PRESENT) && (__MPU_PRESENT == 1U) && \

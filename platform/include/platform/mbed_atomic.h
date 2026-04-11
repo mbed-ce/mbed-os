@@ -19,7 +19,7 @@
 #ifndef __MBED_UTIL_ATOMIC_H__
 #define __MBED_UTIL_ATOMIC_H__
 
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/cmsis.h"
+#include "cmsis.h"
 
 #include <stdbool.h>
 #include <stdint.h>

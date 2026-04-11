@@ -57,7 +57,7 @@
 
 #include <stdlib.h>
 
-#include "../../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/cmsis.h"
+#include "cmsis.h"
 #include "hal/us_ticker_api.h"
 #include "mbed_toolchain.h"
 #include "mbed_boot.h"
