@@ -21,7 +21,7 @@
 #define MBED_GPIO_API_H
 
 #include <stdint.h>
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
+#include "device.h"
 #include "pinmap.h"
 
 #ifdef __cplusplus

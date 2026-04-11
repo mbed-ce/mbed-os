@@ -17,7 +17,7 @@
 
 #include <stdlib.h>
 #include <stdarg.h>
-#include "../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
+#include "device.h"
 #include "platform/mbed_application.h"
 #include "platform/mbed_mpu_mgmt.h"
 

@@ -25,9 +25,9 @@
 
 #include "platform/mbed_retarget.h"
 #include "platform/mbed_toolchain.h"
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
+#include "device.h"
 #include "PinNames.h"
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/PeripheralNames.h"
+#include "PeripheralNames.h"
 #include "hal/PinNameAliases.h"
 
 /** \defgroup platform-public-api Platform

@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
+#include "device.h"
 
 /**
  * Legacy format representing a timestamp in us.

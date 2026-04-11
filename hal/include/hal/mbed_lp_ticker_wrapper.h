@@ -20,7 +20,7 @@
 #ifndef MBED_LP_TICKER_WRAPPER_H
 #define MBED_LP_TICKER_WRAPPER_H
 
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
+#include "device.h"
 
 #if DEVICE_LPTICKER
 

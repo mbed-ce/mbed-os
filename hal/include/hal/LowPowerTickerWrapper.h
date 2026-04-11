@@ -20,7 +20,7 @@
 #ifndef MBED_LOW_POWER_TICKER_WRAPPER_H
 #define MBED_LOW_POWER_TICKER_WRAPPER_H
 
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
+#include "device.h"
 
 #include "hal/ticker_api.h"
 #include "hal/us_ticker_api.h"

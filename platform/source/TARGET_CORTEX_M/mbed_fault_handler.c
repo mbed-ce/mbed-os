@@ -21,7 +21,7 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
+#include "device.h"
 #include "mbed_atomic.h"
 #include "mbed_error.h"
 #include "mbed_interface.h"

@@ -20,7 +20,7 @@
 #ifndef MBED_SERIAL_API_H
 #define MBED_SERIAL_API_H
 
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
+#include "device.h"
 #include "pinmap.h"
 #include "hal/buffer.h"
 #include "hal/dma_api.h"

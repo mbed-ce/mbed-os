@@ -21,7 +21,7 @@
 #ifndef MBED_RTC_API_H
 #define MBED_RTC_API_H
 
-#include "../../../targets/TARGET_RASPBERRYPI/TARGET_MCU_RP2/device.h"
+#include "device.h"
 
 #include <time.h>
 
