@@ -1,0 +1,22 @@
+path_classifiers:
+  test:
+    - "tests"
+
+extraction:
+  cpp:
+    prepare:
+      packages:
+        - ninja-build
+        - python-pip
+    after_prepare:
+      - pip install --user cmake
+      - ls ~/.local/bin
+      - export PATH=~/.local/bin:$PATH
+      - cmake --version
+    configure:
+      command:
+        - cmake -S . -B __build -GNinja -DBUILD_TESTING=ON
+    index:
+      build_command:
+        - cmake --build __build
+        - cmake --build __build --target test

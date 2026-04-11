@@ -111,8 +111,6 @@ list(APPEND CMAKE_MODULE_PATH
     ${mbed-os_SOURCE_DIR}/tools/cmake/upload_methods
 )
 
-add_subdirectory(extern)
-
 if(MBED_IS_STANDALONE)
 
     # Always print output on test failure
