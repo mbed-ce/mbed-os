@@ -8,6 +8,8 @@
 add_library(mbed-mcu-rp2 INTERFACE)
 add_library(mbed-mcu-rp2040 INTERFACE)
 target_link_libraries(mbed-mcu-rp2040 INTERFACE mbed-mcu-rp2)
+add_library(mbed-mcu-rp235x INTERFACE)
+target_link_libraries(mbed-mcu-rp235x INTERFACE mbed-mcu-rp2)
 
 # Generated headers ----------------------------------------------------------------------------------------------------
 
@@ -28,6 +30,10 @@ if(MCU_RP2 IN_LIST MBED_TARGET_LABELS)
 		set(MBED_PICO_CONFIG_HEADER_FILE boards/pico_w.h)
 	elseif(MBED_TARGET STREQUAL "SFE_THING_PLUS_RP2040")
 		set(MBED_PICO_CONFIG_HEADER_FILE boards/sparkfun_thingplus.h)
+	elseif(MBED_TARGET STREQUAL "RASPBERRY_PI_PICO_2")
+		set(MBED_PICO_CONFIG_HEADER_FILE boards/pico2.h)
+	elseif(MBED_TARGET STREQUAL "RASPBERRY_PI_PICO_2_W")
+		set(MBED_PICO_CONFIG_HEADER_FILE boards/pico2_w.h)
 	elseif(NOT DEFINED MBED_PICO_CONFIG_HEADER_FILE)
 		message(FATAL_ERROR "Unknown RP2xxx-family target ${MBED_TARGET}, please edit TARGET_RASPBERRYPI/CMakeLists.txt or set the MBED_PICO_CONFIG_HEADER_FILE cmake variable to contain the correct Pico SDK board header file for this board (e.g. \"boards/pico.h\")")
 	endif()
@@ -79,6 +85,7 @@ target_include_directories(mbed-mcu-rp2
 		pico-sdk/src/rp2_common/hardware_claim/include
 		pico-sdk/src/rp2_common/hardware_ticks/include
 		pico-sdk/src/rp2_common/hardware_vreg/include
+		pico-sdk/src/rp2_common/hardware_rcp/include
 		pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include/
 		pico-sdk/src/rp2_common/pico_bootrom/include
 		pico-sdk/src/rp2_common/pico_float/include
@@ -167,7 +174,6 @@ target_include_directories(mbed-mcu-rp2040
 		pico-sdk/src/rp2040/hardware_regs/include
 		pico-sdk/src/rp2040/pico_platform/include
 		pico-sdk/src/rp2040/boot_stage2/include
-		pico-sdk/src/rp2040/boot_stage2/asminclude
 		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Include
 )
 target_sources(mbed-mcu-rp2040
@@ -175,7 +181,6 @@ target_sources(mbed-mcu-rp2040
 		pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c
 		pico-sdk/src/rp2040/pico_platform/platform.c
 		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Source/system_RP2040.c
-		pico-sdk/src/rp2040/boot_stage2/compile_time_choice.S
 
 		# floating point helper routines
 		pico-sdk/src/rp2_common/pico_float/float_aeabi_rp2040.S
@@ -184,6 +189,30 @@ target_sources(mbed-mcu-rp2040
 		pico-sdk/src/rp2_common/pico_float/float_v1_rom_shim_rp2040.S
 		pico-sdk/src/rp2_common/hardware_divider/divider.S
 )
+
+# RP2350 SDK -----------------------------------------------------------------------------------------------------------
+
+target_include_directories(mbed-mcu-rp235x
+		INTERFACE
+		pico-sdk/src/rp2350/hardware_structs/include
+		pico-sdk/src/rp2350/hardware_regs/include
+		pico-sdk/src/rp2350/pico_platform/include
+		pico-sdk/src/rp2350/boot_stage2/include
+		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include
+)
+target_sources(mbed-mcu-rp235x
+		INTERFACE
+		pico-sdk/src/rp2350/pico_platform/platform.c
+		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Source/system_RP2350.c
+
+		# floating point helper routines
+#		pico-sdk/src/rp2_common/pico_float/float_aeabi_rp2040.S
+#		pico-sdk/src/rp2_common/pico_float/float_init_rom_rp2040.c
+#		pico-sdk/src/rp2_common/pico_float/float_math.c
+#		pico-sdk/src/rp2_common/pico_float/float_v1_rom_shim_rp2040.S
+#		pico-sdk/src/rp2_common/hardware_divider/divider.S
+)
+
 
 # RP2040 floating point helper code ------------------------------------------------------------------------------------
 

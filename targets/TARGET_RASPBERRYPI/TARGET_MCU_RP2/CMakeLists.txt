@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(TARGET_MCU_RP2040 EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_MCU_RP235X EXCLUDE_FROM_ALL)
 
 target_include_directories(mbed-mcu-rp2
     INTERFACE

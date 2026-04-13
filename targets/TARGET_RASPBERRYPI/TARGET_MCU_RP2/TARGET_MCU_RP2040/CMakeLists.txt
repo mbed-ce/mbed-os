@@ -6,6 +6,10 @@ target_sources(mbed-mcu-rp2040
     INTERFACE
         PeripheralPins.c
 )
+target_include_directories(mbed-mcu-rp2040
+        INTERFACE
+        .
+)
 
 if(MCU_RP2040 IN_LIST MBED_TARGET_LABELS)
     pico_compile_boot_stage2(

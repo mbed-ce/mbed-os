@@ -14793,6 +14793,65 @@
                 "units": 2
             }
         },
-        "vendor": "Raspberry Pi:x"
+        "vendor": "RPi:170"
+    },
+
+    "RP2350": {
+        "memories": {
+            // SRAM 0-7 combined
+            "IRAM1": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x80000, // 512kiB
+                "start": 0x20000000,
+                "startup": false
+            },
+
+
+            // Scratch banks are commonly used for critical data and functions accessed only by
+            // one core (when only one core is accessing the RAM bank, there is no opportunity for stalls).
+            "SCRATCH_X": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x1000, // 4kiB
+                "start": 0x20080000,
+                "startup": false
+            },
+            "SCRATCH_Y": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x1000, // 4kiB
+                "start": 0x20082000,
+                "startup": false
+            }
+        },
+        "name": "RP2350",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM33",
+                "fpu": "None",
+                "mpu": "Present",
+                "units": 2
+            }
+        },
+        "vendor": "RPi:170"
     }
 }

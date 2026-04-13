@@ -8357,7 +8357,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "MCU_RP2": {
         "public": false,
         "inherits": ["Target"],
-        "core": "Cortex-M0+",
         "extra_labels": [
             "RASPBERRYPI",
             "memmap_default"
@@ -8392,8 +8391,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "RTC",
             "MPU"
         ],
-        "device_name": "RP2040",
-        "is_mcu_family_target": true,
         "macros_add": [
             "PICO_TIME_DEFAULT_ALARM_POOL_DISABLED",
             "PICO_ON_DEVICE=1",
@@ -8409,6 +8406,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     "MCU_RP2040": {
         "public": false,
         "inherits": ["MCU_RP2"],
+        "core": "Cortex-M0+",
+        "is_mcu_family_target": true,
         "device_name": "RP2040",
         "macros_add": [
             "PICO_RP2040=1",
@@ -8421,6 +8420,41 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "RP2040",
         ]
     },
+
+    // Target for RP235x family MCU
+    "MCU_RP235X": {
+        "inherits": ["MCU_RP2"],
+        "core": "Cortex-M33FE",
+        "is_mcu_family_target": true,
+        "macros_add": [
+            "PICO_RP2350=1"
+        ],
+        "device_has_add": [
+            "MPU"
+        ],
+
+        "device_has_remove": [
+            "ANALOGIN",
+            "FLASH",
+            "I2C",
+            "I2CSLAVE",
+            "INTERRUPTIN",
+            "PWMOUT",
+            "SERIAL_FC",
+            "SPI",
+            "WATCHDOG",
+            "USBDEVICE",
+            "RESET_REASON",
+            "RTC"
+        ]
+    },
+
+    // Target for RP2350 family MCU
+    "MCU_RP2350": {
+        "inherits": ["MCU_RP235X"],
+        "device_name": "RP2350",
+    },
+
 
     // Target for Raspberry Pi Pico board using the RP2040 MCU.
     // Will also work for some 3rd party compatible boards as well.
@@ -8499,5 +8533,30 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "image_url": "https://www.sparkfun.com/media/catalog/product/cache/f8158826193ba5faa8b862a9bd1eb9e9/1/7/17745-SparkFun_Thing_Plus_-_RP2040-01a.jpg"
+    },
+
+    "RASPBERRY_PI_PICO_2": {
+        "inherits": ["MCU_RP2350"],
+        "overrides": {
+            // Use USB serial for the default console on this board instead of the UART
+            "console-usb": true,
+            "console-uart": false,
+        },
+        "memory_banks": {
+            "QSPI_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "startup": true,
+                "size": 0x400000, // 4MiB
+                "start": 0x10000000
+            }
+        },
+        "image_url": "https://akizukidenshi.com/img/goods/L/129604.jpg"
     }
 }
