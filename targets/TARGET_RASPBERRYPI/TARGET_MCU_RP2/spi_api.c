@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if DEVICE_SPI
+
 /******************************************************************************
  * INCLUDE
  ******************************************************************************/
@@ -127,3 +129,5 @@ const PinMap *spi_master_cs_pinmap()
 {
     return PinMap_SPI_SSEL;
 }
+
+#endif

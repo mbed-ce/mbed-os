@@ -533,15 +533,5 @@ runtime_init:
     bx lr
 
 #endif // PICO_CRT0_NO_RESET_SECTION
-// ----------------------------------------------------------------------------
-// If core 1 somehow gets into crt0 due to a spectacular VTOR mishap, we need to
-// catch it and send back to the sleep-and-launch code in the bootrom. Shouldn't
-// happen (it should sleep in the ROM until given an entry point via the
-// cross-core FIFOs) but it's good to be defensive.
-
-hold_non_core0_in_bootrom:
-    ldr r0, = 'W' | ('V' << 8)
-    bl rom_func_lookup
-    bx r0
 
 #include "embedded_end_block.inc.S"

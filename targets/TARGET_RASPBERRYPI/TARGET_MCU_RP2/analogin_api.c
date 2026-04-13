@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#if DEVICE_ANALOGIN
 
 #include "mbed_assert.h"
 #include "analogin_api.h"
@@ -72,3 +73,5 @@ const PinMap *analogin_pinmap()
 {
     return PinMap_ADC;
 }
+
+#endif

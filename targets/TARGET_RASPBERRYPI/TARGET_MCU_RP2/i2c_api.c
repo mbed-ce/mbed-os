@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if DEVICE_I2C
+
 /******************************************************************************
  * INCLUDE
  ******************************************************************************/
@@ -271,3 +273,5 @@ void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask)
 }
 
 #endif // DEVICE_I2CSLAVE
+
+#endif

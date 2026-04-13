@@ -21,7 +21,6 @@ target_sources(mbed-mcu-rp2
         reset_reason.c
         serial_api.c
         spi_api.c
-        rtc_api.c
         us_ticker.c
         USBPhy_RP2.cpp
         watchdog_api.c

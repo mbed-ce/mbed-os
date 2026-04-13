@@ -8388,7 +8388,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "WATCHDOG",
             "USBDEVICE",
             "RESET_REASON",
-            "RTC",
             "MPU"
         ],
         "macros_add": [
@@ -8409,6 +8408,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "core": "Cortex-M0+",
         "is_mcu_family_target": true,
         "device_name": "RP2040",
+
+        "device_has_add": [
+            // Only RP2040 has a dedicated RTC, it was removed in later chips
+            "RTC"
+        ],
+
         "macros_add": [
             "PICO_RP2040=1",
             "PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1"
@@ -8444,8 +8449,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPI",
             "WATCHDOG",
             "USBDEVICE",
-            "RESET_REASON",
-            "RTC"
+            "RESET_REASON"
         ]
     },
 

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#if DEVICE_LPTICKER
 #include "lp_ticker_api.h"
 #include "hardware/rtc.h"
 #include "hardware/irq.h"
@@ -26,7 +27,6 @@
 #define RTC_COUNTER_BITS        32u
 #define RTC_FREQ                1u
 
-#if DEVICE_LPTICKER
 
 /* LP ticker counts with 1Hz resolution */
 const ticker_info_t* lp_ticker_get_info()

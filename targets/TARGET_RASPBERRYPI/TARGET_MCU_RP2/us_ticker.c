@@ -33,7 +33,7 @@ const ticker_info_t* us_ticker_get_info()
 }
 
 static const uint8_t alarm_num = 0;
-static const uint8_t irq_num = TIMER_IRQ_0; // IRQ corresponding to the above alarm
+static const IRQn_Type irq_num = RP2_US_TICKER_TIMER_IRQ_0; // IRQ corresponding to the above alarm
 
 static bool us_ticker_inited = false;
 

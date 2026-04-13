@@ -71,7 +71,6 @@ target_include_directories(mbed-mcu-rp2
 		pico-sdk/src/rp2_common/hardware_irq/include
 		pico-sdk/src/rp2_common/hardware_flash/include
 		pico-sdk/src/rp2_common/hardware_clocks/include
-		pico-sdk/src/rp2_common/hardware_rtc/include
 		pico-sdk/src/rp2_common/hardware_watchdog/include
 		pico-sdk/src/rp2_common/hardware_timer/include
 		pico-sdk/src/rp2_common/hardware_pll/include
@@ -128,7 +127,6 @@ target_sources(mbed-mcu-rp2
 		pico-sdk/src/rp2_common/hardware_clocks/clocks.c
 		pico-sdk/src/rp2_common/hardware_timer/timer.c
 		pico-sdk/src/rp2_common/hardware_sync/sync.c
-		pico-sdk/src/rp2_common/hardware_rtc/rtc.c
 		pico-sdk/src/rp2_common/hardware_pio/pio.c
 		pico-sdk/src/rp2_common/hardware_dma/dma.c
 		pico-sdk/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c
@@ -170,6 +168,7 @@ target_link_libraries(mbed-mcu-rp2 INTERFACE mbed-cmsis-cortex-m)
 
 target_include_directories(mbed-mcu-rp2040
 	INTERFACE
+		pico-sdk/src/rp2_common/hardware_rtc/include
 		pico-sdk/src/rp2040/hardware_structs/include
 		pico-sdk/src/rp2040/hardware_regs/include
 		pico-sdk/src/rp2040/pico_platform/include
@@ -178,6 +177,7 @@ target_include_directories(mbed-mcu-rp2040
 )
 target_sources(mbed-mcu-rp2040
 	INTERFACE
+		pico-sdk/src/rp2_common/hardware_rtc/rtc.c
 		pico-sdk/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c
 		pico-sdk/src/rp2040/pico_platform/platform.c
 		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Source/system_RP2040.c

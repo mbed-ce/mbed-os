@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2023 ARM Limited
+ * Copyright (c) 2026 Jamie Smith
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,10 @@
  * limitations under the License.
  */
 
-#ifndef MBED_OS_US_TICKER_DEFINES_H
-#define MBED_OS_US_TICKER_DEFINES_H
+#pragma once
 
-#include "cmsis.h"
-#include "hardware/timer.h"
-#include "rp2_us_ticker_config.h"
+// TIMER instance to use for the us ticker
+#define RP2_US_TICKER_TIMER TIMER0
 
-// Provide a macro-optimized version of us_ticker_read()
-#define us_ticker_read() RP2_US_TICKER_TIMER->TIMERAWL
-
-#endif //MBED_OS_US_TICKER_DEFINES_H
+// IRQ 0 on the above timer
+#define RP2_US_TICKER_TIMER_IRQ_0 TIMER0_IRQ_0_IRQn
