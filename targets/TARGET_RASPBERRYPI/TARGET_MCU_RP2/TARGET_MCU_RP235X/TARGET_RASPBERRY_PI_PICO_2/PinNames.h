@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 typedef enum {
-    // RP2040 I/O pins
+    // RP2350 I/O pins
     IO_0  = 0,
     IO_1  = 1,
     IO_2  = 2,
@@ -61,16 +61,48 @@ typedef enum {
     IO_28 = 28,
     IO_29 = 29,
 
+    // These IOs pinned out on QFN-80 chips only
+#if !PICO_RP2350A
+    IO_30 = 30,
+    IO_31 = 31,
+    IO_32 = 32,
+    IO_33 = 33,
+    IO_34 = 34,
+    IO_35 = 35,
+    IO_36 = 36,
+    IO_37 = 37,
+    IO_38 = 38,
+    IO_39 = 39,
+    IO_40 = 40,
+    IO_41 = 41,
+    IO_42 = 42,
+    IO_43 = 43,
+    IO_44 = 44,
+    IO_45 = 45,
+    IO_46 = 46,
+    IO_47 = 47,
+#endif
+
     // ADC internal channels
     ADC_TEMP = 0xF0,
-    ADC_VREF = 0xF1,
 
-    // Analog pins
+    // Analog pins. Note that these differ by chip variant!
 #ifndef ARDUINO_ARCH_MBED
+#if PICO_RP2350A
     A0          = IO_26,
     A1          = IO_27,
     A2          = IO_28,
     A3          = IO_29,
+#else
+    A0          = IO_40,
+    A1          = IO_41,
+    A2          = IO_42,
+    A3          = IO_43,
+    A0          = IO_44,
+    A1          = IO_45,
+    A2          = IO_46,
+    A3          = IO_47,
+#endif
 #endif
 
     CONSOLE_TX = IO_0,

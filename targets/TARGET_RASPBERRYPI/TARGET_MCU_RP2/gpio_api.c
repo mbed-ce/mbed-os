@@ -21,15 +21,33 @@
 #include "pinmap.h"
 #include "mbed_error.h"
 
+#if PICO_RP2040 || PICO_RP2350A
 #define GPIO_PIN_COUNT 30
+#elif PICO_RP2350B
+#define GPIO_PIN_COUNT 48
+#elif
+#error "Unknown model, don't know GPIO count!"
+#endif
 
-static gpio_irq_handler m_irq_handler;
-static uint32_t m_channel_ids[GPIO_PIN_COUNT] = {0};
-static uint32_t m_pico_events[GPIO_PIN_COUNT] = {0};
+// Tracks which pins are configured as open drain.
+// RP2 does support open drain pins but they need a different procedure to write to them than normal pins.
+bool gpio_is_open_drain[GPIO_PIN_COUNT] = {};
 
 void gpio_write(gpio_t *obj, int value)
 {
-    gpio_put(obj->pin, value);
+    MBED_ASSERT(obj->pin != (PinName)NC && obj->pin < GPIO_PIN_COUNT);
+    if (gpio_is_open_drain[obj->pin]) {
+        if (value) {
+            gpio_set_dir(obj->pin, GPIO_IN);
+        }
+        else {
+            gpio_put(obj->pin, false);
+            gpio_set_dir(obj->pin, GPIO_OUT);
+        }
+    }
+    else {
+        gpio_put(obj->pin, value);
+    }
 }
 
 int gpio_read(gpio_t *obj)
@@ -44,28 +62,17 @@ void gpio_init(gpio_t *obj, PinName pin)
     if (pin == (PinName)NC) {
         return;
     }
+    MBED_ASSERT(obj->pin < GPIO_PIN_COUNT);
 
     pico_sdk_gpio_init(obj->pin);
 }
 
-static uint32_t gpio_convert_event(gpio_irq_event event)
-{
-    uint32_t irq_event = 0;
-
-    if (event == IRQ_RISE) {
-        irq_event = GPIO_IRQ_EDGE_RISE;
-    } else if (event == IRQ_FALL) {
-        irq_event = GPIO_IRQ_EDGE_FALL;
-    }
-
-    return irq_event;
-}
-
 void gpio_mode(gpio_t *obj, PinMode mode)
 {
-    MBED_ASSERT(obj->pin != (PinName)NC);
+    MBED_ASSERT(obj->pin != (PinName)NC && obj->pin < GPIO_PIN_COUNT);
 
-    gpio_set_pulls(obj->pin, mode == PullUp, mode == PullDown);
+    gpio_set_pulls(obj->pin, mode & PullUp, mode & PullDown);
+    gpio_is_open_drain[obj->pin] = mode & OpenDrain;
 }
 
 void gpio_dir(gpio_t *obj, PinDirection direction)
@@ -90,6 +97,22 @@ int gpio_is_connected(const gpio_t *obj) {
 ***********/
 
 #if DEVICE_INTERRUPTIN
+static uint32_t m_channel_ids[GPIO_PIN_COUNT] = {0};
+static uint32_t m_pico_events[GPIO_PIN_COUNT] = {0};
+static gpio_irq_handler m_irq_handler;
+
+static uint32_t gpio_convert_event(gpio_irq_event event)
+{
+    uint32_t irq_event = 0;
+
+    if (event == IRQ_RISE) {
+        irq_event = GPIO_IRQ_EDGE_RISE;
+    } else if (event == IRQ_FALL) {
+        irq_event = GPIO_IRQ_EDGE_FALL;
+    }
+
+    return irq_event;
+}
 
 static void _gpio_irq(uint gpio, uint32_t events)
 {

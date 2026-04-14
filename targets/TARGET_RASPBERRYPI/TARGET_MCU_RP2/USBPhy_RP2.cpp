@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#if DEVICE_USBDEVICE
+
 #include "USBPhyHw.h"
 
 #ifdef __cplusplus
@@ -520,3 +522,5 @@ void USBPhyHw::_usbisr(void)
     NVIC_DisableIRQ(USBCTRL_IRQ_IRQn);
     instance->events->start_process();
 }
+
+#endif
