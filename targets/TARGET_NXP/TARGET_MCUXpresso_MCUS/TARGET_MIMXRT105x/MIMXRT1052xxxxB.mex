@@ -64,83 +64,6 @@
             <processor_version>26.03.10</processor_version>
          </clocks_profile>
          <clock_configurations>
-            <clock_configuration name="BOARD_BootClockRUN" id_prefix="" prefix_user_defined="false">
-               <description></description>
-               <options/>
-               <dependencies>
-                  <dependency resourceType="PinSignal" resourceId="XTALOSC24M.xtali" description="&apos;XTALI&apos; (Pins tool id: XTALOSC24M.xtali, Clocks tool id: XTALOSC24M.XTALI) needs to be routed" problem_level="1" source="Clocks:BOARD_BootClockRUN">
-                     <feature name="routed" evaluation="">
-                        <data>true</data>
-                     </feature>
-                  </dependency>
-                  <dependency resourceType="PinSignal" resourceId="XTALOSC24M.xtali" description="&apos;XTALI&apos; (Pins tool id: XTALOSC24M.xtali, Clocks tool id: XTALOSC24M.XTALI) needs to have &apos;INPUT&apos; direction" problem_level="1" source="Clocks:BOARD_BootClockRUN">
-                     <feature name="direction" evaluation="">
-                        <data>INPUT</data>
-                     </feature>
-                  </dependency>
-                  <dependency resourceType="PinSignal" resourceId="XTALOSC24M.xtalo" description="&apos;XTALO&apos; (Pins tool id: XTALOSC24M.xtalo, Clocks tool id: XTALOSC24M.XTALO) needs to be routed" problem_level="1" source="Clocks:BOARD_BootClockRUN">
-                     <feature name="routed" evaluation="">
-                        <data>true</data>
-                     </feature>
-                  </dependency>
-                  <dependency resourceType="PinSignal" resourceId="XTALOSC24M.xtalo" description="&apos;XTALO&apos; (Pins tool id: XTALOSC24M.xtalo, Clocks tool id: XTALOSC24M.XTALO) needs to have &apos;OUTPUT&apos; direction" problem_level="1" source="Clocks:BOARD_BootClockRUN">
-                     <feature name="direction" evaluation="">
-                        <data>OUTPUT</data>
-                     </feature>
-                  </dependency>
-                  <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Clocks initialization requires the COMMON Driver in the project." problem_level="2" source="Clocks:BOARD_BootClockRUN">
-                     <feature name="enabled" evaluation="equal" configuration="core0">
-                        <data>true</data>
-                     </feature>
-                  </dependency>
-                  <dependency resourceType="SWComponent" resourceId="platform.drivers.iomuxc" description="Clocks initialization requires the IOMUXC Driver in the project." problem_level="2" source="Clocks:BOARD_BootClockRUN">
-                     <feature name="enabled" evaluation="equal" configuration="core0">
-                        <data>true</data>
-                     </feature>
-                  </dependency>
-               </dependencies>
-               <clock_sources/>
-               <clock_outputs>
-                  <clock_output id="AHB_CLK_ROOT.outFreq" value="12 MHz" locked="false" accuracy=""/>
-                  <clock_output id="CAN_CLK_ROOT.outFreq" value="2 MHz" locked="false" accuracy=""/>
-                  <clock_output id="CLK_1M.outFreq" value="1 MHz" locked="false" accuracy=""/>
-                  <clock_output id="CLK_24M.outFreq" value="24 MHz" locked="false" accuracy=""/>
-                  <clock_output id="CSI_CLK_ROOT.outFreq" value="12 MHz" locked="false" accuracy=""/>
-                  <clock_output id="ENET_125M_CLK.outFreq" value="2.4 MHz" locked="false" accuracy=""/>
-                  <clock_output id="ENET_25M_REF_CLK.outFreq" value="1.2 MHz" locked="false" accuracy=""/>
-                  <clock_output id="FLEXIO1_CLK_ROOT.outFreq" value="1.5 MHz" locked="false" accuracy=""/>
-                  <clock_output id="FLEXIO2_CLK_ROOT.outFreq" value="1.5 MHz" locked="false" accuracy=""/>
-                  <clock_output id="FLEXSPI_CLK_ROOT.outFreq" value="2 MHz" locked="false" accuracy=""/>
-                  <clock_output id="GPT1_ipg_clk_highfreq.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="GPT2_ipg_clk_highfreq.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="IPG_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="LCDIF_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="LPI2C_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="LPSPI_CLK_ROOT.outFreq" value="6 MHz" locked="false" accuracy=""/>
-                  <clock_output id="LVDS1_CLK.outFreq" value="24 MHz" locked="false" accuracy=""/>
-                  <clock_output id="MQS_MCLK.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="PERCLK_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="PLL7_MAIN_CLK.outFreq" value="24 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI1_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI1_MCLK1.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI1_MCLK2.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI1_MCLK3.outFreq" value="1.5 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI2_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI2_MCLK1.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI2_MCLK3.outFreq" value="1.5 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI3_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI3_MCLK1.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SAI3_MCLK3.outFreq" value="1.5 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SEMC_CLK_ROOT.outFreq" value="4 MHz" locked="false" accuracy=""/>
-                  <clock_output id="SPDIF0_CLK_ROOT.outFreq" value="1.5 MHz" locked="false" accuracy=""/>
-                  <clock_output id="TRACE_CLK_ROOT.outFreq" value="6 MHz" locked="false" accuracy=""/>
-                  <clock_output id="UART_CLK_ROOT.outFreq" value="4 MHz" locked="false" accuracy=""/>
-                  <clock_output id="USDHC1_CLK_ROOT.outFreq" value="12 MHz" locked="false" accuracy=""/>
-                  <clock_output id="USDHC2_CLK_ROOT.outFreq" value="12 MHz" locked="false" accuracy=""/>
-               </clock_outputs>
-               <clock_settings/>
-               <called_from_default_init>true</called_from_default_init>
-            </clock_configuration>
             <clock_configuration name="BOARD_ClockFullSpeed" id_prefix="" prefix_user_defined="false">
                <description></description>
                <options/>
@@ -183,6 +106,16 @@
                   <dependency resourceType="PinSignal" resourceId="XTALOSC24M.xtalo" description="&apos;XTALO&apos; (Pins tool id: XTALOSC24M.xtalo, Clocks tool id: XTALOSC24M.XTALO) needs to have &apos;OUTPUT&apos; direction" problem_level="1" source="Clocks:BOARD_ClockFullSpeed">
                      <feature name="direction" evaluation="">
                         <data>OUTPUT</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Clocks initialization requires the COMMON Driver in the project." problem_level="2" source="Clocks:BOARD_ClockFullSpeed">
+                     <feature name="enabled" evaluation="equal" configuration="core0">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.iomuxc" description="Clocks initialization requires the IOMUXC Driver in the project." problem_level="2" source="Clocks:BOARD_ClockFullSpeed">
+                     <feature name="enabled" evaluation="equal" configuration="core0">
+                        <data>true</data>
                      </feature>
                   </dependency>
                </dependencies>
