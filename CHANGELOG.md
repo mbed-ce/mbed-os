@@ -37,7 +37,9 @@ A message that notes the main changes in the update.
 
 ### Fixed
 - Added fixes aimed at improving Greentea stability for KV/FlashIAP (STM32F7) and USBSerial paths.
-- MIMXRT1050_EVK: Fixed build error due to typos
+- MIMXRT105x:
+  - MIMXRT1050_EVK: Fixed build error due to typos
+  - Fixed SPI SCLK frequency being several times higher than set due to clock config error (#564)
 - Fixed memory leak with Nanostack memory manager that caused the stack to run of memory when used with zero-copy Ethernet drivers
 
 ### Removed
