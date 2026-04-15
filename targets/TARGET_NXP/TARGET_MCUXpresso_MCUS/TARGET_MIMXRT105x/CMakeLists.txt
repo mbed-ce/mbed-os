@@ -17,6 +17,7 @@ target_include_directories(mbed-mimxrt105x
         .
         device
         drivers
+        board
 )
 
 target_sources(mbed-mimxrt105x

@@ -265,7 +265,10 @@ typedef enum IRQn {
 #define __DTCM_PRESENT                 1         /**< Defines if an DTCM is present or not */
 #define __NVIC_PRIO_BITS               4         /**< Number of priority bits implemented in the NVIC */
 #define __Vendor_SysTickConfig         0         /**< Vendor specific implementation of SysTickConfig is defined */
+
+#ifndef __FPU_PRESENT
 #define __FPU_PRESENT                  1         /**< Defines if an FPU is present or not */
+#endif
 
 #include "core_cm7.h"                  /* Core Peripheral Access Layer */
 #include "system_MIMXRT1052.h"         /* Device specific configuration file */
