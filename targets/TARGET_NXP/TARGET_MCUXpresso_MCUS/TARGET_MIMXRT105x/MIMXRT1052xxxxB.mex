@@ -139,7 +139,7 @@
                   <clock_output id="IPG_CLK_ROOT.outFreq" value="132 MHz" locked="false" accuracy=""/>
                   <clock_output id="LCDIF_CLK_ROOT.outFreq" value="67.5 MHz" locked="false" accuracy=""/>
                   <clock_output id="LPI2C_CLK_ROOT.outFreq" value="10 MHz" locked="false" accuracy=""/>
-                  <clock_output id="LPSPI_CLK_ROOT.outFreq" value="352/3 MHz" locked="false" accuracy=""/>
+                  <clock_output id="LPSPI_CLK_ROOT.outFreq" value="105.6 MHz" locked="false" accuracy=""/>
                   <clock_output id="LVDS1_CLK.outFreq" value="1.056 GHz" locked="false" accuracy=""/>
                   <clock_output id="MQS_MCLK.outFreq" value="1080/17 MHz" locked="false" accuracy=""/>
                   <clock_output id="PERCLK_CLK_ROOT.outFreq" value="24 MHz" locked="false" accuracy=""/>
@@ -167,8 +167,7 @@
                   <setting id="CCM.FLEXSPI_PODF.scale" value="3" locked="true"/>
                   <setting id="CCM.FLEXSPI_SEL.sel" value="CCM.PLL3_SW_CLK_SEL" locked="false"/>
                   <setting id="CCM.LPI2C_CLK_PODF.scale" value="6" locked="true"/>
-                  <setting id="CCM.LPSPI_CLK_SEL.sel" value="CCM_ANALOG.PLL2_PFD2_CLK" locked="false"/>
-                  <setting id="CCM.LPSPI_PODF.scale" value="3" locked="true"/>
+                  <setting id="CCM.LPSPI_PODF.scale" value="5" locked="true"/>
                   <setting id="CCM.PERCLK_CLK_SEL.sel" value="XTALOSC24M.OSC_CLK" locked="false"/>
                   <setting id="CCM.PERCLK_PODF.scale" value="1" locked="true"/>
                   <setting id="CCM.SEMC_PODF.scale" value="8" locked="false"/>
@@ -267,7 +266,7 @@
                   <clock_output id="IPG_CLK_ROOT.outFreq" value="150 MHz" locked="false" accuracy=""/>
                   <clock_output id="LCDIF_CLK_ROOT.outFreq" value="67.5 MHz" locked="false" accuracy=""/>
                   <clock_output id="LPI2C_CLK_ROOT.outFreq" value="10 MHz" locked="false" accuracy=""/>
-                  <clock_output id="LPSPI_CLK_ROOT.outFreq" value="2880/77 MHz" locked="false" accuracy=""/>
+                  <clock_output id="LPSPI_CLK_ROOT.outFreq" value="105.6 MHz" locked="false" accuracy=""/>
                   <clock_output id="LVDS1_CLK.outFreq" value="1.2 GHz" locked="false" accuracy=""/>
                   <clock_output id="MQS_MCLK.outFreq" value="1080/17 MHz" locked="false" accuracy=""/>
                   <clock_output id="PERCLK_CLK_ROOT.outFreq" value="24 MHz" locked="false" accuracy=""/>
@@ -295,8 +294,7 @@
                   <setting id="CCM.FLEXSPI_PODF.scale" value="3" locked="true"/>
                   <setting id="CCM.FLEXSPI_SEL.sel" value="CCM.PLL3_SW_CLK_SEL" locked="false"/>
                   <setting id="CCM.LPI2C_CLK_PODF.scale" value="6" locked="true"/>
-                  <setting id="CCM.LPSPI_CLK_SEL.sel" value="CCM_ANALOG.PLL3_PFD0_CLK" locked="false"/>
-                  <setting id="CCM.LPSPI_PODF.scale" value="7" locked="true"/>
+                  <setting id="CCM.LPSPI_PODF.scale" value="5" locked="true"/>
                   <setting id="CCM.PERCLK_CLK_SEL.sel" value="XTALOSC24M.OSC_CLK" locked="false"/>
                   <setting id="CCM.PERCLK_PODF.scale" value="1" locked="true"/>
                   <setting id="CCM.SEMC_PODF.scale" value="8" locked="false"/>
@@ -371,7 +369,7 @@
                   <clock_output id="IPG_CLK_ROOT.outFreq" value="12 MHz" locked="false" accuracy=""/>
                   <clock_output id="LCDIF_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
                   <clock_output id="LPI2C_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
-                  <clock_output id="LPSPI_CLK_ROOT.outFreq" value="3 MHz" locked="false" accuracy=""/>
+                  <clock_output id="LPSPI_CLK_ROOT.outFreq" value="12 MHz" locked="false" accuracy=""/>
                   <clock_output id="LVDS1_CLK.outFreq" value="24 MHz" locked="false" accuracy=""/>
                   <clock_output id="MQS_MCLK.outFreq" value="3 MHz" locked="false" accuracy=""/>
                   <clock_output id="PERCLK_CLK_ROOT.outFreq" value="24 MHz" locked="false" accuracy=""/>
@@ -396,8 +394,7 @@
                <clock_settings>
                   <setting id="CCM.FLEXSPI_PODF.scale" value="1" locked="true"/>
                   <setting id="CCM.IPG_PODF.scale" value="2" locked="true"/>
-                  <setting id="CCM.LPSPI_CLK_SEL.sel" value="CCM_ANALOG.PLL3_PFD0_CLK" locked="false"/>
-                  <setting id="CCM.LPSPI_PODF.scale" value="8" locked="true"/>
+                  <setting id="CCM.LPSPI_PODF.scale" value="2" locked="true"/>
                   <setting id="CCM.PERCLK_CLK_SEL.sel" value="XTALOSC24M.OSC_CLK" locked="false"/>
                   <setting id="CCM.PERIPH_CLK2_SEL.sel" value="XTALOSC24M.OSC_CLK" locked="false"/>
                   <setting id="CCM.PERIPH_CLK_SEL.sel" value="CCM.PERIPH_CLK2_PODF" locked="false"/>
@@ -426,7 +423,141 @@
             <dcdx_configuration name="Device_configuration">
                <description></description>
                <options/>
-               <command_groups/>
+               <command_groups>
+                  <command_group name="Imported Commands" enabled="true">
+                     <commands>
+                        <command type="write_value" address="CCM_CCGR0" value="0xFFFFFFFF" value_width="4"/>
+                        <command type="write_value" address="CCM_CCGR1" value="0xFFFFFFFF" value_width="4"/>
+                        <command type="write_value" address="CCM_CCGR2" value="0xFFFFFFFF" value_width="4"/>
+                        <command type="write_value" address="CCM_CCGR3" value="0xFFFFFFFF" value_width="4"/>
+                        <command type="write_value" address="CCM_CCGR4" value="0xFFFFFFFF" value_width="4"/>
+                        <command type="write_value" address="CCM_CCGR5" value="0xFFFFFFFF" value_width="4"/>
+                        <command type="write_value" address="CCM_CCGR6" value="0xFFFFFFFF" value_width="4"/>
+                        <command type="write_value" address="CCM_ANALOG_PLL_SYS" value="0x2001" value_width="4"/>
+                        <command type="write_value" address="CCM_ANALOG_PFD_528" value="0x1D0000" value_width="4"/>
+                        <command type="write_value" address="CCM_CBCDR" value="0x10D40" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_00" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_01" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_02" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_03" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_04" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_05" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_06" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_07" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_08" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_09" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_10" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_11" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_12" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_13" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_14" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_15" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_16" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_17" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_18" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_19" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_20" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_21" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_22" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_23" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_24" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_25" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_26" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_27" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_28" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_29" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_30" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_31" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_32" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_33" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_34" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_35" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_36" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_37" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_38" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_39" value="0x10" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_40" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_41" value="0x00" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_00" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_01" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_02" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_03" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_04" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_05" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_06" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_07" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_08" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_09" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_10" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_11" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_12" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_13" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_14" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_15" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_16" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_17" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_18" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_19" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_20" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_21" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_22" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_23" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_24" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_25" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_26" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_27" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_28" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_29" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_30" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_31" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_32" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_33" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_34" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_35" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_36" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_37" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_38" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_39" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_40" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="IOMUXC_SW_PAD_CTL_PAD_GPIO_EMC_41" value="0x110F9" value_width="4"/>
+                        <command type="write_value" address="SEMC_MCR" value="0x10000004" value_width="4"/>
+                        <command type="write_value" address="SEMC_BMCR0" value="0x81" value_width="4"/>
+                        <command type="write_value" address="SEMC_BMCR1" value="0x81" value_width="4"/>
+                        <command type="write_value" address="SEMC_BR0" value="0x8000001B" value_width="4"/>
+                        <command type="write_value" address="SEMC_BR1" value="0x8200001B" value_width="4"/>
+                        <command type="write_value" address="SEMC_BR2" value="0x8400001B" value_width="4"/>
+                        <command type="write_value" address="SEMC_BR3" value="0x8600001B" value_width="4"/>
+                        <command type="write_value" address="SEMC_BR4" value="0x90000021" value_width="4"/>
+                        <command type="write_value" address="SEMC_BR5" value="0xA0000019" value_width="4"/>
+                        <command type="write_value" address="SEMC_BR6" value="0xA8000017" value_width="4"/>
+                        <command type="write_value" address="SEMC_BR7" value="0xA900001B" value_width="4"/>
+                        <command type="write_value" address="SEMC_BR8" value="0x21" value_width="4"/>
+                        <command type="write_value" address="SEMC_IOCR" value="0x79A8" value_width="4"/>
+                        <command type="write_value" address="SEMC_SDRAMCR0" value="0xF31" value_width="4"/>
+                        <command type="write_value" address="SEMC_SDRAMCR1" value="0x652922" value_width="4"/>
+                        <command type="write_value" address="SEMC_SDRAMCR2" value="0x10920" value_width="4"/>
+                        <command type="write_value" address="SEMC_SDRAMCR3" value="0x50210A08" value_width="4"/>
+                        <command type="write_value" address="SEMC_DBICR0" value="0x21" value_width="4"/>
+                        <command type="write_value" address="SEMC_DBICR1" value="0x888888" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCR1" value="0x02" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCR2" value="0x00" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCR0" value="0x80000000" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCMD" value="0xA55A000F" value_width="4"/>
+                        <command type="check_any_bit_set" address="SEMC_INTR" value="0x01" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCR0" value="0x80000000" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCMD" value="0xA55A000C" value_width="4"/>
+                        <command type="check_any_bit_set" address="SEMC_INTR" value="0x01" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCR0" value="0x80000000" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCMD" value="0xA55A000C" value_width="4"/>
+                        <command type="check_any_bit_set" address="SEMC_INTR" value="0x01" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPTXDAT" value="0x33" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCR0" value="0x80000000" value_width="4"/>
+                        <command type="write_value" address="SEMC_IPCMD" value="0xA55A000A" value_width="4"/>
+                        <command type="check_any_bit_set" address="SEMC_INTR" value="0x01" value_width="4"/>
+                        <command type="write_value" address="SEMC_SDRAMCR3" value="0x50210A09" value_width="4"/>
+                     </commands>
+                  </command_group>
+               </command_groups>
             </dcdx_configuration>
          </dcdx_configurations>
       </dcdx>
