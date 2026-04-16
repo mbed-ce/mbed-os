@@ -31,7 +31,13 @@
 #else
 #define MBED_MPU_ROM_END             (0x10000000 - 1)
 #endif
+
+#ifdef MBED_CONF_TARGET_MPU_RAM_START
+#define MBED_MPU_RAM_START             MBED_CONF_TARGET_MPU_RAM_START
+#else
+// Default to the end of ROM
 #define MBED_MPU_RAM_START           (MBED_MPU_ROM_END + 1)
+#endif
 
 static_assert(
     MBED_MPU_ROM_END == 0x04000000 - 1 ||

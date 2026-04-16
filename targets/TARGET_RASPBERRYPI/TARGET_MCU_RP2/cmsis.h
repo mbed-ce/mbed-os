@@ -21,4 +21,21 @@
 #include "RP2040.h"
 #include "system_RP2040.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern uint32_t ram_vector_table[]; // defined in runtime_init.c
+#define NVIC_RAM_VECTOR_ADDRESS ram_vector_table
+
+#if PICO_RP2040
+#define NVIC_NUM_VECTORS 42
+#else
+#error "Unknown number of vectors!"
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

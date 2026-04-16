@@ -7,6 +7,15 @@
 # 
 # To change any of these parameters from their default values, set them in your build script between where you
 # include mbed_toolchain_setup and where you add mbed os as a subdirectory.
+#
+# Notes:
+# 1. As of PyOCD 0.44, PyOCD can only flash this chip if it already has a valid program on it. Attempting
+#   to flash while the RP2040 is in USB bootloader mode (either because the BOOTSEL button was pressed, or
+#   because it has no valid code to boot up to) will result in incorrect data being written to flash.
+#   I filed a bug about this: https://github.com/pyocd/pyOCD/issues/1961
+# 2. OpenOCD will fail to flash with "Error: Unknown flash device (ID 0x00ffffff)" if the RP2040 has an invalid
+#   program. To get around this, either flash a valid program with picotool first, or boot into the bootloader
+#   using BOOTSEL.
 
 # General config parameters
 # -------------------------------------------------------------

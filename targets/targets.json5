@@ -46,6 +46,10 @@
                 "help": "Last address of ROM protected by the MPU",
                 "value": "0x0fffffff"
             },
+            "mpu-ram-start": {
+                "help": "First address of RAM configured in the MPU. If unset, defaults to the next address after mpu-rom-end.",
+                "value": null
+            },
             "default-form-factor": {
                 "help": "Default form factor of this board taken from supported_form_factors. This must be a lowercase string such as 'arduino'",
                 "value": null
@@ -8384,7 +8388,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             // Note that if the I/O voltage is set to less than the ADC reference voltage,
             // voltages higher than the I/O voltage are illegal for the analog pins
             // (so the ADC can never read 100%).
-            "default-adc-vref": 3.3
+            "default-adc-vref": 3.3,
+
+            "mpu-rom-end": "0x13FFFFFF", // Flash memory ends at 0x10FFFFFF, rounding up to next supported value
+            "mpu-ram-start": "MBED_RAM_BANK_IRAM1_START",
         },
         "device_has": [
             "ANALOGIN",
@@ -8400,7 +8407,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "WATCHDOG",
             "USBDEVICE",
             "RESET_REASON",
-            "RTC"
+            "RTC",
+            "MPU"
         ],
         "device_name": "RP2040",
         "is_mcu_family_target": true,
@@ -8421,8 +8429,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "RP2040",
         "macros_add": [
             "PICO_RP2040=1",
-            "PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1",
-            "MBED_MPU_CUSTOM"
+            "PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1"
         ],
 
         // For backwards compatibility with Mbed CE 7.0 and earlier, also make this match
