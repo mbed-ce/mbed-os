@@ -3,35 +3,38 @@
 Table of Contents
 =================
 
-   * [ST TOOLS](#st-tools)
-      * [USB drivers](#usb-drivers)
-      * [ST-Link FW](#st-link-fw)
-      * [STM32 Cube](#stm32-cube)
-      * [STM32CubeMX](#stm32cubemx)
-      * [STM32CubeProgrammer](#stm32cubeprogrammer)
-   * [STM32 families](#stm32-families)
-      * [STM32WB](#stm32wb)
-      * [STM32WL](#stm32wl)
-      * [STM32H7](#stm32h7)
-   * [Custom boards](#custom-boards)
-      * [STM32 organisation](#stm32-organisation)
-      * [Add a custom board](#add-a-custom-board)
-      * [Board specific files (pinmap)](#board-specific-files-pinmap)
-      * [Use of custom_targets.json](#use-of-custom_targetsjson)
-      * [Make your custom board public](#make-you-custom-board-public)
-   * [ST specific implementation](#st-specific-implementation)
-      * [Pin configuration](#pin-configuration)
-         * [Alternate feature](#alternate-feature)
-         * [Conflict pins](#conflict-pins)
-      * [Clock selection](#clock-selection)
-         * [System clock](#system-clock)
-         * [Low power clock](#low-power-clock)
-         * [I2C Timing calculation algorithm](#i2c-timing-calculation-algorithm)
-      * [Sleep feature](#sleep-feature)
-      * [WiFi configuration](#wifi-configuration)
-      * [Ethernet configuration](#ethernet-configuration)
-      * [Asynchronous SPI limitation](#asynchronous-spi-limitation)
-   * [Mbed OS Wiki pages](#mbed-os-wiki-pages)
+- [README for Mbed OS STM32 targets](#readme-for-mbed-os-stm32-targets)
+- [Table of Contents](#table-of-contents)
+  - [ST TOOLS](#st-tools)
+    - [USB drivers](#usb-drivers)
+    - [ST-Link FW](#st-link-fw)
+    - [STM32 Cube](#stm32-cube)
+    - [STM32CubeMX](#stm32cubemx)
+    - [STM32CubeProgrammer](#stm32cubeprogrammer)
+  - [STM32 families](#stm32-families)
+    - [STM32WB](#stm32wb)
+    - [STM32WL](#stm32wl)
+    - [STM32H7](#stm32h7)
+  - [Custom boards](#custom-boards)
+    - [STM32 organisation](#stm32-organisation)
+    - [Add a custom board](#add-a-custom-board)
+    - [Board specific files (pinmap)](#board-specific-files-pinmap)
+    - [Use of custom\_targets.json5](#use-of-custom_targetsjson5)
+  - [ST specific implementation](#st-specific-implementation)
+    - [Pin configuration](#pin-configuration)
+      - [Alternate feature](#alternate-feature)
+      - [Conflict pins](#conflict-pins)
+    - [Clock selection](#clock-selection)
+      - [System clock](#system-clock)
+      - [Low power clock](#low-power-clock)
+      - [I2C Timing calculation algorithm](#i2c-timing-calculation-algorithm)
+    - [Sleep feature](#sleep-feature)
+    - [WiFi configuration](#wifi-configuration)
+    - [Ethernet configuration](#ethernet-configuration)
+      - [Changing default MAC address in STM32](#changing-default-mac-address-in-stm32)
+    - [Asynchronous SPI limitation](#asynchronous-spi-limitation)
+    - [CAN receive interrupt problem due to mutex and resolution](#can-receive-interrupt-problem-due-to-mutex-and-resolution)
+  - [Mbed OS pages](#mbed-os-pages)
 
 
 ## ST TOOLS
@@ -101,24 +104,28 @@ Note that all ST HAL and LL files are available:
 Each STM32Cube package is also available in Github.
 This table summarizes the STM32Cube versions currently used in Mbed OS master branch :
 
-| STM32 Serie | Cube version | Github source                                     |
-|-------------|--------------|---------------------------------------------------|
-| F0          |    1.11.2    | https://github.com/STMicroelectronics/STM32CubeF0 |
-| F1          |    1.8.3     | https://github.com/STMicroelectronics/STM32CubeF1 |
-| F2          |    1.6.0     | https://github.com/STMicroelectronics/STM32CubeF2 |
-| F3          |    1.11.2    | https://github.com/STMicroelectronics/STM32CubeF3 |
-| F4          |    1.26.1    | https://github.com/STMicroelectronics/STM32CubeF4 |
-| F7          |    1.16.1    | https://github.com/STMicroelectronics/STM32CubeF7 |
-| G0          |    1.5.0     | https://github.com/STMicroelectronics/STM32CubeG0 |
-| G4          |    1.4.0     | https://github.com/STMicroelectronics/STM32CubeG4 |
-| H7          |    1.9.0     | https://github.com/STMicroelectronics/STM32CubeH7 |
-| L0          |    1.12.0    | https://github.com/STMicroelectronics/STM32CubeL0 |
-| L1          |    1.10.2    | https://github.com/STMicroelectronics/STM32CubeL1 |
-| L4          |    1.17.0    | https://github.com/STMicroelectronics/STM32CubeL4 |
-| L5          |    1.4.0     | https://github.com/STMicroelectronics/STM32CubeL5 |
-| U5          |    1.0.0     | https://github.com/STMicroelectronics/STM32CubeU5 |
-| WB          |    1.11.1    | https://github.com/STMicroelectronics/STM32CubeWB |
-| WL          |    1.1.0     | https://github.com/STMicroelectronics/STM32CubeWL |
+| STM32 Serie | Github source                                     |
+|-------------|---------------------------------------------------|
+| F0          | https://github.com/STMicroelectronics/STM32CubeF0 |
+| F1          | https://github.com/STMicroelectronics/STM32CubeF1 |
+| F2          | https://github.com/STMicroelectronics/STM32CubeF2 |
+| F3          | https://github.com/STMicroelectronics/STM32CubeF3 |
+| F4          | https://github.com/STMicroelectronics/STM32CubeF4 |
+| F7          | https://github.com/STMicroelectronics/STM32CubeF7 |
+| G0          | https://github.com/STMicroelectronics/STM32CubeG0 |
+| G4          | https://github.com/STMicroelectronics/STM32CubeG4 |
+| H5          | https://github.com/STMicroelectronics/STM32CubeH5 |
+| H7          | https://github.com/STMicroelectronics/STM32CubeH7 |
+| L0          | https://github.com/STMicroelectronics/STM32CubeL0 |
+| L1          | https://github.com/STMicroelectronics/STM32CubeL1 |
+| L4          | https://github.com/STMicroelectronics/STM32CubeL4 |
+| L5          | https://github.com/STMicroelectronics/STM32CubeL5 |
+| N6          | https://github.com/STMicroelectronics/STM32CubeN6 |
+| U0          | https://github.com/STMicroelectronics/STM32CubeU0 |
+| U3          | https://github.com/STMicroelectronics/STM32CubeU3 |
+| U5          | https://github.com/STMicroelectronics/STM32CubeU5 |
+| WB          | https://github.com/STMicroelectronics/STM32CubeWB |
+| WL          | https://github.com/STMicroelectronics/STM32CubeWL |
 
 In Mbed OS repository, we try to minimize the difference between "official" and copied files.
 
@@ -271,12 +278,10 @@ STM32_open_pin_data DB version STM32CubeMX-DB.6.0.10
  * I/O pins found: 135 connected: 0
 ```
 
-### Use of custom_targets.json
-
-https://os.mbed.com/docs/mbed-os/latest/porting/porting-a-custom-board.html
+### Use of custom_targets.json5
 
 Example with a board based on STM32F103C8 (like BluePill):
-- MCU_STM32F103x8 generic configuration is already available in targets.json file
+- MCU_STM32F103x8 generic configuration is already available in targets.json5 file
 
 ```
 $ python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py -m "STM32F103C(8-B)Tx.xml"
@@ -285,26 +290,43 @@ $ python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py -m "STM32F103C(8-B
 $ mv TARGET_STM32F103C8T TARGET_BLUEPILL_F103C8
 // Edit PeripheralPins.c and PinNames.h to match your board configuration
 
-// Create a custom_targets.json with:
+// Create a custom_targets.json5 with:
 {
     "BLUEPILL_F103C8": {
-        "inherits": [
-            "MCU_STM32F103x8"
-        ],
-        "overrides": {
-            "clock_source": "USE_PLL_HSE_XTAL"
+	    "inherits": ["MCU_STM32F103x8"],
+        "overrides": {"clock-source": "USE_PLL_HSE_XTAL"},
+        "device_has_add": ["USBDEVICE"],
+        "memory_banks": {
+            "IRAM": {
+                "access": {
+                    "execute": false,
+                    "read": true,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x5000,
+                "start": 0x20000000,
+                "startup": false
+            },
+            "IROM": {
+                "access": {
+                    "execute": true,
+                    "read": true,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x10000,
+                "start": 0x8000000,
+                "startup": true
+            }
         },
-        "device_has_remove": [
-            "STDIO_MESSAGES"
-        ],
-        "device_name": "STM32F103C8"
-    }
+    },
 }
 ```
 
 Example with a board based on STM32H745ZI
 - this is dual core MCU with CM4 and CM7
-- MCU_STM32H745I_CM4 and MCU_STM32H745I_CM7 generic configuration is already available in targets.json file
+- MCU_STM32H745I_CM4 and MCU_STM32H745I_CM7 generic configuration is already available in targets.json5 file
 
 ```
 $ python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py -m "STM32H745ZITx.xml"
@@ -313,7 +335,7 @@ $ python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py -m "STM32H745ZITx.
 $ mv TARGET_STM32H745ZIT TARGET_H745ZI_BOARD
 // Edit PeripheralPins.c and PinNames.h to match your board configuration
 
-// Create a custom_targets.json with:
+// Create a custom_targets.json5 with:
 {
     "H745ZI_BOARD_CM4": {
         "inherits": [
@@ -333,13 +355,6 @@ $ mv TARGET_STM32H745ZIT TARGET_H745ZI_BOARD
     }
 }
 ```
-
-
-### Make your custom board public
-
-We will be happy to add every public board in https://github.com/ARMmbed/stm32customtargets
-
-Make a Pull request, we will check consistency and build.
 
 
 ## ST specific implementation
@@ -385,7 +400,7 @@ Sometimes, pin is explicitly removed by default to avoid issues (but you can unc
 
 System Core Clock is based on the high-speed clock, which is selected by the `target.clock_source` option.
 
-For each target, a default choice has been made in the "clock_source" config settings in the targets.json file.
+For each target, a default choice has been made in the "clock_source" config settings in the targets.json5 file.
 
 By default, it is set to something like:
 
@@ -610,12 +625,5 @@ int main() {
 ```
 
 
-## Mbed OS Wiki pages
-
-https://os.mbed.com/teams/ST/wiki/
-
-https://os.mbed.com/teams/ST/wiki/STDIO
-
-https://os.mbed.com/teams/ST/wiki/How-to-enable-flash-dual-bank
-
-https://os.mbed.com/teams/ST/wiki/Nucleo-144pins-ethernet-spi-conflict
+## Mbed OS pages
+https://mbed-ce.dev/
