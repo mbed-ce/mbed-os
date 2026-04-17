@@ -32,23 +32,38 @@ int mbed_sdk_inited = 0;
 
 void mbed_sdk_init()
 {
+    // Reset bootrom state
+#if !PICO_RUNTIME_NO_INIT_BOOTROM_RESET
+    runtime_init_bootrom_reset();
+#endif
+#if !PICO_RUNTIME_NO_INIT_PER_CORE_BOOTROM_RESET
+    runtime_init_per_core_bootrom_reset();
+#endif
+
     // Reset all peripherals to put system into a known state
     runtime_init_early_resets();
 
+    // Release all spin locks
+    spin_locks_reset();
+
     // Ensure USB PHY is in low-power state -- must be cleared before beginning USB operations.
     runtime_init_usb_power_down();
+
+    // Enable coprocessors
+#if !PICO_RUNTIME_NO_INIT_PER_CORE_ENABLE_COPROCESSORS
+    runtime_init_per_core_enable_coprocessors();
+#endif
 
     // Set up clock tree
     runtime_init_clocks();
     runtime_init_post_clock_resets();
     SystemCoreClockUpdate();
 
+#if !PICO_RUNTIME_NO_INIT_RP2040_GPIO_IE_DISABLE
     // After resetting BANK0 we should disable IE on 26-29 as these may have mid-rail voltages when
     // ADC is in use
     runtime_init_rp2040_gpio_ie_disable();
-
-    // Release all spin locks
-    spin_locks_reset();
+#endif
 
 	mbed_sdk_inited = 1;
 }

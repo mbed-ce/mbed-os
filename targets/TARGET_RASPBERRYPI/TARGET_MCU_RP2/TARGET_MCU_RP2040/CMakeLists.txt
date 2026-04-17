@@ -1,14 +1,10 @@
 # Copyright (c) 2026 Jamie Smith. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-# RP2040 linker script
-mbed_set_linker_script(mbed-mcu-rp2040 ${CMAKE_CURRENT_SOURCE_DIR}/memmap_default_mbed.ld)
-
 # RP2040 sources
 target_sources(mbed-mcu-rp2040
     INTERFACE
         PeripheralPins.c
-        crt0_mbed.S
 )
 
 if(MCU_RP2040 IN_LIST MBED_TARGET_LABELS)

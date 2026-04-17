@@ -63,7 +63,6 @@ typedef enum {
 
     // ADC internal channels
     ADC_TEMP = 0xF0,
-    ADC_VREF = 0xF1,
 
     // Analog pins
 #ifndef ARDUINO_ARCH_MBED

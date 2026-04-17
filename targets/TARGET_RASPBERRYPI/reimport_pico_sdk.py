@@ -25,41 +25,16 @@ IDENTIFIERS_TO_RENAME: List[Tuple[str, str]] = [
     (r"rtc_init", r"pico_sdk_rtc_init"),
     (r"spi_init", r"pico_sdk_spi_init"),
 
-    # Rename IRQ handlers to the CMSIS exception names.
-    # Pico SDK does this with macros, but easier to just
-    # do it here.
-    # Based on cmsis/include/rename_exceptions.h.
-    (r"isr_nmi", r"NMI_Handler"),
-    (r"isr_hardfault", r"HardFault_Handler"),
-    (r"isr_svcall", r"SVC_Handler"),
-    (r"isr_pendsv", r"PendSV_Handler"),
-    (r"isr_systick", r"SysTick_Handler"),
-    (r"isr_irq0", r"TIMER_IRQ_0_Handler"),
-    (r"isr_irq1", r"TIMER_IRQ_1_Handler"),
-    (r"isr_irq2", r"TIMER_IRQ_2_Handler"),
-    (r"isr_irq3", r"TIMER_IRQ_3_Handler"),
-    (r"isr_irq4", r"PWM_IRQ_WRAP_Handler"),
-    (r"isr_irq5", r"USBCTRL_IRQ_Handler"),
-    (r"isr_irq6", r"XIP_IRQ_Handler"),
-    (r"isr_irq7", r"PIO0_IRQ_0_Handler"),
-    (r"isr_irq8", r"PIO0_IRQ_1_Handler"),
-    (r"isr_irq9", r"PIO1_IRQ_0_Handler"),
-    (r"isr_irq10", r"PIO1_IRQ_1_Handler"),
-    (r"isr_irq11", r"DMA_IRQ_0_Handler"),
-    (r"isr_irq12", r"DMA_IRQ_1_Handler"),
-    (r"isr_irq13", r"IO_IRQ_BANK0_Handler"),
-    (r"isr_irq14", r"IO_IRQ_QSPI_Handler"),
-    (r"isr_irq15", r"SIO_IRQ_PROC0_Handler"),
-    (r"isr_irq16", r"SIO_IRQ_PROC1_Handler"),
-    (r"isr_irq17", r"CLOCKS_IRQ_Handler"),
-    (r"isr_irq18", r"SPI0_IRQ_Handler"),
-    (r"isr_irq19", r"SPI1_IRQ_Handler"),
-    (r"isr_irq20", r"UART0_IRQ_Handler"),
-    (r"isr_irq21", r"UART1_IRQ_Handler"),
-    (r"isr_irq22", r"ADC_IRQ_FIFO_Handler"),
-    (r"isr_irq23", r"I2C0_IRQ_Handler"),
-    (r"isr_irq24", r"I2C1_IRQ_Handler"),
-    (r"isr_irq25", r"RTC_IRQ_Handler"),
+    # The CMSIS headers always #define these constants, but the Mbed OS build system also defines them,
+    # so edit the headers to have a guard on the define
+    (r"#define __FPU_PRESENT                  1        /\*!< FPU present\s+\*/",
+"""#ifndef __FPU_PRESENT
+#define __FPU_PRESENT                  1        /*!< FPU present                                                               */
+#endif"""),
+    (r"#define __DSP_PRESENT                  1        /\*!< DSP extension present\s+\*/",
+"""#ifndef __DSP_PRESENT
+#define __DSP_PRESENT                  1        /*!< DSP extension present                                                               */
+#endif""")
 ]
 
 # List of files and directories which need to be copied into Mbed.
@@ -92,9 +67,11 @@ FILES_DIRS_TO_COPY: List[pathlib.Path] = [
     pathlib.Path("src") / "rp2_common" / "hardware_xip_cache",
     pathlib.Path("src") / "rp2_common" / "hardware_ticks",
     pathlib.Path("src") / "rp2_common" / "hardware_vreg",
+    pathlib.Path("src") / "rp2_common" / "hardware_rcp",
     pathlib.Path("src") / "rp2_common" / "pico_bootrom",
     pathlib.Path("src") / "rp2_common" / "pico_float",
     pathlib.Path("src") / "rp2_common" / "cmsis" / "stub" / "CMSIS" / "Device",
+    pathlib.Path("src") / "rp2_common" / "cmsis" / "include",
     pathlib.Path("src") / "rp2_common" / "pico_platform_common",
     pathlib.Path("src") / "rp2_common" / "pico_platform_compiler",
     pathlib.Path("src") / "rp2_common" / "pico_platform_panic",
@@ -104,6 +81,8 @@ FILES_DIRS_TO_COPY: List[pathlib.Path] = [
     pathlib.Path("src") / "rp2_common" / "pico_flash",
     pathlib.Path("src") / "rp2_common" / "pico_time_adapter",
     pathlib.Path("src") / "rp2_common" / "boot_bootrom_headers",
+    pathlib.Path("src") / "rp2_common" / "pico_crt0" / "embedded_start_block.inc.S",
+    pathlib.Path("src") / "rp2_common" / "pico_crt0" / "embedded_end_block.inc.S",
     pathlib.Path("src") / "common" / "pico_time",
     pathlib.Path("src") / "common" / "pico_sync",
     pathlib.Path("src") / "common" / "pico_base_headers",
@@ -122,8 +101,12 @@ FILES_DIRS_TO_COPY: List[pathlib.Path] = [
     pathlib.Path("src") / "rp2350" / "hardware_structs",
     pathlib.Path("src") / "rp2350" / "hardware_regs",
     pathlib.Path("src") / "rp2350" / "pico_platform",
+    pathlib.Path("src") / "rp2350" / "boot_stage2",
+    pathlib.Path("src") / "rp2350" / "boot_stage2" / "pad_checksum",
     pathlib.Path("src") / "boards" / "include" / "boards" / "pico.h",
     pathlib.Path("src") / "boards" / "include" / "boards" / "pico_w.h",
+    pathlib.Path("src") / "boards" / "include" / "boards" / "pico2.h",
+    pathlib.Path("src") / "boards" / "include" / "boards" / "pico2_w.h",
     pathlib.Path("src") / "boards" / "include" / "boards" / "sparkfun_thingplus.h",
 ]
 

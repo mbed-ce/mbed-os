@@ -52,6 +52,7 @@ endif()
 target_include_directories(mbed-mcu-rp2
 	INTERFACE
 		.
+		pico-sdk/src/rp2_common/cmsis/include
 		pico-sdk/src/rp2_common/hardware_adc/include
 		pico-sdk/src/rp2_common/hardware_divider/include
 		pico-sdk/src/rp2_common/hardware_gpio/include
@@ -90,6 +91,7 @@ target_include_directories(mbed-mcu-rp2
 		pico-sdk/src/rp2_common/pico_flash/include
 		pico-sdk/src/rp2_common/pico_time_adapter/include
 		pico-sdk/src/rp2_common/boot_bootrom_headers/include
+		pico-sdk/src/rp2_common/pico_crt0
 		pico-sdk/src/common/pico_sync/include
 		pico-sdk/src/common/pico_time/include
 		pico-sdk/src/common/pico_base_headers/include
@@ -100,7 +102,6 @@ target_include_directories(mbed-mcu-rp2
 		pico-sdk/src/common/hardware_claim/include
 		pico-sdk/src/boards/include
 		pico-sdk/src/generated
-		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Include
 		${CMAKE_CURRENT_BINARY_DIR}/pico-sdk-generated/
 )
 
@@ -139,7 +140,9 @@ target_sources(mbed-mcu-rp2
 
 target_compile_definitions(mbed-mcu-rp2
 	INTERFACE
-		LIB_CMSIS_CORE # Enables renaming interrupt vectors to their CMSIS names
+		# Enables renaming interrupt vectors to their CMSIS names
+		LIB_CMSIS_CORE
+		PICO_CMSIS_RENAME_EXCEPTIONS
 
 		# Don't automatically register init stuff as global constructors. We call these manually in mbed_sdk_init()
 		PICO_RUNTIME_SKIP_INIT_BOOTROM_RESET
@@ -165,6 +168,7 @@ target_include_directories(mbed-mcu-rp2040
 		pico-sdk/src/rp2040/pico_platform/include
 		pico-sdk/src/rp2040/boot_stage2/include
 		pico-sdk/src/rp2040/boot_stage2/asminclude
+		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Include
 )
 target_sources(mbed-mcu-rp2040
 	INTERFACE

@@ -24,4 +24,8 @@ target_sources(mbed-mcu-rp2
         us_ticker.c
         USBPhy_RP2.cpp
         watchdog_api.c
+        crt0_mbed.S
 )
+
+# RPxxxx linker script
+mbed_set_linker_script(mbed-mcu-rp2 ${CMAKE_CURRENT_SOURCE_DIR}/memmap_default_mbed.ld)

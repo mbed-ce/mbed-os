@@ -54,18 +54,16 @@ ENTRY(_entry_point)
 
 SECTIONS
 {
-    /* Second stage bootloader is prepended to the image. It must be 256 bytes big
-       and checksummed. It is usually built by the boot_stage2 target
-       in the Raspberry Pi Pico SDK
-    */
-    .second_stage_ota : {
-        KEEP (*(.second_stage_ota))
-    } > FLASH
-
     .flash_begin : {
         __flash_binary_start = .;
     } > FLASH
 
+    /*
+     * On RP2040, boot2 must be at the start of the image as it is executed
+     * as the entry point to configure XIP flash and start the user program.
+     * On RP2350, boot2 can live anywhere and is called by the startup code using the
+     * __boot2_entry_point symbol.
+     */
     .boot2 : {
         __boot2_start__ = .;
         KEEP (*(.boot2))
@@ -87,8 +85,20 @@ SECTIONS
         KEEP (*(.vectors))
         KEEP (*(.binary_info_header))
         __binary_info_header_end = .;
+        KEEP (*(.embedded_block))
+        __embedded_block_end = .;
         KEEP (*(.reset))
+        /* TODO revisit this now memset/memcpy/float in ROM */
+        /* bit of a hack right now to exclude all floating point and time critical (e.g. memset, memcpy) code from
+         * FLASH ... we will include any thing excluded here in .data below by default */
+
+        /* Note: This KEEP() is important -- without it, only the first part of the _init function from crti.S
+         * is linked in, not the last part from crtn.S. This then causes a HardFault later because the registers
+         * pushed to the stack were never popped! The linker script used in the Pico SDK does not have this
+         * KEEP() and I don't know why it works for them -- maybe a toolchain / C library related difference? */
         KEEP (*(.init))
+
+        *(.text*)
         *(.fini)
         /* Pull all c'tors into .text */
         *crtbegin.o(.ctors)
@@ -103,11 +113,34 @@ SECTIONS
         *(SORT(.dtors.*))
         *(.dtors)
 
+        . = ALIGN(4);
+        /* preinit data */
+        PROVIDE_HIDDEN (__preinit_array_start = .);
+        KEEP(*(SORT(.preinit_array.*)))
+        KEEP(*(.preinit_array))
+        PROVIDE_HIDDEN (__preinit_array_end = .);
+
+        . = ALIGN(4);
+        /* init data */
+        PROVIDE_HIDDEN (__init_array_start = .);
+        KEEP(*(SORT(.init_array.*)))
+        KEEP(*(.init_array))
+        PROVIDE_HIDDEN (__init_array_end = .);
+
+        . = ALIGN(4);
+        /* finit data */
+        PROVIDE_HIDDEN (__fini_array_start = .);
+        *(SORT(.fini_array.*))
+        *(.fini_array)
+        PROVIDE_HIDDEN (__fini_array_end = .);
+
         *(.eh_frame*)
         . = ALIGN(4);
     } > FLASH
 
     .rodata : {
+        *(.rodata*)
+        *(.srodata*)
         . = ALIGN(4);
         *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
         . = ALIGN(4);
@@ -149,6 +182,10 @@ SECTIONS
 
         *(.time_critical*)
 
+        /* remaining .text and .rodata; i.e. stuff we exclude above because we want it in RAM */
+        *(.text*)
+        . = ALIGN(4);
+        *(.rodata*)
         . = ALIGN(4);
 
         *(.data*)
@@ -163,29 +200,9 @@ SECTIONS
         PROVIDE_HIDDEN (__mutex_array_end = .);
 
         . = ALIGN(4);
-        /* preinit data */
-        PROVIDE_HIDDEN (__preinit_array_start = .);
-        KEEP(*(SORT(.preinit_array.*)))
-        KEEP(*(.preinit_array))
-        PROVIDE_HIDDEN (__preinit_array_end = .);
-
-        . = ALIGN(4);
-        /* init data */
-        PROVIDE_HIDDEN (__init_array_start = .);
-        KEEP(*(SORT(.init_array.*)))
-        KEEP(*(.init_array))
-        PROVIDE_HIDDEN (__init_array_end = .);
-
-        . = ALIGN(4);
-        /* finit data */
-        PROVIDE_HIDDEN (__fini_array_start = .);
-        *(SORT(.fini_array.*))
-        *(.fini_array)
-        PROVIDE_HIDDEN (__fini_array_end = .);
-
         *(.jcr)
         . = ALIGN(4);
-        /* All data end */
+
         __data_end__ = .;
     } > RAM AT> FLASH
 
@@ -233,8 +250,9 @@ SECTIONS
     ASSERT(__end__ < ORIGIN(RAM) + LENGTH(RAM), "region RAM overflowed")
 
     .flash_end : {
+        KEEP(*(.embedded_end_block*))
         PROVIDE(__flash_binary_end = .);
-    } > FLASH
+    } > FLASH =0xaa
 
     __StackTop = ORIGIN(STACK_SCRATCH) + LENGTH(STACK_SCRATCH);
     __StackLimit = __StackTop - MBED_CONF_TARGET_BOOT_STACK_SIZE;
@@ -242,6 +260,8 @@ SECTIONS
     ASSERT(__StackLimit >= STACK_SCRATCH_STATIC_END_SYMBOL, "stack scratch region overflowed")
     PROVIDE(__stack = __StackTop);
 
-    ASSERT( __binary_info_header_end - __logical_binary_start <= 256, "Binary info must be in first 256 bytes of the binary")
+
+    ASSERT( __binary_info_header_end - __logical_binary_start <= 1024, "Binary info must be in first 1024 bytes of the binary")
+
     /* todo assert on extra code */
 }
