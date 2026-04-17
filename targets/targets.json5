@@ -8425,6 +8425,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
     // Target for RP2040 MCU
     "MCU_RP2040": {
+        "public": false,
         "inherits": ["MCU_RP2"],
         "device_name": "RP2040",
         "macros_add": [
@@ -8434,7 +8435,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
         // For backwards compatibility with Mbed CE 7.0 and earlier, also make this match
         // the target label "RP2040" in addition to "MCU_RP2040".
-        "extra_labels": [
+        "extra_labels_add": [
             "RP2040",
         ]
     },
