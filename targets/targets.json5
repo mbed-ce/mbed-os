@@ -7716,12 +7716,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false
     },
     "MCU_PSOC62_CM4": {
+        "public": false,
         "inherits": [
             "MCU_PSOC6_M4"
         ],
         "is_mcu_family_target": true
     },
     "MCU_PSOC64_CM4": {
+        "public": false,
         "inherits": [
             "MCU_PSOC6_M4"
         ],
