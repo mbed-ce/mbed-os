@@ -41,6 +41,8 @@
 #error HSE_VALUE must be an integer multiple of 1MHz for STM32F4 common clock config
 #endif
 
+#define PLLM_HSE_CLOCK_SETTINGS (HSE_VALUE / 1000000U)
+
 // clock source is selected with CLOCK_SOURCE in json config
 #define USE_PLL_HSE_EXTC     0x8  // Use external clock (ST Link MCO)
 #define USE_PLL_HSE_XTAL     0x4  // Use external xtal (X3 on board - not provided by default)
@@ -121,9 +123,9 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
             RCC_OscInitStruct.HSEState      = RCC_HSE_BYPASS;   // External clock on OSC_IN
         }
 
-        RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-        RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-        RCC_OscInitStruct.PLL.PLLM          = HSE_VALUE / 1000000; // VCO input clock = 1 MHz
+        RCC_OscInitStruct.PLL.PLLState      = RCC_PLL_ON;
+        RCC_OscInitStruct.PLL.PLLSource     = RCC_PLLSOURCE_HSE;
+        RCC_OscInitStruct.PLL.PLLM          = PLLM_HSE_CLOCK_SETTINGS; // VCO input clock = 1 MHz
 #if (DEVICE_USBDEVICE)
         RCC_OscInitStruct.PLL.PLLN          = 384;              // VCO output clock = 384 MHz (1 MHz * 384)
 #else /* DEVICE_USBDEVICE */
