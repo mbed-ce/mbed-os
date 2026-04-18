@@ -104,7 +104,7 @@ Note that all ST HAL and LL files are available:
 Each STM32Cube package is also available in Github.
 This table summarizes the STM32Cube versions currently used in Mbed OS master branch :
 
-| STM32 Serie | Github source                                     |
+| STM32 Series | Github source                                     |
 |-------------|---------------------------------------------------|
 | F0          | https://github.com/STMicroelectronics/STM32CubeF0 |
 | F1          | https://github.com/STMicroelectronics/STM32CubeF1 |

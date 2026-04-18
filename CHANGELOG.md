@@ -13,8 +13,6 @@ UNRELEASED CHANGES - add all changes committed to Mbed here pending the next rel
 A message that notes the main changes in the update.
 
 ### Added
-- STM32
-  - add (TARGET_STM32/tools/stm32.cmake) script for STM32 related helper functions that help hold CMakeLists files more clean
 
 - RP2xxx
   - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board compared to the non-W version is limited).
@@ -22,8 +20,7 @@ A message that notes the main changes in the update.
   - MPU configuration added
 
 ### Changed
-- STM32
-  - TARGET_STM32/CMakeLists was reworked. Only current family is builded by CMake.
+- Reworked targets CMake code to only recurse into the subdir for the current target family, which should speed up the CMake configure a bit
 - STM32F4
   - HAL driver update to `stm32f4xx-hal-driver` v1.8.5 (2025), now integrated as a submodule.
   - CMSIS device update to `cmsis-device-f4` v2.6.11 (2025), now integrated as a submodule.
