@@ -88,18 +88,20 @@ SECTIONS
         KEEP (*(.embedded_block))
         __embedded_block_end = .;
         KEEP (*(.reset))
-        /* TODO revisit this now memset/memcpy/float in ROM */
-        /* bit of a hack right now to exclude all floating point and time critical (e.g. memset, memcpy) code from
-         * FLASH ... we will include any thing excluded here in .data below by default */
+
+        /* Note: The Pico SDK linker script has some extra stuff here that puts libgcc routines in RAM instead
+         * of flash, but this just does not seem to work in Mbed. We get a hardfault from the division operator,
+         * with no obvious cause. I don't really understand why but I suspect it's, again, something to do with
+         * using a different toolchain (maybe that somehow doesn't support relocating libgcc routines to RAM?) */
+        *(.text*)
 
         /* Note: This KEEP() is important -- without it, only the first part of the _init function from crti.S
          * is linked in, not the last part from crtn.S. This then causes a HardFault later because the registers
          * pushed to the stack were never popped! The linker script used in the Pico SDK does not have this
          * KEEP() and I don't know why it works for them -- maybe a toolchain / C library related difference? */
         KEEP (*(.init))
+        KEEP (*(.fini))
 
-        *(.text*)
-        *(.fini)
         /* Pull all c'tors into .text */
         *crtbegin.o(.ctors)
         *crtbegin?.o(.ctors)
