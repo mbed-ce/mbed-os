@@ -196,8 +196,14 @@
         "MIMXRT105X": {
             "mem-size": 36560
         },
-        "STM32H747_ARDUINO": {
-            "mem-size": 16000
+        "MCU_STM32F7": {
+            "mem-size": 16384
+        },
+        "MCU_STM32H5": {
+            "mem-size": 32768
+        },
+        "MCU_STM32H7": {
+            "mem-size": 32768
         },
         "FVP_MPS2_M3": {
             "mem-size": 36560
