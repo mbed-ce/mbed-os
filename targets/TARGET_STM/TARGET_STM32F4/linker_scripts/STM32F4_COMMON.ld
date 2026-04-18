@@ -72,7 +72,8 @@ SECTIONS
         __vector_flash_start__ = ABSOLUTE(.);
         KEEP(*(.isr_vector))
         __vector_flash_end__ = ABSOLUTE(.);
-        __vector_table_ram_size__ = ABSOLUTE(((__vector_flash_end__ - __vector_flash_start__) + 7) & 0xFFFFFFF8);
+        __vector_table_size__ = ABSOLUTE(__vector_flash_end__ - __vector_flash_start__);
+        __vector_table_ram_size__ = ABSOLUTE((__vector_table_size__ + 7) & 0xFFFFFFF8);
         *(.text*)
 
         KEEP(*(.init))
