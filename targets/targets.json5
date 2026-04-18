@@ -1333,9 +1333,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH",
             "MPU"
         ],
-        "macros_add": [
-            "NVIC_NUM_VECTORS_SKIP"
-        ],
         "is_mcu_family_target": true
     },
     "MCU_STM32F401xE": {
