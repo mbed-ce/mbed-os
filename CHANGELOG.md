@@ -30,10 +30,12 @@ A message that notes the main changes in the update.
   - Updated STM32F7 config/init files by consolidating Mbed changes with latest upstream templates.
   - Removed unused Ethernet HAL sections from config (Mbed does not use ST Ethernet stack here).
   - Applied interim local HAL fixes until upstream release includes them: https://github.com/STMicroelectronics/stm32f7xx-hal-driver/issues/23
+  - `mem-size` of lwIP stack increased from default 4000 to 16384
 - RP2xxx
   - SDK updated from 1.5.1 to 2.2.0
   - Pin naming scheme changed. Now the MCU I/O pins are named as `IO_xx` instead of `pxx`. Additionally, `PICO_Pxx` constants are added which match the numbering of the header pins on the PCB.
-
+- STM32H5/H7
+  - `mem-size` of lwIP stack increased to 32768 from default 4000
 ### Deprecated
 
 ### Fixed
