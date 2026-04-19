@@ -68,12 +68,10 @@ SECTIONS
 {
     .text :
     {
-        . = ALIGN(8);
         __vector_flash_start__ = ABSOLUTE(.);
         KEEP(*(.isr_vector))
         __vector_flash_end__ = ABSOLUTE(.);
         __vector_table_size__ = ABSOLUTE(__vector_flash_end__ - __vector_flash_start__);
-        __vector_table_ram_size__ = ABSOLUTE((__vector_table_size__ + 7) & 0xFFFFFFF8);
         *(.text*)
 
         KEEP(*(.init))
@@ -123,22 +121,21 @@ SECTIONS
 #if defined(CCM_RAM)
     .ccm_data_ram 0x10000000 (NOLOAD) :
     {
-        /** Align on 4 byte boundary. */
-        . = ALIGN(4);
-        
         /** Keep the variable even if it is not referenced. */
         KEEP(*(.ccm_data_ram))
     } > CCM
 #endif
 
+    /* Stick the vector table at start of SRAM */
     .vector_ram (NOLOAD) :
     {
-        . = ALIGN(8);
         __vector_ram_start__ = .;
-        . += __vector_table_ram_size__;
+        . += __vector_table_size__;
         __vector_ram_end__ = .;
     } > RAM
 
+#if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
+    /* Stick the crash data ram close to start of SRAM after vector table */
     .crash_data_ram :
     {
         . = ALIGN(8);
@@ -150,6 +147,7 @@ SECTIONS
         . = ALIGN(8);
         __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
     } > RAM
+#endif
 
     .data : AT (__etext)
     {
