@@ -5,7 +5,6 @@
 target_sources(mbed-mcu-rp235x
     INTERFACE
         PeripheralPins.c
-        crt0_mbed.S
 )
 
 target_include_directories(mbed-mcu-rp235x
