@@ -17,8 +17,6 @@
  * Created by: Jan Kamidra with GitHub Copilot
  */
 
-#include "cmsis_nvic.h"
-
 M_CRASH_DATA_RAM_SIZE = 0x100;
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
@@ -27,9 +25,6 @@ M_CRASH_DATA_RAM_SIZE = 0x100;
     #define MBED_CONF_TARGET_BOOT_STACK_SIZE  0x400
 #endif
 STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
-
-/* Round up MBED_VECTTABLE_RAM_SIZE to 8 bytes */
-#define MBED_VECTTABLE_RAM_SIZE  (((NVIC_NUM_VECTORS * 4) + 7) & 0xFFFFFFF8)
 
 /** Notes: 
  *  -   Use default configured ROM bank for F7.
@@ -41,7 +36,7 @@ STACK_SIZE = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 MEMORY
 {
     FLASH (rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_ROM_VIA_AXIM_BUS_START, LENGTH = MBED_CONFIGURED_ROM_BANK_ROM_VIA_AXIM_BUS_SIZE
-    RAM (rwx)  : ORIGIN = MBED_RAM_BANK_SRAM_START + MBED_VECTTABLE_RAM_SIZE, LENGTH = MBED_RAM_BANK_SRAM_SIZE - MBED_VECTTABLE_RAM_SIZE
+    RAM (rwx)  : ORIGIN = MBED_RAM_BANK_SRAM_START, LENGTH = MBED_RAM_BANK_SRAM_SIZE
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -77,7 +72,10 @@ SECTIONS
 {
     .text :
     {
+        __vector_flash_start__ = ABSOLUTE(.);
         KEEP(*(.isr_vector))
+        __vector_flash_end__ = ABSOLUTE(.);
+        __vector_table_size__ = ABSOLUTE(__vector_flash_end__ - __vector_flash_start__);
         *(.text*)
 
         KEEP(*(.init))
@@ -117,6 +115,16 @@ SECTIONS
     __etext = .;
     _sidata = .;
 
+    /* Stick the vector table at start of SRAM */
+    .vector_ram (NOLOAD) :
+    {
+        __vector_ram_start__ = .;
+        . += __vector_table_size__;
+        __vector_ram_end__ = .;
+    } > RAM
+
+#if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
+    /* Stick the crash data ram close to start of SRAM after vector table */
     .crash_data_ram :
     {
         . = ALIGN(8);
@@ -128,6 +136,7 @@ SECTIONS
         . = ALIGN(8);
         __CRASH_DATA_RAM_END__ = .; /* Define a global symbol at data end */
     } > RAM
+#endif
 
     .data : AT (__etext)
     {
