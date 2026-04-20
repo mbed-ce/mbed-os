@@ -3,16 +3,7 @@
 
 add_subdirectory(TARGET_NUCLEO_F722ZE EXCLUDE_FROM_ALL)
 
-if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
-    set(STARTUP_FILE TOOLCHAIN_GCC_ARM/startup_stm32f722xx.S)
-endif()
-
 add_library(mbed-stm32f722xe INTERFACE)
-
-target_sources(mbed-stm32f722xe
-    INTERFACE
-        ${STARTUP_FILE}
-)
 
 target_include_directories(mbed-stm32f722xe
     INTERFACE

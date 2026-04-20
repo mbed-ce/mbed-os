@@ -181,7 +181,6 @@ SECTIONS
         /* All data end */
         __data_end__ = .;
         _edata = .;
-
     } > RAM
 
     /* Uninitialized data section
@@ -196,7 +195,7 @@ SECTIONS
         . = ALIGN(32);
         __uninitialized_end = .;
     } > RAM
-    
+
     .bss :
     {
         . = ALIGN(8);
