@@ -1860,7 +1860,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32F7"
         ],
         "extra_labels_add": [
-            "STM32F722xE"
+            "STM32F722xE",
+            "STARTUP_STM32F722xx"
         ],
         "macros_add": [
             "STM32F722xx"
@@ -1883,8 +1884,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32F7"
         ],
         "extra_labels_add": [
-            "N25Q128A",
-            "STM32F746xG"
+            "STM32F746xG",
+            "STARTUP_STM32F746xx",
+            "N25Q128A"
         ],
         "components_add": [
             "QSPIF"
@@ -1923,7 +1925,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "extra_labels_add": [
             "STM32F746xG",
-            "STM32F746ZG"
+            "STM32F746ZG",
+            "STARTUP_STM32F746xx"
         ],
         "config": {
             "d11-configuration": {
@@ -1957,7 +1960,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "extra_labels_add": [
             "STM32F756xG",
-            "STM32F756ZG"
+            "STM32F756ZG",
+            "STARTUP_STM32F756xx"
         ],
         "config": {
             "d11-configuration": {
@@ -1992,7 +1996,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "extra_labels_add": [
             "STM32F767xI",
-            "STM32F767ZI"
+            "STM32F767ZI",
+            "STARTUP_STM32F767xx"
         ],
         "config": {
             "flash-dual-bank": {
@@ -2030,7 +2035,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "extra_labels_add": [
             "MX25L51245G",
-            "STM32F769xI"
+            "STM32F769xI",
+            "STARTUP_STM32F769xx"
         ],
         "components_add": [
             "QSPIF"

@@ -33,5 +33,15 @@ target_link_libraries(mbed-stm32f7 INTERFACE mbed-stm mbed-stm32f7cube-fw)
 # Use shared F7 clock configuration for all F7 targets.
 target_sources(mbed-stm32f7 INTERFACE clock_cfg/system_clock.c)
 
-# Add linker scripts
-add_subdirectory(linker_scripts)
+if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
+    get_startup_file(STARTUP_FILE "STM32Cube_FW/cmsis-device-f7/Source/Templates/gcc")
+
+    patch_startup_file(STARTUP_FILE_GEN "${STARTUP_FILE}")
+
+    target_sources(mbed-stm32f7
+        INTERFACE
+        ${STARTUP_FILE_GEN}
+    )
+
+    mbed_set_linker_script(mbed-stm32f7 linker_scripts/STM32F7_COMMON.ld)
+endif()
