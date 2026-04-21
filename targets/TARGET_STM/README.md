@@ -37,6 +37,15 @@ Table of Contents
   - [Mbed OS pages](#mbed-os-pages)
 
 
+TODO notes:
+* Introduce common linkers
+* Introduce custom linker usage in custom target CMakeList
+* Introduce how vector table size calculation is now solved
+* Introduce memory banks usage (custom targets)
+* Introduce Startup file from cmcsis
+* Introduce stm32/tools
+
+
 ## ST TOOLS
 
 ### USB drivers
