@@ -58,11 +58,10 @@ SECTIONS
         __flash_binary_start = .;
     } > FLASH
 
+#if PICO_RP2040
     /*
      * On RP2040, boot2 must be at the start of the image as it is executed
      * as the entry point to configure XIP flash and start the user program.
-     * On RP2350, boot2 can live anywhere and is called by the startup code using the
-     * __boot2_entry_point symbol.
      */
     .boot2 : {
         __boot2_start__ = .;
@@ -72,12 +71,22 @@ SECTIONS
 
     ASSERT(__boot2_end__ - __boot2_start__ == 256,
         "ERROR: Pico second stage bootloader must be 256 bytes in size")
+#endif
 
-    /* The second stage will always enter the image at the start of .text.
+    /* On RP2040, the second stage will always enter the image at the start of .text.
        The debugger will use the ELF entry point, which is the _entry_point
        symbol if present, otherwise defaults to start of .text.
        This can be used to transfer control back to the bootrom on debugger
        launches only, to perform proper flash setup.
+
+       On RP2350, the bootrom will enter the image at the point indicated in your
+       IMAGE_DEF (in the embedded_block), which is usually the reset handler of your vector table.
+
+       The debugger will use the ELF entry point, which is the _entry_point
+       symbol, and in our case is *different from the bootrom's entry point.*
+       This is used to go back through the bootrom on debugger launches only,
+       to perform the same initial flash setup that would be performed on a
+       cold boot.
     */
 
     .text : {
@@ -139,6 +148,26 @@ SECTIONS
         *(.eh_frame*)
         . = ALIGN(4);
     } > FLASH
+
+#if !PICO_RP2040
+    /* Note the boot2 section is optional, and should be discarded if there is
+       no reference to it *inside* the binary, as it is not called by the
+       bootrom. (The bootrom performs a simple best-effort XIP setup and
+       leaves it to the binary to do anything more sophisticated.) However
+       there is still a size limit of 256 bytes, to ensure the boot2 can be
+       stored in boot RAM.
+
+       Really this is a "XIP setup function" -- the name boot2 is historic and
+       refers to its dual-purpose on RP2040, where it also handled vectoring
+       from the bootrom into the user image.
+    */
+
+    .boot2 : {
+        __boot2_start__ = .;
+        *(.boot2)
+        __boot2_end__ = .;
+    } > FLASH
+#endif
 
     .rodata : {
         *(.rodata*)

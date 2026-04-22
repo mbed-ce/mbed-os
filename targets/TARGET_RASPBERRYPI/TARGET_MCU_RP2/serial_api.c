@@ -21,6 +21,8 @@
 #include "PeripheralPins.h"
 #include <string.h>
 
+#include "hardware/regs/uart.h"
+
 #if DEVICE_SERIAL
 
 #ifdef __cplusplus
@@ -32,6 +34,9 @@ serial_t stdio_uart;
 
 static inline void uart0_irq(void);
 static inline void uart1_irq(void);
+
+#define UART_IRQ(uart) uart == uart0 ? UART0_IRQ : UART1_IRQ
+#define UART_ISR(uart) uart == uart0 ? uart0_irq : uart1_irq
 
 void serial_init(serial_t *obj, PinName tx, PinName rx)
 {
@@ -62,15 +67,14 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
     gpio_set_function(tx, GPIO_FUNC_UART);
     gpio_set_function(rx, GPIO_FUNC_UART);
 
-    //uart_set_translate_crlf(obj->dev, false);
-    uart_set_fifo_enabled(obj->dev, false);
-
     // Prepare interrupt.  Note that we set it to enabled here, but the interrupt
     // won't fire yet because we haven't enabled any interrupt sources.
-    int UART_IRQ = obj->dev == uart0 ? UART0_IRQ : UART1_IRQ;
-    irq_set_exclusive_handler(UART_IRQ, obj->dev == uart0 ? uart0_irq : uart1_irq);
-    irq_clear(UART_IRQ);
-    irq_set_enabled(UART_IRQ, true);
+    irq_set_exclusive_handler(UART_IRQ(obj->dev), UART_ISR(obj->dev));
+    irq_clear(UART_IRQ(obj->dev));
+    irq_set_enabled(UART_IRQ(obj->dev), true);
+
+    // Enable FIFOs. Oddly the FIFO interrupt levels are configured as a side effect of uart_set_irq_enables() below.
+    uart_set_fifo_enabled(obj->dev, true);
 
     if (tx == STDIO_UART_TX) {
         memcpy(&stdio_uart, obj, sizeof(serial_t));
@@ -80,6 +84,7 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 
 void serial_free(serial_t *obj)
 {
+    irq_set_enabled(UART_IRQ(obj->dev), false);
     uart_deinit(obj->dev);
 }
 
@@ -87,7 +92,6 @@ void serial_baud(serial_t *obj, int baudrate)
 {
     obj->baud = (uint32_t)baudrate;
     uart_set_baudrate(obj->dev, obj->baud);
-    uart_set_fifo_enabled(obj->dev, false);
 }
 
 void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_bits)
