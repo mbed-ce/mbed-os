@@ -30,6 +30,7 @@ A message that notes the main changes in the update.
   - Added target metadata cleanup (`adc-vref`, `hse-value` for all F4 targets).
   - Replaced per-target linker scripts with one common STM32F4 linker script.CCM RAM was added into STM32F4 linker script (related to F429/F439)
   - F4 Vector table size and vector start is now covered by linker script and all cmsis_nvic.h files were removed
+  - Startup files are automatically selected from CMSIS submodule according to labels in targets.json5
 - STM32F7
   - HAL driver update to `stm32f7xx-hal-driver` v1.3.3 (2025), now integrated as a submodule.
   - CMSIS device update to `cmsis-device-f7` v1.2.10 (2025), now integrated as a submodule.
@@ -39,6 +40,8 @@ A message that notes the main changes in the update.
   - Added target metadata cleanup (`adc-vref`, `hse-value for all F7 targets).
   - Updated STM32F7 config/init files by consolidating Mbed changes with latest upstream templates. Removed unused Ethernet HAL sections from config (Mbed does not use ST Ethernet stack here)
   - Applied interim local HAL fixes until upstream release includes them: https://github.com/STMicroelectronics/stm32f7xx-hal-driver/issues/23
+  - F7 Vector table size and vector start is now covered by linker script and all cmsis_nvic.h files were removed
+  - Startup files are automatically selected from CMSIS submodule according to labels in targets.json5
   - `mem-size` of lwIP stack increased from default 4000 to 16384
 - RP2xxx
   - SDK updated from 1.5.1 to 2.2.0
