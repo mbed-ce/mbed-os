@@ -1,11 +1,8 @@
 # Copyright (c) 2020 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-add_subdirectory(TARGET_STM32F302x8 EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F303x8 EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F303xC EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32F303xE EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_STM32F334x8 EXCLUDE_FROM_ALL)
 add_subdirectory(STM32Cube_FW EXCLUDE_FROM_ALL)
 
 add_library(mbed-stm32f3 INTERFACE)
