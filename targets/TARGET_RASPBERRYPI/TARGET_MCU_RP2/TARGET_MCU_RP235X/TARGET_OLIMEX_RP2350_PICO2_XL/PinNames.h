@@ -62,7 +62,6 @@ typedef enum {
     IO_29 = 29,
 
     // These IOs pinned out on QFN-80 chips only
-#if !PICO_RP2350A
     IO_30 = 30,
     IO_31 = 31,
     IO_32 = 32,
@@ -81,7 +80,6 @@ typedef enum {
     IO_45 = 45,
     IO_46 = 46,
     IO_47 = 47,
-#endif
 
     // ADC internal channels
     ADC_TEMP = 0xF0,
@@ -108,42 +106,6 @@ typedef enum {
     CONSOLE_TX = IO_0,
     CONSOLE_RX = IO_1,
 
-    // Raspberry Pi Pico PCB header pin numbering.
-    // See diagram here: https://www.raspberrypi.com/documentation/microcontrollers/pico-series.html#layout_non-wireless
-    // This follows the innermost (grey) numbers.
-    PICO_P0 = IO_0,
-    PICO_P1 = IO_1,
-    PICO_P4 = IO_2,
-    PICO_P5 = IO_3,
-    PICO_P6 = IO_4,
-    PICO_P7 = IO_5,
-    PICO_P9 = IO_6,
-    PICO_P10 = IO_7,
-    PICO_P11 = IO_8,
-    PICO_P12 = IO_9,
-    PICO_P14 = IO_10,
-    PICO_P15 = IO_11,
-    PICO_P16 = IO_12,
-    PICO_P17 = IO_13,
-    PICO_P19 = IO_14,
-    PICO_P20 = IO_15,
-    PICO_P21 = IO_16,
-    PICO_P22 = IO_17,
-    PICO_P24 = IO_18,
-    PICO_P25 = IO_19,
-    PICO_P26 = IO_20,
-    PICO_P27 = IO_21,
-    PICO_P29 = IO_22,
-    PICO_P31 = IO_26,
-    PICO_P32 = IO_27,
-    PICO_P34 = IO_28,
-
-    // These three pins (plus the LED defined below) are connected internally on the Raspberry Pi Pico
-    // rather than being pinned out
-    BUCK_REG_PWM_MODE = IO_23,
-    USB_VBUS_PRESENT = IO_24,
-    VSYS_MEAS = IO_29,
-
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
@@ -152,13 +114,13 @@ typedef enum {
 #define LED1 IO_25
 
 // Default communication pins
-#define I2C_SCL IO_5
-#define I2C_SDA IO_4
+#define I2C_SCL IO_3
+#define I2C_SDA IO_2
 
-#define SPI_SCLK IO_18
-#define SPI_MOSI IO_19
-#define SPI_MISO IO_16
-#define SPI_CS IO_17
+#define SPI_SCLK IO_6
+#define SPI_MOSI IO_7
+#define SPI_MISO IO_4
+#define SPI_CS IO_5
 
 #ifdef __cplusplus
 }

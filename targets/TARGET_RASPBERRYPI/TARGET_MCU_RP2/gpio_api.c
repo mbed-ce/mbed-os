@@ -21,11 +21,11 @@
 #include "pinmap.h"
 #include "mbed_error.h"
 
-#if PICO_RP2040 || PICO_RP2350A
+#if PICO_RP2040 || (PICO_RP2350 && PICO_RP2350A)
 #define GPIO_PIN_COUNT 30
-#elif PICO_RP2350B
+#elif (PICO_RP2350 && !PICO_RP2350A)
 #define GPIO_PIN_COUNT 48
-#elif
+#else
 #error "Unknown model, don't know GPIO count!"
 #endif
 

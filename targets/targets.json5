@@ -8561,5 +8561,29 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "image_url": "https://akizukidenshi.com/img/goods/L/129604.jpg"
+    },
+    "OLIMEX_RP2350_PICO2_XL": {
+        "inherits": ["MCU_RP2350"],
+        "overrides": {
+            // Use USB serial for the default console on this board instead of the UART
+            "console-usb": true,
+            "console-uart": false,
+        },
+        "memory_banks": {
+            "QSPI_FLASH": {
+                "access": {
+                    "execute": true,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "startup": true,
+                "size": 0x200000, // 2MiB
+                "start": 0x10000000
+            }
+        },
+        "image_url": "https://www.olimex.com/Products/RaspberryPi/PICO/PICO2-XXL/images/thumbs/310x230/PICO2-XXL1w.jpg"
     }
 }

@@ -108,6 +108,7 @@ FILES_DIRS_TO_COPY: List[pathlib.Path] = [
     pathlib.Path("src") / "boards" / "include" / "boards" / "pico2.h",
     pathlib.Path("src") / "boards" / "include" / "boards" / "pico2_w.h",
     pathlib.Path("src") / "boards" / "include" / "boards" / "sparkfun_thingplus.h",
+    pathlib.Path("src") / "boards" / "include" / "boards" / "olimex_rp2350_xl.h",
 ]
 
 if len(sys.argv) != 2:

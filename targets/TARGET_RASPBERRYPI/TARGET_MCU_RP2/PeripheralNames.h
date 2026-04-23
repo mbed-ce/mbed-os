@@ -48,7 +48,7 @@ typedef enum {
     PWM_5,
     PWM_6,
     PWM_7,
-#if PICO_RP2350
+#if PICO_RP2350 && !PICO_RP2350A
     PWM_8,
     PWM_9,
     PWM_10,
