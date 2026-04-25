@@ -7,6 +7,15 @@ This script can be used to reimport a newer version of the RPi Pico SDK.
 Since the SDK is quite large, we only want to copy in specific files, not the whole
 thing.  Additionally, certain identifiers need to be renamed in order to not conflict with the
 Mbed ones.  This script takes care of that too, and provides a one-click way to do the import.
+
+NOTE: As of Apr 2025, Mbed is using version 2.2.0 of Pico SDK. However, we also need to pull in
+the following bugfix which has not been released yet:
+https://github.com/raspberrypi/pico-sdk/pull/2631
+So, after checking out master branch, do
+
+$ git cherry-pick b30caca
+
+before importing.
 """
 
 import pathlib
@@ -40,7 +49,7 @@ IDENTIFIERS_TO_RENAME: List[Tuple[str, str]] = [
 # List of files and directories which need to be copied into Mbed.
 # From directories, only .c, .h, .ld, and .S files will be copied, nothing else.
 FILES_DIRS_TO_COPY: List[pathlib.Path] = [
-    pathlib.Path("LICENSE.txt"),
+    pathlib.Path("LICENSE.TXT"),
     pathlib.Path("pico_sdk_version.cmake"),
     pathlib.Path("src") / "rp2_common" / "hardware_base",
     pathlib.Path("src") / "rp2_common" / "hardware_adc",
