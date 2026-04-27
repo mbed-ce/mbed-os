@@ -8,7 +8,7 @@ Since the SDK is quite large, we only want to copy in specific files, not the wh
 thing.  Additionally, certain identifiers need to be renamed in order to not conflict with the
 Mbed ones.  This script takes care of that too, and provides a one-click way to do the import.
 
-NOTE: As of Apr 2025, Mbed is using version 2.2.0 of Pico SDK. However, we also need to pull in
+NOTE: As of Apr 2026, Mbed is using version 2.2.0 of Pico SDK. However, we also need to pull in
 the following bugfix which has not been released yet:
 https://github.com/raspberrypi/pico-sdk/pull/2631
 So, after checking out master branch, do
