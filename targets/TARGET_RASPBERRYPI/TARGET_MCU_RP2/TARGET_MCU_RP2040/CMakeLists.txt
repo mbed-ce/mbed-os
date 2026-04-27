@@ -4,7 +4,6 @@
 # RP2040 sources
 target_sources(mbed-mcu-rp2040
     INTERFACE
-        PeripheralPins.c
         rtc_api.c
 )
 target_include_directories(mbed-mcu-rp2040

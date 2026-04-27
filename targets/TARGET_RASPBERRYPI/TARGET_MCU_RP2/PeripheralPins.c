@@ -16,7 +16,7 @@
  */
 
 
-#include "pinmap.h"
+#include "../../../hal/include/hal/pinmap.h"
 #include "objects.h"
 #include "PeripheralPins.h"
 
@@ -51,6 +51,28 @@ const PinMap PinMap_FULL[] = {
     {IO_27, 0, 0},
     {IO_28, 0, 0},
     {IO_29, 0, 0},
+
+#if !PICO_RP2350A
+    {IO_30, 0, 0},
+    {IO_31, 0, 0},
+    {IO_32, 0, 0},
+    {IO_33, 0, 0},
+    {IO_34, 0, 0},
+    {IO_35, 0, 0},
+    {IO_36, 0, 0},
+    {IO_37, 0, 0},
+    {IO_38, 0, 0},
+    {IO_39, 0, 0},
+    {IO_40, 0, 0},
+    {IO_41, 0, 0},
+    {IO_42, 0, 0},
+    {IO_43, 0, 0},
+    {IO_44, 0, 0},
+    {IO_45, 0, 0},
+    {IO_46, 0, 0},
+    {IO_47, 0, 0},
+#endif
+
     {NC, NC, 0}
 };
 
@@ -65,6 +87,12 @@ const PinMap PinMap_UART_TX[] = {
     {IO_20, UART_1, (uint32_t) uart1},
     {IO_24, UART_1, (uint32_t) uart1},
     {IO_28, UART_0, (uint32_t) uart0},
+#if !PICO_RP2350A
+    {IO_32, UART_0, (uint32_t) uart0},
+    {IO_36, UART_1, (uint32_t) uart1},
+    {IO_40, UART_1, (uint32_t) uart1},
+    {IO_44, UART_0, (uint32_t) uart0},
+#endif
     {NC, NC, 0}
 };
 
@@ -77,6 +105,12 @@ const PinMap PinMap_UART_RX[] = {
     {IO_21, UART_1, (uint32_t) uart1},
     {IO_25, UART_1, (uint32_t) uart1},
     {IO_29, UART_0, (uint32_t) uart0},
+#if !PICO_RP2350A
+    {IO_33, UART_0, (uint32_t) uart0},
+    {IO_37, UART_1, (uint32_t) uart1},
+    {IO_41, UART_1, (uint32_t) uart1},
+    {IO_45, UART_0, (uint32_t) uart0},
+#endif
     {NC, NC, 0}
 };
 
@@ -88,6 +122,12 @@ const PinMap PinMap_UART_CTS[] = {
     {IO_18, UART_0, (uint32_t) uart0},
     {IO_22, UART_1, (uint32_t) uart1},
     {IO_26, UART_1, (uint32_t) uart1},
+#if !PICO_RP2350A
+    {IO_30, UART_0, (uint32_t) uart0},
+    {IO_34, UART_0, (uint32_t) uart0},
+    {IO_38, UART_1, (uint32_t) uart1},
+    {IO_42, UART_1, (uint32_t) uart1},
+#endif
     {NC, NC, 0}
 };
 
@@ -99,6 +139,12 @@ const PinMap PinMap_UART_RTS[] = {
     {IO_19, UART_0, (uint32_t) uart0},
     {IO_23, UART_1, (uint32_t) uart1},
     {IO_27, UART_1, (uint32_t) uart1},
+#if !PICO_RP2350A
+    {IO_31, UART_0, (uint32_t) uart0},
+    {IO_35, UART_0, (uint32_t) uart0},
+    {IO_39, UART_1, (uint32_t) uart1},
+    {IO_43, UART_1, (uint32_t) uart1},
+#endif
     {NC, NC, 0}
 };
 
@@ -134,6 +180,26 @@ const PinMap PinMap_PWM_OUT[] = {
     {IO_27, PWM_5, 0},
     {IO_28, PWM_6, 0},
     {IO_29, PWM_6, 0},
+#if !PICO_RP2350A
+    {IO_30, PWM_7, 0},
+    {IO_31, PWM_7, 0},
+    {IO_32, PWM_8, 0},
+    {IO_33, PWM_8, 0},
+    {IO_34, PWM_9, 0},
+    {IO_35, PWM_9, 0},
+    {IO_36, PWM_10, 0},
+    {IO_37, PWM_10, 0},
+    {IO_38, PWM_11, 0},
+    {IO_39, PWM_11, 0},
+    {IO_40, PWM_8, 0},
+    {IO_41, PWM_8, 0},
+    {IO_42, PWM_9, 0},
+    {IO_43, PWM_9, 0},
+    {IO_44, PWM_10, 0},
+    {IO_45, PWM_10, 0},
+    {IO_46, PWM_11, 0},
+    {IO_47, PWM_11, 0},
+#endif
     {NC, NC, 0}
 };
 
@@ -147,6 +213,12 @@ const PinMap PinMap_SPI_MISO[] = {
     {IO_20, SPI_0, (uint32_t) spi0},
     {IO_24, SPI_1, (uint32_t) spi1},
     {IO_28, SPI_1, (uint32_t) spi1},
+#if !PICO_RP2350A
+    {IO_32, SPI_0, (uint32_t) spi0},
+    {IO_36, SPI_0, (uint32_t) spi0},
+    {IO_40, SPI_1, (uint32_t) spi1},
+    {IO_44, SPI_1, (uint32_t) spi1},
+#endif
     {NC, NC, 0}
 };
 
@@ -159,6 +231,12 @@ const PinMap PinMap_SPI_SSEL[] = {
     {IO_21, SPI_0, (uint32_t) spi0},
     {IO_25, SPI_1, (uint32_t) spi1},
     {IO_29, SPI_1, (uint32_t) spi1},
+#if !PICO_RP2350A
+    {IO_33, SPI_0, (uint32_t) spi0},
+    {IO_37, SPI_0, (uint32_t) spi0},
+    {IO_41, SPI_1, (uint32_t) spi1},
+    {IO_45, SPI_1, (uint32_t) spi1},
+#endif
     {NC, NC, 0}
 };
 
@@ -170,6 +248,12 @@ const PinMap PinMap_SPI_SCLK[] = {
     {IO_18, SPI_0, (uint32_t) spi0},
     {IO_22, SPI_0, (uint32_t) spi0},
     {IO_26, SPI_1, (uint32_t) spi1},
+#if !PICO_RP2350A
+    {IO_30, SPI_1, (uint32_t) spi1},
+    {IO_34, SPI_0, (uint32_t) spi0},
+    {IO_38, SPI_0, (uint32_t) spi0},
+    {IO_42, SPI_1, (uint32_t) spi1},
+#endif
     {NC, NC, 0}
 };
 
@@ -181,6 +265,12 @@ const PinMap PinMap_SPI_MOSI[] = {
     {IO_19, SPI_0, (uint32_t) spi0},
     {IO_23, SPI_0, (uint32_t) spi0},
     {IO_27, SPI_1, (uint32_t) spi1},
+#if !PICO_RP2350A
+    {IO_31, SPI_1, (uint32_t) spi1},
+    {IO_35, SPI_0, (uint32_t) spi0},
+    {IO_39, SPI_0, (uint32_t) spi0},
+    {IO_43, SPI_1, (uint32_t) spi1},
+#endif
     {NC, NC, 0}
 };
 
@@ -201,6 +291,17 @@ const PinMap PinMap_I2C_SDA[] = {
     {IO_24, I2C_0, (uint32_t) i2c0},
     {IO_26, I2C_1, (uint32_t) i2c1},
     {IO_28, I2C_0, (uint32_t) i2c0},
+#if !PICO_RP2350A
+    {IO_30, I2C_1, (uint32_t) i2c1},
+    {IO_32, I2C_0, (uint32_t) i2c0},
+    {IO_34, I2C_1, (uint32_t) i2c1},
+    {IO_36, I2C_0, (uint32_t) i2c0},
+    {IO_38, I2C_1, (uint32_t) i2c1},
+    {IO_40, I2C_0, (uint32_t) i2c0},
+    {IO_42, I2C_1, (uint32_t) i2c1},
+    {IO_44, I2C_0, (uint32_t) i2c0},
+    {IO_46, I2C_1, (uint32_t) i2c1},
+#endif
     {NC, NC, 0}
 };
 
@@ -220,6 +321,17 @@ const PinMap PinMap_I2C_SCL[] = {
     {IO_25, I2C_0, (uint32_t) i2c0},
     {IO_27, I2C_1, (uint32_t) i2c1},
     {IO_29, I2C_0, (uint32_t) i2c0},
+#if !PICO_RP2350A
+    {IO_31, I2C_1, (uint32_t) i2c1},
+    {IO_33, I2C_0, (uint32_t) i2c0},
+    {IO_35, I2C_1, (uint32_t) i2c1},
+    {IO_37, I2C_0, (uint32_t) i2c0},
+    {IO_39, I2C_1, (uint32_t) i2c1},
+    {IO_41, I2C_0, (uint32_t) i2c0},
+    {IO_43, I2C_1, (uint32_t) i2c1},
+    {IO_45, I2C_0, (uint32_t) i2c0},
+    {IO_47, I2C_1, (uint32_t) i2c1},
+#endif
     {NC, NC, 0}
 };
 
@@ -228,11 +340,23 @@ const PinMap PinMap_I2C_SCL[] = {
  * is the onboard temperature sensor.
  */
 const PinMap PinMap_ADC[] = {
+#if PICO_RP2350 && !PICO_RP2350A
+    { IO_40,       ADC0, 0},
+    { IO_41,       ADC0, 1},
+    { IO_42,       ADC0, 2},
+    { IO_43,       ADC0, 3},
+    { IO_44,       ADC0, 4},
+    { IO_45,       ADC0, 5},
+    { IO_46,       ADC0, 6},
+    { IO_47,       ADC0, 7},
+    { ADC_TEMP,    ADC0, 8},
+#else
     { IO_26,       ADC0, 0},
     { IO_27,       ADC0, 1},
     { IO_28,       ADC0, 2},
     { IO_29,       ADC0, 3},
-    { ADC_TEMP, ADC0, 4},
+    { ADC_TEMP,    ADC0, 4},
+#endif
     { NC,       NC,   0}
 };
 

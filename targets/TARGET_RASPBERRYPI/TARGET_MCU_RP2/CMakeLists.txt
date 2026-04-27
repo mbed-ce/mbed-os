@@ -25,6 +25,7 @@ target_sources(mbed-mcu-rp2
         USBPhy_RP2.cpp
         watchdog_api.c
         crt0_mbed.S
+        PeripheralPins.c
 )
 
 # RPxxxx linker script

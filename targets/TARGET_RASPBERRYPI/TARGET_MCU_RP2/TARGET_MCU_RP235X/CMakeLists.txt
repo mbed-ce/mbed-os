@@ -2,11 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # RP235x sources
-target_sources(mbed-mcu-rp235x
-    INTERFACE
-        PeripheralPins.c
-)
-
 target_include_directories(mbed-mcu-rp235x
     INTERFACE
         .
