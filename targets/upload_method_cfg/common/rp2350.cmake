@@ -1,4 +1,4 @@
-# Mbed OS upload method configuration file for most RP2040-based boards
+# Mbed OS upload method configuration file for most RP2350-based boards
 #
 # Currently, only picotool is supported out of the box for uploading code, and it requires manually putting the board
 # into bootloader mode whenever you wish to program it (unlike the pico SDK which has special handling for this).
