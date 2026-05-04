@@ -16,7 +16,7 @@
  */
 
 
-#include "../../../hal/include/hal/pinmap.h"
+#include "hal/pinmap.h"
 #include "objects.h"
 #include "PeripheralPins.h"
 
