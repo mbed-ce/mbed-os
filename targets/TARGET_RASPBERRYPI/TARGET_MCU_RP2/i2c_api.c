@@ -58,7 +58,8 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     /* Verify if both pins belong to the same I2C peripheral. */
     I2CName const i2c_sda = (I2CName)pinmap_peripheral(sda, PinMap_I2C_SDA);
     I2CName const i2c_scl = (I2CName)pinmap_peripheral(scl, PinMap_I2C_SCL);
-    MBED_ASSERT(i2c_sda == i2c_scl);
+    const I2CName i2c_peripheral = pinmap_merge(i2c_sda, i2c_scl);
+    MBED_ASSERT(i2c_peripheral != NC);
 
 #if DEVICE_I2CSLAVE
     /** was_slave is used to decide which driver call we need
@@ -100,8 +101,87 @@ void i2c_frequency(i2c_t *obj, int hz)
     obj->i2c.baudrate = i2c_set_baudrate(obj->i2c.dev, hz);
 }
 
+int i2c_start(i2c_t *obj) {
+    (void)obj;
+    // No-op, we need to wait until we get the address to start
+    return 0;
+}
+
+int i2c_byte_write(i2c_t *obj, int data) {
+    int ret = 1;
+
+    if(obj->state == MBED_HAL_I2C_STATE_STARTED) {
+        // First byte (address). Save for now in TAR register (won't actually get sent until later)
+        obj->i2c.dev->hw->enable = 0;
+        obj->i2c.dev->hw->tar = data >> 1;
+        obj->i2c.dev->hw->enable = 1;
+    }
+    else {
+        // Write byte. Force transmission of a start condition if this is the first data byte.
+        obj->i2c.dev->hw->data_cmd = data | (obj->state == MBED_HAL_I2C_STATE_ADDRESSED ? I2C_IC_DATA_CMD_RESTART_BITS : 0);
+
+        // Wait until the transmission of the address/data from the internal
+        // shift register has completed. For this to function correctly, the
+        // TX_EMPTY_CTRL flag in IC_CON must be set. The TX_EMPTY_CTRL flag
+        // was set in pico_sdk_i2c_init.
+        do {
+            tight_loop_contents();
+        }
+        while (!(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_EMPTY_BITS));
+
+        // Did we encounter an error?
+        if(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+            // Get the abort reason
+            uint32_t abort_reason = obj->i2c.dev->hw->tx_abrt_source;
+            if(abort_reason & (I2C_IC_TX_ABRT_SOURCE_ABRT_TXDATA_NOACK_BITS | I2C_IC_TX_ABRT_SOURCE_ABRT_10ADDR1_NOACK_BITS | I2C_IC_TX_ABRT_SOURCE_ABRT_10ADDR2_NOACK_BITS | I2C_IC_TX_ABRT_SOURCE_ABRT_7B_ADDR_NOACK_BITS)) {
+                ret = 0; // no ACK
+            }
+            else {
+                ret = 3; // other error
+            }
+
+            // Read register to clear abort
+            obj->i2c.dev->hw->clr_tx_abrt;
+        }
+    }
+
+    return ret;
+}
+
+int i2c_byte_read(i2c_t *obj, int last) {
+
+    // Trigger reading of a byte. Force generation of a start condition if this is the first byte.
+    // NOTE: As far as I can tell, there is not a way to make the hardware NACK this read byte.
+    (void)last;
+    obj->i2c.dev->hw->data_cmd = I2C_IC_DATA_CMD_CMD_BITS |
+        (obj->state == MBED_HAL_I2C_STATE_ADDRESSED ? I2C_IC_DATA_CMD_RESTART_BITS : 0);
+
+    // Wait until the transmission of the address/data from the internal
+    // shift register has completed. For this to function correctly, the
+    // TX_EMPTY_CTRL flag in IC_CON must be set. The TX_EMPTY_CTRL flag
+    // was set in pico_sdk_i2c_init.
+    do {
+        tight_loop_contents();
+    }
+    while (!(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) && !i2c_get_read_available(obj->i2c.dev));
+
+    // Did we encounter an error?
+    if(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+        // Sadly no way to pass up the abort reason so no reason to read tx_abrt_source
+        // Also don't clear the abort yet!
+
+        return 0;
+    }
+
+    // Return data
+}
+
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 {
+    // Make sure a repeated start is correctly generated if we currently have the bus locked
+    obj->i2c.dev->restart_on_next = obj->state != MBED_HAL_I2C_STATE_IDLE;
+
+
     int const bytes_read = i2c_read_blocking(obj->i2c.dev,
                                              (uint8_t)(address >> 1),
                                              (uint8_t *)data,
@@ -113,16 +193,25 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
         return bytes_read;
 }
 
+int i2c_stop(i2c_t *obj)
+{
+    // If we didn't already generate a stop due to an error earlier in the transaction...
+    if(!(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS)) {
+        // ...then generate one now.
+        obj->i2c.dev->hw->enable |= I2C_IC_ENABLE_ABORT_BITS;
+        do {
+            tight_loop_contents();
+        }
+        while (!(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS));
+    }
+
+    return 0;
+}
+
 int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 {
-    if (length == 0) {
-        // From pico-sdk:
-        // static int i2c_write_blocking_internal(i2c_inst_t *i2c, uint8_t addr, const uint8_t *src, size_t len, bool nostop,
-        // Synopsys hw accepts start/stop flags alongside data items in the same
-        // FIFO word, so no 0 byte transfers.
-        // invalid_params_if(I2C, len == 0);
-        length = 1;
-    }
+    // Make sure a repeated start is correctly generated if we currently have the bus locked
+    obj->i2c.dev->restart_on_next = obj->state != MBED_HAL_I2C_STATE_IDLE;
 
     int const bytes_written = i2c_write_blocking(obj->i2c.dev,
                                                  address >> 1,
@@ -159,11 +248,6 @@ const PinMap *i2c_slave_sda_pinmap()
 const PinMap *i2c_slave_scl_pinmap()
 {
     return PinMap_I2C_SCL;
-}
-
-int i2c_stop(i2c_t *obj)
-{
-    return 0;
 }
 
 #if DEVICE_I2CSLAVE
