@@ -30,8 +30,6 @@
 
 #define DEFAULT_CLK_FREQ (AM_HAL_IOM_400KHZ)
 
-static am_hal_iom_transfer_t xfer = {0};
-
 I2CName i2c_get_peripheral_name(PinName sda, PinName scl)
 {
     uint32_t iom_sda = pinmap_peripheral(sda, i2c_master_sda_pinmap());
@@ -55,11 +53,11 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     MBED_ASSERT((int)iom != IOM_NUM);
 
     // iom configuration
-    obj->i2c.iom_obj.iom.inst = (uint32_t)iom;
-    obj->i2c.iom_obj.iom.cfg.eInterfaceMode = AM_HAL_IOM_I2C_MODE;
-    obj->i2c.iom_obj.iom.cfg.ui32ClockFreq = DEFAULT_CLK_FREQ;
-    obj->i2c.iom_obj.iom.cfg.pNBTxnBuf = NULL;
-    obj->i2c.iom_obj.iom.cfg.ui32NBTxnBufLength = 0;
+    obj->i2c.i2c.iom_obj.iom.inst = (uint32_t)iom;
+    obj->i2c.i2c.iom_obj.iom.cfg.eInterfaceMode = AM_HAL_IOM_I2C_MODE;
+    obj->i2c.i2c.iom_obj.iom.cfg.ui32ClockFreq = DEFAULT_CLK_FREQ;
+    obj->i2c.i2c.iom_obj.iom.cfg.pNBTxnBuf = NULL;
+    obj->i2c.i2c.iom_obj.iom.cfg.ui32NBTxnBufLength = 0;
 
     // pin configuration
     if ((int)sda != NC) {
@@ -69,22 +67,14 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
         pinmap_config(scl, i2c_master_scl_pinmap());
     }
 
-    // invariant xfer settings
-    xfer.ui32InstrLen = 0;
-    xfer.ui32Instr = 0;
-    xfer.ui8RepeatCount = 0;
-    xfer.ui8Priority = 1;
-    xfer.ui32PauseCondition = 0;
-    xfer.ui32StatusSetClr = 0;
-
     // initialization
-    iom_init(&obj->i2c.iom_obj);
+    iom_init(&obj->i2c.i2c.iom_obj);
 }
 
 void i2c_free(i2c_t *obj)
 {
     MBED_ASSERT(obj);
-    iom_deinit(&obj->i2c.iom_obj);
+    iom_deinit(&obj->i2c.i2c.iom_obj);
 }
 
 void i2c_frequency(i2c_t *obj, int hz)
@@ -93,8 +83,8 @@ void i2c_frequency(i2c_t *obj, int hz)
     if (hz > AM_HAL_IOM_MAX_FREQ) {
         hz = AM_HAL_IOM_MAX_FREQ;
     }
-    obj->i2c.iom_obj.iom.cfg.ui32ClockFreq = hz;
-    iom_init(&obj->i2c.iom_obj);
+    obj->i2c.i2c.iom_obj.iom.cfg.ui32ClockFreq = hz;
+    iom_init(&obj->i2c.i2c.iom_obj);
 }
 
 int  i2c_start(i2c_t *obj)
@@ -117,13 +107,15 @@ int i2c_read(i2c_t *obj, int address8bit, char *data, int length, int stop)
 
     int handled_chars = 0;
 
+    am_hal_iom_transfer_t xfer = {0};
+    xfer.ui8Priority = 1;
     xfer.uPeerInfo.ui32I2CDevAddr = (address8bit >> 1);
     xfer.eDirection = AM_HAL_IOM_RX;
     xfer.ui32NumBytes = length;
     xfer.pui32RxBuffer = (uint32_t *)data;
     xfer.pui32TxBuffer = NULL;
     xfer.bContinue = (stop) ? false : true;
-    uint32_t status = am_hal_iom_blocking_transfer(obj->i2c.iom_obj.iom.handle, &xfer);
+    uint32_t status = am_hal_iom_blocking_transfer(obj->i2c.i2c.iom_obj.iom.handle, &xfer);
     if (AM_HAL_STATUS_SUCCESS != status) {
         return I2C_ERROR_NO_SLAVE;
     }
@@ -138,13 +130,15 @@ int i2c_write(i2c_t *obj, int address8bit, const char *data, int length, int sto
 
     int handled_chars = 0;
 
+    am_hal_iom_transfer_t xfer = {0};
+    xfer.ui8Priority = 1;
     xfer.uPeerInfo.ui32I2CDevAddr = (address8bit >> 1);
     xfer.eDirection = AM_HAL_IOM_TX;
     xfer.ui32NumBytes = length;
     xfer.pui32TxBuffer = (uint32_t *)data;
     xfer.pui32RxBuffer = NULL;
     xfer.bContinue = (stop) ? false : true;
-    uint32_t status = am_hal_iom_blocking_transfer(obj->i2c.iom_obj.iom.handle, &xfer);
+    uint32_t status = am_hal_iom_blocking_transfer(obj->i2c.i2c.iom_obj.iom.handle, &xfer);
     if (AM_HAL_STATUS_SUCCESS != status) {
         return I2C_ERROR_NO_SLAVE;
     }
@@ -191,6 +185,19 @@ const PinMap *i2c_slave_sda_pinmap(void)
 const PinMap *i2c_slave_scl_pinmap(void)
 {
     return PinMap_I2C_SCL;
+}
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_address_delayed = false,
+    .single_byte_start_cond_delayed = false,
+    .supports_single_byte = false,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = true
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
 }
 
 #endif // DEVICE_I2C

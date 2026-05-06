@@ -91,6 +91,21 @@ MBED_WEAK void spi_get_capabilities(PinName ssel, bool slave, spi_capabilities_t
         cs_pins++;
     }
 }
+#endif
+
+#if DEVICE_I2C
+// Default I2C capabilities: no quirks, everything supported
+static const i2c_capabilities_t default_i2c_caps = {
+    .single_byte_address_delayed = false,
+    .single_byte_start_cond_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = true
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &default_i2c_caps;
+}
 
 #endif
 

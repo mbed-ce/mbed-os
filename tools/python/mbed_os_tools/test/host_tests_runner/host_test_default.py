@@ -142,7 +142,7 @@ class DefaultTestSelector(DefaultTestSelectorBase):
         # Flag check if __exit_event_queue event occurred
         callbacks__exit_event_queue = False
         # Handle to dynamically loaded host test object
-        self.test_supervisor = None
+        self.host_test = None
         # Version: greentea-client version from DUT
         self.client_version = None
 
@@ -262,18 +262,18 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                         self.logger.prn_inf("DUT greentea-client version: " + self.client_version)
                     elif key == "__host_test_name":
                         # Load dynamically requested host test
-                        self.test_supervisor = self.registry.get_host_test(value)
+                        self.host_test = self.registry.get_host_test(value)
 
                         # Check if host test object loaded is actually host test class
                         # derived from 'mbed_os_tools.test.BaseHostTest()'
                         # Additionaly if host test class implements custom ctor it should
                         # call BaseHostTest().__Init__()
-                        if self.test_supervisor and self.is_host_test_obj_compatible(self.test_supervisor):
+                        if self.host_test and self.is_host_test_obj_compatible(self.host_test):
                             # Pass communication queues and setup() host test
-                            self.test_supervisor.setup_communication(event_queue, dut_event_queue, config)
+                            self.host_test.setup_communication(event_queue, dut_event_queue, config)
                             try:
                                 # After setup() user should already register all callbacks
-                                self.test_supervisor.setup()
+                                self.host_test.setup()
                             except (TypeError, ValueError):
                                 # setup() can throw in normal circumstances TypeError and ValueError
                                 self.logger.prn_err("host test setup() failed, reason:")
@@ -285,8 +285,8 @@ class DefaultTestSelector(DefaultTestSelectorBase):
                                 event_queue.put(("__exit_event_queue", 0, time()))
 
                             self.logger.prn_inf("host test setup() call...")
-                            if self.test_supervisor.get_callbacks():
-                                callbacks.update(self.test_supervisor.get_callbacks())
+                            if self.host_test.get_callbacks():
+                                callbacks.update(self.host_test.get_callbacks())
                                 self.logger.prn_inf("CALLBACKs updated")
                             else:
                                 self.logger.prn_wrn("no CALLBACKs specified by host test")
@@ -463,8 +463,8 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             # Here for example we've received some error code like IOERR_COPY
             self.logger.prn_inf("host test result() call skipped, received: %s" % str(result))
         else:
-            if self.test_supervisor:
-                result = self.test_supervisor.result()
+            if self.host_test:
+                result = self.host_test.result()
             self.logger.prn_inf("host test result(): %s" % str(result))
 
         if not callbacks__exit:
@@ -481,8 +481,8 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             result = self.RESULT_TIMEOUT
 
         self.logger.prn_inf("calling blocking teardown()")
-        if self.test_supervisor:
-            self.test_supervisor.teardown()
+        if self.host_test:
+            self.host_test.teardown()
         self.logger.prn_inf("teardown() finished")
 
         return result

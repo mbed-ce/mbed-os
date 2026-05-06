@@ -222,10 +222,13 @@ public:
         NACK,
         /// Timeout waiting for I2C hardware
         TIMEOUT,
-        /// Other error in I2C operation
-        OTHER_ERROR
+        /// Other error in I2C operation (e.g. wrong sequence of single byte calls)
+        OTHER_ERROR,
+        /// Operation not supported (check i2c_get_capabilities())
+        NOT_SUPPORTED,
+        /// You tried to do something while in the wrong state (e.g. calling stop() before start())
+        INVALID_STATE
     };
-
 
     /** Create an I2C Master interface, connected to the specified pins.
      * The new object defaults to 100kHz speed.
@@ -284,10 +287,18 @@ public:
      */
     Result write(int address, const char *data, int length, bool repeated = false);
 
-    /** Creates a start condition on the %I2C bus.  After calling this function, you should call
-     * \link write_byte() \endlink to send the %I2C address.
+    /**
+     * @brief Creates a start condition on the %I2C bus.
+     *
+     * After calling this function, you should call \link write_byte() \endlink to send the %I2C address.
+     *
+     * @note Some I2C peripherals (e.g. RP2xxx, newer STM32s) are not capable of sending a start condition
+     * until the address is known. On these MCUs, the start condition will not actually be sent until the first
+     * \link write_byte() \endlink call after the start().
+     *
+     * @returns 0 if successful or -1 on error
      */
-    void start(void);
+    int start();
 
     /** Read a single byte from the %I2C bus.
      *
@@ -349,27 +360,28 @@ public:
      *    '1' - ACK was received,
      *    '2' - timeout
      */
-    MBED_DEPRECATED_SINCE("mbed-ce", "Use I2C::write_byte() instead for better readability and return codes")
+    MBED_DEPRECATED_SINCE("mbed-os-7.0", "Use I2C::write_byte() instead for better readability and return codes")
     int write(int data);
 
     /**
-     * Creates a stop condition on the %I2C bus. This puts the bus back into an idle state where new transactions can be
+     * @brief Creates a stop condition on the %I2C bus.
+     *
+     * This puts the bus back into an idle state where new transactions can be
      * initiated by this device or others.
+     *
+     * @returns 0 if successful or -1 on error
      */
-    void stop(void);
+    int stop();
 
     /** Acquire exclusive access to this %I2C bus
      */
-    virtual void lock(void);
+    virtual void lock();
 
     /** Release exclusive access to this %I2C bus
      */
-    virtual void unlock(void);
+    virtual void unlock();
 
-    virtual ~I2C()
-    {
-        // Do nothing
-    }
+    virtual ~I2C();
 
 #if DEVICE_I2C_ASYNCH
 
@@ -385,7 +397,7 @@ public:
      * This callback will be called when the transfer completes or errors out.  Be careful: if you
      * only request the I2C_EVENT_TRANSFER_COMPLETE event, and the transfer errors, the callback will never be called.
      *
-     * Internally, the chip vendor may implement this function using either DMA or interrupts.
+     * Internally, the chip HAL may implement this function using either DMA or interrupts.
      *
      * This function locks the deep sleep until any event has occurred.
      *
@@ -403,7 +415,7 @@ public:
      * @param repeated Set up for a repeated start.  If true, the Mbed processor does not relinquish the bus after
      *       this operation.  You may then call write(), read(), start(), or transfer() again to start another operation.
      *
-     * @returns Zero if the transfer has started, or -1 if I2C peripheral is busy
+     * @returns Zero if the transfer has started, or -1 on error
      */
     int transfer(int address, const char *tx_buffer, int tx_length, char *rx_buffer, int rx_length, const event_callback_t &callback, int event = I2C_EVENT_TRANSFER_COMPLETE, bool repeated = false);
 
@@ -449,6 +461,7 @@ protected:
     CThunk<I2C> _irq;
     DMAUsage _usage;
     bool _deep_sleep_locked;
+    bool _async_transfer_is_repeated; // Flag that the current async transfer is configured for a repeated start
 #endif
 #endif
 

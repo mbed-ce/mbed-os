@@ -34,8 +34,11 @@
 
 // Macro to check the result of calling am am_hal function and trigger an error if it fails
 #define MBED_CHECK_AM_HAL_CALL(call) \
-    if((call) != AM_HAL_STATUS_SUCCESS) { \
-        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_INVALID_OPERATION), "AM HAL Call Failed!"); \
+    { \
+        const uint32_t _ret = (call); \
+        if(_ret != AM_HAL_STATUS_SUCCESS) { \
+            MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_INVALID_OPERATION), "AM HAL Call Failed!", _ret); \
+        } \
     }
 
 #endif

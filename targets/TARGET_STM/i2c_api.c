@@ -2434,4 +2434,19 @@ uint32_t i2c_get_timing(I2CName i2c, uint32_t current_timing, int current_hz,
 
 #endif /* I2C_IP_VERSION_V2 */
 
+#ifdef I2C_IP_VERSION_V2
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_address_delayed = false,
+    .single_byte_start_cond_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = false,
+    .supports_zero_length_transfer_transaction = true
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
+}
+#endif
+
 #endif // DEVICE_I2C

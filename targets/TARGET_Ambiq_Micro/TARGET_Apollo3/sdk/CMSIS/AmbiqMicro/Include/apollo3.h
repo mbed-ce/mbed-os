@@ -134,8 +134,9 @@ typedef enum {
 #define __NVIC_PRIO_BITS               3        /*!< Number of Bits used for Priority Levels                                   */
 #define __Vendor_SysTickConfig         0        /*!< Set to 1 if different SysTick Config is used                              */
 #define __MPU_PRESENT                  1        /*!< MPU present                                                               */
+#ifndef __FPU_PRESENT
 #define __FPU_PRESENT                  1        /*!< FPU present                                                               */
-
+#endif
 
 /** @} */ /* End of group Configuration_of_CMSIS */
 

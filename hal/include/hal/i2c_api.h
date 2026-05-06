@@ -69,26 +69,32 @@
 
 /**@}*/
 
-#if DEVICE_I2C_ASYNCH
-/** Asynch I2C HAL structure
- */
+/// Enumeration of states the I2C HAL can be in
+enum mbed_hal_i2c_state {
+    MBED_HAL_I2C_STATE_IDLE, ///< Not in the middle of a transaction
+    MBED_HAL_I2C_STATE_STARTED, ///< start() has been called but not write_byte() or read_byte()
+    MBED_HAL_I2C_STATE_ADDRESSED, ///< write_byte() has been called after start()
+    MBED_HAL_I2C_STATE_BYTE_READ, ///< In the middle of a single-byte read
+    MBED_HAL_I2C_STATE_BYTE_WRITE, ///< In the middle of a single-byte read
+    MBED_HAL_I2C_STATE_HOLDING_BUS, ///< We just completed a transaction with the repeated option set, so we are still holding the bus
+    MBED_HAL_I2C_STATE_ASYNC_TRANSACTION, ///< In an async transaction
+};
+
+
 typedef struct {
     struct i2c_s    i2c;     /**< Target specific I2C structure */
+    volatile enum mbed_hal_i2c_state state; ///< I2C state. Managed by the I2C class, available for use by the HAL.
+#if DEVICE_I2C_ASYNCH
     struct buffer_s tx_buff; /**< Tx buffer */
     struct buffer_s rx_buff; /**< Rx buffer */
-} i2c_t;
-
-#else
-/** Non-asynch I2C HAL structure
- */
-typedef struct i2c_s i2c_t;
-
 #endif
+} i2c_t;
 
 enum {
     I2C_ERROR_NO_SLAVE = -1,
     I2C_ERROR_BUS_BUSY = -2,
-    I2C_ERROR_INVALID_USAGE = -3 // Invalid usage of the I2C API, e.g. by mixing single-byte and transactional function calls.
+    I2C_ERROR_INVALID_USAGE = -3, // Invalid usage of the I2C API, e.g. by mixing single-byte and transactional function calls.
+    I2C_ERROR_OTHER = -4, ///< Other internal error
 };
 
 typedef struct {
@@ -98,6 +104,35 @@ typedef struct {
     PinName scl_pin;
     int scl_function;
 } i2c_pinmap_t;
+
+/**
+ * Describes the capabilities of an I2C peripheral
+ */
+typedef struct {
+    /// If true, generation of the start condition in single-byte mode is delayed until the address is transmitted.
+    /// If single-byte is not supported this is a don't care.
+    bool        single_byte_start_cond_delayed;
+
+    /// If true, transmission of the address in single-byte mode is delayed until the first data byte is read/written.
+    /// For write transactions, the ACK/NACK from the address byte will be reported in the status of the first data byte.
+    /// Note that this means there is no way to detect a NACK of the address for a single-byte read operation.
+    /// If single-byte is not supported this is a don't care.
+    bool        single_byte_address_delayed;
+
+    bool        supports_single_byte; ///< If true, the single-byte API is implemented. Otherwise, it is a no-op.
+
+    /// If true, the single-byte API supports a zero-length transfer (one that has only a start, then an address, then a stop).
+    /// If single-byte is not supported this is a don't care.
+    bool        supports_zero_length_transfer_single_byte;
+
+    /// If true, the transaction-based API supports a zero-length transfer (one that has only a start, then an address, then a stop).
+    bool        supports_zero_length_transfer_transaction;
+
+#if DEVICE_I2C_ASYNCH
+    /// If true, the async API supports a zero-length transfer (one that has only a start, then an address, then a stop).
+    bool        supports_zero_length_transfer_async;
+#endif
+} i2c_capabilities_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -202,19 +237,14 @@ void i2c_free(i2c_t *obj);
  */
 void i2c_frequency(i2c_t *obj, int hz);
 
-/** Send START command
+/**
+ * @brief Blocking read of data
  *
- *  @param obj The I2C object
- */
-int  i2c_start(i2c_t *obj);
-
-/** Send STOP command
- *
- *  @param obj The I2C object
- */
-int  i2c_stop(i2c_t *obj);
-
-/** Blocking reading data
+ * This function may be called in these I2C states:
+ * - IDLE
+ * - HOLDING_BUS
+ * - BYTE_READ (to do a repeated start after a single byte transaction)
+ * - BYTE_WRITE (to do a repeated start after a single byte transaction)
  *
  *  @param obj     The I2C object
  *  @param address 8/11-bit address (last bit is 1)
@@ -225,18 +255,57 @@ int  i2c_stop(i2c_t *obj);
  */
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop);
 
-/** Blocking sending data
+/**
+ * @brief Blocking write of data
  *
- *  @param obj     The I2C object
- *  @param address 8/11-bit address (last bit is 0)
- *  @param data    The buffer for sending
- *  @param length  Number of bytes to write
- *  @param stop    Stop to be generated after the transfer is done
- *  @return
- *      zero or non-zero - Number of written bytes
- *      negative - I2C_ERROR_XXX status
+ * This function may be called in these I2C states:
+ * - IDLE
+ * - HOLDING_BUS
+ * - BYTE_READ (to do a repeated start after a single byte transaction)
+ * - BYTE_WRITE (to do a repeated start after a single byte transaction)
+ *
+ * @param obj     The I2C object
+ * @param address 8/11-bit address (last bit is 0)
+ * @param data    The buffer for sending
+ * @param length  Number of bytes to write
+ * @param stop    Stop to be generated after the transfer is done
+ * @retval zero or non-zero - Number of written bytes
+ * @retval negative - I2C_ERROR_XXX status
  */
 int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop);
+
+/**
+ * @brief Send START command
+ *
+ * The I2C class guarantees that this will only be called at appropriate times (when the bus is idle or
+ * during an existing single-byte transaction to do a repeated start).
+ *
+ * Note that some I2C peripherals (e.g. RP2xxx, newer STM32s) are not capable of sending a start condition
+ * until the address is known. On these MCUs, the start condition will not actually be sent until the first write_byte()
+ * call after the start().
+ *
+ * This function may be called in these I2C states:
+ * - IDLE
+ * - HOLDING_BUS
+ * - ADDRESSED (to do a repeated start after a zero length transaction, if supported)
+ * - BYTE_READ
+ * - BYTE_WRITE
+ *
+ * @param obj The I2C object
+ */
+int i2c_start(i2c_t *obj);
+
+/**
+ * @brief Send STOP command
+ *
+ * This function may be called in these I2C states:
+ * - ADDRESSED (to complete a zero length transaction, if supported)
+ * - BYTE_READ
+ * - BYTE_WRITE
+ *
+ * @param obj The I2C object
+ */
+int i2c_stop(i2c_t *obj);
 
 /** Reset I2C peripheral. TODO: The action here. Most of the implementation sends stop()
  *
@@ -244,7 +313,12 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop);
  */
 void i2c_reset(i2c_t *obj);
 
-/** Read one byte
+/**
+ * @brief Read one byte
+ *
+ * This function may be called in these I2C states:
+ * - ADDRESSED
+ * - BYTE_READ
  *
  *  @param obj The I2C object
  *  @param last Acknoledge
@@ -252,7 +326,13 @@ void i2c_reset(i2c_t *obj);
  */
 int i2c_byte_read(i2c_t *obj, int last);
 
-/** Write one byte
+/**
+ * @brief Write one byte
+ *
+ * This function may be called in these I2C states:
+ * - STARTED (to send the address byte)
+ * - ADDRESSED
+ * - BYTE_WRITE
  *
  *  @param obj The I2C object
  *  @param data Byte to be written
@@ -296,6 +376,13 @@ const PinMap *i2c_slave_sda_pinmap(void);
  */
 const PinMap *i2c_slave_scl_pinmap(void);
 
+/**
+ * Fills the given i2c_capabilities_t structure with the capabilities of the I2C peripheral.
+ * 
+ * @returns Pointer to constant capabilities data
+ */
+i2c_capabilities_t const * i2c_get_capabilities();
+
 /**@}*/
 
 #if DEVICE_I2CSLAVE
@@ -320,9 +407,14 @@ int  i2c_slave_receive(i2c_t *obj);
 
 /**
  *  @brief Read specified number of bytes from an I2C master.
+ *
+ * This function shall be called only after ::i2c_slave_receive() has returned 2 or 3.
+ *  
  *  @param obj The I2C object
- *  @param data    The buffer for receiving
- *  @param length  Number of bytes to read
+ *  @param data The buffer for receiving
+ *  @param length  Number of bytes to read. If the master writes more than this number
+ *    of bytes, the additional bytes are dropped.
+ * 
  *  @return Number of bytes read, or zero on error
  */
 int  i2c_slave_read(i2c_t *obj, char *data, int length);

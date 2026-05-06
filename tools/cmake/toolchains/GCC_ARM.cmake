@@ -62,6 +62,7 @@ list(APPEND common_options
     "-Wno-missing-field-initializers"
     "-Wno-psabi" # Disable "parameter passing changed in GCC 7.1" warning
     "-Wno-packed-bitfield-compat" # Disable "offset of packed bitfield changed in GCC 4.4" warning
+    "-Werror=return-type" # Turn a missing return statement into a fatal error
     "-fmessage-length=0"
     "-fno-exceptions"
     "-ffunction-sections"

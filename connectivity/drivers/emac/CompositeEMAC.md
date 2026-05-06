@@ -22,7 +22,7 @@ To run an ethernet connection, two chips need to work together*: the microcontro
 
 *though some MCUs, e.g. TI's TM4C129 line, do have the Ethernet PHY integrated into the MCU.
 
-The PHY and the MCU are connected via a standard called [Reduced Media Independent Interface](https://en.wikipedia.org/wiki/Media-independent_interface#RMII) (RMII), which transfers the Ethernet packets as serialized bytes. This is an 8-wire bus with a 50MHz clock, four receive lines, and three transmit lines. The clock is traditionally either supplied by the PHY or by a dedicated clock generator chip, though some MCUs support supplying this clock as well. In addition to RMII, there's also a two-wire command and control bus called [Management Data IO](https://en.wikipedia.org/wiki/Management_Data_Input/Output) (MDIO) (though it can also be referred to Station Management Interface (SMI) or even "MiiM" for some reason). MDIO is used for talking directly to the PHY, not for sending Ethernet packets. MDIO is an open-drain bus similar to I2C, but with 16-bit words instead of bytes and a specific frame format (referred to as "Clause 22"). Unlike RMII, MDIO is a multi-drop bus, so you can actually connect up to 15 PHYs or other devices to one set of MDIO lines as long as they have different addresses!
+The PHY and the MCU are connected via a standard called [Reduced Media Independent Interface](https://en.wikipedia.org/wiki/Media-independent_interface#RMII) (RMII), which transfers the Ethernet packets as serialized bytes. This is an 8-wire bus with a 50MHz clock, four receive lines, and three transmit lines. The clock is traditionally either supplied by the PHY or by a dedicated clock generator chip, though some MCUs support supplying this clock as well. In addition to RMII, there's also a two-wire command and control bus called [Management Data IO](https://en.wikipedia.org/wiki/Management_Data_Input/Output) (MDIO) (though it can also be referred to Station Management Interface (SMI) or MII Management (MIIM)). MDIO is used for talking directly to the PHY, not for sending Ethernet packets. MDIO is an open-drain bus similar to I2C, but with 16-bit words instead of bytes and a specific frame format (referred to as "Clause 22"). Unlike RMII, MDIO is a multi-drop bus, so you can actually connect up to 15 PHYs or other devices to one set of MDIO lines as long as they have different addresses!
 
 Inside the microcontroller, the bridge between the CPU and Ethernet is a peripheral called the Ethernet MAC. MAC stands for "Media Access Control" and refers to the second layer of the Ethernet protocol stack, the logic which encodes Ethernet packets and decides when to send them across the wire. The MAC has a number of moving parts inside, which are shown in the diagram above. The simplest is the block of configuration registers, which is accessible at a specific memory address and sets up operation of the MAC (e.g. what MAC addresses the hardware should accept and which checksums should be inserted/checked by the MAC). There is also an MDIO master interface, which controls the MDIO lines to talk to the PHY. And then, we have the DMA.
 
@@ -34,7 +34,7 @@ How does the DMA know where in RAM to read and write packets, though? On every e
 
 ![DMA descriptor ring](doc/stm32f2-eth-dma-descriptors.png)
 
-A descriptor is a structure in memory that contains control information and one or more pointers to memory buffers (which contain the actual packet data). For Tx, the DMA will fetch the descriptor, then transmit the data in the buffers. For Rx, the DMA will fetch the descriptor, then write the packet to the descriptor's buffers. Either way, when the MAC is done with the descriptor, the DMA will write back status information (e.g. whether the checksum passed, or what timestamp the packet was sent at) to the descriptor, set a "done" flag, and then interrupt the CPU to tell it it has something to process.
+A descriptor is a structure in memory that contains control information and one or more pointers to memory buffers (which contain the actual packet data). For Tx, the DMA will fetch the descriptor, then transmit the data in the buffers. For Rx, the DMA will fetch the descriptor, then write the packet to the descriptor's buffers. In both cases, when the MAC is done with the descriptor, the DMA will write back status information (e.g. whether the checksum passed, or what timestamp the packet was sent at) to the descriptor, set a "done" flag, and then interrupt the CPU to tell it it has something to process.
 
 But we don't want the DMA to have to wait for the CPU, do we? To avoid this, each descriptor also specifies a "next descriptor", either via an offset or a pointer. The DMA can move to this next descriptor and start processing it right away to send or receive the next packet. The CPU will process the completed descriptor on its own time and give it back to the DMA. In this manner, as long as your ring of descriptors is big enough and your CPU can keep up with the processing them, the CPU and MAC never have to wait for each other!
 
@@ -63,8 +63,8 @@ Unlike the MAC driver and the DMA, the PHY driver does not need to be subclassed
 
 ```json5
 "MY_TARGET": {
-    "nsapi.emac-phy-model": "LAN87XX",
-    "nsapi.emac-phy-mdio-address": 0
+    "ephy.model": "LAN87XX",
+    "ephy.mdio-address": 0
 }
 ```
 

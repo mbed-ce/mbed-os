@@ -170,10 +170,11 @@ public:
      *
      * Call this function only once \c receive() returns WriteAddressed or WriteGeneral.
      *
-     *  @param data   Pointer to the buffer to read data into.
-     *  @param length Maximum number of bytes to read.
+     * @param data   Pointer to the buffer to read data into.
+     * @param length Maximum number of bytes to read. If the master writes more than this number
+     *    of bytes, the additional bytes are dropped.
      *
-     *  @return The number of bytes read
+     * @return The number of bytes read
      */
     int read(char *data, int length);
 

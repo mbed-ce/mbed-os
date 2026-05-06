@@ -65,7 +65,7 @@ struct can_s {
 };
 
 struct i2c_s {
-    LPC_I2C_TypeDef *i2c;
+    LPC_I2C_TypeDef *regs;
 };
 
 struct spi_s {

@@ -35,15 +35,16 @@ class KiViBufferWalker:
         self.buff = str()
         self.kvl = []
         self.re_kv = re.compile(self.KIVI_REGEX)
+        self.logger = HtrunLogger("CONN")
 
     def append(self, payload: bytes):
         """! Append stream buffer with payload and process. Returns non-KV strings"""
-        logger = HtrunLogger("CONN")
+        
         try:
             self.buff += payload.decode("utf-8")
         except UnicodeDecodeError:
             decoded_payload = payload.decode("utf-8", "ignore")
-            logger.prn_wrn(
+            self.logger.prn_wrn(
                 f'UnicodeDecodeError encountered! Raw bytes were {payload!r} and they decoded to "{decoded_payload}"'
             )
             self.buff += decoded_payload
@@ -65,17 +66,17 @@ class KiViBufferWalker:
                 before = line[:pos]
                 after = line[pos + len(match) :]
                 if len(before) > 0:
-                    logger.prn_rxd(before)
+                    self.logger.prn_rxd(before)
                     discarded.append(before)
                 if len(after) > 0:
                     # not a K,V pair part
-                    logger.prn_rxd(after)
+                    self.logger.prn_rxd(after)
                     discarded.append(after)
-                logger.prn_inf("found KV pair in stream: {{%s;%s}}, queued..." % (key, value))
+                self.logger.prn_inf("found KV pair in stream: {{%s;%s}}, queued..." % (key, value))
             else:
                 # not a K,V pair
                 discarded.append(line)
-                logger.prn_rxd(line)
+                self.logger.prn_rxd(line)
 
         return discarded
 
@@ -83,9 +84,10 @@ class KiViBufferWalker:
         """! Check if there is a KV value in buffer"""
         return len(self.kvl) > 0
 
-    def pop_kv(self):
+    def pop_kv(self) -> tuple[str, str, float]:
         if len(self.kvl):
             return self.kvl.pop(0)
+
         return None, None, time()
 
 

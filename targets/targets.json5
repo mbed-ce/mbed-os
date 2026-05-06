@@ -8441,8 +8441,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_remove": [
             "ANALOGIN",
             "FLASH",
-            "I2C",
-            "I2CSLAVE",
             "PWMOUT",
             "SERIAL_FC",
             "SPI",
