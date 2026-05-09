@@ -56,10 +56,10 @@ static unsigned int const DEFAULT_I2C_BAUDRATE = 100 * 1000; /* 100 kHz */
 void i2c_init(i2c_t *obj, PinName sda, PinName scl)
 {
     /* Verify if both pins belong to the same I2C peripheral. */
-    I2CName const i2c_sda = (I2CName)pinmap_peripheral(sda, PinMap_I2C_SDA);
-    I2CName const i2c_scl = (I2CName)pinmap_peripheral(scl, PinMap_I2C_SCL);
-    const I2CName i2c_peripheral = pinmap_merge(i2c_sda, i2c_scl);
-    MBED_ASSERT(i2c_peripheral != NC);
+    uint32_t const i2c_sda = pinmap_peripheral(sda, PinMap_I2C_SDA);
+    uint32_t const i2c_scl = pinmap_peripheral(scl, PinMap_I2C_SCL);
+    const uint32_t i2c_peripheral = pinmap_merge(i2c_sda, i2c_scl);
+    MBED_ASSERT(i2c_peripheral != ((uint32_t)NC));
 
 #if DEVICE_I2CSLAVE
     /** was_slave is used to decide which driver call we need
@@ -174,6 +174,7 @@ int i2c_byte_read(i2c_t *obj, int last) {
     }
 
     // Return data
+    return (uint8_t) obj->i2c.dev->hw->data_cmd;
 }
 
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
@@ -248,6 +249,19 @@ const PinMap *i2c_slave_sda_pinmap()
 const PinMap *i2c_slave_scl_pinmap()
 {
     return PinMap_I2C_SCL;
+}
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_address_delayed = true,
+    .single_byte_start_cond_delayed = true,
+    .supports_single_byte = false,
+    .supports_zero_length_transfer_single_byte = false,
+    .supports_zero_length_transfer_transaction = false
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
 }
 
 #if DEVICE_I2CSLAVE
