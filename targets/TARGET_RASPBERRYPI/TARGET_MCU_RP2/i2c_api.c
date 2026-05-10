@@ -327,54 +327,99 @@ int i2c_slave_receive(i2c_t *obj)
     return (retValue);
 }
 
-/** Configure I2C as slave or master.
- *  @param obj The I2C objecti2c_get_read_availableread
- *  @return non-zero if a value is available
- */
 int i2c_slave_read(i2c_t *obj, char *data, int length)
 {
     int bytes_read = 0;
-    for (size_t i = 0; i < (size_t)length; ++i) {
-        while (!i2c_get_read_available(obj->i2c.dev)) {
+
+    while(true) {
+        // Wait until something happens
+        while (!i2c_get_read_available(obj->i2c.dev) && !(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS)) {
             tight_loop_contents();
         }
 
-        *data = obj->i2c.dev->hw->data_cmd;
-        bytes_read++;
+        // Drain Rx FIFO while there is data
+        while(i2c_get_read_available(obj->i2c.dev)) {
+            if(bytes_read < length) {
+                data[bytes_read++] = obj->i2c.dev->hw->data_cmd;
+            }
+            else {
+                obj->i2c.dev->hw->data_cmd; // throw away data
+            }
+        }
 
-        // Check stop condition
-        bool stop = (obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS) != 0;
-        if (stop && !i2c_get_read_available(obj->i2c.dev)) {
+        // If we have received a stop, then bail
+        if((obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS)) {
+            // Race condition: did we get any data after exiting the while loop above? If so then loop again.
+            if(i2c_get_read_available(obj->i2c.dev)) {
+                continue;
+            }
+
             // Clear stop (by reading the register)
-            int clear_stop = obj->i2c.dev->hw->clr_stop_det;
-            (void)clear_stop;
+            obj->i2c.dev->hw->clr_stop_det;
+
             break;
-        } else {
-            data++;
         }
     }
 
     return bytes_read;
 }
 
-/** Configure I2C as slave or master.
- *  @param obj The I2C object
- *  @param data    The buffer for sending
- *  @param length  Number of bytes to write
- *  @return non-zero if a value is available
- */
 int i2c_slave_write(i2c_t *obj, const char *data, int length)
 {
     DEBUG_PRINTF("i2c_slave_write\r\n");
 
-    i2c_write_raw_blocking(obj->i2c.dev, (const uint8_t *)data, (size_t)length);
+    int bytes_written = 0;
 
-    // Clear interrupt (by reading the register)
-    int clear_read_req = i2c_get_hw(obj->i2c.dev)->clr_rd_req;
-    (void)clear_read_req;
-    DEBUG_PRINTF("clear_read_req: %d\n", clear_read_req);
+    while(true) {
+        // Wait for something to happen
+        while (!i2c_get_write_available(obj->i2c.dev) && 
+            !(obj->i2c.dev->hw->raw_intr_stat & (I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS | I2C_IC_RAW_INTR_STAT_STOP_DET_BITS | I2C_IC_RAW_INTR_STAT_RD_REQ_BITS))) {
+            tight_loop_contents();
+        }
 
-    return length;
+        // Feed more bytes into the FIFO if we have them and there's room
+        if(i2c_get_write_available(obj->i2c.dev) && bytes_written < length) {
+            obj->i2c.dev->hw->data_cmd = data[bytes_written++];
+
+            // Tell the hardware we gave it some data
+            obj->i2c.dev->hw->clr_rd_req;
+        }
+        
+        if(obj->i2c.dev->hw->raw_intr_stat & (I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS | I2C_IC_RAW_INTR_STAT_STOP_DET_BITS)) {
+            // Transaction ended
+            break;
+        }
+
+        if((obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_RD_REQ_BITS) && (bytes_written >= length)) {
+            // Out of data, and currently stretching the clock.
+            // To un-stick the master, for now we will just feed zeros into the FIFO.
+            // This error case could potentially be improved later.
+            obj->i2c.dev->hw->data_cmd = 0;
+            obj->i2c.dev->hw->clr_rd_req;
+        }
+    }
+
+    // Clear stop flag always
+    obj->i2c.dev->hw->clr_stop_det;
+
+    // Handle success vs failure
+    if(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+        if(obj->i2c.dev->hw->tx_abrt_source & I2C_IC_TX_ABRT_SOURCE_ABRT_SLVFLUSH_TXFIFO_BITS) {
+            // Master ended transaction early.
+            // Thankfully there is a useful field that shows the number of bytes
+            // written to the FIFO that were flushed due to transaction end.
+            const int bytes_actually_written = bytes_written - (obj->i2c.dev->hw->tx_abrt_source >> I2C_IC_TX_ABRT_SOURCE_TX_FLUSH_CNT_LSB);
+            obj->i2c.dev->hw->clr_tx_abrt;
+            return bytes_actually_written;
+        }
+        else {
+            // Other error
+            obj->i2c.dev->hw->clr_tx_abrt;
+            return -1;
+        }
+    }
+
+    return bytes_written;
 }
 
 /** Configure I2C address.
