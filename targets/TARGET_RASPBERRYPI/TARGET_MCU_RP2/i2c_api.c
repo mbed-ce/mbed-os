@@ -88,6 +88,10 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     gpio_pull_up(scl);
 }
 
+void i2c_free(i2c_t *obj) {
+    i2c_deinit(obj->i2c.dev);
+}
+
 void i2c_frequency(i2c_t *obj, int hz)
 {
     DEBUG_PRINTF("obj->i2c.is_slave: %d\r\n", obj->i2c.is_slave);
@@ -150,9 +154,12 @@ int i2c_byte_write(i2c_t *obj, int data) {
 
 int i2c_byte_read(i2c_t *obj, int last) {
 
-    // Trigger reading of a byte. Force generation of a start condition if this is the first byte.
-    // NOTE: As far as I can tell, there is not a way to make the hardware NACK this read byte.
+    // This I2C peripheral waits to generate the ACK/NACK after a read until either we try to read the
+    // next byte or we generate a stop/repeated start. This means it automatically uses the correct
+    // type of ACK or NACK and doesn't need (and can't accept) a flag on whether to do so.
     (void)last;
+
+    // Trigger reading of a byte. Force generation of a start condition if this is the first byte.
     obj->i2c.dev->hw->data_cmd = I2C_IC_DATA_CMD_CMD_BITS |
         (obj->state == MBED_HAL_I2C_STATE_ADDRESSED ? I2C_IC_DATA_CMD_RESTART_BITS : 0);
 
@@ -177,23 +184,6 @@ int i2c_byte_read(i2c_t *obj, int last) {
     return (uint8_t) obj->i2c.dev->hw->data_cmd;
 }
 
-int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
-{
-    // Make sure a repeated start is correctly generated if we currently have the bus locked
-    obj->i2c.dev->restart_on_next = obj->state != MBED_HAL_I2C_STATE_IDLE;
-
-
-    int const bytes_read = i2c_read_blocking(obj->i2c.dev,
-                                             (uint8_t)(address >> 1),
-                                             (uint8_t *)data,
-                                             (size_t)length,
-                                             /* nostop = */(stop == 0));
-    if (bytes_read < 0)
-        return I2C_ERROR_NO_SLAVE;
-    else
-        return bytes_read;
-}
-
 int i2c_stop(i2c_t *obj)
 {
     // If we didn't already generate a stop due to an error earlier in the transaction...
@@ -206,13 +196,46 @@ int i2c_stop(i2c_t *obj)
         while (!(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS));
     }
 
+    // Clear stop detection and abort reason flags (clear on read registers, ick!).
+    // If we don't clear these the SDK read/write functions will get stuck.
+    obj->i2c.dev->hw->clr_tx_abrt;
+    obj->i2c.dev->hw->clr_stop_det;
+
     return 0;
+}
+
+int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
+{
+    // Make sure a repeated start is correctly generated if we currently have the bus locked
+    obj->i2c.dev->restart_on_next = true;
+
+    // If we were previously doing a single byte transaction which aborted for any reason,
+    // ensure we clear that abort so that the Pico SDK function doesn't get stuck
+    if(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+        i2c_stop(obj);
+    }
+
+    int const bytes_read = i2c_read_blocking(obj->i2c.dev,
+                                             (uint8_t)(address >> 1),
+                                             (uint8_t *)data,
+                                             (size_t)length,
+                                             /* nostop = */(stop == 0));
+    if (bytes_read < 0)
+        return I2C_ERROR_NO_SLAVE;
+    else
+        return bytes_read;
 }
 
 int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 {
     // Make sure a repeated start is correctly generated if we currently have the bus locked
-    obj->i2c.dev->restart_on_next = obj->state != MBED_HAL_I2C_STATE_IDLE;
+    obj->i2c.dev->restart_on_next = true;
+
+    // If we were previously doing a single byte transaction which aborted for any reason,
+    // ensure we clear that abort so that the Pico SDK function doesn't get stuck
+    if(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
+        i2c_stop(obj);
+    }
 
     int const bytes_written = i2c_write_blocking(obj->i2c.dev,
                                                  address >> 1,
@@ -255,7 +278,7 @@ const PinMap *i2c_slave_scl_pinmap()
 static const i2c_capabilities_t i2c_caps = {
     .single_byte_address_delayed = true,
     .single_byte_start_cond_delayed = true,
-    .supports_single_byte = false,
+    .supports_single_byte = true,
     .supports_zero_length_transfer_single_byte = false,
     .supports_zero_length_transfer_transaction = false
 };
