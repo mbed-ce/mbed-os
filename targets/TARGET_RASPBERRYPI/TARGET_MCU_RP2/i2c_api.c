@@ -64,19 +64,19 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     /** was_slave is used to decide which driver call we need
      * to use when uninitializing a given instance
      */
-    obj->was_slave = false;
-    obj->is_slave = false;
-    obj->slave_addr = 0;
+    obj->i2c.was_slave = false;
+    obj->i2c.is_slave = false;
+    obj->i2c.slave_addr = 0;
 #endif
 
     /* Obtain the pointer to the I2C hardware instance. */
-    obj->dev = (i2c_inst_t *)pinmap_function(sda, PinMap_I2C_SDA);
-    //obj->baudrate = DEFAULT_I2C_BAUDRATE;
+    obj->i2c.dev = (i2c_inst_t *)pinmap_function(sda, PinMap_I2C_SDA);
+    //obj->i2c.baudrate = DEFAULT_I2C_BAUDRATE;
     //Call this function because if we are configuring a slave, we don't have to set the frequency
-    //i2c_frequency(obj->dev, DEFAULT_I2C_BAUDRATE);
+    //i2c_frequency(obj->i2c.dev, DEFAULT_I2C_BAUDRATE);
 
     /* Initialize the I2C module. */
-    pico_sdk_i2c_init(obj->dev, DEFAULT_I2C_BAUDRATE);
+    pico_sdk_i2c_init(obj->i2c.dev, DEFAULT_I2C_BAUDRATE);
 
     /* Configure GPIO for I2C as alternate function. */
     gpio_set_function(sda, GPIO_FUNC_I2C);
@@ -89,20 +89,20 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
 
 void i2c_frequency(i2c_t *obj, int hz)
 {
-    DEBUG_PRINTF("obj->is_slave: %d\r\n", obj->is_slave);
+    DEBUG_PRINTF("obj->i2c.is_slave: %d\r\n", obj->i2c.is_slave);
 
 #if DEVICE_I2CSLAVE
     /* Slaves automatically get frequency from master */
-    if(obj->is_slave) {
+    if(obj->i2c.is_slave) {
     		return;
     }
 #endif
-    obj->baudrate = i2c_set_baudrate(obj->dev, hz);
+    obj->i2c.baudrate = i2c_set_baudrate(obj->i2c.dev, hz);
 }
 
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 {
-    int const bytes_read = i2c_read_blocking(obj->dev,
+    int const bytes_read = i2c_read_blocking(obj->i2c.dev,
                                              (uint8_t)(address >> 1),
                                              (uint8_t *)data,
                                              (size_t)length,
@@ -124,7 +124,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
         length = 1;
     }
 
-    int const bytes_written = i2c_write_blocking(obj->dev,
+    int const bytes_written = i2c_write_blocking(obj->i2c.dev,
                                                  address >> 1,
                                                  (const uint8_t *)data,
                                                  (size_t)length,
@@ -137,8 +137,8 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 
 void i2c_reset(i2c_t *obj)
 {
-    i2c_deinit(obj->dev);
-    pico_sdk_i2c_init(obj->dev, obj->baudrate);
+    i2c_deinit(obj->i2c.dev);
+    pico_sdk_i2c_init(obj->i2c.dev, obj->i2c.baudrate);
 }
 
 const PinMap *i2c_master_sda_pinmap()
@@ -177,7 +177,7 @@ void i2c_slave_mode(i2c_t *obj, int enable_slave)
 {
     DEBUG_PRINTF("i2c_slave_mode: %p, %d\r\n", obj, enable_slave);
 
-    obj->is_slave = enable_slave;
+    obj->i2c.is_slave = enable_slave;
 }
 
 /** Check to see if the I2C slave has been addressed.
@@ -189,14 +189,14 @@ int i2c_slave_receive(i2c_t *obj)
 {
     int retValue = NoData;
 
-    int rd_req = (obj->dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_RD_REQ_BITS) >> 5;
+    int rd_req = (obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_RD_REQ_BITS) >> 5;
 
     if (rd_req == I2C_IC_RAW_INTR_STAT_RD_REQ_VALUE_ACTIVE) {
         DEBUG_PRINTF("Read addressed\r\n");
         return ReadAddressed;
     }
 
-    int wr_req = (obj->dev->hw->status & I2C_IC_STATUS_RFNE_BITS) >> 3;
+    int wr_req = (obj->i2c.dev->hw->status & I2C_IC_STATUS_RFNE_BITS) >> 3;
 
     if (wr_req == I2C_IC_STATUS_RFNE_VALUE_NOT_EMPTY) {
         DEBUG_PRINTF("Write addressed\r\n");
@@ -214,18 +214,18 @@ int i2c_slave_read(i2c_t *obj, char *data, int length)
 {
     int bytes_read = 0;
     for (size_t i = 0; i < (size_t)length; ++i) {
-        while (!i2c_get_read_available(obj->dev)) {
+        while (!i2c_get_read_available(obj->i2c.dev)) {
             tight_loop_contents();
         }
 
-        *data = obj->dev->hw->data_cmd;
+        *data = obj->i2c.dev->hw->data_cmd;
         bytes_read++;
 
         // Check stop condition
-        bool stop = (obj->dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS) != 0;
-        if (stop && !i2c_get_read_available(obj->dev)) {
+        bool stop = (obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_STOP_DET_BITS) != 0;
+        if (stop && !i2c_get_read_available(obj->i2c.dev)) {
             // Clear stop (by reading the register)
-            int clear_stop = obj->dev->hw->clr_stop_det;
+            int clear_stop = obj->i2c.dev->hw->clr_stop_det;
             (void)clear_stop;
             break;
         } else {
@@ -246,10 +246,10 @@ int i2c_slave_write(i2c_t *obj, const char *data, int length)
 {
     DEBUG_PRINTF("i2c_slave_write\r\n");
 
-    i2c_write_raw_blocking(obj->dev, (const uint8_t *)data, (size_t)length);
+    i2c_write_raw_blocking(obj->i2c.dev, (const uint8_t *)data, (size_t)length);
 
     // Clear interrupt (by reading the register)
-    int clear_read_req = i2c_get_hw(obj->dev)->clr_rd_req;
+    int clear_read_req = i2c_get_hw(obj->i2c.dev)->clr_rd_req;
     (void)clear_read_req;
     DEBUG_PRINTF("clear_read_req: %d\n", clear_read_req);
 
@@ -264,11 +264,11 @@ int i2c_slave_write(i2c_t *obj, const char *data, int length)
  */
 void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask)
 {
-    if (obj->is_slave) {
+    if (obj->i2c.is_slave) {
         DEBUG_PRINTF("i2c_slave_address: %p, %d, %d, %d\r\n", obj, idx, address, mask);
 
-        obj->slave_addr = (uint8_t)(address >> 1);
-        i2c_set_slave_mode(obj->dev, true, obj->slave_addr);
+        obj->i2c.slave_addr = (uint8_t)(address >> 1);
+        i2c_set_slave_mode(obj->i2c.dev, true, obj->i2c.slave_addr);
     }
 }
 

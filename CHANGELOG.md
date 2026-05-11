@@ -14,6 +14,7 @@ A message that notes the main changes in the update.
 
 ### Added
 
+- Added `i2c_get_capabilities()` function, which can be used to determine what detailed I2C features the hardware supports. This is primarily intended to be used by the Mbed test suite but can also be used in user applications that want to be cross-platform
 - RP2xxx
   - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board compared to the non-W version is limited).
   - `SFE_THING_PLUS_RP2040` board target added for the [SparkFun Thing Plus RP2040 board](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html)
@@ -22,6 +23,8 @@ A message that notes the main changes in the update.
 
 ### Changed
 - Reworked targets CMake code to only recurse into the subdir for the current target family, which should speed up the CMake configure a bit
+- The `I2C` class now keeps track of the I2C bus state and prevents you from doing operations that are obviously wrong, such as calling `start()` before `stop()` or calling `write_byte()` before `start()`. Previously these operations would get passed down to the HAL API which may or may not have appropriate error handling for them.
+- The `I2C` class now detects and rejects attempts to perform a zero-length transaction on hardware which does not support it.
 - STM32F4
   - HAL driver update to `stm32f4xx-hal-driver` v1.8.5 (2025), now integrated as a submodule.
   - CMSIS device update to `cmsis-device-f4` v2.6.11 (2025), now integrated as a submodule.
