@@ -87,6 +87,8 @@ struct trng_s {
 #if DEVICE_I2C
 struct i2c_s {
     cyhal_i2c_t hal_i2c;
+    PinName pin_scl;
+    PinName pin_sda;
     cyhal_i2c_cfg_t cfg;
 #ifdef DEVICE_I2C_ASYNCH
     void (*async_handler)(void);

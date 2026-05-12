@@ -54,24 +54,24 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     mxc_i2c_regs_t *i2c = (mxc_i2c_regs_t*)pinmap_merge(i2c_sda, i2c_scl);
     MBED_ASSERT((int)i2c != NC);
 
-    obj->i2c = i2c;
-    obj->start_pending = 0;
+    obj->i2c.i2c = i2c;
+    obj->i2c.start_pending = 0;
 
-    MXC_I2C_Shutdown(obj->i2c);
-    MXC_I2C_Init(obj->i2c, 1, 0);// configure as master
+    MXC_I2C_Shutdown(obj->i2c.i2c);
+    MXC_I2C_Init(obj->i2c.i2c, 1, 0);// configure as master
 }
 
 //******************************************************************************
 void i2c_frequency(i2c_t *obj, int hz)
 {
-    MXC_I2C_SetFrequency(obj->i2c, hz);
+    MXC_I2C_SetFrequency(obj->i2c.i2c, hz);
 }
 
 //******************************************************************************
 int i2c_start(i2c_t *obj)
 { 
     int ret;
-    ret = MXC_I2C_Start(obj->i2c);
+    ret = MXC_I2C_Start(obj->i2c.i2c);
     if (ret != 0) {
         //...
     }
@@ -82,7 +82,7 @@ int i2c_start(i2c_t *obj)
 int i2c_stop(i2c_t *obj)
 { 
     int ret;
-    ret = MXC_I2C_Stop(obj->i2c);
+    ret = MXC_I2C_Stop(obj->i2c.i2c);
     if (ret != 0) {
         //...
     }
@@ -95,7 +95,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     int ret = 0;
     mxc_i2c_req_t reqMaster;
 
-    reqMaster.i2c = obj->i2c;
+    reqMaster.i2c = obj->i2c.i2c;
     reqMaster.addr = address;
     reqMaster.tx_buf = NULL;
     reqMaster.tx_len = 0;
@@ -118,7 +118,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
     int ret = 0;
     mxc_i2c_req_t reqMaster;
 
-    reqMaster.i2c = obj->i2c;
+    reqMaster.i2c = obj->i2c.i2c;
     reqMaster.addr = address;
     reqMaster.tx_buf = (unsigned char *)data;
     reqMaster.tx_len = length;
@@ -138,7 +138,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 //******************************************************************************
 void i2c_reset(i2c_t *obj)
 {
-    MXC_I2C_Recover(obj->i2c, 5);
+    MXC_I2C_Recover(obj->i2c.i2c, 5);
 }
 
 //******************************************************************************
@@ -146,7 +146,7 @@ int i2c_byte_read(i2c_t *obj, int ack)
 {
     unsigned char byt = 0; 
 
-    MXC_I2C_ReadByte(obj->i2c, &byt, ack);
+    MXC_I2C_ReadByte(obj->i2c.i2c, &byt, ack);
 
     return byt;
 }
@@ -156,7 +156,7 @@ int i2c_byte_write(i2c_t *obj, int data)
 {
     int ret;
 
-    ret = MXC_I2C_WriteByte(obj->i2c, (unsigned char)data);
+    ret = MXC_I2C_WriteByte(obj->i2c.i2c, (unsigned char)data);
 
     /*  
         Functions returns:
@@ -198,6 +198,19 @@ const PinMap *i2c_slave_sda_pinmap()
 const PinMap *i2c_slave_scl_pinmap()
 {
     return PinMap_I2C_SCL;
+}
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = false,
+    .single_byte_address_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = false
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
 }
 
 #if 0 // DEVICE_I2CSLAVE

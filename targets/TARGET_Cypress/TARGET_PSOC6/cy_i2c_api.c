@@ -87,25 +87,26 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
     cy_rslt_t result = cyhal_i2c_init(&(i2c->hal_i2c), sda, scl, NULL);
-    if (result == CYHAL_HWMGR_RSLT_ERR_INUSE) {
-        // MBED I2C driver currently does not support free, so we will allow I2C to be reallocated.
-        // TODO: once the the I2C driver properly supports free, this need to be fixed so that clocks and pins are no longer leaked.
-        cyhal_hwmgr_free(&(i2c->hal_i2c.resource));
-        cyhal_resource_inst_t pin_rsc = cyhal_utils_get_gpio_resource(sda);
-        cyhal_hwmgr_free(&pin_rsc);
-        pin_rsc = cyhal_utils_get_gpio_resource(scl);
-        cyhal_hwmgr_free(&pin_rsc);
-        result = cyhal_i2c_init(&(i2c->hal_i2c), sda, scl, NULL);
-    }
     if (CY_RSLT_SUCCESS != result) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_init");
     }
+    i2c->pin_scl = scl;
+    i2c->pin_sda = sda;
     i2c->cfg.is_slave = false;
     i2c->cfg.address = 0;
     i2c->cfg.frequencyhal_hz = 400000;
     i2c->async_handler = NULL;
     cyhal_i2c_register_callback(&(i2c->hal_i2c), &cy_i2c_event_handler, obj);
     cyhal_i2c_enable_event(&(i2c->hal_i2c), (cyhal_i2c_event_t)(CYHAL_I2C_SLAVE_READ_EVENT | CYHAL_I2C_SLAVE_WRITE_EVENT | CYHAL_I2C_SLAVE_ERR_EVENT | CYHAL_I2C_SLAVE_RD_CMPLT_EVENT | CYHAL_I2C_SLAVE_WR_CMPLT_EVENT | CYHAL_I2C_MASTER_ERR_EVENT | CYHAL_I2C_MASTER_RD_CMPLT_EVENT | CYHAL_I2C_MASTER_WR_CMPLT_EVENT), CYHAL_ISR_PRIORITY_DEFAULT, true);
+}
+
+void i2c_free(i2c_t *obj) {
+    struct i2c_s *i2c = cy_get_i2c(obj);
+    cyhal_hwmgr_free(&(i2c->hal_i2c.resource));
+    cyhal_resource_inst_t pin_rsc = cyhal_utils_get_gpio_resource(i2c->pin_sda);
+    cyhal_hwmgr_free(&pin_rsc);
+    pin_rsc = cyhal_utils_get_gpio_resource(i2c->pin_scl);
+    cyhal_hwmgr_free(&pin_rsc);
 }
 
 void i2c_frequency(i2c_t *obj, int hz)
@@ -327,5 +328,18 @@ void i2c_free(i2c_t *obj)
 #ifdef __cplusplus
 }
 #endif
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = true,
+    .single_byte_address_delayed = true,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = true
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
+}
 
 #endif

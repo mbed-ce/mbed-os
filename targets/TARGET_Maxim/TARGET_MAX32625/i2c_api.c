@@ -58,9 +58,9 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     mxc_i2cm_regs_t *i2c = (mxc_i2cm_regs_t*)pinmap_merge(i2c_sda, i2c_scl);
     MBED_ASSERT((int)i2c != NC);
 
-    obj->i2c = i2c;
-    obj->fifo = MXC_I2CM_GET_FIFO(MXC_I2CM_GET_IDX(i2c));
-    obj->start_pending = 0;
+    obj->i2c.i2c = i2c;
+    obj->i2c.fifo = MXC_I2CM_GET_FIFO(MXC_I2CM_GET_IDX(i2c));
+    obj->i2c.start_pending = 0;
 
     // Merge pin function requests for use with CMSIS init func
     ioman_req_t io_req;
@@ -76,42 +76,42 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     sys_cfg.io_cfg.req_val = io_req;
     sys_cfg.clk_scale = CLKMAN_SCALE_DIV_1;
 
-    I2CM_Init(obj->i2c, &sys_cfg, I2CM_SPEED_400KHZ);
+    I2CM_Init(obj->i2c.i2c, &sys_cfg, I2CM_SPEED_400KHZ);
 }
 
 //******************************************************************************
 void i2c_frequency(i2c_t *obj, int hz)
 {
-    I2CM_SetFrequency(obj->i2c, (i2cm_speed_t)hz);
+    I2CM_SetFrequency(obj->i2c.i2c, (i2cm_speed_t)hz);
 }
 
 //******************************************************************************
 int i2c_start(i2c_t *obj)
 {
-    obj->start_pending = 1;
+    obj->i2c.start_pending = 1;
     return 0;
 }
 
 //******************************************************************************
 int i2c_stop(i2c_t *obj)
 {
-    obj->start_pending = 0;
-    I2CM_WriteTxFifo(obj->i2c, obj->fifo, MXC_S_I2CM_TRANS_TAG_STOP);
-    I2CM_TxInProgress(obj->i2c);
+    obj->i2c.start_pending = 0;
+    I2CM_WriteTxFifo(obj->i2c.i2c, obj->i2c.fifo, MXC_S_I2CM_TRANS_TAG_STOP);
+    I2CM_TxInProgress(obj->i2c.i2c);
     return 0;
 }
 
 //******************************************************************************
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 {
-    return I2CM_Read(obj->i2c, address >> 1, NULL, 0, (uint8_t *)data, length);
+    return I2CM_Read(obj->i2c.i2c, address >> 1, NULL, 0, (uint8_t *)data, length);
 }
 
 //******************************************************************************
 int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 {
-    mxc_i2cm_regs_t *i2cm = obj->i2c;
-    mxc_i2cm_fifo_regs_t *fifo = obj->fifo;
+    mxc_i2cm_regs_t *i2cm = obj->i2c.i2c;
+    mxc_i2cm_fifo_regs_t *fifo = obj->i2c.fifo;
 
     if (stop) {
         return I2CM_Write(i2cm, address >> 1, NULL, 0, (uint8_t *)data, length);
@@ -129,14 +129,14 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 //******************************************************************************
 void i2c_reset(i2c_t *obj)
 {
-    I2CM_Recover(obj->i2c);
+    I2CM_Recover(obj->i2c.i2c);
 }
 
 //******************************************************************************
 int i2c_byte_read(i2c_t *obj, int last)
 {
-    mxc_i2cm_regs_t *i2cm = obj->i2c;
-    mxc_i2cm_fifo_regs_t *fifo = obj->fifo;
+    mxc_i2cm_regs_t *i2cm = obj->i2c.i2c;
+    mxc_i2cm_fifo_regs_t *fifo = obj->i2c.fifo;
     int tmp;
 
     // Start the transaction if it is not currently ongoing
@@ -183,12 +183,12 @@ byte_write_err:
 //******************************************************************************
 int i2c_byte_write(i2c_t *obj, int data)
 {
-    mxc_i2cm_regs_t *i2cm = obj->i2c;
-    mxc_i2cm_fifo_regs_t *fifo = obj->fifo;
+    mxc_i2cm_regs_t *i2cm = obj->i2c.i2c;
+    mxc_i2cm_fifo_regs_t *fifo = obj->i2c.fifo;
     int result;
 
-    if (obj->start_pending) {
-        obj->start_pending = 0;
+    if (obj->i2c.start_pending) {
+        obj->i2c.start_pending = 0;
         data |= MXC_S_I2CM_TRANS_TAG_START;
     } else {
         data |= MXC_S_I2CM_TRANS_TAG_TXDATA_ACK;
@@ -228,6 +228,19 @@ const PinMap *i2c_slave_sda_pinmap()
 const PinMap *i2c_slave_scl_pinmap()
 {
     return PinMap_I2C_SCL;
+}
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = true,
+    .single_byte_address_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = false
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
 }
 
 #endif  // #if DEVICE_I2C
