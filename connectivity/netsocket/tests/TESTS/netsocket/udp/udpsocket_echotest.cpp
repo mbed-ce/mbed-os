@@ -249,9 +249,9 @@ void UDPSOCKET_ECHOTEST_NONBLOCK_impl(bool use_sendto)
                         break;
                     }
                     signals.wait_all_for(
-                               SIGNAL_SIGIO_RX,
-                               500ms
-                           );
+                        SIGNAL_SIGIO_RX,
+                        500ms
+                    );
                     --retry_recv;
                     continue;
                 } else if (recvd < 0) {
