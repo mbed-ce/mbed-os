@@ -40,6 +40,7 @@
 
 #include "mbed_assert.h"
 #include "analogin_api.h"
+#include <string.h>
 
 #if DEVICE_ANALOGIN
 

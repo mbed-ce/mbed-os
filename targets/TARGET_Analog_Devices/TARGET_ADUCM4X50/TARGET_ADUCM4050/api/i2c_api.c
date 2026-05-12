@@ -83,9 +83,9 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
 
 #if defined(BUILD_I2C_MI_DYNAMIC)
     I2C_DevNum = I2C_0;
-    pI2C_Handle = &obj->I2C_Handle;
-    obj->pI2C_Handle = pI2C_Handle;
-    I2C_Mem = obj->I2C_Mem;
+    pI2C_Handle = &obj->i2c.I2C_Handle;
+    obj->i2c.pI2C_Handle = pI2C_Handle;
+    I2C_Mem = obj->i2c.I2C_Mem;
 #else
     I2C_DevNum = I2C_0;
     pI2C_Handle = &i2c_Handle;
@@ -94,19 +94,19 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
 #endif
 
 
-    obj->instance = pinmap_merge(i2c_sda, i2c_scl);
-    MBED_ASSERT((int)obj->instance != NC);
+    obj->i2c.instance = pinmap_merge(i2c_sda, i2c_scl);
+    MBED_ASSERT((int)obj->i2c.instance != NC);
     pinmap_pinout(sda, PinMap_I2C_SDA);
     pinmap_pinout(scl, PinMap_I2C_SCL);
     SystemCoreClockUpdate();
     I2C_Return = adi_i2c_Open(I2C_DevNum, I2C_Mem, ADI_I2C_MEMORY_SIZE, pI2C_Handle);
     if (I2C_Return) {
-        obj->error = I2C_EVENT_ERROR;
+        obj->i2c.error = I2C_EVENT_ERROR;
         return;
     }
     I2C_Return = adi_i2c_Reset(*pI2C_Handle);
     if (I2C_Return) {
-        obj->error = I2C_EVENT_ERROR;
+        obj->i2c.error = I2C_EVENT_ERROR;
         return;
     }
 }
@@ -132,10 +132,10 @@ void i2c_frequency(i2c_t *obj, int hz)
     ADI_I2C_RESULT  I2C_Return = ADI_I2C_SUCCESS;
 
 
-    I2C_Handle = *obj->pI2C_Handle;
+    I2C_Handle = *obj->i2c.pI2C_Handle;
     I2C_Return = adi_i2c_SetBitRate(I2C_Handle, (uint32_t) hz);
     if (I2C_Return) {
-        obj->error = I2C_EVENT_ERROR;
+        obj->i2c.error = I2C_EVENT_ERROR;
         return;
     }
 }
@@ -150,7 +150,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     ADI_I2C_HANDLE      I2C_Handle;
 
 
-    I2C_Handle = *obj->pI2C_Handle;
+    I2C_Handle = *obj->i2c.pI2C_Handle;
     I2C_Return = adi_i2c_SetSlaveAddress(I2C_Handle, (address & 0x0000FFFF));
     I2C_inst.pPrologue     = &I2C_PrologueData;
     I2C_inst.nPrologueSize = 0;
@@ -160,7 +160,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     I2C_inst.bRepeatStart  = stop;
     I2C_Return = adi_i2c_ReadWrite(I2C_Handle, &I2C_inst, &I2C_Errors);
     if (I2C_Return) {
-        obj->error = I2C_EVENT_ERROR;
+        obj->i2c.error = I2C_EVENT_ERROR;
         return -1;
     } else {
         return length;
@@ -177,7 +177,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
     ADI_I2C_HANDLE      I2C_Handle;
 
 
-    I2C_Handle = *obj->pI2C_Handle;
+    I2C_Handle = *obj->i2c.pI2C_Handle;
     I2C_Return = adi_i2c_SetSlaveAddress(I2C_Handle, (address & 0x0000FFFF));
     I2C_inst.pPrologue      = &I2C_PrologueData;
     I2C_inst.nPrologueSize  = 0;
@@ -187,7 +187,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
     I2C_inst.bRepeatStart   = stop;
     I2C_Return = adi_i2c_ReadWrite(I2C_Handle, &I2C_inst, &I2C_Errors);
     if (I2C_Return) {
-        obj->error = I2C_EVENT_ERROR;
+        obj->i2c.error = I2C_EVENT_ERROR;
         return -1;
     } else {
         return length;
@@ -198,11 +198,11 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 void i2c_reset(i2c_t *obj)
 {
     ADI_I2C_RESULT      I2C_Return;
-    ADI_I2C_HANDLE      I2C_Handle = *obj->pI2C_Handle;
+    ADI_I2C_HANDLE      I2C_Handle = *obj->i2c.pI2C_Handle;
 
     I2C_Return = adi_i2c_Reset(I2C_Handle);
     if (I2C_Return) {
-        obj->error = I2C_EVENT_ERROR;
+        obj->i2c.error = I2C_EVENT_ERROR;
         return;
     }
 }
@@ -239,6 +239,19 @@ const PinMap *i2c_slave_sda_pinmap()
 const PinMap *i2c_slave_scl_pinmap()
 {
     return PinMap_I2C_SCL;
+}
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = false,
+    .single_byte_address_delayed = false,
+    .supports_single_byte = false,
+    .supports_zero_length_transfer_single_byte = false,
+    .supports_zero_length_transfer_transaction = false
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
 }
 
 #endif  // #if DEVICE_I2C
