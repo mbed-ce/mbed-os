@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2010-2017 Analog Devices, Inc.
+ * SPDX-License-Identifier: adi-bsd
  *
  * All rights reserved.
  *

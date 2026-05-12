@@ -5,6 +5,8 @@
  *          TOSHIBA 'TMPM46B' Device Series
  * @version V2.0.2.4
  * @date    2015/03/13
+ *
+ * SPDX-License-Identifier: Apache-2.0
  * 
  * DO NOT USE THIS SOFTWARE WITHOUT THE SOFTWARE LICENSE AGREEMENT.
  * 

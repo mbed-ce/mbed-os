@@ -44,7 +44,6 @@ jobs:
           echo $?
           git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
             | ( grep '.\(c\|cpp\|h\|hpp\|py\)$' || true ) \
-            | ( grep -v '^tools/test/toolchains/api_test.py' || true ) \
             | while read file; do cp --parents "${file}" SCANCODE; done
           ls SCANCODE
           scancode -l --json-pp scancode.json SCANCODE

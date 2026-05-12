@@ -34,6 +34,8 @@
 #include "lp_ticker_api.h"
 #include "clocking.h"
 
+#include <mbed_critical.h>
+
 static bool lptick_inited = false;
 static uint32_t lptick_offset = 0;
 

@@ -1179,7 +1179,7 @@ bool spi_master_transfer_dma(spi_t *obj, const void *txdata, void *rxdata, int t
  */
 bool spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint8_t bit_width, uint32_t handler, uint32_t event, DMAUsage hint)
 {
-    if( spi_active(obj) ) return;
+    if( spi_active(obj) ) return false;
 
     /* update fill word if on 9-bit frame size */
     if(obj->spi.bits == 9) fill_word = SPI_FILL_WORD & 0x1FF;
