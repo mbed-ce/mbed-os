@@ -49,8 +49,8 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
         case I2C_1:
             TSB_CG_FSYSMENA_IPMENA26     = TXZ_ENABLE; // Enable clock for I2C_1
             TSB_CG_FSYSMENA_IPMENA03     = TXZ_ENABLE; // Enable clock for GPIO D
-            obj->my_i2c.i2c.p_instance = TSB_I2C1;
-            obj->my_i2c.info.irqn      = INTI2C1NST_IRQn;
+            obj->i2c.my_i2c.i2c.p_instance = TSB_I2C1;
+            obj->i2c.my_i2c.info.irqn      = INTI2C1NST_IRQn;
             break;
         default:
             error("I2C is not available");
@@ -68,14 +68,14 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
 
     i2c_reset(obj);
     i2c_frequency(obj, 100000);
-    I2C_init(&obj->my_i2c.i2c);
+    I2C_init(&obj->i2c.my_i2c.i2c);
 }
 
 // Configure the I2C frequency
 void i2c_frequency(i2c_t *obj, int hz)
 {
     if (hz <= MAX_I2C_FREQ) {
-        i2c_frequency_t(&obj->my_i2c, hz);
+        i2c_frequency_t(&obj->i2c.my_i2c, hz);
     } else {
         error("Failed : Max I2C frequency is 400000");
     }
@@ -83,27 +83,27 @@ void i2c_frequency(i2c_t *obj, int hz)
 
 int i2c_start(i2c_t *obj)
 {
-    i2c_start_t(&obj->my_i2c);
+    i2c_start_t(&obj->i2c.my_i2c);
     return TXZ_SUCCESS;
 }
 
 int i2c_stop(i2c_t *obj)
 {
-    i2c_stop_t(&obj->my_i2c);
+    i2c_stop_t(&obj->i2c.my_i2c);
     return TXZ_SUCCESS;
 }
 
 void i2c_reset(i2c_t *obj)
 {
     // Software reset
-    i2c_reset_t(&obj->my_i2c);
+    i2c_reset_t(&obj->i2c.my_i2c);
 }
 
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 {
     int32_t count = 0;
 
-    count = i2c_read_t(&obj->my_i2c, address, (uint8_t *)data, length, stop);
+    count = i2c_read_t(&obj->i2c.my_i2c, address, (uint8_t *)data, length, stop);
 
     return count;
 }
@@ -112,7 +112,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 {
     int32_t count = 0;
 
-    count = i2c_write_t(&obj->my_i2c, address, (uint8_t *)data, length, stop);
+    count = i2c_write_t(&obj->i2c.my_i2c, address, (uint8_t *)data, length, stop);
 
     return count;
 }
@@ -121,7 +121,7 @@ int i2c_byte_read(i2c_t *obj, int last)
 {
     int32_t data = 0;
 
-    data = i2c_byte_read_t(&obj->my_i2c, last);
+    data = i2c_byte_read_t(&obj->i2c.my_i2c, last);
 
     return data;
 }
@@ -130,26 +130,26 @@ int i2c_byte_write(i2c_t *obj, int data)
 {
     int32_t result = 0;
 
-    result = i2c_byte_write_t(&obj->my_i2c, data);
+    result = i2c_byte_write_t(&obj->i2c.my_i2c, data);
 
     return result;
 }
 
 void i2c_slave_mode(i2c_t *obj, int enable_slave)
 {
-    i2c_slave_mode_t(&obj->my_i2c, enable_slave);
+    i2c_slave_mode_t(&obj->i2c.my_i2c, enable_slave);
 }
 
 void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask)
 {
-    i2c_slave_address_t(&obj->my_i2c, address);
+    i2c_slave_address_t(&obj->i2c.my_i2c, address);
 }
 
 int i2c_slave_receive(i2c_t *obj)
 {
     int32_t result = 0;
 
-    result = i2c_slave_receive_t(&obj->my_i2c);
+    result = i2c_slave_receive_t(&obj->i2c.my_i2c);
 
     return result;
 }
@@ -158,7 +158,7 @@ int i2c_slave_read(i2c_t *obj, char *data, int length)
 {
     int32_t count = 0;
 
-    count = i2c_slave_read_t(&obj->my_i2c, (uint8_t *)data, length);
+    count = i2c_slave_read_t(&obj->i2c.my_i2c, (uint8_t *)data, length);
 
     return count;
 }
@@ -167,7 +167,7 @@ int i2c_slave_write(i2c_t *obj, const char *data, int length)
 {
     int32_t count = 0;
 
-    count = i2c_slave_write_t(&obj->my_i2c, (uint8_t *)data, length);
+    count = i2c_slave_write_t(&obj->i2c.my_i2c, (uint8_t *)data, length);
 
     return count;
 }
@@ -190,4 +190,17 @@ const PinMap *i2c_slave_sda_pinmap()
 const PinMap *i2c_slave_scl_pinmap()
 {
     return PinMap_I2C_SCL;
+}
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = true,
+    .single_byte_address_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = false
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
 }

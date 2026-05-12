@@ -39,7 +39,7 @@ class KiViBufferWalker:
 
     def append(self, payload: bytes):
         """! Append stream buffer with payload and process. Returns non-KV strings"""
-        
+
         try:
             self.buff += payload.decode("utf-8")
         except UnicodeDecodeError:

@@ -520,7 +520,7 @@ static inline void state_idle(struct i2c_s *obj_s)
     do {
         flag_state = I2C_GetState(obj_s->i2c);
     } while (flag_state.Bit.BusState);
-    // To satisfy the setup time of restart, at least 4.7µs wait must be created by software (Ref. TRM pg. 561)
+    // To satisfy the setup time of restart, at least 4.7ï¿½s wait must be created by software (Ref. TRM pg. 561)
     wait_us(5);
 }
 
@@ -586,6 +586,19 @@ const PinMap *i2c_slave_sda_pinmap()
 const PinMap *i2c_slave_scl_pinmap()
 {
     return PinMap_I2C_SCL;
+}
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = true,
+    .single_byte_address_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = false
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
 }
 
 #endif  // #if DEVICE_I2C

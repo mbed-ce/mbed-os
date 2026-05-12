@@ -305,4 +305,17 @@ void i2c_abort_asynch(i2c_t *obj)
 
 #endif  // #if DEVICE_I2C_ASYNCH
 
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = true,
+    .single_byte_address_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = false
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
+}
+
 #endif  // #if DEVICE_I2C

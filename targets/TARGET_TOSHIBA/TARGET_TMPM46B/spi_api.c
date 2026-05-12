@@ -426,7 +426,7 @@ bool spi_master_transfer(spi_t *obj, const void *tx, size_t tx_length, void *rx,
 
     // don't do anything, if the buffers aren't valid
     if (!use_tx && !use_rx) {
-        return;
+        return false;
     }
 
     // copy the buffers to the SPI object
