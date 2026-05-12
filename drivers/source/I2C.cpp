@@ -73,13 +73,13 @@ void I2C::frequency(int hz)
 I2C::Result I2C::write(int address, const char *data, int length, bool repeated)
 {
     // Not all HW supports zero-length transactions
-    if(length == 0 && !i2c_get_capabilities()->supports_zero_length_transfer_transaction) {
+    if (length == 0 && !i2c_get_capabilities()->supports_zero_length_transfer_transaction) {
         return Result::NOT_SUPPORTED;
     }
 
     lock();
 
-    if(_i2c.state != MBED_HAL_I2C_STATE_IDLE && _i2c.state != MBED_HAL_I2C_STATE_HOLDING_BUS && _i2c.state != MBED_HAL_I2C_STATE_BYTE_READ && _i2c.state != MBED_HAL_I2C_STATE_BYTE_WRITE) {
+    if (_i2c.state != MBED_HAL_I2C_STATE_IDLE && _i2c.state != MBED_HAL_I2C_STATE_HOLDING_BUS && _i2c.state != MBED_HAL_I2C_STATE_BYTE_READ && _i2c.state != MBED_HAL_I2C_STATE_BYTE_WRITE) {
         // Invalid state for write
         unlock();
         return Result::INVALID_STATE;
@@ -100,13 +100,13 @@ I2C::Result I2C::write(int address, const char *data, int length, bool repeated)
 I2C::Result I2C::read(int address, char *data, int length, bool repeated)
 {
     // Not all HW supports zero-length transactions
-    if(length == 0 && !i2c_get_capabilities()->supports_zero_length_transfer_transaction) {
+    if (length == 0 && !i2c_get_capabilities()->supports_zero_length_transfer_transaction) {
         return Result::NOT_SUPPORTED;
     }
 
     lock();
 
-    if(_i2c.state != MBED_HAL_I2C_STATE_IDLE && _i2c.state != MBED_HAL_I2C_STATE_HOLDING_BUS && _i2c.state != MBED_HAL_I2C_STATE_BYTE_READ && _i2c.state != MBED_HAL_I2C_STATE_BYTE_WRITE) {
+    if (_i2c.state != MBED_HAL_I2C_STATE_IDLE && _i2c.state != MBED_HAL_I2C_STATE_HOLDING_BUS && _i2c.state != MBED_HAL_I2C_STATE_BYTE_READ && _i2c.state != MBED_HAL_I2C_STATE_BYTE_WRITE) {
         // Invalid state for read
         unlock();
         return Result::INVALID_STATE;
@@ -127,11 +127,10 @@ int I2C::start()
 {
     int ret = 0;
     lock();
-    if(_i2c.state == MBED_HAL_I2C_STATE_IDLE || _i2c.state == MBED_HAL_I2C_STATE_HOLDING_BUS || _i2c.state == MBED_HAL_I2C_STATE_ADDRESSED || _i2c.state == MBED_HAL_I2C_STATE_BYTE_READ || _i2c.state == MBED_HAL_I2C_STATE_BYTE_WRITE) {
+    if (_i2c.state == MBED_HAL_I2C_STATE_IDLE || _i2c.state == MBED_HAL_I2C_STATE_HOLDING_BUS || _i2c.state == MBED_HAL_I2C_STATE_ADDRESSED || _i2c.state == MBED_HAL_I2C_STATE_BYTE_READ || _i2c.state == MBED_HAL_I2C_STATE_BYTE_WRITE) {
         i2c_start(&_i2c);
         _i2c.state = MBED_HAL_I2C_STATE_STARTED;
-    }
-    else {
+    } else {
         // Invalid state for starting
         ret = -1;
     }
@@ -143,11 +142,10 @@ int I2C::read_byte(bool ack)
 {
     lock();
     int ret;
-    if(_i2c.state == MBED_HAL_I2C_STATE_ADDRESSED || _i2c.state == MBED_HAL_I2C_STATE_BYTE_READ) {
+    if (_i2c.state == MBED_HAL_I2C_STATE_ADDRESSED || _i2c.state == MBED_HAL_I2C_STATE_BYTE_READ) {
         ret = i2c_byte_read(&_i2c, !ack);
         _i2c.state = MBED_HAL_I2C_STATE_BYTE_READ;
-    }
-    else {
+    } else {
         // Invalid state for reading a byte
         ret = -1;
     }
@@ -159,13 +157,12 @@ I2C::Result I2C::write_byte(int data)
 {
     lock();
     int ret;
-    if(_i2c.state == MBED_HAL_I2C_STATE_STARTED || _i2c.state == MBED_HAL_I2C_STATE_ADDRESSED || _i2c.state == MBED_HAL_I2C_STATE_BYTE_WRITE) {
+    if (_i2c.state == MBED_HAL_I2C_STATE_STARTED || _i2c.state == MBED_HAL_I2C_STATE_ADDRESSED || _i2c.state == MBED_HAL_I2C_STATE_BYTE_WRITE) {
         ret = i2c_byte_write(&_i2c, data);
 
         // If this was the first byte after a start, change state to ADDRESSED. Otherwise we are in byte write mode.
         _i2c.state = _i2c.state == MBED_HAL_I2C_STATE_STARTED ? MBED_HAL_I2C_STATE_ADDRESSED : MBED_HAL_I2C_STATE_BYTE_WRITE;
-    }
-    else {
+    } else {
         // Invalid state for reading a byte
         unlock();
         return Result::INVALID_STATE;
@@ -204,13 +201,12 @@ int I2C::stop()
 {
     int ret = 0;
     lock();
-    if((_i2c.state == MBED_HAL_I2C_STATE_ADDRESSED && i2c_get_capabilities()->supports_zero_length_transfer_single_byte) || 
-        _i2c.state == MBED_HAL_I2C_STATE_BYTE_READ || 
-        _i2c.state == MBED_HAL_I2C_STATE_BYTE_WRITE) {
+    if ((_i2c.state == MBED_HAL_I2C_STATE_ADDRESSED && i2c_get_capabilities()->supports_zero_length_transfer_single_byte) ||
+            _i2c.state == MBED_HAL_I2C_STATE_BYTE_READ ||
+            _i2c.state == MBED_HAL_I2C_STATE_BYTE_WRITE) {
         i2c_stop(&_i2c);
         _i2c.state = MBED_HAL_I2C_STATE_IDLE;
-    }
-    else {
+    } else {
         // Invalid state for stopping
         ret = -1;
     }
@@ -286,12 +282,12 @@ int I2C::transfer(int address, const char *tx_buffer, int tx_length, char *rx_bu
 {
     lock();
 
-    if(_i2c.state != MBED_HAL_I2C_STATE_IDLE && _i2c.state != MBED_HAL_I2C_STATE_HOLDING_BUS && _i2c.state != MBED_HAL_I2C_STATE_BYTE_READ && _i2c.state != MBED_HAL_I2C_STATE_BYTE_WRITE) {
+    if (_i2c.state != MBED_HAL_I2C_STATE_IDLE && _i2c.state != MBED_HAL_I2C_STATE_HOLDING_BUS && _i2c.state != MBED_HAL_I2C_STATE_BYTE_READ && _i2c.state != MBED_HAL_I2C_STATE_BYTE_WRITE) {
         // Invalid state for new transaction
         unlock();
         return -1;
     }
-    
+
     lock_deep_sleep();
 
     _callback = callback;
@@ -307,7 +303,7 @@ int I2C::transfer(int address, const char *tx_buffer, int tx_length, char *rx_bu
 void I2C::abort_transfer()
 {
     lock();
-    if(_i2c.state == MBED_HAL_I2C_STATE_ASYNC_TRANSACTION) {
+    if (_i2c.state == MBED_HAL_I2C_STATE_ASYNC_TRANSACTION) {
         i2c_abort_asynch(&_i2c);
         unlock_deep_sleep();
     }
@@ -324,7 +320,7 @@ I2C::Result I2C::transfer_and_wait(int address, const char *tx_buffer, int tx_le
         transferResultFlags.set(event);
     });
 
-    if(transfer(address, tx_buffer, tx_length, rx_buffer, rx_length, transferCallback, I2C_EVENT_ALL, repeated) != 0) {
+    if (transfer(address, tx_buffer, tx_length, rx_buffer, rx_length, transferCallback, I2C_EVENT_ALL, repeated) != 0) {
         return Result::OTHER_ERROR;
     }
 

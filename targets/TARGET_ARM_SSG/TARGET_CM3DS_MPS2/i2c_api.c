@@ -276,6 +276,19 @@ int i2c_byte_write(i2c_t *obj, int data)
     return ack;
 }
 
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = false,
+    .single_byte_address_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = true
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
+}
+
 const PinMap *i2c_master_sda_pinmap()
 {
     return PinMap_I2C_SDA;

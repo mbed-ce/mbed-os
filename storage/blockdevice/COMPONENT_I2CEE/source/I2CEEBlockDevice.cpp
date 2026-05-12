@@ -167,17 +167,16 @@ int I2CEEBlockDevice::_sync()
     // reset it before using the EEPROM again.
     char dummy_buffer = 0;
     for (int i = 0; i < I2CEE_TIMEOUT; i++) {
-        if(i2c_get_capabilities()->supports_zero_length_transfer_transaction) {
+        if (i2c_get_capabilities()->supports_zero_length_transfer_transaction) {
             if (_i2c->write(_i2c_addr | 0, 0, 0) == I2C::ACK) {
                 return 0;
             }
-        }
-        else {
+        } else {
             if (_i2c->write(_i2c_addr | 0, &dummy_buffer, 1) == I2C::ACK) {
                 return 0;
             }
         }
-        
+
         wait_us(100);
     }
 

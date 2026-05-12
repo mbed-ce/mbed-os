@@ -102,7 +102,7 @@ static const i2c_capabilities_t default_i2c_caps = {
     .supports_zero_length_transfer_single_byte = true,
     .supports_zero_length_transfer_transaction = true
 };
-MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+MBED_WEAK i2c_capabilities_t const *i2c_get_capabilities()
 {
     return &default_i2c_caps;
 }

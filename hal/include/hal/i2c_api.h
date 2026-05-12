@@ -378,10 +378,10 @@ const PinMap *i2c_slave_scl_pinmap(void);
 
 /**
  * Fills the given i2c_capabilities_t structure with the capabilities of the I2C peripheral.
- * 
+ *
  * @returns Pointer to constant capabilities data
  */
-i2c_capabilities_t const * i2c_get_capabilities();
+i2c_capabilities_t const *i2c_get_capabilities();
 
 /**@}*/
 
@@ -409,12 +409,12 @@ int  i2c_slave_receive(i2c_t *obj);
  *  @brief Read specified number of bytes from an I2C master.
  *
  * This function shall be called only after ::i2c_slave_receive() has returned 2 or 3.
- *  
+ *
  *  @param obj The I2C object
  *  @param data The buffer for receiving
  *  @param length  Number of bytes to read. If the master writes more than this number
  *    of bytes, the additional bytes are dropped.
- * 
+ *
  *  @return Number of bytes read, or zero on error
  */
 int  i2c_slave_read(i2c_t *obj, char *data, int length);

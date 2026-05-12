@@ -75,7 +75,7 @@ static inline void i2c_send_byte(i2c_t *obj, unsigned char c)
 {
     int loop;
     switch ((int)obj->i2c) {
-        case I2C_0: 
+        case I2C_0:
             obj->i2c->CONTROLC = SCL;
             i2c_delay(TSC_TSU);
 
@@ -85,7 +85,7 @@ static inline void i2c_send_byte(i2c_t *obj, unsigned char c)
                     obj->i2c->CONTROLS = SDA;
                 else
                     obj->i2c->CONTROLC = SDA;
-                
+
                 i2c_delay(TSC_TSU);
                 obj->i2c->CONTROLS = SCL;
                 i2c_delay(TSC_TSU);
@@ -105,7 +105,7 @@ static inline void i2c_send_byte(i2c_t *obj, unsigned char c)
                     obj->i2c->CONTROLS = SDA;
                 else
                     obj->i2c->CONTROLC = SDA;
-                
+
                 i2c_delay(AAIC_TSU);
                 obj->i2c->CONTROLS = SCL;
                 i2c_delay(AAIC_TSU);
@@ -116,8 +116,8 @@ static inline void i2c_send_byte(i2c_t *obj, unsigned char c)
             obj->i2c->CONTROLS = SDA;
             i2c_delay(AAIC_TSU);
         break;
-        case I2C_2: 
-        case I2C_3: 
+        case I2C_2:
+        case I2C_3:
             obj->i2c->CONTROLC = SCL;
             i2c_delay(SHIELD_TSU);
 
@@ -127,7 +127,7 @@ static inline void i2c_send_byte(i2c_t *obj, unsigned char c)
                     obj->i2c->CONTROLS = SDA;
                 else
                     obj->i2c->CONTROLC = SDA;
-                
+
                 i2c_delay(SHIELD_TSU);
                 obj->i2c->CONTROLS = SCL;
                 i2c_delay(SHIELD_TSU);
@@ -145,7 +145,7 @@ static inline unsigned char i2c_receive_byte(i2c_t *obj)
 {
     int data_receive_byte, loop;
     switch ((int)obj->i2c) {
-        case I2C_0: 
+        case I2C_0:
             obj->i2c->CONTROLS = SDA;
             i2c_delay(TSC_TSU);
 
@@ -157,7 +157,7 @@ static inline unsigned char i2c_receive_byte(i2c_t *obj)
                 i2c_delay(TSC_TSU);
                 if ((obj->i2c->CONTROL & SDA))
                     data_receive_byte += (1 << (7 - loop));
-                
+
                 obj->i2c->CONTROLC = SCL;
                 i2c_delay(TSC_TSU);
             }
@@ -177,7 +177,7 @@ static inline unsigned char i2c_receive_byte(i2c_t *obj)
                 i2c_delay(AAIC_TSU);
                 if ((obj->i2c->CONTROL & SDA))
                     data_receive_byte += (1 << (7 - loop));
-                
+
                 i2c_delay(AAIC_TSU);
                 obj->i2c->CONTROLC = SCL;
             }
@@ -186,7 +186,7 @@ static inline unsigned char i2c_receive_byte(i2c_t *obj)
             obj->i2c->CONTROLC = SDA;
             i2c_delay(AAIC_TSU);
         break;
-        case I2C_2: 
+        case I2C_2:
         case I2C_3:
             obj->i2c->CONTROLS = SDA;
             i2c_delay(SHIELD_TSU);
@@ -199,7 +199,7 @@ static inline unsigned char i2c_receive_byte(i2c_t *obj)
                 i2c_delay(SHIELD_TSU);
                 if ((obj->i2c->CONTROL & SDA))
                     data_receive_byte += (1 << (7 - loop));
-                
+
                 obj->i2c->CONTROLC = SCL;
                 i2c_delay(SHIELD_TSU);
             }
@@ -242,7 +242,7 @@ static inline int i2c_receive_ack(i2c_t *obj)
 }
 
 
-static inline void i2c_send_nack(i2c_t *obj) 
+static inline void i2c_send_nack(i2c_t *obj)
 {
     int delay_value;
     switch ((int)obj->i2c) {
@@ -266,7 +266,7 @@ static inline void i2c_send_nack(i2c_t *obj)
 
 }
 
-static inline void i2c_send_ack(i2c_t *obj) 
+static inline void i2c_send_ack(i2c_t *obj)
 {
     int delay_value;
     switch ((int)obj->i2c) {
@@ -292,21 +292,21 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     I2CName i2c_sda = (I2CName)pinmap_peripheral(sda, PinMap_I2C_SDA);
     I2CName i2c_scl = (I2CName)pinmap_peripheral(scl, PinMap_I2C_SCL);
     obj->i2c = (MPS2_I2C_TypeDef *)pinmap_merge(i2c_sda, i2c_scl);
-    
+
     if ((int)obj->i2c == NC) {
         error("I2C pin mapping failed");
     }
-        
+
     pinmap_pinout(sda, PinMap_I2C_SDA);
     pinmap_pinout(scl, PinMap_I2C_SCL);
-        
+
     switch ((int)obj->i2c) {
         case I2C_2: CMSDK_GPIO0->ALTFUNCSET |= 0x8020; break;
-        case I2C_3: CMSDK_GPIO1->ALTFUNCSET |= 0x8000; 
+        case I2C_3: CMSDK_GPIO1->ALTFUNCSET |= 0x8000;
                                         CMSDK_GPIO2->ALTFUNCSET |= 0x0200; break;
     }
-        
-        
+
+
 }
 
 int i2c_start(i2c_t *obj)
@@ -318,7 +318,7 @@ int i2c_start(i2c_t *obj)
         case I2C_2: delay_value = SHIELD_TSU; break;
         case I2C_3: delay_value = SHIELD_TSU; break;
     }
-    
+
     i2c_delay(delay_value);
     obj->i2c->CONTROLS = SDA | SCL;
     i2c_delay(delay_value);
@@ -337,7 +337,7 @@ int i2c_start_tsc(i2c_t *obj)
         case I2C_2: delay_value = SHIELD_TSU; break;
         case I2C_3: delay_value = SHIELD_TSU; break;
     }
-    
+
     i2c_delay(delay_value);
     obj->i2c->CONTROLC = SDA;
     i2c_delay(delay_value);
@@ -348,7 +348,7 @@ int i2c_start_tsc(i2c_t *obj)
 }
 
 int i2c_stop(i2c_t *obj)
-{    
+{
     int delay_value;
     switch ((int)obj->i2c) {
         case I2C_0: delay_value = TSC_TSU; break;
@@ -379,14 +379,14 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     int sadr, ack, bytes_read;
     rxdata=0;
     switch ((int)obj->i2c) {
-        case I2C_0: 
-            sadr = TSC_I2C_ADDR; 
+        case I2C_0:
+            sadr = TSC_I2C_ADDR;
             break;
-        case I2C_1: 
-            sadr = AAIC_I2C_ADDR; 
+        case I2C_1:
+            sadr = AAIC_I2C_ADDR;
             break;
-        case I2C_2: 
-        case I2C_3: 
+        case I2C_2:
+        case I2C_3:
             sadr = address;     //LM75_I2C_ADDR; or MMA7660_I2C_ADDR;
             break;
          }
@@ -395,7 +395,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     i2c_start(obj);
 
     switch ((int)obj->i2c) {
-        case I2C_0: 
+        case I2C_0:
             // Set serial and register address
             i2c_send_byte(obj,sadr);
             ack += i2c_receive_ack(obj);
@@ -429,7 +429,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
                     rxdata = i2c_receive_byte(obj);
                     data[(length-1)-bytes_read] = (char)rxdata;
                     bytes_read++;
-                            
+
                 }
             }
             break;
@@ -467,12 +467,12 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
                     rxdata = i2c_receive_byte(obj);
                     data[loop] = (char)rxdata;
                     bytes_read++;
-                            
+
                 }
             }
             break;
     }
-    i2c_send_nack(obj);  
+    i2c_send_nack(obj);
 
     i2c_stop(obj);    // Actual stop bit
 
@@ -534,6 +534,19 @@ int i2c_byte_read(i2c_t *obj, int last) {
 
 int i2c_byte_write(i2c_t *obj, int data) {
     return 0;
+}
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = false,
+    .single_byte_address_delayed = false,
+    .supports_single_byte = false,
+    .supports_zero_length_transfer_single_byte = false,
+    .supports_zero_length_transfer_transaction = true
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
 }
 
 const PinMap *i2c_master_sda_pinmap()

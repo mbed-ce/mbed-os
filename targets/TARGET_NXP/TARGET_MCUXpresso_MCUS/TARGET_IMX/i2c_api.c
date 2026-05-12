@@ -35,16 +35,16 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
 {
     uint32_t i2c_sda = pinmap_peripheral(sda, PinMap_I2C_SDA);
     uint32_t i2c_scl = pinmap_peripheral(scl, PinMap_I2C_SCL);
-    obj->instance = pinmap_merge(i2c_sda, i2c_scl);
+    obj->i2c.instance = pinmap_merge(i2c_sda, i2c_scl);
 
-    MBED_ASSERT((int)obj->instance != NC);
+    MBED_ASSERT((int)obj->i2c.instance != NC);
 
     lpi2c_master_config_t master_config;
 
     i2c_setup_clock();
 
     LPI2C_MasterGetDefaultConfig(&master_config);
-    LPI2C_MasterInit(i2c_addrs[obj->instance], &master_config, i2c_get_clock());
+    LPI2C_MasterInit(i2c_addrs[obj->i2c.instance], &master_config, i2c_get_clock());
 
     pinmap_pinout(sda, PinMap_I2C_SDA);
     pinmap_pinout(scl, PinMap_I2C_SCL);
@@ -58,10 +58,10 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
 
 int i2c_start(i2c_t *obj)
 {
-    LPI2C_Type *base = i2c_addrs[obj->instance];
+    LPI2C_Type *base = i2c_addrs[obj->i2c.instance];
     int status = 0;
 
-    obj->address_set = 0;
+    obj->i2c.address_set = 0;
 
     /* Clear all flags. */
     LPI2C_MasterClearStatusFlags(base, kLPI2C_MasterEndOfPacketFlag |
@@ -80,11 +80,11 @@ int i2c_start(i2c_t *obj)
 
 int i2c_stop(i2c_t *obj)
 {
-    if (LPI2C_MasterStop(i2c_addrs[obj->instance]) != kStatus_Success) {
+    if (LPI2C_MasterStop(i2c_addrs[obj->i2c.instance]) != kStatus_Success) {
         return 1;
     }
 
-    obj->address_set = 0;
+    obj->i2c.address_set = 0;
 
     return 0;
 }
@@ -94,12 +94,12 @@ void i2c_frequency(i2c_t *obj, int hz)
     uint32_t busClock;
 
     busClock = i2c_get_clock();
-    LPI2C_MasterSetBaudRate(i2c_addrs[obj->instance], busClock, hz);
+    LPI2C_MasterSetBaudRate(i2c_addrs[obj->i2c.instance], busClock, hz);
 }
 
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 {
-    LPI2C_Type *base = i2c_addrs[obj->instance];
+    LPI2C_Type *base = i2c_addrs[obj->i2c.instance];
     lpi2c_master_transfer_t master_xfer;
 
     memset(&master_xfer, 0, sizeof(master_xfer));
@@ -123,7 +123,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 
 int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 {
-    LPI2C_Type *base = i2c_addrs[obj->instance];
+    LPI2C_Type *base = i2c_addrs[obj->i2c.instance];
     lpi2c_master_transfer_t master_xfer;
 
     if (length == 0) {
@@ -175,7 +175,7 @@ void i2c_reset(i2c_t *obj)
 int i2c_byte_read(i2c_t *obj, int last)
 {
     uint8_t data;
-    LPI2C_Type *base = i2c_addrs[obj->instance];
+    LPI2C_Type *base = i2c_addrs[obj->i2c.instance];
     lpi2c_master_transfer_t master_xfer;
 
     memset(&master_xfer, 0, sizeof(master_xfer));
@@ -192,7 +192,7 @@ int i2c_byte_read(i2c_t *obj, int last)
 
 int i2c_byte_write(i2c_t *obj, int data)
 {
-    LPI2C_Type *base = i2c_addrs[obj->instance];
+    LPI2C_Type *base = i2c_addrs[obj->i2c.instance];
     uint32_t status;
     size_t txCount;
     size_t txFifoSize = FSL_FEATURE_LPI2C_FIFO_SIZEn(base);
@@ -207,8 +207,8 @@ int i2c_byte_write(i2c_t *obj, int data)
         txCount = txFifoSize - txCount;
     } while (!txCount);
 
-    if (!obj->address_set) {
-        obj->address_set  = 1;
+    if (!obj->i2c.address_set) {
+        obj->i2c.address_set  = 1;
         /* Issue start command. */
         base->MTDR = LPI2C_MTDR_CMD(0x4U) | LPI2C_MTDR_DATA(data);
     } else {
@@ -258,12 +258,12 @@ void i2c_slave_mode(i2c_t *obj, int enable_slave)
     LPI2C_SlaveGetDefaultConfig(&slave_config);
     slave_config.enableSlave = (bool)enable_slave;
 
-    LPI2C_SlaveInit(i2c_addrs[obj->instance], &slave_config, i2c_get_clock());
+    LPI2C_SlaveInit(i2c_addrs[obj->i2c.instance], &slave_config, i2c_get_clock());
 }
 
 int i2c_slave_receive(i2c_t *obj)
 {
-    LPI2C_Type *base = i2c_addrs[obj->instance];
+    LPI2C_Type *base = i2c_addrs[obj->i2c.instance];
     uint32_t status_flags = LPI2C_SlaveGetStatusFlags(base);
 
     if (status_flags & kLPI2C_SlaveAddressValidFlag) {
@@ -282,7 +282,7 @@ int i2c_slave_receive(i2c_t *obj)
 
 int i2c_slave_read(i2c_t *obj, char *data, int length)
 {
-    LPI2C_Type *base = i2c_addrs[obj->instance];
+    LPI2C_Type *base = i2c_addrs[obj->i2c.instance];
     int actual_rx;
 
     LPI2C_SlaveReceive(base, (uint8_t *)data, length, (size_t *)&actual_rx);
@@ -292,7 +292,7 @@ int i2c_slave_read(i2c_t *obj, char *data, int length)
 
 int i2c_slave_write(i2c_t *obj, const char *data, int length)
 {
-    LPI2C_Type *base = i2c_addrs[obj->instance];
+    LPI2C_Type *base = i2c_addrs[obj->i2c.instance];
     int actual_rx;
 
     LPI2C_SlaveSend(base, (uint8_t *)data, length, (size_t *)&actual_rx);
@@ -302,8 +302,21 @@ int i2c_slave_write(i2c_t *obj, const char *data, int length)
 
 void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask)
 {
-    i2c_addrs[obj->instance]->SAMR = LPI2C_SAMR_ADDR0(address & 0xfe);
+    i2c_addrs[obj->i2c.instance]->SAMR = LPI2C_SAMR_ADDR0(address & 0xfe);
 }
 #endif
+
+// Report I2C capabilities
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_start_cond_delayed = true,
+    .single_byte_address_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = true,
+    .supports_zero_length_transfer_transaction = true
+};
+MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
+{
+    return &i2c_caps;
+}
 
 #endif
