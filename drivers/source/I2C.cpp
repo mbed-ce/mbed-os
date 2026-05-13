@@ -132,7 +132,7 @@ int I2C::start()
         _i2c.state = MBED_HAL_I2C_STATE_STARTED;
     } else {
         // Invalid state for starting
-        ret = -1;
+        ret = I2C_ERROR_INVALID_USAGE;
     }
     unlock();
     return ret;
@@ -208,7 +208,7 @@ int I2C::stop()
         _i2c.state = MBED_HAL_I2C_STATE_IDLE;
     } else {
         // Invalid state for stopping
-        ret = -1;
+        ret = I2C_ERROR_INVALID_USAGE;
     }
     unlock();
 

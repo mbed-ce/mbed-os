@@ -128,10 +128,6 @@ typedef struct {
     /// If true, the transaction-based API supports a zero-length transfer (one that has only a start, then an address, then a stop).
     bool        supports_zero_length_transfer_transaction;
 
-#if DEVICE_I2C_ASYNCH
-    /// If true, the async API supports a zero-length transfer (one that has only a start, then an address, then a stop).
-    bool        supports_zero_length_transfer_async;
-#endif
 } i2c_capabilities_t;
 
 #ifdef __cplusplus
@@ -249,7 +245,8 @@ void i2c_frequency(i2c_t *obj, int hz);
  *  @param obj     The I2C object
  *  @param address 8/11-bit address (last bit is 1)
  *  @param data    The buffer for receiving
- *  @param length  Number of bytes to read
+ *  @param length  Number of bytes to read. Allowed to be 0 *only* if the \c supports_zero_length_transfer_transaction
+ *     capability is true.
  *  @param stop    Stop to be generated after the transfer is done
  *  @return Number of read bytes
  */
@@ -267,7 +264,8 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop);
  * @param obj     The I2C object
  * @param address 8/11-bit address (last bit is 0)
  * @param data    The buffer for sending
- * @param length  Number of bytes to write
+ *  @param length  Number of bytes to write. Allowed to be 0 *only* if the \c supports_zero_length_transfer_transaction
+ *     capability is true.
  * @param stop    Stop to be generated after the transfer is done
  * @retval zero or non-zero - Number of written bytes
  * @retval negative - I2C_ERROR_XXX status
@@ -299,7 +297,7 @@ int i2c_start(i2c_t *obj);
  * @brief Send STOP command
  *
  * This function may be called in these I2C states:
- * - ADDRESSED (to complete a zero length transaction, if supported)
+ * - ADDRESSED (to complete a zero length transaction, *only* allowed if the \c supports_zero_length_transfer_single_byte capability is enabled)
  * - BYTE_READ
  * - BYTE_WRITE
  *

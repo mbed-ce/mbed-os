@@ -522,7 +522,7 @@ static inline void state_idle(struct i2c_s *obj_s)
     do {
         flag_state = I2C_GetState(obj_s->i2c);
     } while (flag_state.Bit.BusState);
-    // To satisfy the setup time of restart, at least 4.7�s wait must be created by software (Ref. TRM pg. 561)
+    // To satisfy the setup time of restart, at least 4.7µs wait must be created by software (Ref. TRM pg. 561)
     wait_us(5);
 }
 

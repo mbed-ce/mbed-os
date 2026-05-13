@@ -399,8 +399,8 @@ int i2c_byte_write(i2c_t *obj, int data) {
     printf("i2c_byte_write(): status was originally 0x%x\n", initial_status);
 #endif
 
-    if(initial_status == ADDR_WRITE_TRANSMITTED_NACK) {
-        // Address was previously transmitted and not-acknowledged, do not transmit anything else.
+    if(initial_status == ADDR_WRITE_TRANSMITTED_NACK || initial_status == DATA_TRANSMITTED_NACK) {
+        // Address or data was previously transmitted and not-acknowledged, do not transmit anything else.
         return 0;
     }
 

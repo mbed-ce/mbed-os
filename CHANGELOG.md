@@ -25,6 +25,7 @@ A message that notes the main changes in the update.
 - Reworked targets CMake code to only recurse into the subdir for the current target family, which should speed up the CMake configure a bit
 - The `I2C` class now keeps track of the I2C bus state and prevents you from doing operations that are obviously wrong, such as calling `start()` before `stop()` or calling `write_byte()` before `start()`. Previously these operations would get passed down to the HAL API which may or may not have appropriate error handling for them.
 - The `I2C` class now detects and rejects attempts to perform a zero-length transaction on hardware which does not support it.
+- Use `-Werror=return-type` in the default GCC flags so that a missing return statement in a function becomes a fatal error 
 - STM32F4
   - HAL driver update to `stm32f4xx-hal-driver` v1.8.5 (2025), now integrated as a submodule.
   - CMSIS device update to `cmsis-device-f4` v2.6.11 (2025), now integrated as a submodule.

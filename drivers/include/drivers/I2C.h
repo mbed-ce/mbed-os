@@ -296,7 +296,7 @@ public:
      * until the address is known. On these MCUs, the start condition will not actually be sent until the first
      * \link write_byte() \endlink call after the start().
      *
-     * @returns 0 if successful or -1 on error
+     * @returns 0 if successful or negative error code on error
      */
     int start();
 
@@ -369,7 +369,7 @@ public:
      * This puts the bus back into an idle state where new transactions can be
      * initiated by this device or others.
      *
-     * @returns 0 if successful or -1 on error
+     * @returns 0 if successful or negative error code on error
      */
     int stop();
 
