@@ -1159,7 +1159,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
 
-    // STM32F3 Targets -------------------------------------------------------------------------------------------------
+// STM32F3 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F3": {
         "inherits": [
             "MCU_STM32"
@@ -1174,6 +1174,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "help": "Mask value : USE_PLL_HSE_EXTC | USE_PLL_HSE_XTAL (need HW patch) | USE_PLL_HSI",
                 "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
                 "macro_name": "CLOCK_SOURCE"
+            },
+            "hse-value": {
+                "help": "Frequency in MHz of external oscillator / crystal.  Will be used to compute PLL parameters. May be any value that is between 6MHz and 32MHz and is divisible by 6 or 8MHz",
+                "value": 8000000,
+                "value_min": 6000000,
+                "value_max": 32000000,
+                "macro_name": "HSE_VALUE"
             },
             "lse-drive-load-level": {
                 "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
@@ -1194,27 +1201,18 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "is_mcu_family_target": true
     },
-    "MCU_STM32F302x8": {
-        "inherits": [
-            "MCU_STM32F3"
-        ],
-        "public": false,
-        "c_lib": "small",
-        "extra_labels_add": [
-            "STM32F302x8"
-        ],
-        "macros_add": [
-            "STM32F302x8"
-        ]
-    },
     "MCU_STM32F303x8": {
         "inherits": [
             "MCU_STM32F3"
         ],
         "public": false,
         "c_lib": "small",
+        "overrides": {
+            "application-profile": "bare-metal",
+        },
         "extra_labels_add": [
-            "STM32F303x8"
+            "STM32F303x8",
+            "STARTUP_STM32F303x8"
         ],
         "macros_add": [
             "STM32F303x8"
@@ -1226,26 +1224,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "overrides": {
             "clock-source": "USE_PLL_HSI",
-            "lse-available": 0
+            "lse-available": 0,
+            "default-adc-vref": 3.3
         },
+        "device_has_remove": [
+            "LPTICKER"
+        ],
         "device_name": "STM32F303K8Tx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262544.en.feature-description-include-personalized-no-cpn-medium.jpg"
-    },
-    "MCU_STM32F303xC": {
-        "inherits": [
-            "MCU_STM32F3"
-        ],
-        "public": false,
-        "c_lib": "small",
-        "extra_labels_add": [
-            "STM32F303xC"
-        ],
-        "macros_add": [
-            "STM32F303xC"
-        ],
-        "device_has_add": [
-            "MPU"
-        ]
     },
     "MCU_STM32F303xE": {
         "inherits": [
@@ -1253,7 +1239,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false,
         "extra_labels_add": [
-            "STM32F303xE"
+            "STM32F303xE",
+            "STARTUP_STM32F303xe"
         ],
         "macros_add": [
             "STM32F303xE"
@@ -1271,6 +1258,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
+        "overrides": {
+            "default-adc-vref": 3.3
+        },
         "device_name": "STM32F303RETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF260945.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
@@ -1281,24 +1271,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
+        "overrides": {
+            "default-adc-vref": 3.3
+        },
         "device_has_add": [
             "USBDEVICE"
         ],
         "device_name": "STM32F303ZETx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
-    },
-    "MCU_STM32F334x8": {
-        "inherits": [
-            "MCU_STM32F3"
-        ],
-        "public": false,
-        "c_lib": "small",
-        "extra_labels_add": [
-            "STM32F334x8"
-        ],
-        "macros_add": [
-            "STM32F334x8"
-        ]
     },
 
 // STM32F4 Targets -------------------------------------------------------------------------------------------------
@@ -1558,7 +1538,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "STM32F429xx",
-            "CCM_RAM"
         ],
         "device_has_add": [
             "ANALOGOUT",
@@ -1633,7 +1612,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "macros_add": [
             "STM32F439xx",
-            "CCM_RAM",
             "MBEDTLS_CONFIG_HW_SUPPORT"
         ],
         "device_has_add": [
