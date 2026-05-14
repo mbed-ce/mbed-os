@@ -20,6 +20,7 @@ A message that notes the main changes in the update.
   - `SFE_THING_PLUS_RP2040` board target added for the [SparkFun Thing Plus RP2040 board](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html)
   - MPU configuration support added
   - RP235x target family added, containing two boards to start, `RASPBERRY_PI_PICO_2` and `OLIMEX_RP2350_PICO2_XL`
+  - Support for single-byte i2c operations implemented (allowing features like the I2C EEPROM block device to work).
 
 ### Changed
 - Reworked targets CMake code to only recurse into the subdir for the current target family, which should speed up the CMake configure a bit
