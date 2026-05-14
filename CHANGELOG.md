@@ -62,6 +62,8 @@ A message that notes the main changes in the update.
   - MIMXRT1050_EVK: Fixed build error due to typos
   - Fixed SPI SCLK frequency being several times higher than set due to clock config error (#564)
 - Fixed memory leak with Nanostack memory manager that caused the stack to run of memory when used with zero-copy Ethernet drivers
+- LPC17xx:
+  - Fixed I2C single-byte API continuing to send bytes after being NACKed
 
 ### Removed
 - Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7)
