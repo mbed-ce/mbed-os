@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Created by: Jan Kamidra with GitHub Copilot
+ * Created by: Jan Kamidra
  */
 
 M_CRASH_DATA_RAM_SIZE = 0x100;
@@ -119,7 +119,7 @@ SECTIONS
      * std::uint8_t __attribute__((section(".ccm_data_ram"))) ccm_buffer[64 * 1024];
      */
 #if defined(MBED_CONFIGURED_RAM_BANK_CCM_RAM_START)
-    .ccm_data_ram MBED_CONFIGURED_RAM_BANK_CCM_RAM_START (NOLOAD) :
+    .ccm_data_ram 0x10000000 (NOLOAD) :
     {
         /** Keep the variable even if it is not referenced. */
         KEEP(*(.ccm_data_ram))
