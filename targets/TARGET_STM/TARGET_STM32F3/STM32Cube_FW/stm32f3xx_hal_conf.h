@@ -21,6 +21,14 @@
 #define __STM32F3xx_HAL_CONF_H
 
 #ifdef __cplusplus
+
+/* STM32F3 CMSIS uses a bare CAN macro for the peripheral instance, which
+ * collides with Mbed's C++ CAN class name.
+ */
+#ifdef CAN
+#undef CAN 
+#endif /* CAN */
+
  extern "C" {
 #endif
 
