@@ -117,18 +117,18 @@ uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
     if(HSE_VALUE % 6000000U == 0)
     {
 #if defined(RCC_CFGR_PLLSRC_HSI_PREDIV)
-        RCC_OscInitStruct.PLL.PREDIV        = HSE_VALUE / 6000000U;
+        RCC_OscInitStruct.PLL.PREDIV        = (HSE_VALUE / 6000000U) - 1U;
 #else
-         RCC_OscInitStruct.HSEPredivValue   = HSE_VALUE / 6000000U;
+         RCC_OscInitStruct.HSEPredivValue   = (HSE_VALUE / 6000000U) - 1U;
 #endif
         RCC_OscInitStruct.PLL.PLLMUL        = RCC_PLL_MUL12; // 72 MHz (6 MHz * 12)
     }
     else if(HSE_VALUE % 8000000U == 0)
     {
 #if defined(RCC_CFGR_PLLSRC_HSI_PREDIV)
-        RCC_OscInitStruct.PLL.PREDIV        = HSE_VALUE / 8000000U;
+        RCC_OscInitStruct.PLL.PREDIV        = (HSE_VALUE / 8000000U) - 1U;
 #else
-         RCC_OscInitStruct.HSEPredivValue   = HSE_VALUE / 8000000U;
+         RCC_OscInitStruct.HSEPredivValue   = (HSE_VALUE / 8000000U) - 1U;
 #endif
         RCC_OscInitStruct.PLL.PLLMUL        = RCC_PLL_MUL9; // 72 MHz (8 MHz * 9)
     }
