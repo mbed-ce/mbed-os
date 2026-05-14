@@ -65,6 +65,11 @@ A message that notes the main changes in the update.
 - Fixed memory leak with Nanostack memory manager that caused the stack to run of memory when used with zero-copy Ethernet drivers
 - LPC17xx:
   - Fixed I2C single-byte API continuing to send bytes after being NACKed
+- RP2xxx:
+  - Fixed issue where reading from an I2C master in slave mode could put the I2C peripheral in a bad state if the master transferred
+    more bytes than expected
+  - Fixed issue where reading from an I2c master in slave mode could hang forever if the master ends the transaction early
+  - 
 
 ### Removed
 - Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7)

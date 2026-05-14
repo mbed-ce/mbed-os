@@ -144,8 +144,7 @@ int i2c_byte_write(i2c_t *obj, int data) {
                 ret = 3; // other error
             }
 
-            // Read register to clear abort
-            obj->i2c.dev->hw->clr_tx_abrt;
+            // Don't clear the abort yet as we check this in i2c_stop()
         }
     }
 
@@ -174,9 +173,8 @@ int i2c_byte_read(i2c_t *obj, int last) {
 
     // Did we encounter an error?
     if(obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS) {
-        // Sadly no way to pass up the abort reason so no reason to read tx_abrt_source
-        // Also don't clear the abort yet!
-
+        // Sadly no way to pass up the abort reason so no reason to read tx_abrt_source.
+        // Also don't clear the abort yet as we check this in i2c_stop()
         return 0;
     }
 
@@ -377,17 +375,17 @@ int i2c_slave_write(i2c_t *obj, const char *data, int length)
             tight_loop_contents();
         }
 
+        if(obj->i2c.dev->hw->raw_intr_stat & (I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS | I2C_IC_RAW_INTR_STAT_STOP_DET_BITS)) {
+            // Transaction ended
+            break;
+        }
+
         // Feed more bytes into the FIFO if we have them and there's room
         if(i2c_get_write_available(obj->i2c.dev) && bytes_written < length) {
             obj->i2c.dev->hw->data_cmd = data[bytes_written++];
 
             // Tell the hardware we gave it some data
             obj->i2c.dev->hw->clr_rd_req;
-        }
-        
-        if(obj->i2c.dev->hw->raw_intr_stat & (I2C_IC_RAW_INTR_STAT_TX_ABRT_BITS | I2C_IC_RAW_INTR_STAT_STOP_DET_BITS)) {
-            // Transaction ended
-            break;
         }
 
         if((obj->i2c.dev->hw->raw_intr_stat & I2C_IC_RAW_INTR_STAT_RD_REQ_BITS) && (bytes_written >= length)) {
