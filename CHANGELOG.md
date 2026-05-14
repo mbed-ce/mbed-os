@@ -68,8 +68,8 @@ A message that notes the main changes in the update.
 - RP2xxx:
   - Fixed issue where reading from an I2C master in slave mode could put the I2C peripheral in a bad state if the master transferred
     more bytes than expected
-  - Fixed issue where reading from an I2c master in slave mode could hang forever if the master ends the transaction early
-  - 
+  - Fixed issue where reading from an I2C master in slave mode could hang forever if the master ends the transaction early
+  - Fixed issue where writing to an I2C master in slave mode would always return success regardless of success/failure
 
 ### Removed
 - Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7)
