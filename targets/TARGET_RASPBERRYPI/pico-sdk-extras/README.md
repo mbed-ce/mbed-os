@@ -1,0 +1,1 @@
+This directory contains additional SDK files manually imported from https://github.com/raspberrypi/pico-extras

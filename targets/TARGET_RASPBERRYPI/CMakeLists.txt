@@ -110,6 +110,7 @@ target_include_directories(mbed-mcu-rp2
 		pico-sdk/src/common/hardware_claim/include
 		pico-sdk/src/boards/include
 		pico-sdk/src/generated
+		pico-sdk-extras/rp2_common/hardware_rosc/include
 		${CMAKE_CURRENT_BINARY_DIR}/pico-sdk-generated/
 )
 
@@ -143,6 +144,7 @@ target_sources(mbed-mcu-rp2
 		pico-sdk/src/common/pico_time/time.c
 		pico-sdk/src/common/pico_sync/lock_core.c
 		pico-sdk/src/common/hardware_claim/claim.c
+		pico-sdk-extras/rp2_common/hardware_rosc/rosc.c
 )
 
 target_compile_definitions(mbed-mcu-rp2

@@ -8410,8 +8410,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "RP2040",
 
         "device_has_add": [
-            // Only RP2040 has a dedicated RTC, it was removed in later chips
-            "RTC"
+            // Only RP2040 has a dedicated RTC, it was removed in later chips.
+            // Also note that the RTC is the only LP-ticker-like feature this chip has,
+            // but is unsuited to being used as an LP ticker because it only counts at 1Hz.
+            // So, RP2040 does not support LPTICKER.
+            "RTC",
+            "SLEEP"
         ],
 
         "macros_add": [
