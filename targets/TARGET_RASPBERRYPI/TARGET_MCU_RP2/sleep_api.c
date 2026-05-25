@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
-* Copyright (c) 2026 Jamie Smith
+ * Copyright (c) 2026 Jamie Smith
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,6 +35,10 @@ void hal_sleep(void) {
 
 #if PICO_RP2040
 #define DEEPSLEEP_KEEP_ENABLED_CLOCKS_EN0 (CLOCKS_SLEEP_EN0_CLK_RTC_RTC_BITS | CLOCKS_SLEEP_EN0_CLK_SYS_PADS_BITS | CLOCKS_SLEEP_EN0_CLK_SYS_IO_BITS)
+#elif PICO_RP2350
+#define DEEPSLEEP_KEEP_ENABLED_CLOCKS_EN0 (CLOCKS_SLEEP_EN0_CLK_REF_POWMAN_BITS | CLOCKS_SLEEP_EN0_CLK_SYS_PADS_BITS | CLOCKS_SLEEP_EN0_CLK_SYS_IO_BITS)
+#else
+#error "Unknown RP2xxx model, don't know how ot set clocks!"
 #endif
 
 static void reconfigure_clock_tree_for_deepsleep() {

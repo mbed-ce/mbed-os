@@ -7,6 +7,11 @@ target_include_directories(mbed-mcu-rp235x
         .
 )
 
+target_sources(mbed-mcu-rp235x
+    INTERFACE
+        lp_ticker_api.c
+)
+
 if(MCU_RP235X IN_LIST MBED_TARGET_LABELS)
     pico_compile_boot_stage2(
         mbed-mcu-rp235x

@@ -202,18 +202,20 @@ target_sources(mbed-mcu-rp2040
 # RP2350 SDK -----------------------------------------------------------------------------------------------------------
 
 target_include_directories(mbed-mcu-rp235x
-		INTERFACE
+	INTERFACE
 		pico-sdk/src/rp2350/hardware_structs/include
 		pico-sdk/src/rp2350/hardware_regs/include
 		pico-sdk/src/rp2350/pico_platform/include
 		pico-sdk/src/rp2350/boot_stage2/include
 		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include
+		pico-sdk/src/rp2_common/hardware_powman/include
+
 )
 target_sources(mbed-mcu-rp235x
-		INTERFACE
+	INTERFACE
 		pico-sdk/src/rp2350/pico_platform/platform.c
 		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Source/system_RP2350.c
-
+		pico-sdk/src/rp2_common/hardware_powman/powman.c
 		# floating point helper routines
 #		pico-sdk/src/rp2_common/pico_float/float_aeabi_rp2040.S
 #		pico-sdk/src/rp2_common/pico_float/float_init_rom_rp2040.c
