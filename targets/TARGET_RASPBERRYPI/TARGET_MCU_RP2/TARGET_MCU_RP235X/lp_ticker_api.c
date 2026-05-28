@@ -20,15 +20,27 @@
 
 #include "hardware/powman.h"
 
+#if DEVICE_LPTICKER
+
 // To increase time precision (with no real downside), we run the ticker at a faster
 // clock than the usual 1ms. Per the datasheet, the recommended fastest clock is
 // 16 ticks/ms, giving a quite respectable time resolution of 62.5us.
 #define MBED_PICO_AON_TIMER_TICKS_PER_MS 16
 
+static bool initialized = false;
+
 void lp_ticker_init(void) {
 
+    if(initialized) {
+        // Already initialized, just clear the interrupt and then return
+        powman_timer_disable_alarm();
+        return;
+    }
+
     // Initialize the timer, using the recommended method of "lying" to the SDK about
-    // how fast the clock is. (if we gave it the real clock values it would tick at 1kHz)
+    // how fast the clock is. (if we gave it the real clock values it would tick at 1kHz).
+    // Also, oddly, calling this seems to reset the time, so we have to not call it if already
+    // initialized.
 #if MBED_CONF_TARGET_LPTICKER_USE_LPOSC
     powman_timer_set_1khz_tick_source_lposc_with_hz(32768 / MBED_PICO_AON_TIMER_TICKS_PER_MS);
 #else
@@ -41,12 +53,16 @@ void lp_ticker_init(void) {
     // Start the timer counting
     powman_timer_start();
 
-    // Make sure the IRQ can fire
+    // Make sure the IRQ can fire when ready
     irq_set_enabled(POWMAN_IRQ_TIMER, true);
+    irq_set_exclusive_handler(POWMAN_IRQ_TIMER, lp_ticker_irq_handler);
+
+    initialized = true;
 }
 
 void lp_ticker_free(void) {
     powman_timer_stop();
+    irq_remove_handler(POWMAN_IRQ_TIMER, lp_ticker_irq_handler);
 }
 
 uint32_t lp_ticker_read(void) {
@@ -102,3 +118,5 @@ const ticker_info_t *lp_ticker_get_info(void) {
     };
     return &info;
 }
+
+#endif

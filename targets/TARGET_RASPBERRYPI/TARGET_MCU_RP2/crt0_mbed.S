@@ -45,11 +45,6 @@ __VECTOR_TABLE:
 __vectors:
 .word __StackTop
 .word _reset_handler
-
-#if PICO_MINIMAL_STORED_VECTOR_TABLE
-.word isr_invalid   // NMI
-.word isr_invalid   // HardFault
-#else
 .word NMI_Handler
 .word HardFault_Handler
 #if PICO_RP2040
@@ -144,15 +139,22 @@ __vectors:
 .word I2C1_IRQ_Handler
 .word OTP_IRQ_Handler
 .word TRNG_IRQ_Handler
+.word PROC0_IRQ_CTI_Handler
+.word PROC1_IRQ_CTI_Handler
 .word PLL_SYS_IRQ_Handler
 .word PLL_USB_IRQ_Handler
 .word POWMAN_IRQ_POW_Handler
 .word POWMAN_IRQ_TIMER_Handler
+.word SPARE_IRQ_0_Handler
+.word SPARE_IRQ_1_Handler
+.word SPARE_IRQ_2_Handler
+.word SPARE_IRQ_3_Handler
+.word SPARE_IRQ_4_Handler
+.word SPARE_IRQ_5_Handler
 #else
 #error Unknown processor, can't declare IRQs!
 #endif
 
-#endif  // #if !PICO_MINIMAL_STORED_VECTOR_TABLE
 __vectors_end:
 
 // all default exception handlers do nothing, and we can check for them being set to our
@@ -254,10 +256,18 @@ decl_isr I2C0_IRQ_Handler
 decl_isr I2C1_IRQ_Handler
 decl_isr OTP_IRQ_Handler
 decl_isr TRNG_IRQ_Handler
+decl_isr PROC0_IRQ_CTI_Handler
+decl_isr PROC1_IRQ_CTI_Handler
 decl_isr PLL_SYS_IRQ_Handler
 decl_isr PLL_USB_IRQ_Handler
 decl_isr POWMAN_IRQ_POW_Handler
 decl_isr POWMAN_IRQ_TIMER_Handler
+decl_isr SPARE_IRQ_0_Handler
+decl_isr SPARE_IRQ_1_Handler
+decl_isr SPARE_IRQ_2_Handler
+decl_isr SPARE_IRQ_3_Handler
+decl_isr SPARE_IRQ_4_Handler
+decl_isr SPARE_IRQ_5_Handler
 #else
 #error Unknown processor, can't declare IRQs!
 #endif

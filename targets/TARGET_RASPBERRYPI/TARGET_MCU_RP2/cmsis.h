@@ -15,8 +15,13 @@
  * limitations under the License.
  */
 
-#ifndef __RP2040_CMSIS_H__
-#define __RP2040_CMSIS_H__
+#ifndef __RP2_CMSIS_H__
+#define __RP2_CMSIS_H__
+
+#include <stdbool.h>
+#include <pico/platform/compiler.h>
+#include <pico/platform/common.h>
+#include <hardware/platform_defs.h>
 
 #if PICO_RP2040
 #include "RP2040.h"
@@ -35,13 +40,8 @@ extern "C" {
 extern uint32_t ram_vector_table[]; // defined in runtime_init.c
 #define NVIC_RAM_VECTOR_ADDRESS ram_vector_table
 
-#if PICO_RP2040
-#define NVIC_NUM_VECTORS 42
-#elif PICO_RP2350
-#define NVIC_NUM_VECTORS 60
-#else
-#error "Unknown number of vectors!"
-#endif
+// Mirrors define in runtime.c
+#define NVIC_NUM_VECTORS (VTABLE_FIRST_IRQ + PICO_NUM_VTABLE_IRQS)
 
 #ifdef __cplusplus
 }

@@ -202,6 +202,9 @@ void ticker_init_test()
     }
 
     TEST_ASSERT(intf->read() >= (ticks_start + 2 * TICKER_INT_VAL));
+
+    printf("ticks_start = %" PRIu32 ", ticks_after_reinit = %" PRIu32 "\n", ticks_start, ticks_after_reinit);
+
     TEST_ASSERT(ticks_start <= ticks_after_reinit);
     TEST_ASSERT_EQUAL(0, intFlag);
 }
@@ -606,6 +609,8 @@ utest::v1::status_t us_ticker_teardown(const Case *const source, const size_t pa
 #if DEVICE_LPTICKER
 utest::v1::status_t lp_ticker_setup(const Case *const source, const size_t index_of_case)
 {
+    printf("Pre LP ticker setup, powman IRQ is 0x%lx\n", irq_get_vtable_handler(POWMAN_IRQ_TIMER));
+
     intf = get_lp_ticker_data()->interface;
 
 #ifdef MBED_CONF_RTOS_PRESENT
@@ -671,7 +676,7 @@ Case cases[] = {
 #endif
 };
 
-Specification specification(test_setup, cases);
+Specification specification(test_setup, cases, greentea_continue_handlers);
 
 int main()
 {

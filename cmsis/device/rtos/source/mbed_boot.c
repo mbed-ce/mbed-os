@@ -139,7 +139,7 @@ static void mbed_cpy_nvic(void)
 #if defined(NVIC_RAM_VECTOR_ADDRESS)
     uint32_t *old_vectors = (uint32_t *)SCB->VTOR;
     uint32_t *vectors = (uint32_t *)NVIC_RAM_VECTOR_ADDRESS;
-    for (int i = 0; i < NVIC_NUM_VECTORS; i++) {
+    for (int i = 0; i < (int)(NVIC_NUM_VECTORS); i++) {
         vectors[i] = old_vectors[i];
     }
     SCB->VTOR = (uint32_t)NVIC_RAM_VECTOR_ADDRESS;
