@@ -609,8 +609,6 @@ utest::v1::status_t us_ticker_teardown(const Case *const source, const size_t pa
 #if DEVICE_LPTICKER
 utest::v1::status_t lp_ticker_setup(const Case *const source, const size_t index_of_case)
 {
-    printf("Pre LP ticker setup, powman IRQ is 0x%lx\n", irq_get_vtable_handler(POWMAN_IRQ_TIMER));
-
     intf = get_lp_ticker_data()->interface;
 
 #ifdef MBED_CONF_RTOS_PRESENT
