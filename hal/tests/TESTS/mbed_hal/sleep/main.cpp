@@ -50,8 +50,8 @@ static const uint32_t sleep_mode_delta_us = (10 + 4 + 5);
 #endif
 
 /* Used for deep-sleep mode, a target should be awake within 10 ms. Define us delta value as follows:
- * delta = default 10 ms + worst ticker resolution + extra time for code execution */
-static const uint32_t deepsleep_mode_delta_us = (10000 + 125 + 5);
+ * delta = wakeup time + worst ticker resolution + extra time for code execution */
+static const uint32_t deepsleep_mode_delta_us = (MBED_CONF_TARGET_DEEP_SLEEP_LATENCY * 1000 + 125 + 5);
 
 /* Test that wake-up time from sleep should be less than 10 us and
  * high frequency ticker interrupt can wake-up target from sleep. */
@@ -148,7 +148,7 @@ void deepsleep_lpticker_test()
 
         const timestamp_t wakeup_timestamp = lp_ticker_read();
 
-        sprintf(info, "Delta ticks: %u, Ticker width: %u, Expected wake up tick: %" PRIu32 ", Actual wake up tick: %" PRIu32 ", delay ticks: %d, wake up after ticks: %" PRIu32 "\n",
+        sprintf(info, "Allowed delta ticks: %u (based on target.deep-sleep-latency), Ticker width: %u, Expected wake up tick: %" PRIu32 ", Actual wake up tick: %" PRIu32 ", delay ticks: %d, wake up after ticks: %" PRIu32 "\n",
                 us_to_ticks(deepsleep_mode_delta_us, ticker_freq), ticker_width, next_match_timestamp, wakeup_timestamp, us_to_ticks(i, ticker_freq),  wakeup_timestamp - start_timestamp);
 
         TEST_ASSERT_MESSAGE(compare_timestamps(us_to_ticks(deepsleep_mode_delta_us, ticker_freq), ticker_width,

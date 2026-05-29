@@ -8373,6 +8373,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
             "mpu-rom-end": "0x13FFFFFF", // Flash memory ends at 0x10FFFFFF, rounding up to next supported value
             "mpu-ram-start": "MBED_RAM_BANK_IRAM1_START",
+
+            // Sleep wakeup latency, measured on hardware
+            "deep-sleep-latency": 1, // ms
         },
         "device_has": [
             "ANALOGIN",
