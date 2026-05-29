@@ -83,6 +83,7 @@ static void reconfigure_clock_tree_for_deepsleep() {
 
 static void reset_clock_tree_after_deepsleep() {
     // First reenable the ROSC as apparently this is needed for runtime_init_clocks() to complete successfully
+    // per here https://ghubcoder.github.io/posts/awaking-the-pico/
     rosc_enable();
 
     // Now we can use the regular Pico SDK function to reconfigure the clocks.
