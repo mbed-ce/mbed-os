@@ -19,8 +19,11 @@ A message that notes the main changes in the update.
   - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board compared to the non-W version is limited).
   - `SFE_THING_PLUS_RP2040` board target added for the [SparkFun Thing Plus RP2040 board](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html)
   - MPU configuration support added
-  - RP235x target family added, containing two boards to start, `RASPBERRY_PI_PICO_2` and `OLIMEX_RP2350_PICO2_XL`
   - Support for single-byte i2c operations implemented (allowing features like the I2C EEPROM block device to work).
+  - DEVICE_SLEEP support added, so RP2 chips can now go to sleep or deep sleep when not running any threads.
+- RP235x
+  - RP235x target family added, containing two boards to start, `RASPBERRY_PI_PICO_2` and `OLIMEX_RP2350_PICO2_XL`
+  - LP ticker support added using new POWMAN always-on timer peripheral
 
 ### Changed
 - Reworked targets CMake code to only recurse into the subdir for the current target family, which should speed up the CMake configure a bit
