@@ -19,6 +19,8 @@
 #include "objects.h"
 #include "platform/mbed_error.h"
 #include "mbed_interface.h"
+#include "mbed_boot.h"
+#include "MbedCRC.h"
 
 #include "hardware/resets.h"
 #include "hardware/clocks.h"
@@ -27,6 +29,7 @@
 #include "pico/runtime_init.h"
 
 #include <stdarg.h>
+#include <hardware/flash.h>
 
 int mbed_sdk_inited = 0;
 
@@ -77,9 +80,12 @@ void __attribute__((noreturn)) panic_unsupported() {
     panic("not supported");
 }
 
+#ifdef NDEBUG
+// Simple assert failure handler for release builds, to save space
 void hard_assertion_failure(void) {
     panic("Hard assert");
 }
+#endif
 
 void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
     mbed_error_printf("\n*** PANIC ***\n");
@@ -100,3 +106,28 @@ void __attribute__((noreturn)) __printflike(1, 0) panic(const char *fmt, ...) {
             msgBuf
         );
 }
+
+#if !PICO_NO_FLASH
+void mbed_mac_address(char *mac) {
+    // Generate a random MAC address using the flash device's unique ID.
+    // This is not suitable for production use, but will ensure there are
+    // no MAC conflicts.
+
+    uint8_t flashUID[FLASH_UNIQUE_ID_SIZE_BYTES];
+    flash_get_unique_id(flashUID);
+
+    // The flash unique ID is 64 bits, but we need a unique ID no more
+    // than 48 bits long. So, use a CRC.
+    mbed::MbedCRC<POLY_32BIT_ANSI, 32, mbed::CrcMode::BITWISE> crcCalc;
+    uint32_t crc;
+    crcCalc.compute(flashUID, FLASH_UNIQUE_ID_SIZE_BYTES, &crc);
+
+    // Build the MAC address
+    mac[0] = 2; // Locally administered, unicast
+    mac[1] = 0;
+    mac[2] = crc >> 24;
+    mac[3] = (crc >> 16) & 0xFF;
+    mac[4] = (crc >> 8) & 0xFF;
+    mac[5] = crc & 0xFF;
+}
+#endif

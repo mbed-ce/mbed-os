@@ -5,6 +5,7 @@
 target_sources(mbed-mcu-rp2040
     INTERFACE
         rtc_api.c
+        reset_reason.c
 )
 target_include_directories(mbed-mcu-rp2040
         INTERFACE

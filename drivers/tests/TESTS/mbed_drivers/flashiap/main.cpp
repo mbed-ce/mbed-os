@@ -250,7 +250,7 @@ void flashiap_timing_test()
     std::chrono::microseconds avg_erase_time{};
     unsigned int num_write_sizes;
     float byte_sec_ratio;
-    std::chrono::microseconds max_erase_time(0), min_erase_time(-1);
+    std::chrono::microseconds max_erase_time(0), min_erase_time(1000000);
     const unsigned int max_writes = 128;
     const unsigned int max_write_sizes = 6;
     const unsigned int max_byte_sec_ratio = 200000000;
@@ -286,7 +286,7 @@ void flashiap_timing_test()
         min_erase_time = us_min(min_erase_time, curr_time);
         uint32_t address = base_address;
         std::chrono::microseconds avg_write_time(0);
-        std::chrono::microseconds max_write_time(0), min_write_time(-1);
+        std::chrono::microseconds max_write_time(0), min_write_time(1000000);
         unsigned int num_writes;
         for (num_writes = 0; num_writes < max_writes; num_writes++) {
             if ((address + write_size) > end_address) {

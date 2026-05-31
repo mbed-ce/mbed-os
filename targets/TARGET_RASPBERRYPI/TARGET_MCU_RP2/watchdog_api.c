@@ -23,11 +23,20 @@
 
 static watchdog_config_t watchdogConfig;
 
+// On RP2040, an errata makes the watchdog hardware count twice as fast as intended, so
+// its resolution and max time are halved.
+#if PICO_RP2040
+#define WATCHDOG_MAX_VALUE 0x7fffff
+#define WATCHDOG_FREQUENCY 500 // Hz
+#else
+#define WATCHDOG_MAX_VALUE 0xffffff
+#define WATCHDOG_FREQUENCY 1000 // Hz
+#endif
+
 watchdog_status_t hal_watchdog_init(const watchdog_config_t *config)
 {
     watchdogConfig = *config;
-    // The pico watchdogs accept a maximum value of 0x7fffff
-    if ( config->timeout_ms < 0x1 || config->timeout_ms > 0x7FFFFF ) {
+    if ( config->timeout_ms < 0x1 || config->timeout_ms > WATCHDOG_MAX_VALUE ) {
         return WATCHDOG_STATUS_INVALID_ARGUMENT;
     }
 
@@ -43,7 +52,7 @@ void hal_watchdog_kick(void)
 
 watchdog_status_t hal_watchdog_stop(void)
 {
-    hw_clear_bits(&watchdog_hw->ctrl, WATCHDOG_CTRL_ENABLE_BITS);
+    watchdog_disable();
     return WATCHDOG_STATUS_OK;
 }
 
@@ -56,13 +65,13 @@ watchdog_features_t hal_watchdog_get_platform_features(void)
 {
     watchdog_features_t features;
 
-    features.max_timeout = 0x7FFFFF;
+    features.max_timeout = WATCHDOG_MAX_VALUE;
     features.update_config = true;
     features.disable_watchdog = true;
 
     // SDK configures the watchdog underlying counter to run at 1MHz
-    features.clock_typical_frequency = 1000000;
-    features.clock_max_frequency = 1000000;
+    features.clock_typical_frequency = WATCHDOG_FREQUENCY;
+    features.clock_max_frequency = WATCHDOG_FREQUENCY;
 
     return features;
 }

@@ -44,7 +44,7 @@ extern "C" {
  *   * lp ticker should wake up a target from this mode - Verified by deepsleep_lpticker_test().
  *   * RTC should wake up a target from this mode - not verified.
  *   * an external interrupt on a pin should wake up a target from this mode - not verified.
- *   * a watchdog timer should wake up a target from this mode - not verified.
+ *   * a watchdog timer should wake up a target from this mode - verified by test-mbed-hal-watchdog-reset
  *   * High-speed clocks are turned off - Verified by deepsleep_high_speed_clocks_turned_off_test().
  *   * RTC keeps time - Verified by rtc_sleep_test().
  *

@@ -15,9 +15,8 @@ target_sources(mbed-mcu-rp2
         flash_api.c
         gpio_api.c
         i2c_api.c
-        mbed_overrides.c
+        mbed_overrides.cpp
         pwmout_api.c
-        reset_reason.c
         serial_api.c
         spi_api.c
         us_ticker.c

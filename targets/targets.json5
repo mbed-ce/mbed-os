@@ -8447,13 +8447,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
         "device_has_remove": [
             "ANALOGIN",
-            "FLASH",
             "PWMOUT",
             "SERIAL_FC",
             "SPI",
-            "WATCHDOG",
             "USBDEVICE",
-            "RESET_REASON"
         ],
         "config": {
             "lpticker-use-lposc": {
