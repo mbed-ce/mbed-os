@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <pico/bootrom.h>
+
 #include "reset_reason_api.h"
 #include "hardware/watchdog.h"
 
@@ -64,8 +66,8 @@ reset_reason_t hal_reset_reason_get(void)
 uint32_t hal_reset_reason_get_raw(void)
 {
     // Return the watchdog reset reason register concatenated with the upper
-    // 16 bits of the POWMAN CHIP_RESET register.
-    return (powman_hw->chip_reset & 0xFFFF0000) | (watchdog_hw->reason & 0xFF);
+    // 16 bits of the POWMAN CHIP_RESET register and the bootrom reset type register.
+    return (powman_hw->chip_reset & 0xFFFF0000) | (rom_get_last_boot_type() << 8) | (watchdog_hw->reason & 0xFF);
 }
 
 
@@ -77,9 +79,14 @@ void hal_reset_reason_clear(void)
 
 void hal_reset_reason_get_capabilities(reset_reason_capabilities_t *cap)
 {
-    cap->reasons = (1 << RESET_REASON_PIN_RESET) |
-            (1 << RESET_REASON_POWER_ON) |
-            (1 << RESET_REASON_WATCHDOG);
+    cap->reasons = (1 << RESET_REASON_WATCHDOG) |
+        (1 << RESET_REASON_BROWN_OUT) |
+        (1 << RESET_REASON_WAKE_LOW_POWER) |
+        (1 << RESET_REASON_LOCKUP) |
+        (1 << RESET_REASON_DEBUGGER) |
+        (1 << RESET_REASON_PIN_RESET) |
+        (1 << RESET_REASON_SOFTWARE) |
+        (1 << RESET_REASON_POWER_ON);
 }
 
 #endif // DEVICE_RESET_REASON
