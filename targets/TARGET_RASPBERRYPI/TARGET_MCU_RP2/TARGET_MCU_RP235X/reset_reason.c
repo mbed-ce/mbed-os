@@ -49,16 +49,18 @@ reset_reason_t hal_reset_reason_get(void)
         // but may as well add it.
         return RESET_REASON_LOCKUP;
     }
-    else if(powman_chip_reset & POWMAN_CHIP_RESET_HAD_DP_RESET_REQ_BITS) {
-        return RESET_REASON_DEBUGGER;
-    }
     else if(powman_chip_reset & POWMAN_CHIP_RESET_HAD_RUN_LOW_BITS) {
         return RESET_REASON_PIN_RESET;
     }
-    else if(powman_chip_reset & POWMAN_CHIP_RESET_HAD_POR_BITS) {
-        return RESET_REASON_POWER_ON;
-    }
 
+    // NOTE: The "power on reset" flag (POWMAN_CHIP_RESET_HAD_POR_BITS) is also seen for most types of software
+    // reset, e.g. NVIC_SystemReset() and a reset through OpenOCD. So, we report a so-called "power-on reset"
+    // as UNKNOWN since we can't really determine what actually caused it.
+    // Interestingly SOME software resets can be detected (via POWMAN_CHIP_RESET_HAD_DP_RESET_REQ_BITS) but not
+    // the ARM core reset method that actually seems to be used, so we cannot report support for the
+    // SOFTWARE reset reason. Seems like bad chip design to me...
+    // See forum thread I started here:
+    // https://forums.raspberrypi.com/viewtopic.php?p=2378084
     return RESET_REASON_UNKNOWN;
 }
 
@@ -66,7 +68,7 @@ reset_reason_t hal_reset_reason_get(void)
 uint32_t hal_reset_reason_get_raw(void)
 {
     // Return the watchdog reset reason register concatenated with the upper
-    // 16 bits of the POWMAN CHIP_RESET register and the bootrom reset type register.
+    // 16 bits of the POWMAN CHIP_RESET register and the bootrom reset type field.
     return (powman_hw->chip_reset & 0xFFFF0000) | (rom_get_last_boot_type() << 8) | (watchdog_hw->reason & 0xFF);
 }
 
@@ -83,10 +85,7 @@ void hal_reset_reason_get_capabilities(reset_reason_capabilities_t *cap)
         (1 << RESET_REASON_BROWN_OUT) |
         (1 << RESET_REASON_WAKE_LOW_POWER) |
         (1 << RESET_REASON_LOCKUP) |
-        (1 << RESET_REASON_DEBUGGER) |
-        (1 << RESET_REASON_PIN_RESET) |
-        (1 << RESET_REASON_SOFTWARE) |
-        (1 << RESET_REASON_POWER_ON);
+        (1 << RESET_REASON_PIN_RESET);
 }
 
 #endif // DEVICE_RESET_REASON

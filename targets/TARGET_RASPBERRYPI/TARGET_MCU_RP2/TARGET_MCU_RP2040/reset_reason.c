@@ -37,15 +37,17 @@ reset_reason_t hal_reset_reason_get(void)
     else if(vreg_and_chip_reset_hw->chip_reset & VREG_AND_CHIP_RESET_CHIP_RESET_HAD_RUN_BITS) {
         return RESET_REASON_PIN_RESET;
     }
-    else if(vreg_and_chip_reset_hw->chip_reset & VREG_AND_CHIP_RESET_CHIP_RESET_HAD_POR_BITS) {
-        return RESET_REASON_POWER_ON;
-    }
     else if(vreg_and_chip_reset_hw->chip_reset & VREG_AND_CHIP_RESET_CHIP_RESET_HAD_PSM_RESTART_BITS) {
         // Note: This will only be reached with the debugger resets the core from a lockup,
         // but may as well add it.
         return RESET_REASON_LOCKUP;
     }
 
+    // NOTE: The "power on reset" flag (VREG_AND_CHIP_RESET_CHIP_RESET_HAD_POR_BITS) is also seen for most types of software
+    // reset, e.g. NVIC_SystemReset() and a reset through OpenOCD. So, we report a so-called "power-on reset"
+    // as UNKNOWN since we can't really determine what actually caused it.
+    // See forum thread I started here:
+    // https://forums.raspberrypi.com/viewtopic.php?p=2378084
     return RESET_REASON_UNKNOWN;
 }
 
@@ -67,7 +69,6 @@ void hal_reset_reason_clear(void)
 void hal_reset_reason_get_capabilities(reset_reason_capabilities_t *cap)
 {
     cap->reasons = (1 << RESET_REASON_PIN_RESET) |
-            (1 << RESET_REASON_POWER_ON) |
             (1 << RESET_REASON_WATCHDOG) |
             (1 << RESET_REASON_LOCKUP);
 }

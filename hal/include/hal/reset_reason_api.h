@@ -88,7 +88,6 @@ typedef enum {
     RESET_REASON_MULTIPLE,       /**< Set if multiple reset reasons are set within the board. Occurs when the reset reason registers aren't cleared between resets */
     RESET_REASON_PLATFORM,       /**< Platform specific reset reason not captured in this enum */
     RESET_REASON_UNKNOWN,        /**< Unknown or unreadable reset reason **/
-    RESET_REASON_DEBUGGER,       /**< Debugger initiated soft reset (i.e. not through the reset pin) **/
 } reset_reason_t;
 
 /** Reset reason capabilities of the platform
