@@ -107,6 +107,11 @@ endif()
 # - UPLOAD_RESTART_COMMANDS - List of GDB commands to run when the "restart chip" function is used.
 # See here for more info: https://github.com/mbed-ce/mbed-os/wiki/Debugger-Commands-and-State-in-Upload-Methods
 #
+# Upload methods can create the following targets:
+# - reset - resets the target without flashing anything. Optional, recommended if possible to add.
+#    If this exists, it will be used by the Greentea test scripts instead of the default method
+#    (sending a break command over the serial port, which not all debug probes understand).
+#
 # WARNING: Upload method files are included during the add_subdirectory(mbed-os) call in the top-level CMakeLists.txt.  This means that
 # if you declare variables in an upload method script, you have to save them as CACHE INTERNAL (or PARENT_SCOPE) so that they are accessible
 # to code running outside of the mbed-os subdirectory.

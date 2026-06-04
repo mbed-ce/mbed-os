@@ -22,7 +22,6 @@ DEFAULT_SYNC_DELAY = 4.0
 MSG_VALUE_WATCHDOG_PRESENT = 1
 MSG_VALUE_DUMMY = '0'
 MSG_VALUE_RESET_REASON_GET = 'get'
-MSG_VALUE_RESET_REASON_CLEAR = 'clear'
 MSG_VALUE_DEVICE_RESET_NVIC = 'nvic'
 MSG_VALUE_DEVICE_RESET_WATCHDOG = 'watchdog'
 
@@ -34,20 +33,19 @@ MSG_KEY_SYNC = '__sync'
 MSG_KEY_RESET_COMPLETE = 'reset_complete'
 
 RESET_REASONS = {
-    'POWER_ON': '0',
-    'PIN_RESET': '1',
-    'BROWN_OUT': '2',
-    'SOFTWARE': '3',
-    'WATCHDOG': '4',
-    'LOCKUP': '5',
-    'WAKE_LOW_POWER': '6',
-    'ACCESS_ERROR': '7',
-    'BOOT_ERROR': '8',
-    'MULTIPLE': '9',
-    'PLATFORM': '10',
-    'UNKNOWN': '11'
+    0: 'POWER_ON',
+    1: 'PIN_RESET',
+    2: 'BROWN_OUT',
+    3: 'SOFTWARE',
+    4: 'WATCHDOG',
+    5: 'LOCKUP',
+    6: 'WAKE_LOW_POWER',
+    7: 'ACCESS_ERROR',
+    8: 'BOOT_ERROR',
+    9: 'MULTIPLE',
+    10: 'PLATFORM',
+    11: 'UNKNOWN'
 }
-
 
 def raise_if_different(expected, actual, text=''):
     """Raise a RuntimeError if actual is different than expected."""
@@ -66,12 +64,12 @@ class ResetReasonTest(BaseHostTest):
 
     def __init__(self):
         super(ResetReasonTest, self).__init__()
-        self.device_reasons = None
+        self.device_reasons: set[str] | None = None
         self.device_has_watchdog = None
         self.raw_reset_reasons = set()
         self.sync_delay = DEFAULT_SYNC_DELAY
         self.test_steps_sequence = self.test_steps()
-        # Advance the coroutine to it's first yield statement.
+        # Advance the coroutine to its first yield statement.
         self.test_steps_sequence.send(None)
 
     def setup(self):
@@ -91,7 +89,7 @@ class ResetReasonTest(BaseHostTest):
         if self.device_reasons is None:
             reasons, wdg_status = (int(i, base=16) for i in value.split(','))
             self.device_has_watchdog = (wdg_status == MSG_VALUE_WATCHDOG_PRESENT)
-            self.device_reasons = [k for k, v in RESET_REASONS.items() if (reasons & 1 << int(v))]
+            self.device_reasons = set(v for k, v in RESET_REASONS.items() if (reasons & 1 << k))
         self.send_kv(MSG_KEY_RESET_REASON_RAW, MSG_VALUE_RESET_REASON_GET)
 
     def cb_reset_reason_raw(self, key, value, timestamp):
@@ -116,7 +114,9 @@ class ResetReasonTest(BaseHostTest):
         Fail the test suite if the iterator stops or raises a RuntimeError.
         """
         try:
-            if self.test_steps_sequence.send(value):
+            if value == "ack":
+                self.test_steps_sequence.send(value)
+            elif self.test_steps_sequence.send(RESET_REASONS[int(value)]):
                 self.notify_complete(True)
         except (StopIteration, RuntimeError) as exc:
             self.log('TEST FAILED: {}'.format(exc))
@@ -132,8 +132,6 @@ class ResetReasonTest(BaseHostTest):
         # Ignore the first reason.
         __ignored_reset_reason = yield
         self.raw_reset_reasons.clear()
-        self.send_kv(MSG_KEY_RESET_REASON, MSG_VALUE_RESET_REASON_CLEAR)
-        __ignored_clear_ack = yield
 
         # Request a NVIC_SystemReset() call.
         expected_reason = 'SOFTWARE'
@@ -146,13 +144,14 @@ class ResetReasonTest(BaseHostTest):
             time.sleep(self.sync_delay)
             self.send_kv(MSG_KEY_SYNC, MSG_VALUE_DUMMY)
             reset_reason = yield
-            raise_if_different(RESET_REASONS[expected_reason], reset_reason, 'Wrong reset reason. ')
-            self.send_kv(MSG_KEY_RESET_REASON, MSG_VALUE_RESET_REASON_CLEAR)
-            __ignored_clear_ack = yield
+            raise_if_different(expected_reason, reset_reason, 'Wrong reset reason. ')
 
         # Reset the device using DAP.
-        expected_reason = 'PIN_RESET'
-        if expected_reason not in self.device_reasons:
+        # This could report PIN_RESET or SOFTWARE depending on how the debugger is connected and whether
+        # it's configured for soft or hard reset
+        supports_some_dap_reset_reasons = "PIN_RESET" in self.device_reasons or "SOFTWARE" in self.device_reasons
+        supports_all_dap_reset_reasons = "PIN_RESET" in self.device_reasons and "SOFTWARE" in self.device_reasons
+        if not supports_some_dap_reset_reasons:
             self.log('Skipping the {} reset reason -- not supported.'.format(expected_reason))
         else:
             self.reset()
@@ -160,9 +159,16 @@ class ResetReasonTest(BaseHostTest):
             time.sleep(self.sync_delay)
             self.send_kv(MSG_KEY_SYNC, MSG_VALUE_DUMMY)
             reset_reason = yield
-            raise_if_different(RESET_REASONS[expected_reason], reset_reason, 'Wrong reset reason. ')
-            self.send_kv(MSG_KEY_RESET_REASON, MSG_VALUE_RESET_REASON_CLEAR)
-            __ignored_clear_ack = yield
+
+            if not supports_all_dap_reset_reasons and reset_reason == "UNKNOWN":
+                # If the target only supports some of the possible reset reasons, and we got UNKNOWN back,
+                # allow this as the debugger may have reset using a method we can't recognize.
+                # This is the case on RP2xxx, where the debugger uses a software reset and
+                # we can only detect pin resets, not software resets.
+                self.log("UNKNOWN received for DAP reset test, but OK because PIN_RESET or SOFTWARE reasons not supported.")
+                pass
+            elif reset_reason != "PIN_RESET" and reset_reason != "SOFTWARE":
+                raise RuntimeError(f"Expected 'PIN_RESET' or 'SOFTWARE', got '{reset_reason}'")
 
         # Start a watchdog timer and wait for it to reset the device.
         expected_reason = 'WATCHDOG'
@@ -174,7 +180,7 @@ class ResetReasonTest(BaseHostTest):
             time.sleep(self.sync_delay)
             self.send_kv(MSG_KEY_SYNC, MSG_VALUE_DUMMY)
             reset_reason = yield
-            raise_if_different(RESET_REASONS[expected_reason], reset_reason, 'Wrong reset reason. ')
+            raise_if_different(expected_reason, reset_reason, 'Wrong reset reason. ')
 
         # The sequence is correct -- test passed.
         yield True

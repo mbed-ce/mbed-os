@@ -120,7 +120,7 @@ def init_host_test_cli_params() -> Any:
     reset_methods_str = "Plugin support: " + ", ".join(host_tests_plugins.get_plugin_caps("ResetMethod"))
 
     parser.add_argument(
-        "-r", "--reset", dest="forced_reset_type", help="Forces different type of reset. " + reset_methods_str
+        "-r", "--reset-type", dest="forced_reset_type", help="Forces different type of reset. " + reset_methods_str
     )
 
     parser.add_argument(
@@ -256,6 +256,12 @@ def init_host_test_cli_params() -> Any:
         dest="test_name",
         required=True,
         help="Name of the test being run in the build system. This is passed to the test script.",
+    )
+
+    parser.add_argument(
+        "--build-dir",
+        dest="build_dir",
+        help="Build directory where code was compiled. This is required for certain features such as the 'cmake' reset plugin to work.",
     )
 
     parser.description = """Flash, reset and perform host supervised tests on mbed platforms"""

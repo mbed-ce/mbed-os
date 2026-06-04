@@ -119,3 +119,13 @@ set(UPLOAD_RESTART_COMMANDS
 	"monitor gdb_sync"
 	"stepi"
 )
+
+add_custom_target(reset
+	COMMENT "Resetting target with OpenOCD..."
+	COMMAND ${OpenOCD}
+		${OPENOCD_CHIP_CONFIG_COMMANDS}
+		${OPENOCD_ADAPTER_SERIAL_COMMAND}
+		-c "gdb_port disabled" # Don't start a GDB server when just resetting
+		-c "init; reset; exit"
+	VERBATIM
+	USES_TERMINAL)

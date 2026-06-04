@@ -22,6 +22,7 @@ from multiprocessing import freeze_support
 from mbed_os_tools.test import init_host_test_cli_params
 from mbed_os_tools.test.host_tests_runner.host_test_default import DefaultTestSelector
 from mbed_os_tools.test.host_tests_toolbox.host_functional import handle_send_break_cmd
+from importlib import metadata
 
 
 def main():
@@ -34,9 +35,7 @@ def main():
     cli_params = init_host_test_cli_params()
 
     if cli_params.version:  # --version
-        import pkg_resources  # part of setuptools
-
-        version = pkg_resources.require("mbed-host-tests")[0].version
+        version = metadata.version("mbed-host-tests")
         print(version)
     elif cli_params.send_break_cmd:  # -b with -p PORT (and optional -r RESET_TYPE)
         handle_send_break_cmd(

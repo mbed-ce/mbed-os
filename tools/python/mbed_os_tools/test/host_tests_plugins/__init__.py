@@ -29,6 +29,7 @@ from . import module_reset_mbed
 from . import module_power_cycle_mbed
 from . import module_copy_pyocd
 from . import module_reset_pyocd
+from . import module_reset_cmake
 
 # Additional, non standard platforms
 from . import module_copy_silabs
@@ -52,6 +53,7 @@ HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_copy_mbed.load_plugin())
 HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_copy_shell.load_plugin())
 HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_reset_mbed.load_plugin())
 HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_copy_pyocd.load_plugin())
+HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_reset_cmake.load_plugin())
 
 # Extra platforms support
 HOST_TEST_PLUGIN_REGISTRY.register_plugin(module_copy_mps2.load_plugin())

@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import inspect
+import pathlib
 from time import time
 from inspect import isfunction, ismethod
 
@@ -85,6 +86,11 @@ class HostTestConfig:
     mcu: str | None = None
     """
     CMSIS name of the MCU being tested, if configured in targets.json
+    """
+
+    build_dir: pathlib.Path | None = None
+    """
+    Path to the build directory, if provided.
     """
 
 

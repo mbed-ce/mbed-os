@@ -85,3 +85,13 @@ set(UPLOAD_LAUNCH_COMMANDS
 set(UPLOAD_RESTART_COMMANDS
 "monitor reset halt"
 )
+
+add_custom_target(reset
+	COMMENT "Resetting target with PyOCD..."
+	COMMAND ${Python3_EXECUTABLE} -m pyocd
+		reset
+		-f ${PYOCD_CLOCK_SPEED}
+		-t ${PYOCD_TARGET_NAME}
+		${PYOCD_PROBE_ARGS}
+	VERBATIM
+	USES_TERMINAL)

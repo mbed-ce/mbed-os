@@ -12,8 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
+import pathlib
 import re
 import sys
 import traceback
@@ -162,6 +161,7 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             polling_timeout=self.options.polling_timeout,
             reset_type=self.options.forced_reset_type,
             post_reset_delay=self.options.forced_reset_timeout,
+            build_dir=pathlib.Path(self.options.build_dir),
         )
 
         def start_conn_process():

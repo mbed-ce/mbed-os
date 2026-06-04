@@ -143,7 +143,8 @@ function(mbed_greentea_add_test)
     list(APPEND MBED_HTRUN_ARGUMENTS -p 
         ${MBED_GREENTEA_SERIAL_PORT} 
         --test-name ${MBED_GREENTEA_TEST_NAME}
-        --mbed-target ${MBED_TARGET})
+        --mbed-target ${MBED_TARGET}
+        --build-dir ${CMAKE_BINARY_DIR})
 
     # All of the upload methods already reset the chip after uploading so we don't need to reset via
     # the serial port.  Doing that type of reset also seems to give the Pitaya-Link probe trouble.
@@ -156,6 +157,13 @@ function(mbed_greentea_add_test)
     # Forward sync predelay argument to htrun
     if("${MBED_CONFIG_DEFINITIONS}" MATCHES "MBED_CONF_GREENTEA_CLIENT_SYNC_PREDELAY=([^;]+)")
         list(APPEND MBED_HTRUN_ARGUMENTS --sync-predelay ${CMAKE_MATCH_1})
+    endif()
+
+    # If the upload method provides a 'reset' target, use it instead of the default
+    # (serial port based) reset. Note that even though we pass --skip-reset above,
+    # this is still used by tests that need to reset the device in the middle of the test
+    if(TARGET reset)
+        list(APPEND MBED_HTRUN_ARGUMENTS --reset-type cmake)
     endif()
 
     if(DEFINED MBED_GREENTEA_EXTRA_HTRUN_ARGUMENTS)
