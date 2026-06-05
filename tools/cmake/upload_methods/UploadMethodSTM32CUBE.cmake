@@ -69,3 +69,12 @@ set(UPLOAD_LAUNCH_COMMANDS
 set(UPLOAD_RESTART_COMMANDS
 	"monitor reset"
 )
+
+add_custom_target(reset
+	COMMENT "Resetting target with STM32CubeProgrammer..."
+	COMMAND ${STM32CubeProg_COMMAND}
+		${STM32CUBE_CONNECT_COMMAND}
+		${STM32CUBE_UPLOAD_PROBE_ARGS} # probe arg must be immediately after -c command as it gets appended to -c
+		-rst
+	VERBATIM
+	USES_TERMINAL)

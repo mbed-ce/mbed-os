@@ -108,3 +108,16 @@ set(UPLOAD_RESTART_COMMANDS
 	"monitor halt"
 	"monitor reset"
 )
+
+add_custom_target(reset
+	COMMENT "Resetting target with J-Link..."
+	COMMAND ${JLINK}
+		${JLINK_EXE_SELECT_ARG}
+		-Device \"${JLINK_CPU_NAME}\"
+		-Speed ${JLINK_CLOCK_SPEED}
+		-if ${JLINK_UPLOAD_INTERFACE}
+		-AutoConnect 1
+		-NoGui 1
+		-CommandFile ${CMAKE_CURRENT_LIST_DIR}/reset.jlink
+	VERBATIM
+	USES_TERMINAL)

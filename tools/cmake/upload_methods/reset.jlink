@@ -1,0 +1,6 @@
+JTAGConf -1,-1
+ExitOnError 1
+connect
+r
+go
+exit

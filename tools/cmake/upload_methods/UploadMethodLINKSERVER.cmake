@@ -74,3 +74,9 @@ set(UPLOAD_LAUNCH_COMMANDS
 set(UPLOAD_RESTART_COMMANDS
 	"monitor reset"
 )
+
+# Note: LinkServer does not seem to support resetting via the command line.
+# It might be possible to create a way via LinkServer Scripts:
+# https://mcuoneclipse.com/2023/07/25/linkserver-scripting-and-how-to-recover-mcus-with-a-script/
+# but it seems a bit complex to implement (in particular, it requires calling down to the
+# underlying Redlink program, it can't be done via the LinkServer binary)
