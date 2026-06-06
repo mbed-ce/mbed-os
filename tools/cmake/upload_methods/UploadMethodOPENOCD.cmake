@@ -126,6 +126,6 @@ add_custom_target(reset
 		${OPENOCD_CHIP_CONFIG_COMMANDS}
 		${OPENOCD_ADAPTER_SERIAL_COMMAND}
 		-c "gdb_port disabled" # Don't start a GDB server when just resetting
-		-c "init; reset; exit"
+		-c "init; reset; shutdown"
 	VERBATIM
 	USES_TERMINAL)

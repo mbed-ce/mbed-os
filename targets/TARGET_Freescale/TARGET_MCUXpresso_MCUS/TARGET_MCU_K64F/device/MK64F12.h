@@ -25,6 +25,8 @@
 **     Copyright (c) 1997 - 2016 Freescale Semiconductor, Inc.
 **     All rights reserved.
 **
+**     SPDX-License-Identifier: BSD-3-Clause
+**
 **     Redistribution and use in source and binary forms, with or without modification,
 **     are permitted provided that the following conditions are met:
 **
@@ -281,7 +283,10 @@ typedef enum IRQn {
 #define __MPU_PRESENT                  0         /**< Defines if an MPU is present or not */
 #define __NVIC_PRIO_BITS               4         /**< Number of priority bits implemented in the NVIC */
 #define __Vendor_SysTickConfig         0         /**< Vendor specific implementation of SysTickConfig is defined */
+
+#ifndef __FPU_PRESENT
 #define __FPU_PRESENT                  1         /**< Defines if an FPU is present or not */
+#endif
 
 #include "core_cm4.h"                  /* Core Peripheral Access Layer */
 #include "system_MK64F12.h"            /* Device specific configuration file */

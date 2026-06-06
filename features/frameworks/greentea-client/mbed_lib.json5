@@ -1,0 +1,24 @@
+{
+  // Config file for Mbed's Greentea unit test runner
+  "name": "greentea-client",
+
+  // Config options
+  "config": {
+    "sync-predelay": {
+      "help": "Wait this amount of time (in floating point seconds) after opening the serial port before sending sync.",
+      "value": null
+    },
+  },
+
+  // Per-target overrides
+  "target_overrides": {
+    "AMA3B1KK": {
+      // These boards have the serial port DTR line tied to the MCU reset, so the MCU will restart when
+      // the serial port is opened. It appears that if there is serial port activity within 200ms of opening the port
+      // (see here https://github.com/sparkfun/Apollo3_Uploader_SVL/blob/fc89de7f8163fe755021ca88e779e2963209e5a6/bootloader/src/main.c#L330)
+      // the MCU will get stuck in the bootloader and not boot. Based on testing, we need to wait about 300ms
+      // for the MCU to fully boot and be ready to accept the sync word.
+      "sync-predelay": 0.3
+    }
+  }
+}

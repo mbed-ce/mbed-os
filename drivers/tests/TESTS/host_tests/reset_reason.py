@@ -76,8 +76,10 @@ class ResetReasonTest(BaseHostTest):
         self.register_callback(MSG_KEY_DEVICE_READY, self.cb_device_ready)
         self.register_callback(MSG_KEY_RESET_REASON_RAW, self.cb_reset_reason_raw)
         self.register_callback(MSG_KEY_RESET_REASON, self.cb_reset_reason)
-        self.register_callback(MSG_KEY_DEVICE_RESET, self.cb_reset_reason)
-        self.register_callback(MSG_KEY_RESET_COMPLETE, self.cb_reset_reason)
+        self.register_callback(MSG_KEY_DEVICE_RESET, self.cb_reset_ack)
+
+        # note: this is sent by the test runner, not the DUT
+        self.register_callback(MSG_KEY_RESET_COMPLETE, self.cb_reset_complete)
 
     def cb_device_ready(self, key, value, timestamp):
         """Request a raw value of the reset_reason register.
@@ -107,13 +109,37 @@ class ResetReasonTest(BaseHostTest):
         Fail the test suite if the iterator stops or raises a RuntimeError.
         """
         try:
+            reason = RESET_REASONS[int(value)]
+            self.log("Device reported reset reason {}".format(reason))
+            if self.test_steps_sequence.send(reason):
+                self.notify_complete(True)
+        except (StopIteration, RuntimeError) as exc:
+            self.log('TEST FAILED: {}'.format(exc))
+            self.notify_complete(False)
+
+    def cb_reset_ack(self, key, value, timestamp):
+        """
+        Callback for the 'reset' key which is used for ACKs
+
+        Pass the test suite if the coroutine yields True.
+        Fail the test suite if the iterator stops or raises a RuntimeError.
+        """
+        try:
             if value == "ack":
                 self.test_steps_sequence.send(value)
-            else:
-                reason = RESET_REASONS[int(value)]
-                self.log("Device reported reset reason {}".format(reason))
-                if self.test_steps_sequence.send(reason):
-                    self.notify_complete(True)
+        except (StopIteration, RuntimeError) as exc:
+            self.log('TEST FAILED: {}'.format(exc))
+            self.notify_complete(False)
+
+    def cb_reset_complete(self, key, value, timestamp):
+        """
+        Callback for the 'reset_complete' key
+
+        Pass the test suite if the coroutine yields True.
+        Fail the test suite if the iterator stops or raises a RuntimeError.
+        """
+        try:
+            self.test_steps_sequence.send(value)
         except (StopIteration, RuntimeError) as exc:
             self.log('TEST FAILED: {}'.format(exc))
             self.notify_complete(False)
