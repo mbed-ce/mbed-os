@@ -66,7 +66,6 @@ class ResetReasonTest(BaseHostTest):
         super(ResetReasonTest, self).__init__()
         self.device_reasons: set[str] | None = None
         self.device_has_watchdog = None
-        self.raw_reset_reasons = set()
         self.sync_delay = DEFAULT_SYNC_DELAY
         self.test_steps_sequence = self.test_steps()
         # Advance the coroutine to its first yield statement.
@@ -98,13 +97,7 @@ class ResetReasonTest(BaseHostTest):
         Fail the test suite if the raw reset_reason value is not unique.
         Request a platform independent reset_reason otherwise.
         """
-        if value in self.raw_reset_reasons:
-            self.log('TEST FAILED: The raw reset reason is not unique. '
-                     '{!r} is already present in {!r}.'
-                     .format(value, self.raw_reset_reasons))
-            self.notify_complete(False)
-        else:
-            self.raw_reset_reasons.add(value)
+        self.log("Device reported raw reset reason 0x{:x}".format(int(value, 16)))
         self.send_kv(MSG_KEY_RESET_REASON, MSG_VALUE_RESET_REASON_GET)
 
     def cb_reset_reason(self, key, value, timestamp):
@@ -116,8 +109,11 @@ class ResetReasonTest(BaseHostTest):
         try:
             if value == "ack":
                 self.test_steps_sequence.send(value)
-            elif self.test_steps_sequence.send(RESET_REASONS[int(value)]):
-                self.notify_complete(True)
+            else:
+                reason = RESET_REASONS[int(value)]
+                self.log("Device reported reset reason {}".format(reason))
+                if self.test_steps_sequence.send(reason):
+                    self.notify_complete(True)
         except (StopIteration, RuntimeError) as exc:
             self.log('TEST FAILED: {}'.format(exc))
             self.notify_complete(False)
@@ -131,7 +127,6 @@ class ResetReasonTest(BaseHostTest):
         """
         # Ignore the first reason.
         __ignored_reset_reason = yield
-        self.raw_reset_reasons.clear()
 
         # Request a NVIC_SystemReset() call.
         expected_reason = 'SOFTWARE'
