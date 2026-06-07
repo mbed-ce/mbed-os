@@ -99,7 +99,7 @@ class SerialConnectorPrimitive(ConnectorPrimitive):
             disk=None,
             mcu=self.mcu,
             polling_timeout=self.polling_timeout,
-            build_dir=self.config.build_dir
+            build_dir=self.config.build_dir,
         )
         # Post-reset sleep
         if delay:

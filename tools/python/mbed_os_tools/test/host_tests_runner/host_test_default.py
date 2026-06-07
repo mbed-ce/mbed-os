@@ -161,7 +161,7 @@ class DefaultTestSelector(DefaultTestSelectorBase):
             polling_timeout=self.options.polling_timeout,
             reset_type=self.options.forced_reset_type,
             post_reset_delay=self.options.forced_reset_timeout,
-            build_dir=pathlib.Path(self.options.build_dir),
+            build_dir=pathlib.Path(self.options.build_dir) if self.options.build_dir is not None else None,
         )
 
         def start_conn_process():

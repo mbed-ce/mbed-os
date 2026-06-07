@@ -43,7 +43,7 @@ class MockTestEnvironment(object):
             (
                 "mbedhtrun --mbed-target {} --port {}:9600 --image-path "
                 '"{}" --enum-host-tests "TESTS/host_tests" --disk {} --copy default '
-                "--reset default --test-name test-some-feature "
+                "--reset-type default --test-name test-some-feature "
                 "--program-cycle-s 4 --sync 5 --polling-timeout 15"
             )
             .format(
