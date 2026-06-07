@@ -41,8 +41,7 @@
  * to the user specified reset value.
  *
  * # Defined behavior
- * * Sleep and debug modes don't stop the watchdog timer from counting down.
- * * However, the watchdog may count as much as 2x slower when in deep sleep mode.
+ * * Sleep and debug modes don't stop the watchdog timer from counting down or timing out.
  * * The function ::hal_watchdog_init is safe to call repeatedly. The
  * function's implementation must not do anything if ::hal_watchdog_init has
  * already initialized the hardware watchdog timer.
@@ -52,6 +51,10 @@
  * multiplied by the frequency accuracy ratio of its oscillator (typical_frequency / max_frequency).
  * * The calibrated watchdog should trigger at or after the timeout value.
  * * The watchdog should trigger before twice the timeout value.
+ * * On some devices (Kinetis MCUs), if the watchdog times out during deep sleep mode, the timer will reset
+ *    and count up to the timeout value again before resetting the system. This means that if your MCU may be
+ *    in deep sleep mode when the timer times out, allow for up to double the configured watchdog time before timeout.
+ *    See here for details: https://github.com/ARMmbed/mbed-os/issues/11774
  *
  * # Undefined behavior
  * * Calling any function other than ::hal_watchdog_init or
