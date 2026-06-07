@@ -113,6 +113,11 @@ static cmd_status_t handle_command(const char *key, const char *value)
     if (strcmp(key, MSG_KEY_DEVICE_RESET) == 0 && strcmp(value, MSG_VALUE_DEVICE_RESET_WATCHDOG) == 0) {
         greentea_send_kv(MSG_KEY_DEVICE_RESET, MSG_VALUE_DEVICE_RESET_ACK);
         ThisThread::sleep_for(SERIAL_FLUSH_TIME_MS); // Wait for the serial buffers to flush.
+
+        // On some devices (e.g. K64F), the watchdog counts much slower during deep sleep.
+        // To get accurate timing, prevent the device from using deep sleep.
+        sleep_manager_lock_deep_sleep();
+
         watchdog_config_t config = { .timeout_ms = WDG_TIMEOUT_MS.count() };
         if (hal_watchdog_init(&config) != WATCHDOG_STATUS_OK) {
             TEST_ASSERT_MESSAGE(0, "hal_watchdog_init() error.");

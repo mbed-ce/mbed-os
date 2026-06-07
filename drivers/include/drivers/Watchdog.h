@@ -60,6 +60,10 @@ namespace mbed {
  * }
  * @endcode
  *
+ * @note The watchdog still counts down when the device is in sleep and deep sleep mode. However,
+ *     when in deep sleep mode, it is allowed to count slower on some targets (between 1x and 0.5x the
+ *     normal tick rate).
+ *
  * @note Synchronization level: Interrupt safe
  */
 class Watchdog : private NonCopyable<Watchdog>  {

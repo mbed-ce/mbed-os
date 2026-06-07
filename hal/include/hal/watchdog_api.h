@@ -42,6 +42,7 @@
  *
  * # Defined behavior
  * * Sleep and debug modes don't stop the watchdog timer from counting down.
+ * * However, the watchdog may count as much as 2x slower when in deep sleep mode.
  * * The function ::hal_watchdog_init is safe to call repeatedly. The
  * function's implementation must not do anything if ::hal_watchdog_init has
  * already initialized the hardware watchdog timer.
