@@ -23,10 +23,6 @@
 #include "hardware/pll.h"
 #include "hardware/rosc.h"
 
-#if !PICO_RP2040
-#include "hardware/ticks.h"
-#endif
-
 void hal_sleep(void) {
     // For this function we will sleep the core without turning off any clocks.
 
@@ -46,11 +42,6 @@ void hal_sleep(void) {
 #endif
 
 static void reconfigure_clock_tree_for_deepsleep() {
-
-    // Disable timer 0 (us ticker) from counting
-#if !PICO_RP2040
-    tick_stop(TICK_TIMER0);
-#endif
 
     // Slow down CLK_REF and CLK_SYS by running them directly off the XOSC
     clock_configure_undivided(clk_ref,
@@ -98,10 +89,6 @@ static void reset_clock_tree_after_deepsleep() {
 
     // Now we can use the regular Pico SDK function to reconfigure the clocks.
     runtime_init_clocks();
-
-#if !PICO_RP2040
-    tick_start(TICK_TIMER0, clock_get_hz(clk_ref) / MHZ);
-#endif
 }
 
 void hal_deepsleep(void) {
