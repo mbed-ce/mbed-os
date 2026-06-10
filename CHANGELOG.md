@@ -21,6 +21,7 @@ A message that notes the main changes in the update.
   - MPU configuration support added
   - Support for single-byte i2c operations implemented (allowing features like the I2C EEPROM block device to work).
   - DEVICE_SLEEP support added, so RP2 chips can now go to sleep or deep sleep when not running any threads.
+  - Per-device unique MAC addresses are now implemented, using the unique identifier built into the QSPI flash chip
 - RP235x
   - RP235x target family added, containing two boards to start, `RASPBERRY_PI_PICO_2` and `OLIMEX_RP2350_PICO2_XL`
   - LP ticker support added using new POWMAN always-on timer peripheral
@@ -56,6 +57,7 @@ A message that notes the main changes in the update.
   - SDK updated from 1.5.1 to 2.2.0
   - Pin naming scheme changed. Now the MCU I/O pins are named as `IO_xx` instead of `pxx`. Additionally, `PICO_Pxx` constants are added which match the numbering of the header pins on the PCB.
   - FIFO turned on for the UART, which should significantly improve the ability of code to handle rapidly arriving serial bytes
+  - The `POWER_ON` reset reason is no longer supported on RP2040 because it could also be [erroneously triggered for non-actual-power-on reasons](https://forums.raspberrypi.com/viewtopic.php?p=2378084), like flashing code through OpenOCD. Mbed now returns the unknown reset reason if this flag is set in HW.
 - STM32H5/H7
   - `mem-size` of lwIP stack increased to 32768 from default 4000
 ### Deprecated
