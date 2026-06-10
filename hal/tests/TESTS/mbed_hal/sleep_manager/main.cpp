@@ -138,6 +138,10 @@ utest::v1::status_t testcase_teardown(const Case *const source, const size_t pas
  */
 void test_sleep_auto()
 {
+#ifdef MBED_DEBUG
+    TEST_FAIL_MESSAGE("This test cannot be run in Debug build configuration as it disables deep sleep");
+#endif
+
     const ticker_info_t *us_ticker_info = get_us_ticker_data()->interface->get_info();
     const unsigned us_ticker_mask = ((1 << us_ticker_info->bits) - 1);
     const ticker_irq_handler_type us_ticker_irq_handler_org = set_us_ticker_irq_handler(us_ticker_isr);

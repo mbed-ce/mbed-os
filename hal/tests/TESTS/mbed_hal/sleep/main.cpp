@@ -104,6 +104,10 @@ void sleep_usticker_test()
  * low power ticker interrupt can wake-up target from sleep. */
 void deepsleep_lpticker_test()
 {
+#ifdef MBED_DEBUG
+    TEST_FAIL_MESSAGE("This test cannot be run in Debug build configuration as it disables deep sleep");
+#endif
+
     const ticker_data_t *ticker = get_lp_ticker_data();
     const unsigned int ticker_freq = ticker->interface->get_info()->frequency;
     const unsigned int ticker_width = ticker->interface->get_info()->bits;
@@ -161,6 +165,10 @@ void deepsleep_lpticker_test()
 
 void deepsleep_high_speed_clocks_turned_off_test()
 {
+#ifdef MBED_DEBUG
+    TEST_FAIL_MESSAGE("This test cannot be run in Debug build configuration as it disables deep sleep");
+#endif
+
     const ticker_data_t *us_ticker = get_us_ticker_data();
     const ticker_data_t *lp_ticker = get_lp_ticker_data();
     const unsigned int us_ticker_freq = us_ticker->interface->get_info()->frequency;
