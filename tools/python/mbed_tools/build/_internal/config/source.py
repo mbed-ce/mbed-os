@@ -343,12 +343,12 @@ def _extract_target_overrides(
     target_override_data: dict[str, dict[str, schemas.ConfigSettingValue]],
     allowed_target_labels: Iterable[str],
 ) -> List[Override]:
-    valid_target_data = {}
-    for target_type, override in target_override_data.items():
+    overrides = []
+    for target_type, target_overrides in target_override_data.items():
         if target_type == "*" or target_type in allowed_target_labels:
-            valid_target_data.update(override)
+            overrides.extend(_extract_overrides(context, namespace, target_overrides))
 
-    return _extract_overrides(context, namespace, valid_target_data)
+    return overrides
 
 
 def _extract_overrides(

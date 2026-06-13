@@ -37,5 +37,15 @@
         // adapter connected.
         "target.console-usb": false,
         "target.console-uart": true
+    },
+
+    "target_overrides":
+    {
+        "*": {
+            "target.components_add": ["SPIF"]
+        },
+        "MIMXRT1060_EVK": {
+            "target.components_add": ["ESPRESSIF_ESP32"]
+        }
     }
 }
