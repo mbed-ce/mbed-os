@@ -1,0 +1,85 @@
+/* generated configuration header file - do not edit */
+#ifndef BSP_PIN_CFG_H_
+#define BSP_PIN_CFG_H_
+#include "r_ioport.h"
+
+/* Common macro for FSP header files. There is also a corresponding FSP_FOOTER macro at the end of this file. */
+FSP_HEADER
+
+#define Arduino_A3 (BSP_IO_PORT_00_PIN_01)
+#define Arduino_A1 (BSP_IO_PORT_00_PIN_03)
+#define Arduino_A0 (BSP_IO_PORT_00_PIN_04)
+#define PMOD1_IRQ (BSP_IO_PORT_00_PIN_06)
+#define Arduino_A2 (BSP_IO_PORT_00_PIN_07)
+#define USER_SW (BSP_IO_PORT_00_PIN_09)
+#define PMOD2_IRQ (BSP_IO_PORT_00_PIN_10)
+#define Arduino_A4 (BSP_IO_PORT_00_PIN_14)
+#define Arduino_A5 (BSP_IO_PORT_00_PIN_15)
+#define JLINK_VCOM_RXD (BSP_IO_PORT_01_PIN_01)
+#define JLINK_VCOM_TXD (BSP_IO_PORT_01_PIN_02)
+#define JLINK_VCOM_CTS_RTS (BSP_IO_PORT_01_PIN_03)
+#define JLINK_VCOM_CTS (BSP_IO_PORT_01_PIN_04)
+#define Ardiuno_RST (BSP_IO_PORT_01_PIN_05)
+#define PMOD2_RST (BSP_IO_PORT_01_PIN_06)
+#define PMOD2_P9 (BSP_IO_PORT_01_PIN_07)
+#define Ardiuno_D9 (BSP_IO_PORT_01_PIN_12)
+#define Ardiuno_D6 (BSP_IO_PORT_01_PIN_13)
+#define Ardiuno_D5 (BSP_IO_PORT_01_PIN_14)
+#define NMI (BSP_IO_PORT_02_PIN_00)
+#define MD (BSP_IO_PORT_02_PIN_01)
+#define Arduino_D11 (BSP_IO_PORT_02_PIN_02)
+#define Arduino_D13 (BSP_IO_PORT_02_PIN_03)
+#define Arduino_D10 (BSP_IO_PORT_02_PIN_04)
+#define DEBUG_TDI (BSP_IO_PORT_02_PIN_08)
+#define DEBUG_TDO (BSP_IO_PORT_02_PIN_09)
+#define DEBUG_TMS (BSP_IO_PORT_02_PIN_10)
+#define DEBUG_TCK (BSP_IO_PORT_02_PIN_11)
+#define EXTAL (BSP_IO_PORT_02_PIN_12)
+#define XTAL (BSP_IO_PORT_02_PIN_13)
+#define Arduino_D2 (BSP_IO_PORT_03_PIN_00)
+#define Arduino_D7 (BSP_IO_PORT_03_PIN_02)
+#define Arduino_D8 (BSP_IO_PORT_03_PIN_03)
+#define Arduino_D0 (BSP_IO_PORT_03_PIN_09)
+#define Arduino_D1 (BSP_IO_PORT_03_PIN_10)
+#define Arduino_D12 (BSP_IO_PORT_03_PIN_13)
+#define CAM_D0 (BSP_IO_PORT_04_PIN_00)
+#define CAM_D1 (BSP_IO_PORT_04_PIN_01)
+#define CAM_XCLK (BSP_IO_PORT_04_PIN_03)
+#define CAM_D2 (BSP_IO_PORT_04_PIN_05)
+#define CAM_D3 (BSP_IO_PORT_04_PIN_06)
+#define CAM_E19 (BSP_IO_PORT_04_PIN_14)
+#define CAM_User_Arduino_D3 (BSP_IO_PORT_04_PIN_15)
+#define IIC_SYSTEM_SDA1 (BSP_IO_PORT_05_PIN_11)
+#define IIC_SYSTEM_SCL1 (BSP_IO_PORT_05_PIN_12)
+#define PMOD1_RST (BSP_IO_PORT_06_PIN_04)
+#define PMOD1_P9 (BSP_IO_PORT_06_PIN_05)
+#define PMOD1_MOSI0_TXD0 (BSP_IO_PORT_06_PIN_09)
+#define PMOD1_MISOO_RXD0 (BSP_IO_PORT_06_PIN_10)
+#define PMOD1_SCK0 (BSP_IO_PORT_06_PIN_11)
+#define PMOD1_SS0_CTD_RTS0 (BSP_IO_PORT_06_PIN_12)
+#define PMOD1_CTS0 (BSP_IO_PORT_06_PIN_13)
+#define PMOD1_P10 (BSP_IO_PORT_06_PIN_14)
+#define CAM_D4 (BSP_IO_PORT_07_PIN_00)
+#define CAM_D5 (BSP_IO_PORT_07_PIN_01)
+#define CAM_D6 (BSP_IO_PORT_07_PIN_02)
+#define CAM_D7 (BSP_IO_PORT_07_PIN_03)
+#define CAM_CLK (BSP_IO_PORT_07_PIN_08)
+#define CAM_HD (BSP_IO_PORT_07_PIN_09)
+#define CAM_VD (BSP_IO_PORT_07_PIN_10)
+#define PMOD2_CTS2 (BSP_IO_PORT_08_PIN_00)
+#define PMOD2_MOSI2_TXD2 (BSP_IO_PORT_08_PIN_01)
+#define PMOD2_MISO2_RXD2 (BSP_IO_PORT_08_PIN_02)
+#define PMOD2_SCK2 (BSP_IO_PORT_08_PIN_03)
+#define PMOD2_SS2_CTS_RTS2 (BSP_IO_PORT_08_PIN_04)
+#define CAM_E23 (BSP_IO_PORT_08_PIN_05)
+#define CAM_E34 (BSP_IO_PORT_08_PIN_06)
+#define PMOD2_P10 (BSP_IO_PORT_08_PIN_09)
+#define Arduino_D4 (BSP_IO_PORT_09_PIN_05)
+
+extern const ioport_cfg_t g_bsp_pin_cfg; /* FPB_RA4E1.pincfg */
+
+void BSP_PinConfigSecurityInit();
+
+/* Common macro for FSP header files. There is also a corresponding FSP_HEADER macro at the top of this file. */
+FSP_FOOTER
+#endif /* BSP_PIN_CFG_H_ */
