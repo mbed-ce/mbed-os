@@ -1,3 +1,7 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2024 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "mbed_assert.h"
 #include "mbed_error.h"
 #include "serial_api.h"
@@ -147,11 +151,13 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
     fsp_err_t err = obj->p_api->open(obj->p_ctrl, &obj->cfg);
     MBED_ASSERT(err == FSP_SUCCESS);
 
+#if MBED_CONF_TARGET_CONSOLE_UART
     // For stdio management in platform/mbed_board.c and platform/mbed_retarget.cpp
     if (stdio_config) {
         stdio_uart_inited = 1;
         memcpy(&stdio_uart, obj, sizeof(serial_t));
     }
+#endif
 }
 
 void serial_free(serial_t *obj)

@@ -1,3 +1,7 @@
+/* Copyright (c) 2024 Renesas Electronics Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 /* generated vector source file - do not edit */
         #include "bsp_api.h"
         /* Do not build these data structures if no interrupts are currently allocated because IAR will have build errors. */

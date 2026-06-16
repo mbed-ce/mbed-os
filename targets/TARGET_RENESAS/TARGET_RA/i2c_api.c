@@ -1,3 +1,7 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2024 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #if DEVICE_I2C
 
 #include "mbed_assert.h"

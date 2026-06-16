@@ -1,3 +1,7 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2024 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #define RA_PIN_MODE_ANALOG (0x0U)

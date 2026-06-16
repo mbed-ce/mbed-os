@@ -1,3 +1,7 @@
+/* Copyright (c) 2024 Renesas Electronics Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 /* generated HAL header file - do not edit */
 #ifndef HAL_DATA_H_
 #define HAL_DATA_H_

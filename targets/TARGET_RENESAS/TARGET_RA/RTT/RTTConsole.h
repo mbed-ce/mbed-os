@@ -1,3 +1,8 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2024 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #pragma once
 
 #include "platform/FileHandle.h"

@@ -1,3 +1,7 @@
+/* Copyright (c) 2024 Renesas Electronics Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 /* generated common header file - do not edit */
 #ifndef COMMON_DATA_H_
 #define COMMON_DATA_H_

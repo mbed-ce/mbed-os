@@ -1,3 +1,7 @@
+/* Copyright (c) 2024 Renesas Electronics Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 /* generated common source file - do not edit */
 #include "common_data.h"
 sce_instance_ctrl_t sce_ctrl;

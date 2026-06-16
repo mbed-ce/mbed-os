@@ -1,3 +1,7 @@
+/* Copyright (c) 2024 Renesas Electronics Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 /* generated vector header file - do not edit */
         #ifndef VECTOR_DATA_H
         #define VECTOR_DATA_H

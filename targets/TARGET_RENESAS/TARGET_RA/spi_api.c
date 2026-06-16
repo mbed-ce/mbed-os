@@ -1,4 +1,7 @@
-/* spi_api.c - Mbed CE HAL for RA6E2 SPI (R_SPI only) */
+/* mbed Microcontroller Library
+ * Copyright (c) 2024 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #include "mbed_assert.h"
 #include "mbed_error.h"
@@ -148,10 +151,13 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
     obj->hz = spi_actual_frequency(&ext->spck_div);
 
 #if MBED_CONF_RTOS_PRESENT
-    osSemaphoreAttr_t attr = { 0 };
-    attr.cb_mem = &obj->semaphoreMem;
-    attr.cb_size = sizeof(osRtxSemaphore_t);
-    obj->semaphoreId = osSemaphoreNew(1, 0, &attr);
+    if(obj->semaphoreId == NULL)
+    {
+        osSemaphoreAttr_t attr = { 0 };
+        attr.cb_mem = &obj->semaphoreMem;
+        attr.cb_size = sizeof(osRtxSemaphore_t);
+        obj->semaphoreId = osSemaphoreNew(1, 0, &attr);
+    }
 #else
     obj->xfer_done = true;
 #endif
@@ -173,6 +179,10 @@ void spi_free(spi_t *obj)
         return;
     }
     R_SPI_Close(obj->p_ctrl);
+#if MBED_CONF_RTOS_PRESENT
+    osSemaphoreDelete(obj->semaphoreId);
+    obj->semaphoreId = NULL;
+#endif
 }
 
 /* bits: 4..16, mode: 0..3, slave: 0=master, 1=slave (we only support 8-bit master transfer here) */

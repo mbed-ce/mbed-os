@@ -19,6 +19,8 @@ target_include_directories(mbed-ra8e1
         ../ra/fsp/src/r_rsip_protected/crypto_procedures_protected/src/rsip/ra/private/ra_rsip_e5xx/lib/rsip/ra_rsip_e51a/src
         ../ra/fsp/src/r_rsip_protected/crypto_procedures_protected/src/rsip/ra/private/ra_rsip_e5xx/lib/sb_lib/inc
         ../ra/fsp/src/r_rsip_protected/crypto_procedures_protected/src/rsip/ra/private/ra_rsip_e5xx/lib/sb_lib/src
+        ../ra/fsp/src/r_usb_basic/src/driver/inc
+        ../ra/fsp/src/r_usb_basic/src/hw/inc
         .
 )
 
@@ -57,7 +59,6 @@ target_sources(mbed-ra8e1
 		../ra/fsp/src/r_sci_spi/r_sci_spi.c
 		../ra/fsp/src/r_sci_b_uart/r_sci_b_uart.c
 		../ra/fsp/src/r_spi_b/r_spi_b.c
-		../ra/fsp/src/r_usb_basic/r_usb_basic.c
 		../ra/fsp/src/r_wdt/r_wdt.c
 		../ra/fsp/src/r_rsip_protected/crypto_procedures_protected/src/rsip/common/primitive/r_rsip_reg.c
 		../ra/fsp/src/r_rsip_protected/crypto_procedures_protected/src/rsip/common/private/r_rsip_private.c

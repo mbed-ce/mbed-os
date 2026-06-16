@@ -1,3 +1,7 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2024 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "gpio_irq_api.h"
 #include "pinmap.h"
 #include "mbed_critical.h"

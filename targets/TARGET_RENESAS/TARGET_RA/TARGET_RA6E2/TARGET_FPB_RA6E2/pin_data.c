@@ -1,3 +1,7 @@
+/* Copyright (c) 2024 Renesas Electronics Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
 /* generated pin source file - do not edit */
 #include "bsp_api.h"
 #include "r_ioport.h"

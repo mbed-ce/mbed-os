@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: RZ_A1H */
-
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H
 

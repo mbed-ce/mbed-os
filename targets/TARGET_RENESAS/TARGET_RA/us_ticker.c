@@ -1,3 +1,7 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2024 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "mbed_error.h"
 #include "us_ticker_api.h"
 #include "us_ticker_defines.h"

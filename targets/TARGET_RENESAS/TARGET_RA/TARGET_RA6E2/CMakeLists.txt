@@ -45,7 +45,6 @@ target_sources(mbed-ra6e2
 		../ra/fsp/src/r_sci_spi/r_sci_spi.c
 		../ra/fsp/src/r_sci_uart/r_sci_uart.c
 		../ra/fsp/src/r_spi/r_spi.c
-		../ra/fsp/src/r_usb_basic/r_usb_basic.c
 		../ra/fsp/src/r_wdt/r_wdt.c
 )
 
