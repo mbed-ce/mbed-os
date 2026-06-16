@@ -377,7 +377,7 @@ const spi_b_extended_cfg_t g_spi1_ext_cfg =
     .spck_delay          = SPI_B_DELAY_COUNT_1,
     .ssl_negation_delay  = SPI_B_DELAY_COUNT_1,
     .next_access_delay   = SPI_B_DELAY_COUNT_1,
-    .burst_interframe_delay = SPI_B_BURST_TRANSFER_WITH_DELAY
+    .burst_interframe_delay = SPI_B_BURST_TRANSFER_WITHOUT_DELAY
 
  };
 
@@ -1913,7 +1913,7 @@ const spi_b_extended_cfg_t g_spi0_ext_cfg =
     .spck_delay          = SPI_B_DELAY_COUNT_1,
     .ssl_negation_delay  = SPI_B_DELAY_COUNT_1,
     .next_access_delay   = SPI_B_DELAY_COUNT_1,
-    .burst_interframe_delay = SPI_B_BURST_TRANSFER_WITH_DELAY
+    .burst_interframe_delay = SPI_B_BURST_TRANSFER_WITHOUT_DELAY
 
  };
 

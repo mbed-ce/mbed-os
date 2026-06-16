@@ -1,3 +1,7 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2024 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #ifndef I2C_DEVICE_H
 #define I2C_DEVICE_H
 

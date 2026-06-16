@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: SEGGER */
+
 /*********************************************************************
 *                    SEGGER Microcontroller GmbH                     *
 *                        The Embedded Experts                        *
