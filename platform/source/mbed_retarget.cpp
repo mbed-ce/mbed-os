@@ -54,6 +54,9 @@
 #if MBED_CONF_TARGET_CONSOLE_USB
 #include "USBSerial.h"
 #endif
+#if MBED_CONF_TARGET_CONSOLE_RTT
+#include "RTTHandle.h"
+#endif
 
 static SingletonPtr<rtos::Mutex> _mutex;
 
@@ -382,7 +385,8 @@ static FileHandle *default_console()
     if (consoleInitialized.compare_exchange_strong(uninitializedVal, true)) {
         console.connect();
     }
-
+#elif MBED_CONF_TARGET_CONSOLE_RTT
+    static RTTHandle console;
 #else // MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
     static Sink console;
 #endif

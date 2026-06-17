@@ -19,11 +19,15 @@
         },
         "config": {
             "console-uart": {
-                "help": "Target has UART console on pins CONSOLE_TX, CONSOLE_RX. Value is only significant if target has SERIAL device. Mutually exclusive with target.console-usb.",
+                "help": "Target has UART console on pins CONSOLE_TX, CONSOLE_RX. Value is only significant if target has SERIAL device. Mutually exclusive with target.console-usb and target.console-rtt.",
                 "value": true
             },
             "console-usb": {
-                "help": "Target has USB console on the default USB pins.  Mutually exclusive with target.console-uart.",
+                "help": "Target has USB console on the default USB pins.  Mutually exclusive with target.console-uart and target.console-rtt.",
+                "value": false
+            },
+            "console-rtt": {
+                "help": "Target has USB console on the default USB pins.  Mutually exclusive with target.console-uart and target.console-usb.",
                 "value": false
             },
             "console-uart-flow-control": {

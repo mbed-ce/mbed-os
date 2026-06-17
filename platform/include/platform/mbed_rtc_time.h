@@ -20,32 +20,10 @@
 
 #include <time.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/** \addtogroup platform-public-api */
-/** @{*/
-
 /**
- * \defgroup platform_rtc_time rtc_time functions
- * @{
- */
-
-/* Timeval definition for non GCC_ARM toolchains,
- * Note: The GNU libc defines _TIMEVAL_DEFINED and the newlib defines __timeval_defined,
- * thus the double-check and double-define
- */
-#if !defined(__timeval_defined) && !defined(_TIMEVAL_DEFINED)
-#define __timeval_defined 1
-#define _TIMEVAL_DEFINED
-struct timeval {
-    time_t tv_sec;
-    int32_t tv_usec;
-};
-#endif
-
-/** Implementation of the C time.h functions
+ * @file
+ *
+ * @brief Implementation of the C time.h functions
  *
  * Provides mechanisms to set and read the current time, based
  * on the microcontroller Real-Time Clock (RTC), plus some
@@ -74,6 +52,31 @@ struct timeval {
  * }
  * @endcode
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/** \addtogroup platform-public-api */
+/** @{*/
+
+/**
+ * \defgroup platform_rtc_time rtc_time functions
+ * @{
+ */
+
+/* Timeval definition for non GCC_ARM toolchains,
+ * Note: The GNU libc defines _TIMEVAL_DEFINED and the newlib defines __timeval_defined,
+ * thus the double-check and double-define
+ */
+#if !defined(__timeval_defined) && !defined(_TIMEVAL_DEFINED)
+#define __timeval_defined 1
+#define _TIMEVAL_DEFINED
+struct timeval {
+    time_t tv_sec;
+    int32_t tv_usec;
+};
+#endif
 
 /** Set the current time
  *

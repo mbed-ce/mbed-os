@@ -7,6 +7,7 @@ add_library(mbed-client-cli INTERFACE)
 
 add_subdirectory(frameworks/COMPONENT_FPGA_CI_TEST_SHIELD EXCLUDE_FROM_ALL)
 add_subdirectory(frameworks/cy_rtos_rtx_adapter EXCLUDE_FROM_ALL)
+add_subdirectory(frameworks/rtt)
 
 if(MBED_ENABLE_TESTING)
     add_library(mbed-unity STATIC EXCLUDE_FROM_ALL)

@@ -36,6 +36,7 @@
         // This assumes that such boards (e.g. RASPBERRY_PI_PICO) have an external USB-serial
         // adapter connected.
         "target.console-usb": false,
-        "target.console-uart": true
+        "target.console-uart": false,
+        "target.console-rtt": true
     }
 }

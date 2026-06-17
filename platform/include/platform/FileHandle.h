@@ -47,31 +47,36 @@ class FileHandle : private NonCopyable<FileHandle> {
 public:
     virtual ~FileHandle() = default;
 
-    /** Read the contents of a file into a buffer
+    /**
+     * @brief Read the contents of a file into a buffer
      *
-     *  Devices acting as FileHandles should follow POSIX semantics:
+     * Devices acting as FileHandles should follow POSIX semantics:
      *
-     *  * if no data is available, and nonblocking set, return -EAGAIN
-     *  * if no data is available, and blocking set, wait until some data is available
-     *  * If any data is available, call returns immediately
+     * - if no data is available, and nonblocking set, return -EAGAIN
+     * - if no data is available, and blocking set, wait until some data is available
+     * - If any data is available, call returns immediately
      *
-     *  @param buffer   The buffer to read in to
-     *  @param size     The number of bytes to read
-     *  @return         The number of bytes read, 0 at end of file, negative error on failure
+     * In the event that *some* data are available now, but not the full amount described by \c size,
+     * read() will read those data immediately and return.
+     *
+     * @param buffer   The buffer to read in to
+     * @param size     The number of bytes to read
+     * @return         The number of bytes read, 0 at end of file, negative error on failure
      */
     virtual ssize_t read(void *buffer, size_t size) = 0;
 
-    /** Write the contents of a buffer to a file
+    /**
+     * @brief Write the contents of a buffer to a file
      *
-     *  Devices acting as FileHandles should follow POSIX semantics:
+     * Devices acting as FileHandles should follow POSIX semantics:
      *
-     * * if blocking, block until all data is written
-     * * if no data can be written, and nonblocking set, return -EAGAIN
-     * * if some data can be written, and nonblocking set, write partial
+     * - if blocking, block until all data is written
+     * - if no data can be written, and nonblocking set, return -EAGAIN
+     * - if some data can be written, and nonblocking set, write partial
      *
-     *  @param buffer   The buffer to write from
-     *  @param size     The number of bytes to write
-     *  @return         The number of bytes written, negative error on failure
+     * @param buffer   The buffer to write from
+     * @param size     The number of bytes to write
+     * @return         The number of bytes written, negative error on failure
      */
     virtual ssize_t write(const void *buffer, size_t size) = 0;
 

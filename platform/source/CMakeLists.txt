@@ -68,3 +68,8 @@ if("MBED_CONF_TARGET_CONSOLE_USB=1" IN_LIST MBED_CONFIG_DEFINITIONS)
     # If the stdio console uses USB, we need to link mbed-usb into the default OS build
     target_link_libraries(mbed-core-flags INTERFACE mbed-usb)
 endif()
+
+if("MBED_CONF_TARGET_CONSOLE_RTT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
+    # If the stdio console uses RTT, we need to link mbed-rtt into the default OS build
+    target_link_libraries(mbed-core-flags INTERFACE mbed-rtt)
+endif()
