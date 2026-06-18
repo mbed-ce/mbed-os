@@ -96,6 +96,10 @@ set(UPLOAD_GDBSERVER_DEBUG_COMMAND
 	-singlerun # Terminate GDB server after GDB disconnects
 	)
 
+if("MBED_CONF_TARGET_CONSOLE_RTT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
+	list(APPEND UPLOAD_GDBSERVER_DEBUG_COMMAND -RTTTelnetPort ${MBED_RTT_PORT})
+endif()
+
 # Reference: https://github.com/Marus/cortex-debug/blob/056c03f01e008828e6527c571ef5c9adaf64083f/src/jlink.ts#L42
 set(UPLOAD_LAUNCH_COMMANDS
 	"monitor halt"

@@ -57,9 +57,10 @@ if(NOT "${UPLOAD_METHOD_UCASE}" STREQUAL "${UPLOAD_METHOD}")
 	set(UPLOAD_METHOD "${UPLOAD_METHOD_UCASE}" CACHE STRING "" FORCE)
 endif()
 
-## GDB port
+## Port numbers
 # use a higher numbered port to allow use without root on Linux/Mac
 set(MBED_GDB_PORT 23331 CACHE STRING "Port that the GDB server will be started on.")
+set(MBED_RTT_PORT 19022 CACHE STRING "Port that RTT telnet will be made available on if RTT console is enabled")
 
 ## Upload tool serial number
 set(MBED_UPLOAD_SERIAL_NUMBER "" CACHE STRING "Serial number of the Mbed board or the programming tool, for upload methods that select by serial number.")
@@ -97,6 +98,7 @@ endif()
 # Upload methods are expected to refer to the following variables:
 # - MBED_UPLOAD_SERIAL_NUMBER - USB serial number of the mbed board or of the programmer
 # - MBED_UPLOAD_BASE_ADDR - Base address of the flash where the bin file will be written to
+# - MBED_RTT_PORT - Port for RTT to be started on, if supported
 #
 # Upload methods are expected to set the following variables:
 # - UPLOAD_${UPLOAD_METHOD}_FOUND - True iff the dependencies for this upload method were found
