@@ -201,6 +201,17 @@ def _generate_macros_for_memory_banks(banks_by_type: BanksByType, configured_ban
             all_macros.add(f"MBED_CONFIGURED_{bank_type}_BANK_{bank_name}_START=0x{configured_bank_data['start']:x}")
             all_macros.add(f"MBED_CONFIGURED_{bank_type}_BANK_{bank_name}_SIZE=0x{configured_bank_data['size']:x}")
 
+    # Also generate RAM_RANGE_START and RAM_RANGE_END macros which aggregate all RAM banks.
+    # These are currently used for configuring RTT control block search ranges.
+    first_ram_bank_start = 0xFFFFFFFF
+    last_ram_bank_end = 0x0
+    for (_, bank_data) in enumerate(banks_by_type["RAM"].values()):
+        first_ram_bank_start = min(first_ram_bank_start, bank_data['start'])
+        last_ram_bank_end = max(last_ram_bank_end, bank_data['start'] + bank_data['size'])
+
+    all_macros.add(f"MBED_RAM_RANGE_START=0x{first_ram_bank_start:x}") # First address part of any RAM bank
+    all_macros.add(f"MBED_RAM_RANGE_END=0x{last_ram_bank_end:x}") # Last address part of any RAM bank
+
     return all_macros
 
 
