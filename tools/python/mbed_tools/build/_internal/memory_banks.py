@@ -207,7 +207,8 @@ def _generate_macros_for_memory_banks(banks_by_type: BanksByType, configured_ban
     last_ram_bank_end = 0x0
     for (_, bank_data) in enumerate(banks_by_type["RAM"].values()):
         first_ram_bank_start = min(first_ram_bank_start, bank_data['start'])
-        last_ram_bank_end = max(last_ram_bank_end, bank_data['start'] + bank_data['size'])
+        # note: subtract 1 from the size to get the last valid address in the bank.
+        last_ram_bank_end = max(last_ram_bank_end, bank_data['start'] + bank_data['size'] - 1)
 
     all_macros.add(f"MBED_RAM_RANGE_START=0x{first_ram_bank_start:x}") # First address part of any RAM bank
     all_macros.add(f"MBED_RAM_RANGE_END=0x{last_ram_bank_end:x}") # Last address part of any RAM bank

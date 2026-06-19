@@ -31,14 +31,21 @@ namespace mbed
 {
 
 /**
+ * @brief Initialize the RTT library.
+ *
+ * This must be called before any code using SEGGER RTT is run. As the RTT library does not
+ * handle double-initialization, Mbed contains a guard to make sure it will not be reinitialized
+ * if this function is called again.
+ *
+ * This function will be called at boot via global constructor, and whenever an RTTHandle object is constructed
+ * (to handle the case where an RTTHandle is used inside another global constructor).
+ */
+static void initialize_rtt();
+
+/**
  * @brief Class which wraps the RTT library as an Mbed FileHandle.
  */
 class RTTHandle : public FileHandle {
-
-    // Initialization guard for RTT.
-    // Needed since initializing the library again will wipe away existing data.
-    static mstd::atomic<bool> rtt_initialized;
-
     // Buffer index within RTT that this handle points to
     const unsigned int buffer_index;
 

@@ -22,11 +22,8 @@
 
 namespace mbed {
 
-mstd::atomic<bool> RTTHandle::rtt_initialized = false;
-
-RTTHandle::RTTHandle():
-buffer_index(0)
-{
+static mstd::atomic<bool> rtt_initialized = false;
+void initialize_rtt() {
     // Initialize RTT, using a critical section to ensure thread safety
     core_util_critical_section_enter();
     bool expected_value = false;
@@ -34,6 +31,22 @@ buffer_index(0)
         SEGGER_RTT_Init();
     }
     core_util_critical_section_exit();
+}
+
+// Class used to call initialize_rtt() via global constructor.
+// This is needed so that the debug
+class RTTInitializer {
+public:
+    RTTInitializer() {
+        initialize_rtt();
+    }
+};
+static RTTInitializer rtt_initializer [[maybe_unused]];
+
+RTTHandle::RTTHandle():
+buffer_index(0)
+{
+    initialize_rtt();
 
     // Ensure up buffer is in nonblocking-with-trim mode
     SEGGER_RTT_SetFlagsUpBuffer(buffer_index, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
@@ -46,13 +59,7 @@ buffer_index(buffer_index)
     MBED_ASSERT(buffer_index != 0);
     MBED_ASSERT(buffer_index < MBED_CONF_RTT_MAX_BUFFERS);
 
-    // Initialize RTT, using a critical section to ensure thread safety
-    core_util_critical_section_enter();
-    bool expected_value = false;
-    if(rtt_initialized.compare_exchange_strong(expected_value, true)) {
-        SEGGER_RTT_Init();
-    }
-    core_util_critical_section_exit();
+    initialize_rtt();
 
     // Configure up and down buffers
     SEGGER_RTT_ConfigUpBuffer(buffer_index, name, up_buffer, up_buffer_size, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
