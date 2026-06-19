@@ -46,6 +46,7 @@ void pin_function(PinName pin, int function)
     uint32_t mode = RA_PIN_MODE(function);
     uint32_t pull = RA_PIN_PULL(function);
     uint32_t alt  = RA_PIN_ALT(function);
+    uint32_t speed = RA_PIN_SPEED(function);
 
     uint32_t cfg = 0;
 
@@ -70,7 +71,18 @@ void pin_function(PinName pin, int function)
             break;
     }
 
-    // pull-up/down
+    switch (speed) {
+        case RA_PIN_SPEED_MID:
+            cfg |= IOPORT_CFG_DRIVE_MID;
+            break;
+        case RA_PIN_SPEED_HS_HIGH:
+            cfg |= IOPORT_CFG_DRIVE_HS_HIGH;
+            break;
+        case RA_PIN_SPEED_HIGH:
+            cfg |= IOPORT_CFG_DRIVE_HIGH;
+            break;
+    }
+
     if (pull == RA_PIN_PULL_UP) {
         cfg |= IOPORT_CFG_PULLUP_ENABLE;
     } else if (pull == RA_PIN_PULL_DOWN) {
