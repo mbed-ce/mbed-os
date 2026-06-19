@@ -6,6 +6,7 @@
 #include "bsp_api.h"
 #include "hal_data.h"
 #include "mbed_mktime.h"
+#include "reset_reason_api.h"
 
 static bool rtc_opened = false;
 
@@ -20,6 +21,19 @@ void rtc_init(void)
         rtc_opened = true;
     }
 
+#if TARGET_FPB_RA8E1
+    // To retain the RTC clock after reset, R_RTC_ClockSourceSet can only be called once after Power On.
+    // Unfortunately, only on FPB-RA8E1 we can get the correct Power Up reset reason
+    // Note: rtc_init() must be called before ResetReason::get()
+    reset_reason_t reset_reason = hal_reset_reason_get();
+    if (reset_reason == RESET_REASON_POWER_ON)
+#endif
+    {
+        R_RTC_ClockSourceSet(&g_rtc0_ctrl);
+        R_SYSTEM->RSTSR0_b.PORF = 0U;
+    }
+
+    R_BSP_SoftwareDelay(10, BSP_DELAY_UNITS_MILLISECONDS);
 }
 
 int rtc_isenabled(void)
@@ -87,4 +101,6 @@ void rtc_free(void)
     if (!rtc_opened) {
         return;
     }
+    R_RTC_Close(&g_rtc0_ctrl);
+    rtc_opened = false;
 }

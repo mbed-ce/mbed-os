@@ -1814,7 +1814,7 @@ const rtc_error_adjustment_cfg_t g_rtc0_err_cfg =
 };
 const rtc_cfg_t g_rtc0_cfg =
 {
-    .clock_source            = RTC_CLOCK_SOURCE_LOCO,
+    .clock_source            = MBED_CONF_TARGET_RTC_CLOCK_SOURCE,
     .freq_compare_value = 255,
     .p_err_cfg               = &g_rtc0_err_cfg,
     .p_callback              = NULL,

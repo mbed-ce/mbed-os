@@ -8610,8 +8610,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "config": {
             "lse-available": {
-                "help": "Define if a Low Speed External xtal (LSE) is available on the board (0 = No, 1 = Yes). If Yes, the LSE will be used to clock the RTC, LPUART, ... otherwise the Low Speed Internal clock (LSI) will be used",
+                "help": "Define if a Low Speed External xtal (LSE) is available on the board (0 = No, 1 = Yes). If Yes, the LSE will be used to clock the RTC, LPUART, ... otherwise the Low Speed Internal clock (LOCO) will be used",
                 "value": "1"
+            },
+            "rtc-clock-source": {
+                "help": "Define the RTC clock source. RTC_CLOCK_SOURCE_SUBCLK, RTC_CLOCK_SOURCE_LOCO, RTC_CLOCK_SOURCE_MAINCLK.",
+                "value": "RTC_CLOCK_SOURCE_SUBCLK"
             },
             "console-rtt": {
                 "help": "Target has JLink RTT console. Mutually exclusive with target.console-uart.",
@@ -8677,7 +8681,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "overrides": {
-            "lse-available": 0
+            "lse-available": 0,
+            "rtc-clock-source": "RTC_CLOCK_SOURCE_LOCO"
         },
         "device_name": "R7FA4E10D",
         "image_url": "https://www.renesas.com/sites/default/files/styles/product_features_large/public/fpb-ra4e1-pcb.png"
