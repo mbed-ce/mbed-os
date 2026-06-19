@@ -12,7 +12,7 @@ set(UPLOAD_SUPPORTS_DEBUG TRUE)
 ### Find PyOCD package
 
 # Use >=0.37 so that we get Ambiq Apollo3 support
-mbed_check_or_install_python_package(HAVE_PYTHON_PYOCD pyocd pyocd>=0.37)
+mbed_check_or_install_python_package(HAVE_PYTHON_PYOCD pyocd 0.37)
 
 set(UPLOAD_PYOCD_FOUND ${HAVE_PYTHON_PYOCD})
 
@@ -82,6 +82,20 @@ set(UPLOAD_LAUNCH_COMMANDS
 # or debugger will become abnormal.
 "monitor reset halt"
 )
+
+if("MBED_CONF_TARGET_CONSOLE_RTT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
+	set(UPLOAD_POST_LAUNCH_COMMANDS
+		# The commands for starting RTT in PyOCD do not appear to be documented anywhere.
+		# Had to check the source code:
+		# https://github.com/pyocd/pyOCD/blob/83ed5cbc2c437407cefe23d648e533c7d0c5a1f9/pyocd/gdbserver/gdbserver_commands.py#L130
+		# The first command needs the control block ID as its third argument, i.e. the value of the constant
+		# _aInitStr in the RTT code
+		"monitor rtt setup ${MBED_RTT_RAM_RANGE_START} ${MBED_RTT_RAM_RANGE_SIZE} SEGGER RTT"
+		"monitor rtt start"
+		"monitor rtt server start ${MBED_RTT_PORT} 0"
+	)
+endif()
+
 set(UPLOAD_RESTART_COMMANDS
 "monitor reset halt"
 )

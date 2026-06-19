@@ -40,7 +40,7 @@ namespace mbed
  * This function will be called at boot via global constructor, and whenever an RTTHandle object is constructed
  * (to handle the case where an RTTHandle is used inside another global constructor).
  */
-static void initialize_rtt();
+void initialize_rtt();
 
 /**
  * @brief Class which wraps the RTT library as an Mbed FileHandle.

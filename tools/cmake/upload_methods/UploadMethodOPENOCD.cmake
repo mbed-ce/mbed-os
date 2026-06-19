@@ -108,45 +108,19 @@ set(UPLOAD_LAUNCH_COMMANDS
 	# OpenOCD provides the 'monitor program' command as an alternative to 'load'. Seems like it does basically the same thing, except
 	# that on certain devices (e.g. PSoC 62) it works while 'load' does not.
 	"monitor program"
-)
-
-if("MBED_CONF_TARGET_CONSOLE_RTT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
-	# Unlike J-Link, OpenOCD is not smart enough to automatically compute the RTT search range based
-	# on the device memory layout. So, we need to give it some more help.
-	# The alternative would be to put the RTT CB at a fixed address, but that would likely require
-	# specific configuration for each target, so it's probably a non-starter.
-	string(REGEX MATCH "MBED_RAM_RANGE_START=([^;]+)" RTT_RAM_RANGE_MATCH "${MBED_CONFIG_DEFINITIONS}")
-
-	# Handle old build configs that didn't provide this definition
-	if("${RTT_RAM_RANGE_MATCH}" STREQUAL "")
-		message(FATAL_ERROR "Memory bank information not available for this target, cannot configure RTT support. This may be caused by an old build directory -- try deleting and recreating it if you made it with an older version of Mbed.")
-	endif()
-
-	set(RTT_RAM_RANGE_START ${CMAKE_MATCH_1})
-	string(REGEX MATCH "MBED_RAM_RANGE_END=([^;]+)" _ "${MBED_CONFIG_DEFINITIONS}")
-	set(RTT_RAM_RANGE_END ${CMAKE_MATCH_1})
-	math(EXPR RTT_RAM_RANGE_SIZE "${RTT_RAM_RANGE_END} - ${RTT_RAM_RANGE_START} + 1" OUTPUT_FORMAT HEXADECIMAL)
-
-	list(APPEND UPLOAD_LAUNCH_COMMANDS
-			# Allow to run to main so that the RTT control block gets initialized
-			${OPENOCD_GDB_RESET_SEQUENCE}
-			"tbreak main"
-			"c"
-
-			# Now start RTT (this needs the CB to be initialized)
-			"monitor rtt setup ${RTT_RAM_RANGE_START} ${RTT_RAM_RANGE_SIZE}"
-			"monitor rtt start"
-			"monitor rtt server start ${MBED_RTT_PORT} 0 \"OpenOCD Mbed RTT Console\"")
-endif()
-
-
-list(APPEND UPLOAD_LAUNCH_COMMANDS
-	# Reset
-	${OPENOCD_GDB_RESET_SEQUENCE}
 
 	# Set temp breakpoint at main
 	"tbreak main"
 )
+
+if("MBED_CONF_TARGET_CONSOLE_RTT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
+	set(UPLOAD_POST_LAUNCH_COMMANDS
+		# Start RTT (this needs the CB to be initialized)
+		"monitor rtt setup ${MBED_RTT_RAM_RANGE_START} ${MBED_RTT_RAM_RANGE_SIZE}"
+		"monitor rtt start"
+		"monitor rtt server start ${MBED_RTT_PORT} 0 \"OpenOCD Mbed RTT Console\"")
+endif()
+
 set(UPLOAD_RESTART_COMMANDS
 	${OPENOCD_GDB_RESET_SEQUENCE}
 

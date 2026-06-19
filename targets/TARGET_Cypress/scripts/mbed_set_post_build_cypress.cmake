@@ -64,7 +64,7 @@ macro(mbed_post_build_psoc6_sign_image
     if("${cypress_psoc6_target}" STREQUAL "${MBED_TARGET}")
 
         # Make sure we have the python packages we need
-        mbed_check_or_install_python_package(HAVE_PYTHON_CYSECURETOOLS cysecuretools "cysecuretools~=6.0")
+        mbed_check_or_install_python_package(HAVE_PYTHON_CYSECURETOOLS cysecuretools 6.0)
         if(NOT HAVE_PYTHON_CYSECURETOOLS)
             message(FATAL_ERROR "Python package required for signing not found.")
         endif()

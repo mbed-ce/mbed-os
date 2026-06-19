@@ -93,6 +93,26 @@ if(NOT DEFINED MBED_DEBUG_CORE_INDEX)
 	set(MBED_DEBUG_CORE_INDEX 0)
 endif()
 
+## RTT addresses
+if("MBED_CONF_TARGET_CONSOLE_RTT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
+	# Some upload methods, like PyOCD and OpenOCD, are not smart enough to automatically compute the RTT search range based
+	# on the device memory layout. So, we need to give them some more help.
+	# The alternative would be to put the RTT CB at a fixed address, but that would likely require
+	# specific configuration for each target, so it's probably a non-starter.
+	string(REGEX MATCH "MBED_RAM_RANGE_START=([^;]+)" RTT_RAM_RANGE_MATCH "${MBED_CONFIG_DEFINITIONS}")
+
+	# Handle old build configs that didn't provide this definition
+	if("${RTT_RAM_RANGE_MATCH}" STREQUAL "")
+		message(FATAL_ERROR "Memory bank information not available for this target, cannot configure RTT support. This may be caused by an old build directory -- try deleting and recreating it if you made it with an older version of Mbed.")
+	endif()
+
+	set(MBED_RTT_RAM_RANGE_START ${CMAKE_MATCH_1})
+	string(REGEX MATCH "MBED_RAM_RANGE_END=([^;]+)" _ "${MBED_CONFIG_DEFINITIONS}")
+	set(MBED_RTT_RAM_RANGE_END ${CMAKE_MATCH_1})
+	math(EXPR MBED_RTT_RAM_RANGE_SIZE "${MBED_RTT_RAM_RANGE_END} - ${MBED_RTT_RAM_RANGE_START} + 1" OUTPUT_FORMAT HEXADECIMAL)
+endif()
+
+
 # ----------------------------------------------
 # Load the upload method.
 # Upload methods are expected to refer to the following variables:
@@ -106,6 +126,8 @@ endif()
 # - UPLOAD_GDBSERVER_DEBUG_COMMAND - Command to start a new GDB server
 # - UPLOAD_WANTS_EXTENDED_REMOTE - True iff GDB should use "target extended-remote" to connect to the GDB server
 # - UPLOAD_LAUNCH_COMMANDS - List of GDB commands to run after launching GDB.
+# - UPLOAD_POST_LAUNCH_COMMANDS - List of GDB commands to run after the target hits main() in GDB.
+#    Commonly used for setting up RTT.
 # - UPLOAD_RESTART_COMMANDS - List of GDB commands to run when the "restart chip" function is used.
 # See here for more info: https://github.com/mbed-ce/mbed-os/wiki/Debugger-Commands-and-State-in-Upload-Methods
 #
@@ -139,6 +161,7 @@ set(MBED_UPLOAD_SUPPORTS_DEBUG ${UPLOAD_SUPPORTS_DEBUG} CACHE INTERNAL "" FORCE)
 set(MBED_UPLOAD_GDBSERVER_DEBUG_COMMAND ${UPLOAD_GDBSERVER_DEBUG_COMMAND} CACHE INTERNAL "" FORCE)
 set(MBED_UPLOAD_WANTS_EXTENDED_REMOTE ${UPLOAD_WANTS_EXTENDED_REMOTE} CACHE INTERNAL "" FORCE)
 set(MBED_UPLOAD_LAUNCH_COMMANDS ${UPLOAD_LAUNCH_COMMANDS} CACHE INTERNAL "" FORCE)
+set(MBED_UPLOAD_POST_LAUNCH_COMMANDS ${UPLOAD_POST_LAUNCH_COMMANDS} CACHE INTERNAL "" FORCE)
 set(MBED_UPLOAD_RESTART_COMMANDS ${UPLOAD_RESTART_COMMANDS} CACHE INTERNAL "" FORCE)
 
 # ----------------------------------------------

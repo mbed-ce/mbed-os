@@ -137,13 +137,21 @@ elseif(MBED_GENERATE_VS_CODE_DEBUG_CFGS)
 	    # Create name (combine target name, Mbed target, and build config to generate a unique string)
 	    set(CONFIG_NAME "Debug ${CMAKE_TARGET} ${MBED_TARGET} ${CMAKE_BUILD_TYPE}")
 
-		# Escape quotes in the launch commands
+		# Determine launch commands
 		mbed_get_upload_launch_commands_for(${target} TARGET_UPLOAD_LAUNCH_COMMANDS)
+
+		# VS Code seems to prefer the post-launch commands to end with a "continue", or we end up
+		# in a weird state where the UI thinks the target is running when it's actually halted
+		list(APPEND MBED_UPLOAD_POST_LAUNCH_COMMANDS "c")
+
+		# Escape quotes in the launch commands
 		string(REPLACE "\"" "\\\"" UPLOAD_LAUNCH_COMMANDS_FOR_JSON "${TARGET_UPLOAD_LAUNCH_COMMANDS}")
+		string(REPLACE "\"" "\\\"" UPLOAD_POST_LAUNCH_COMMANDS_FOR_JSON "${MBED_UPLOAD_POST_LAUNCH_COMMANDS}")
 		string(REPLACE "\"" "\\\"" UPLOAD_RESTART_COMMANDS_FOR_JSON "${MBED_UPLOAD_RESTART_COMMANDS}")
 
 		# Convert CMake lists to json
 		list(JOIN UPLOAD_LAUNCH_COMMANDS_FOR_JSON "\", \"" UPLOAD_LAUNCH_COMMANDS_FOR_JSON)
+		list(JOIN UPLOAD_POST_LAUNCH_COMMANDS_FOR_JSON "\", \"" UPLOAD_POST_LAUNCH_COMMANDS_FOR_JSON)
 		list(JOIN UPLOAD_RESTART_COMMANDS_FOR_JSON "\", \"" UPLOAD_RESTART_COMMANDS_FOR_JSON)
 
 	    # property list here: https://github.com/Marus/cortex-debug/blob/master/debug_attributes.md
@@ -162,6 +170,7 @@ elseif(MBED_GENERATE_VS_CODE_DEBUG_CFGS)
 		\"preLaunchTask\": \"Build ${CMAKE_TARGET} and start GDB server\",
 		// Override the command sequences used by VS Code to be correct for this GDB server
 		\"overrideLaunchCommands\": [\"${UPLOAD_LAUNCH_COMMANDS_FOR_JSON}\"],
+		\"postStartSessionCommands\": [\"${UPLOAD_POST_LAUNCH_COMMANDS_FOR_JSON}\"],
 		\"overrideRestartCommands\": [\"${UPLOAD_RESTART_COMMANDS_FOR_JSON}\"],
 	},")
 
@@ -281,13 +290,15 @@ elseif(MBED_UPLOAD_SUPPORTS_DEBUG)
 		mbed_get_upload_launch_commands_for(${target} TARGET_UPLOAD_LAUNCH_COMMANDS)
 
 		list(JOIN TARGET_UPLOAD_LAUNCH_COMMANDS "\n" UPLOAD_LAUNCH_COMMANDS_FOR_GDBINIT)
+		list(JOIN UPLOAD_POST_LAUNCH_COMMANDS "\n" UPLOAD_POST_LAUNCH_COMMANDS_FOR_GDBINIT)
 
 		file(GENERATE OUTPUT ${CMAKE_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${CMAKE_TARGET}>.gdbinit CONTENT
 "# connect to GDB server
 echo Connecting to GDB server at 127.0.0.1:${MBED_GDB_PORT}...
 target ${UPLOAD_GDB_REMOTE_KEYWORD} 127.0.0.1:${MBED_GDB_PORT}
 ${UPLOAD_LAUNCH_COMMANDS_FOR_GDBINIT}
-c"
+c # run to main()
+${UPLOAD_POST_LAUNCH_COMMANDS_FOR_GDBINIT}"
 )
 
 			# add debug target

@@ -48,7 +48,6 @@ if(MBED_CREATE_PYTHON_VENV)
     set(ENV{VIRTUAL_ENV} ${MBED_VENV_LOCATION})
     set(Python3_FIND_VIRTUALENV FIRST)
     find_package(Python3 COMPONENTS Interpreter)
-    include(CheckPythonPackage)
 
     set(NEED_TO_CREATE_VENV FALSE)
     set(NEED_TO_INSTALL_PACKAGES FALSE)
@@ -196,16 +195,17 @@ find_program(ambiq_svl
 
 #
 # Utility function to check for a Python package with the given import name.
-# If the package is not found and the Mbed venv is in use,
-# then the package will be installed by passing PACKAGE_INSTALL_CONSTRAINT to Pip.
+# If the package is not found at at least PACKAGE_MIN_VERSION and the Mbed venv is in use,
+# then the package will be installed via Pip.
 # If the install fails or the venv is not being used, FOUND_VAR will be set to false.
 #
-function(mbed_check_or_install_python_package FOUND_VAR PACKAGE_IMPORT_NAME PACKAGE_INSTALL_CONSTRAINT)
-    check_python_package(${PACKAGE_IMPORT_NAME} ${FOUND_VAR})
+function(mbed_check_or_install_python_package FOUND_VAR PACKAGE_IMPORT_NAME PACKAGE_MIN_VERSION)
+    check_python_package(${PACKAGE_IMPORT_NAME} ${FOUND_VAR} VERSION ${PACKAGE_MIN_VERSION})
 
     if(NOT ${FOUND_VAR})
         # If we are using the Mbed venv, we can install the package automatically.
         if(MBED_CREATE_PYTHON_VENV)
+            set(PACKAGE_INSTALL_CONSTRAINT "${PACKAGE_IMPORT_NAME}>=${PACKAGE_MIN_VERSION}")
             message(STATUS "Mbed: Installing ${PACKAGE_INSTALL_CONSTRAINT} into Mbed's Python virtualenv")
             execute_process(
                     COMMAND ${Python3_EXECUTABLE} -m pip install ${PACKAGE_INSTALL_CONSTRAINT}

@@ -15,6 +15,9 @@ A message that notes the main changes in the update.
 ### Added
 
 - Added `i2c_get_capabilities()` function, which can be used to determine what detailed I2C features the hardware supports. This is primarily intended to be used by the Mbed test suite but can also be used in user applications that want to be cross-platform
+- Added support for Real-Time Transfer (RTT), a method of transferring text from a target device using a debugger connection. RTT allows getting UART console-like behavior at a higher speed and with no additional wires to the target.
+  - RTT can be used automatically by Mbed via the `target.console-rtt` JSON option, or manually in code by linking the `mbed-rtt` CMake library and using the `RTTHandle` class.
+  - RTT is supported in the JLINK, OPENOCD, and PYOCD upload methods. RTT can be used with command-line development and VS Code, but not with CLion at this time.
 - RP2xxx
   - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board compared to the non-W version is limited).
   - `SFE_THING_PLUS_RP2040` board target added for the [SparkFun Thing Plus RP2040 board](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html)
