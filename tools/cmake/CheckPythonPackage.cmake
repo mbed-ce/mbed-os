@@ -61,6 +61,7 @@ function(check_python_package PACKAGENAME OUTPUT_VAR)
                     COMMAND ${Python3_EXECUTABLE} -c "from importlib.metadata import version; print(version(\"${PACKAGENAME}\"))"
                     OUTPUT_VARIABLE PACKAGECHECK_VERSION
                     RESULT_VARIABLE VERSION_CHECK_RESULT
+                    ERROR_QUIET
                     OUTPUT_STRIP_TRAILING_WHITESPACE
                 )
             else()
@@ -68,6 +69,7 @@ function(check_python_package PACKAGENAME OUTPUT_VAR)
                     COMMAND ${Python3_EXECUTABLE} -c "import pkg_resources; print(pkg_resources.get_distribution(\"${PACKAGENAME}\").version)"
                     OUTPUT_VARIABLE PACKAGECHECK_VERSION
                     RESULT_VARIABLE VERSION_CHECK_RESULT
+                    ERROR_QUIET
                     OUTPUT_STRIP_TRAILING_WHITESPACE
                 )
             endif()
