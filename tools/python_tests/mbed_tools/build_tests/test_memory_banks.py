@@ -73,6 +73,9 @@ class TestMemoryBankProcessing:
             "MBED_RAM_SIZE=0x100000",
             "MBED_CONFIGURED_RAM_START=0x8000000",
             "MBED_CONFIGURED_RAM_SIZE=0x100000",
+            # RAM range
+            "MBED_RAM_RANGE_END=0x80fffff",
+            "MBED_RAM_RANGE_START=0x8000000",
         }
 
     def test_memory_configuration(self):
@@ -152,6 +155,9 @@ class TestMemoryBankProcessing:
             "MBED_RAM_SIZE=0x100000",
             "MBED_CONFIGURED_RAM_START=0x8000000",
             "MBED_CONFIGURED_RAM_SIZE=0xa0000",
+            # RAM range (ignores configuration)
+            "MBED_RAM_RANGE_END=0x80fffff",
+            "MBED_RAM_RANGE_START=0x8000000",
         }
 
     def test_two_ram_banks(self):
@@ -246,4 +252,7 @@ class TestMemoryBankProcessing:
             "MBED_RAM1_SIZE=0x400000",
             "MBED_CONFIGURED_RAM1_START=0x8100000",
             "MBED_CONFIGURED_RAM1_SIZE=0x400000",
+            # RAM ranges
+            "MBED_RAM_RANGE_START=0x8000000",
+            "MBED_RAM_RANGE_END=0x84fffff",
         }

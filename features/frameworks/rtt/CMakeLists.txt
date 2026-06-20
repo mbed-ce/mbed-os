@@ -3,6 +3,10 @@
 
 # Build file for SEGGER RTT
 
+if(MBED_IS_NATIVE_BUILD)
+    return()
+endif()
+
 mbed_setup_submodule(RTT CHECK_FILE RTT/SEGGER_RTT.c)
 
 add_library(mbed-rtt STATIC

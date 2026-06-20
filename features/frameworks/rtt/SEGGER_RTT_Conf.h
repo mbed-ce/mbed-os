@@ -19,7 +19,7 @@
 
 // This file gets included from ASM so we need to not include C code if that is happening
 #ifndef __ASSEMBLER__
-#include "device.h"
+#include "device.h" // for __DCACHE_PRESENT
 #include "mbed_critical.h"
 #endif
 

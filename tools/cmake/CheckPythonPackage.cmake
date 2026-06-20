@@ -31,7 +31,7 @@ function(check_python_package PACKAGENAME OUTPUT_VAR)
         if(${OUTPUT_VAR})
             # if the python interpreter changed, we need to recheck
             if("${PY_INTERP_FOR_${OUTPUT_VAR}}" STREQUAL "${Python3_EXECUTABLE}")
-                if((NOT DEFINED ARG_VERSION) OR ("${${OUTPUT_VAR}_VERSION}" VERSION_GREATER_EQUAL "${ARG_VERSION}"))
+                if((NOT DEFINED ARG_VERSION) OR (DEFINED ${OUTPUT_VAR}_VERSION AND "${${OUTPUT_VAR}_VERSION}" VERSION_GREATER_EQUAL "${ARG_VERSION}"))
                     set(NEED_TO_RUN_CHECK FALSE)
                 endif()
             endif()
@@ -59,26 +59,42 @@ function(check_python_package PACKAGENAME OUTPUT_VAR)
                 execute_process(
                     COMMAND ${Python3_EXECUTABLE} -c "from importlib.metadata import version; print(version(\"${PACKAGENAME}\"))"
                     OUTPUT_VARIABLE PACKAGECHECK_VERSION
-                    COMMAND_ERROR_IS_FATAL ANY
+                    RESULT_VARIABLE VERSION_CHECK_RESULT
                     OUTPUT_STRIP_TRAILING_WHITESPACE
                 )
             else()
                 execute_process(
                     COMMAND ${Python3_EXECUTABLE} -c "import pkg_resources; print(pkg_resources.get_distribution(\"${PACKAGENAME}\").version)"
                     OUTPUT_VARIABLE PACKAGECHECK_VERSION
-                    COMMAND_ERROR_IS_FATAL ANY
+                    RESULT_VARIABLE VERSION_CHECK_RESULT
                     OUTPUT_STRIP_TRAILING_WHITESPACE
                 )
             endif()
-            set(${OUTPUT_VAR}_VERSION ${PACKAGECHECK_VERSION} CACHE INTERNAL "Detected version of the Python package ${PACKAGENAME}" FORCE)
+
+            # Note: the version check may fail if someone asks us to check a sub-package of another package,
+            # so (for now) silently ignore that unless we are required to check the version.
+            if(VERSION_CHECK_RESULT EQUAL 0)
+                set(${OUTPUT_VAR}_VERSION ${PACKAGECHECK_VERSION} CACHE INTERNAL "Detected version of the Python package ${PACKAGENAME}" FORCE)
+            endif()
+
+            if(DEFINED ARG_VERSION AND NOT DEFINED ${OUTPUT_VAR}_VERSION)
+                message(STATUS "Version check for ${PACKAGENAME} failed.")
+            endif()
         endif()
 
         if(HAVE_PACKAGE)
-            if((NOT DEFINED ARG_VERSION) OR ("${PACKAGECHECK_VERSION}" VERSION_GREATER_EQUAL "${ARG_VERSION}"))
-                message(STATUS "Checking for Python package ${PACKAGENAME} -- found (version ${PACKAGECHECK_VERSION})")
-            else()
+            if(DEFINED ARG_VERSION AND NOT DEFINED ${OUTPUT_VAR}_VERSION)
+                message(STATUS "Checking for Python package ${PACKAGENAME} -- found but version check failed")
+                set(HAVE_PACKAGE FALSE)
+            elseif(DEFINED ARG_VERSION AND ("${PACKAGECHECK_VERSION}" VERSION_LESS "${ARG_VERSION}"))
                 message(STATUS "Checking for Python package ${PACKAGENAME} -- found but too old (version ${PACKAGECHECK_VERSION}, need >=${ARG_VERSION})")
                 set(HAVE_PACKAGE FALSE)
+            else()
+                if(DEFINED ${OUTPUT_VAR}_VERSION)
+                    message(STATUS "Checking for Python package ${PACKAGENAME} -- found (version ${PACKAGECHECK_VERSION})")
+                else()
+                    message(STATUS "Checking for Python package ${PACKAGENAME} -- found")
+                endif()
             endif()
         else()
             message(STATUS "Checking for Python package ${PACKAGENAME} -- not found")

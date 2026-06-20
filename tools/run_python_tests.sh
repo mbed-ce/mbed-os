@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 #
 # Copyright (c) 2020-2023 Arm Limited and Contributors. All rights reserved.
