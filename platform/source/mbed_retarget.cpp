@@ -387,6 +387,7 @@ static FileHandle *default_console()
     }
 #elif MBED_CONF_TARGET_CONSOLE_RTT
     static RTTHandle console;
+    console.set_blocking(false); // Don't block the application if nothing is connected to RTT
 #else // MBED_CONF_TARGET_CONSOLE_UART && DEVICE_SERIAL
     static Sink console;
 #endif

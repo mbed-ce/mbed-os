@@ -50,7 +50,7 @@ class RTTHandle : public FileHandle {
     const unsigned int buffer_index;
 
     // Are wr in blocking mode?
-    bool blocking_mode = true;
+    mstd::atomic<bool> blocking_mode = true;
 
 public:
 
