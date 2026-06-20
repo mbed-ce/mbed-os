@@ -57,7 +57,7 @@ RTTHandle::RTTHandle(unsigned int buffer_index, char *up_buffer, size_t up_buffe
 buffer_index(buffer_index)
 {
     MBED_ASSERT(buffer_index != 0);
-    MBED_ASSERT(buffer_index < MBED_CONF_RTT_MAX_BUFFERS);
+    MBED_ASSERT(buffer_index < MBED_CONF_RTT_MAX_CHANNELS);
 
     initialize_rtt();
 

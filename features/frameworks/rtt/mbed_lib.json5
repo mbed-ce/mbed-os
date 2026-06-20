@@ -9,8 +9,8 @@
       help: "Size in bytes of channel 0 down buffer (the one used for stdin).",
       value: 16
     },
-    "max-buffers": {
-      help: "Maximum number of buffers supported by RTT. This controls the size of some static arrays within the RTT code. Note that this does NOT, by itself, allocate space for the buffers.",
+    "max-channels": {
+      help: "Maximum number of channels supported by RTT. This controls the size of some static arrays within the RTT code. Note that this does NOT, by itself, allocate space for the buffers.",
       value: 3
     }
   }
