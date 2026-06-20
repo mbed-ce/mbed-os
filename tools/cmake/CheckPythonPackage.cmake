@@ -10,11 +10,12 @@
 # Usage: check_python_package(<package name> <result variable> [VERSION x.y.z])
 #
 # <result variable> will be set to TRUE iff the package is found in the current active python
-#     interpreter and is at least the specified version.
+#     interpreter and is at least the specified version (if given).
 #
 # The following variables are also created:
 #  - PY_INTERP_FOR_<result variable>: Set to the path to the python interpreter used to run this check.
-#  - <result variable>_VERSION: Set to the version of the package from the most recent run of this check.
+#  - <result variable>_VERSION: Set to the version of the package from the most recent run of this check,
+#      if version checking was successful.
 #
 function(check_python_package PACKAGENAME OUTPUT_VAR)
     cmake_parse_arguments(ARG "" "VERSION" "" ${ARGN})
