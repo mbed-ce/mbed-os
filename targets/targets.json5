@@ -8617,15 +8617,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "help": "Define the RTC clock source. RTC_CLOCK_SOURCE_SUBCLK, RTC_CLOCK_SOURCE_LOCO, RTC_CLOCK_SOURCE_MAINCLK.",
                 "value": "RTC_CLOCK_SOURCE_SUBCLK"
             },
-            "console-rtt": {
-                "help": "Target has JLink RTT console. Mutually exclusive with target.console-uart.",
-                "value": true
-            },
         },
         "overrides": {
             "deep-sleep-latency": 4,
             "init-us-ticker-at-boot": true,
-            "console-uart": false
+            "console-uart": false,
+            "console-rtt": true,
         },
         "device_has": [
             "MPU",

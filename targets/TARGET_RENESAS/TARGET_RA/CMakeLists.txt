@@ -10,7 +10,6 @@ add_library(mbed-renesas-ra INTERFACE)
 target_include_directories(mbed-renesas-ra
     INTERFACE
         .
-        ./RTT
         ./ra/fsp/inc
         ./ra/fsp/inc/api
         ./ra/fsp/inc/instances
@@ -20,7 +19,6 @@ target_include_directories(mbed-renesas-ra
 
 target_sources(mbed-renesas-ra
     INTERFACE
-        ./RTT/SEGGER_RTT.c
 		./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.c
 		./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.c
         ./ra/fsp/src/bsp/mcu/all/bsp_clocks.c
