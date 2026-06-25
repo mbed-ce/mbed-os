@@ -21,6 +21,7 @@
 #ifndef __ASSEMBLER__
 #include "device.h" // for __DCACHE_PRESENT
 #include "mbed_critical.h"
+#include "mbed_toolchain.h"
 #endif
 
 // Buffer counts and sizes
@@ -38,6 +39,7 @@
 // Cache setup
 #if __DCACHE_PRESENT
 // NOTE: On targets with a data cache, the RTT control block and buffers must be put in an uncached section of memory.
-// This requires that the linker script contain logic to place the ".rtt" section.
-#define SEGGER_RTT_SECTION ".rtt"
+// This requires that the linker script contain logic to place the ".noncached" section.
+#define SEGGER_RTT_SECTION MBED_NONCACHED_SECTION_NAME
+#define SEGGER_RTT_BUFFER_SECTION MBED_NONCACHED_SECTION_NAME
 #endif

@@ -45,6 +45,8 @@
 #warning "This compiler is not yet supported."
 #endif
 
+#include "cmsis.h"
+
 /** \addtogroup platform-public-api */
 /** @{*/
 
@@ -472,6 +474,15 @@
  */
 #ifndef MBED_PRETTY_FUNCTION
 #define MBED_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#endif
+
+#if __DCACHE_PRESENT
+/// Name of the section where non-cached data is stored.
+#define MBED_NONCACHED_SECTION_NAME ".noncached"
+
+/// Attach to a global variable to put it in the noncached section.
+/// Note that this section is always zero-initialized at boot.
+#define MBED_NONCACHED MBED_SECTION(MBED_NONCACHED_SECTION_NAME)
 #endif
 
 #ifndef MBED_PRINTF

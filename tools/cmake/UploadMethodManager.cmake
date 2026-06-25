@@ -99,16 +99,33 @@ if("MBED_CONF_TARGET_CONSOLE_RTT=1" IN_LIST MBED_CONFIG_DEFINITIONS)
 	# on the device memory layout. So, we need to give them some more help.
 	# The alternative would be to put the RTT CB at a fixed address, but that would likely require
 	# specific configuration for each target, so it's probably a non-starter.
-	string(REGEX MATCH "MBED_RAM_RANGE_START=([^;]+)" RTT_RAM_RANGE_MATCH "${MBED_CONFIG_DEFINITIONS}")
 
-	# Handle old build configs that didn't provide this definition
-	if("${RTT_RAM_RANGE_MATCH}" STREQUAL "")
-		message(FATAL_ERROR "Memory bank information not available for this target, cannot configure RTT support. This may be caused by an old build directory -- try deleting and recreating it if you made it with an older version of Mbed.")
+	# Try to get start from JSON option, but fall back to start of all RAM banks
+	mbed_get_json_option_value("rtt.cb-search-range-start" MBED_RTT_RAM_RANGE_START)
+	if(NOT DEFINED MBED_RTT_RAM_RANGE_START)
+		mbed_get_config_definition_value(MBED_RAM_RANGE_START MBED_RTT_RAM_RANGE_START)
+
+		# Handle old build configs that didn't provide this definition
+		if("${MBED_RTT_RAM_RANGE_START}" STREQUAL "")
+			message(FATAL_ERROR "Memory bank information not available for this target, cannot configure RTT support. This may be caused by an old build directory -- try deleting and recreating it if you made it with an older version of Mbed.")
+		endif()
 	endif()
 
-	set(MBED_RTT_RAM_RANGE_START ${CMAKE_MATCH_1})
-	string(REGEX MATCH "MBED_RAM_RANGE_END=([^;]+)" _ "${MBED_CONFIG_DEFINITIONS}")
-	set(MBED_RTT_RAM_RANGE_END ${CMAKE_MATCH_1})
+	# Also get end
+	mbed_get_json_option_value("rtt.cb-search-range-end" MBED_RTT_RAM_RANGE_END)
+	if(NOT DEFINED MBED_RTT_RAM_RANGE_END)
+		mbed_get_config_definition_value(MBED_RAM_RANGE_END MBED_RTT_RAM_RANGE_END)
+	endif()
+
+	# For cleanliness, convert everything to hex
+	math(EXPR MBED_RTT_RAM_RANGE_START "${MBED_RTT_RAM_RANGE_START}" OUTPUT_FORMAT HEXADECIMAL)
+	math(EXPR MBED_RTT_RAM_RANGE_END "${MBED_RTT_RAM_RANGE_END}" OUTPUT_FORMAT HEXADECIMAL)
+
+	if(MBED_RTT_RAM_RANGE_END LESS MBED_RTT_RAM_RANGE_START)
+		message(FATAL_ERROR "RTT search range end (${MBED_RTT_RAM_RANGE_END}) cannot be less than search range start (${MBED_RTT_RAM_RANGE_START})!")
+	endif()
+
+	# Compute size
 	math(EXPR MBED_RTT_RAM_RANGE_SIZE "${MBED_RTT_RAM_RANGE_END} - ${MBED_RTT_RAM_RANGE_START} + 1" OUTPUT_FORMAT HEXADECIMAL)
 endif()
 

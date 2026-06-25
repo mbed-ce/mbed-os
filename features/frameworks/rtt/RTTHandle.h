@@ -75,8 +75,8 @@ public:
      * @param down_buffer_size Size of the down buffer in bytes.
      * @param name Optional name to give this channel.
      *
-     * @warning On targets with a data cache, the up and down buffer memory needs to be declared in the section
-     *    defined by \c SEGGER_RTT_SECTION, or otherwise placed into non-cachable memory. The same is true for
+     * @warning On targets with a data cache, the up and down buffer memory needs to be declared as \c MBED_NONCACHED ,
+     *     or otherwise placed into non-cachable memory. The same is true for
      *    \c name if it is not a string constant in flash.
      */
     RTTHandle(unsigned int buffer_index, char * up_buffer, size_t up_buffer_size, char * down_buffer, size_t down_buffer_size, char const * name = nullptr);

@@ -12,6 +12,32 @@
     "max-channels": {
       help: "Maximum number of channels supported by RTT. This controls the size of some static arrays within the RTT code. Note that this does NOT, by itself, allocate space for the buffers.",
       value: 3
+    },
+    "cb-search-range-start": {
+      help: "Override the start (first address) of the search range that will be used when a debugger searches for the RTT control block.",
+      value: null
+    },
+    "cb-search-range-end": {
+      help: "Override the end (last address) of the search range that will be used when a debugger searches for the RTT control block.",
+      value: null
+    }
+  },
+  target_overrides: {
+    "MCU_STM32H7": {
+      // STM32H7 has an ITCM bank at address 0, which then causes OpenOCD to fault out when searching for the RTT control
+      // block between the end of that bank and the start of the next one. So, manually target SRAM_D1
+      "cb-search-range-start": 0x24000000,
+      "cb-search-range-end": 0x2407FFFF
+    },
+    "MIMXRT1060": {
+      // RTT lives in OCRAM
+      "cb-search-range-start": 0x20280000,
+      "cb-search-range-end": 0x2029FFFF
+    },
+    "MIMXRT1050": {
+      // RTT lives in OCRAM
+      "cb-search-range-start": 0x20200000,
+      "cb-search-range-end": 0x2021FFFF
     }
   }
 }

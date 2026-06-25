@@ -18,6 +18,8 @@
 #include "platform/mbed_assert.h"
 #include "cmsis.h"
 
+#include <mbed_math_helpers.h>
+
 #if ((__ARM_ARCH_7M__ == 1U) || (__ARM_ARCH_7EM__ == 1U) || (__ARM_ARCH_6M__ == 1U)) && \
     defined (__MPU_PRESENT) && (__MPU_PRESENT == 1U) && \
     !defined(MBED_MPU_CUSTOM)
@@ -37,6 +39,12 @@
 #else
 // Default to the end of ROM
 #define MBED_MPU_RAM_START           (MBED_MPU_ROM_END + 1)
+#endif
+
+#ifdef __DCACHE_PRESENT
+// Symbols defined in linker script for noncache region
+extern uint8_t __noncached_start[];
+extern uint8_t __noncached_end[];
 #endif
 
 static_assert(
@@ -59,11 +67,7 @@ void mbed_mpu_init()
 
     // Our MPU setup requires 3 or 4 regions - if this assert is hit, remove
     // a region by setting MPU_ROM_END to 0x1fffffff, or remove MPU from device_has
-#if MBED_MPU_RAM_START == 0x20000000
-    MBED_ASSERT(regions >= 3);
-#else
-    MBED_ASSERT(regions >= 4);
-#endif
+    MBED_ASSERT(regions >= mbed_used_mpu_regions);
 
     // Disable the MPU
     MPU->CTRL = 0;
@@ -185,6 +189,31 @@ void mbed_mpu_init()
             ARM_MPU_REGION_SIZE_512MB)  // Size
     );
 
+#if __DCACHE_PRESENT
+    ptrdiff_t noncached_region_size = __noncached_end - __noncached_start;
+    if(noncached_region_size > 0) {
+        // Check configuration from linker script
+        MBED_ASSERT(mbed_is_power_of_two(noncached_region_size));
+        MBED_ASSERT(((uintptr_t)__noncached_start) % noncached_region_size == 0);
+
+        // Region size constant is the log2 of the region size, offset by 1
+        const uint32_t region_size = mbed_integer_log_2(noncached_region_size) - 1;
+
+        // Select region 3/4 and use it for the non-cached region
+        ARM_MPU_SetRegion(
+            ARM_MPU_RBAR(
+                LAST_RAM_REGION + 1,             // Region
+                ((uintptr_t)__noncached_start)), // Base
+            ARM_MPU_RASR_EX(
+                1,                          // DisableExec
+                ARM_MPU_AP_FULL,            // AccessPermission
+                ARM_MPU_ACCESS_NORMAL(ARM_MPU_CACHEP_NOCACHE, ARM_MPU_CACHEP_NOCACHE, true), // Access and cache policy
+                0U,                         // SubRegionDisable
+                region_size)                // Size
+        );
+    }
+#endif
+
     // Enable the MPU
     MPU->CTRL =
         (1 << MPU_CTRL_PRIVDEFENA_Pos) |            // Use the default memory map for unmapped addresses
@@ -215,25 +244,25 @@ static void enable_region(bool enable, uint32_t region)
     MPU->RASR = (MPU->RASR & ~MPU_RASR_ENABLE_Msk) | (enable << MPU_RASR_ENABLE_Pos);
 }
 
-void mbed_mpu_enable_rom_wn(bool enable)
+void mbed_mpu_enable_rom_wn(bool disable)
 {
     // Flush memory writes before configuring the MPU.
     __DMB();
 
-    enable_region(enable, 0);
+    enable_region(disable, 0);
 
     // Ensure changes take effect
     __DSB();
     __ISB();
 }
 
-void mbed_mpu_enable_ram_xn(bool enable)
+void mbed_mpu_enable_ram_xn(bool disable)
 {
     // Flush memory writes before configuring the MPU.
     __DMB();
 
     for (uint32_t region = 1; region <= LAST_RAM_REGION; region++) {
-        enable_region(enable, region);
+        enable_region(disable, region);
     }
 
     // Ensure changes take effect

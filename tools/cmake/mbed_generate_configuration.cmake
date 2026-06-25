@@ -156,3 +156,29 @@ include(${CMAKE_CURRENT_BINARY_DIR}/mbed_config.cmake)
 
 # Make it so that if any config JSON files are modified, CMake is rerun.
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${MBED_CONFIG_JSON_SOURCE_FILES})
+
+# Helper function to get config definition values.
+# Sets RESULT_VARIABLE to the value of DEF_NAME.
+# Does not set RESULT_VARIABLE if the setting is not in MBED_CONFIG_DEFINITIONS.
+function(mbed_get_config_definition_value DEF_NAME RESULT_VARIABLE)
+    if(MBED_CONFIG_DEFINITIONS MATCHES "${DEF_NAME}=([^;]+)")
+        set(${RESULT_VARIABLE} ${CMAKE_MATCH_1} PARENT_SCOPE)
+    endif()
+endfunction(mbed_get_config_definition_value)
+
+# Helper function to getthe value of a JSON option
+# Sets RESULT_VARIABLE to the value of the option described by OPT_NAME.
+# Does not set RESULT_VARIABLE if the setting is not in MBED_CONFIG_DEFINITIONS.
+function(mbed_get_json_option_value OPT_NAME RESULT_VARIABLE)
+    # Transform the JSON option name into the CMake option name.
+    # This mirrors the logic in mbed_config.tmpl.
+    string(TOUPPER ${OPT_NAME} OPT_NAME_UCASE)
+    string(REPLACE "-" "_" OPT_NAME_CMAKE ${OPT_NAME_UCASE})
+    string(REPLACE "." "_" OPT_NAME_CMAKE ${OPT_NAME_CMAKE})
+    set(OPT_NAME_CMAKE MBED_CONF_${OPT_NAME_CMAKE})
+
+    mbed_get_config_definition_value(${OPT_NAME_CMAKE} ${RESULT_VARIABLE})
+    if(DEFINED ${RESULT_VARIABLE})
+        set(${RESULT_VARIABLE} "${${RESULT_VARIABLE}}" PARENT_SCOPE)
+    endif()
+endfunction(mbed_get_json_option_value)

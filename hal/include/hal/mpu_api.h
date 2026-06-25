@@ -60,6 +60,18 @@ extern "C" {
  *     mbed test -t <toolchain> -m <target> -n tests-mbed_hal-mpu*
  */
 
+#ifndef MBED_MPU_CUSTOM
+/// Number of MPU regions that will be used by Mbed OS's MPU configuration.
+/// The application is generally free to use regions above this number.
+static const size_t mbed_used_mpu_regions = 3
+#if MBED_MPU_RAM_START != 0x20000000
+  + 1
+#endif
+#if __DCACHE_PRESENT
+  + 1
+#endif
+;
+#endif
 
 /**
  * Initialize the MPU
@@ -78,9 +90,9 @@ void mbed_mpu_init(void);
  *
  * By default writes to ROM are disabled.
  *
- * @param enable true to disable writes to ROM, false otherwise
+ * @param disable true to disable writes to ROM, false otherwise
  */
-void mbed_mpu_enable_rom_wn(bool enable);
+void mbed_mpu_enable_rom_wn(bool disable);
 
 /**
  * Enable or disable ram MPU protection
@@ -90,9 +102,9 @@ void mbed_mpu_enable_rom_wn(bool enable);
  *
  * By default execution from RAM is disabled.
  *
- * @param enable true to disable execution from RAM, false otherwise
+ * @param disable true to disable execution from RAM, false otherwise
  */
-void mbed_mpu_enable_ram_xn(bool enable);
+void mbed_mpu_enable_ram_xn(bool disable);
 
 /** Deinitialize the MPU
  *
