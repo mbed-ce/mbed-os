@@ -147,25 +147,25 @@ void BOARD_ConfigMPU(void)
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 1, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_32MB);
 #endif
 
-    /* Region 9: Noncached memory. */
-    ptrdiff_t noncached_region_size = __noncached_end - __noncached_start;
-    if(noncached_region_size > 0) {
-        // Check configuration from linker script
-        MBED_ASSERT(mbed_is_power_of_two(noncached_region_size));
-        MBED_ASSERT(((uintptr_t)__noncached_start) % noncached_region_size == 0);
-
-        // Region size constant is the log2 of the region size, offset by 1
-        const uint32_t region_size = mbed_integer_log_2(noncached_region_size) - 1;
-
-        MPU->RBAR = ARM_MPU_RBAR(9, ((uintptr_t)__noncached_start));
-        MPU->RASR =
-            ARM_MPU_RASR_EX(
-                1,                          // DisableExec
-                ARM_MPU_AP_FULL,            // AccessPermission
-                ARM_MPU_ACCESS_NORMAL(ARM_MPU_CACHEP_NOCACHE, ARM_MPU_CACHEP_NOCACHE, true), // Access and cache policy
-                0U,                         // SubRegionDisable
-                region_size);               // Size
-    }
+    // /* Region 9: Noncached memory. */
+    // ptrdiff_t noncached_region_size = __noncached_end - __noncached_start;
+    // if(noncached_region_size > 0) {
+    //     // Check configuration from linker script
+    //     MBED_ASSERT(mbed_is_power_of_two(noncached_region_size));
+    //     MBED_ASSERT(((uintptr_t)__noncached_start) % noncached_region_size == 0);
+    //
+    //     // Region size constant is the log2 of the region size, offset by 1
+    //     const uint32_t region_size = mbed_integer_log_2(noncached_region_size) - 1;
+    //
+    //     MPU->RBAR = ARM_MPU_RBAR(9, ((uintptr_t)__noncached_start));
+    //     MPU->RASR =
+    //         ARM_MPU_RASR_EX(
+    //             1,                          // DisableExec
+    //             ARM_MPU_AP_FULL,            // AccessPermission
+    //             ARM_MPU_ACCESS_NORMAL(ARM_MPU_CACHEP_NOCACHE, ARM_MPU_CACHEP_NOCACHE, true), // Access and cache policy
+    //             0U,                         // SubRegionDisable
+    //             region_size);               // Size
+    // }
 
     /* Enable MPU */
     ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);

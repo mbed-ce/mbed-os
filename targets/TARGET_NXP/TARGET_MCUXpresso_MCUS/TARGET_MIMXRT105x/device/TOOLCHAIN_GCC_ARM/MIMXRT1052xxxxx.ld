@@ -282,6 +282,7 @@ SECTIONS
   .ncache :
   {
     *(NonCacheable)
+    *(.noncached)
     . = ALIGN(8);
     __noncachedata_end__ = .;     /* define a global symbol at ncache data end */
   } > m_dtcm :ram_ncache_noinit
@@ -347,25 +348,6 @@ SECTIONS
   __StackTop   = ORIGIN(m_dtcm) + LENGTH(m_dtcm);
   __StackLimit = __StackTop - STACK_SIZE;
   PROVIDE(__stack = __StackTop);
-
-  /* Non-cached data section.
-   * This section is configured in the MPU as uncached, so reads and writes go directly through to memory.
-   * We put this first in OCRAM so it's very, very aligned. */
-  .noncached (NOLOAD):
-  {
-      __noncached_start = .;
-      *(.noncached)
-
-      /* For the MPU configuration, we need to align the size of this section up to
-       * the next power of two. Also note that the MPU does not support regions
-       * smaller than 32 bytes so round up if smaller than that. */
-      __noncached_data_size = (. - __noncached_start);
-      __noncached_aligned_size = MAX(32, 1 << LOG2CEIL(__noncached_data_size));
-
-      . += (__noncached_aligned_size - __noncached_data_size);
-
-      __noncached_end = .;
-  } > m_ocram
 
   /* Store crash data RAM at the end of OCRAM (which is otherwise unused).
      Note that the ROM bootloader clobbers the first part of OCRAM, so we have to put this at the end. */

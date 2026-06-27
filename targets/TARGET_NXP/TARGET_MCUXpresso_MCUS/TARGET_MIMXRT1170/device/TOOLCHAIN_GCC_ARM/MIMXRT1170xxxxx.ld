@@ -29,12 +29,12 @@ ENTRY(Reset_Handler)
 
 __ram_vector_table__ = 1;
 
-#if !defined(MBED_APP_START)
-  #define MBED_APP_START 0x30000000
-#endif
-
-#if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE 0x1000000
+/* If we are not configured to execute out of the start of ROM, then a bootloader is
+ * present.  This tells us whether we need to add the Flash Configuration Field at the start of flash. */
+#if MBED_CONFIGURED_ROM_BANK_EXT_FLASH_START == MBED_ROM_BANK_EXT_FLASH_START
+#define IS_BOOTLOADER_PRESENT 0
+#else
+#define IS_BOOTLOADER_PRESENT 1
 #endif
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
@@ -49,56 +49,70 @@ M_VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x0400 : 0x0;
 /* Specify the memory areas */
 MEMORY
 {
-#if !defined(MBED_APP_COMPILE)
-  m_flash_config        (RX)  : ORIGIN = MBED_APP_START + 0x0400, LENGTH = 0x00000C00
-  m_ivt                 (RX)  : ORIGIN = MBED_APP_START + 0x1000, LENGTH = 0x00001000
-  m_interrupts          (RX)  : ORIGIN = MBED_APP_START + 0x2000, LENGTH = 0x00000400
-  m_text                (RX)  : ORIGIN = MBED_APP_START + 0x2400, LENGTH = MBED_APP_SIZE - 0x2400
-#else
-  m_interrupts          (RX)  : ORIGIN = MBED_APP_START, LENGTH = 0x00000400
-  m_text                (RX)  : ORIGIN = MBED_APP_START + 0x400, LENGTH = MBED_APP_SIZE - 0x400
+  m_text                (RX)  : ORIGIN = MBED_CONFIGURED_ROM_BANK_EXT_FLASH_START, LENGTH = MBED_CONFIGURED_ROM_BANK_EXT_FLASH_SIZE
+  m_dtcm                (RW)  : ORIGIN = MBED_RAM_BANK_SRAM_DTC_START, LENGTH = MBED_RAM_BANK_SRAM_DTC_SIZE
+  m_itcm                (RX)  : ORIGIN = MBED_RAM_BANK_SRAM_ITC_START, LENGTH = MBED_RAM_BANK_SRAM_ITC_SIZE
+
+  m_ocram_combined      (RW)  : ORIGIN = MBED_RAM_BANK_SRAM_OC_1_2_COMBINED_START, LENGTH = MBED_RAM_BANK_SRAM_OC_1_2_COMBINED_SIZE
+
+ /* External SDRAM, if available */
+#ifdef MBED_RAM_BANK_SDRAM_SIZE
+  m_sdram               (RW)  : ORIGIN = MBED_RAM_BANK_SDRAM_START, LENGTH = MBED_RAM_BANK_SDRAM_SIZE
 #endif
-  m_text2               (RX)  : ORIGIN = 0x00000000, LENGTH = 0x00020000
-  m_data                (RW)  : ORIGIN = 0x80000000, LENGTH = 0x03000000
-  m_ncache              (RW)  : ORIGIN = 0x81E00000, LENGTH = 0x01000000
-  m_data2               (RW)  : ORIGIN = 0x20000000, LENGTH = 0x00040000
-  m_data3               (RW)  : ORIGIN = 0x202C0000, LENGTH = 0x00080000
 }
 
 /* Define output sections */
 SECTIONS
 {
 
-#if !defined(MBED_APP_COMPILE)
+#if !defined(IS_BOOTLOADER_PRESENT)
+  /* Flash config goes first, at the start of flash */
   .flash_config :
   {
     . = ALIGN(8);
     __FLASH_BASE = .;
     KEEP(* (.boot_hdr.conf))     /* flash config section */
     . = ALIGN(8);
-  } > m_flash_config
+  } > m_text
 
-  ivt_begin = ORIGIN(m_flash_config) + LENGTH(m_flash_config);
-
-  .ivt : AT(ivt_begin)
+  /* Then IVT at offset 0x1000 */
+  .ivt MBED_ROM_BANK_EXT_FLASH_START + 0x1000 :
   {
     . = ALIGN(8);
     KEEP(* (.boot_hdr.ivt))           /* ivt section */
     KEEP(* (.boot_hdr.boot_data))     /* boot section */
     KEEP(* (.boot_hdr.dcd_data))      /* dcd section */
     . = ALIGN(8);
-  } > m_ivt
+  } > m_text
+  /* Note that we do not want to use AT> above, because that would result in this section being
+   * placed in flash immediately after .flash_config.  Instead we don't use AT> to set the LMA equal
+   * to the VMA. */
+
+  /* Interrupts go after that */
+  #define INTERRUPT_TABLE_ADDR MBED_ROM_BANK_EXT_FLASH_START + 0x2000
+#else
+  /* We have a bootloader so we don't need the flash config or IVT */
+  /DISCARD/ : {
+    *(.boot_hdr.conf)
+    *(.boot_hdr.ivt)
+    *(.boot_hdr.boot_data)
+    *(.boot_hdr.dcd_data)
+  }
+
+  /* Interrupts go at the start of configured flash area */
+  #define INTERRUPT_TABLE_ADDR MBED_CONFIGURED_ROM_BANK_EXT_FLASH_START
 #endif
+
   /* The startup code goes first into internal RAM */
-  .interrupts :
+  .interrupts INTERRUPT_TABLE_ADDR :
   {
     __VECTOR_TABLE = .;
     . = ALIGN(8);
     KEEP(*(.isr_vector))     /* Startup code */
     . = ALIGN(8);
-  } > m_interrupts
+  } > m_text
 
-  /* The program code and other data goes into internal RAM */
+  /* The program code and other data goes into FlexSPI */
   .text :
   {
     . = ALIGN(8);
@@ -196,12 +210,42 @@ SECTIONS
     . += M_VECTOR_RAM_SIZE;
     . = ALIGN(8);
     __interrupts_ram_end__ = .; /* Define a global symbol at data end */
-  } > m_data2
+  } > m_dtcm
 
   __VECTOR_RAM = DEFINED(__ram_vector_table__) ? __VECTOR_RAM__ : ORIGIN(m_interrupts);
   __RAM_VECTOR_TABLE_SIZE_BYTES = DEFINED(__ram_vector_table__) ? (__interrupts_ram_end__ - __interrupts_ram_start__) : 0x0;
 
-  .data : AT(__DATA_ROM)
+  /* Note: MIMXRT1170 has a major errata (ERR050396) which causes many DMA-enabled peripherals to be unable to write to
+   * DTCM. So, we currently do not use DTCM, even though this does hurt performance a fair bit. */
+
+   /* Non-cached data section.
+    * This section is configured in the MPU as uncached, so reads and writes go directly through to memory.
+    * We put this first in OCRAM so it's very, very aligned. */
+   .ncache.init : AT(__NDATA_ROM)
+   {
+     __noncachedata_start__ = .;   /* create a global symbol at ncache data start */
+     *(NonCacheable.init)
+     . = ALIGN(8);
+     __noncachedata_init_end__ = .;   /* create a global symbol at initialized ncache data end */
+   } > m_ocram_combined
+   . = __noncachedata_init_end__;
+   .ncache :
+   {
+     *(NonCacheable)
+     *(.noncached)
+
+     /* For the MPU configuration, we need to align the size of this section up to
+      * the next power of two. Also note that the MPU does not support regions
+      * smaller than 32 bytes so round up if smaller than that. */
+     __noncached_data_size = (. - __noncachedata_start__);
+     __noncached_aligned_size = MAX(32, 1 << LOG2CEIL(__noncached_data_size));
+
+     . += (__noncached_aligned_size - __noncached_data_size);
+
+     __noncachedata_end__ = .;     /* define a global symbol at ncache data end */
+   } > m_ocram_combined
+
+  .data :
   {
     . = ALIGN(8);
     __DATA_RAM = .;
@@ -212,36 +256,21 @@ SECTIONS
     KEEP(*(.jcr*))
     . = ALIGN(8);
     __data_end__ = .;        /* define a global symbol at data end */
-  } > m_data
+  } > m_ocram_combined AT> m_text
   __ram_function_flash_start = __DATA_ROM + (__data_end__ - __data_start__); /* Symbol is used by startup for TCM data initialization */
 
-  .ram_function : AT(__ram_function_flash_start)
+  .ram_function :
   {
     . = ALIGN(32);
     __ram_function_start__ = .;
     *(CodeQuickAccess)
     . = ALIGN(128);
     __ram_function_end__ = .;
-  } > m_text2
+  } > m_itcm AT> m_text
 
   __ram_function_size = SIZEOF(.ram_function);
 
   __NDATA_ROM = __ram_function_flash_start + SIZEOF(.ram_function);
-
-  .ncache.init : AT(__NDATA_ROM)
-  {
-    __noncachedata_start__ = .;   /* create a global symbol at ncache data start */
-    *(NonCacheable.init)
-    . = ALIGN(8);
-    __noncachedata_init_end__ = .;   /* create a global symbol at initialized ncache data end */
-  } > m_ncache
-  . = __noncachedata_init_end__;
-  .ncache :
-  {
-    *(NonCacheable)
-    . = ALIGN(8);
-    __noncachedata_end__ = .;     /* define a global symbol at ncache data end */
-  } > m_ncache
 
   __DATA_END = __NDATA_ROM + (__noncachedata_init_end__ - __noncachedata_start__);
   text_end = ORIGIN(m_text) + LENGTH(m_text);
@@ -261,7 +290,7 @@ SECTIONS
     . = ALIGN(8);
     __bss_end__ = .;
     __END_BSS = .;
-  } > m_data
+  } > m_ocram_combined
 
   .heap :
   {
@@ -269,24 +298,24 @@ SECTIONS
     __end__ = .;
     PROVIDE(end = .);
     __HeapBase = .;
-    . =  ORIGIN(m_data) + LENGTH(m_data) - STACK_SIZE;
+    . =  ORIGIN(m_ocram_combined) + LENGTH(m_ocram_combined) - STACK_SIZE;
     __HeapLimit = .;
     __heap_limit = .; /* Add for _sbrk */
-  } > m_data
+  } > m_ocram_combined
 
   .stack :
   {
     . = ALIGN(8);
     . += STACK_SIZE;
-  } > m_data
+  } > m_ocram_combined
 
   /* Initializes stack on the end of block */
-  __StackTop   = ORIGIN(m_data) + LENGTH(m_data);
+  __StackTop   = ORIGIN(m_ocram_combined) + LENGTH(m_ocram_combined);
   __StackLimit = __StackTop - STACK_SIZE;
   PROVIDE(__stack = __StackTop);
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 
-  ASSERT(__StackLimit >= __HeapLimit, "region m_data overflowed with stack and heap")
+  ASSERT(__StackLimit >= __HeapLimit, "region m_ocram_combined overflowed with stack and heap")
 }
 

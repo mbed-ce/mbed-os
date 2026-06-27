@@ -21,7 +21,12 @@
 #include "fsl_gpio.h"
 #include "fsl_xbara.h"
 
+#include <mbed_assert.h>
+#include <mbed_math_helpers.h>
 
+// Symbols defined in linker script for noncache region
+extern uint8_t __noncachedata_start__[];
+extern uint8_t __noncachedata_end__[];
 
 void BOARD_ConfigMPU(void)
 {
@@ -37,66 +42,85 @@ void BOARD_ConfigMPU(void)
         SCB_DisableDCache();
     }
 
-ARM_MPU_Disable();
+    ARM_MPU_Disable();
 
+    /*
+     * Add default region to deny access to whole address space to workaround speculative prefetch.
+     * Refer to Arm errata 1013783-B for more details.
+     */
     /* Region 0 setting: No data access permission. */
     MPU->RBAR = ARM_MPU_RBAR(0, 0x00000000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_NONE, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_4GB);
 
-    /* Region 1 setting: Memory with Device type, not shareable, non-cacheable. */
+    /* Region 1 setting: Memory with Device type, not shareable, non-cacheable (SEMC0-SEMC1) */
     MPU->RBAR = ARM_MPU_RBAR(1, 0x80000000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_512MB);
 
-    /* Region 2 setting: Memory with Device type, not shareable,  non-cacheable. */
-    MPU->RBAR = ARM_MPU_RBAR(2, 0x60000000U);
-    MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_512MB);
-
-    /* Region 3 setting: Memory with Device type, not shareable, non-cacheable. */
-    MPU->RBAR = ARM_MPU_RBAR(3, 0x00000000U);
+    /* Region 2 setting: Memory with Device type, not shareable, non-cacheable. (CAAM Secure RAM, FlexSPI1 control registers) */
+    MPU->RBAR = ARM_MPU_RBAR(2, 0x00000000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1GB);
 
-    /* Region 4 setting: Memory with Normal type, not shareable, outer/inner write back */
-    MPU->RBAR = ARM_MPU_RBAR(4, 0x00000000U);
+    /* Region 3 setting: Memory with Normal type, not shareable, outer/inner write back (ITCM) */
+    MPU->RBAR = ARM_MPU_RBAR(3, 0x00000000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_256KB);
 
-    /* Region 5 setting: Memory with Normal type, not shareable, outer/inner write back */
-    MPU->RBAR = ARM_MPU_RBAR(5, 0x20000000U);
+    /* Region 4 setting: Memory with Normal type, not shareable, outer/inner write back (DTCM) */
+    MPU->RBAR = ARM_MPU_RBAR(4, 0x20000000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_256KB);
 
-    /* Region 6 setting: Memory with Normal type, not shareable, outer/inner write back */
-    MPU->RBAR = ARM_MPU_RBAR(6, 0x20200000U);
+    /* Region 5 setting: Memory with Normal type, not shareable, outer/inner write back (CM4 TCM, OCRAM1, OCRAM2) */
+    MPU->RBAR = ARM_MPU_RBAR(5, 0x20200000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_1MB);
 
-    /* Region 7 setting: Memory with Normal type, not shareable, outer/inner write back */
-    MPU->RBAR = ARM_MPU_RBAR(7, 0x20300000U);
+    /* Region 6 setting: Memory with Normal type, not shareable, outer/inner write back (ORCAM1 ECC, OCRAM2 ECC, OCRAM M7) */
+    MPU->RBAR = ARM_MPU_RBAR(6, 0x20300000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_512KB);
 
-    /* Region 8 setting: Memory with Normal type, not shareable, outer/inner write back. */
+    /* Region 7: Noncached memory. */
+    ptrdiff_t noncached_region_size = __noncachedata_end__ - __noncachedata_start__;
+    if(noncached_region_size > 0) {
+        // Check configuration from linker script
+        MBED_ASSERT(mbed_is_power_of_two(noncached_region_size));
+        MBED_ASSERT(((uintptr_t)__noncachedata_start__) % noncached_region_size == 0);
+
+        // Region size constant is the log2 of the region size, offset by 1
+        const uint32_t region_size = mbed_integer_log_2(noncached_region_size) - 1;
+
+        MPU->RBAR = ARM_MPU_RBAR(7, ((uintptr_t)__noncachedata_start__));
+        MPU->RASR =
+            ARM_MPU_RASR_EX(
+                1,                          // DisableExec
+                ARM_MPU_AP_FULL,            // AccessPermission
+                ARM_MPU_ACCESS_NORMAL(ARM_MPU_CACHEP_NOCACHE, ARM_MPU_CACHEP_NOCACHE, true), // Access and cache policy
+                0U,                         // SubRegionDisable
+                region_size);               // Size
+    }
+
+    /* Region 8 setting: Memory with Normal type, not shareable, outer/inner write back. (FlexSPI1) */
     MPU->RBAR = ARM_MPU_RBAR(8, 0x30000000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
 
-
-    /* Region 9 setting: Memory with Normal type, not shareable, outer/inner write back */
+    /* Region 9 setting: Memory with Normal type, not shareable, outer/inner write back (SEMC0) */
     MPU->RBAR = ARM_MPU_RBAR(9, 0x80000000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_64MB);
    
-    /* Region 11 setting: Memory with Device type, not shareable, non-cacheable */
+    /* Region 11 setting: Memory with Device type, not shareable, non-cacheable (AIPS peripherals) */
     MPU->RBAR = ARM_MPU_RBAR(11, 0x40000000);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_16MB);
 
-    /* Region 12 setting: Memory with Device type, not shareable, non-cacheable */
+    /* Region 12 setting: Memory with Device type, not shareable, non-cacheable (SIM_M/SIM_DISP) */
     MPU->RBAR = ARM_MPU_RBAR(12, 0x41000000);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_2MB);
 
-    /* Region 13 setting: Memory with Device type, not shareable, non-cacheable */
+    /* Region 13 setting: Memory with Device type, not shareable, non-cacheable (SIM_M7) */
     MPU->RBAR = ARM_MPU_RBAR(13, 0x41400000);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1MB);
 
-    /* Region 14 setting: Memory with Device type, not shareable, non-cacheable */
+    /* Region 14 setting: Memory with Device type, not shareable, non-cacheable (GPU2D) */
     MPU->RBAR = ARM_MPU_RBAR(14, 0x41800000);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1MB);
 
-    /* Region 15 setting: Memory with Device type, not shareable, non-cacheable */
+    /* Region 15 setting: Memory with Device type, not shareable, non-cacheable (AIPS M7) */
     MPU->RBAR = ARM_MPU_RBAR(15, 0x42000000);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1MB);
 

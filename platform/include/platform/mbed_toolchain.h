@@ -481,7 +481,8 @@
 #define MBED_NONCACHED_SECTION_NAME ".noncached"
 
 /// Attach to a global variable to put it in the noncached section.
-/// Note that this section is always zero-initialized at boot.
+/// Note that this section is always zero-initialized at boot, and any initial value assigned to
+/// noncached values is ignored.
 #define MBED_NONCACHED MBED_SECTION(MBED_NONCACHED_SECTION_NAME)
 #endif
 

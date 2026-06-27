@@ -29,15 +29,15 @@
       "cb-search-range-start": 0x24000000,
       "cb-search-range-end": 0x2407FFFF
     },
-    "MIMXRT1060": {
-      // RTT lives in OCRAM
-      "cb-search-range-start": 0x20280000,
-      "cb-search-range-end": 0x2029FFFF
+    "MIMXRT105X": {
+      // RTT lives in DTCM
+      "cb-search-range-start": 0x20000000,
+      "cb-search-range-end": 0x2023FFFF
     },
-    "MIMXRT1050": {
-      // RTT lives in OCRAM
-      "cb-search-range-start": 0x20200000,
-      "cb-search-range-end": 0x2021FFFF
+    "MIMXRT1170": {
+      // RTT lives in OCRAM combined
+      "cb-search-range-start": 0x20240000,
+      "cb-search-range-end": 0x2035FFFF
     }
   }
 }
