@@ -21,6 +21,7 @@ A message that notes the main changes in the update.
 - Added a new `MBED_NONCACHED` define which can be used to store global variables in non-cached memory on devices with a data cache. This is supported on STM32H7 and MIMXRT (which I believe are the only currently supported MCUs with a D-cache)
 - Added a new global, `mbed_used_mpu_regions`, which gives the number of MPU regions used by Mbed. This is intended to allow applications to also use the MPU without creating breakages in the future if Mbed uses additional MPU regions.
 - Added new header, `mbed_math_helpers.h`, containing some useful math functions. Currently this contains `mbed_integer_log_2()` and `mbed_is_power_of_two()`
+- MIMRT117x: Memory bank configuration is now supported in the linker script.
 - RP2xxx
   - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board with Mbed compared to the non-W version is limited).
   - `SFE_THING_PLUS_RP2040` board target added for the [SparkFun Thing Plus RP2040 board](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html)
