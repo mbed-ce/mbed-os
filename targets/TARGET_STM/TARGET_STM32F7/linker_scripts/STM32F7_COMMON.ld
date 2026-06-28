@@ -70,6 +70,25 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
+    /* Non-cached data section.
+     * This section is configured in the MPU as uncached, so reads and writes go directly through to memory.
+     * We put this first in SRAM so it's very, very aligned. */
+    .noncached (NOLOAD):
+    {
+        __noncached_start = .;
+        *(.noncached)
+
+        /* For the MPU configuration, we need to align the size of this section up to
+         * the next power of two. Also note that the MPU does not support regions
+         * smaller than 32 bytes so round up if smaller than that. */
+        __noncached_data_size = (. - __noncached_start);
+        __noncached_aligned_size = MAX(32, 1 << LOG2CEIL(__noncached_data_size));
+
+        . += (__noncached_aligned_size - __noncached_data_size);
+
+        __noncached_end = .;
+    } > RAM
+
     .text :
     {
         __vector_flash_start__ = ABSOLUTE(.);

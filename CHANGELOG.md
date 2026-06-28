@@ -18,7 +18,7 @@ A message that notes the main changes in the update.
 - Added support for Real-Time Transfer (RTT), a method of transferring text from a target device using a debugger connection. RTT allows getting UART console-like behavior at a higher speed and with no additional wires to the target.
   - RTT can be used automatically by Mbed via the `target.console-rtt` JSON option, or manually in code by linking the `mbed-rtt` CMake library and using the `RTTHandle` class.
   - RTT is supported in the JLINK, OPENOCD, and PYOCD upload methods. RTT can be used with command-line development and VS Code, but not with CLion at this time.
-- Added a new `MBED_NONCACHED` define which can be used to store global variables in non-cached memory on devices with a data cache. This is supported on STM32H7 and MIMXRT (which I believe are the only currently supported MCUs with a D-cache)
+- Added a new `MBED_NONCACHED` define which can be used to store global variables in non-cached memory on devices with a data cache. This is supported on STM32F7, STM32H7, and MIMXRT (which I believe are the only currently supported MCUs with a D-cache)
 - Added a new global, `mbed_used_mpu_regions`, which gives the number of MPU regions used by Mbed. This is intended to allow applications to also use the MPU without creating breakages in the future if Mbed uses additional MPU regions.
 - Added new header, `mbed_math_helpers.h`, containing some useful math functions. Currently this contains `mbed_integer_log_2()` and `mbed_is_power_of_two()`
 - MIMRT117x: Memory bank configuration is now supported in the linker script.
