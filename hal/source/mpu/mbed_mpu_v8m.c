@@ -39,6 +39,12 @@
 #define MBED_MPU_RAM_START           (MBED_MPU_ROM_END + 1)
 #endif
 
+#ifdef __DCACHE_PRESENT
+// Symbols defined in linker script for noncache region
+extern uint8_t __noncached_start[];
+extern uint8_t __noncached_end[];
+#endif
+
 static_assert(MBED_MPU_ROM_END <= 0x20000000 - 1,
               "Unsupported value for MBED_MPU_ROM_END");
 
@@ -49,13 +55,9 @@ void mbed_mpu_init()
 
     const uint32_t regions = (MPU->TYPE & MPU_TYPE_DREGION_Msk) >> MPU_TYPE_DREGION_Pos;
 
-    // Our MPU setup requires 4 or 5 regions - if this assert is hit, remove
+    // Our MPU setup requires 4-6 regions - if this assert is hit, remove
     // a region by setting MPU_ROM_END to 0x1fffffff, or remove MPU from device_has
-#if MBED_MPU_RAM_START == 0x20000000
-    MBED_ASSERT(regions >= 4);
-#else
-    MBED_ASSERT(regions >= 5);
-#endif
+    MBED_ASSERT(regions >= mbed_used_mpu_regions);
 
     // Disable the MCU
     MPU->CTRL = 0;
@@ -81,13 +83,10 @@ void mbed_mpu_init()
 
     const uint8_t WTRA = ARM_MPU_ATTR_MEMORY_(1, 0, 1, 0);      // Non-transient, Write-Through, Read-allocate, Not Write-allocate
     const uint8_t WBWARA = ARM_MPU_ATTR_MEMORY_(1, 1, 1, 1);    // Non-transient, Write-Back, Read-allocate, Write-allocate
-    enum {
-        AttrIndex_WTRA,
-        AttrIndex_WBWARA,
-    };
 
-    ARM_MPU_SetMemAttr(AttrIndex_WTRA, ARM_MPU_ATTR(WTRA, WTRA));
-    ARM_MPU_SetMemAttr(AttrIndex_WBWARA, ARM_MPU_ATTR(WBWARA, WBWARA));
+    ARM_MPU_SetMemAttr(MBED_MPU_ATTR_INDEX_NORMAL_WRITE_THROUGH, ARM_MPU_ATTR(WTRA, WTRA));
+    ARM_MPU_SetMemAttr(MBED_MPU_ATTR_INDEX_NORMAL_WRITE_BACK, ARM_MPU_ATTR(WBWARA, WBWARA));
+    ARM_MPU_SetMemAttr(MBED_MPU_ATTR_INDEX_NON_CACHEABLE, ARM_MPU_ATTR(MPU_ATTR_NORMAL_OUTER_NON_CACHEABLE, MPU_ATTR_NORMAL_INNER_NON_CACHEABLE));
 
     ARM_MPU_SetRegion(
         0,                          // Region
@@ -99,10 +98,10 @@ void mbed_mpu_init()
             0),                     // Execute Never disabled
         ARM_MPU_RLAR(
             MBED_MPU_ROM_END,       // Limit
-            AttrIndex_WTRA)         // Attribute index - Write-Through, Read-allocate
+            MBED_MPU_ATTR_INDEX_NORMAL_WRITE_THROUGH) // Attribute index - Write-Through, Read-allocate
     );
 
-#if MBED_MPU_RAM_START != 0x20000000
+#if MBED_MPU_RAM_START < 0x20000000
     ARM_MPU_SetRegion(
         4,                          // Region
         ARM_MPU_RBAR(
@@ -113,7 +112,7 @@ void mbed_mpu_init()
             1),                     // Execute Never enabled
         ARM_MPU_RLAR(
             0x1FFFFFFF,             // Limit
-            AttrIndex_WTRA)         // Attribute index - Write-Through, Read-allocate
+            MBED_MPU_ATTR_INDEX_NORMAL_WRITE_THROUGH) // Attribute index - Write-Through, Read-allocate
     );
 #define LAST_RAM_REGION 4
 #else
@@ -130,7 +129,7 @@ void mbed_mpu_init()
             1),                     // Execute Never enabled
         ARM_MPU_RLAR(
             0x3FFFFFFF,             // Limit
-            AttrIndex_WBWARA)       // Attribute index - Write-Back, Write-allocate
+            MBED_MPU_ATTR_INDEX_NORMAL_WRITE_BACK) // Attribute index - Write-Back, Write-allocate
     );
 
     ARM_MPU_SetRegion(
@@ -143,7 +142,7 @@ void mbed_mpu_init()
             1),                     // Execute Never enabled
         ARM_MPU_RLAR(
             0x7FFFFFFF,             // Limit
-            AttrIndex_WBWARA)       // Attribute index - Write-Back, Write-allocate
+            MBED_MPU_ATTR_INDEX_NORMAL_WRITE_BACK) // Attribute index - Write-Back, Write-allocate
     );
 
     ARM_MPU_SetRegion(
@@ -156,8 +155,28 @@ void mbed_mpu_init()
             1),                     // Execute Never enabled
         ARM_MPU_RLAR(
             0x9FFFFFFF,             // Limit
-            AttrIndex_WTRA)         // Attribute index - Write-Through, Read-allocate
+            MBED_MPU_ATTR_INDEX_NORMAL_WRITE_THROUGH) // Attribute index - Write-Through, Read-allocate
     );
+
+#if __DCACHE_PRESENT
+    // Region addresses must be 32-byte aligned.
+    MBED_ASSERT(((uintptr_t)__noncached_start) % 32 == 0);
+    MBED_ASSERT(((uintptr_t)__noncached_end) % 32 == 0);
+
+    // Select region 4/5 and use it for the non-cached region
+    ARM_MPU_SetRegion(
+        LAST_RAM_REGION + 1,
+        ARM_MPU_RBAR(
+            __noncached_start,          // Base
+            ARM_MPU_SH_OUTER,           // Sharability
+            0,                          // Read-Write
+            1,                          // Non-privileged
+            1),                         // Execute Never
+        ARM_MPU_RLAR(
+            __noncached_end - 1,        // Limit
+            MBED_MPU_ATTR_INDEX_NON_CACHEABLE)
+    );
+#endif
 
     // Enable the MPU
     MPU->CTRL =
@@ -189,25 +208,25 @@ static void enable_region(bool enable, uint32_t region)
     MPU->RLAR = (MPU->RLAR & ~MPU_RLAR_EN_Msk) | (enable << MPU_RLAR_EN_Pos);
 }
 
-void mbed_mpu_enable_rom_wn(bool enable)
+void mbed_mpu_enable_rom_wn(bool disable)
 {
     // Flush memory writes before configuring the MPU.
     __DMB();
 
-    enable_region(enable, 0);
+    enable_region(disable, 0);
 
     // Ensure changes take effect
     __DSB();
     __ISB();
 }
 
-void mbed_mpu_enable_ram_xn(bool enable)
+void mbed_mpu_enable_ram_xn(bool disable)
 {
     // Flush memory writes before configuring the MPU.
     __DMB();
 
     for (uint32_t region = 1; region <= LAST_RAM_REGION; region++) {
-        enable_region(enable, region);
+        enable_region(disable, region);
     }
 
     // Ensure changes take effect

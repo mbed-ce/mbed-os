@@ -33,6 +33,7 @@ static inline bool mbed_is_power_of_two(const uint32_t x)
  *
  * Rounds down to the nearest power of 2, i.e. \c mbed_integer_log_2(3) is 1.
  */
-static inline uint32_t mbed_integer_log_2(uint32_t x) {
-    return sizeof(uint32_t)*8 - 1 - __builtin_clz(x);
+static inline uint32_t mbed_integer_log_2(uint32_t x)
+{
+    return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
 }

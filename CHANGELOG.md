@@ -18,8 +18,11 @@ A message that notes the main changes in the update.
 - Added support for Real-Time Transfer (RTT), a method of transferring text from a target device using a debugger connection. RTT allows getting UART console-like behavior at a higher speed and with no additional wires to the target.
   - RTT can be used automatically by Mbed via the `target.console-rtt` JSON option, or manually in code by linking the `mbed-rtt` CMake library and using the `RTTHandle` class.
   - RTT is supported in the JLINK, OPENOCD, and PYOCD upload methods. RTT can be used with command-line development and VS Code, but not with CLion at this time.
+- Added a new `MBED_NONCACHED` define which can be used to store global variables in non-cached memory on devices with a data cache. This is supported on STM32H7 and MIMXRT (which I believe are the only currently supported MCUs with a D-cache)
+- Added a new global, `mbed_used_mpu_regions`, which gives the number of MPU regions used by Mbed. This is intended to allow applications to also use the MPU without creating breakages in the future if Mbed uses additional MPU regions.
+- Added new header, `mbed_math_helpers.h`, containing some useful math functions. Currently this contains `mbed_integer_log_2()` and `mbed_is_power_of_two()`
 - RP2xxx
-  - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board compared to the non-W version is limited).
+  - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board with Mbed compared to the non-W version is limited).
   - `SFE_THING_PLUS_RP2040` board target added for the [SparkFun Thing Plus RP2040 board](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html)
   - MPU configuration support added
   - Support for single-byte i2c operations implemented (allowing features like the I2C EEPROM block device to work).
@@ -33,7 +36,8 @@ A message that notes the main changes in the update.
 - Reworked targets CMake code to only recurse into the subdir for the current target family, which should speed up the CMake configure a bit
 - The `I2C` class now keeps track of the I2C bus state and prevents you from doing operations that are obviously wrong, such as calling `start()` before `stop()` or calling `write_byte()` before `start()`. Previously these operations would get passed down to the HAL API which may or may not have appropriate error handling for them.
 - The `I2C` class now detects and rejects attempts to perform a zero-length transaction on hardware which does not support it.
-- Use `-Werror=return-type` in the default GCC flags so that a missing return statement in a function becomes a fatal error 
+- Use `-Werror=return-type` in the default GCC flags so that a missing return statement in a function becomes a fatal error
+- On targets with a data cache (`__DCACHE_PRESENT` is defined), one additional MPU region is used to implement the new non-cacheable memory support.
 - STM32F4
   - HAL driver update to `stm32f4xx-hal-driver` v1.8.5 (2025), now integrated as a submodule.
   - CMSIS device update to `cmsis-device-f4` v2.6.11 (2025), now integrated as a submodule.
@@ -50,7 +54,7 @@ A message that notes the main changes in the update.
   - Standardized ROM names in `cmsis_mcu_descriptions` across STM32F7 targets.
   - Replaced per-target linker scripts with one common STM32F7 linker script.
   - Replaced most STM32F7 `system_clock.c` files with one common clock configuration.
-  - Added target metadata cleanup (`adc-vref`, `hse-value for all F7 targets).
+  - Added target metadata cleanup (`adc-vref`, `hse-value` for all F7 targets).
   - Updated STM32F7 config/init files by consolidating Mbed changes with latest upstream templates. Removed unused Ethernet HAL sections from config (Mbed does not use ST Ethernet stack here)
   - Applied interim local HAL fixes until upstream release includes them: https://github.com/STMicroelectronics/stm32f7xx-hal-driver/issues/23
   - F7 Vector table size and vector start is now covered by linker script and all cmsis_nvic.h files were removed

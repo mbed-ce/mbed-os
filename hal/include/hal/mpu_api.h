@@ -22,6 +22,9 @@
 
 #include "device.h"
 #include <stdbool.h>
+#include "cmsis.h"
+
+#include <mstd_cstddef>
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,17 +63,54 @@ extern "C" {
  *     mbed test -t <toolchain> -m <target> -n tests-mbed_hal-mpu*
  */
 
-#ifndef MBED_MPU_CUSTOM
+#if !defined(MBED_MPU_CUSTOM)
+
+#ifdef MBED_CONF_TARGET_MPU_ROM_END
+#define MBED_MPU_ROM_END             MBED_CONF_TARGET_MPU_ROM_END
+#else
+#define MBED_MPU_ROM_END             (0x10000000 - 1)
+#endif
+
+#ifdef MBED_CONF_TARGET_MPU_RAM_START
+#define MBED_MPU_RAM_START             MBED_CONF_TARGET_MPU_RAM_START
+#else
+// Default to the end of ROM
+#define MBED_MPU_RAM_START           (MBED_MPU_ROM_END + 1)
+#endif
+
+#if ((__ARM_ARCH_8M_BASE__ == 1U) || (__ARM_ARCH_8M_MAIN__ == 1U) || (__ARM_ARCH_8_1M_MAIN__ == 1U))
+/// On ARMv8 cores, MPU regions must use one of 8 global "attribute registers", which give the attributes
+/// for one or more memory regions. This enum gives the attribute registers (i.e. the first arg to
+/// \c ARM_MPU_SetMemAttr() ) that are defined by Mbed.
+/// The application is free to use attribute registers above this number.
+enum mbed_mpu_attr_index {
+    /// Normal memory, write-through (i.e. writes are always sent immediately to main memory)
+    MBED_MPU_ATTR_INDEX_NORMAL_WRITE_THROUGH = 0,
+
+    /// Normal memory, write-back (i.e. writes may only write to the cache immediately, and get synced to main memory later)
+    MBED_MPU_ATTR_INDEX_NORMAL_WRITE_BACK = 1,
+
+    /// Non-cacheable: Reads and writes hit main memory directly.
+    /// Note that this is still normal memory, not device, so the CPU can still reorder accesses.
+    MBED_MPU_ATTR_INDEX_NON_CACHEABLE = 2,
+};
+#endif
+
 /// Number of MPU regions that will be used by Mbed OS's MPU configuration.
 /// The application is generally free to use regions above this number.
-static const size_t mbed_used_mpu_regions = 3
-#if MBED_MPU_RAM_START != 0x20000000
-  + 1
+static MSTD_CONSTEXPR_OBJ_11 size_t mbed_used_mpu_regions =
+#if ((__ARM_ARCH_8M_BASE__ == 1U) || (__ARM_ARCH_8M_MAIN__ == 1U) || (__ARM_ARCH_8_1M_MAIN__ == 1U))
+    4
+#else
+    3
+#endif
+#if MBED_MPU_RAM_START < 0x20000000
+    + 1
 #endif
 #if __DCACHE_PRESENT
-  + 1
+    + 1
 #endif
-;
+    ;
 #endif
 
 /**

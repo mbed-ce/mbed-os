@@ -28,19 +28,6 @@
 #error "Device has v7m MPU but it is not enabled. Add 'MPU' to device_has in targets.json"
 #endif
 
-#ifdef MBED_CONF_TARGET_MPU_ROM_END
-#define MBED_MPU_ROM_END             MBED_CONF_TARGET_MPU_ROM_END
-#else
-#define MBED_MPU_ROM_END             (0x10000000 - 1)
-#endif
-
-#ifdef MBED_CONF_TARGET_MPU_RAM_START
-#define MBED_MPU_RAM_START             MBED_CONF_TARGET_MPU_RAM_START
-#else
-// Default to the end of ROM
-#define MBED_MPU_RAM_START           (MBED_MPU_ROM_END + 1)
-#endif
-
 #ifdef __DCACHE_PRESENT
 // Symbols defined in linker script for noncache region
 extern uint8_t __noncached_start[];
@@ -191,7 +178,7 @@ void mbed_mpu_init()
 
 #if __DCACHE_PRESENT
     ptrdiff_t noncached_region_size = __noncached_end - __noncached_start;
-    if(noncached_region_size > 0) {
+    if (noncached_region_size > 0) {
         // Check configuration from linker script
         MBED_ASSERT(mbed_is_power_of_two(noncached_region_size));
         MBED_ASSERT(((uintptr_t)__noncached_start) % noncached_region_size == 0);
