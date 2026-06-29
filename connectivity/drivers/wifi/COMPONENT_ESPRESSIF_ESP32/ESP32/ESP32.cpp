@@ -624,31 +624,34 @@ const char *ESP32::getNetmask_ap()
 
 int8_t ESP32::getRSSI()
 {
-    bool ret;
-    int8_t rssi[2]; /* It needs 1 byte extra. */
+    // Practically we only care about RSSI when a station is actually connected to AP
+    // The way AT+CWLAP operates has also changed since ESP8266 era therefore deprecated
+    // If we ever want to see the RSSI of AP with certain SSID
+    // Please parse a SSID str here then issue command: AT+CWLAP="SSID"
+    // Typical response will be:
+    // +CWLAP:(<ecn>,<"ssid">,<rssi>,<"mac">,<channel>,<freq_offset>,<freqcal_val>,<pairwise_cipher>,<group_cipher>,<wifi_protocol>,<wps>)
+    int rssi = -128/* the least possible RSSI value */;
+    if (!isConnected()) {
+        return rssi;
+    }
+
+    // The following 3 variables are not actually needed
+    // Declared to faciliate parsing
+    // Typical response to AT+CWJAP?
+    // +CWJAP:<"ssid">,<"bssid">,<channel>,<rssi>,<pci_en>,<reconn_interval>,<listen_interval>,<scan_mode>,<pmf>
     char ssid[33];
     char bssid[18];
+    int elements[6];
+    bool ret;
 
     _smutex.lock();
     _startup_wifi();
     ret = _parser.send("AT+CWJAP?")
-          && _parser.recv("+CWJAP:\"%32[^\"]\",\"%17[^\"]\"", ssid, bssid)
-          && _parser.recv("OK");
-    if (!ret) {
-        _smutex.unlock();
-        return 0;
-    }
-
-    ret = _parser.send("AT+CWLAP=\"%s\",\"%s\"", ssid, bssid)
-          && _parser.recv("+CWLAP:(%*d,\"%*[^\"]\",%hhd,", &rssi[0])
+          && _parser.recv("+CWJAP:\"%32[^\"]\",\"%17[^\"]\",%d,%d,%d,%d,%d,%d,%d", ssid, bssid, &elements[0], &rssi, &elements[1], &elements[2], &elements[3], &elements[4], &elements[5])
           && _parser.recv("OK");
     _smutex.unlock();
 
-    if (!ret) {
-        return 0;
-    }
-
-    return rssi[0];
+    return ret ? rssi : -128;
 }
 
 int ESP32::scan(WiFiAccessPoint *res, unsigned limit)
