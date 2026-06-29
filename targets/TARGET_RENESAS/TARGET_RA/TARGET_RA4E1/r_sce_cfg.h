@@ -1,0 +1,15 @@
+/* Copyright (c) 2024 Renesas Electronics Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* generated configuration header file - do not edit */
+#ifndef R_SCE_CFG_H_
+#define R_SCE_CFG_H_
+#define SCE_RSA_RETRY_COUNT_FOR_RSA_KEY_GENERATION 10240
+            #define SCE_USER_SHA_384_ENABLED                   (0)
+            #define SCE_USER_SHA_384_FUNCTION                  crypto_sha384_user_function
+            #ifndef SCE_USER_FAST_BOOT
+            #define SCE_USER_FAST_BOOT                         (0)
+            #define SCE_CFG_PARAM_CHECKING_ENABLE              BSP_CFG_PARAM_CHECKING_ENABLE
+            #endif
+#endif /* R_SCE_CFG_H_ */

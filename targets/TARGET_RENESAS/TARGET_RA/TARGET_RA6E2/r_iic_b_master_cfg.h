@@ -1,0 +1,19 @@
+/* Copyright (c) 2024 Renesas Electronics Corporation
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* generated configuration header file - do not edit */
+#ifndef R_IIC_B_MASTER_CFG_H_
+#define R_IIC_B_MASTER_CFG_H_
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define IIC_B_MASTER_CFG_PARAM_CHECKING_ENABLE (BSP_CFG_PARAM_CHECKING_ENABLE)
+#define IIC_B_MASTER_CFG_DTC_ENABLE (0)
+#define IIC_B_MASTER_CFG_ADDR_MODE_10_BIT_ENABLE (0)
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* R_IIC_B_MASTER_CFG_H_ */
