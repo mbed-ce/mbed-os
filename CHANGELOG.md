@@ -71,6 +71,8 @@ A message that notes the main changes in the update.
 - ESP32 Wi-Fi driver
   - Added tested working modules and their firmware version
   - Added note to increase RX buffer size to ensure data integrity and system stability
+  - Updated code to get RSSI from ESP32 module
+  
 ### Deprecated
 
 ### Fixed
