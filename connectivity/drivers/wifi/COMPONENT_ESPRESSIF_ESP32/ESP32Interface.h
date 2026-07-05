@@ -71,6 +71,8 @@ public:
 
     int disconnect() override;
 
+    bool restart();
+
     nsapi_error_t get_ip_address(SocketAddress *sockAddr) override;
 
     const char *get_mac_address() override;

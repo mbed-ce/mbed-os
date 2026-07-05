@@ -213,6 +213,11 @@ int ESP32Interface::disconnect()
     return NSAPI_ERROR_OK;
 }
 
+bool ESP32Interface::restart()
+{
+    return _esp->restart();
+}
+
 nsapi_error_t ESP32Interface::get_ip_address(SocketAddress *sockAddr)
 {
     if (sockAddr->set_ip_address(_esp->getIPAddress())) {
