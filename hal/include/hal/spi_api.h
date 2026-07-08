@@ -187,7 +187,7 @@ extern "C" {
  * @param[in]  sclk The pin to use for SCLK
  * @return     An SPI peripheral identifier
  */
-SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName mclk);
+SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName sclk);
 #endif
 
 /**

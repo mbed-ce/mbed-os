@@ -203,15 +203,29 @@ SECTIONS
     /* End of .text-like segments */
     __etext = .;
 
-   .ram_vector_table (NOLOAD): {
+    .ram_vector_table (NOLOAD): {
         *(.ram_vector_table)
+    } > RAM
+
+    .ram_code ALIGN(32) : {
+        __ram_function_start = .;
+        
+        *(.time_critical*)
+
+        /* 
+         * The Pico SDK creates functions at runtime via its "IRQ handler chain" mechanism.
+         * We need to ensure that the created functions are included in the ram_code section
+         * so that Mbed's MPU config doesn't block them from executing.
+         */
+         *irq_handler_chain.S.o*(.data)
+
+        . = ALIGN(32);
+        __ram_function_end = .;
     } > RAM
 
     .data : {
         __data_start__ = .;
         *(vtable)
-
-        *(.time_critical*)
 
         /* remaining .text and .rodata; i.e. stuff we exclude above because we want it in RAM */
         *(.text*)

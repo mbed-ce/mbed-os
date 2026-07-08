@@ -8476,17 +8476,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "core": "Cortex-M33FE",
         "is_mcu_family_target": true,
         "macros_add": [
-            "PICO_RP2350=1"
+            "PICO_RP2350=1",
+            "MBED_MPU_HAS_RAM_FUNCTION_REGION"
         ],
         "device_has_add": [
             "LPTICKER"
         ],
 
         "device_has_remove": [
-            "ANALOGIN",
-            "PWMOUT",
             "SERIAL_FC",
-            "SPI",
             "USBDEVICE",
         ],
         "config": {

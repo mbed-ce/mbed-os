@@ -37,18 +37,21 @@ static unsigned int const SPI_MASTER_DEFAULT_BITRATE = 1000 * 1000; /* 1 MHz */
  * FUNCTION DEFINITION
  ******************************************************************************/
 
-void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel)
-{
-    /* Check if all pins do in fact belong to the same SPI module. */
+SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName sclk) {
     SPIName spi_mosi = (SPIName)pinmap_peripheral(mosi, PinMap_SPI_MOSI);
     SPIName spi_miso = (SPIName)pinmap_peripheral(miso, PinMap_SPI_MISO);
     SPIName spi_sclk = (SPIName)pinmap_peripheral(sclk, PinMap_SPI_SCLK);
-    SPIName spi_ssel = (SPIName)pinmap_peripheral(ssel, PinMap_SPI_SSEL);
 
-    MBED_ASSERT(spi_mosi == spi_miso);
-    MBED_ASSERT(spi_miso == spi_sclk);
-    if (spi_ssel != (SPIName)NC) {
-        MBED_ASSERT(spi_sclk == spi_ssel);
+    return pinmap_merge(pinmap_merge(spi_mosi, spi_miso), spi_sclk);
+}
+
+void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel)
+{
+    /* Check if all pins do in fact belong to the same SPI module. */
+    const SPIName spi_other_pins = spi_get_peripheral_name(mosi, miso, sclk);
+    if (ssel != NC) {
+        const SPIName spi_ssel = (SPIName)pinmap_peripheral(ssel, PinMap_SPI_SSEL);
+        pinmap_merge(spi_ssel, spi_other_pins);
     }
 
     /* Obtain pointer to the SPI module. */
@@ -61,6 +64,11 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
 
     /* Initialize SPI at 1 MHz bitrate */
     pico_sdk_spi_init(obj->dev, SPI_MASTER_DEFAULT_BITRATE);
+}
+
+void spi_free(spi_t *obj)
+{
+    spi_deinit(obj->dev);
 }
 
 void spi_format(spi_t *obj, int bits, int mode, int slave)

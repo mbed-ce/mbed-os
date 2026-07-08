@@ -164,11 +164,6 @@ target_compile_definitions(mbed-mcu-rp2
 		PICO_RUNTIME_SKIP_INIT_RP2040_GPIO_IE_DISABLE
 		PICO_RUNTIME_SKIP_INIT_SPIN_LOCKS_RESET
 		PICO_RUNTIME_SKIP_INIT_INSTALL_RAM_VECTOR_TABLE
-
-		# Don't use the shared interrupt vector mechanism, which dynamically builds functions in memory to
-		# call multiple IRQ handlers. This does NOT play nice with Mbed's default configuration of
-		# disabling RAM execution via the MPU.
-		PICO_DISABLE_SHARED_IRQ_HANDLERS
 )
 
 target_link_libraries(mbed-mcu-rp2 INTERFACE mbed-cmsis-cortex-m)

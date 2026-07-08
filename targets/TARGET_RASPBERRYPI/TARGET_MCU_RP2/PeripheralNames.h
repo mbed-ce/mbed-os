@@ -34,6 +34,8 @@ typedef enum {
     SPI_1
 } SPIName;
 
+#define DEVICE_SPI_COUNT 2
+
 typedef enum {
     I2C_0 = 0,
     I2C_1

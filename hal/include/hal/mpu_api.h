@@ -110,6 +110,9 @@ static MSTD_CONSTEXPR_OBJ_11 size_t mbed_used_mpu_regions =
 #if __DCACHE_PRESENT
     + 1
 #endif
+#if MBED_MPU_HAS_RAM_FUNCTION_REGION
+    + 1
+#endif
     ;
 #endif
 
