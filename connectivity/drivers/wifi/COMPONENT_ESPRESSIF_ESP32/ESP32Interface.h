@@ -71,6 +71,12 @@ public:
 
     int disconnect() override;
 
+    /**
+     * Resets ESP32 HW, re-runs startup sequence
+     * Sometimes this is the only way to re-establish connection with certain AP
+     */
+    bool restart();
+
     nsapi_error_t get_ip_address(SocketAddress *sockAddr) override;
 
     const char *get_mac_address() override;
