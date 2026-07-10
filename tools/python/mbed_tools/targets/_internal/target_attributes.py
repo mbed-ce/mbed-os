@@ -90,7 +90,7 @@ def _extract_full_target_definition(
     Extracts the definition for a particular target from all the targets in targets.json, processing the inheritance hierarchy.
 
     Args:
-        all_targets_data: a dictionary representation of the raw targets.json data.
+        all_targets_data: a pydantic model representing the targets.json data.
         target_name: the name of the target.
         allow_non_public_targets: If set to True, attributes can be gotten even for non-public targets
 
