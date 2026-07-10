@@ -77,12 +77,15 @@ def incorporate_memory_bank_data_from_cmsis(target_attributes: dict[str, Any], p
     cmsis_mcu_descriptions_data = decode_json_file(program.mbed_os.cmsis_mcu_descriptions_json_file)
 
     target_attributes["memory_banks"] = incorporate_memory_bank_data_from_cmsis_preparsed(
-        target_attributes["device_name"],
-        cmsis_mcu_descriptions_data,
-        target_attributes.get("memory_banks", {})
+        target_attributes["device_name"], cmsis_mcu_descriptions_data, target_attributes.get("memory_banks", {})
     )
 
-def incorporate_memory_bank_data_from_cmsis_preparsed(device_name: str, cmsis_mcu_description_data: dict[str, Any], target_existing_memory_banks: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+
+def incorporate_memory_bank_data_from_cmsis_preparsed(
+    device_name: str,
+    cmsis_mcu_description_data: dict[str, Any],
+    target_existing_memory_banks: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
     """
     Find the memory bank data for the given CMSIS device name in the CMSIS mcu description data.
 
@@ -94,7 +97,6 @@ def incorporate_memory_bank_data_from_cmsis_preparsed(device_name: str, cmsis_mc
 
     :return: New dict with additional memory bank info from the CMSIS JSON
     """
-
     if device_name not in cmsis_mcu_description_data:
         msg = f"""Target specifies device_name {device_name} but this device is not
 listed in the CMSIS MCU descriptions file.  Perhaps you need to use
@@ -114,6 +116,7 @@ a 'device_name' property."""
             result[memory_bank_name] = memory_bank
 
     return result
+
 
 def _apply_configured_overrides(banks_by_type: BanksByType, bank_config: dict[str, dict[str, int]]) -> BanksByType:
     """
