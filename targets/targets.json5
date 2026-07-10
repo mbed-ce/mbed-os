@@ -8472,6 +8472,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
     // Target for RP235x family MCU
     "MCU_RP235X": {
+        public: false,
         "inherits": ["MCU_RP2"],
         "core": "Cortex-M33FE",
         "is_mcu_family_target": true,
@@ -8497,6 +8498,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
     // Target for RP2350 family MCU
     "MCU_RP2350": {
+        public: false,
         "inherits": ["MCU_RP235X"],
         "device_name": "RP2350",
     },

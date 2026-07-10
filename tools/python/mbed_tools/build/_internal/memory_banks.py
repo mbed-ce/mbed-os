@@ -74,26 +74,46 @@ def incorporate_memory_bank_data_from_cmsis(target_attributes: dict[str, Any], p
         # No CMSIS device name for this target
         return
 
-    cmsis_mcu_descriptions = decode_json_file(program.mbed_os.cmsis_mcu_descriptions_json_file)
+    cmsis_mcu_descriptions_data = decode_json_file(program.mbed_os.cmsis_mcu_descriptions_json_file)
 
-    if target_attributes["device_name"] not in cmsis_mcu_descriptions:
-        msg = f"""Target specifies device_name {target_attributes["device_name"]} but this device is not
-listed in {program.mbed_os.cmsis_mcu_descriptions_json_file}.  Perhaps you need to use
+    target_attributes["memory_banks"] = incorporate_memory_bank_data_from_cmsis_preparsed(
+        target_attributes["device_name"],
+        cmsis_mcu_descriptions_data,
+        target_attributes.get("memory_banks", {})
+    )
+
+def incorporate_memory_bank_data_from_cmsis_preparsed(device_name: str, cmsis_mcu_description_data: dict[str, Any], target_existing_memory_banks: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """
+    Find the memory bank data for the given CMSIS device name in the CMSIS mcu description data.
+
+    Similar to ``incorporate_memory_bank_data_from_cmsis`` but for the case when you already have a parsed JSON file.
+
+    :param device_name: Name of the device to look up
+    :param cmsis_mcu_description_data: Decoded CMSIS MCU descriptions JSON file
+    :param target_existing_memory_banks: Existing memory banks for the target, e.g. from its JSON definition
+
+    :return: New dict with additional memory bank info from the CMSIS JSON
+    """
+
+    if device_name not in cmsis_mcu_description_data:
+        msg = f"""Target specifies device_name {device_name} but this device is not
+listed in the CMSIS MCU descriptions file.  Perhaps you need to use
 the 'python -m mbed_tools.cli.main cmsis-mcu-descr fetch-missing' command to download
-the missing MCU description?"""
+the missing MCU description? If this is a custom target, then the memory bank information
+should be inserted inline into the target JSON under 'memory_banks' and it should not declare
+a 'device_name' property."""
         raise MbedBuildError(msg)
 
-    mcu_description = cmsis_mcu_descriptions[target_attributes["device_name"]]
-    mcu_memory_description: dict[str, dict[str, Any]] = mcu_description["memories"]
+    mcu_description = cmsis_mcu_description_data[device_name]
 
     # If a memory bank is not already described in targets.json, import its description from the CMSIS
     # MCU description.
-    target_memory_banks_section = target_attributes.get("memory_banks", {})
-    for memory_bank_name, memory_bank in mcu_memory_description.items():
-        if memory_bank_name not in target_memory_banks_section:
-            target_memory_banks_section[memory_bank_name] = memory_bank
-    target_attributes["memory_banks"] = target_memory_banks_section
+    result = copy.deepcopy(target_existing_memory_banks)
+    for memory_bank_name, memory_bank in mcu_description["memories"].items():
+        if memory_bank_name not in result:
+            result[memory_bank_name] = memory_bank
 
+    return result
 
 def _apply_configured_overrides(banks_by_type: BanksByType, bank_config: dict[str, dict[str, int]]) -> BanksByType:
     """
