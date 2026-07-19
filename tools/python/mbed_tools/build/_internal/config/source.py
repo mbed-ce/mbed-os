@@ -293,10 +293,10 @@ class Override:
         """Parse modifiers and convert list values to sets."""
         if self.name.endswith("_add"):
             self.modifier = "add"
-            self.name = self.name.removesuffix("_add")
+            self.name = self.name[: -1 * len("_add")]
         elif self.name.endswith("_remove"):
             self.modifier = "remove"
-            self.name = self.name.removesuffix("_remove")
+            self.name = self.name[: -1 * len("_remove")]
 
         self.value = _sanitise_value(self.value)
 
