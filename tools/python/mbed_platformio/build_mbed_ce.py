@@ -23,6 +23,7 @@ from SCons.Script import ARGUMENTS, DefaultEnvironment
 
 if TYPE_CHECKING:
     from SCons.Environment import Base as Environment
+    from SCons.Node import FS as SconsFS
 
 env: Environment = DefaultEnvironment()
 platform = env.PioPlatform()
@@ -57,7 +58,7 @@ from mbed_platformio.cmake_to_scons_converter import (
     extract_includes,
     extract_link_args,
     extract_link_libraries,
-    find_included_files,
+    find_included_files, build_executable,
 )
 from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
 
@@ -209,7 +210,10 @@ def generate_project_ld_script() -> pathlib.Path:
     return next(BUILD_DIR.glob("*.link_script.ld"))
 
 
-def get_targets_by_type(target_configs: dict, target_types: list[str], ignore_targets: list[str] | None = None) -> list:
+def get_targets_by_type(target_configs: dict, target_types: list[str], ignore_targets: list[str] | None = None) -> list[dict[str, Any]]:
+    """
+    Get the CMake exported JSON for all targets of the given type
+    """
     ignore_targets = ignore_targets or []
     result = []
     for target_config in target_configs.values():
@@ -219,28 +223,74 @@ def get_targets_by_type(target_configs: dict, target_types: list[str], ignore_ta
     return result
 
 
-def get_components_map(
-    target_configs: dict, target_types: list[str], ignore_components: list[str] | None = None
-) -> dict:
+def get_targets_map(
+    target_configs: dict, target_types: list[str], ignore_targets: list[str] | None = None
+) -> dict[str, dict[str, Any]]:
+    """
+    Get map of target name to target JSON for each selected target
+    """
     result = {}
-    for config in get_targets_by_type(target_configs, target_types, ignore_components):
+    for config in get_targets_by_type(target_configs, target_types, ignore_targets):
         if "nameOnDisk" not in config:
             config["nameOnDisk"] = "lib{}.a".format(config["name"])
-        result[config["id"]] = {"config": config}
+        result[config["name"]] = {"config": config}
 
     return result
 
 
-def build_components(env: Environment, components_map: dict, project_src_dir: pathlib.Path) -> None:
-    for k, v in components_map.items():
-        components_map[k]["lib"] = build_library(
-            env, v["config"], project_src_dir, FRAMEWORK_DIR, pathlib.Path("$BUILD_DIR/mbed-os")
-        )
+def build_targets(env: Environment, targets_map: dict[str, Any], project_src_dir: pathlib.Path) -> None:
+    for target_data in targets_map.values():
+        if target_data["config"]["type"] == "EXECUTABLE":
+            target_data["exe"] = build_executable(
+                env, target_data["config"], project_src_dir, FRAMEWORK_DIR, pathlib.Path("$BUILD_DIR/mbed-os")
+            )
+        else:
+            target_data["lib"] = build_library(
+                env, target_data["config"], project_src_dir, FRAMEWORK_DIR, pathlib.Path("$BUILD_DIR/mbed-os")
+            )
 
 
 def get_app_defines(app_config: dict) -> list[tuple[str, str]]:
     return extract_defines(app_config["compileGroups"][0])
 
+def rp2xxx_bootloader_custom_commands(env: Environment, framework_targets_map: dict[str, Any]) -> None:
+    """
+    Custom logic for generated bootloader source file for RP2xxx.
+
+    Sadly this is needed because CMake does not export custom commands in any way, shape, or form via the API.
+    So, we have to replicate the custom command logic here.
+    """
+
+    if "mbed-mcu-rp2-boot-stage-2" not in framework_targets_map:
+        # Not rp2xxx
+        return
+
+    generated_src_file = None
+    for source in framework_targets_map["mbed-os"]["config"]["sources"]:
+        source_path = pathlib.Path(source["path"])
+        if source.get("isGenerated", False) and source_path.name == "mbed-mcu-rp2-boot-stage-2_padded_checksummed.S":
+            generated_src_file = "$BUILD_DIR" / source_path.relative_to(BUILD_DIR)
+    if generated_src_file is None:
+        raise RuntimeError("Failed to find generated bootloader source file in source list")
+
+    # First generate bin file from elf
+    boot_stage_2_elf: SconsFS.File = env.GetBuildPath(framework_targets_map["mbed-mcu-rp2-boot-stage-2"]["exe"])[0]
+    boot_stage_2_bin = pathlib.Path(boot_stage_2_elf).with_suffix(".bin")
+    env.Command(target=str(boot_stage_2_bin),
+                source=boot_stage_2_elf,
+                action=f"$OBJCOPY -O binary {boot_stage_2_elf} {boot_stage_2_bin!s}")
+
+    # Now use the appropriate script to generate the ASM source file containing the padded and checksummed contents
+    # of the source file. There are two versions of the script, one for RP2040 and one for RP2350+, so we need to figure
+    # out which to use.
+    use_rp2040_script = "pico-sdk/src/rp2040/boot_stage2" in framework_targets_map["mbed-mcu-rp2-boot-stage-2"]["config"]["sources"][0]["path"]
+    script_path = f"{FRAMEWORK_DIR}/targets/TARGET_RASPBERRYPI/pico-sdk/src/{'rp2040' if use_rp2040_script else 'rp2350'}/boot_stage2/pad_checksum"
+
+    env.Command(
+        target=generated_src_file,
+        source=str(boot_stage_2_bin),
+        action=f"{sys.executable} {script_path} -s 0xffffffff {boot_stage_2_bin!s} {generated_src_file}"
+    )
 
 ## CMake configuration -------------------------------------------------------------------------------------------------
 
@@ -272,11 +322,14 @@ if not project_codemodel:
 print("Mbed CE: Reading CMake configuration...")
 target_configs = load_target_configurations(project_codemodel)
 
-framework_components_map = get_components_map(target_configs, ["STATIC_LIBRARY", "OBJECT_LIBRARY"], [])
+# Scan targets information from CMake. Note that we DO want to load executable targets as they can
+# be used as intermediary steps during the build, but we do NOT want to load the final executable target here.
+framework_targets_map = get_targets_map(target_configs, ["STATIC_LIBRARY", "OBJECT_LIBRARY", "EXECUTABLE"], ["PIODummyExecutable"])
 
 ## Convert targets & flags from CMake to SCons -------------------------------------------------------------------------
 
-build_components(env, framework_components_map, PROJECT_DIR)
+build_targets(env, framework_targets_map, PROJECT_DIR)
+rp2xxx_bootloader_custom_commands(env, framework_targets_map)
 
 mbed_os_lib_target_json = target_configs.get("mbed-os", {})
 app_target_json = target_configs.get("PIODummyExecutable", {})
