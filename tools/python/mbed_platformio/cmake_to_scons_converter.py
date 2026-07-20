@@ -15,8 +15,13 @@ from typing import TYPE_CHECKING, Sequence
 from click.parser import split_arg_string
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from SCons.Environment import Base as Environment
     from SCons.Node import NodeList
+
+    # split_arg_string moved in click 8.2.0+ so make sure it has a type annotation
+    split_arg_string = typing.cast(Callable[[str], list[str]], split_arg_string)
 
 
 def extract_defines(compile_group: dict) -> list[tuple[str, str]]:
@@ -97,7 +102,6 @@ def compile_source_files(
     :param framework_dir: Path to the Mbed CE framework source
     :param framework_obj_dir: Path to the directory where object files for Mbed CE will be saved.
     """
-
     build_dir = pathlib.Path(typing.cast(str, default_env.subst("$BUILD_DIR")))
 
     build_envs = prepare_build_envs(config, default_env)
@@ -150,18 +154,19 @@ def build_library(
 
     return default_env.Library(target=str(pathlib.Path("$BUILD_DIR") / lib_path / lib_name), source=lib_objects)
 
+
 def build_executable(
-        default_env: Environment,
-        exe_json: dict,
-        project_src_dir: pathlib.Path,
-        framework_dir: pathlib.Path,
-        framework_obj_dir: pathlib.Path,
+    default_env: Environment,
+    exe_json: dict,
+    project_src_dir: pathlib.Path,
+    framework_dir: pathlib.Path,
+    framework_obj_dir: pathlib.Path,
 ) -> NodeList:
     exe_name = exe_json["nameOnDisk"]
     exe_path = exe_json["paths"]["build"]
     lib_objects = compile_source_files(exe_json, default_env, project_src_dir, framework_dir, framework_obj_dir)
 
-    print(f"Created build rule for " + str(pathlib.Path("$BUILD_DIR") / exe_path / exe_name))
+    print("Created build rule for " + str(pathlib.Path("$BUILD_DIR") / exe_path / exe_name))
 
     link_flags = extract_link_args(exe_json)
     link_libraries = extract_link_libraries(exe_json)
@@ -169,7 +174,9 @@ def build_executable(
     build_env = default_env.Clone()
     build_env.Append(_LIBFLAGS=link_flags)
 
-    return build_env.Program(target=str(pathlib.Path("$BUILD_DIR") / exe_path / exe_name), source=lib_objects, LIBS=link_libraries)
+    return build_env.Program(
+        target=str(pathlib.Path("$BUILD_DIR") / exe_path / exe_name), source=lib_objects, LIBS=link_libraries
+    )
 
 
 def _get_flags_for_compile_group(compile_group_json: dict) -> list[str]:

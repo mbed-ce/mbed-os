@@ -22,8 +22,12 @@ from platformio.proc import exec_command
 from SCons.Script import ARGUMENTS, DefaultEnvironment
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from SCons.Environment import Base as Environment
-    from SCons.Node import FS as SconsFS
+
+    # split_arg_string moved in click 8.2.0+ so make sure it has a type annotation
+    split_arg_string = typing.cast(Callable[[str], list[str]], split_arg_string)
 
 env: Environment = DefaultEnvironment()
 platform = env.PioPlatform()
@@ -52,13 +56,14 @@ CMAKE_PATH = pathlib.Path(platform.get_package_dir("tool-cmake")) / "bin" / "cma
 sys.path.append(str(FRAMEWORK_DIR / "tools" / "python"))
 
 from mbed_platformio.cmake_to_scons_converter import (
+    build_executable,
     build_library,
     extract_defines,
     extract_flags,
     extract_includes,
     extract_link_args,
     extract_link_libraries,
-    find_included_files, build_executable,
+    find_included_files,
 )
 from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
 
@@ -210,7 +215,9 @@ def generate_project_ld_script() -> pathlib.Path:
     return next(BUILD_DIR.glob("*.link_script.ld"))
 
 
-def get_targets_by_type(target_configs: dict, target_types: list[str], ignore_targets: list[str] | None = None) -> list[dict[str, Any]]:
+def get_targets_by_type(
+    target_configs: dict, target_types: list[str], ignore_targets: list[str] | None = None
+) -> list[dict[str, Any]]:
     """
     Get the CMake exported JSON for all targets of the given type
     """
@@ -253,6 +260,7 @@ def build_targets(env: Environment, targets_map: dict[str, Any], project_src_dir
 def get_app_defines(app_config: dict) -> list[tuple[str, str]]:
     return extract_defines(app_config["compileGroups"][0])
 
+
 def rp2xxx_bootloader_custom_commands(env: Environment, framework_targets_map: dict[str, Any]) -> None:
     """
     Custom logic for generated bootloader source file for RP2xxx.
@@ -260,7 +268,6 @@ def rp2xxx_bootloader_custom_commands(env: Environment, framework_targets_map: d
     Sadly this is needed because CMake does not export custom commands in any way, shape, or form via the API.
     So, we have to replicate the custom command logic here.
     """
-
     if "mbed-mcu-rp2-boot-stage-2" not in framework_targets_map:
         # Not rp2xxx
         return
@@ -271,26 +278,33 @@ def rp2xxx_bootloader_custom_commands(env: Environment, framework_targets_map: d
         if source.get("isGenerated", False) and source_path.name == "mbed-mcu-rp2-boot-stage-2_padded_checksummed.S":
             generated_src_file = "$BUILD_DIR" / source_path.relative_to(BUILD_DIR)
     if generated_src_file is None:
-        raise RuntimeError("Failed to find generated bootloader source file in source list")
+        msg = "Failed to find generated bootloader source file in source list"
+        raise RuntimeError(msg)
 
     # First generate bin file from elf
-    boot_stage_2_elf: SconsFS.File = env.GetBuildPath(framework_targets_map["mbed-mcu-rp2-boot-stage-2"]["exe"])[0]
+    boot_stage_2_elf = env.GetBuildPath(framework_targets_map["mbed-mcu-rp2-boot-stage-2"]["exe"])[0]
     boot_stage_2_bin = pathlib.Path(boot_stage_2_elf).with_suffix(".bin")
-    env.Command(target=str(boot_stage_2_bin),
-                source=boot_stage_2_elf,
-                action=f"$OBJCOPY -O binary {boot_stage_2_elf} {boot_stage_2_bin!s}")
+    env.Command(
+        target=str(boot_stage_2_bin),
+        source=boot_stage_2_elf,
+        action=f"$OBJCOPY -O binary {boot_stage_2_elf} {boot_stage_2_bin!s}",
+    )
 
     # Now use the appropriate script to generate the ASM source file containing the padded and checksummed contents
     # of the source file. There are two versions of the script, one for RP2040 and one for RP2350+, so we need to figure
     # out which to use.
-    use_rp2040_script = "pico-sdk/src/rp2040/boot_stage2" in framework_targets_map["mbed-mcu-rp2-boot-stage-2"]["config"]["sources"][0]["path"]
+    use_rp2040_script = (
+        "pico-sdk/src/rp2040/boot_stage2"
+        in framework_targets_map["mbed-mcu-rp2-boot-stage-2"]["config"]["sources"][0]["path"]
+    )
     script_path = f"{FRAMEWORK_DIR}/targets/TARGET_RASPBERRYPI/pico-sdk/src/{'rp2040' if use_rp2040_script else 'rp2350'}/boot_stage2/pad_checksum"
 
     env.Command(
         target=generated_src_file,
         source=str(boot_stage_2_bin),
-        action=f"{sys.executable} {script_path} -s 0xffffffff {boot_stage_2_bin!s} {generated_src_file}"
+        action=f"{sys.executable} {script_path} -s 0xffffffff {boot_stage_2_bin!s} {generated_src_file}",
     )
+
 
 ## CMake configuration -------------------------------------------------------------------------------------------------
 
@@ -324,7 +338,9 @@ target_configs = load_target_configurations(project_codemodel)
 
 # Scan targets information from CMake. Note that we DO want to load executable targets as they can
 # be used as intermediary steps during the build, but we do NOT want to load the final executable target here.
-framework_targets_map = get_targets_map(target_configs, ["STATIC_LIBRARY", "OBJECT_LIBRARY", "EXECUTABLE"], ["PIODummyExecutable"])
+framework_targets_map = get_targets_map(
+    target_configs, ["STATIC_LIBRARY", "OBJECT_LIBRARY", "EXECUTABLE"], ["PIODummyExecutable"]
+)
 
 ## Convert targets & flags from CMake to SCons -------------------------------------------------------------------------
 
