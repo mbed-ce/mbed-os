@@ -29,4 +29,6 @@ PIO_VARIANT_TO_MBED_TARGET = {
     "sparkfun_thingplusrp2040": "SFE_THING_PLUS_RP2040",
     "rpipico2": "RASPBERRY_PI_PICO_2",
     "olimex_pico2xl": "OLIMEX_RP2350_PICO2_XL",
+    "teensy40": "TEENSY_40",
+    "teensy41": "TEENSY_41"
 }
