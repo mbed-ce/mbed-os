@@ -8436,6 +8436,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "PICO_ON_DEVICE=1",
             "PICO_NO_HARDWARE=0",
             "PICO_32BIT=1",
+            "MBED_MPU_HAS_RAM_FUNCTION_REGION",
 
             // Do not translate CRLF to LF in UART Pico SDK driver
             "PICO_UART_ENABLE_CRLF_SUPPORT=0"
@@ -8477,8 +8478,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "core": "Cortex-M33FE",
         "is_mcu_family_target": true,
         "macros_add": [
-            "PICO_RP2350=1",
-            "MBED_MPU_HAS_RAM_FUNCTION_REGION"
+            "PICO_RP2350=1"
         ],
         "device_has_add": [
             "LPTICKER"
