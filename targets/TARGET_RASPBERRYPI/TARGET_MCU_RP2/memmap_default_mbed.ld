@@ -200,15 +200,9 @@ SECTIONS
     __binary_info_end = .;
     . = ALIGN(4);
 
-    /* End of .text-like segments */
-    __etext = .;
-
-    .ram_vector_table (NOLOAD): {
-        *(.ram_vector_table)
-    } > RAM
-
-    .ram_code ALIGN(32) : {
-        __ram_function_start = .;
+    /* RAM code section. This gets put right at the start of RAM so it's very, very aligned. */
+    .ram_code : {
+        __ram_code_start = .;
         
         *(.time_critical*)
 
@@ -219,8 +213,38 @@ SECTIONS
          */
          *irq_handler_chain.S.o*(.data)
 
+         __ram_code_data_size = (. - __ram_code_start);
+
+#ifdef PICO_RP2040
+        /* For the Cortex-M0+ MPU configuration, we need to align the size of this section up to
+         * the next power of two. Also note that the MPU does not support regions
+         * smaller than 32 bytes so round up if smaller than that. */
+        __ram_code_aligned_size = MAX(32, 1 << LOG2CEIL(__ram_code_data_size));
+
+        . += (__ram_code_aligned_size - __ram_code_data_size);
+#else
+        /* For the Cortex-M33 MPU it's way easier. */
         . = ALIGN(32);
-        __ram_function_end = .;
+#endif
+        __ram_code_end = .;
+    } > RAM AT> FLASH
+
+    /* Symbols for Pico SDK */
+    __ram_text_source__ = LOADADDR(.ram_code);
+    __ram_text_start__ = __ram_code_start;
+    __ram_text_end__ = __ram_code_start + __ram_code_data_size;
+
+    /*
+     * RAM vector table. Per the docs: https://developer.arm.com/documentation/ddi0403/d/System-Level-Architecture/System-Level-Programmers--Model/ARMv7-M-exception-model/The-vector-table
+     * this must be aligned to (the next power of 2 larger than 4*the number of vectors) or (128), whichever is greater.
+     */
+#if PICO_RP2040
+#define VTABLE_ALIGN 128
+#else
+#define VTABLE_ALIGN 256
+#endif
+    .ram_vector_table BLOCK(VTABLE_ALIGN) (NOLOAD) : {
+        *(.ram_vector_table)
     } > RAM
 
     .data : {
@@ -250,6 +274,9 @@ SECTIONS
 
         __data_end__ = .;
     } > RAM AT> FLASH
+
+    /* End of .text-like segments */
+    __etext = LOADADDR(.data);
 
     .uninitialized_data (NOLOAD): {
         . = ALIGN(4);
