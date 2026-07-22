@@ -166,7 +166,7 @@ def build_executable(
     exe_path = exe_json["paths"]["build"]
     lib_objects = compile_source_files(exe_json, default_env, project_src_dir, framework_dir, framework_obj_dir)
 
-    print("Created build rule for " + str(pathlib.Path("$BUILD_DIR") / exe_path / exe_name))
+    # print("Created build rule for " + str(pathlib.Path("$BUILD_DIR") / exe_path / exe_name))
 
     link_flags = extract_link_args(exe_json)
     link_libraries = extract_link_libraries(exe_json)
