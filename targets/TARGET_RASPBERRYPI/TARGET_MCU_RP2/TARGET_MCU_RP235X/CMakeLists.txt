@@ -13,12 +13,5 @@ target_sources(mbed-mcu-rp235x
         reset_reason.c
 )
 
-if(MCU_RP235X IN_LIST MBED_TARGET_LABELS)
-    pico_compile_boot_stage2(
-        mbed-mcu-rp235x
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../pico-sdk/src/rp2350
-    )
-endif()
-
 add_subdirectory(TARGET_RASPBERRY_PI_PICO_2)
 add_subdirectory(TARGET_OLIMEX_RP2350_PICO2_XL)

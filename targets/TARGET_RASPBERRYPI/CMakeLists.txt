@@ -168,6 +168,21 @@ target_compile_definitions(mbed-mcu-rp2
 
 target_link_libraries(mbed-mcu-rp2 INTERFACE mbed-cmsis-cortex-m)
 
+# 2nd stage bootloader. Do this here to avoid paths containing ../.. references that trigger
+# path length issues on Windows
+include(${CMAKE_CURRENT_SOURCE_DIR}/pico_compile_boot_stage_2.cmake)
+if(MCU_RP2040 IN_LIST MBED_TARGET_LABELS)
+	pico_compile_boot_stage2(
+		mbed-mcu-rp2
+		${CMAKE_CURRENT_SOURCE_DIR}/pico-sdk/src/rp2040
+	)
+elseif(MCU_RP235X IN_LIST MBED_TARGET_LABELS)
+	pico_compile_boot_stage2(
+		mbed-mcu-rp2
+		${CMAKE_CURRENT_SOURCE_DIR}/pico-sdk/src/rp2350
+	)
+endif()
+
 # RP2040 SDK -----------------------------------------------------------------------------------------------------------
 
 target_include_directories(mbed-mcu-rp2040
@@ -304,5 +319,4 @@ pico_wrap_function(mbed-mcu-rp2040 fmaf)
 
 # Subdirs -----------------------------------------------------------------------------------------------------------
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/pico_compile_boot_stage_2.cmake)
 add_subdirectory(TARGET_MCU_RP2 EXCLUDE_FROM_ALL)

@@ -13,7 +13,9 @@
 #   to flash while the RP2040 is in USB bootloader mode (either because the BOOTSEL button was pressed, or
 #   because it has no valid code to boot up to) will result in incorrect data being written to flash.
 #   I filed a bug about this: https://github.com/pyocd/pyOCD/issues/1961
-# 2. OpenOCD will fail to flash with "Error: Unknown flash device (ID 0x00ffffff)" if the RP2040 has an invalid
+# 2. Also note that with PyOCD, resetting the chip seems to render the debug session unusable. You must
+#   disconnect and reconnect the debugger after resetting.
+# 3. OpenOCD will fail to flash with "Error: Unknown flash device (ID 0x00ffffff)" if the RP2040 has an invalid
 #   program. To get around this, either flash a valid program with picotool first, or boot into the bootloader
 #   using BOOTSEL.
 

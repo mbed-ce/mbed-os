@@ -12,13 +12,6 @@ target_include_directories(mbed-mcu-rp2040
         .
 )
 
-if(MCU_RP2040 IN_LIST MBED_TARGET_LABELS)
-    pico_compile_boot_stage2(
-        mbed-mcu-rp2040
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../pico-sdk/src/rp2040
-    )
-endif()
-
 add_subdirectory(TARGET_RASPBERRY_PI_PICO)
 add_subdirectory(TARGET_RASPBERRY_PI_PICO_W)
 add_subdirectory(TARGET_SFE_THING_PLUS_RP2040)
