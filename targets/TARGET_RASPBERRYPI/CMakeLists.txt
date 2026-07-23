@@ -153,6 +153,9 @@ target_compile_definitions(mbed-mcu-rp2
 		LIB_CMSIS_CORE
 		PICO_CMSIS_RENAME_EXCEPTIONS
 
+		# Copy .ram_code section at startup
+		PICO_COPY_TO_RAM
+
 		# Don't automatically register init stuff as global constructors. We call these manually in mbed_sdk_init()
 		PICO_RUNTIME_SKIP_INIT_BOOTROM_RESET
 		PICO_RUNTIME_SKIP_INIT_PER_CORE_BOOTROM_RESET

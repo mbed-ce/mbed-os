@@ -49,8 +49,8 @@ extern uint8_t __noncached_end[];
 // Symbols defined in linker script for ram function region.
 // This region may be contained inside any other RAM region. Its start address and size must
 // be 32-byte aligned.
-extern uint8_t __ram_function_start[];
-extern uint8_t __ram_function_end[];
+extern uint8_t __ram_code_start[];
+extern uint8_t __ram_code_end[];
 #endif
 
 static_assert(MBED_MPU_ROM_END <= 0x20000000 - 1,
@@ -167,6 +167,7 @@ void mbed_mpu_init()
     );
 
     uint8_t next_ram_region = LAST_RAM_REGION + 1;
+    (void)next_ram_region; // silence unused warning
 
 #if __DCACHE_PRESENT
     // Region addresses must be 32-byte aligned.
@@ -191,20 +192,20 @@ void mbed_mpu_init()
 
 #if MBED_MPU_HAS_RAM_FUNCTION_REGION
     // Region addresses must be 32-byte aligned.
-    MBED_ASSERT(((uintptr_t)__ram_function_start) % 32 == 0);
-    MBED_ASSERT(((uintptr_t)__ram_function_end) % 32 == 0);
+    MBED_ASSERT(((uintptr_t)__ram_code_start) % 32 == 0);
+    MBED_ASSERT(((uintptr_t)__ram_code_end) % 32 == 0);
 
     // Select region 4/5/6 and use it for the non-cached region
     ARM_MPU_SetRegion(
         next_ram_region,
         ARM_MPU_RBAR(
-            (uintptr_t)__ram_function_start, // Base
+            (uintptr_t)__ram_code_start, // Base
             ARM_MPU_SH_NON,                  // Sharability
             0,                               // Read-Write
             1,                               // Non-privileged
             0),                              // Execute Never disabled
         ARM_MPU_RLAR(
-            (uintptr_t)__ram_function_end - 1,     // Limit
+            (uintptr_t)__ram_code_end - 1,     // Limit
             MBED_MPU_ATTR_INDEX_NORMAL_WRITE_THROUGH)
     );
 #endif

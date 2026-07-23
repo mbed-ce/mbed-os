@@ -25,6 +25,7 @@
 #include "mbed_mktime.h"
 #include "mbed_wait_api.h"
 
+
 void rtc_init(void)
 {
     core_util_critical_section_enter();
@@ -36,6 +37,14 @@ void rtc_init(void)
     {
         pico_sdk_rtc_init();
         rtc_initted = true;
+
+        // RP2040 RTC does not keep time across resets, so we always need to set the time.
+        // The docs are a bit limited, but it appears this is needed so that the RTC shows as running.
+        datetime_t initTime = {};
+        initTime.year = 1970;
+        initTime.month = 1;
+        initTime.day = 1;
+        rtc_set_datetime(&initTime);
     }
 
     core_util_critical_section_exit();

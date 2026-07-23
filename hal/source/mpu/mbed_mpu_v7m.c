@@ -34,6 +34,15 @@ extern uint8_t __noncached_start[];
 extern uint8_t __noncached_end[];
 #endif
 
+#ifdef MBED_MPU_HAS_RAM_FUNCTION_REGION
+// Symbols defined in linker script for ram function region.
+// This region may be contained inside any other RAM region. Its start address and size must
+// be 32-byte aligned.
+extern uint8_t __ram_code_start[];
+extern uint8_t __ram_code_end[];
+#endif
+
+
 static_assert(
     MBED_MPU_ROM_END == 0x04000000 - 1 ||
     MBED_MPU_ROM_END == 0x08000000 - 1 ||
@@ -176,6 +185,9 @@ void mbed_mpu_init()
             ARM_MPU_REGION_SIZE_512MB)  // Size
     );
 
+    uint8_t next_ram_region = LAST_RAM_REGION + 1;
+    (void)next_ram_region; // silence unused warning
+
 #if __DCACHE_PRESENT
     ptrdiff_t noncached_region_size = __noncached_end - __noncached_start;
     if (noncached_region_size > 0) {
@@ -189,7 +201,7 @@ void mbed_mpu_init()
         // Select region 3/4 and use it for the non-cached region
         ARM_MPU_SetRegion(
             ARM_MPU_RBAR(
-                LAST_RAM_REGION + 1,             // Region
+                next_ram_region,                 // Region
                 ((uintptr_t)__noncached_start)), // Base
             ARM_MPU_RASR_EX(
                 1,                          // DisableExec
@@ -198,6 +210,35 @@ void mbed_mpu_init()
                 0U,                         // SubRegionDisable
                 region_size)                // Size
         );
+        ++next_ram_region;
+    }
+#endif
+
+#if MBED_MPU_HAS_RAM_FUNCTION_REGION
+    ptrdiff_t ram_code_region_size = __ram_code_end - __ram_code_start;
+    if (ram_code_region_size > 0) {
+        // Check configuration from linker script
+        MBED_ASSERT(mbed_is_power_of_two(ram_code_region_size));
+        MBED_ASSERT(((uintptr_t)__ram_code_start) % ram_code_region_size == 0);
+
+        // Region size constant is the log2 of the region size, offset by 1
+        const uint32_t region_size = mbed_integer_log_2(ram_code_region_size) - 1;
+
+        // Select region 3/4/5 and use it for the ram code region.
+        // Note that some target layers, like the RPi Pico SDK, actually modify the code in this section
+        // at runtime (e.g. for interrupt handler redirection). So, we cannot mark it read-only.
+        ARM_MPU_SetRegion(
+            ARM_MPU_RBAR(
+                next_ram_region,                 // Region
+                ((uintptr_t)__ram_code_start)),  // Base
+            ARM_MPU_RASR_EX(
+                0,                          // DisableExec
+                ARM_MPU_AP_FULL,            // AccessPermission
+                ARM_MPU_ACCESS_NORMAL(ARM_MPU_CACHEP_WB_WRA, ARM_MPU_CACHEP_WB_WRA, false), // Access and cache policy
+                0U,                         // SubRegionDisable
+                region_size)                // Size
+        );
+        ++next_ram_region;
     }
 #endif
 
