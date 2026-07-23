@@ -87,7 +87,7 @@ SECTIONS
         /* For the MPU configuration, we need to align the size of this section up to
          * the next power of two. Also note that the MPU does not support regions
          * smaller than 32 bytes so round up if smaller than that. */
-        __noncached_data_size = (. - __noncached_start);
+        __noncached_data_size = ABSOLUTE(. - __noncached_start);
         __noncached_aligned_size = MAX(32, 1 << LOG2CEIL(__noncached_data_size));
 
         . += (__noncached_aligned_size - __noncached_data_size);

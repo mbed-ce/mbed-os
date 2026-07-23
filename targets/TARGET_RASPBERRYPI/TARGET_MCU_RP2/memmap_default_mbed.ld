@@ -213,7 +213,7 @@ SECTIONS
          */
          *irq_handler_chain.S.o*(.data)
 
-         __ram_code_data_size = (. - __ram_code_start);
+         __ram_code_data_size = ABSOLUTE(. - __ram_code_start);
 
 #ifdef PICO_RP2040
         /* For the Cortex-M0+ MPU configuration, we need to align the size of this section up to
@@ -237,13 +237,10 @@ SECTIONS
     /*
      * RAM vector table. Per the docs: https://developer.arm.com/documentation/ddi0403/d/System-Level-Architecture/System-Level-Programmers--Model/ARMv7-M-exception-model/The-vector-table
      * this must be aligned to (the next power of 2 larger than 4*the number of vectors) or (128), whichever is greater.
+     * Oddly, though, RP2040 appears to crash if the vector table is not 256 byte aligned, even though it should only need 128 byte alignment.
+     * Not sure what's up with that but oh well.
      */
-#if PICO_RP2040
-#define VTABLE_ALIGN 128
-#else
-#define VTABLE_ALIGN 256
-#endif
-    .ram_vector_table BLOCK(VTABLE_ALIGN) (NOLOAD) : {
+    .ram_vector_table BLOCK(256) (NOLOAD) : {
         *(.ram_vector_table)
     } > RAM
 
