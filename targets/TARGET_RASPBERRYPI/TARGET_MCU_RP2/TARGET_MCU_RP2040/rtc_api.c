@@ -25,7 +25,6 @@
 #include "mbed_mktime.h"
 #include "mbed_wait_api.h"
 
-static bool rtc_initted = false;
 
 void rtc_init(void)
 {
@@ -33,6 +32,7 @@ void rtc_init(void)
 
     // Calling _rtc_init() resets the current time.
     // So, if the RTC has already been initialized, we don't want to initialize it again.
+    static bool rtc_initted = false;
     if(!rtc_initted)
     {
         pico_sdk_rtc_init();
