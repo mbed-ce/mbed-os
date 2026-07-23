@@ -329,24 +329,24 @@ utest::v1::status_t testsuite_setup(const size_t number_of_cases)
 
 Case cases[] = {
     Case("deep sleep lock/unlock",
-    (utest::v1::case_setup_handler_t) testcase_setup,
-    test_lock_unlock,
-    (utest::v1::case_teardown_handler_t) testcase_teardown),
+         (utest::v1::case_setup_handler_t) testcase_setup,
+         test_lock_unlock,
+         (utest::v1::case_teardown_handler_t) testcase_teardown),
     Case("deep sleep locked USHRT_MAX times",
-    (utest::v1::case_setup_handler_t) testcase_setup,
-    test_lock_eq_ushrt_max,
-    (utest::v1::case_teardown_handler_t) testcase_teardown),
+         (utest::v1::case_setup_handler_t) testcase_setup,
+         test_lock_eq_ushrt_max,
+         (utest::v1::case_teardown_handler_t) testcase_teardown),
 #if DEVICE_LPTICKER
 #if DEVICE_USTICKER
     Case("sleep_auto calls sleep/deep sleep based on lock",
-    (utest::v1::case_setup_handler_t) testcase_setup,
-    test_sleep_auto,
-    (utest::v1::case_teardown_handler_t) testcase_teardown),
+         (utest::v1::case_setup_handler_t) testcase_setup,
+         test_sleep_auto,
+         (utest::v1::case_teardown_handler_t) testcase_teardown),
 #endif
     Case("deep sleep lock/unlock test_check",
-    (utest::v1::case_setup_handler_t) testcase_setup,
-    test_lock_unlock_test_check,
-    (utest::v1::case_teardown_handler_t) testcase_teardown)
+         (utest::v1::case_setup_handler_t) testcase_setup,
+         test_lock_unlock_test_check,
+         (utest::v1::case_teardown_handler_t) testcase_teardown)
 #endif
 };
 
