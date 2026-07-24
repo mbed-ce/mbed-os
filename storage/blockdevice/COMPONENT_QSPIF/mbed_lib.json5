@@ -60,6 +60,10 @@
             // The flash on this board (AT25SF128A) is quite old and does not have reset information in its
             // SFDP table.
             "enable-and-reset": true
+        },
+        "ARDUINO_OPTA": {
+            "qspi-polarity-mode": "QSPIF_POLARITY_MODE_1",
+            "enable-and-reset": true
         }
     }
 }
