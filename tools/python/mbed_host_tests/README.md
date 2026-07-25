@@ -501,8 +501,8 @@ int main() {
 
 ```python
 class GimmeAuto(BaseHostTest):
-    """ Simple, basic host test's test runner waiting for serial port
-        output from MUT, no supervision over test running in MUT is executed.
+    """Simple, basic host test's test runner waiting for serial port
+    output from MUT, no supervision over test running in MUT is executed.
     """
 
     __result = None
@@ -513,10 +513,10 @@ class GimmeAuto(BaseHostTest):
 
         # We will send DUT some data back...
         # And now decide about test case result
-        if value == 'some_stuff':
+        if value == "some_stuff":
             # Message payload/value was 'some_stuff'
             # We can for example return true from test
-            self.send_kv("print_this", "This is what I wanted %s"% value)
+            self.send_kv("print_this", "This is what I wanted %s" % value)
             self.notify_complete(True)
         else:
             self.send_kv("print_this", "This not what I wanted :(")
@@ -602,8 +602,8 @@ mbedgt: test suite results: 1 OK
 
 ```python
 class GimmeAuto(BaseHostTest):
-    """ Simple, basic host test's test runner waiting for serial port
-        output from MUT, no supervision over test running in MUT is executed.
+    """Simple, basic host test's test runner waiting for serial port
+    output from MUT, no supervision over test running in MUT is executed.
     """
 
     __result = None
@@ -614,10 +614,10 @@ class GimmeAuto(BaseHostTest):
 
         # We will send DUT some data back...
         # And now decide about test case result
-        if value == 'some_stuff':
+        if value == "some_stuff":
             # Message payload/value was 'some_stuff'
             # We can for example return true from test
-            self.send_kv("print_this", "This is what I wanted %s"% value)
+            self.send_kv("print_this", "This is what I wanted %s" % value)
             self.__result = True
         else:
             self.send_kv("print_this", "This not what I wanted :(")
@@ -770,11 +770,11 @@ int app_start(int, char*[]) {
 ```python
 from mbed_host_tests import BaseHostTest
 
+
 class YourCustomHostTest(BaseHostTest):
+    name = "my_host_test"  # Host test names used by GREENTEA_CLIENT(..., host_test_name)
 
-    name = "my_host_test"   # Host test names used by GREENTEA_CLIENT(..., host_test_name)
-
-    __result = False    # Result in case of timeout!
+    __result = False  # Result in case of timeout!
 
     def _callback_for_event(self, key, value, timestamp):
         #
@@ -891,8 +891,8 @@ You can register callbacks in ```setup()``` phase or decorate callback functions
 ```python
 from mbed_host_tests import BaseHostTest
 
-class DetectRuntimeError(BaseHostTest):
 
+class DetectRuntimeError(BaseHostTest):
     __result = False
 
     def callback_some_event(self, key, value, timeout):
@@ -901,7 +901,7 @@ class DetectRuntimeError(BaseHostTest):
 
     def setup(self):
         # Reagister call back for 'some_event' event
-        self.register_callback('some_event', self.callback_some_event)
+        self.register_callback("some_event", self.callback_some_event)
 
     def result(self):
         # Do some return calculations
@@ -915,11 +915,11 @@ Below the same callback registered using decorator:
 ```python
 from mbed_host_tests.host_tests import BaseHostTest, event_callback
 
-class DetectRuntimeError(BaseHostTest):
 
+class DetectRuntimeError(BaseHostTest):
     __result = False
 
-    @event_callback('some_event')
+    @event_callback("some_event")
     def callback_some_event(self, key, value, timeout):
         # Do something with 'some_event'
         pass
@@ -944,9 +944,9 @@ We will use allowed to override ```__rxd_line``` event to hook to DUT RXD channe
 from sys import stdout
 from mbed_host_tests import BaseHostTest
 
-class DetectRuntimeError(BaseHostTest):
 
-    name = 'detect_runtime_error'
+class DetectRuntimeError(BaseHostTest):
+    name = "detect_runtime_error"
 
     def test(self, selftest):
         result = selftest.RESULT_FAILURE
@@ -978,8 +978,9 @@ class DetectRuntimeError(BaseHostTest):
 ```python
 from mbed_host_tests import BaseHostTest
 
+
 class DetectRuntimeError(BaseHostTest):
-    """! We _expect_ to detect 'Runtime error' """
+    """! We _expect_ to detect 'Runtime error'"""
 
     __result = False
 
@@ -994,7 +995,7 @@ class DetectRuntimeError(BaseHostTest):
 
     def setup(self):
         # Force, we force callback registration even it is a restricted one (starts with '__')
-        self.register_callback('__rxd_line', self.callback__rxd_line, force=True)
+        self.register_callback("__rxd_line", self.callback__rxd_line, force=True)
 
     def result(self):
         # We will return here (False) when we reach timeout of the test
