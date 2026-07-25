@@ -112,6 +112,7 @@ struct i2c_s {
 
 struct spi_s {
     spi_inst_t * dev;
+    uint8_t bits; // Bits per word, usually 8 or 16
 };
 
 struct pwmout_s

@@ -40,15 +40,17 @@
 #endif
 
 #ifdef __DCACHE_PRESENT
-// Symbols defined in linker script for noncache region
+// Symbols defined in linker script for noncache region.
+// The region's size does not need to be a power of 2, but its size and address need to be
+// 32-byte aligned. It must either be after the end of normal RAM, or before the start.
 extern uint8_t __noncached_start[];
 extern uint8_t __noncached_end[];
 #endif
 
 #ifdef MBED_MPU_HAS_RAM_FUNCTION_REGION
 // Symbols defined in linker script for ram function region.
-// This region may be contained inside any other RAM region. Its start address and size must
-// be 32-byte aligned.
+// The region's size does not need to be a power of 2, but its size and address need to be
+// 32-byte aligned. It must either be after the end of normal RAM, or before the start.
 extern uint8_t __ram_code_start[];
 extern uint8_t __ram_code_end[];
 #endif
@@ -109,34 +111,46 @@ void mbed_mpu_init()
             MBED_MPU_ATTR_INDEX_NORMAL_WRITE_THROUGH) // Attribute index - Write-Through, Read-allocate
     );
 
-#if MBED_MPU_RAM_START < 0x20000000
-    ARM_MPU_SetRegion(
-        4,                          // Region
-        ARM_MPU_RBAR(
-            MBED_MPU_RAM_START,     // Base
-            ARM_MPU_SH_NON,         // Non-shareable
-            0,                      // Read-Write
-            1,                      // Non-Privileged
-            1),                     // Execute Never enabled
-        ARM_MPU_RLAR(
-            0x1FFFFFFF,             // Limit
-            MBED_MPU_ATTR_INDEX_NORMAL_WRITE_THROUGH) // Attribute index - Write-Through, Read-allocate
-    );
-#define LAST_RAM_REGION 4
-#else
-#define LAST_RAM_REGION 3
+    // MBED_MPU_RAM_START contains the start of the physical RAM address range on the chip.
+    // However, because MPU regions cannot overlap, we may need to adjust the RAM region addresses
+    // to account for the noncached and ram_code regions.
+    uintptr_t sram_region_start = MBED_MPU_RAM_START;
+    uintptr_t sram_region_limit = 0x3FFFFFFF;
+#if __DCACHE_PRESENT
+    if (((uintptr_t)__noncached_end <= sram_region_start) || ((uintptr_t)__noncached_start > sram_region_limit)) {
+        // OK - noncached region outside normal SRAM
+    } else if ((uintptr_t)__noncached_start == sram_region_start) {
+        // OK - noncached region at start of SRAM. Move sram start back.
+        sram_region_start = (uintptr_t)__noncached_end;
+    } else {
+        // Assume noncached region at end of SRAM.
+        sram_region_limit = (uintptr_t)__noncached_start - 1;
+    }
 #endif
+#if MBED_MPU_HAS_RAM_FUNCTION_REGION
+    if (((uintptr_t)__ram_code_end <= sram_region_start) || ((uintptr_t)__ram_code_start > sram_region_limit)) {
+        // OK - ram_code region outside normal SRAM
+    } else if ((uintptr_t)__ram_code_start == sram_region_start) {
+        // OK - ram_code region at start of SRAM. Move sram start back.
+        sram_region_start = (uintptr_t)__ram_code_end;
+    } else {
+        // Assume ram_code region at end of SRAM.
+        sram_region_limit = (uintptr_t)__ram_code_start - 1;
+    }
+#endif
+
+#define LAST_RAM_REGION 3
 
     ARM_MPU_SetRegion(
         1,                          // Region
         ARM_MPU_RBAR(
-            0x20000000,             // Base
+            sram_region_start,      // Base
             ARM_MPU_SH_NON,         // Non-shareable
             0,                      // Read-Write
             1,                      // Non-Privileged
             1),                     // Execute Never enabled
         ARM_MPU_RLAR(
-            0x3FFFFFFF,             // Limit
+            sram_region_limit,      // Limit
             MBED_MPU_ATTR_INDEX_NORMAL_WRITE_BACK) // Attribute index - Write-Back, Write-allocate
     );
 
@@ -174,7 +188,7 @@ void mbed_mpu_init()
     MBED_ASSERT(((uintptr_t)__noncached_start) % 32 == 0);
     MBED_ASSERT(((uintptr_t)__noncached_end) % 32 == 0);
 
-    // Select region 4/5 and use it for the non-cached region
+    // Select region 4 and use it for the non-cached region
     ARM_MPU_SetRegion(
         next_ram_region,
         ARM_MPU_RBAR(
@@ -195,7 +209,7 @@ void mbed_mpu_init()
     MBED_ASSERT(((uintptr_t)__ram_code_start) % 32 == 0);
     MBED_ASSERT(((uintptr_t)__ram_code_end) % 32 == 0);
 
-    // Select region 4/5/6 and use it for the non-cached region
+    // Select region 4/5 and use it for the non-cached region
     ARM_MPU_SetRegion(
         next_ram_region,
         ARM_MPU_RBAR(

@@ -22,7 +22,7 @@ A message that notes the main changes in the update.
 - Added a new global, `mbed_used_mpu_regions`, which gives the number of MPU regions used by Mbed. This is intended to allow applications to also use the MPU without creating breakages in the future if Mbed uses additional MPU regions.
 - Added new header, `mbed_math_helpers.h`, containing some useful math functions. Currently this contains `mbed_integer_log_2()` and `mbed_is_power_of_two()`
 - MPU configuration code gained the ability to create a noncached section and a ram function section (for code that has to be executed out of RAM). This RAM function section is an exception to the normal limitations on RAM execution.
-- MIMRT117x: Memory bank configuration is now supported in the linker script.
+- MIMXRT117x: Memory bank configuration is now supported in the linker script.
 - RP2xxx
   - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board with Mbed compared to the non-W version is limited).
   - `SFE_THING_PLUS_RP2040` board target added for the [SparkFun Thing Plus RP2040 board](https://www.sparkfun.com/sparkfun-thing-plus-rp2040.html)
@@ -30,6 +30,7 @@ A message that notes the main changes in the update.
   - Support for single-byte i2c operations implemented (allowing features like the I2C EEPROM block device to work).
   - DEVICE_SLEEP support added, so RP2 chips can now go to sleep or deep sleep when not running any threads.
   - Per-device unique MAC addresses are now implemented, using the unique identifier built into the QSPI flash chip
+  - SPI driver now supports 16-bit word size
 - RP235x
   - RP235x target family added, containing two boards to start, `RASPBERRY_PI_PICO_2` and `OLIMEX_RP2350_PICO2_XL`
   - LP ticker support added using new POWMAN always-on timer peripheral
@@ -90,6 +91,7 @@ A message that notes the main changes in the update.
     more bytes than expected
   - Fixed issue where reading from an I2C master in slave mode could hang forever if the master ends the transaction early
   - Fixed issue where writing to an I2C master in slave mode would always return success regardless of success/failure
+  - Fixed assert failure when calling SPI::write() with a zero-length Tx or Rx buffer
 - Fixed issue where if the same setting was overridden in multiple different `target_override` blocks in mbed_app.json, only one of the overrides would be processed
 
 ### Removed

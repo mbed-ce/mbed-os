@@ -93,6 +93,7 @@ void spi_format(spi_t *obj, int bits, int mode, int slave)
 
     /* Configure the SPI. */
     spi_set_format(obj->dev, bits, SPI_MODE[mode].cpol, SPI_MODE[mode].cpha, SPI_MSB_FIRST);
+    obj->bits = bits;
     /* Set's the SPI up as slave if the value of slave is different from 0, e.g. a value of 1 or -1 set's this SPI up as a slave. */
     spi_set_slave(obj->dev, slave != 0);
 }
@@ -104,18 +105,55 @@ void spi_frequency(spi_t *obj, int hz)
 
 int spi_master_write(spi_t *obj, int value)
 {
-    uint8_t rx;
-    uint8_t const tx = (uint8_t)value;
-    spi_write_read_blocking(obj->dev, &tx, &rx, sizeof(rx));
-    return rx;
+    // Logic based on spi_write_read_blocking() from pico SDK
+
+    while(!spi_is_writable(obj->dev)) {}
+
+    spi_get_hw(obj->dev)->dr = value;
+
+    while(!spi_is_readable(obj->dev)) {}
+
+    return spi_get_hw(obj->dev)->dr;
 }
 
 int spi_master_block_write(spi_t *obj, const char *tx_buffer, int tx_length, char *rx_buffer, int rx_length, char write_fill)
 {
     /* The pico-sdk API does not support different length SPI buffers. */
-    MBED_ASSERT(tx_length == rx_length);
-    /* Perform the SPI transfer. */
-    return spi_write_read_blocking(obj->dev, (const uint8_t *)tx_buffer, (uint8_t *)rx_buffer, (size_t)tx_length);
+    MBED_ASSERT(tx_length == rx_length || tx_length == 0 || rx_length == 0);
+
+    if(obj->bits >= 9)
+    {
+        // note: Pico SDK uses number of uint16_ts, Mbed uses bytes, so we need a factor of 2
+        if(tx_length == 0)
+        {
+            const uint16_t tx_fill = ((uint16_t)write_fill << 8) | write_fill;
+            return spi_read16_blocking(obj->dev, tx_fill, (uint16_t *)rx_buffer, rx_length / 2) * 2;
+        }
+        else if(rx_length == 0)
+        {
+            return spi_write16_blocking(obj->dev, (const uint16_t *)tx_buffer, tx_length / 2) * 2;
+        }
+        else
+        {
+            return spi_write16_read16_blocking(obj->dev, (const uint16_t *)tx_buffer, (uint16_t *)rx_buffer, tx_length / 2) * 2;
+        }
+    }
+    else // 8 bits or less
+    {
+        if(tx_length == 0)
+        {
+            return spi_read_blocking(obj->dev, write_fill, (uint8_t *)rx_buffer, rx_length);
+        }
+        else if(rx_length == 0)
+        {
+            return spi_write_blocking(obj->dev, (const uint8_t *)tx_buffer, tx_length);
+        }
+        else
+        {
+            return spi_write_read_blocking(obj->dev, (const uint8_t *)tx_buffer, (uint8_t *)rx_buffer, (size_t)tx_length);
+        }
+        
+    }
 }
 
 const PinMap *spi_master_mosi_pinmap()
