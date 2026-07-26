@@ -49,7 +49,10 @@
 #define __MPU_PRESENT             1       /*!< STM32L4XX provides an MPU                     */
 #define __NVIC_PRIO_BITS          4       /*!< STM32L4XX uses 4 Bits for the Priority Levels */
 #define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used  */
+
+#ifndef __FPU_PRESENT
 #define __FPU_PRESENT             1       /*!< FPU present                                   */
+#endif
 
 /**
   * @}

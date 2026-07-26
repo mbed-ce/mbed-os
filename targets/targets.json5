@@ -4031,6 +4031,36 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "NUCLEO_L496ZG"
         ],
     },
+    "MCU_STM32L4A6xG": {
+        "inherits": [
+            "MCU_STM32L4"
+        ],
+        "public": false,
+        "extra_labels_add": [
+            "STM32L4A6xG"
+        ],
+        "overrides": {
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+        },
+        "macros_add": [
+            "STM32L4A6xx",
+            "MBEDTLS_CONFIG_HW_SUPPORT",
+            "MBED_SPLIT_HEAP"
+        ]
+    },
+    "NUCLEO_L4A6ZG": {
+        "inherits": [
+            "MCU_STM32L4A6xG"
+        ],
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "device_has_add": [
+            "USBDEVICE"
+        ],
+        "device_name": "STM32L4A6ZGTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF266521.en.feature-description-include-personalized-no-cpn-medium.jpg"
+    },
     "MCU_STM32L4P5xG": {
         "inherits": [
             "MCU_STM32L4"
