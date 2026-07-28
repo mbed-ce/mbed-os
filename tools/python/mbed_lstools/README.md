@@ -226,7 +226,8 @@ As a normal function definition:
 
 ```python
 def filter_func(mbed):
-    return m['platform_name'] == 'K64F'
+    return m["platform_name"] == "K64F"
+
 
 mbeds.list_mbeds(filter_function=filter_func)
 ```
@@ -234,7 +235,7 @@ mbeds.list_mbeds(filter_function=filter_func)
 As a lambda function:
 
 ```python
-platforms = mbeds.list_mbeds(filter_function=lambda m: m['platform_name'] == 'K64F')
+platforms = mbeds.list_mbeds(filter_function=lambda m: m["platform_name"] == "K64F")
 ```
 
 #### `fs_interaction`

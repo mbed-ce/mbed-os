@@ -103,9 +103,9 @@ static MSTD_CONSTEXPR_OBJ_11 size_t mbed_used_mpu_regions =
     4
 #else
     3
-#endif
 #if MBED_MPU_RAM_START < 0x20000000
     + 1
+#endif
 #endif
 #if __DCACHE_PRESENT
     + 1

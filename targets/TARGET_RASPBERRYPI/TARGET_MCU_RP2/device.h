@@ -35,4 +35,16 @@
 #include "objects.h"
 #include "us_ticker_defines.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Provide flash end address from linker script for FlashIAP.h
+extern uint8_t __flash_binary_end[];
+#define FLASHIAP_APP_ROM_END_ADDR ((uint32_t)__flash_binary_end)
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
