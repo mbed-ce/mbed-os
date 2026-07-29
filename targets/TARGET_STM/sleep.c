@@ -182,6 +182,20 @@ __WEAK void hal_deepsleep(void)
 
     save_timer_ctx();
 
+    /* Stop mode stops HSI16 in hardware, and neither ForceOscOutofDeepSleep()
+     * nor SetSysClock() below re-enables it (both use an MSI-only oscillator
+     * mask). Any peripheral using HSI16 as its clock therefore loses that clock
+     * permanently after the first deep sleep. 
+     * This sets HSIASFS "HSI16 automatic start from Stop" before Stop entry when 
+     * HSI16 is on. So hardware restarts HSI16 in parallel with MSI during wake-up.*/
+#if defined(RCC_CR_HSIASFS)
+    if (READ_BIT(RCC->CR, RCC_CR_HSION) != 0U) {
+        SET_BIT(RCC->CR, RCC_CR_HSIASFS);
+    } else {
+        CLEAR_BIT(RCC->CR, RCC_CR_HSIASFS);
+    }
+#endif /* RCC_CR_HSIASFS */
+
     // Request to enter STOP mode with regulator in low power mode
     //PWR_CR1_LPMS_STOP2 -> STM32L4 ; PWR_LOWPOWERMODE_STOP2 -> STM32WL
 #if defined (PWR_CR1_LPMS_STOP2) || defined(PWR_LOWPOWERMODE_STOP2)
