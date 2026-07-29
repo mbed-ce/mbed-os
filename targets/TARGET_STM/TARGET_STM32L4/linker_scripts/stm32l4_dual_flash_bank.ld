@@ -181,14 +181,14 @@ SECTIONS
         _ebss = .;
     } > SRAM1
     
-    /* Placeholder for heap 0 space */
+    /* Heap 1: all remaining SRAM1 below the boot/ISR stack */
     .heap (COPY):
     {
         __end__ = .;
         end = __end__;
         __mbed_sbrk_start = .;
         *(.heap*)
-        . += (ORIGIN(SRAM1) + LENGTH(SRAM1) - .);
+        . = ORIGIN(SRAM1) + LENGTH(SRAM1) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
         __mbed_krbs_start = .;
         __HeapLimit = .;
     } > SRAM1
@@ -201,4 +201,7 @@ SECTIONS
 
     /* Check if bss exceeds SRAM1 */
     ASSERT(__bss_end__ < __StackLimit, "Size of static variables does not leave enough room for minimum stack size")
+
+    /* Check that the heap does not run into the boot/ISR stack */
+    ASSERT(__StackLimit >= __HeapLimit, "region SRAM1 overflowed with stack")
 }
