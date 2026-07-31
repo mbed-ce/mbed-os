@@ -49,6 +49,14 @@ prepend_code() {
         "$FILE"
 }
 
+prepend_file_code() {
+    CODE=$(IFS=""; printf "%s" "$*")
+    TEMP_FILE="${FILE}.tmp"
+    printf "%b" "$CODE" > "$TEMP_FILE"
+    cat "$FILE" >> "$TEMP_FILE"
+    mv "$TEMP_FILE" "$FILE"
+}
+
 # Add code after the matching line
 append_code() {
     MATCH_PATTERN="$1"
@@ -127,6 +135,7 @@ conf unset MBEDTLS_SSL_PROTO_TLS1_1
 conf unset MBEDTLS_SSL_TRUNCATED_HMAC
 
 conf unset MBEDTLS_PLATFORM_TIME_TYPE_MACRO
+conf set MBEDTLS_PLATFORM_MS_TIME_ALT
 
 # potentially save flash space by not enabling self-tests by default
 conf unset MBEDTLS_SELF_TEST
@@ -141,20 +150,20 @@ conf set MBEDTLS_MPI_MAX_SIZE     512
 # FEATURE_PSA flag in Mbed OS
 conf unset MBEDTLS_USE_PSA_CRYPTO
 
-# add an #ifndef to include config-no-entropy.h when the target does not have
-# an entropy source we can use.
-append_code                                                                                       \
-    "#ifndef MBEDTLS_CONFIG_H\n"                                                                  \
+# Select config-no-entropy.h when the target does not have an entropy source.
+# Mbed TLS 3.x configuration headers no longer have their own include guard,
+# so insert the selection block before the first configuration section and
+# close it at the end of the file.
+prepend_file_code                                                                                 \
+    "#include \"platform/inc/platform_mbed.h\"\n"                                                \
     "\n"                                                                                          \
-    "#include \"platform\/inc\/platform_mbed.h\"\n"                                               \
-    "\n"                                                                                          \
-    "\/*\n"                                                                                       \
+    "/*\n"                                                                                        \
     " * Only use features that do not require an entropy source when\n"                           \
     " * DEVICE_ENTROPY_SOURCE is not defined in mbed OS.\n"                                       \
-    " *\/\n"                                                                                      \
+    " */\n"                                                                                        \
     "#if !defined(MBEDTLS_ENTROPY_HARDWARE_ALT) && !defined(MBEDTLS_TEST_NULL_ENTROPY) && \\\\\n" \
     "    !defined(MBEDTLS_ENTROPY_NV_SEED)\n"                                                     \
-    "#include \"mbedtls\/config-no-entropy.h\"\n"                                                 \
+    "#include \"mbedtls/config-no-entropy.h\"\n"                                                  \
     "\n"                                                                                          \
     "#if defined(MBEDTLS_USER_CONFIG_FILE)\n"                                                     \
     "#include MBEDTLS_USER_CONFIG_FILE\n"                                                         \
@@ -162,8 +171,8 @@ append_code                                                                     
     "\n"                                                                                          \
     "#else\n"
 
-prepend_code                                                                                                   \
-    "#endif \/\* MBEDTLS_CONFIG_H \*\/"                                                                        \
+append_code                                                                                                    \
+    "\/\*\* \\\\} name SECTION: Module configuration options \*\/"                                         \
     "\n"                                                                                                       \
     "#endif \/* !MBEDTLS_ENTROPY_HARDWARE_ALT && !MBEDTLS_TEST_NULL_ENTROPY && !MBEDTLS_ENTROPY_NV_SEED *\/\n" \
     "\n"                                                                                                       \
