@@ -53,3 +53,4 @@ conf unset MBEDTLS_CIPHER_MODE_XTS
 
 # potentially save flash space by not enabling self-tests by default
 conf unset MBEDTLS_SELF_TEST
+conf set MBEDTLS_PLATFORM_MS_TIME_ALT
