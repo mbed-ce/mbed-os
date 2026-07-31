@@ -188,11 +188,37 @@ void test_case_realloc_size()
     TEST_ASSERT_EQUAL_UINT32(stats_start.current_size, stats_current.current_size);
 }
 
+void test_case_realloc_zero()
+{
+    mbed_stats_heap_t stats_start;
+    mbed_stats_heap_t stats_allocated;
+    mbed_stats_heap_t stats_current;
+
+    mbed_stats_heap_get(&stats_start);
+
+    void *data = malloc(ALLOCATION_SIZE_DEFAULT);
+    TEST_ASSERT_NOT_NULL(data);
+    mbed_stats_heap_get(&stats_allocated);
+    TEST_ASSERT_EQUAL_UINT32(stats_start.current_size + ALLOCATION_SIZE_DEFAULT, stats_allocated.current_size);
+    TEST_ASSERT_EQUAL_UINT32(stats_start.alloc_cnt + 1, stats_allocated.alloc_cnt);
+
+    data = realloc(data, 0);
+    TEST_ASSERT_NULL(data);
+
+    mbed_stats_heap_get(&stats_current);
+    TEST_ASSERT_EQUAL_UINT32(stats_start.current_size, stats_current.current_size);
+    TEST_ASSERT_EQUAL_UINT32(stats_start.alloc_cnt, stats_current.alloc_cnt);
+    TEST_ASSERT_EQUAL_UINT32(stats_start.overhead_size, stats_current.overhead_size);
+    TEST_ASSERT_EQUAL_UINT32(stats_allocated.total_size, stats_current.total_size);
+    TEST_ASSERT_EQUAL_UINT32(stats_start.alloc_fail_cnt, stats_current.alloc_fail_cnt);
+}
+
 Case cases[] = {
     Case("malloc and free size", test_case_malloc_free_size),
     Case("allocate size zero", test_case_allocate_zero),
     Case("allocation failure", test_case_allocate_fail),
     Case("realloc size", test_case_realloc_size),
+    Case("realloc size zero", test_case_realloc_zero),
 };
 
 utest::v1::status_t greentea_test_setup(const size_t number_of_cases)

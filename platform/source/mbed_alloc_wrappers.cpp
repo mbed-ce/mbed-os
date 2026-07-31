@@ -164,8 +164,11 @@ extern "C" void *__wrap__realloc_r(struct _reent *r, void *ptr, size_t size)
         old_size = alloc_info->size;
     }
 
-    // Allocate space
-    if (size != 0) {
+    // A zero-sized reallocation frees the original allocation.
+    if (size == 0) {
+        free(ptr);
+    } else {
+        // Allocate space
         new_ptr = malloc(size);
     }
 

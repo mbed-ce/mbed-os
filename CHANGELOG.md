@@ -79,6 +79,7 @@ A message that notes the main changes in the update.
 ### Deprecated
 
 ### Fixed
+- Fixed `realloc(ptr, 0)` leaking the original allocation when heap statistics are enabled
 - Added fixes aimed at improving Greentea stability for KV/FlashIAP (STM32F7) and USBSerial paths.
 - MIMXRT105x:
   - MIMXRT1050_EVK: Fixed build error due to typos
