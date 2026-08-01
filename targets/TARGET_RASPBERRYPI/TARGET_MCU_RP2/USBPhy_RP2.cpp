@@ -68,6 +68,7 @@ void USBPhyHw::init(USBPhyEvents *events)
 {
     this->events = events;
     this->new_addr = 0;
+    this->open_endpoints = 0;
     instance = this;
 
     // Disable IRQ
@@ -290,9 +291,12 @@ bool USBPhyHw::endpoint_add(usb_ep_t endpoint, uint32_t max_packet, usb_ep_type_
             (this->dpram_buffer_free_ptr + 0x180);
 
         this->dpram_buffer_free_ptr += (max_packet + 63) & ~63;
+        ++open_endpoints;
+        mbed_error_printf("EP added: %hhu\n", endpoint);
     }
     else
     {
+        mbed_error_printf("RP2xxx USB PHY: Out of DPRAM memory! Too many opened and closed endpoints.\n");
         return false;
     }
 
@@ -301,7 +305,13 @@ bool USBPhyHw::endpoint_add(usb_ep_t endpoint, uint32_t max_packet, usb_ep_type_
 
 void USBPhyHw::endpoint_remove(usb_ep_t endpoint)
 {
+    mbed_error_printf("EP removed: %hhu\n", endpoint);
+    --open_endpoints;
 
+    if(open_endpoints == 0) {
+        mbed_error_printf("All EPs closed, freeing DPRAM\n");
+        dpram_buffer_free_ptr = 0;
+    }
 }
 
 void USBPhyHw::endpoint_stall(usb_ep_t endpoint)
@@ -402,6 +412,7 @@ again:
         // Reset all endpoint buffers and controls (leave SETUP packet)
         memset(&usb_dpram->ep_ctrl[0], 0, sizeof(*usb_dpram) - sizeof(usb_dpram->setup_packet));
         this->dpram_buffer_free_ptr = 0;
+        open_endpoints = 0;
         // Clear the bus reset
         usb_hw->sie_status = USB_SIE_STATUS_BUS_RESET_BITS;
 

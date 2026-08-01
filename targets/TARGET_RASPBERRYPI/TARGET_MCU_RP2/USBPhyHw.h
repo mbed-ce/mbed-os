@@ -67,6 +67,7 @@ public:
 private:
     USBPhyEvents *events;
     int             new_addr;  // Indicates a new device address has been chosen
+    size_t          open_endpoints;
     uint32_t        dpram_buffer_free_ptr;
     endpoint_info_t ep_info_in [USB_NUM_ENDPOINTS];
     endpoint_info_t ep_info_out[USB_NUM_ENDPOINTS];
