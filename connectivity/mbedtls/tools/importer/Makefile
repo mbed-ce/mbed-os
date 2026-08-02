@@ -56,6 +56,8 @@ rsync:
 	# Copying mbed TLS into mbed library...
 	rm -rf $(TARGET_SRC)
 	rsync -a --include='*.[hc]' --exclude='*' $(MBED_TLS_DIR)/library/ $(TARGET_SRC)
+	# Normalize a generated upstream source file to the repository's EOF style.
+	perl -0pi -e 's/\n+\z/\n/' $(TARGET_SRC)/ssl_debug_helpers_generated.c
 	#
 	# Copying mbed TLS headers to mbed includes...
 	rm -rf $(TARGET_INC)
