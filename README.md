@@ -31,9 +31,7 @@ Folders containing files under different permissive license than Apache 2.0 are 
 
 To start a new project that uses Mbed CE, see the setup guide [here](https://github.com/mbed-ce/mbed-os/wiki/New-Project-Setup-Guide).
 
-We have a [developer website](https://os.mbed.com) for asking questions, engaging with others, finding information on boards and components, using an online IDE and compiler, reading the documentation and learning about what's new and what's coming next in Mbed OS.
-
-Additionally, the [discussions page](https://github.com/mbed-ce/mbed-os/discussions) on this repo can be used for proposing and discussing specific code changes.
+If you'd like to talk to the Mbed CE devs, the [discussions page](https://github.com/mbed-ce/mbed-os/discussions) on this repo can be used to ask for help or to propose and discuss code changes.
 
 ## Documentation
 
