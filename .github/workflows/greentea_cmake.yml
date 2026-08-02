@@ -123,6 +123,8 @@ jobs:
           # Raspberry Pi MCUs
           - target: RASPBERRY_PI_PICO
             profile: full
+          - target: RASPBERRY_PI_PICO_2
+            profile: full
 
     steps:
       - name: Checkout
