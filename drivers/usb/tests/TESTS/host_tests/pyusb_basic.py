@@ -1054,7 +1054,7 @@ class PyusbBasicTest(BaseHostTest):
         return bool(dev.ctrl_transfer(**ctrl_kwargs)[0])
     
     
-    def ep_test_data_correctness(self, dev: usb.core.Device, log, verbose=False):
+    def ep_test_data_correctness(self, dev: usb.core.Device, log, verbose=True):
         """Test data correctness for every OUT/IN endpoint pair.
     
         Given a USB device with multiple OUT/IN endpoint pairs
@@ -1065,11 +1065,11 @@ class PyusbBasicTest(BaseHostTest):
         """
         cfg = dev.get_active_configuration()
         for intf in cfg:
-            log('interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting), end='')
+            message = 'interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting)
             if intf.bAlternateSetting == 0:
-                log('skipping the default AlternateSetting')
+                log(message + 'skipping the default AlternateSetting')
                 continue
-            log('running tests')
+            log(message + 'running tests')
             intf.set_altsetting()
     
             bulk_out, bulk_in = self.find_ep_pair(intf, usb.ENDPOINT_TYPE_BULK)
@@ -1110,7 +1110,7 @@ class PyusbBasicTest(BaseHostTest):
     #             self.raise_unconditionally(self.lineno(), USB_ERROR_FMT.format(err, iso_out, iso_in, payload_size))
     
     
-    def ep_test_halt(self, dev: usb.core.Device, log, verbose=False):
+    def ep_test_halt(self, dev: usb.core.Device, log, verbose=True):
         """Test endpoint halt for every OUT/IN endpoint pair.
     
         Given a USB device with multiple OUT/IN endpoint pairs
@@ -1118,13 +1118,15 @@ class PyusbBasicTest(BaseHostTest):
             of OUT or IN transfer
         Then the endpoint is stalled and all further transfers fail
         """
+        self.log(f"Testing with device (bus = {dev.bus}, address = {dev.address})")
+
         cfg = dev.get_active_configuration()
         for intf in cfg:
-            log('interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting), end='')
+            message = 'interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting)
             if intf.bAlternateSetting == 0:
-                log('skipping the default AlternateSetting')
+                log(message + 'skipping the default AlternateSetting')
                 continue
-            log('running tests')
+            log(message + 'running tests')
             intf.set_altsetting()
     
             bulk_out, bulk_in = self.find_ep_pair(intf, usb.ENDPOINT_TYPE_BULK)
@@ -1161,11 +1163,11 @@ class PyusbBasicTest(BaseHostTest):
         """
         cfg = dev.get_active_configuration()
         for intf in cfg:
-            log('interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting), end='')
+            message = 'interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting)
             if intf.bAlternateSetting == 0:
-                log('skipping the default AlternateSetting')
+                log(message + 'skipping the default AlternateSetting')
                 continue
-            log('running tests')
+            log(message + 'running tests')
             intf.set_altsetting()
     
             bulk_out, bulk_in = self.find_ep_pair(intf, usb.ENDPOINT_TYPE_BULK)
@@ -1222,11 +1224,11 @@ class PyusbBasicTest(BaseHostTest):
         """
         cfg = dev.get_active_configuration()
         for intf in cfg:
-            log('interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting), end='')
+            message = 'interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting)
             if intf.bAlternateSetting == 0:
-                log('skipping the default AlternateSetting')
+                log(message + 'skipping the default AlternateSetting')
                 continue
-            log('running tests')
+            log(message + 'running tests')
             intf.set_altsetting()
     
             bulk_out, bulk_in = self.find_ep_pair(intf, usb.ENDPOINT_TYPE_BULK)
@@ -1293,11 +1295,11 @@ class PyusbBasicTest(BaseHostTest):
     
         cfg = dev.get_active_configuration()
         for intf in cfg:
-            log('interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting), end='')
+            message = 'interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting)
             if intf.bAlternateSetting == 0:
-                log('skipping the default AlternateSetting')
+                log(message + 'skipping the default AlternateSetting')
                 continue
-            log('running tests')
+            log(message + 'running tests')
             intf.set_altsetting()
     
             bulk_out, bulk_in = self.find_ep_pair(intf, usb.ENDPOINT_TYPE_BULK)
@@ -1387,11 +1389,11 @@ class PyusbBasicTest(BaseHostTest):
         """
         cfg = dev.get_active_configuration()
         for intf in cfg:
-            log('interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting), end='')
+            message = 'interface {}, alt {} -- '.format(intf.bInterfaceNumber, intf.bAlternateSetting)
             if intf.bAlternateSetting == 0:
-                log('skipping the default AlternateSetting')
+                log(message + 'skipping the default AlternateSetting')
                 continue
-            log('running tests')
+            log(message + 'running tests')
     
             if verbose:
                 log('Testing data toggle reset for bulk endpoint pair.')

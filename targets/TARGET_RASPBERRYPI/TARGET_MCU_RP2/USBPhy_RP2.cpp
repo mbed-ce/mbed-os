@@ -18,6 +18,8 @@
 #if DEVICE_USBDEVICE
 
 #include "USBPhyHw.h"
+#include "tinyalloc.h"
+#include "mbed_math_helpers.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,6 +50,9 @@ extern "C" {
 
 static USBPhyHw *instance;
 
+// Per RP2350 manual section 12.7.3.7.3, DPRAM buffers must be 64 byte aligned.
+constexpr size_t USB_BUFFER_ALIGN = 64;
+
 USBPhy *get_usb_phy()
 {
     static USBPhyHw usbphy;
@@ -68,7 +73,6 @@ void USBPhyHw::init(USBPhyEvents *events)
 {
     this->events = events;
     this->new_addr = 0;
-    this->open_endpoints = 0;
     instance = this;
 
     // Disable IRQ
@@ -80,6 +84,7 @@ void USBPhyHw::init(USBPhyEvents *events)
 
     // Clear any previous state in dpram just in case
     memset(usb_dpram, 0, sizeof(*usb_dpram));
+    reinit_dpram_heap();
 
     // Mux the controller to the onboard usb phy
     usb_hw->muxing = USB_USB_MUXING_TO_PHY_BITS | USB_USB_MUXING_SOFTCON_BITS;
@@ -130,6 +135,7 @@ void USBPhyHw::disconnect()
 {
     // Clear all endpoint interrupts and disable interrupts
     memset(&usb_dpram->ep_ctrl[0], 0, sizeof(*usb_dpram) - sizeof(usb_dpram->setup_packet));
+    reinit_dpram_heap();
 
     // TODO - Disable pullup on D+
     usb_hw_clear->sie_ctrl = USB_SIE_CTRL_PULLUP_EN_BITS;
@@ -172,25 +178,29 @@ void USBPhyHw::remote_wakeup()
 
 const usb_ep_table_t *USBPhyHw::endpoint_table()
 {
+    // Struct sizes for tinyalloc structures. These should be constant for any 32 bit machines
+    constexpr size_t TA_HEAP_SIZE = 16; // Base heap structure
+    constexpr size_t TA_BLOCK_SIZE = 12;
+
     static const usb_ep_table_t template_table = {
-        sizeof(usb_dpram->epx_data),
+        sizeof(usb_dpram->epx_data) - TA_HEAP_SIZE,
         {
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
-            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, 0},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
+            {USB_EP_ATTR_ALLOW_ALL | USB_EP_ATTR_DIR_IN_AND_OUT,  1, TA_BLOCK_SIZE + USB_BUFFER_ALIGN},
         }
     };
     return &template_table;
@@ -277,22 +287,23 @@ bool USBPhyHw::endpoint_add(usb_ep_t endpoint, uint32_t max_packet, usb_ep_type_
     int in     = endpoint >> 7;
     io_rw_32 * ep_ctrl = in ? &usb_dpram->ep_ctrl[ep_num - 1].in :
                               &usb_dpram->ep_ctrl[ep_num - 1].out;
-    if(this->dpram_buffer_free_ptr + max_packet < sizeof(usb_dpram->epx_data) )
+
+    auto * const dpram_buffer_base = reinterpret_cast<uint8_t *>(ta_alloc(max_packet));
+
+    if(dpram_buffer_base != nullptr)
     {
         endpoint_info_t * ep = in ? &this->ep_info_in[ep_num] : &this->ep_info_out[ep_num];
         ep->next_pid = 0;
-        ep->dpram = &usb_dpram->epx_data[this->dpram_buffer_free_ptr];
+        ep->dpram = static_cast<uint8_t *>(dpram_buffer_base);
 
         *ep_ctrl =
             EP_CTRL_ENABLE_BITS |
             EP_CTRL_INTERRUPT_PER_BUFFER |
             type << EP_CTRL_BUFFER_TYPE_LSB |
             EP_CTRL_INTERRUPT_ON_STALL |
-            (this->dpram_buffer_free_ptr + 0x180);
+            reinterpret_cast<ptrdiff_t>(ep->dpram - USBCTRL_DPRAM_BASE);
 
-        this->dpram_buffer_free_ptr += (max_packet + 63) & ~63;
-        ++open_endpoints;
-        mbed_error_printf("EP added: %hhu\n", endpoint);
+        // mbed_error_printf("EP added: %hhu, using buffer %p\n", endpoint, ep->dpram - USBCTRL_DPRAM_BASE);
     }
     else
     {
@@ -303,27 +314,41 @@ bool USBPhyHw::endpoint_add(usb_ep_t endpoint, uint32_t max_packet, usb_ep_type_
     return true;
 }
 
-void USBPhyHw::endpoint_remove(usb_ep_t endpoint)
-{
-    mbed_error_printf("EP removed: %hhu\n", endpoint);
-    --open_endpoints;
+void USBPhyHw::endpoint_remove(usb_ep_t endpoint) {
+    int ep_num = endpoint & 0x7f;
+    int in     = endpoint >> 7;
+    io_rw_32 * const ep_ctrl = in ? &usb_dpram->ep_ctrl[ep_num - 1].in :
+                                    &usb_dpram->ep_ctrl[ep_num - 1].out;
+    endpoint_info_t * const ep = in ? &this->ep_info_in[ep_num] : &this->ep_info_out[ep_num];
 
-    if(open_endpoints == 0) {
-        mbed_error_printf("All EPs closed, freeing DPRAM\n");
-        dpram_buffer_free_ptr = 0;
-    }
+    // Disable endpoint
+    *ep_ctrl = 0;
+
+    // mbed_error_printf("EP removed: %hhu, buffer: %p\n", endpoint, ep->dpram - USBCTRL_DPRAM_BASE);
+
+    MBED_ASSERT(ta_free(ep->dpram));
 }
 
 void USBPhyHw::endpoint_stall(usb_ep_t endpoint)
 {
+    mbed_error_printf("EP stalled: %hhu\n", endpoint);
+
+    // Implemented per TinyUSB: https://github.com/hathach/tinyusb/blob/f3021b337fcea154b898489c417d428c92f88e92/src/portable/raspberrypi/rp2040/dcd_rp2040.c#L532
+    endpoint_abort(endpoint);
+
     int ep_num = endpoint & 0x7f;
-    usb_dpram->ep_buf_ctrl[ep_num].out |= USB_BUF_CTRL_STALL;
+    usb_dpram->ep_buf_ctrl[ep_num].out = USB_BUF_CTRL_STALL;
 }
 
 void USBPhyHw::endpoint_unstall(usb_ep_t endpoint)
 {
+    mbed_error_printf("EP unstalled: %hhu\n", endpoint);
+
     int ep_num = endpoint & 0x7f;
     usb_dpram->ep_buf_ctrl[ep_num].out &= ~USB_BUF_CTRL_STALL;
+
+    // reset data toggle
+    this->ep_info_out[ep_num].next_pid = 0;
 }
 
 bool USBPhyHw::endpoint_read(usb_ep_t endpoint, uint8_t *data, uint32_t size)
@@ -336,8 +361,10 @@ bool USBPhyHw::endpoint_read(usb_ep_t endpoint, uint8_t *data, uint32_t size)
 
     usb_dpram->ep_buf_ctrl[ep_num].out =
                                     (size & USB_BUF_CTRL_LEN_MASK) |
-                                    USB_BUF_CTRL_AVAIL |
                                     (ep->next_pid ? USB_BUF_CTRL_DATA1_PID : 0);
+
+    // Per RP2350 datasheet section 12.7.3.7.4, must set AVAIL after assigning other fields in the buf ctrl register.
+    usb_dpram->ep_buf_ctrl[ep_num].out |= USB_BUF_CTRL_AVAIL;
 
     ep->next_pid = !ep->next_pid;
 
@@ -387,8 +414,10 @@ bool USBPhyHw::endpoint_write(usb_ep_t endpoint, uint8_t *data, uint32_t size)
 
     usb_dpram->ep_buf_ctrl[ep_num].in = size |
                                         USB_BUF_CTRL_FULL  |
-                                        USB_BUF_CTRL_AVAIL |
                                         (ep->next_pid ? USB_BUF_CTRL_DATA1_PID : 0);
+
+    // Per RP2350 datasheet section 12.7.3.7.4, must set AVAIL after assigning other fields in the buf ctrl register.
+    usb_dpram->ep_buf_ctrl[ep_num].in |= USB_BUF_CTRL_AVAIL;
 
     ep->next_pid = !ep->next_pid;
 
@@ -397,7 +426,31 @@ bool USBPhyHw::endpoint_write(usb_ep_t endpoint, uint8_t *data, uint32_t size)
 
 void USBPhyHw::endpoint_abort(usb_ep_t endpoint)
 {
+    // Based on TinyUSB: https://github.com/hathach/tinyusb/blob/f3021b337fcea154b898489c417d428c92f88e92/src/portable/raspberrypi/rp2040/dcd_rp2040.c#L119
+    // Abort any pending transfer
+    int ep_num = endpoint & 0x7f;
+    int in     = endpoint >> 7;
+    const uint32_t abort_mask = 1 << (ep_num * 2 + in);
 
+    // Due to Errata RP2040-E2: ABORT flag is only applicable for B2 and later (unusable for B0, B1).
+    // Which means we are not guaranteed to safely abort pending transfer on B0 and B1.
+    if (rp2040_chip_version() >= 2) {
+        usb_hw_set->abort = abort_mask;
+        while ((usb_hw->abort_done & abort_mask) != abort_mask) {}
+    }
+
+    // clear buffer control
+    if(in) {
+        usb_dpram->ep_buf_ctrl[ep_num].in = 0;
+    }
+    else {
+        usb_dpram->ep_buf_ctrl[ep_num].out = 0;
+    }
+
+    if (rp2040_chip_version() >= 2) {
+        usb_hw_clear->abort_done = abort_mask;
+        usb_hw_clear->abort = abort_mask;
+    }
 }
 
 void USBPhyHw::process()
@@ -411,8 +464,8 @@ again:
         usb_hw->dev_addr_ctrl = 0;
         // Reset all endpoint buffers and controls (leave SETUP packet)
         memset(&usb_dpram->ep_ctrl[0], 0, sizeof(*usb_dpram) - sizeof(usb_dpram->setup_packet));
-        this->dpram_buffer_free_ptr = 0;
-        open_endpoints = 0;
+        reinit_dpram_heap();
+
         // Clear the bus reset
         usb_hw->sie_status = USB_SIE_STATUS_BUS_RESET_BITS;
 
@@ -526,6 +579,12 @@ again:
     // Re-enable interrupt
     NVIC_ClearPendingIRQ(USBCTRL_IRQ_IRQn);
     NVIC_EnableIRQ(USBCTRL_IRQ_IRQn);
+}
+
+void USBPhyHw::reinit_dpram_heap() {
+    // Initialize the heap to cover all of the DPRAM block after the EP0 data (fixed layout).
+    // There are 15 user-controlled endpoints, and for each endpoint we can have In and Out buffers, so there can be 15*2=30 total blocks.
+    ta_init(usb_dpram->epx_data, usb_dpram->epx_data + sizeof(usb_dpram->epx_data), USB_HOST_INTERRUPT_ENDPOINTS * 2, 64, USB_BUFFER_ALIGN);
 }
 
 void USBPhyHw::_usbisr(void)

@@ -22,6 +22,7 @@
 #include "USBDescriptor.h"
 #include "usb_phy_api.h"
 #include "mbed_assert.h"
+#include "mbed_interface.h"
 #include "platform/mbed_error.h"
 
 //#define DEBUG
@@ -1007,7 +1008,17 @@ void USBDevice::in(usb_ep_t endpoint)
 
     endpoint_info_t *info = &_endpoint_info[EP_TO_INDEX(endpoint)];
 
-    MBED_ASSERT(info->pending >= 1);
+    if(info->pending == 0) {
+        MBED_ERROR1(
+            MBED_MAKE_ERROR(
+                MBED_MODULE_DRIVER_USB,
+                MBED_ERROR_CODE_INVALID_OPERATION
+            ),
+            "IN transfer started to endpoint with no preceding write_start() call.",
+            endpoint
+        );
+    }
+
     info->pending -= 1;
     if (info->callback) {
         info->callback();

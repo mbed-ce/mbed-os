@@ -28,3 +28,6 @@
 [submodule "features/frameworks/rtt/RTT"]
 	path = features/frameworks/rtt/RTT
 	url = https://github.com/SEGGERMicro/RTT.git
+[submodule "targets/TARGET_RASPBERRYPI/tinyalloc"]
+	path = targets/TARGET_RASPBERRYPI/tinyalloc
+	url = https://github.com/thi-ng/tinyalloc.git
