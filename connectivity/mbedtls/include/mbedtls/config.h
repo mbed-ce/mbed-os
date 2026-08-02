@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2026 Arm Limited and affiliates.
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Compatibility include for Mbed OS integrations which predate the
  * mbedtls_config.h rename in Mbed TLS 3.0.
  */
