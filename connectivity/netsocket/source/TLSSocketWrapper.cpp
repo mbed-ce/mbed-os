@@ -43,7 +43,8 @@ TLSSocketWrapper::TLSSocketWrapper(Socket *transport, const char *hostname, cont
     _handshake_completed(false),
     _cacert_allocated(false),
     _clicert_allocated(false),
-    _ssl_conf_allocated(false)
+    _ssl_conf_allocated(false),
+    _drbg_seeded(false)
 {
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
     // It is safe to call psa_crypto_init() any number of times as
@@ -218,8 +219,14 @@ nsapi_error_t TLSSocketWrapper::set_client_cert_key(const void *client_cert, siz
         return NSAPI_ERROR_PARAMETER;
     }
     mbedtls_pk_init(&_pkctx);
+    if ((ret = seed_drbg()) != 0) {
+        print_mbedtls_error("DRBG seed", ret);
+        mbedtls_x509_crt_free(crt);
+        delete crt;
+        return NSAPI_ERROR_AUTH_FAILURE;
+    }
     if ((ret = mbedtls_pk_parse_key(&_pkctx, static_cast<const unsigned char *>(client_private_key_pem),
-                                    client_private_key_len, nullptr, 0)) != 0) {
+                                    client_private_key_len, nullptr, 0, DRBG_RANDOM, &_drbg)) != 0) {
         print_mbedtls_error("mbedtls_pk_parse_key", ret);
         mbedtls_x509_crt_free(crt);
         delete crt;
@@ -232,10 +239,33 @@ nsapi_error_t TLSSocketWrapper::set_client_cert_key(const void *client_cert, siz
 #endif /* MBEDTLS_X509_CRT_PARSE_C */
 }
 
+int TLSSocketWrapper::seed_drbg()
+{
+    if (_drbg_seeded) {
+        return 0;
+    }
+
+    static const unsigned char drbg_pers[] = "mbed TLS client";
+    int ret;
+#if defined(MBEDTLS_CTR_DRBG_C)
+    ret = mbedtls_ctr_drbg_seed(&_drbg, mbedtls_entropy_func, &_entropy,
+                                drbg_pers, sizeof(drbg_pers));
+#elif defined(MBEDTLS_HMAC_DRBG_C)
+    ret = mbedtls_hmac_drbg_seed(&_drbg, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
+                                 mbedtls_entropy_func, &_entropy,
+                                 drbg_pers, sizeof(drbg_pers));
+#else
+#error "CTR or HMAC must be defined for TLSSocketWrapper!"
+#endif
+    if (ret == 0) {
+        _drbg_seeded = true;
+    }
+    return ret;
+}
+
 
 nsapi_error_t TLSSocketWrapper::start_handshake(bool first_call)
 {
-    const char DRBG_PERS[] = "mbed TLS client";
     int ret;
 
     if (!_transport) {
@@ -247,8 +277,9 @@ nsapi_error_t TLSSocketWrapper::start_handshake(bool first_call)
     }
 
 #if defined(MBEDTLS_X509_CRT_PARSE_C) && !defined(MBEDTLS_X509_REMOVE_HOSTNAME_VERIFICATION)
-    if (_ssl.hostname != nullptr) {
-        tr_info("Starting TLS handshake with %s", _ssl.hostname);
+    const char *hostname = mbedtls_ssl_get_hostname(&_ssl);
+    if (hostname != nullptr) {
+        tr_info("Starting TLS handshake with %s", hostname);
     } else
 #endif
     {
@@ -257,24 +288,10 @@ nsapi_error_t TLSSocketWrapper::start_handshake(bool first_call)
     /*
      * Initialize TLS-related stuf.
      */
-#if defined(MBEDTLS_CTR_DRBG_C)
-    if ((ret = mbedtls_ctr_drbg_seed(&_drbg, mbedtls_entropy_func, &_entropy,
-                                     (const unsigned char *) DRBG_PERS,
-                                     sizeof(DRBG_PERS))) != 0) {
-        print_mbedtls_error("mbedtls_crt_drbg_init", ret);
+    if ((ret = seed_drbg()) != 0) {
+        print_mbedtls_error("DRBG seed", ret);
         return NSAPI_ERROR_AUTH_FAILURE;
     }
-#elif defined(MBEDTLS_HMAC_DRBG_C)
-    if ((ret = mbedtls_hmac_drbg_seed(&_drbg, mbedtls_md_info_from_type(MBEDTLS_MD_SHA256),
-                                      mbedtls_entropy_func, &_entropy,
-                                      (const unsigned char *) DRBG_PERS,
-                                      sizeof(DRBG_PERS))) != 0) {
-        print_mbedtls_error("mbedtls_hmac_drbg_seed", ret);
-        return NSAPI_ERROR_AUTH_FAILURE;
-    }
-#else
-#error "CTR or HMAC must be defined for TLSSocketWrapper!"
-#endif
 
 #if !defined(MBEDTLS_SSL_CONF_RNG)
     mbedtls_ssl_conf_rng(get_ssl_config(), DRBG_RANDOM, &_drbg);
@@ -355,8 +372,9 @@ nsapi_error_t TLSSocketWrapper::continue_handshake()
 
     /* It also means the handshake is done, time to print info */
 #if defined(MBEDTLS_X509_CRT_PARSE_C) && !defined(MBEDTLS_X509_REMOVE_HOSTNAME_VERIFICATION)
-    if (_ssl.hostname != nullptr) {
-        tr_info("TLS connection to %s established", _ssl.hostname);
+    const char *hostname = mbedtls_ssl_get_hostname(&_ssl);
+    if (hostname != nullptr) {
+        tr_info("TLS connection to %s established", hostname);
     } else
 #endif
     {
