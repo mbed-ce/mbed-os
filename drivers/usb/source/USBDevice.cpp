@@ -1008,7 +1008,7 @@ void USBDevice::in(usb_ep_t endpoint)
 
     endpoint_info_t *info = &_endpoint_info[EP_TO_INDEX(endpoint)];
 
-    if(info->pending == 0) {
+    if (info->pending == 0) {
         MBED_ERROR1(
             MBED_MAKE_ERROR(
                 MBED_MODULE_DRIVER_USB,
@@ -1462,7 +1462,7 @@ bool USBDevice::read_start(usb_ep_t endpoint, uint8_t *buffer, uint32_t max_size
     endpoint_info_t *info = &_endpoint_info[EP_TO_INDEX(endpoint)];
     if (!(info->flags & ENDPOINT_ENABLED)) {
         // Only valid endpoints may be used when in the configured state
-        if(configured()) {
+        if (configured()) {
             MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_USB, MBED_ERROR_CODE_INVALID_OPERATION), "Endpoint read before being enabled!", endpoint);
         }
         unlock();

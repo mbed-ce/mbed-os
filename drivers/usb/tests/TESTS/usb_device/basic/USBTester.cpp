@@ -210,12 +210,12 @@ void USBTester::callback_set_configuration(uint8_t configuration)
 bool USBTester::setup_iterface(uint8_t ep_in, uint8_t ep_out, uint32_t ep_size, usb_ep_type_t ep_type,
                                uint8_t *buf, uint32_t buf_size, void (USBTester::*callback)())
 {
-    if(!endpoint_add(ep_in, ep_size, ep_type)) {
+    if (!endpoint_add(ep_in, ep_size, ep_type)) {
         mbed_error_printf("Warning: endpoint_add(%" PRIu8 ", %" PRIu32 ", %d) failed.\n", ep_in, ep_size, ep_type);
         return false;
     }
 
-    if(!endpoint_add(ep_out, ep_size, ep_type, callback)) {
+    if (!endpoint_add(ep_out, ep_size, ep_type, callback)) {
         mbed_error_printf("Warning: endpoint_add(%" PRIu8 ", %" PRIu32 ", %d, callback) failed.\n", ep_out, ep_size, ep_type);
         return false;
     }

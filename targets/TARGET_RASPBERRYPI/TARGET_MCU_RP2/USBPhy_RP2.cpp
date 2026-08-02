@@ -331,7 +331,7 @@ void USBPhyHw::endpoint_remove(usb_ep_t endpoint) {
 
 void USBPhyHw::endpoint_stall(usb_ep_t endpoint)
 {
-    mbed_error_printf("EP stalled: %hhu\n", endpoint);
+    // mbed_error_printf("EP stalled: %hhu\n", endpoint);
 
     // Implemented per TinyUSB: https://github.com/hathach/tinyusb/blob/f3021b337fcea154b898489c417d428c92f88e92/src/portable/raspberrypi/rp2040/dcd_rp2040.c#L532
     endpoint_abort(endpoint);
@@ -342,7 +342,7 @@ void USBPhyHw::endpoint_stall(usb_ep_t endpoint)
 
 void USBPhyHw::endpoint_unstall(usb_ep_t endpoint)
 {
-    mbed_error_printf("EP unstalled: %hhu\n", endpoint);
+    // mbed_error_printf("EP unstalled: %hhu\n", endpoint);
 
     int ep_num = endpoint & 0x7f;
     usb_dpram->ep_buf_ctrl[ep_num].out &= ~USB_BUF_CTRL_STALL;

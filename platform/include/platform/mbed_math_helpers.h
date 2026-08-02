@@ -41,7 +41,7 @@ static inline uint32_t mbed_integer_log_2(uint32_t x)
 /**
  * @brief Align an address (\c addr) to a given \c alignment by adding between 0 and \c alignment-1 bytes to it.
  */
-static inline void* mbed_align_up_to(void* addr, size_t alignment)
+static inline void *mbed_align_up_to(void *addr, size_t alignment)
 {
     // Use integer division to divide the address down to the alignment size, which
     // rounds to the block before the given address.
