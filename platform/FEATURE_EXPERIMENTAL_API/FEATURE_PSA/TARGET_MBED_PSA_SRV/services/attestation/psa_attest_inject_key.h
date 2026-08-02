@@ -53,19 +53,19 @@ extern "C"
  * \param[out] public_key_data_length  On success, the number of bytes
  *                                     that make up the key data.
  *
- * \retval #PSA_SUCCESS
+ * \retval PSA_SUCCESS
  *         Success.
- * \retval #PSA_ERROR_INVALID_HANDLE
- * \retval #PSA_ERROR_OCCUPIED_SLOT
+ * \retval PSA_ERROR_INVALID_HANDLE
+ * \retval PSA_ERROR_OCCUPIED_SLOT
  *         There is already a key in the specified slot.
- * \retval #PSA_ERROR_NOT_SUPPORTED
- * \retval #PSA_ERROR_INVALID_ARGUMENT
- * \retval #PSA_ERROR_INSUFFICIENT_MEMORY
- * \retval #PSA_ERROR_INSUFFICIENT_ENTROPY
- * \retval #PSA_ERROR_COMMUNICATION_FAILURE
- * \retval #PSA_ERROR_HARDWARE_FAILURE
- * \retval #PSA_ERROR_TAMPERING_DETECTED
- * \retval #PSA_ERROR_BAD_STATE
+ * \retval PSA_ERROR_NOT_SUPPORTED
+ * \retval PSA_ERROR_INVALID_ARGUMENT
+ * \retval PSA_ERROR_INSUFFICIENT_MEMORY
+ * \retval PSA_ERROR_INSUFFICIENT_ENTROPY
+ * \retval PSA_ERROR_COMMUNICATION_FAILURE
+ * \retval PSA_ERROR_HARDWARE_FAILURE
+ * \retval PSA_ERROR_TAMPERING_DETECTED
+ * \retval PSA_ERROR_BAD_STATE
  *         The library has not been previously initialized by psa_crypto_init().
  *         It is implementation-dependent whether a failure to initialize
  *         results in this error code.
