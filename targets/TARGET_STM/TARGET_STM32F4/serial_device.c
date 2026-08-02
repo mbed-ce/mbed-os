@@ -32,6 +32,10 @@
 uint32_t serial_irq_ids[UART_NUM] = {0};
 UART_HandleTypeDef uart_handlers[UART_NUM];
 
+#if defined(STM32_SERIAL_RX_DMA)
+static serial_t *uart_rx_dma_objects[UART_NUM] = {0};
+#endif
+
 static uart_irq_handler irq_handler;
 
 // Defined in serial_api.c
@@ -504,9 +508,6 @@ int serial_tx_asynch(serial_t *obj, const void *tx, size_t tx_length, uint8_t tx
  */
 void serial_rx_asynch(serial_t *obj, void *rx, size_t rx_length, uint8_t rx_width, uint32_t handler, uint32_t event, uint8_t char_match, DMAUsage hint)
 {
-    // TODO: DMA usage is currently ignored
-    (void) hint;
-
     /* Sanity check arguments */
     MBED_ASSERT(obj);
     MBED_ASSERT(rx != (void *)0);
@@ -530,7 +531,36 @@ void serial_rx_asynch(serial_t *obj, void *rx, size_t rx_length, uint8_t rx_widt
     NVIC_SetVector(irq_n, (uint32_t)handler);
     NVIC_EnableIRQ(irq_n);
 
-    // following HAL function will enable the RXNE interrupt + error interrupts
+#if defined(STM32_SERIAL_RX_DMA)
+    obj_s->rx_callback = (void (*)(void))handler;
+    obj_s->rx_uses_dma = false;
+
+    // Character matching needs each byte to be inspected as it arrives, so it
+    // remains interrupt-driven until the DMA path supports an early stop.
+    if ((hint != DMA_USAGE_NEVER) && ((event & SERIAL_EVENT_RX_CHARACTER_MATCH) == 0)) {
+        if (obj_s->rx_dma_handle.dmaIdx == 0) {
+            const DMALinkInfo *dma_link = &UARTRxDMALinks[obj_s->index];
+            obj_s->rx_dma_handle = stm_init_dma_link(dma_link, DMA_PERIPH_TO_MEMORY,
+                                                     false, true, 1, 1, DMA_NORMAL);
+            if (obj_s->rx_dma_handle.hdma == NULL) {
+                memset(&obj_s->rx_dma_handle, 0, sizeof(obj_s->rx_dma_handle));
+            }
+        }
+
+        if (obj_s->rx_dma_handle.hdma != NULL) {
+            __HAL_LINKDMA(huart, hdmarx, *obj_s->rx_dma_handle.hdma);
+            if (HAL_UART_Receive_DMA(huart, (uint8_t *)rx, rx_length) == HAL_OK) {
+                obj_s->rx_uses_dma = true;
+                uart_rx_dma_objects[obj_s->index] = obj;
+                return;
+            }
+        }
+    }
+#else
+    (void) hint;
+#endif
+
+    // This HAL function enables the RXNE and error interrupts.
     HAL_UART_Receive_IT(huart, (uint8_t *)rx, rx_length);
 }
 
@@ -578,6 +608,36 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
         volatile uint32_t tmpval __attribute__((unused)) = huart->Instance->DR; // Clear ORE flag
     }
 }
+
+#if defined(STM32_SERIAL_RX_DMA)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    int8_t index = get_uart_index((UARTName)huart->Instance);
+
+    if ((index >= 0) && (uart_rx_dma_objects[index] != NULL)) {
+        struct serial_s *obj_s = SERIAL_S(uart_rx_dma_objects[index]);
+        if (obj_s->rx_uses_dma && (obj_s->rx_callback != NULL)) {
+            obj_s->rx_callback();
+        }
+    }
+}
+
+void serial_rx_dma_free(serial_t *obj)
+{
+    struct serial_s *obj_s = SERIAL_S(obj);
+    UART_HandleTypeDef *huart = &uart_handlers[obj_s->index];
+
+    if (obj_s->rx_dma_handle.dmaIdx != 0) {
+        HAL_UART_DMAStop(huart);
+        huart->hdmarx = NULL;
+        stm_free_dma_link(&obj_s->rx_dma_handle);
+    }
+
+    uart_rx_dma_objects[obj_s->index] = NULL;
+    obj_s->rx_callback = NULL;
+    obj_s->rx_uses_dma = false;
+}
+#endif
 
 /**
  * The asynchronous TX and RX handler.
@@ -691,6 +751,14 @@ void serial_rx_abort_asynch(serial_t *obj)
 {
     struct serial_s *obj_s = SERIAL_S(obj);
     UART_HandleTypeDef *huart = &uart_handlers[obj_s->index];
+
+#if defined(STM32_SERIAL_RX_DMA)
+    if (obj_s->rx_uses_dma) {
+        HAL_UART_AbortReceive(huart);
+        obj_s->rx_uses_dma = false;
+        return;
+    }
+#endif
 
     // disable interrupts
     __HAL_UART_DISABLE_IT(huart, UART_IT_RXNE);

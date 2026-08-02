@@ -64,6 +64,11 @@ struct serial_s {
     PinName pin_rx;
 #if DEVICE_SERIAL_ASYNCH
     uint32_t events;
+#if defined(STM32_SERIAL_RX_DMA)
+    DMAHandlePointer rx_dma_handle;
+    void (*rx_callback)(void);
+    bool rx_uses_dma;
+#endif
 #endif
 #if DEVICE_SERIAL_FC
     uint32_t hw_flow_ctl;

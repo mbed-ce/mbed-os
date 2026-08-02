@@ -59,6 +59,11 @@ extern "C" {
  */
 HAL_StatusTypeDef init_uart(serial_t *obj);
 
+#if DEVICE_SERIAL_ASYNCH && defined(STM32_SERIAL_RX_DMA)
+/** Release DMA resources associated with an asynchronous UART receive. */
+void serial_rx_dma_free(serial_t *obj);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
