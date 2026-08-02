@@ -192,3 +192,6 @@ append_code                                                                     
     "    #define MBEDTLS_USE_PSA_CRYPTO\n"                                                                     \
     "#endif\n"                                                                                                 \
     "\n"
+
+# Keep regenerated configuration files stable and avoid blank lines at EOF.
+perl -0pi -e 's/\n+\z/\n/' "$FILE"
