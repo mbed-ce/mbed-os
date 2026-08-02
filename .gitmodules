@@ -30,4 +30,4 @@
 	url = https://github.com/SEGGERMicro/RTT.git
 [submodule "targets/TARGET_RASPBERRYPI/tinyalloc"]
 	path = targets/TARGET_RASPBERRYPI/tinyalloc
-	url = https://github.com/thi-ng/tinyalloc.git
+	url = https://github.com/dzyong/tinyalloc.git
