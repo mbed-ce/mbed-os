@@ -10,7 +10,7 @@ function(get_stm32_family out_var)
     set(temp_stm32 "")
 
     foreach(_label IN LISTS MBED_TARGET_LABELS)
-        if(_label MATCHES "^STM32([A-Z][0-9]|WB|WL)$")
+        if(_label MATCHES "^STM32([A-Z][0-9]|WB0|WB|WL)$")
             set(temp_stm32 "${_label}")
             break()
         endif()

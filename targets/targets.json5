@@ -4576,6 +4576,77 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
 
     // STM32WB Targets -------------------------------------------------------------------------------------------------
+    // STM32WB0 Targets -----------------------------------------------------------------------------------------------
+    // STM32WB0 is not part of the dual-core STM32WB family below.
+    "MCU_STM32WB0": {
+        "inherits": [
+            "MCU_STM32"
+        ],
+        "public": false,
+        "c_lib": "small",
+        "core": "Cortex-M0+",
+        "extra_labels_add": [
+            "STM32WB0"
+        ],
+        "device_has_remove": [
+            "LPTICKER", "RTC", "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
+            "INTERRUPTIN", "PWMOUT", "SERIAL", "SERIAL_FC", "SLEEP",
+            "SPI", "SPISLAVE", "SPI_ASYNCH", "WATCHDOG", "RESET_REASON"
+        ],
+        "device_has_add": [
+            "MPU"
+        ],
+        "is_mcu_family_target": true
+    },
+    "MCU_STM32WB09xE": {
+        "inherits": [
+            "MCU_STM32WB0"
+        ],
+        "public": false,
+        "extra_labels_add": [
+            "STM32WB09xE",
+            "STARTUP_STM32WB09"
+        ],
+        "macros_add": [
+            "STM32WB09"
+        ],
+        "memory_banks": {
+            "IROM1": {
+                "access": {
+                    "execute": true, "peripheral": false, "read": true,
+                    "secure": false, "write": false
+                },
+                "default": true,
+                "size": 0x7F000,
+                "start": 0x10040000,
+                "startup": true
+            },
+            "SRAM1": {
+                "access": {
+                    "execute": true, "peripheral": false, "read": true,
+                    "secure": false, "write": true
+                },
+                "default": true,
+                "size": 0x10000,
+                "start": 0x20000000,
+                "startup": false
+            }
+        }
+    },
+    "NUCLEO_WB09KE": {
+        "inherits": [
+            "MCU_STM32WB09xE"
+        ],
+        "overrides": {
+            "lse-available": 1
+        },
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "image_url": "https://www.st.com/en/evaluation-tools/nucleo-wb09ke.html"
+    },
+
+    // STM32WB Targets ------------------------------------------------------------------------------------------------
     "MCU_STM32WB": {
         "inherits": [
             "MCU_STM32"

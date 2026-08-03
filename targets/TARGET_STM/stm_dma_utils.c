@@ -32,7 +32,9 @@ static osRtxMutex_t dmaMutexMem;
 
 // Array to store pointer to DMA handle for each DMA channel.
 // Note: arrays are 0-indexed, so DMA1 Channel2 is at stmDMAHandles[0][1].
+#ifndef TARGET_MCU_STM32WB0
 static DMAHandlePointer stmDMAHandles[NUM_DMA_CONTROLLERS][MAX_DMA_CHANNELS_PER_CONTROLLER];
+#endif
 
 void stm_init_dma_mutex()
 {
@@ -46,6 +48,11 @@ void stm_init_dma_mutex()
     dmaMutex = osMutexNew(&attr);
 #endif
 }
+
+/* STM32WB0 uses one combined DMA IRQ and different RCC naming. Async DMA
+ * drivers are not advertised by the initial WB0 port, so only the mutex
+ * initialization hook is needed until its DMA backend is added. */
+#ifndef TARGET_MCU_STM32WB0
 
 void stm_lock_dma_mutex()
 {
@@ -2073,3 +2080,4 @@ void MDMA_IRQHandler(void)
     }
 }
 #endif
+#endif /* !TARGET_MCU_STM32WB0 */
