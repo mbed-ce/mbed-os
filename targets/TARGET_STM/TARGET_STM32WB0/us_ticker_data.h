@@ -4,7 +4,6 @@
 
 #include "stm32wb0x.h"
 #include "stm32wb0x_ll_tim.h"
-#include "cmsis_nvic.h"
 
 #define TIM_MST TIM16
 #define TIM_MST_IRQ TIM16_IRQn
