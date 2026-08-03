@@ -4,8 +4,8 @@ FROM ubuntu:24.04
 
 # ------------------------------------------------------------------------------
 # set locale
-ENV LANG C.UTF-8
-ENV LC_ALL C.UTF-8
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 # ------------------------------------------------------------------------------
 # Arguments
@@ -24,10 +24,12 @@ RUN set -x \
     python3-setuptools \
     python3-wheel \
     python3-pip \
+    python3-venv \
     python-is-python3 \
     build-essential \
     astyle \
     mercurial \
+    cmake \
     ninja-build \
     libssl-dev \
     cargo \
@@ -38,29 +40,6 @@ RUN set -x \
     ccache \
     gcovr \
     && apt clean && rm -rf /var/lib/apt/lists \
-    && : # last line
-
-RUN set -x \
-    && pip3 install -U cmake
-
-# Set up Mbed environment
-WORKDIR /tmp/
-COPY tools/requirements.txt .
-RUN set -x \
-    && pip3 install -r requirements.txt  \
-    && : # last line
-
-COPY tools/requirements-ci-build.txt .
-RUN set -x \
-    && pip3 install -r requirements-ci-build.txt  \
-    && : # last line
-
-
-# ------------------------------------------------------------------------------
-# Install Python modules (which are not included in requirements.txt)
-RUN set -x \
-    && pip3 install -U \
-    mbed-cli \
     && : # last line
 
 # ------------------------------------------------------------------------------
@@ -88,11 +67,9 @@ RUN /bin/bash -c \
    "set -x -o pipefail \
     && arm-none-eabi-gcc --version | grep arm-none-eabi-gcc | tee env_settings \
     && cmake --version | grep version | tee -a env_settings \
+    && ninja --version | tee -a env_settings \
     && python --version 2>&1 | tee -a env_settings \
-    && (echo -n 'mbed-cli ' && mbed --version) | tee -a env_settings \
-    && (echo -n 'mbed-greentea ' && mbedgt --version | grep ^[0-9]) | tee -a env_settings \
-    && (echo -n 'mbed-host-tests ' && mbedhtrun --version) | tee -a env_settings \
-    && (echo -n 'mbed-tools ' && mbed-tools --version) | tee -a env_settings \
+    && python3 -c 'import venv' \
     && : # LAST LINE"
 
 WORKDIR /root
