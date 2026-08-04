@@ -4575,9 +4575,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271812.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
 
-    // STM32WB Targets -------------------------------------------------------------------------------------------------
-    // STM32WB0 Targets -----------------------------------------------------------------------------------------------
-    // STM32WB0 is not part of the dual-core STM32WB family below.
+// STM32WB0 Targets -----------------------------------------------------------------------------------------------
     "MCU_STM32WB0": {
         "inherits": [
             "MCU_STM32"
@@ -4603,6 +4601,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32WB0"
         ],
         "public": false,
+        "device_name": "STM32WB09KEVx",
         "extra_labels_add": [
             "STM32WB09xE",
             "STARTUP_STM32WB09"
@@ -4610,26 +4609,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros_add": [
             "STM32WB09"
         ],
-        "memory_banks": {
-            "IROM1": {
-                "access": {
-                    "execute": true, "peripheral": false, "read": true,
-                    "secure": false, "write": false
-                },
-                "default": true,
-                "size": 0x7F000,
-                "start": 0x10040000,
-                "startup": true
-            },
-            "SRAM1": {
-                "access": {
-                    "execute": true, "peripheral": false, "read": true,
-                    "secure": false, "write": true
-                },
-                "default": true,
-                "size": 0x10000,
-                "start": 0x20000000,
-                "startup": false
+        "memory_bank_config": {
+            "IROM": {
+                "size": 0x7F000 // final 4 KiB for WB0 stack NVM
             }
         }
     },
