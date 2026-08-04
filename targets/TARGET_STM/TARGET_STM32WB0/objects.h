@@ -9,6 +9,7 @@
 #include "stm32wb0x_ll_tim.h"
 #include "stm32wb0x_ll_pwr.h"
 #include "stm32wb0x_ll_system.h"
+#include "stm32wb0x_ll_usart.h"
 
 struct port_s {
     PortName port;
@@ -16,6 +17,17 @@ struct port_s {
     PinDirection direction;
     __IO uint32_t *reg_in;
     __IO uint32_t *reg_out;
+};
+
+struct serial_s {
+    UARTName uart;
+    int index;
+    uint32_t baudrate;
+    uint32_t databits;
+    uint32_t stopbits;
+    uint32_t parity;
+    PinName pin_tx;
+    PinName pin_rx;
 };
 
 #include "gpio_object.h"

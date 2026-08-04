@@ -66,12 +66,12 @@ SECTIONS
     _sidata = .;
 
     /* STM32WB0 ROM ABI data occupies the first 0x100 bytes of SRAM. */
-    .ram_vr MBED_RAM_BANK_SRAM1_START + 0x4 (NOLOAD) :
+    .ram_vr MBED_RAM_BANK_SRAM_START + 0x4 (NOLOAD) :
     {
         KEEP(*(.ram_vr))
     } > RAM
 
-    .bss.blueRAM MBED_RAM_BANK_SRAM1_START + 0xC0 (NOLOAD) :
+    .bss.blueRAM MBED_RAM_BANK_SRAM_START + 0xC0 (NOLOAD) :
     {
         _sbssblue = .;
         KEEP(*(.bss.__blue_RAM))
@@ -79,7 +79,7 @@ SECTIONS
     } > RAM
 
     /* Place the runtime vector table immediately after the ROM ABI area. */
-    .vector_ram MBED_RAM_BANK_SRAM1_START + 0x100 (NOLOAD) :
+    .vector_ram MBED_RAM_BANK_SRAM_START + 0x100 (NOLOAD) :
     {
         __vector_ram_start__ = .;
         . += __vector_table_size__;

@@ -4588,7 +4588,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_has_remove": [
             "LPTICKER", "RTC", "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
-            "INTERRUPTIN", "PWMOUT", "SERIAL", "SERIAL_FC", "SLEEP",
+            "INTERRUPTIN", "PWMOUT", "SERIAL_FC", "SLEEP",
             "SPI", "SPISLAVE", "SPI_ASYNCH", "WATCHDOG", "RESET_REASON"
         ],
         "device_has_add": [
@@ -4610,7 +4610,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32WB09"
         ],
         "memory_bank_config": {
-            "IROM": {
+            "ROM": {
                 "size": 0x7F000 // final 4 KiB for WB0 stack NVM
             }
         }
