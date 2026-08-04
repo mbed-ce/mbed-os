@@ -20,11 +20,13 @@
 
 #include "platform/platform.h"
 
-#if (DEVICE_SERIAL && DEVICE_INTERRUPTIN) || defined(DOXYGEN_ONLY)
+#if DEVICE_SERIAL || defined(DOXYGEN_ONLY)
 
 #include "platform/FileHandle.h"
 #include "drivers/SerialBase.h"
+#if DEVICE_INTERRUPTIN || defined(DOXYGEN_ONLY)
 #include "drivers/InterruptIn.h"
+#endif
 #include "rtos/Mutex.h"
 #include "platform/CircularBuffer.h"
 #include "platform/NonCopyable.h"
@@ -231,6 +233,7 @@ public:
      */
     void sigio(Callback<void()> func) override;
 
+#if DEVICE_INTERRUPTIN || defined(DOXYGEN_ONLY)
     /** Setup interrupt handler for DCD line
      *
      *  If DCD line is connected, an IRQ handler will be setup.
@@ -241,6 +244,7 @@ public:
      *                         low
      */
     void set_data_carrier_detect(PinName dcd_pin, bool active_high = false);
+#endif
 
     /** Set the baud rate
      *
@@ -337,7 +341,9 @@ private:
     bool _blocking = true;
     bool _tx_irq_enabled = false;
     bool _rx_irq_enabled = false;
+#if DEVICE_INTERRUPTIN
     InterruptIn *_dcd_irq = nullptr;
+#endif
 
     /** Device Hanged up
      *  Determines if the device hanged up on us.
@@ -358,14 +364,15 @@ private:
      */
     void wake(void);
 
-    /** Wake on data carrier detected.
-     */
+#if DEVICE_INTERRUPTIN
+    /** Wake on data carrier detected. */
     void dcd_irq(void);
+#endif
 };
 
 /** @}*/
 
 } //namespace mbed
 
-#endif //(DEVICE_SERIAL && DEVICE_INTERRUPTIN) || defined(DOXYGEN_ONLY)
+#endif // DEVICE_SERIAL || defined(DOXYGEN_ONLY)
 #endif //MBED_BUFFEREDSERIAL_H
