@@ -10,8 +10,10 @@
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
 #define HAL_TIM_MODULE_ENABLED
+#define HAL_UART_MODULE_ENABLED
 
 #define USE_HAL_TIM_REGISTER_CALLBACKS 0U
+#define USE_HAL_UART_REGISTER_CALLBACKS 0U
 
 #ifndef HSE_VALUE
 #define HSE_VALUE 32000000UL
@@ -52,6 +54,7 @@
 #include "stm32wb0x_hal_flash.h"
 #include "stm32wb0x_hal_pwr.h"
 #include "stm32wb0x_hal_tim.h"
+#include "stm32wb0x_hal_uart.h"
 
 #ifdef USE_FULL_ASSERT
 void assert_failed(uint8_t *file, uint32_t line);
