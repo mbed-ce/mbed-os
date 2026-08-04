@@ -37,7 +37,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           file: ./docker_images/mbed-ce-env/Dockerfile
           load: true
-          tags: mbed-ce-env:pr-test
+          tags: mbed-ce-env:ci-local
 
       - name: Checkout Mbed CE Hello World repo
         uses: actions/checkout@v7
@@ -60,7 +60,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           options: -v ${{ github.workspace }}:/work -w=/work --platform ${{ matrix.platform }}
-          image: mbed-ce-env:pr-test
+          image: mbed-ce-env:ci-local
           shell: bash
           run: |
             uname -m

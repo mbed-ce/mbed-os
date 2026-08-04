@@ -19,7 +19,6 @@ The following image tags are published:
 * `main`: Latest successful build of `main`
 * `main-YYYYMMDD-<sha7>`: Snapshot of a particular `main` build
 * `mbed-ce-X.Y.Z`: Release image for a specific mbed-ce version
-* `pr-N`: Temporary pull request builds used only by CI
 
 Note: release Git tags may still use the `mbed-os-X.Y.Z` naming scheme, even though the published container images use `mbed-ce-X.Y.Z`.
 

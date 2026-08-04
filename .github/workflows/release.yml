@@ -9,8 +9,7 @@ on:
       - 'mbed-os-*'
 
 permissions:
-  contents: read
-  packages: write
+  contents: write
 
 jobs:
   release:
