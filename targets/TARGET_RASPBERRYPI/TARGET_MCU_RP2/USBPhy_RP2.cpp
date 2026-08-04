@@ -48,6 +48,9 @@ extern "C" {
 #define usb_hw_set hw_set_alias(usb_hw)
 #define usb_hw_clear hw_clear_alias(usb_hw)
 
+// Change to 1 to print additional debug information
+#define RP2_USB_DEBUG 0
+
 static USBPhyHw *instance;
 
 // Per RP2350 manual section 12.7.3.7.3, DPRAM buffers must be 64 byte aligned.
@@ -303,7 +306,9 @@ bool USBPhyHw::endpoint_add(usb_ep_t endpoint, uint32_t max_packet, usb_ep_type_
             EP_CTRL_INTERRUPT_ON_STALL |
             reinterpret_cast<ptrdiff_t>(ep->dpram - USBCTRL_DPRAM_BASE);
 
-        // mbed_error_printf("EP added: %hhu, using buffer %p\n", endpoint, ep->dpram - USBCTRL_DPRAM_BASE);
+#if RP2_USB_DEBUG
+        mbed_error_printf("EP added: %hhu, using buffer %p\n", endpoint, ep->dpram - USBCTRL_DPRAM_BASE);
+#endif
     }
     else
     {
@@ -324,31 +329,47 @@ void USBPhyHw::endpoint_remove(usb_ep_t endpoint) {
     // Disable endpoint
     *ep_ctrl = 0;
 
-    // mbed_error_printf("EP removed: %hhu, buffer: %p\n", endpoint, ep->dpram - USBCTRL_DPRAM_BASE);
+#if RP2_USB_DEBUG
+    mbed_error_printf("EP removed: %hhu, buffer: %p\n", endpoint, ep->dpram - USBCTRL_DPRAM_BASE);
+#endif
 
-    MBED_ASSERT(ta_free(ep->dpram));
+    const bool free_result = ta_free(ep->dpram);
+    MBED_ASSERT(free_result);
 }
 
 void USBPhyHw::endpoint_stall(usb_ep_t endpoint)
 {
-    // mbed_error_printf("EP stalled: %hhu\n", endpoint);
+#if RP2_USB_DEBUG
+    mbed_error_printf("EP stalled: %hhu\n", endpoint);
+#endif
 
     // Implemented per TinyUSB: https://github.com/hathach/tinyusb/blob/f3021b337fcea154b898489c417d428c92f88e92/src/portable/raspberrypi/rp2040/dcd_rp2040.c#L532
     endpoint_abort(endpoint);
 
     int ep_num = endpoint & 0x7f;
-    usb_dpram->ep_buf_ctrl[ep_num].out = USB_BUF_CTRL_STALL;
+    int in     = endpoint >> 7;
+    io_rw_32 * const ep_buf_ctrl = in ? &usb_dpram->ep_buf_ctrl[ep_num - 1].in :
+                                        &usb_dpram->ep_buf_ctrl[ep_num - 1].out;
+
+    *ep_buf_ctrl = USB_BUF_CTRL_STALL;
 }
 
 void USBPhyHw::endpoint_unstall(usb_ep_t endpoint)
 {
-    // mbed_error_printf("EP unstalled: %hhu\n", endpoint);
+#if RP2_USB_DEBUG
+    mbed_error_printf("EP unstalled: %hhu\n", endpoint);
+#endif
 
     int ep_num = endpoint & 0x7f;
-    usb_dpram->ep_buf_ctrl[ep_num].out &= ~USB_BUF_CTRL_STALL;
+    int in     = endpoint >> 7;
+    io_rw_32 * const ep_buf_ctrl = in ? &usb_dpram->ep_buf_ctrl[ep_num - 1].in :
+                                        &usb_dpram->ep_buf_ctrl[ep_num - 1].out;
+
+    *ep_buf_ctrl &= ~USB_BUF_CTRL_STALL;
 
     // reset data toggle
-    this->ep_info_out[ep_num].next_pid = 0;
+    endpoint_info_t * const ep = in ? &this->ep_info_in[ep_num] : &this->ep_info_out[ep_num];
+    ep->next_pid = 0;
 }
 
 bool USBPhyHw::endpoint_read(usb_ep_t endpoint, uint8_t *data, uint32_t size)

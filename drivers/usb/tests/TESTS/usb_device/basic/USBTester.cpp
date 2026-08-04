@@ -40,6 +40,8 @@
 
 #define EVENT_READY (1 << 0)
 
+using namespace std::chrono_literals;
+
 USBTester::USBTester(USBPhy *phy, uint16_t vendor_id, uint16_t product_id, uint16_t product_release):
     USBDevice(phy, vendor_id, product_id, product_release), interface_0_alt_set(NONE),
     interface_1_alt_set(NONE), configuration_set(NONE), reset_count(0),
@@ -58,8 +60,10 @@ USBTester::USBTester(USBPhy *phy, uint16_t vendor_id, uint16_t product_id, uint1
     ctrl_buf = new uint8_t[CTRL_BUF_SIZE];
     init();
     USBDevice::connect();
-    flags.wait_any(EVENT_READY, osWaitForever, false);
 
+    if(flags.wait_any_for(EVENT_READY, 5s, false) & osFlagsError) {
+        printf("WARNING: USB device never went into CONFIGURED state!\n");
+    }
 }
 
 USBTester::~USBTester()
