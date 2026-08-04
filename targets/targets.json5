@@ -4583,6 +4583,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "c_lib": "small",
         "core": "Cortex-M0+",
+        "overrides": {
+            // WB0 flash starts at 0x10040000, above Mbed's default MPU ROM boundary.
+            "mpu-rom-end": "0x1fffffff"
+        },
         "extra_labels_add": [
             "STM32WB0"
         ],
