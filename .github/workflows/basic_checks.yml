@@ -10,91 +10,15 @@ on:
       - main
 
 env:
-  # Set up the oldest python version that's currently still supported by Python (as of Winter 2026)
-  PYTHON_VERSION: '3.10'
-
-  MBED_OS_ENV_IMAGE: ghcr.io/mbed-ce/mbed-os-env:main-latest
+  # Set up the oldest python version that's currently still supported by Python (as of Summer 2026)
+  PYTHON_VERSION: "3.10"
 
 jobs:
-  license-check:
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ env.MBED_OS_ENV_IMAGE }}
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          
-
-      - 
-        name: install dependencies
-        shell: bash
-        # TODO scancode 32.0 introduced significant breaking changes to the license
-        # detection output format: https://github.com/nexB/scancode-toolkit/releases/tag/v32.0.0
-        # Need to update Mbed's scripts for the new format.
-        run: |
-          apt-get update
-          apt-get install -y libxml2-dev libxslt1-dev
-          pip install -U "scancode-toolkit<32.0" "click>=7,<8"
-
-      - 
-        name: license check 
-        run: |
-          set -x
-          mkdir -p SCANCODE
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
-            | ( grep '.\(c\|cpp\|h\|hpp\|py\)$' || true )
-          echo $?
-          git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
-            | ( grep '.\(c\|cpp\|h\|hpp\|py\)$' || true ) \
-            | while read file; do cp --parents "${file}" SCANCODE; done
-          ls SCANCODE
-          scancode -l --json-pp scancode.json SCANCODE
-          cd tools/python
-          
-          # Run the evaluation script, which may fail, and save its exit code.
-          EVALUATE_EXITCODE=0
-          python -m scancode_evaluate.scancode_evaluate ../../scancode.json || EVALUATE_EXITCODE=$?
-          
-          cat scancode_evaluate.log
-          if [ "$EVALUATE_EXITCODE" = 0 ]; then
-            echo "License check OK";
-            true;
-          else
-            echo "License check failed, please review license issues found in files";
-            false;
-          fi
-
-  include-check:
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ env.MBED_OS_ENV_IMAGE }}
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - 
-        name: include check
-        run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          # checks mbed.h is not included in MbedOS files except in tests
-          ! git grep '^#include\s["'"']mbed.h['"'"]$' -- '*.c' '*.h' '*.cpp' '*.hpp' \
-              ':!*platform_mbed.h' ':!*TESTS/*' ':!TEST_APPS/' ':!UNITTESTS/' \
-              ':!*tests/*' ':!*targets/*' ':!*TARGET_*' ':!*unsupported/*' \
-              ':!*events/tests/*' ':!*drivers/tests/*'
-
   style-check:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -102,7 +26,7 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install astyle aspell
-    
+
       - name: UTF-8 Check
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -143,7 +67,7 @@ jobs:
           find  -name "*.s" | tee BUILD/badasm |
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -161,15 +85,13 @@ jobs:
           cd tools
           ruff check --diff python/mbed_tools python/mbed_platformio
           basedpyright
-          
 
   docs-check:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -187,9 +109,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -205,9 +127,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -221,47 +143,7 @@ jobs:
           mbed-tools cmsis-mcu-descr find-unused
           mbed-tools cmsis-mcu-descr check-missing
 
-
-  pin-validation:
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ env.MBED_OS_ENV_IMAGE }}
-    steps:
-      -
-        name: Checkout repo
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      -
-        name: validate pins
-        run: |
-          set -x
-          python3 -m pip install json5
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
-            | ( grep '.*[\\|\/]PinNames.h$' || true ) \
-            | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vvvfp "${file}"; done
-          git diff --exit-code --diff-filter=d --color
-
-  cmake-native-unit-tests:
-    runs-on: ubuntu-latest
-    container:
-      image: ${{ env.MBED_OS_ENV_IMAGE }}
-    steps:
-      -
-        name: Checkout repo
-        uses: actions/checkout@v6
-
-      - name: Install python3-venv
-        run: |
-          apt-get update
-          apt-get install -y python3-venv
-
-      -
-        name: Build and run unit tests
-        run: |
-          set -x     
-          ctest --build-and-test . build --build-generator Ninja --build-options -DMBED_ENABLE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON --test-command ctest --output-on-failure        
-          gcovr --gcov-executable gcov -r . ./build -s -e ".*\.h" --exclude-directories=${GITHUB_WORKSPACE}/build/UNITTESTS --exclude-directories=${GITHUB_WORKSPACE}/build/_deps
-          ccache -s
+  container-checks:
+    uses: ./.github/workflows/ci-basic-checks-container.yml
+    with:
+      image: ghcr.io/mbed-ce/mbed-ce-env:main
