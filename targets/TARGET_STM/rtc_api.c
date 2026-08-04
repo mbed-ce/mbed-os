@@ -47,7 +47,9 @@ static RTC_HandleTypeDef RtcHandle;
 void rtc_init(void)
 {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+#if !TARGET_STM32WB0
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+#endif
 
     if (RTC_inited) {
         return;
@@ -55,8 +57,10 @@ void rtc_init(void)
     RTC_inited = 1;
 
     // Enable access to Backup domain
+#if !TARGET_STM32WB0
     __HAL_RCC_PWR_CLK_ENABLE();
     HAL_PWR_EnableBkUpAccess();
+#endif
 
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
     while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID)) {
@@ -75,57 +79,82 @@ void rtc_init(void)
     }
 #elif (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_LSE_OR_LSI) && MBED_CONF_TARGET_LSE_AVAILABLE
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
+#if TARGET_STM32WB0
+    RCC_OscInitStruct.LSEState       = RCC_LSE_ON;
+#if MBED_CONF_TARGET_LSE_BYPASS
+    RCC_OscInitStruct.OscillatorType |= RCC_OSCILLATORTYPE_LSE_BYPASS;
+    RCC_OscInitStruct.LSEBYPASSState = RCC_LSE_BYPASS_ON;
+#else
+    RCC_OscInitStruct.LSEBYPASSState = RCC_LSE_BYPASS_OFF;
+#endif
+#else
     RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_NONE;
 #if MBED_CONF_TARGET_LSE_BYPASS
     RCC_OscInitStruct.LSEState       = RCC_LSE_BYPASS;
 #else
     RCC_OscInitStruct.LSEState       = RCC_LSE_ON;
 #endif
+#endif
 
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         error("Cannot initialize RTC with LSE\n");
     }
 
+#if TARGET_STM32WB0
+    __HAL_RCC_RTC_WDG_BLEWKUP_CLK_CONFIG(RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSE);
+#else
     __HAL_RCC_RTC_CONFIG(RCC_RTCCLKSOURCE_LSE);
-
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         error("PeriphClkInitStruct RTC failed with LSE\n");
     }
+#endif
 #else /* Fallback to LSI */
 #if TARGET_STM32WB
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI1;
 #else
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI;
 #endif
+#if !TARGET_STM32WB0
     RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_NONE;
+#endif
     RCC_OscInitStruct.LSIState       = RCC_LSI_ON;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         error("Cannot initialize RTC with LSI\n");
     }
 
+#if TARGET_STM32WB0
+    __HAL_RCC_RTC_WDG_BLEWKUP_CLK_CONFIG(RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSI);
+#else
     __HAL_RCC_RTC_CONFIG(RCC_RTCCLKSOURCE_LSI);
-
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         error("PeriphClkInitStruct RTC failed with LSI\n");
     }
+#endif
 #endif /* MBED_CONF_TARGET_RTC_CLOCK_SOURCE */
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
     LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
 #endif /* DUAL_CORE */
 
     // Enable RTC
+#if TARGET_STM32WB0
+    __HAL_RCC_RTC_CLK_ENABLE();
+#else
     __HAL_RCC_RTC_ENABLE();
 
 #if defined __HAL_RCC_RTCAPB_CLK_ENABLE /* part of STM32L4 / STM32L5 */
     __HAL_RCC_RTCAPB_CLK_ENABLE();
 #endif /* __HAL_RCC_RTCAPB_CLK_ENABLE */
+#endif
 
     RtcHandle.Instance = RTC;
     RtcHandle.State = HAL_RTC_STATE_RESET;
+#if TARGET_STM32WB0
+    uint32_t calendar_initialized = __HAL_RTC_IS_CALENDAR_INITIALIZED(&RtcHandle);
+#endif
 
 #if TARGET_STM32F1
     RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
@@ -135,7 +164,9 @@ void rtc_init(void)
     RtcHandle.Init.SynchPrediv    = PREDIV_S_VALUE;
     RtcHandle.Init.OutPut         = RTC_OUTPUT_DISABLE;
     RtcHandle.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+#if defined (RTC_OUTPUT_TYPE_OPENDRAIN)
     RtcHandle.Init.OutPutType     = RTC_OUTPUT_TYPE_OPENDRAIN;
+#endif /* defined (RTC_OUTPUT_TYPE_OPENDRAIN) */
 #if defined (RTC_OUTPUT_REMAP_NONE)
     RtcHandle.Init.OutPutRemap    = RTC_OUTPUT_REMAP_NONE;
 #endif /* defined (RTC_OUTPUT_REMAP_NONE) */
@@ -155,6 +186,13 @@ void rtc_init(void)
         error("EnableBypassShadow error\n");
     }
 #endif /* TARGET_STM32F1 || TARGET_STM32F2 */
+
+#if TARGET_STM32WB0
+    // The WB0 reset date precedes the epoch supported by Mbed's STM RTC mapping.
+    if (!calendar_initialized) {
+        rtc_write(0);
+    }
+#endif
 }
 
 void rtc_free(void)

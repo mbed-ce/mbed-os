@@ -9,10 +9,12 @@
 #define HAL_GPIO_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
+#define HAL_RTC_MODULE_ENABLED
 #define HAL_TIM_MODULE_ENABLED
 #define HAL_UART_MODULE_ENABLED
 
 #define USE_HAL_TIM_REGISTER_CALLBACKS 0U
+#define USE_HAL_RTC_REGISTER_CALLBACKS 0U
 #define USE_HAL_UART_REGISTER_CALLBACKS 0U
 
 #ifndef HSE_VALUE
@@ -53,6 +55,7 @@
 #include "stm32wb0x_hal_cortex.h"
 #include "stm32wb0x_hal_flash.h"
 #include "stm32wb0x_hal_pwr.h"
+#include "stm32wb0x_hal_rtc.h"
 #include "stm32wb0x_hal_tim.h"
 #include "stm32wb0x_hal_uart.h"
 

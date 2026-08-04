@@ -4591,7 +4591,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32WB0"
         ],
         "device_has_remove": [
-            "LPTICKER", "RTC", "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
+            "LPTICKER", "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
             "INTERRUPTIN", "PWMOUT", "SERIAL_FC", "SLEEP",
             "SPI", "SPISLAVE", "SPI_ASYNCH", "WATCHDOG", "RESET_REASON"
         ],
