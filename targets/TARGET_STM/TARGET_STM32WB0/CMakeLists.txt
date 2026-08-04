@@ -9,6 +9,7 @@ add_library(mbed-stm32wb0 INTERFACE)
 target_sources(mbed-stm32wb0 INTERFACE
     clock_cfg/system_clock.c
     serial_device.c
+    wait_ns.c
 )
 
 target_include_directories(mbed-stm32wb0 INTERFACE .)
