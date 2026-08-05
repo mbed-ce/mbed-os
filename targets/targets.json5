@@ -8630,5 +8630,145 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "image_url": "https://www.olimex.com/Products/RaspberryPi/PICO/PICO2-XXL/images/thumbs/310x230/PICO2-XXL1w.jpg"
+    },
+    // Renesas RA Targets ------------------------------------------------------------------------------------------
+    "MCU_RA": {
+        "inherits": [
+            "Target"
+        ],
+        "public": false,
+        "extra_labels": [
+            "RENESAS",
+            "RA"
+        ],
+        "config": {
+            "lse-available": {
+                "help": "Define if a Low Speed External xtal (LSE) is available on the board (0 = No, 1 = Yes). If Yes, the LSE will be used to clock the RTC, LPUART, ... otherwise the Low Speed Internal clock (LOCO) will be used",
+                "value": "1"
+            },
+            "rtc-clock-source": {
+                "help": "Define the RTC clock source. RTC_CLOCK_SOURCE_SUBCLK, RTC_CLOCK_SOURCE_LOCO, RTC_CLOCK_SOURCE_MAINCLK.",
+                "value": "RTC_CLOCK_SOURCE_SUBCLK"
+            },
+        },
+        "overrides": {
+            "deep-sleep-latency": 4,
+            "init-us-ticker-at-boot": true,
+            "console-uart": false,
+            "console-rtt": true,
+        },
+        "device_has": [
+            "MPU",
+            "USTICKER",
+            //"LPTICKER",
+            "RTC",
+            "CRC",
+            "TRNG",
+            "ANALOGIN",
+            "ANALOGOUT",
+            "I2C",
+            //"I2CSLAVE",
+            //"I2C_ASYNCH",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "SERIAL",
+            //"SERIAL_FC",
+            //"SLEEP",
+            "SPI",
+            //"SPISLAVE",
+            //"SPI_ASYNCH",
+            "FLASH",
+            //"USBDEVICE",
+            //"EMAC",
+            //"QSPI",
+            //"OSPI",
+            "WATCHDOG",
+            "RESET_REASON"
+        ]
+    },
+    "MCU_RA4E1": {
+        "inherits": [
+            "MCU_RA"
+        ],
+        "public": false,
+        "core": "Cortex-M33",
+        "device_has_add": [
+            "CAN"
+        ],
+        "extra_labels_add": [
+            "RA4E1"
+        ]
+    },
+    "FPB_RA4E1": {
+        "inherits": [
+            "MCU_RA4E1"
+        ],
+        "public": true,
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "overrides": {
+            "lse-available": 0,
+            "rtc-clock-source": "RTC_CLOCK_SOURCE_LOCO"
+        },
+        "device_name": "R7FA4E10D",
+        "image_url": "https://www.renesas.com/sites/default/files/styles/product_features_large/public/fpb-ra4e1-pcb.png"
+    },
+    "MCU_RA6E2": {
+        "inherits": [
+            "MCU_RA"
+        ],
+        "public": false,
+        "core": "Cortex-M33",
+        "device_has_add": [
+            "CAN",
+            "CAN_FD"
+        ],
+        "extra_labels_add": [
+            "RA6E2"
+        ]
+    },
+    "FPB_RA6E2": {
+        "inherits": [
+            "MCU_RA6E2"
+        ],
+        "public": true,
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "device_name": "R7FA6E2BB",
+        "image_url": "https://www.renesas.com/sites/default/files/styles/product_features_large/public/fpb-ra6e2-fast-prototyping-board.jpg"
+    },
+    "MCU_RA8E1": {
+        "inherits": [
+            "MCU_RA"
+        ],
+        "public": false,
+        "core": "Cortex-M85FE",
+        "device_has_add": [
+            "CAN",
+            "CAN_FD"
+        ],
+        "extra_labels_add": [
+            "RA8E1"
+        ]
+    },
+    "FPB_RA8E1": {
+        "inherits": [
+            "MCU_RA8E1"
+        ],
+        "public": true,
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "device_name": "R7FA8E1AF",
+        "image_url": "https://www.renesas.com/sites/default/files/styles/product_features_large/public/fpb-ra8e1-top.jpg",
+        "overrides": {
+            "console-uart": true,
+            "console-rtt": false
+        },
     }
 }

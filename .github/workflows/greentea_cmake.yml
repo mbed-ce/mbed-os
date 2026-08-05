@@ -101,6 +101,12 @@ jobs:
             profile: full
           - target: RZ_A1H
             profile: full
+          - target: FPB_RA4E1
+            profile: full
+          - target: FPB_RA6E2
+            profile: full
+          - target: FPB_RA8E1
+            profile: full
 
           # Ambiq MCUs
           - target: SFE_ARTEMIS_DK
