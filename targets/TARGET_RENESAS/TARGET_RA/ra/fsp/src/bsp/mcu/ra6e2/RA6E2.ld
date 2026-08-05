@@ -6,6 +6,16 @@ DATA_FLASH_START = 0x08000000;
 DATA_FLASH_LENGTH = 0x00001000;
 QSPI_FLASH_START = 0x60000000;
 QSPI_FLASH_LENGTH = 0x04000000;
+OPTION_SETTING_OFS0_START = 0x0100a100;
+OPTION_SETTING_OFS0_LENGTH = 0x00000004;
+OPTION_SETTING_OSIS_START = 0x0100a120;
+OPTION_SETTING_OSIS_LENGTH = 0x00000010;
+OPTION_SETTING_OFS1_SEC_START = 0x0100a200;
+OPTION_SETTING_OFS1_SEC_LENGTH = 0x00000004;
+OPTION_SETTING_BPS_SEC_START = 0x0100a240;
+OPTION_SETTING_BPS_SEC_LENGTH = 0x00000004;
+OPTION_SETTING_PBPS_SEC_START = 0x0100a260;
+OPTION_SETTING_PBPS_SEC_LENGTH = 0x00000004;
 __vector_table_size__ = 112 * 4;
 
 MEMORY
@@ -14,6 +24,11 @@ MEMORY
   FLASH (rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_Flash_START, LENGTH = MBED_CONFIGURED_ROM_BANK_Flash_SIZE
   DATA_FLASH (rx) : ORIGIN = DATA_FLASH_START, LENGTH = DATA_FLASH_LENGTH
   QSPI_FLASH (rx) : ORIGIN = QSPI_FLASH_START, LENGTH = QSPI_FLASH_LENGTH
+  OPTION_SETTING_OFS0 (r) : ORIGIN = OPTION_SETTING_OFS0_START, LENGTH = OPTION_SETTING_OFS0_LENGTH
+  OPTION_SETTING_OSIS (r) : ORIGIN = OPTION_SETTING_OSIS_START, LENGTH = OPTION_SETTING_OSIS_LENGTH
+  OPTION_SETTING_OFS1_SEC (r) : ORIGIN = OPTION_SETTING_OFS1_SEC_START, LENGTH = OPTION_SETTING_OFS1_SEC_LENGTH
+  OPTION_SETTING_BPS_SEC (r) : ORIGIN = OPTION_SETTING_BPS_SEC_START, LENGTH = OPTION_SETTING_BPS_SEC_LENGTH
+  OPTION_SETTING_PBPS_SEC (r) : ORIGIN = OPTION_SETTING_PBPS_SEC_START, LENGTH = OPTION_SETTING_PBPS_SEC_LENGTH
 }
 
 /* code entry point...need to define to keep crt0 _start out */
@@ -288,6 +303,101 @@ SECTIONS
        __ddsc_FLASH_END = . ;
 
   }  > FLASH
+
+  /***** OPTION_SETTING_OFS0 memory section allocations ******/
+  .option_setting_ofs0.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS0_START = . ;
+
+  }  > OPTION_SETTING_OFS0
+  /* Option Function Select Register 0 Secure */
+  __option_setting_ofs0_reg$$  (READONLY) :
+  {
+      __option_setting_ofs0_reg$$Base = . ;
+  KEEP(*(.option_setting_ofs0))
+      __option_setting_ofs0_reg$$Limit = . ;
+  }  > OPTION_SETTING_OFS0
+  .option_setting_ofs0.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS0_END = . ;
+
+  }  > OPTION_SETTING_OFS0
+
+  /***** OPTION_SETTING_OSIS memory section allocations ******/
+  .option_setting_osis.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OSIS_START = . ;
+
+  }  > OPTION_SETTING_OSIS
+  /* OCD/Serial Programmer ID setting register Secure */
+  __option_setting_osis_reg$$  (READONLY) :
+  {
+      __option_setting_osis_reg$$Base = . ;
+  KEEP(*(.option_setting_osis))
+      __option_setting_osis_reg$$Limit = . ;
+  }  > OPTION_SETTING_OSIS
+  .option_setting_osis.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OSIS_END = . ;
+
+  }  > OPTION_SETTING_OSIS
+
+  /***** OPTION_SETTING_OFS1_SEC memory section allocations ******/
+  .option_setting_ofs1_sec.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS1_SEC_START = . ;
+
+  }  > OPTION_SETTING_OFS1_SEC
+  /* Option Function Select Register 1 Secure */
+  __option_setting_ofs1_sec_reg$$  (READONLY) :
+  {
+      __option_setting_ofs1_sec_reg$$Base = . ;
+  KEEP(*(.option_setting_ofs1_sec))
+      __option_setting_ofs1_sec_reg$$Limit = . ;
+  }  > OPTION_SETTING_OFS1_SEC
+  .option_setting_ofs1_sec.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS1_SEC_END = . ;
+
+  }  > OPTION_SETTING_OFS1_SEC
+
+  /***** OPTION_SETTING_BPS_SEC memory section allocations ******/
+  .option_setting_bps_sec.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_BPS_SEC_START = . ;
+
+  }  > OPTION_SETTING_BPS_SEC
+  /* Block Protect Setting Register Secure */
+  __option_setting_bps_sec_reg$$  (READONLY) :
+  {
+      __option_setting_bps_sec_reg$$Base = . ;
+  KEEP(*(.option_setting_bps_sec))
+      __option_setting_bps_sec_reg$$Limit = . ;
+  }  > OPTION_SETTING_BPS_SEC
+  .option_setting_bps_sec.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_BPS_SEC_END = . ;
+
+  }  > OPTION_SETTING_BPS_SEC
+
+  /***** OPTION_SETTING_PBPS_SEC memory section allocations ******/
+  .option_setting_pbps_sec.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_PBPS_SEC_START = . ;
+
+  }  > OPTION_SETTING_PBPS_SEC
+  /* Permanent Block Protect Setting Register Secure */
+  __option_setting_pbps_sec_reg$$  (READONLY) :
+  {
+      __option_setting_pbps_sec_reg$$Base = . ;
+  KEEP(*(.option_setting_pbps_sec))
+      __option_setting_pbps_sec_reg$$Limit = . ;
+  }  > OPTION_SETTING_PBPS_SEC
+  .option_setting_pbps_sec.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_PBPS_SEC_END = . ;
+
+  }  > OPTION_SETTING_PBPS_SEC
 
 }
 

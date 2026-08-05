@@ -1988,7 +1988,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "STM32F756ZGTx",
         "overrides": {
             "network-default-interface-type": "ETHERNET",
-            
+
             // ADC reference voltage is same as MCU VDD.
             "default-adc-vref": 3.3
         },
@@ -2027,7 +2027,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "STM32F767ZITx",
         "overrides": {
             "network-default-interface-type": "ETHERNET",
-            
+
             // ADC reference voltage is same as MCU VDD.
             "default-adc-vref": 3.3
         },
@@ -8655,7 +8655,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "deep-sleep-latency": 4,
             "init-us-ticker-at-boot": true,
             "console-uart": false,
-            "console-rtt": true,
+            "console-rtt": true
         },
         "device_has": [
             "MPU",
@@ -8687,7 +8687,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             //"OSPI",
             "WATCHDOG",
             "RESET_REASON"
-        ]
+        ],
+        "OUTPUT_EXT": "hex"
     },
     "MCU_RA4E1": {
         "inherits": [

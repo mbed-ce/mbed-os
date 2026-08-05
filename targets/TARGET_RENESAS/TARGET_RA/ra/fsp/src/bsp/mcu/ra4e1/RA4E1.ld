@@ -6,6 +6,24 @@ DATA_FLASH_START = 0x08000000;
 DATA_FLASH_LENGTH = 0x00002000;
 QSPI_FLASH_START = 0x60000000;
 QSPI_FLASH_LENGTH = 0x04000000;
+OPTION_SETTING_OFS0_START = 0x0100a100;
+OPTION_SETTING_OFS0_LENGTH = 0x00000004;
+OPTION_SETTING_OFS1_START = 0x0100a180;
+OPTION_SETTING_OFS1_LENGTH = 0x00000004;
+OPTION_SETTING_BPS_START = 0x0100a1c0;
+OPTION_SETTING_BPS_LENGTH = 0x00000004;
+OPTION_SETTING_PBPS_START = 0x0100a1e0;
+OPTION_SETTING_PBPS_LENGTH = 0x00000004;
+OPTION_SETTING_OFS1_SEC_START = 0x0100a200;
+OPTION_SETTING_OFS1_SEC_LENGTH = 0x00000004;
+OPTION_SETTING_BPS_SEC_START = 0x0100a240;
+OPTION_SETTING_BPS_SEC_LENGTH = 0x00000004;
+OPTION_SETTING_PBPS_SEC_START = 0x0100a260;
+OPTION_SETTING_PBPS_SEC_LENGTH = 0x00000004;
+OPTION_SETTING_OFS1_SEL_START = 0x0100a280;
+OPTION_SETTING_OFS1_SEL_LENGTH = 0x00000004;
+OPTION_SETTING_BPS_SEL_START = 0x0100a2c0;
+OPTION_SETTING_BPS_SEL_LENGTH = 0x00000004;
 __vector_table_size__ = 112 * 4;
 
 MEMORY
@@ -14,6 +32,15 @@ MEMORY
   FLASH (rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_Flash_START, LENGTH = MBED_CONFIGURED_ROM_BANK_Flash_SIZE
   DATA_FLASH (rx) : ORIGIN = DATA_FLASH_START, LENGTH = DATA_FLASH_LENGTH
   QSPI_FLASH (rx) : ORIGIN = QSPI_FLASH_START, LENGTH = QSPI_FLASH_LENGTH
+  OPTION_SETTING_OFS0 (r) : ORIGIN = OPTION_SETTING_OFS0_START, LENGTH = OPTION_SETTING_OFS0_LENGTH
+  OPTION_SETTING_OFS1 (r) : ORIGIN = OPTION_SETTING_OFS1_START, LENGTH = OPTION_SETTING_OFS1_LENGTH
+  OPTION_SETTING_BPS (r) : ORIGIN = OPTION_SETTING_BPS_START, LENGTH = OPTION_SETTING_BPS_LENGTH
+  OPTION_SETTING_PBPS (r) : ORIGIN = OPTION_SETTING_PBPS_START, LENGTH = OPTION_SETTING_PBPS_LENGTH
+  OPTION_SETTING_OFS1_SEC (r) : ORIGIN = OPTION_SETTING_OFS1_SEC_START, LENGTH = OPTION_SETTING_OFS1_SEC_LENGTH
+  OPTION_SETTING_BPS_SEC (r) : ORIGIN = OPTION_SETTING_BPS_SEC_START, LENGTH = OPTION_SETTING_BPS_SEC_LENGTH
+  OPTION_SETTING_PBPS_SEC (r) : ORIGIN = OPTION_SETTING_PBPS_SEC_START, LENGTH = OPTION_SETTING_PBPS_SEC_LENGTH
+  OPTION_SETTING_OFS1_SEL (r) : ORIGIN = OPTION_SETTING_OFS1_SEL_START, LENGTH = OPTION_SETTING_OFS1_SEL_LENGTH
+  OPTION_SETTING_BPS_SEL (r) : ORIGIN = OPTION_SETTING_BPS_SEL_START, LENGTH = OPTION_SETTING_BPS_SEL_LENGTH
 }
 
 /* code entry point...need to define to keep crt0 _start out */
@@ -272,5 +299,175 @@ SECTIONS
 
   }  > FLASH
 
-}
+  /***** OPTION_SETTING_OFS0 memory section allocations ******/
+  .option_setting_ofs0.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS0_START = . ;
 
+  }  > OPTION_SETTING_OFS0
+  /* Option Function Select Register 0 */
+  __option_setting_ofs0_reg$$  (READONLY) :
+  {
+      __option_setting_ofs0_reg$$Base = . ;
+  KEEP(*(.option_setting_ofs0))
+      __option_setting_ofs0_reg$$Limit = . ;
+  }  > OPTION_SETTING_OFS0
+  .option_setting_ofs0.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS0_END = . ;
+
+  }  > OPTION_SETTING_OFS0
+
+  /***** OPTION_SETTING_OFS1 memory section allocations ******/
+  .option_setting_ofs1.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS1_START = . ;
+
+  }  > OPTION_SETTING_OFS1
+  /* Option Function Select Register 1 */
+  __option_setting_ofs1_reg$$  (READONLY) :
+  {
+      __option_setting_ofs1_reg$$Base = . ;
+  KEEP(*(.option_setting_ofs1))
+      __option_setting_ofs1_reg$$Limit = . ;
+  }  > OPTION_SETTING_OFS1
+  .option_setting_ofs1.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS1_END = . ;
+
+  }  > OPTION_SETTING_OFS1
+
+  /***** OPTION_SETTING_BPS memory section allocations ******/
+  .option_setting_bps.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_BPS_START = . ;
+
+  }  > OPTION_SETTING_BPS
+  /* Block Protect Setting Register */
+  __option_setting_bps_reg$$  (READONLY) :
+  {
+      __option_setting_bps_reg$$Base = . ;
+  KEEP(*(.option_setting_bps))
+      __option_setting_bps_reg$$Limit = . ;
+  }  > OPTION_SETTING_BPS
+  .option_setting_bps.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_BPS_END = . ;
+
+  }  > OPTION_SETTING_BPS
+
+  /***** OPTION_SETTING_PBPS memory section allocations ******/
+  .option_setting_pbps.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_PBPS_START = . ;
+
+  }  > OPTION_SETTING_PBPS
+  /* Permanent Block Protect Setting Register */
+  __option_setting_pbps_reg$$  (READONLY) :
+  {
+      __option_setting_pbps_reg$$Base = . ;
+  KEEP(*(.option_setting_pbps))
+      __option_setting_pbps_reg$$Limit = . ;
+  }  > OPTION_SETTING_PBPS
+  .option_setting_pbps.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_PBPS_END = . ;
+
+  }  > OPTION_SETTING_PBPS
+
+  /***** OPTION_SETTING_OFS1_SEC memory section allocations ******/
+  .option_setting_ofs1_sec.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS1_SEC_START = . ;
+
+  }  > OPTION_SETTING_OFS1_SEC
+  /* Option Function Select Register 1 Secure */
+  __option_setting_ofs1_sec_reg$$  (READONLY) :
+  {
+      __option_setting_ofs1_sec_reg$$Base = . ;
+  KEEP(*(.option_setting_ofs1_sec))
+      __option_setting_ofs1_sec_reg$$Limit = . ;
+  }  > OPTION_SETTING_OFS1_SEC
+  .option_setting_ofs1_sec.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS1_SEC_END = . ;
+
+  }  > OPTION_SETTING_OFS1_SEC
+
+  /***** OPTION_SETTING_BPS_SEC memory section allocations ******/
+  .option_setting_bps_sec.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_BPS_SEC_START = . ;
+
+  }  > OPTION_SETTING_BPS_SEC
+  /* Block Protect Setting Register Secure */
+  __option_setting_bps_sec_reg$$  (READONLY) :
+  {
+      __option_setting_bps_sec_reg$$Base = . ;
+  KEEP(*(.option_setting_bps_sec))
+      __option_setting_bps_sec_reg$$Limit = . ;
+  }  > OPTION_SETTING_BPS_SEC
+  .option_setting_bps_sec.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_BPS_SEC_END = . ;
+
+  }  > OPTION_SETTING_BPS_SEC
+
+  /***** OPTION_SETTING_PBPS_SEC memory section allocations ******/
+  .option_setting_pbps_sec.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_PBPS_SEC_START = . ;
+
+  }  > OPTION_SETTING_PBPS_SEC
+  /* Permanent Block Protect Setting Register Secure */
+  __option_setting_pbps_sec_reg$$  (READONLY) :
+  {
+      __option_setting_pbps_sec_reg$$Base = . ;
+  KEEP(*(.option_setting_pbps_sec))
+      __option_setting_pbps_sec_reg$$Limit = . ;
+  }  > OPTION_SETTING_PBPS_SEC
+  .option_setting_pbps_sec.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_PBPS_SEC_END = . ;
+
+  }  > OPTION_SETTING_PBPS_SEC
+
+  /***** OPTION_SETTING_OFS1_SEL memory section allocations ******/
+  .option_setting_ofs1_sel.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS1_SEL_START = . ;
+
+  }  > OPTION_SETTING_OFS1_SEL
+  /* OFS1 Security Attribution */
+  __option_setting_ofs1_sel_reg$$  (READONLY) :
+  {
+      __option_setting_ofs1_sel_reg$$Base = . ;
+  KEEP(*(.option_setting_ofs1_sel))
+      __option_setting_ofs1_sel_reg$$Limit = . ;
+  }  > OPTION_SETTING_OFS1_SEL
+  .option_setting_ofs1_sel.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_OFS1_SEL_END = . ;
+
+  }  > OPTION_SETTING_OFS1_SEL
+
+  /***** OPTION_SETTING_BPS_SEL memory section allocations ******/
+  .option_setting_bps_sel.startof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_BPS_SEL_START = . ;
+
+  }  > OPTION_SETTING_BPS_SEL
+  /* BPS Security Attribution */
+  __option_setting_bps_sel_reg$$  (READONLY) :
+  {
+      __option_setting_bps_sel_reg$$Base = . ;
+  KEEP(*(.option_setting_bps_sel))
+      __option_setting_bps_sel_reg$$Limit = . ;
+  }  > OPTION_SETTING_BPS_SEL
+  .option_setting_bps_sel.endof  (READONLY) :
+  {
+       __ddsc_OPTION_SETTING_BPS_SEL_END = . ;
+
+  }  > OPTION_SETTING_BPS_SEL
+
+}
