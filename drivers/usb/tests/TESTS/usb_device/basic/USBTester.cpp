@@ -61,7 +61,7 @@ USBTester::USBTester(USBPhy *phy, uint16_t vendor_id, uint16_t product_id, uint1
     init();
     USBDevice::connect();
 
-    if(flags.wait_any_for(EVENT_READY, 5s, false) & osFlagsError) {
+    if (flags.wait_any_for(EVENT_READY, 5s, false) & osFlagsError) {
         printf("WARNING: USB device never went into CONFIGURED state!\n");
     }
 }
