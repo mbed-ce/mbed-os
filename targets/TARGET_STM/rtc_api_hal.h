@@ -33,16 +33,13 @@
 
 #include "rtc_api.h"
 #include "lp_ticker_api.h"
+#include "rtc_clock_source.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Possible choices of the RTC_CLOCK_SOURCE configuration set in json file
-#define USE_RTC_CLK_LSE_OR_LSI 1
-#define USE_RTC_CLK_HSE 3
-
-#if !((MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_LSE_OR_LSI) || (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_HSE))
+#if !((MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_LSE_OR_LSI) || (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_LSI) || (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_HSE))
 #error "RTC clock configuration is invalid!"
 #endif
 
