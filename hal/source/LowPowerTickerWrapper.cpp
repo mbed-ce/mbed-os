@@ -156,6 +156,10 @@ void LowPowerTickerWrapper::disable_interrupt()
 {
     core_util_critical_section_enter();
 
+    _timeout.detach();
+    _pending_timeout = false;
+    _pending_match = false;
+    _pending_fire_now = false;
     _intf->disable_interrupt();
 
     core_util_critical_section_exit();

@@ -4588,6 +4588,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "help": "Mask value: USE_RC64MPLL (requires 32 MHz HSE) | USE_DIRECT_HSE | USE_HSI",
                 "value": "USE_HSI",
                 "macro_name": "CLOCK_SOURCE"
+            },
+            "lpticker-lptim": {
+                "help": "STM32WB0 uses the RTC wake-up timer for the low-power ticker",
+                "value": 0
             }
         },
         "overrides": {
@@ -4598,7 +4602,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32WB0"
         ],
         "device_has_remove": [
-            "LPTICKER", "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
+            "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
             "INTERRUPTIN", "PWMOUT", "SERIAL_FC", "SLEEP",
             "SPI", "SPISLAVE", "SPI_ASYNCH", "WATCHDOG", "RESET_REASON"
         ],
