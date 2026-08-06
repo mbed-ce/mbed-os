@@ -93,6 +93,8 @@ A message that notes the main changes in the update.
   - Fixed issue where reading from an I2C master in slave mode could hang forever if the master ends the transaction early
   - Fixed issue where writing to an I2C master in slave mode would always return success regardless of success/failure
   - Fixed assert failure when calling SPI::write() with a zero-length Tx or Rx buffer
+  - Implemented missing USB endpoint abort function, so `USBDevice::endpoint_abort()` is no longer a no-op
+  - Implemented memory manager for USB DPRAM and proper deallocation of endpoint buffers, so USB will no longer die once a certain number of endpoints are created and destroyed over the life of the application. 
 - RP2040:
   - Fixed RTC not counting until the time was first set (just calling `RealTimeClock::init()` was not enough)
 - Fixed issue where if the same setting was overridden in multiple different `target_override` blocks in mbed_app.json, only one of the overrides would be processed

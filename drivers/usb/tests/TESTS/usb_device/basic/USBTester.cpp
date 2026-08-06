@@ -17,10 +17,13 @@
 
 #if DEVICE_USBDEVICE
 
+#include <cinttypes>
+
 #include "stdint.h"
 #include "USBTester.h"
 #include "events/mbed_shared_queues.h"
 #include "EndpointResolver.h"
+#include "mbed_interface.h"
 
 #define DEFAULT_CONFIGURATION (1)
 #define LAST_CONFIGURATION    (2)
@@ -36,6 +39,8 @@
 #define CTRL_BUF_SIZE (2048)
 
 #define EVENT_READY (1 << 0)
+
+using namespace std::chrono_literals;
 
 USBTester::USBTester(USBPhy *phy, uint16_t vendor_id, uint16_t product_id, uint16_t product_release):
     USBDevice(phy, vendor_id, product_id, product_release), interface_0_alt_set(NONE),
@@ -55,8 +60,10 @@ USBTester::USBTester(USBPhy *phy, uint16_t vendor_id, uint16_t product_id, uint1
     ctrl_buf = new uint8_t[CTRL_BUF_SIZE];
     init();
     USBDevice::connect();
-    flags.wait_any(EVENT_READY, osWaitForever, false);
 
+    if (flags.wait_any_for(EVENT_READY, 5s, false) & osFlagsError) {
+        printf("WARNING: USB device never went into CONFIGURED state!\n");
+    }
 }
 
 USBTester::~USBTester()
@@ -207,12 +214,17 @@ void USBTester::callback_set_configuration(uint8_t configuration)
 bool USBTester::setup_iterface(uint8_t ep_in, uint8_t ep_out, uint32_t ep_size, usb_ep_type_t ep_type,
                                uint8_t *buf, uint32_t buf_size, void (USBTester::*callback)())
 {
-    bool success = false;
+    if (!endpoint_add(ep_in, ep_size, ep_type)) {
+        mbed_error_printf("Warning: endpoint_add(%" PRIu8 ", %" PRIu32 ", %d) failed.\n", ep_in, ep_size, ep_type);
+        return false;
+    }
 
-    success = endpoint_add(ep_in, ep_size, ep_type);
-    success &= endpoint_add(ep_out, ep_size, ep_type, callback);
-    success &= read_start(ep_out, buf, buf_size);
-    return success;
+    if (!endpoint_add(ep_out, ep_size, ep_type, callback)) {
+        mbed_error_printf("Warning: endpoint_add(%" PRIu8 ", %" PRIu32 ", %d, callback) failed.\n", ep_out, ep_size, ep_type);
+        return false;
+    }
+
+    return read_start(ep_out, buf, buf_size);
 }
 
 void USBTester::remove_iterface(uint16_t interface)
@@ -276,6 +288,8 @@ void USBTester::callback_set_interface(uint16_t interface, uint8_t alternate)
 
 bool USBTester::set_interface(uint16_t interface, uint16_t alternate)
 {
+    mbed_error_printf("Interface set: interface=%" PRIu16 ", alternate = %" PRIu16 "\n", interface, alternate);
+
     bool success = false;
 
     if (interface == 0) {

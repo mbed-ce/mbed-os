@@ -37,3 +37,18 @@ static inline uint32_t mbed_integer_log_2(uint32_t x)
 {
     return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
 }
+
+/**
+ * @brief Align an address (\c addr) to a given \c alignment by adding between 0 and \c alignment-1 bytes to it.
+ */
+static inline void *mbed_align_up_to(void *addr, size_t alignment)
+{
+    // Use integer division to divide the address down to the alignment size, which
+    // rounds to the block before the given address.
+    // So that we always go one cache line back even if the given address is on the start of a block,
+    // subtract 1.
+    ptrdiff_t prev_block_start = ((ptrdiff_t)(addr) - 1) / alignment;
+
+    // Now we just have to multiply up again to get an address (adding 1 to go forward by 1 block)
+    return (void *)((prev_block_start + 1) * alignment);
+}

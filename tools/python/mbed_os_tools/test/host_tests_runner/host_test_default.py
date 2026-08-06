@@ -129,8 +129,11 @@ class DefaultTestSelector(DefaultTestSelectorBase):
 
         def callback__notify_prn(key, value, timestamp):
             """! Handles __norify_prn. Prints all lines in separate log line"""
-            for line in value.splitlines():
-                self.logger.prn_inf(line)
+            if isinstance(value, Exception):
+                self.logger.prn_err(traceback.format_exception(value))
+            else:
+                for line in value.splitlines():
+                    self.logger.prn_inf(line)
 
         callbacks = {"__notify_prn": callback__notify_prn}
 
