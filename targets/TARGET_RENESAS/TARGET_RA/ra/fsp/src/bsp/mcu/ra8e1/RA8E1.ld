@@ -399,96 +399,6 @@ SECTIONS
 
   }  > DTCM
 
-  /***** RAM memory section allocations ******/
-  /* ram initialized from flash */
-  .data  :
-  {
-    __data_start__ = .;
-    _sdata = .;
-  __ram_from_flash$$Base = . ;__ram_from_flash$$Load = LOADADDR(.data) ;
-  /* section.ram.from_flash */
-  *(.ram_from_flash)
-  /* section.ram.code_from_flash */
-  *(.ram_code_from_flash)
-  *(.data*)
-  *(vtable)
-    __ram_from_flash$$Limit = . ;
-    /* All data end */
-    __data_end__ = .;
-    _edata = .;
-  }  > RAM AT > FLASH
-  /* Non-cached ram for Mbed noncached memory support */
-  .noncached(NOLOAD): ALIGN(32)
-  {
-    __noncached_start = .;
-    *(.noncached)
-    . = ALIGN(32);
-    __noncached_end = .;
-  } > RAM
-  /* Non-initialized, non-cached ram */
-  .bss  (NOLOAD) : ALIGN(32)
-  {
-  	__bss_start__ = .;
-    _sbss = .;
-      __ram_noinit_nocache$$Base = . ;
-  /* section.ram.noinit_nocache */
-  *(.ram_noinit_nocache)
-      __ram_noinit_nocache$$Limit = . ;
-  }  > RAM
-  /* Zeroed, non-cached ram */
-  __ram_zero_nocache$$  (NOLOAD) :
-  {
-      __ram_zero_nocache$$Base = . ;
-  /* section.ram.zero_nocache */
-  *(.ram_nocache)
-    . = ALIGN(32);
-      __ram_zero_nocache$$Limit = . ;
-  }  > RAM
-  /* Non-initialized ram */
-  __ram_noinit$$  (NOLOAD) :
-  {
-  __ram_noinit$$Base = . ;
-    /* Main stack region */
-    __StackLimit = .;
-  *(.bss.g_main_stack)
-  __StackTop = .;
-  _estack = __StackTop;
-  PROVIDE(__stack = __StackTop);
-    /* Other no-init data */
-  *(.ram_noinit)
-  *(.noinit)
-      __ram_noinit$$Limit = . ;
-  }  > RAM
-  /* Zeroed ram */
-  __ram_zero$$  (NOLOAD) :
-  {
-      __ram_zero$$Base = . ;
-  /* section.ram.zero */
-  *(.ram)
-  *(.bss*)
-      . = ALIGN(32);
-      __ram_zero$$Limit = . ;
-      __bss_end__ = .;
-      _ebss = .;
-  }  > RAM
-  /* Thread Stacks */
-  __ram_thread_stack$$  (NOLOAD) : ALIGN(8)
-  {
-      __ram_thread_stack$$Base = . ;
-  KEEP(*(.stack?*))
-      __ram_thread_stack$$Limit = . ;
-  }  > RAM
-  .ram.endof ALIGN(.,512) :
-  {
-       __ddsc_RAM_END = . ;
-    /* Heap region */
-    __HeapBase = .;
-    __end__ = .;
-    PROVIDE(end = .);
-    *(.bss.g_heap)
-    __HeapLimit = ORIGIN(RAM) + LENGTH(RAM);
-  }  > RAM
-
   .text  (READONLY) :
   {
       __flash_readonly$$Base = . ;
@@ -560,12 +470,104 @@ SECTIONS
   *(.gnu.linkonce.armexidx.*)
        __exidx_end = . ;
   }  > FLASH
+
+  __etext = .;
+
+/***** RAM memory section allocations ******/
+  /* ram initialized from flash */
+  .data  :
+  {
+    __data_start__ = .;
+    _sdata = .;
+  __ram_from_flash$$Base = . ;__ram_from_flash$$Load = LOADADDR(.data) ;
+  /* section.ram.from_flash */
+  *(.ram_from_flash)
+  /* section.ram.code_from_flash */
+  *(.ram_code_from_flash)
+  *(.data*)
+    __ram_from_flash$$Limit = . ;
+    /* All data end */
+    __data_end__ = .;
+    _edata = .;
+  }  > RAM AT > FLASH
+
   .flash.endof ALIGN(.,512) (READONLY) :
   {
        __ddsc_FLASH_END = . ;
 
   }  > FLASH
-  __etext = ADDR(.flash.endof);
+
+  /* Non-cached ram for Mbed noncached memory support */
+  .noncached(NOLOAD): ALIGN(32)
+  {
+    __noncached_start = .;
+    *(.noncached)
+    . = ALIGN(32);
+    __noncached_end = .;
+  } > RAM
+  /* Non-initialized, non-cached ram */
+  .bss  (NOLOAD) : ALIGN(32)
+  {
+  	__bss_start__ = .;
+    _sbss = .;
+      __ram_noinit_nocache$$Base = . ;
+  /* section.ram.noinit_nocache */
+  *(.ram_noinit_nocache)
+      __ram_noinit_nocache$$Limit = . ;
+  }  > RAM
+  /* Zeroed, non-cached ram */
+  __ram_zero_nocache$$  (NOLOAD) :
+  {
+      __ram_zero_nocache$$Base = . ;
+  /* section.ram.zero_nocache */
+  *(.ram_nocache)
+    . = ALIGN(32);
+      __ram_zero_nocache$$Limit = . ;
+  }  > RAM
+  /* Non-initialized ram */
+  __ram_noinit$$  (NOLOAD) :
+  {
+  __ram_noinit$$Base = . ;
+    /* Main stack region */
+    __StackLimit = .;
+  *(.bss.g_main_stack)
+  __StackTop = .;
+  _estack = __StackTop;
+  PROVIDE(__stack = __StackTop);
+    /* Other no-init data */
+  *(.ram_noinit)
+  *(.noinit)
+      __ram_noinit$$Limit = . ;
+  }  > RAM
+  /* Zeroed ram */
+  __ram_zero$$  (NOLOAD) :
+  {
+      __ram_zero$$Base = . ;
+  /* section.ram.zero */
+  *(.ram)
+  *(.bss*)
+      . = ALIGN(32);
+      __ram_zero$$Limit = . ;
+      __bss_end__ = .;
+      _ebss = .;
+  }  > RAM
+  /* Thread Stacks */
+  __ram_thread_stack$$  (NOLOAD) : ALIGN(8)
+  {
+      __ram_thread_stack$$Base = . ;
+  KEEP(*(.stack?*))
+      __ram_thread_stack$$Limit = . ;
+  }  > RAM
+  .ram.endof ALIGN(.,512) :
+  {
+       __ddsc_RAM_END = . ;
+    /* Heap region */
+    __HeapBase = .;
+    __end__ = .;
+    PROVIDE(end = .);
+    *(.bss.g_heap)
+    __HeapLimit = ORIGIN(RAM) + LENGTH(RAM);
+  }  > RAM
 
   /***** OPTION_SETTING_OFS0 memory section allocations ******/
   .option_setting_ofs0.startof  (READONLY) :

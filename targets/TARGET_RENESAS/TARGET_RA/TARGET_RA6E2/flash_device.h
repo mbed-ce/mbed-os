@@ -12,11 +12,8 @@
 #ifndef RA_CF_SIZE
 #define RA_CF_SIZE       (512u * 1024u)
 #endif
-#ifndef RA_CF_SECTOR_SIZE
-#define RA_CF_SECTOR_SIZE (2048u)      /* 2KB */
-#endif
 #ifndef RA_CF_WRITE_SIZE
-#define RA_CF_WRITE_SIZE  (128u)       /* 128B */
+#define RA_CF_WRITE_SIZE  (128u)
 #endif
 
 #ifndef RA_DF_START
@@ -26,7 +23,7 @@
 #define RA_DF_SIZE       (8u * 1024u)
 #endif
 #ifndef RA_DF_SECTOR_SIZE
-#define RA_DF_SECTOR_SIZE (64u)        /* 64B */
+#define RA_DF_SECTOR_SIZE (64u)
 #endif
 #ifndef RA_DF_WRITE_SIZE
 #define RA_DF_WRITE_SIZE  (4u)
