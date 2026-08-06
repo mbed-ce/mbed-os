@@ -36,6 +36,7 @@
 
 #include "mbedtls/sha1.h"
 #include "mbedtls/platform_util.h"
+#include "crypto_common.h"
 
 #include <string.h>
 
