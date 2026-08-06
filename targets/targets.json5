@@ -4588,11 +4588,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "help": "Mask value: USE_RC64MPLL (requires 32 MHz HSE) | USE_DIRECT_HSE | USE_HSI",
                 "value": "USE_HSI",
                 "macro_name": "CLOCK_SOURCE"
-            },
-            "hse-value": {
-                "help": "HSE oscillator frequency in Hz",
-                "value": 32000000,
-                "macro_name": "HSE_VALUE"
             }
         },
         "overrides": {
