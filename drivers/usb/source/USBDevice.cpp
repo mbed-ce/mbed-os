@@ -22,6 +22,7 @@
 #include "USBDescriptor.h"
 #include "usb_phy_api.h"
 #include "mbed_assert.h"
+#include "mbed_interface.h"
 #include "platform/mbed_error.h"
 
 //#define DEBUG
@@ -1007,7 +1008,17 @@ void USBDevice::in(usb_ep_t endpoint)
 
     endpoint_info_t *info = &_endpoint_info[EP_TO_INDEX(endpoint)];
 
-    MBED_ASSERT(info->pending >= 1);
+    if (info->pending == 0) {
+        MBED_ERROR1(
+            MBED_MAKE_ERROR(
+                MBED_MODULE_DRIVER_USB,
+                MBED_ERROR_CODE_INVALID_OPERATION
+            ),
+            "IN transfer started to endpoint with no preceding write_start() call.",
+            endpoint
+        );
+    }
+
     info->pending -= 1;
     if (info->callback) {
         info->callback();
@@ -1434,12 +1445,13 @@ bool USBDevice::read_start(usb_ep_t endpoint, uint8_t *buffer, uint32_t max_size
 
     if (!EP_INDEXABLE(endpoint)) {
 #if MBED_TRAP_ERRORS_ENABLED
-        MBED_ERROR(
+        MBED_ERROR1(
             MBED_MAKE_ERROR(
                 MBED_MODULE_DRIVER_USB,
                 MBED_ERROR_CODE_INVALID_INDEX
             ),
-            "The endpoint is not indexable."
+            "The endpoint is not indexable.",
+            endpoint
         );
 #else
         unlock();
@@ -1449,8 +1461,10 @@ bool USBDevice::read_start(usb_ep_t endpoint, uint8_t *buffer, uint32_t max_size
 
     endpoint_info_t *info = &_endpoint_info[EP_TO_INDEX(endpoint)];
     if (!(info->flags & ENDPOINT_ENABLED)) {
-        // Assert that only valid endpoints are used when in the configured state
-        MBED_ASSERT(!configured());
+        // Only valid endpoints may be used when in the configured state
+        if (configured()) {
+            MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_USB, MBED_ERROR_CODE_INVALID_OPERATION), "Endpoint read before being enabled!", endpoint);
+        }
         unlock();
         return false;
     }

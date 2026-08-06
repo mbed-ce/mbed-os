@@ -8486,7 +8486,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
         "device_has_remove": [
             "SERIAL_FC",
-            "USBDEVICE",
         ],
         "config": {
             "lpticker-use-lposc": {

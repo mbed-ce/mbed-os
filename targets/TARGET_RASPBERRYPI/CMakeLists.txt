@@ -186,6 +186,15 @@ elseif(MCU_RP235X IN_LIST MBED_TARGET_LABELS)
 	)
 endif()
 
+# tinyalloc, used for managing USB ram
+mbed_setup_submodule(tinyalloc CHECK_FILE tinyalloc.c IF_LABEL MCU_RP2)
+target_sources(mbed-mcu-rp2
+	INTERFACE
+		tinyalloc/tinyalloc.c)
+target_include_directories(mbed-mcu-rp2
+	INTERFACE
+		tinyalloc)
+
 # RP2040 SDK -----------------------------------------------------------------------------------------------------------
 
 target_include_directories(mbed-mcu-rp2040
