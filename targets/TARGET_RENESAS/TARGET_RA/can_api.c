@@ -214,28 +214,89 @@ static int calc_bit_timing(uint32_t canclk, uint32_t bitrate,
                            can_bit_timing_cfg_t *out,
                            float sample_point)
 {
-    /* sample_point = TSEG1 / (TSEG1 + TSEG2) */
+    if (bitrate == 0 || canclk == 0) return 0;
 
-    for (uint32_t prescaler = 1; prescaler <= 1024; prescaler++) {
+/* ==================== 1. Define Hardware Limits ==================== */
+#ifdef DEVICE_CAN_FD
+    /* CAN FD (Nominal Bit Timing Hardware Specifications) */
+    const uint32_t min_total_tq = 8;
+    const uint32_t max_total_tq = 256;
+    const uint32_t min_tseg1    = 2;
+    const uint32_t max_tseg1    = 255;
+    const uint32_t min_tseg2    = 1;
+    const uint32_t max_tseg2    = 127;
+    const uint32_t max_sjw      = 128;
+    const uint32_t max_brp      = 1024;
+#else
+    /* Classic CAN (e.g., RA4E1 R_CAN Hardware Specifications) */
+    const uint32_t min_total_tq = 8;
+    const uint32_t max_total_tq = 25;
+    const uint32_t min_tseg1    = 4;
+    const uint32_t max_tseg1    = 16;
+    const uint32_t min_tseg2    = 2;
+    const uint32_t max_tseg2    = 8;
+    const uint32_t max_sjw      = 4;
+    const uint32_t max_brp      = 1024;
+#endif
 
-        uint32_t tq = canclk / (prescaler * bitrate);
-        if (tq < 8 || tq > 256) continue;
+/* ==================== 2. Bit Timing Calculation Logic ==================== */
+    uint32_t best_prescaler = 0;
+    uint32_t best_tseg1     = 0;
+    uint32_t best_tseg2     = 0;
+    float min_error         = 1.0f;
 
-        uint32_t tseg1 = (uint32_t)(tq * sample_point);
-        uint32_t tseg2 = tq - tseg1 - 1;
+    for (uint32_t total_tq = min_total_tq; total_tq <= max_total_tq; total_tq++) {
+        // Must be evenly divisible to ensure zero baud rate error
+        if ((canclk % (bitrate * total_tq)) != 0) {
+            continue;
+        }
 
-        if (tseg1 < 2 || tseg1 > 255) continue;
-        if (tseg2 < 1 || tseg2 > 127) continue;
+        uint32_t prescaler = canclk / (bitrate * total_tq);
+        if (prescaler < 1 || prescaler > max_brp) {
+            continue;
+        }
 
-        out->baud_rate_prescaler = prescaler;
-        out->time_segment_1 = tseg1;
-        out->time_segment_2 = tseg2;
-        out->synchronization_jump_width = (tseg2 > 4 ? 4 : tseg2);
+        // Calculate TSEG1 based on formula: Sample Point = (1 + TSEG1) / total_tq
+        uint32_t tseg1 = (uint32_t)((total_tq * sample_point) - 1.0f + 0.5f);
 
-        return 1;
+        // Clamp TSEG1 within current hardware limits
+        if (tseg1 < min_tseg1) tseg1 = min_tseg1;
+        if (tseg1 > max_tseg1) tseg1 = max_tseg1;
+
+        if (total_tq <= (1 + tseg1)) continue; // Prevent underflow in unsigned subtraction
+        uint32_t tseg2 = total_tq - 1 - tseg1;
+
+        // Validate whether TSEG2 is within hardware limits
+        if (tseg2 < min_tseg2 || tseg2 > max_tseg2) {
+            continue;
+        }
+
+        // Calculate deviation between actual and target sample point
+        float actual_sp = (float)(1 + tseg1) / (float)total_tq;
+        float error = (actual_sp > sample_point) ? (actual_sp - sample_point) : (sample_point - actual_sp);
+
+        if (error < min_error) {
+            min_error = error;
+            best_prescaler = prescaler;
+            best_tseg1 = tseg1;
+            best_tseg2 = tseg2;
+        }
     }
 
-    return 0;
+    // Return failure if no valid configuration matching hardware limits was found
+    if (best_prescaler == 0) {
+        return 0;
+    }
+
+    out->baud_rate_prescaler = (uint16_t)best_prescaler;
+    out->time_segment_1      = (uint8_t)best_tseg1;
+    out->time_segment_2      = (uint8_t)best_tseg2;
+
+    // SJW must not exceed TSEG2 nor the maximum hardware limit max_sjw
+    uint32_t sjw = (best_tseg2 > max_sjw) ? max_sjw : best_tseg2;
+    out->synchronization_jump_width = (uint8_t)sjw;
+
+    return 1;
 }
 
 int can_frequency(can_t *obj, int hz
@@ -250,14 +311,14 @@ int can_frequency(can_t *obj, int hz
     obj->instance->p_api->close(obj->instance->p_ctrl);
 
 #ifdef DEVICE_CAN_FD
-    // Use PLL/PLL1Q for CAN FD clock source
+    // Use CANFDCLK for CAN FD clock source
     uint32_t canclk = R_BSP_SourceClockHzGet(BSP_CFG_CANFDCLK_SOURCE) / canfd_get_clock_div(BSP_CFG_CANFDCLK_DIV) ;
 #else
     // Use PCLKB for CAN clock source
     uint32_t canclk = R_FSP_SystemClockHzGet(FSP_PRIV_CLOCK_PCLKB);
 #endif
 
-    if (!calc_bit_timing(canclk, hz, obj->cfg_copy.p_bit_timing, 0.75f)) {
+    if (!calc_bit_timing(canclk, hz, obj->cfg_copy.p_bit_timing, 0.875f)) {
         return 0;
     }
 
@@ -267,7 +328,7 @@ int can_frequency(can_t *obj, int hz
 
     obj->data_hz = data_hz;
     if (data_hz > 0) {
-        if (!calc_bit_timing(canclk, data_hz, ext_rom->p_data_timing, 0.80f)) {
+        if (!calc_bit_timing(canclk, data_hz, ext_rom->p_data_timing, 0.625f)) {
             return 0;
         }
     }
@@ -331,6 +392,7 @@ int can_write(can_t *obj, CAN_Message msg)
     mbed_to_can_frame(&msg, &frame);
 
     fsp_err_t err = obj->instance->p_api->write(obj->instance->p_ctrl, MBED_CAN_MAILBOX_TX, &frame);
+
     return (err == FSP_SUCCESS) ? 1 : 0;
 }
 
@@ -447,7 +509,7 @@ int classic_can_filter(can_t *obj, uint32_t id, uint32_t mask, CANFormat format,
 
     /* 2. mailbox index（mailbox 0 is usually used by TX，so starting from 1） */
     uint32_t mb_count = ext->mailbox_count;
-    uint32_t mb = (handle >= 1 && handle < mb_count) ? handle : 1;
+    uint32_t mb = (handle >= 1 && handle < (int32_t) mb_count) ? handle : 1;
 
     /* 3. configure mailbox */
     can_mailbox_t *mbox = &ext->p_mailbox[mb];

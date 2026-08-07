@@ -58,20 +58,6 @@ can_bit_timing_cfg_t g_canfd1_data_timing_cfg =
 extern const canfd_afl_entry_t p_canfd1_afl[CANFD_CFG_AFL_CH1_RULE_NUM];
 
 
-#define CANFD_CFG_COMMONFIFO0 (((0) << R_CANFD_CFDCFCC_CFE_Pos) | \
-                                        ((0) << R_CANFD_CFDCFCC_CFRXIE_Pos) | \
-                                        ((0) << R_CANFD_CFDCFCC_CFTXIE_Pos) | \
-                                        ((7) << R_CANFD_CFDCFCC_CFPLS_Pos) | \
-                                        ((1) << R_CANFD_CFDCFCC_CFM_Pos) | \
-                                        ((0) << R_CANFD_CFDCFCC_CFITSS_Pos) | \
-                                        ((0) << R_CANFD_CFDCFCC_CFITR_Pos) | \
-                                        ((0)  << R_CANFD_CFDCFCC_CFIM_Pos) | \
-                                        ((3U) << R_CANFD_CFDCFCC_CFIGCV_Pos) | \
-                                        ((0) << R_CANFD_CFDCFCC_CFTML_Pos) | \
-                                        ((1) << R_CANFD_CFDCFCC_CFDC_Pos) | \
-                                        (0 << R_CANFD_CFDCFCC_CFITT_Pos))
-
-
 /* Buffer RAM used: 608 bytes */
 canfd_global_cfg_t g_canfd1_global_cfg =
 {
