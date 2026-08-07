@@ -90,7 +90,10 @@ endfunction()
 # Read, patch and write a generated startup file into the current binary directory.
 #
 # Usage:
-#   patch_startup_file(<out_var> <startup_file>)
+#   patch_startup_file(<out_var> <startup_file> [PRESERVE_SYSTEM_INIT_ORDER])
+#
+# PRESERVE_SYSTEM_INIT_ORDER keeps the vendor's SystemInit call before runtime
+# initialization for targets which resume low-power context during SystemInit.
 #
 # Cache options:
 #   STM_PATCH_STARTUP_ENTRY_FLOW  : enable default entry-flow patch (default ON)
@@ -104,6 +107,8 @@ function(patch_startup_file out_var startup_file)
     set(STM_PATCH_STARTUP_ENTRY_FLOW ON CACHE BOOL "Patch STM32 startup entry flow for Mbed startup")
     set(STM_STARTUP_PATCH_REGEX "" CACHE STRING "Regex patterns applied to generated STM32 startup file")
     set(STM_STARTUP_PATCH_REPLACE "" CACHE STRING "Replacement strings for STM_STARTUP_PATCH_REGEX")
+
+    cmake_parse_arguments(PATCH_STARTUP "PRESERVE_SYSTEM_INIT_ORDER" "" "" ${ARGN})
 
     set(_startup_source "${CMAKE_CURRENT_SOURCE_DIR}/${startup_file}")
     if(NOT EXISTS "${_startup_source}")
@@ -120,9 +125,15 @@ function(patch_startup_file out_var startup_file)
     string(REPLACE "\r" "\n" _startup_content "${_startup_content}")
 
     if(STM_PATCH_STARTUP_ENTRY_FLOW)
-        string(REGEX REPLACE "\n[ \t]*bl[ \t]+SystemInit[ \t]*\n" "\n" _startup_content "${_startup_content}")
+        if(NOT PATCH_STARTUP_PRESERVE_SYSTEM_INIT_ORDER)
+            string(REGEX REPLACE "\n[ \t]*bl[ \t]+SystemInit[ \t]*\n" "\n" _startup_content "${_startup_content}")
+        endif()
         string(REGEX REPLACE "\n[ \t]*bl[ \t]+__libc_init_array[ \t]*\n" "\n" _startup_content "${_startup_content}")
-        string(REGEX REPLACE "\n[ \t]*bl[ \t]+main[ \t]*\n" "\n  bl  SystemInit   \n  bl _start\n" _startup_content "${_startup_content}")
+        if(PATCH_STARTUP_PRESERVE_SYSTEM_INIT_ORDER)
+            string(REGEX REPLACE "\n[ \t]*bl[ \t]+main[ \t]*\n" "\n  bl _start\n" _startup_content "${_startup_content}")
+        else()
+            string(REGEX REPLACE "\n[ \t]*bl[ \t]+main[ \t]*\n" "\n  bl  SystemInit   \n  bl _start\n" _startup_content "${_startup_content}")
+        endif()
     endif()
 
     if(NOT STM_STARTUP_PATCH_REGEX STREQUAL "")

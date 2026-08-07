@@ -4603,7 +4603,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_has_remove": [
             "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
-            "INTERRUPTIN", "PWMOUT", "SERIAL_FC", "SLEEP",
+            "INTERRUPTIN", "PWMOUT", "SERIAL_FC",
             "SPI", "SPISLAVE", "SPI_ASYNCH", "WATCHDOG", "RESET_REASON"
         ],
         "device_has_add": [
