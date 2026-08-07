@@ -7,3 +7,4 @@ mbed_set_linker_script(mbed-stm32l475xg ${CMAKE_CURRENT_SOURCE_DIR}/stm32l4_dual
 mbed_set_linker_script(mbed-stm32l476xg ${CMAKE_CURRENT_SOURCE_DIR}/stm32l4_dual_flash_bank.ld)
 mbed_set_linker_script(mbed-stm32l486xg ${CMAKE_CURRENT_SOURCE_DIR}/stm32l4_dual_flash_bank.ld)
 mbed_set_linker_script(mbed-stm32l496xg ${CMAKE_CURRENT_SOURCE_DIR}/stm32l4_dual_flash_bank.ld)
+mbed_set_linker_script(mbed-stm32l4a6xg ${CMAKE_CURRENT_SOURCE_DIR}/stm32l4_dual_flash_bank.ld)
