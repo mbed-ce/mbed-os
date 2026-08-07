@@ -15,32 +15,6 @@ typedef enum {
     PB_12 = 0x1C, PB_13 = 0x1D, PB_14 = 0x1E, PB_15 = 0x1F,
     NC = (int) 0xFFFFFFFF,
 
-#ifdef TARGET_FF_ARDUINO_UNO
-    /* These header positions require solder-bridge changes on NUCLEO-WB09KE. */
-    ARDUINO_UNO_A0 = NC,
-    ARDUINO_UNO_A1 = NC,
-    ARDUINO_UNO_A2 = NC,
-    ARDUINO_UNO_A3 = NC,
-    ARDUINO_UNO_A4 = NC,
-    ARDUINO_UNO_A5 = NC,
-    ARDUINO_UNO_D0 = NC,
-    ARDUINO_UNO_D1 = NC,
-    ARDUINO_UNO_D2 = NC,
-    ARDUINO_UNO_D3 = NC,
-    ARDUINO_UNO_D4 = NC,
-    ARDUINO_UNO_D5 = NC,
-    ARDUINO_UNO_D6 = NC,
-    ARDUINO_UNO_D7 = NC,
-    ARDUINO_UNO_D8 = PB_15,
-    ARDUINO_UNO_D9 = NC,
-    ARDUINO_UNO_D10 = PA_9,
-    ARDUINO_UNO_D11 = PA_11,
-    ARDUINO_UNO_D12 = PA_8,
-    ARDUINO_UNO_D13 = PB_3,
-    ARDUINO_UNO_D14 = PB_7,
-    ARDUINO_UNO_D15 = PB_6,
-#endif
-
     CONSOLE_TX = PA_1,
     CONSOLE_RX = PB_0,
 
