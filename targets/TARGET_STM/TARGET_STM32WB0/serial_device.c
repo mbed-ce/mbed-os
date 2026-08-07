@@ -12,6 +12,16 @@ UART_HandleTypeDef uart_handlers[UART_NUM];
 static uart_irq_handler irq_handler;
 
 extern int8_t get_uart_index(UARTName uart_name);
+extern int stdio_uart_inited;
+extern serial_t stdio_uart;
+
+void serial_restore_stdio(void)
+{
+    if (stdio_uart_inited) {
+        struct serial_s *obj_s = SERIAL_S(&stdio_uart);
+        serial_init(&stdio_uart, obj_s->pin_tx, obj_s->pin_rx);
+    }
+}
 
 static void uart_irq(UARTName uart_name)
 {
