@@ -10,12 +10,14 @@
 #define GPIO_PORT_COUNT 2U
 #define GPIO_PIN_COUNT  16U
 
-static gpio_irq_handler irq_handler;
-static uintptr_t contexts[GPIO_PORT_COUNT][GPIO_PIN_COUNT];
-static uint32_t events[GPIO_PORT_COUNT][GPIO_PIN_COUNT];
-static uint16_t active_pins[GPIO_PORT_COUNT];
+typedef struct {
+    uintptr_t context;
+    uint32_t events;
+} gpio_irq_state_t;
 
-extern GPIO_TypeDef *Set_GPIO_Clock(uint32_t port_idx);
+static gpio_irq_handler irq_handler;
+static gpio_irq_state_t irq_states[GPIO_PORT_COUNT][GPIO_PIN_COUNT];
+static uint32_t active_pins[GPIO_PORT_COUNT];
 
 static GPIO_TypeDef *gpio_port(uint32_t port)
 {
@@ -45,11 +47,11 @@ static void gpio_irq_handler_port(uint32_t port)
         }
 
         uint32_t register_mask = syscfg_pin_mask(port, pin);
-        uint32_t event = events[port][pin];
-        uintptr_t context = contexts[port][pin];
+        gpio_irq_state_t *state = &irq_states[port][pin];
+        uint32_t event = state->events;
 
         SYSCFG->IO_ISCR = register_mask;
-        if ((context == 0U) || (event == IRQ_NONE)) {
+        if (event == IRQ_NONE) {
             continue;
         }
 
@@ -57,7 +59,7 @@ static void gpio_irq_handler_port(uint32_t port)
             event = (gpio->IDR & pin_mask) != 0U ? IRQ_RISE : IRQ_FALL;
         }
 
-        irq_handler(context, (gpio_irq_event)event);
+        irq_handler(state->context, (gpio_irq_event)event);
     }
 }
 
@@ -86,21 +88,20 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uintpt
 
     core_util_critical_section_enter();
 
-    uint16_t pin_mask = (uint16_t)(1UL << pin_index);
+    uint32_t pin_mask = 1UL << pin_index;
     if ((active_pins[port] & pin_mask) != 0U) {
         core_util_critical_section_exit();
         return -1;
     }
 
     __HAL_RCC_SYSCFG_CLK_ENABLE();
-    Set_GPIO_Clock(port);
 
     obj->pin = pin;
     obj->event = IRQ_NONE;
     obj->enabled = 1U;
     irq_handler = handler;
-    contexts[port][pin_index] = context;
-    events[port][pin_index] = IRQ_NONE;
+    irq_states[port][pin_index].context = context;
+    irq_states[port][pin_index].events = IRQ_NONE;
     active_pins[port] |= pin_mask;
 
     IRQn_Type irq_n = gpio_irq_number(port);
@@ -118,7 +119,7 @@ void gpio_irq_free(gpio_irq_t *obj)
 
     uint32_t port = STM_PORT(obj->pin);
     uint32_t pin = STM_PIN(obj->pin);
-    uint16_t pin_mask = (uint16_t)(1UL << pin);
+    uint32_t pin_mask = 1UL << pin;
     uint32_t register_mask = syscfg_pin_mask(port, pin);
 
     SYSCFG->IO_IER &= ~register_mask;
@@ -127,9 +128,9 @@ void gpio_irq_free(gpio_irq_t *obj)
     SYSCFG->IO_DTR &= ~register_mask;
     SYSCFG->IO_ISCR = register_mask;
 
-    active_pins[port] &= (uint16_t)~pin_mask;
-    contexts[port][pin] = 0U;
-    events[port][pin] = IRQ_NONE;
+    active_pins[port] &= ~pin_mask;
+    irq_states[port][pin].context = 0U;
+    irq_states[port][pin].events = IRQ_NONE;
     obj->event = IRQ_NONE;
     obj->enabled = 0U;
 
@@ -153,7 +154,7 @@ void gpio_irq_set(gpio_irq_t *obj, gpio_irq_event event, uint32_t enable)
     } else {
         obj->event &= ~event;
     }
-    events[port][pin] = obj->event;
+    irq_states[port][pin].events = obj->event;
 
     SYSCFG->IO_DTR &= ~register_mask;
     if (obj->event == (IRQ_RISE | IRQ_FALL)) {

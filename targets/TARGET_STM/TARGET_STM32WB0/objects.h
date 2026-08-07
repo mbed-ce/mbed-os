@@ -38,7 +38,4 @@ struct gpio_irq_s {
 
 #include "gpio_object.h"
 
-/* WB0 backup-domain access does not use the legacy STM32 PWR DBP API. */
-#define HAL_PWR_EnableBkUpAccess() ((void) 0)
-
 #endif
