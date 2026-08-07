@@ -61,7 +61,9 @@ extern void SetSysClock(void);
 
 static void LSEDriveConfig(void)
 {
+#if !TARGET_STM32WB0
     HAL_PWR_EnableBkUpAccess();
+#endif
 #if defined(__HAL_RCC_LSEDRIVE_CONFIG)
     __HAL_RCC_LSEDRIVE_CONFIG(LSE_DRIVE_LOAD_LEVEL);
 #else

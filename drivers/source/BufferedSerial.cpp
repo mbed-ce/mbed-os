@@ -16,7 +16,7 @@
  */
 #include "drivers/BufferedSerial.h"
 
-#if DEVICE_SERIAL
+#if (DEVICE_SERIAL && DEVICE_INTERRUPTIN)
 
 #include "platform/mbed_poll.h"
 #include "platform/mbed_thread.h"
@@ -37,24 +37,19 @@ BufferedSerial::BufferedSerial(const serial_pinmap_t &static_pinmap, int baud):
 
 BufferedSerial::~BufferedSerial()
 {
-#if DEVICE_INTERRUPTIN
     delete _dcd_irq;
-#endif
 }
 
-#if DEVICE_INTERRUPTIN
 void BufferedSerial::dcd_irq()
 {
     wake();
 }
-#endif
 
 void BufferedSerial::set_baud(int baud)
 {
     SerialBase::baud(baud);
 }
 
-#if DEVICE_INTERRUPTIN
 void BufferedSerial::set_data_carrier_detect(PinName dcd_pin, bool active_high)
 {
     delete _dcd_irq;
@@ -69,7 +64,6 @@ void BufferedSerial::set_data_carrier_detect(PinName dcd_pin, bool active_high)
         }
     }
 }
-#endif
 
 void BufferedSerial::set_format(int bits, Parity parity, int stop_bits)
 {
@@ -235,11 +229,7 @@ ssize_t BufferedSerial::read(void *buffer, size_t length)
 
 bool BufferedSerial::hup() const
 {
-#if DEVICE_INTERRUPTIN
     return _dcd_irq && _dcd_irq->read() != 0;
-#else
-    return false;
-#endif
 }
 
 void BufferedSerial::wake()
@@ -389,4 +379,4 @@ int BufferedSerial::enable_output(bool enabled)
 
 } // namespace mbed
 
-#endif // DEVICE_SERIAL
+#endif //(DEVICE_SERIAL && DEVICE_INTERRUPTIN)

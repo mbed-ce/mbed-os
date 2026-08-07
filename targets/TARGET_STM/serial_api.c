@@ -383,8 +383,10 @@ void serial_baud(serial_t *obj, int baudrate)
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPUART1;
 #if TARGET_STM32WB0
         PeriphClkInitStruct.LPUART1ClockSelection = RCC_LPUART1_CLKSOURCE_16M;
-        HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
-        init_uart(obj);
+        if ((HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) ||
+                (init_uart(obj) != HAL_OK)) {
+            debug("Cannot initialize LPUART with baud rate %u\n", baudrate);
+        }
         return;
 #else
 #if ((MBED_CONF_TARGET_LPUART_CLOCK_SOURCE) & USE_LPUART_CLK_LSE) && MBED_CONF_TARGET_LSE_AVAILABLE

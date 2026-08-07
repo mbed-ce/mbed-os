@@ -4575,7 +4575,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271812.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
 
-// STM32WB0 Targets -----------------------------------------------------------------------------------------------
+    // STM32WB0 Targets -----------------------------------------------------------------------------------------------
+    // STM32WB0 is not part of the dual-core STM32WB family below.
     "MCU_STM32WB0": {
         "inherits": [
             "MCU_STM32"

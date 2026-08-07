@@ -11921,7 +11921,8 @@
                 "default_reset_sequence": null,
                 "dp": 0,
                 "fpu": "None",
-                "mpu": "NotPresent",
+                // Keil DFP 1.0.1 reports NotPresent, but ST's device header and datasheet specify an 8-region MPU.
+                "mpu": "Present",
                 "name": null,
                 "svd": "CMSIS/SVD/STM32WB09.svd",
                 "unit": 0
