@@ -4046,6 +4046,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "STM32L4A6xx",
             "MBEDTLS_CONFIG_HW_SUPPORT",
             "MBED_SPLIT_HEAP"
+        ],
+        "device_has_add": [
+            "USBDEVICE"
         ]
     },
     "NUCLEO_L4A6ZG": {
@@ -4054,9 +4057,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "supported_form_factors": [
             "ARDUINO_UNO"
-        ],
-        "device_has_add": [
-            "USBDEVICE"
         ],
         "device_name": "STM32L4A6ZGTx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF266521.en.feature-description-include-personalized-no-cpn-medium.jpg"
