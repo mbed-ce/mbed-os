@@ -4603,7 +4603,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_has_remove": [
             "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
-            "INTERRUPTIN", "PWMOUT", "SERIAL_FC",
+            "PWMOUT", "SERIAL_FC",
             "SPI", "SPISLAVE", "SPI_ASYNCH", "WATCHDOG", "RESET_REASON"
         ],
         "device_has_add": [
@@ -4638,9 +4638,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "clock-source": "USE_RC64MPLL|USE_HSI",
             "lse-available": 1
         },
-        "supported_form_factors": [
-            "ARDUINO_UNO"
-        ],
         "image_url": "https://www.st.com/en/evaluation-tools/nucleo-wb09ke.html"
     },
 
