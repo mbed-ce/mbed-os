@@ -8,6 +8,7 @@ add_library(mbed-stm32wb0 INTERFACE)
 
 target_sources(mbed-stm32wb0 INTERFACE
     clock_cfg/system_clock.c
+    gpio_irq_api.c
     serial_device.c
     sleep.c
     wait_ns.c

@@ -30,6 +30,12 @@ struct serial_s {
     PinName pin_rx;
 };
 
+struct gpio_irq_s {
+    PinName pin;
+    uint32_t event;
+    uint32_t enabled;
+};
+
 #include "gpio_object.h"
 
 /* WB0 backup-domain access does not use the legacy STM32 PWR DBP API. */
