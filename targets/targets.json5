@@ -4575,14 +4575,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271812.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
 
-    // STM32WB0 Targets -----------------------------------------------------------------------------------------------
-    // STM32WB0 is not part of the dual-core STM32WB family below.
-    "MCU_STM32WB0": {
+// STM32WB0 Targets -----------------------------------------------------------------------------------------------
+    "MCU_STM32WB0": { // STM32WB0 is not part of the dual-core STM32WB family below.
         "inherits": [
             "MCU_STM32"
         ],
         "public": false,
-        "c_lib": "small",
         "core": "Cortex-M0+",
         "config": {
             "clock-source": {
@@ -4642,7 +4640,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/en/evaluation-tools/nucleo-wb09ke.html"
     },
 
-    // STM32WB Targets ------------------------------------------------------------------------------------------------
+// STM32WB Targets ------------------------------------------------------------------------------------------------
     "MCU_STM32WB": {
         "inherits": [
             "MCU_STM32"
@@ -4784,7 +4782,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271050.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
 
-    // STM32WL Targets -------------------------------------------------------------------------------------------------
+// STM32WL Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32WL": {
         "inherits": [
             "MCU_STM32"
