@@ -1,638 +1,422 @@
-# README for Mbed OS STM32 targets
+# STM32 targets in MbedCE
 
-Table of Contents
-=================
+This document describes the STM32 target structure and the current workflow
+for adding an STM32 family, MCU target, or board to MbedCE. The repository
+currently contains both modernized and legacy family layouts; new work should
+follow the modern structure described below.
 
-- [README for Mbed OS STM32 targets](#readme-for-mbed-os-stm32-targets)
-- [Table of Contents](#table-of-contents)
-  - [ST TOOLS](#st-tools)
-    - [USB drivers](#usb-drivers)
-    - [ST-Link FW](#st-link-fw)
-    - [STM32 Cube](#stm32-cube)
-    - [STM32CubeMX](#stm32cubemx)
-    - [STM32CubeProgrammer](#stm32cubeprogrammer)
-  - [STM32 families](#stm32-families)
-    - [STM32WB](#stm32wb)
-    - [STM32WL](#stm32wl)
-    - [STM32H7](#stm32h7)
-  - [Custom boards](#custom-boards)
-    - [STM32 organisation](#stm32-organisation)
-    - [Add a custom board](#add-a-custom-board)
-    - [Board specific files (pinmap)](#board-specific-files-pinmap)
-    - [Use of custom\_targets.json5](#use-of-custom_targetsjson5)
-  - [ST specific implementation](#st-specific-implementation)
-    - [Pin configuration](#pin-configuration)
-      - [Alternate feature](#alternate-feature)
-      - [Conflict pins](#conflict-pins)
-    - [Clock selection](#clock-selection)
-      - [System clock](#system-clock)
-      - [Low power clock](#low-power-clock)
-      - [I2C Timing calculation algorithm](#i2c-timing-calculation-algorithm)
-    - [Sleep feature](#sleep-feature)
-    - [WiFi configuration](#wifi-configuration)
-    - [Ethernet configuration](#ethernet-configuration)
-      - [Changing default MAC address in STM32](#changing-default-mac-address-in-stm32)
-    - [Asynchronous SPI limitation](#asynchronous-spi-limitation)
-    - [CAN receive interrupt problem due to mutex and resolution](#can-receive-interrupt-problem-due-to-mutex-and-resolution)
-  - [Mbed OS pages](#mbed-os-pages)
+## Status of the existing documentation
 
+The following guidance from the existing README remains valid:
 
-TODO notes:
-* Introduce common linkers
-* Introduce custom linker usage in custom target CMakeList
-* Introduce how vector table size calculation is now solved
-* Introduce memory banks usage (custom targets)
-* Introduce Startup file from cmcsis
-* Introduce stm32/tools
+- use current ST-LINK firmware and install ST USB drivers when the operating
+  system does not expose all probe interfaces;
+- use STM32CubeMX and STM32Cube MCU packages as reference material;
+- generate candidate pin maps from STM32 open pin data, then review them
+  against the board schematic and MCU datasheet;
+- select high- and low-speed clocks according to the board hardware;
+- account for conflicts between connector pins and LEDs, buttons, debug,
+  oscillators, and other board functions.
 
+The following parts require rework and are replaced in this document:
 
-## ST TOOLS
+- STM32 vendor code is not always copied from a complete STM32Cube package.
+  Migrated families use pinned CMSIS-device and HAL-driver submodules;
+- a custom board should inherit the correct MCU target instead of being made by
+  copying the nearest development board;
+- startup files, linker scripts, vector-table sizing, memory banks, and the
+  helpers in `tools/stm32.cmake` are now part of the documented target model;
+- clock-source names and deep-sleep modes are family-specific, not universal;
+- STM32CubeProgrammer is an active MbedCE upload method;
+- old ARMmbed repository links, obsolete command output, and static tool
+  version examples must be replaced with MbedCE and current ST sources;
+- Wi-Fi, Ethernet, CAN, and asynchronous SPI details must be maintained with
+  their drivers or family implementations instead of as universal STM32 rules.
 
-### USB drivers
+## Repository structure
 
-Mandatory: get the latest USB driver in order to make available all the USB interfaces provided by the ST-LINK:
-- ST Debug
-- Virtual COM port
-- ST Bridge interfaces
+The STM32 port is divided into common, family, MCU, and board layers:
 
-Default Windows USB drivers will not setup full capabilities.
-
-https://www.st.com/en/development-tools/stsw-link009.html
-
-
-### ST-Link FW
-
-Mandatory: get the latest ST-Link Firmware:
-
-https://www.st.com/en/development-tools/stsw-link007.html
-
-You could have some issue to connect your board if you didn't install full USB drivers.
-
-
-Note that with the latest FW version, you are able to check the version number easily with a simple "mbedls":
-
-```
-$ mbedls
-| platform_name       | platform_name_unique   | mount_point | serial_port | target_id                | interface_version |
-|---------------------|------------------------|-------------|-------------|--------------------------|-------------------|
-| DISCO_H747I         | DISCO_H747I[0]         | D:          | COM13       | 081402210D03E72132477E08 | V3J7M2            |
-| DISCO_L475VG_IOT01A | DISCO_L475VG_IOT01A[0] | E:          | COM9        | 07640221683B630A577FF553 | V2J37M26          |
+```text
+targets/TARGET_STM/
+|-- CMakeLists.txt                 # selects the active STM32 family
+|-- tools/
+|   |-- stm32.cmake               # family, clock, and startup helpers
+|   `-- STM32_gen_PeripheralPins.py
+|-- TARGET_STM32<family>/
+|   |-- CMakeLists.txt             # family HAL and common implementation
+|   |-- STM32Cube_FW/              # CMSIS device and HAL integration
+|   |-- clock_cfg/
+|   |-- linker_scripts/
+|   `-- TARGET_STM32<device>/
+|       |-- CMakeLists.txt         # MCU selection
+|       `-- TARGET_<board>/
+|           |-- CMakeLists.txt
+|           |-- PinNames.h
+|           `-- PeripheralPins.c
+`-- common STM32 Mbed HAL sources
 ```
 
-```
-$ mbedtools detect
-Board name       Serial number             Serial port    Mount point(s)    Build target(s)    Interface Version
----------------  ------------------------  -------------  ----------------  -----------------  -------------------
-NUCLEO-U575ZI-Q  0022003c5553500d20393256  COM25          D:                NUCLEO_U575ZI_Q    V3J7M3
-```
+Target metadata is stored separately:
 
+- `targets/targets.json5` defines inheritance, labels, capabilities, clocks,
+  device names, and configured memory restrictions;
+- `targets/cmsis_mcu_descriptions.json5` stores physical memory descriptions
+  obtained from CMSIS packs;
+- `targets/upload_method_cfg/` contains board upload and debug configuration.
 
-### STM32 Cube
+Only the selected STM32 family is added by the root `TARGET_STM/CMakeLists.txt`.
+The family is resolved from the exact family label in `MBED_TARGET_LABELS`.
 
-https://www.st.com/en/embedded-software/stm32cube-mcu-packages.html
+## Supported STM32 families
 
-There is one STM32Cube package for each individual STM32 MCU family.
+The following family directories currently exist in this repository:
 
-It includes:
-- The hardware abstraction layer (HAL) enabling portability between different STM32 devices via standardized API calls
-- Low-layer (LL) APIs, a light-weight, optimized, expert oriented set of APIs designed for both performance and runtime efficiency
-- A collection of middleware components including RTOS, USB library, file system, TCP/IP stack, touch-sensing library or graphics library (depending on the STM32 series)
-- BSP drivers, based on HAL drivers.
+| Family | Directory | Notes |
+| --- | --- | --- |
+| STM32F0 | [`TARGET_STM32F0`](TARGET_STM32F0/) | Legacy copied vendor layout |
+| STM32F1 | [`TARGET_STM32F1`](TARGET_STM32F1/) | Legacy copied vendor layout |
+| STM32F2 | [`TARGET_STM32F2`](TARGET_STM32F2/) | Legacy copied vendor layout |
+| STM32F3 | [`TARGET_STM32F3`](TARGET_STM32F3/) | Legacy copied vendor layout |
+| STM32F4 | [`TARGET_STM32F4`](TARGET_STM32F4/) | Pinned CMSIS/HAL submodules and common linker |
+| STM32F7 | [`TARGET_STM32F7`](TARGET_STM32F7/) | Pinned CMSIS/HAL submodules and common linker |
+| STM32G0 | [`TARGET_STM32G0`](TARGET_STM32G0/) | Legacy copied vendor layout |
+| STM32G4 | [`TARGET_STM32G4`](TARGET_STM32G4/) | Legacy copied vendor layout |
+| STM32H5 | [`TARGET_STM32H5`](TARGET_STM32H5/) | Legacy copied vendor layout |
+| STM32H7 | [`TARGET_STM32H7`](TARGET_STM32H7/README.md) | Family-specific documentation |
+| STM32L0 | [`TARGET_STM32L0`](TARGET_STM32L0/) | Legacy copied vendor layout |
+| STM32L1 | [`TARGET_STM32L1`](TARGET_STM32L1/) | Legacy copied vendor layout |
+| STM32L4 | [`TARGET_STM32L4`](TARGET_STM32L4/) | Legacy copied vendor layout |
+| STM32L5 | [`TARGET_STM32L5`](TARGET_STM32L5/) | Legacy copied vendor layout |
+| STM32U0 | [`TARGET_STM32U0`](TARGET_STM32U0/) | Pinned CMSIS/HAL submodules |
+| STM32U5 | [`TARGET_STM32U5`](TARGET_STM32U5/) | Legacy copied vendor layout |
+| STM32WB | [`TARGET_STM32WB`](TARGET_STM32WB/README.md) | Dual-core wireless family |
+| STM32WB0 | [`TARGET_STM32WB0`](TARGET_STM32WB0/README.md) | Cortex-M0+ wireless family; pinned CMSIS/HAL and common linker |
+| STM32WL | [`TARGET_STM32WL`](TARGET_STM32WL/README.md) | Long-range wireless family |
 
-Part of STM32Cube files are copied in each targets/TARGET_STM/TARGET_STM32\<xx\>/STM32Cube_FW directory:
-- CMSIS header files in CMSIS sub-directory
-- HAL and LL files in STM32\<XX\>xx_HAL_Driver sub-directory
+STM32WB0 and STM32WB are different product families. STM32WB0 uses the
+`STM32WB0` family label, `TARGET_STM32WB0` directory, `cmsis-device-wb0`, and
+`stm32wb0x-hal-driver`; it must not inherit the STM32WB family target.
 
-Mbed OS HAL calls ST porting layer, which calls ST HAL and LL API.
+## ST tools and vendor sources
 
-Note that all ST HAL and LL files are available:
-- you can then develop some applications with direct ST HAL and LL call, even if feature is not supported in Mbed OS
-- BSP for LCD, AUDIO, SENSORS, etc... are not available in Mbed OS, but you should be able to use it in your local application.
+### ST-LINK software
 
+- [ST-LINK USB driver](https://www.st.com/en/development-tools/stsw-link009.html)
+- [ST-LINK firmware upgrade](https://www.st.com/en/development-tools/stsw-link007.html)
 
-Each STM32Cube package is also available in Github.
-This table summarizes the STM32Cube versions currently used in Mbed OS master branch :
+Update the probe firmware when connection, reset, mass-storage, or virtual COM
+behavior is unreliable. On Windows, install the ST driver if the debug, VCP,
+or bridge interfaces are missing.
 
-| STM32 Series | Github source                                     |
-|-------------|---------------------------------------------------|
-| F0          | https://github.com/STMicroelectronics/STM32CubeF0 |
-| F1          | https://github.com/STMicroelectronics/STM32CubeF1 |
-| F2          | https://github.com/STMicroelectronics/STM32CubeF2 |
-| F3          | https://github.com/STMicroelectronics/STM32CubeF3 |
-| F4          | https://github.com/STMicroelectronics/STM32CubeF4 |
-| F7          | https://github.com/STMicroelectronics/STM32CubeF7 |
-| G0          | https://github.com/STMicroelectronics/STM32CubeG0 |
-| G4          | https://github.com/STMicroelectronics/STM32CubeG4 |
-| H5          | https://github.com/STMicroelectronics/STM32CubeH5 |
-| H7          | https://github.com/STMicroelectronics/STM32CubeH7 |
-| L0          | https://github.com/STMicroelectronics/STM32CubeL0 |
-| L1          | https://github.com/STMicroelectronics/STM32CubeL1 |
-| L4          | https://github.com/STMicroelectronics/STM32CubeL4 |
-| L5          | https://github.com/STMicroelectronics/STM32CubeL5 |
-| N6          | https://github.com/STMicroelectronics/STM32CubeN6 |
-| U0          | https://github.com/STMicroelectronics/STM32CubeU0 |
-| U3          | https://github.com/STMicroelectronics/STM32CubeU3 |
-| U5          | https://github.com/STMicroelectronics/STM32CubeU5 |
-| WB          | https://github.com/STMicroelectronics/STM32CubeWB |
-| WL          | https://github.com/STMicroelectronics/STM32CubeWL |
+### STM32Cube and CMSIS
 
-In Mbed OS repository, we try to minimize the difference between "official" and copied files.
+[STM32Cube MCU packages](https://www.st.com/en/embedded-software/stm32cube-mcu-packages.html)
+contain CMSIS device support, HAL and LL drivers, examples, BSPs, and optional
+middleware. MbedCE uses the CMSIS and HAL/LL portions required by each target;
+it does not automatically include a package's BSP or middleware.
 
+New and migrated families should use ST's separate CMSIS-device and HAL-driver
+repositories as pinned Git submodules. Keep vendor submodules unmodified. Put
+an unavoidable temporary adaptation in a clearly scoped `Mbed_HAL_overrides`
+directory and document how it can be removed.
 
-### STM32CubeMX
+### STM32CubeMX and pin data
 
-STM32CubeMX is a graphical tool that allows a very easy configuration of all STM32
-
-https://www.st.com/en/development-tools/stm32cubemx.html
-
-Tool is not used in Mbed OS, but it can be useful for you.
-
+[STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) is not
+part of the MbedCE build, but its device database and generated configuration
+are useful references. MbedCE's pin generator consumes
+[STM32 open pin data](https://github.com/STMicroelectronics/STM32_open_pin_data).
 
 ### STM32CubeProgrammer
 
-It provides an easy-to-use and efficient environment for reading, writing and verifying device memory.
+[STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html)
+is supported by the MbedCE `STM32CUBE` upload method. See
+[STM32 Deploy & Debug](https://github.com/mbed-ce/mbed-os/wiki/STM32-Deploy&Debug)
+for setup and troubleshooting. Upload behavior is board-specific; verify the
+connection mode, ROM base address, programming, verification, and final reset
+on physical hardware.
 
-https://www.st.com/en/development-tools/stm32cubeprog.html
+## Adding or changing an STM32 target
 
-Tool is not used in Mbed OS, but it can be useful for you.
+First determine the scope:
 
+1. For a board using an existing MCU target, add only board metadata, pins,
+   CMake linkage, clocks, and upload configuration.
+2. For a new MCU in an existing family, add the MCU target, exact CMSIS device
+   name, memory configuration, startup label, and validated capabilities.
+3. For a new family, add its CMSIS/HAL integration, family library, common
+   drivers, clocks, startup flow, linker support, at least one MCU, and one
+   physical board.
 
-## STM32 families
+For application-owned boards, start from
+[mbed-ce-custom-targets](https://github.com/mbed-ce/mbed-ce-custom-targets)
+and set `CUSTOM_TARGETS_JSON_PATH` before including
+`mbed_toolchain_setup.cmake`. The example repository shows the supported file
+layout, target JSON, and CMake ordering.
 
-### STM32WB
+### From a development-board target to a custom target
 
-[STM32WB README](TARGET_STM32WB/README.md)
+A product can begin with a built-in development-board target and later use a
+custom target for the settings that differ. The inheritance choice depends on
+the product:
 
-### STM32WL
+- inherit the generic `MCU_STM32...` target when most board-level settings must
+  be defined independently;
+- inherit an existing Nucleo, Discovery, or other board target when the custom
+  target intentionally keeps most of that board's Mbed configuration and only
+  needs a small number of overrides.
 
-[STM32WL README](TARGET_STM32WL/README.md)
+Review inherited settings before deciding. Inheriting a board also inherits
+its clock choices, target labels, capabilities, components, form factor, and
+other metadata. Keep inherited values that are still correct and override or
+remove only the differences.
 
-### STM32H7
+The usual MbedCE changes are:
 
-[STM32H7 README](TARGET_STM32H7/README.md)
+1. Define inheritance and metadata changes in `custom_targets.json5`, using
+   `overrides`, `device_has_add`/`device_has_remove`, components, features, and
+   labels as required.
+2. Add the custom target directory before `mbed-os` in the application's
+   `CMakeLists.txt`.
+3. Reuse the inherited pin files or provide replacement `PinNames.h` and
+   `PeripheralPins.c` through the custom target CMake interface.
+4. When replacing a source already supplied by an Mbed MCU target, call
+   `mbed_disable_mcu_target_file()` after Mbed project setup and before adding
+   the `mbed-os` subdirectory, then provide the replacement source from the
+   custom target.
+5. Select or replace clock configuration, linker script, memory-bank
+   configuration, and upload/debug configuration only where the product
+   differs from its parent target.
+6. Build and test both the inherited behavior and every override. Pay special
+   attention to console pins, standard LED/button names, clocks, flash base,
+   and the generated upload command.
 
+See [mbed-ce-custom-targets](https://github.com/mbed-ce/mbed-ce-custom-targets)
+for the maintained complete example rather than copying partial snippets from
+this README.
 
+### Board pin maps
 
-## Custom boards
+Generate a candidate pin map with:
 
-It should be "easy" to add your custom board with a STM32 MCU in Mbed OS
-
-You can also check in https://github.com/ARMmbed/stm32customtargets
-
-
-### STM32 organisation
-
-STM32 root directory is https://github.com/ARMmbed/mbed-os/tree/master/targets/TARGET_STM
-
-This contains:
-- all STM32 families directories: F0, F1, F2, F3, F4, F7, G0, G4, H7, L0, L1, L4, L5, U5, WB, WL
-- Mbed OS porting layer common for all
-
-Each STM32 family contains several "sub-families".
-
-Each STM32 Part Number defines a sub-family: STM32F401 / STM32F407 / STM32F429 / ...
-
-But also each STM32 Part Number with different FLASH size : STM32F401xC / STM32F401xE
-
-Mbed OS porting layer specific for this family are placed here.
-
-Example in TARGET_STM32G0:
-- TARGET_STM32G031x8
-- TARGET_STM32G071xB
-- ...
-
-Each STM32 sub-family contains:
-- toolchains files
-- board specific files
-
-
-### Add a custom board
-
-ST provides the complete support for few NUCLEO and DISCO boards.
-
-Locate one of these boards with the minimum difference with your chosen MCU.
-
-Copy paste, and update!
-
-
-### Board specific files (pinmap)
-
-2 files in Mbed OS:
-- PeripheralPins.c
-- PinNames.h
-
-It is recommended to use a python script to generate those files
-
-https://github.com/ARMmbed/mbed-os/blob/master/targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py
-
-This script is using MCU database from https://github.com/STMicroelectronics/STM32_open_pin_data.git repo
-
-```
-$ python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py -h
-
-SScript version 1.19
-
-Checking STM32_open_pin_data repo...
-*** git clone done
-
-usage: STM32_gen_PeripheralPins.py [-h] (-l | -b | -m xml | -t HW | -c CUSTOM)
-                                   [-g]
-
-Script will generate PeripheralPins.c thanks to the xml files description available in STM32_open_pin_data GitHub repo
-
-More information in targets/TARGET_STM/README.md
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -l, --list            list available mcu xml files description in STM32CubeMX
-  -b, --boards          list available boards description in STM32CubeMX
-  -m xml, --mcu xml     specify the mcu xml file description in STM32CubeMX to use (use double quotes).
-                           Parameter can be a filter like L496 if you want to parse all L496 chips (-m STM32 to parse all).
-  -t HW, --target HW    specify the board file description in STM32CubeMX to use (use double quotes).
-                           Parameter can be a filter like L496 (only the first file found will be parsed).
-  -c CUSTOM, --custom CUSTOM
-                        specify a custom board .ioc file description to use (use double quotes).
-  -g, --gpio            Add GPIO PinMap table
-
-Once generated, you have to check and comment pins that can not be used (specific HW, internal ADC channels, remove PWM using us ticker timer, ...)
-
+```sh
+python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py --help
+python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py --mcu "<device XML>"
 ```
 
-How to generate files for a custom boards based on a STM32F427 MCU:
+The script clones or updates `STM32_open_pin_data` unless `--nopull` is used.
+Its output is a starting point, not a validated board definition. Review:
+
+- package availability and alternate-function numbers;
+- internal-only and unbonded signals;
+- SWD, oscillators, ST-LINK VCP, LEDs, buttons, and board peripherals;
+- timer channels reserved by Mbed tickers;
+- default pull configuration and electrical constraints;
+- aliases exposed through `PinNames.h` and any advertised form factor.
+
+Alternate pin names such as `PC_10_ALT0` select a different peripheral mapping
+from the default `PC_10` entry. A pin listed in `PeripheralPins.c` can still be
+unusable when another enabled board function owns it.
+
+### Clock configuration
+
+The target's `clock-source` setting selects a family implementation. The valid
+values are defined by that family's `clock_cfg` and HAL configuration; there is
+no global list that applies to every STM32 family. A board should advertise
+only sources supported by its fitted oscillator circuit and may provide an
+internal-clock fallback when the family implementation supports it.
+
+Use STM32CubeMX's **Clock Configuration** view when creating or changing a
+family clock implementation. Configure the exact MCU, supply voltage, HSE and
+LSE sources, PLL path, system clock, bus prescalers, peripheral clocks, flash
+latency, and voltage scaling. CubeMX is useful for checking clock limits and
+for generating a reference `SystemClock_Config()`, but its generated project is
+not copied into MbedCE unchanged. Translate the required RCC and power setup
+into the family `clock_cfg`, compare it with the current ST HAL version, and
+remove unrelated generated initialization.
+
+Check the real board source carefully: a Nucleo may receive HSE from the
+ST-LINK MCO while a production board uses a crystal, oscillator module, or no
+external high-speed source. After implementation, verify `SystemCoreClock`,
+timer and serial timing, USB or radio clock requirements, oscillator failure
+fallback, and wake-up clock restoration on hardware.
+
+Low-speed clock handling is also family-specific. The `lse-available` setting
+describes whether the board has a 32.768 kHz LSE source. RTC, low-power ticker,
+and deep-sleep behavior must be checked against the selected family's driver;
+do not assume every STM32 maps Mbed deep sleep to STOP2.
+
+### Startup files
+
+Modern STM32 families use the upstream GCC startup file from the CMSIS-device
+submodule. The family CMake file selects and patches it:
+
+```cmake
+get_startup_file(STARTUP_FILE "STM32Cube_FW/cmsis-device-xx/Source/Templates/gcc")
+patch_startup_file(STARTUP_FILE_GEN "${STARTUP_FILE}")
+target_sources(mbed-stm32xx INTERFACE ${STARTUP_FILE_GEN})
 ```
-$ python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py -l | grep F427
-STM32F427A(G-I)Hx.xml
-STM32F427I(G-I)Hx.xml
-STM32F427I(G-I)Tx.xml
-STM32F427V(G-I)Tx.xml
-STM32F427Z(G-I)Tx.xml
 
-$ python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py -m "STM32F427V(G-I)Tx.xml"
+The MCU target supplies an exact `STARTUP_<device>` label. Use
+`PRESERVE_SYSTEM_INIT_ORDER` only when the vendor startup order is required,
+such as STM32WB0 deep-stop context restoration. Confirm the generated reset
+flow and ELF entry point instead of assuming all vendor startup files match.
 
-Script version 1.19
+### Linker scripts and vector tables
 
-Checking STM32_open_pin_data repo...
-        Already up to date.
+Prefer one preprocessed family linker script driven by generated memory-bank
+macros. Select it on the family or MCU interface target:
 
-STM32_open_pin_data DB version STM32CubeMX-DB.6.0.10
-
- * Output directory: targets_custom\TARGET_STM\TARGET_STM32F4\TARGET_STM32F427xG\TARGET_STM32F427VGT
- * Generating PeripheralPins.c and PinNames.h with 'STM32_open_pin_data\mcu\STM32F427V(G-I)Tx.xml'
- * GPIO file: STM32_open_pin_data\mcu\IP\GPIO-STM32F427_gpio_v1_0_Modes.xml
- * I/O pins found: 135 connected: 0
-
- * Output directory: targets_custom\TARGET_STM\TARGET_STM32F4\TARGET_STM32F427xI\TARGET_STM32F427VIT
- * Generating PeripheralPins.c and PinNames.h with 'STM32_open_pin_data\mcu\STM32F427V(G-I)Tx.xml'
- * GPIO file: STM32_open_pin_data\mcu\IP\GPIO-STM32F427_gpio_v1_0_Modes.xml
- * I/O pins found: 135 connected: 0
+```cmake
+mbed_set_linker_script(mbed-stm32xx linker_scripts/STM32XX_COMMON.ld)
 ```
 
-### Use of custom_targets.json5
+If a custom target owns a different memory layout, select its script on the
+custom target's interface library in `custom_targets/CMakeLists.txt`:
 
-Example with a board based on STM32F103C8 (like BluePill):
-- MCU_STM32F103x8 generic configuration is already available in targets.json5 file
-
+```cmake
+mbed_set_linker_script(
+    mbed-my-stm32-board
+    ${CMAKE_CURRENT_SOURCE_DIR}/linker_scripts/my_stm32_board.ld
+)
 ```
-$ python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py -m "STM32F103C(8-B)Tx.xml"
-// PeripheralPins.c and PinNames.h template files are created in targets_custom/TARGET_STM/TARGET_STM32F1/TARGET_STM32F103x8/TARGET_STM32F103C8T directory
 
-$ mv TARGET_STM32F103C8T TARGET_BLUEPILL_F103C8
-// Edit PeripheralPins.c and PinNames.h to match your board configuration
+Use separate scripts only for a real difference in memory topology, core,
+security mode, boot flow, or execution mode. An application can deliberately
+override the selected script by passing a second argument to its post-build
+setup:
 
-// Create a custom_targets.json5 with:
+```cmake
+mbed_set_post_build(my_application path/to/custom_linker.ld)
+```
+
+A common linker script should export the flash vector start and end, vector
+table size, and RAM vector destination. The family `cmsis.h` can then derive:
+
+```c
+extern uint32_t __vector_ram_start__;
+extern uint32_t __vector_table_size__;
+
+#define NVIC_NUM_VECTORS \
+    ((uint32_t)(uintptr_t)&__vector_table_size__) / sizeof(uint32_t)
+#define NVIC_RAM_VECTOR_ADDRESS (uint32_t *)&__vector_ram_start__
+```
+
+This replaces copied per-MCU `cmsis_nvic.h` constants. Keep a per-MCU file only
+when the vector layout truly differs and cannot be expressed by linker symbols.
+
+### Memory banks
+
+For a built-in MCU target, set `device_name` to the exact CMSIS pack key and
+store its physical banks in `targets/cmsis_mcu_descriptions.json5`. Use the
+repository tools from `tools/python` to refresh and check the data:
+
+```sh
+python -m mbed_tools.cli.main cmsis-mcu-descr reload-cache
+python -m mbed_tools.cli.main cmsis-mcu-descr fetch-missing
+python -m mbed_tools.cli.main cmsis-mcu-descr check-missing
+python -m mbed_tools.cli.main cmsis-mcu-descr find-unused
+```
+
+`fetch-missing` prints a candidate entry for review; it does not update the
+description file automatically. Compare addresses and capacities with the
+datasheet, reference manual, and vendor linker file.
+
+Custom targets that cannot use a built-in `device_name` must define physical
+`memory_banks` inline. Use `memory_bank_config` only to restrict an existing
+bank for an application offset, bootloader, reserved NVM, or similar purpose:
+
+```json5
 {
-    "BLUEPILL_F103C8": {
-	    "inherits": ["MCU_STM32F103x8"],
-        "overrides": {"clock-source": "USE_PLL_HSE_XTAL"},
-        "device_has_add": ["USBDEVICE"],
-        "memory_banks": {
-            "IRAM": {
-                "access": {
-                    "execute": false,
-                    "read": true,
-                    "write": true
-                },
-                "default": true,
-                "size": 0x5000,
-                "start": 0x20000000,
-                "startup": false
-            },
-            "IROM": {
-                "access": {
-                    "execute": true,
-                    "read": true,
-                    "write": false
-                },
-                "default": true,
-                "size": 0x10000,
-                "start": 0x8000000,
-                "startup": true
-            }
-        },
-    },
-}
-```
-
-Example with a board based on STM32H745ZI
-- this is dual core MCU with CM4 and CM7
-- MCU_STM32H745I_CM4 and MCU_STM32H745I_CM7 generic configuration is already available in targets.json5 file
-
-```
-$ python targets/TARGET_STM/tools/STM32_gen_PeripheralPins.py -m "STM32H745ZITx.xml"
-// PeripheralPins.c and PinNames.h template files are created in targets_custom/TARGET_STM/TARGET_STM32H7/TARGET_STM32H745xI/TARGET_STM32H745ZIT directory
-
-$ mv TARGET_STM32H745ZIT TARGET_H745ZI_BOARD
-// Edit PeripheralPins.c and PinNames.h to match your board configuration
-
-// Create a custom_targets.json5 with:
-{
-    "H745ZI_BOARD_CM4": {
-        "inherits": [
-            "MCU_STM32H745I_CM4"
-        ],
-        "extra_labels_add": [
-            "H745ZI_BOARD"
-        ]
-    },
-    "H745ZI_BOARD_CM7": {
-        "inherits": [
-            "MCU_STM32H745I_CM7"
-        ],
-        "extra_labels_add": [
-            "H745ZI_BOARD"
-        ]
-    }
-}
-```
-
-
-## ST specific implementation
-
-### Pin configuration
-
-It can be useful to have a look on files that describes pin configuration for your board:
-- targets/TARGET_STM/TARGET_STM32**XX**/TARGET_STM32**XXXXX**/TARGET_**XXXXX**/PeripheralPins.c
-- targets/TARGET_STM/TARGET_STM32**XX**/TARGET_STM32**XXXXX**/TARGET_**XXXXX**/PinNames.h
-
-#### Alternate feature
-
-You can easily see the alternate functions for each pin.
-
-Ex:
-```
-    {PC_10,      UART_3,  STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF7_USART3)},
-    {PC_10_ALT0, UART_4,  STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF5_UART4)},
-```
-- If your application is using PC_10 pin for UART, drivers will configure UART3 instance.
-- If your application is using PC_10_ALT0 pin for UART, drivers will configure UART4 instance.
-
-The same alternate choice feature is also used for PWM, ADC, SPI, etc...
-
-#### Conflict pins
-
-Sometimes there are some conflicts in pin use.
-
-Ex:
-```
-    {PA_5,       SPI_1, STM_PIN_DATA(STM_MODE_AF_PP, GPIO_NOPULL, GPIO_AF5_SPI1)}, // Connected to LD2 [green led]
-```
-==> You can use PA_5 pin as SPI, **only** if your application is not using LED...
-
-Sometimes, pin is explicitly removed by default to avoid issues (but you can uncomment the line for your custom board)
-```
-//  {PB_4,       UART_2,  STM_PIN_DATA(STM_MODE_AF_PP, GPIO_PULLUP, GPIO_AF7_USART2)}, // Connected to same instance as STDIO 
-```
-
-### Clock selection
-
-#### System clock
-
-System Core Clock is based on the high-speed clock, which is selected by the `target.clock_source` option.
-
-For each target, a default choice has been made in the "clock_source" config settings in the targets.json5 file.
-
-By default, it is set to something like:
-
-```
-    "clock_source": {
-        "value": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
-```
-
-Meaning that:
-- PLL with the external HSE clock is first configured
-- if it fails, PLL with HSI is then configured
-
-The specific choice of oscillator for your custom board is outside the scope of this README.  However, in general, using a crystal for the clock will provide good accuracy, but uses a bit more power and requires an external component.  Additionally, crystals can require careful design and tuning of the circuit board for best reliability and accuracy.  To make the PCB simpler, a logic level oscillator can be used instead, though this is slightly more expensive.
-
-If you wish to omit a high speed oscillator, then all STM32 parts can run from their internal oscillators (HSI). However, the clock accuracy of this oscillator is limited -- it can be as bad as +-10% over the full temperature range!  So, if you are trying to do anything that relies on accurate clock speed, like USB, then you might run into trouble.  To solve that issue, some STM32 parts (L4, L5, U5) provide an MSI oscillator.  This works like the HSI oscillator, but trims itself using the 32kHz LSE crystal to stay at an accurate frequency.  So, if you want USB but would prefer to have a 32kHz crystal than a MHz crystal, the MSI may be for you.
-
-The options for the `target.clock_source` option include:
-
-- `USE_PLL_HSE` -  Use the High Speed External clock, with a crystal attached.  The frequency expected for the crystal depends on the target, check the value of the `HSE_VALUE` define.
-- `USE_PLL_HSE_EXTC` - Same as above but expect a logic level square wave instead of a crystal.  Nucleo boards mostly use this configuration because the ST-Link outputs a clock signal for the MCU to use.
-- `USE_PLL_HSI` - Use the High Speed Internal clock.  No external parts needed.
-- `USE_PLL_MSI` - Use the MSI oscillator (L4/L5/U5 only).  If a 32kHz crystal is present, then this will be more accurate than HSI.
-
-#### Low power clock
-
-The low power ticker and the RTC are based on a low-speed (32kHz) clock.  This clock source is designed to stay on even when most of the CPU is in sleep mode.
-
-By default, Mbed expects a 32kHz crystal to be present on the LSE (Low Speed External) oscillator pins.  If your board does not have such a crystal, you should set the `target.lse_available` option to 0 in mbed_app.json.  This will switch Mbed to use the internal oscillator instead.  Just be aware that the timing accuracy of the RTC, as well as of some Mbed RTOS operations like thread sleeps and LowPowerTimer, will be reduced to +-10%.
-
-Note that, by default, Mbed uses low drive strength for the LSE crystal.  This can be a problem on custom boards, where the LSE might need a bit more oomph to get started.  If your LSE is not starting, or it's taking a long time to start, try adding
-```json
-"target.lse_drive_load_level": "RCC_LSEDRIVE_HIGH"
-```
-to your mbed_app.json and see if that fixes the issue.  If so, you might need to revisit your board design or just keep the LSE drive at a higher setting.  Be careful because this setting may require a complete power cycle (not just a reset!) of the target to take effect.
-
-#### I2C Timing calculation algorithm
-
-I2C drivers version 2 use I2C timing register.
-
-Enable I2C timing algorithm by setting the value of `i2c_timing_value_algo`
-target config to `true`
-
-```
-"i2c_timing_value_algo": {
-                "help": "If value was set to true I2C timing algorithm is 
-                enabled. Enabling may leads to performance issue. Keeping this
-                false and changing system clock will trigger assert.",
-                "value": false
-            }
-```
-Default configuration disables I2C timing algorithm. If user need to use
-different system clock speed other than default system clock configuration.
-Then I2C timing calculation algorithm need to enable. To enable
-
-```
-"i2c_timing_value_algo": {
-                "value": true
-            }
-```
-
-
-### Sleep feature
-
-ST MCUs feature several low-power modes, please check Reference Manual of each one for more details.
-
-- MBED sleep mode is usually mapped to ST SLEEP mode:
-  - CPU clock is off
-  - all peripherals can run and wake up the CPU when an interrupt or an event
-occurs
-
-- MBED deepsleep mode is mapped to ST STOP2 mode:
-  - all clocks in the VCORE domain are stopped
-  - the PLL, the MSI, the HSI and the HSE are disabled
-  - the LSI and the LSE can be kept running
-  - RTC can remain active
-
-Detailed sleep Mbed OS description : https://os.mbed.com/docs/mbed-os/latest/apis/power-management-sleep.html
-- debug profile is disabling deepsleep
-- deepsleep can also be disabled by application or drivers using sleep_manager_lock_deep_sleep()
-- deep-sleep-latency value is configured to 4 by default for STM32
-- trace with MBED_SLEEP_TRACING_ENABLED macro is set by default with low verbosity
-```
-    "target_overrides": {
-        "*": {
-            "platform.deepsleep-stats-enabled": true,
-            "platform.deepsleep-stats-verbose": false
-        },
-```
-
-
-### WiFi configuration
-
-https://github.com/ARMmbed/wifi-ism43362
-
-https://os.mbed.com/teams/ST/wiki/How-to-make-wifi-tests
-
-
-### Ethernet configuration
-
-Depending on your PHY, you will have to customize several configuration values:
-- the number of RX buffers
-- the number of TX buffers
-- thread size
-- PHY address
-- media interface
-- AutoNegotiation mode
-- DuplexMode mode
-- Speed mode
-- PHY register Offset
-- Speed mask information in the PHY status register
-- Duplex mask information in the PHY status register
-
-Check the default values in:
-https://github.com/ARMmbed/mbed-os/blob/master/connectivity/drivers/emac/TARGET_STM/mbed_lib.json
-
-Option is also to define your own `HAL_ETH_MspInit` function,
-you then have to add **USE_USER_DEFINED_HAL_ETH_MSPINIT** macro.
-
-#### Changing default MAC address in STM32
-To change the default MAC address in STM32,
-If we have the function mbed_otp_mac_address() in the user application,the default ethernet address
-can be changed.
-Because as this is defined as weak in mbed-os/connectivity/drivers/emac/TARGET_STM/stm32xx_emac.cpp
-```
-#include "platform/mbed_toolchain.h"
-MBED_WEAK uint8_t mbed_otp_mac_address(char *mac).
-```
-
-Please find the code snippet here for reference:
-
-```
-..
-uint8_t mbed_otp_mac_address(char *mac);
-uint8_t mbed_otp_mac_address(char *mac)
-{
-	unsigned char ST_mac_addr[6] = {0x00, 0x88, 0xe0,0x90,0x80,0x70}; // New User mac address
-	// printf("%s:%s\n",__FILE__,__func__);
-	memcpy(mac,ST_mac_addr,sizeof(ST_mac_addr));
-	return 1;
-}
-
-int main()
-{
-	// Bring up the ethernet interface
-	printf("Ethernet socket example\n");
-	uint8_t MyMAC[6];
-	printf("return of set_mac_address:%d\n",net.set_mac_address(MyMAC,sizeof(MyMAC)));
-
-	net.connect();
-	printf("MAC address %s\n",net.get_mac_address());
-...
-
-```
-### Asynchronous SPI limitation
-
-The current Asynchronous SPI implementation will not be able to support high speeds (MHz Range).
-The maximum speed supported depends on
-- core operating frequency
-- depth of SPI FIFOs (if available).
-
-For application that require optimized maximum performance, the recommendation is to implement the DMA-based SPI transfer.
-The SPI DMA transfer support shall be implemented on a case-by-case based on below example
-https://github.com/ABOSTM/mbed-os/tree/I2C_SPI_DMA_IMPLEMENTATION_FOR_STM32L4
-
-### CAN receive interrupt problem due to mutex and resolution
-
-In bxCAN and earlier versions the receive interrupt flags can be cleared only on performing a read operation in ST MCUs
-But can_read() cannot be used in interrupt context as it is gaurded by lock operation and mbed does not allow locks in 
-interrupt context. Hence the Rx interrupt is disabled for a while and read is deferred to thread context, the interrupt is
-enabled on a successful read.
-
-As an other option RawCAN (with unlocked CAN apis) is also available and can be used directly, if only one thread is accessing
-the CAN interface.
-
-While using RxInterrupt with the CAN object the receive ISR callback registered should defer read to thread context.
-A simple example is as shown below:
-
-```
-#include "mbed.h"
-
-Ticker ticker;
-Thread canReadThread;
-
-DigitalOut led1(LED1);
-DigitalOut led2(LED2);
-DigitalOut led3(LED3);
-
-CAN can1(PD_0 ,PD_1);
-
-EventQueue queue(32 * EVENTS_EVENT_SIZE);
-
-int counter = 0xABCD;
-CANMessage msg;
-
-void canRead(){
-        if(can1.read(msg)) {
-            if(msg.id==1100)
-                led2 = !led2;
-            if(msg.id==1102){
-                led3 = !led3;
+    "MY_STM32_BOARD": {
+        "inherits": ["MCU_STM32xxxx"],
+        "memory_bank_config": {
+            "IROM1": {
+                "start": 0x08008000,
+                "size": 0x00078000
             }
         }
-}
-
-void canISR(){
-    queue.call(canRead);
-    led3 = !led3;
-}
-
-int main() {
-
-    can1.frequency(100000);
-    can1.mode(CAN::Normal);
-
-    can1.attach(canISR, CAN::RxIrq);
-
-    canReadThread.start(callback(&queue, &EventQueue::dispatch_forever));
-
-    while(1) {
     }
 }
 ```
 
+Only `start` and `size` may be changed by `memory_bank_config`. Inspect the
+configuration summary and generated `memory_banks.json`; confirm that physical
+and configured values, linker macros, and upload base address agree.
 
-## Mbed OS pages
-https://mbed-ce.dev/
+### `tools/stm32.cmake`
+
+The current helper file provides:
+
+- `get_stm32_family()` to resolve the complete family label, including the
+  three-character `STM32WB0` suffix;
+- `get_system_clock_file()` to select a family clock file from target labels;
+- `get_startup_file()` to map an exact startup label to an upstream file;
+- `patch_startup_file()` to generate an Mbed-compatible startup file without
+  modifying the CMSIS submodule.
+
+Keep family-name parsing bounded so MCU-level labels cannot be mistaken for a
+family. When adding a new naming pattern, test existing two-character families
+as well as the new family.
+
+### Connectivity drivers
+
+Not every STM32-specific driver belongs below `targets/TARGET_STM`. The target
+tree owns MCU HAL implementations, startup, clocks, memory, pins, and other
+code required to expose Mbed's hardware APIs. Drivers that implement a Mbed
+connectivity subsystem should normally live under
+[`connectivity/drivers`](../../connectivity/drivers/), alongside the subsystem
+interfaces and other vendor implementations.
+
+Existing STM32 examples include:
+
+- [Ethernet MAC](../../connectivity/drivers/emac/TARGET_STM/);
+- [Wi-Fi modules](../../connectivity/drivers/wifi/TARGET_STM/);
+- [STM32WB Bluetooth integration](../../connectivity/drivers/ble/FEATURE_BLE/TARGET_STM32WB/);
+- [STM32WL LoRa radio](../../connectivity/drivers/lora/TARGET_STM32WL/);
+- [STM32 cryptographic acceleration for Mbed TLS](../../connectivity/drivers/mbedtls/TARGET_STM/).
+
+Small target-side glue may still be needed for interrupts, clocks, transport,
+or low power, but the protocol or network driver should remain with the
+subsystem that consumes it. Use target labels, features, and components to
+select the implementation without pulling connectivity middleware into
+applications that do not use it.
+
+## Family-level implementation notes
+
+Pin, clock, sleep, DMA, and peripheral behavior varies between STM32 families.
+Do not copy a family-specific workaround into common `TARGET_STM` code without
+checking all callers. Advertise a capability in `device_has` only after its
+Mbed HAL is implemented and validated on hardware.
+
+For networking, storage, USB, wireless, and DMA-backed asynchronous APIs,
+verify the required middleware, external hardware, interrupt behavior, cache
+maintenance, and low-power interaction separately. Family or board READMEs
+should document only persistent product behavior; build logs and Greentea
+results belong in the pull request or test report.
+
+## Validation
+
+For a new or changed target:
+
+1. configure and build a minimal application;
+2. inspect ELF sections, reset vector, vector-table size, stack, and memory
+   boundaries;
+3. program and verify the board through each advertised upload method;
+4. test clock accuracy, GPIO, serial, tickers, interrupts, and sleep/wake;
+5. run focused tests for every newly enabled API;
+6. run the local Greentea suite and classify failures separately from missing
+   peripherals or external fixtures;
+7. record exact target, toolchain, configuration, dependency revisions, board
+   revision, probe firmware, and test results in the pull request.
+
+Compilation alone is not sufficient evidence that an STM32 target is
+supported.
+
+## Related documentation
+
+- [MbedCE documentation](https://mbed-ce.dev/)
+- [MbedCE wiki](https://github.com/mbed-ce/mbed-os/wiki)
+- [Mbed memory-bank information](https://github.com/mbed-ce/mbed-os/wiki/Mbed-Memory-Bank-Information)
+- [Running Greentea tests locally](https://github.com/mbed-ce/mbed-os/wiki/Running-the-Mbed-Greentea-Tests-Locally)
