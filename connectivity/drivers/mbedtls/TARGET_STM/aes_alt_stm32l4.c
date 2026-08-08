@@ -218,10 +218,10 @@ int mbedtls_aes_crypt_cbc(mbedtls_aes_context *ctx,
         }
         ctx->ctx_save_cr = ctx->hcryp_aes.Instance->CR; // save here before overwritten
         ctx->hcryp_aes.Instance->CR &= ~AES_CR_EN;
-        *iv_ptr++ = ctx->hcryp_aes.Instance->IVR3;
-        *iv_ptr++ = ctx->hcryp_aes.Instance->IVR2;
-        *iv_ptr++ = ctx->hcryp_aes.Instance->IVR1;
-        *iv_ptr++ = ctx->hcryp_aes.Instance->IVR0;
+        *iv_ptr++ = __REV(ctx->hcryp_aes.Instance->IVR3);
+        *iv_ptr++ = __REV(ctx->hcryp_aes.Instance->IVR2);
+        *iv_ptr++ = __REV(ctx->hcryp_aes.Instance->IVR1);
+        *iv_ptr++ = __REV(ctx->hcryp_aes.Instance->IVR0);
     } else {
         if (st_hal_cryp_cbc(ctx, CRYP_ALGOMODE_ENCRYPT, length, iv, (uint8_t *)input, (uint8_t *)output) != 0) {
             return ST_ERR_AES_BUSY;
