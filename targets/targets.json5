@@ -4603,10 +4603,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_remove": [
             "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
             "PWMOUT", "SERIAL_FC",
-            "SPI", "SPISLAVE", "SPI_ASYNCH", "WATCHDOG", "RESET_REASON"
+            "SPI", "SPISLAVE", "SPI_ASYNCH"
         ],
         "device_has_add": [
-            "MPU"
+            "MPU", "WATCHDOG", "RESET_REASON"
         ],
         "is_mcu_family_target": true
     },

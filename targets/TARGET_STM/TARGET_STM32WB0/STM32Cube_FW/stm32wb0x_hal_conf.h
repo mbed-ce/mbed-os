@@ -7,6 +7,7 @@
 #define HAL_DMA_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_GPIO_MODULE_ENABLED
+#define HAL_IWDG_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
 #define HAL_RTC_MODULE_ENABLED
@@ -54,16 +55,16 @@
 #include "stm32wb0x_hal_dma.h"
 #include "stm32wb0x_hal_cortex.h"
 #include "stm32wb0x_hal_flash.h"
+#include "stm32wb0x_hal_iwdg.h"
 #include "stm32wb0x_hal_pwr.h"
 #include "stm32wb0x_hal_rtc.h"
 #include "stm32wb0x_hal_tim.h"
 #include "stm32wb0x_hal_uart.h"
 
 #ifdef USE_FULL_ASSERT
-void assert_failed(uint8_t *file, uint32_t line);
-#define assert_param(expr) ((expr) ? (void) 0U : assert_failed((uint8_t *)__FILE__, __LINE__))
+#include "stm32_assert.h"
 #else
-#define assert_param(expr) ((void) 0U)
+#define assert_param(expr) ((void)0U)
 #endif
 
 #endif
