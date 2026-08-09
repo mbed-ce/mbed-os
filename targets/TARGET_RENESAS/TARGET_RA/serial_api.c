@@ -175,10 +175,9 @@ void serial_baud(serial_t *obj, int baudrate)
 {
     MBED_ASSERT(obj);
 
-    baud_setting_t setting;
-    fsp_err_t err = R_SCI_UART_BaudCalculate(baudrate, true, 500, &setting);
+    fsp_err_t err = R_SCI_UART_BaudCalculate(baudrate, true, 500, obj->ext.p_baud_setting);
     if (err == FSP_SUCCESS) {
-        obj->p_api->baudSet(obj->p_ctrl, &setting);
+        obj->p_api->baudSet(obj->p_ctrl, obj->ext.p_baud_setting);
     }
 }
 
