@@ -1,3 +1,19 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2026 Jan Gerrit Gers
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /**
  * AES-CBC chaining tests.
  *
@@ -124,9 +140,14 @@ static void setkey(mbedtls_aes_context *ctx, int mode,
     }
 }
 
+static const char *mode_name(int mode)
+{
+    return mode == MBEDTLS_AES_ENCRYPT ? "encrypt" : "decrypt";
+}
+
 /* CBC one message in the given chunk sizes, carrying iv[] across calls, then check
  * against the expected vector. */
-static void run_cbc(const char *label, int mode,
+static void run_cbc(int mode,
                     const unsigned char *key, unsigned int keybits,
                     const unsigned char *input, const unsigned char *expected,
                     const split_t *split)
@@ -152,21 +173,12 @@ static void run_cbc(const char *label, int mode,
     mbedtls_aes_free(&ctx);
 
     TEST_ASSERT_EQUAL_UINT32(MSG_SIZE, offset);
-    snprintf(msg, sizeof(msg), "%s, split %s", label, split->name);
+    snprintf(msg, sizeof(msg), "AES-%u-CBC %s, split %s",
+             keybits, mode_name(mode), split->name);
     TEST_ASSERT_EQUAL_UINT8_ARRAY_MESSAGE(expected, output, MSG_SIZE, msg);
 }
 
-static void run_all_splits(const char *label, int mode,
-                           const unsigned char *key, unsigned int keybits,
-                           const unsigned char *input,
-                           const unsigned char *expected)
-{
-    for (size_t i = 0; i < NUM_SPLITS; i++) {
-        run_cbc(label, mode, key, keybits, input, expected, &SPLITS[i]);
-    }
-}
-
-static void check_iv_contract(const char *label, int mode,
+static void check_iv_contract(int mode,
                               const unsigned char *key, unsigned int keybits,
                               const unsigned char *input,
                               const unsigned char *ciphertext,
@@ -189,8 +201,8 @@ static void check_iv_contract(const char *label, int mode,
                                                        output + offset));
         offset += *chunk;
 
-        snprintf(msg, sizeof(msg), "%s, split %s: IV after %u bytes",
-                 label, split->name, (unsigned)offset);
+        snprintf(msg, sizeof(msg), "AES-%u-CBC %s, split %s: IV after %u bytes",
+                 keybits, mode_name(mode), split->name, (unsigned)offset);
         TEST_ASSERT_EQUAL_UINT8_ARRAY_MESSAGE(ciphertext + offset - BLOCK_SIZE,
                                               iv, BLOCK_SIZE, msg);
     }
@@ -198,82 +210,31 @@ static void check_iv_contract(const char *label, int mode,
     mbedtls_aes_free(&ctx);
 }
 
-static void check_iv_contract_all_splits(const char *label, int mode,
-                                         const unsigned char *key,
-                                         unsigned int keybits,
-                                         const unsigned char *input,
-                                         const unsigned char *ciphertext)
-{
-    for (size_t i = 0; i < NUM_SPLITS; i++) {
-        check_iv_contract(label, mode, key, keybits, input, ciphertext,
-                          &SPLITS[i]);
-    }
-}
 
-/* Baselines */
-
-static void test_aes128_encrypt_single_call()
+template<int mode, const unsigned char *key, unsigned int keybits,
+         const unsigned char *input, const unsigned char *expected>
+static void run_single_call()
 {
-    run_cbc("AES-128-CBC encrypt", MBEDTLS_AES_ENCRYPT, AES128_KEY, 128,
-            PLAINTEXT, AES128_CIPHERTEXT, &SPLITS[0]);
-}
-
-static void test_aes128_decrypt_single_call()
-{
-    run_cbc("AES-128-CBC decrypt", MBEDTLS_AES_DECRYPT, AES128_KEY, 128,
-            AES128_CIPHERTEXT, PLAINTEXT, &SPLITS[0]);
+    run_cbc(mode, key, keybits, input, expected, &SPLITS[0]);
 }
 
 /* The regression proper: every split, both directions, both key sizes. */
-
-static void test_aes128_encrypt_all_splits()
+template<int mode, const unsigned char *key, unsigned int keybits,
+         const unsigned char *input, const unsigned char *expected>
+static void run_all_splits()
 {
-    run_all_splits("AES-128-CBC encrypt", MBEDTLS_AES_ENCRYPT, AES128_KEY, 128,
-                   PLAINTEXT, AES128_CIPHERTEXT);
+    for (size_t i = 0; i < NUM_SPLITS; i++) {
+        run_cbc(mode, key, keybits, input, expected, &SPLITS[i]);
+    }
 }
 
-static void test_aes128_decrypt_all_splits()
+template<int mode, const unsigned char *key, unsigned int keybits,
+         const unsigned char *input, const unsigned char *ciphertext>
+static void check_iv_contract_all_splits()
 {
-    run_all_splits("AES-128-CBC decrypt", MBEDTLS_AES_DECRYPT, AES128_KEY, 128,
-                   AES128_CIPHERTEXT, PLAINTEXT);
-}
-
-static void test_aes256_encrypt_all_splits()
-{
-    run_all_splits("AES-256-CBC encrypt", MBEDTLS_AES_ENCRYPT, AES256_KEY, 256,
-                   PLAINTEXT, AES256_CIPHERTEXT);
-}
-
-static void test_aes256_decrypt_all_splits()
-{
-    run_all_splits("AES-256-CBC decrypt", MBEDTLS_AES_DECRYPT, AES256_KEY, 256,
-                   AES256_CIPHERTEXT, PLAINTEXT);
-}
-
-static void test_aes128_encrypt_iv_contract()
-{
-    check_iv_contract_all_splits("AES-128-CBC encrypt", MBEDTLS_AES_ENCRYPT,
-                                 AES128_KEY, 128, PLAINTEXT, AES128_CIPHERTEXT);
-}
-
-static void test_aes128_decrypt_iv_contract()
-{
-    check_iv_contract_all_splits("AES-128-CBC decrypt", MBEDTLS_AES_DECRYPT,
-                                 AES128_KEY, 128, AES128_CIPHERTEXT,
-                                 AES128_CIPHERTEXT);
-}
-
-static void test_aes256_encrypt_iv_contract()
-{
-    check_iv_contract_all_splits("AES-256-CBC encrypt", MBEDTLS_AES_ENCRYPT,
-                                 AES256_KEY, 256, PLAINTEXT, AES256_CIPHERTEXT);
-}
-
-static void test_aes256_decrypt_iv_contract()
-{
-    check_iv_contract_all_splits("AES-256-CBC decrypt", MBEDTLS_AES_DECRYPT,
-                                 AES256_KEY, 256, AES256_CIPHERTEXT,
-                                 AES256_CIPHERTEXT);
+    for (size_t i = 0; i < NUM_SPLITS; i++) {
+        check_iv_contract(mode, key, keybits, input, ciphertext, &SPLITS[i]);
+    }
 }
 
 /* A zero-length call must be a no-op */
@@ -339,16 +300,26 @@ static utest::v1::status_t greentea_setup(const size_t number_of_cases)
 }
 
 static Case cases[] = {
-    Case("AES-128-CBC (enc) single call", test_aes128_encrypt_single_call),
-    Case("AES-128-CBC (dec) single call", test_aes128_decrypt_single_call),
-    Case("AES-128-CBC (enc) call all splits", test_aes128_encrypt_all_splits),
-    Case("AES-128-CBC (dec) call all splits", test_aes128_decrypt_all_splits),
-    Case("AES-256-CBC (enc) call all splits", test_aes256_encrypt_all_splits),
-    Case("AES-256-CBC (dec) call all splits", test_aes256_decrypt_all_splits),
-    Case("AES-128-CBC (enc) leaves last cipher block in IV", test_aes128_encrypt_iv_contract),
-    Case("AES-128-CBC (dec) leaves last cipher block in IV", test_aes128_decrypt_iv_contract),
-    Case("AES-256-CBC (enc) leaves last cipher block in IV", test_aes256_encrypt_iv_contract),
-    Case("AES-256-CBC (dec) leaves last cipher block in IV", test_aes256_decrypt_iv_contract),
+    Case("AES-128-CBC (enc) single call",
+         run_single_call<MBEDTLS_AES_ENCRYPT, AES128_KEY, 128, PLAINTEXT, AES128_CIPHERTEXT>),
+    Case("AES-128-CBC (dec) single call",
+         run_single_call<MBEDTLS_AES_DECRYPT, AES128_KEY, 128, AES128_CIPHERTEXT, PLAINTEXT>),
+    Case("AES-128-CBC (enc) call all splits",
+         run_all_splits<MBEDTLS_AES_ENCRYPT, AES128_KEY, 128, PLAINTEXT, AES128_CIPHERTEXT>),
+    Case("AES-128-CBC (dec) call all splits",
+         run_all_splits<MBEDTLS_AES_DECRYPT, AES128_KEY, 128, AES128_CIPHERTEXT, PLAINTEXT>),
+    Case("AES-256-CBC (enc) call all splits",
+         run_all_splits<MBEDTLS_AES_ENCRYPT, AES256_KEY, 256, PLAINTEXT, AES256_CIPHERTEXT>),
+    Case("AES-256-CBC (dec) call all splits",
+         run_all_splits<MBEDTLS_AES_DECRYPT, AES256_KEY, 256, AES256_CIPHERTEXT, PLAINTEXT>),
+    Case("AES-128-CBC (enc) leaves last cipher block in IV",
+         check_iv_contract_all_splits<MBEDTLS_AES_ENCRYPT, AES128_KEY, 128, PLAINTEXT, AES128_CIPHERTEXT>),
+    Case("AES-128-CBC (dec) leaves last cipher block in IV",
+         check_iv_contract_all_splits<MBEDTLS_AES_DECRYPT, AES128_KEY, 128, AES128_CIPHERTEXT, AES128_CIPHERTEXT>),
+    Case("AES-256-CBC (enc) leaves last cipher block in IV",
+         check_iv_contract_all_splits<MBEDTLS_AES_ENCRYPT, AES256_KEY, 256, PLAINTEXT, AES256_CIPHERTEXT>),
+    Case("AES-256-CBC (dec) leaves last cipher block in IV",
+         check_iv_contract_all_splits<MBEDTLS_AES_DECRYPT, AES256_KEY, 256, AES256_CIPHERTEXT, AES256_CIPHERTEXT>),
     Case("AES-CBC zero-length call is a no-op", test_zero_length_call_is_a_noop),
     Case("AES-CBC decrypt with interleaved contexts", test_decrypt_interleaved_contexts)
 };
