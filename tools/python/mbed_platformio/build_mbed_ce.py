@@ -287,7 +287,7 @@ def rp2xxx_bootloader_custom_commands(env: Environment, framework_targets_map: d
     env.Command(
         target=str(boot_stage_2_bin),
         source=boot_stage_2_elf,
-        action=f"$OBJCOPY -O binary {boot_stage_2_elf} {boot_stage_2_bin!s}",
+        action=f"$OBJCOPY -O binary \"{boot_stage_2_elf}\" \"{boot_stage_2_bin!s}\"",
     )
 
     # Now use the appropriate script to generate the ASM source file containing the padded and checksummed contents
@@ -302,7 +302,7 @@ def rp2xxx_bootloader_custom_commands(env: Environment, framework_targets_map: d
     env.Command(
         target=generated_src_file,
         source=str(boot_stage_2_bin),
-        action=f"{sys.executable} {script_path} -s 0xffffffff {boot_stage_2_bin!s} {generated_src_file}",
+        action=f"\"{sys.executable}\" \"{script_path}\" -s 0xffffffff \"{boot_stage_2_bin!s}\" \"{generated_src_file}\"",
     )
 
 
