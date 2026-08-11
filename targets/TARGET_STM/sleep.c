@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************
  */
-#if DEVICE_SLEEP && !defined(TARGET_STM32WB0)
+#if DEVICE_SLEEP
 
 #include "sleep_api.h"
 #include "us_ticker_api.h"

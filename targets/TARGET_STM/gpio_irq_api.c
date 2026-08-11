@@ -28,7 +28,7 @@
  *******************************************************************************
  */
 
-#if DEVICE_INTERRUPTIN && !defined(TARGET_STM32WB0)
+#if DEVICE_INTERRUPTIN
 
 #include <stdbool.h>
 #include <inttypes.h>
@@ -563,4 +563,4 @@ void gpio_irq_disable(gpio_irq_t *obj)
     }
 }
 
-#endif /* DEVICE_INTERRUPTIN && !TARGET_STM32WB0 */
+#endif /* DEVICE_INTERRUPTIN */
