@@ -1,4 +1,4 @@
-# Copyright (c) 2026 MbedCE Community Contributors
+# Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
 # SPDX-License-Identifier: Apache-2.0
 
 mbed_setup_submodule(cmsis-device-wb0 CHECK_FILE Source/Templates/system_stm32wb0x.c IF_LABEL MCU_STM32WB0)

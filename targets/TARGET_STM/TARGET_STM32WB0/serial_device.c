@@ -1,4 +1,7 @@
-/* SPDX-License-Identifier: BSD-3-Clause */
+/* Copyright (c) 2019 STMicroelectronics
+ * Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #if DEVICE_SERIAL
 
