@@ -1,4 +1,6 @@
-/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "PeripheralPins.h"
 #include "mbed_toolchain.h"
 

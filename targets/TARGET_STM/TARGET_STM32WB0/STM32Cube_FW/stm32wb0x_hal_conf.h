@@ -1,4 +1,7 @@
-/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (c) 2024 STMicroelectronics.
+ * Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 #ifndef STM32WB0X_HAL_CONF_H
 #define STM32WB0X_HAL_CONF_H
 

@@ -1,4 +1,6 @@
-/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (c) 2026 MbedCE Community Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 /**
  * This file configures the STM32WB0 system clock as follows:

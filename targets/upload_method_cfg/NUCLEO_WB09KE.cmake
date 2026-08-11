@@ -1,3 +1,6 @@
+# Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
+# SPDX-License-Identifier: Apache-2.0
+
 # MbedCE upload configuration for the NUCLEO_WB09KE ST-LINK interface.
 set(UPLOAD_METHOD_DEFAULT STM32CUBE)
 

@@ -1,4 +1,6 @@
-/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #ifndef MBED_PIN_DEVICE_H
 #define MBED_PIN_DEVICE_H
 

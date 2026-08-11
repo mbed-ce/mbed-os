@@ -1,4 +1,4 @@
-# Copyright (c) 2026 MbedCE Community Contributors
+# Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(TARGET_NUCLEO_WB09KE EXCLUDE_FROM_ALL)
