@@ -1,16 +1,19 @@
-# Copyright (c) 2026 MbedCE Community Contributors
+# Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(STM32Cube_FW EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_STM32WB09xE EXCLUDE_FROM_ALL)
 
+# STM32WB0 uses port-level GPIO interrupts and resumes from Deepstop through a
+# context-restoring reset path, so it replaces the default STM32 HAL backends.
+set(STM_GPIO_IRQ_API_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/gpio_irq_api.c PARENT_SCOPE)
+set(STM_SLEEP_API_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/sleep.c PARENT_SCOPE)
+
 add_library(mbed-stm32wb0 INTERFACE)
 
 target_sources(mbed-stm32wb0 INTERFACE
     clock_cfg/system_clock.c
-    gpio_irq_api.c
     serial_device.c
-    sleep.c
     wait_ns.c
 )
 
