@@ -61,7 +61,7 @@ MBED_NORETURN void mbed_assert_internal(const char *expr, const char *file, int 
  *  @endcode
  */
 #ifdef NDEBUG
-#define MBED_ASSERT(expr) ((void)0)
+#define MBED_ASSERT(expr) (void)(expr)
 
 #else
 #define MBED_ASSERT(expr)                                \
