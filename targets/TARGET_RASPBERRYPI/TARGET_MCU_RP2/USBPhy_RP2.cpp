@@ -56,6 +56,30 @@ static USBPhyHw *instance;
 // Per RP2350 manual section 12.7.3.7.3, DPRAM buffers must be 64 byte aligned.
 constexpr size_t USB_BUFFER_ALIGN = 64;
 
+/// Simple memcpy implementation which does not use any unaligned accesses.
+/// This is needed because, at least in some toolchains/build configurations,
+/// the C library memcpy appears to use access types that the USB DPRAM does not support, causing a HardFault.
+static void simple_memcpy(uint8_t * dest, uint8_t const * src, size_t len)
+{
+    // While possible, copy as full words
+    while(len >= sizeof(uint32_t) && (reinterpret_cast<uintptr_t>(src) % sizeof(uint32_t) == 0) && (reinterpret_cast<uintptr_t>(dest) % sizeof(uint32_t) == 0))
+    {
+        *reinterpret_cast<uint32_t *>(dest) = *reinterpret_cast<uint32_t const *>(src);
+        dest += sizeof(uint32_t);
+        src += sizeof(uint32_t);
+        len -= sizeof(uint32_t);
+    }
+
+    // Use single-byte accesses for remaining data (or the entire thing if unaligned)
+    while(len > 0)
+    {
+        *dest = *src;
+        ++src;
+        ++dest;
+        --len;
+    }
+}
+
 USBPhy *get_usb_phy()
 {
     static USBPhyHw usbphy;
@@ -218,7 +242,7 @@ uint32_t USBPhyHw::ep0_set_max_packet(uint32_t max_packet)
 // read setup packet
 void USBPhyHw::ep0_setup_read_result(uint8_t *buffer, uint32_t size)
 {
-    memcpy(buffer, (void *) usb_dpram->setup_packet, size < 8 ? size : 8);
+    simple_memcpy(buffer, const_cast<uint8_t *>(usb_dpram->setup_packet), size < 8 ? size : 8);
 }
 
 void USBPhyHw::ep0_read(uint8_t *data, uint32_t size)
@@ -244,7 +268,7 @@ uint32_t USBPhyHw::ep0_read_result()
     {
         if(ep->data != NULL)
         {
-            memcpy(ep->data, ep->dpram, sz);
+            simple_memcpy(ep->data, ep->dpram, sz);
         }
     }
     else
@@ -258,7 +282,7 @@ void USBPhyHw::ep0_write(uint8_t *buffer, uint32_t size)
     endpoint_info_t * ep = &this->ep_info_in[0];
 
     if(buffer != NULL)
-        memcpy((void *) ep->dpram, buffer, size);
+        simple_memcpy(ep->dpram, buffer, size);
 
     __asm volatile (
             "b 1f\n"
@@ -404,7 +428,7 @@ uint32_t USBPhyHw::endpoint_read_result(usb_ep_t endpoint)
     {
         if(ep->data != NULL)
         {
-            memcpy(ep->data, ep->dpram, sz);
+            simple_memcpy(ep->data, ep->dpram, sz);
         }
     }
     else
@@ -420,7 +444,7 @@ bool USBPhyHw::endpoint_write(usb_ep_t endpoint, uint8_t *data, uint32_t size)
     endpoint_info_t * ep = &this->ep_info_in[ep_num];
 
     if(data != NULL)
-        memcpy(ep->dpram, data, size);
+        simple_memcpy(ep->dpram, data, size);
 
     __asm volatile (
             "b 1f\n"
