@@ -104,7 +104,7 @@ greentea = [
 # Install this optional dependency group to get IDE completion for packages used by the mbed_platformio package.
 # Note that this package is actually run in platformio's venv, not the Mbed venv, so there is no other need to install these.
 platformio = [
-    "SCons",
+    "SCons>=4.11", # v4.11 added type annotations for certain methods, linting will fail without them
     "platformio",
     "click"
 ]

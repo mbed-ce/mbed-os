@@ -35,9 +35,9 @@ board = env.BoardConfig()
 
 # Directories
 FRAMEWORK_DIR = Path(platform.get_package_dir("framework-mbed-ce"))
-BUILD_DIR = Path(typing.cast(str, env.subst("$BUILD_DIR")))
-PROJECT_DIR = Path(typing.cast(str, env.subst("$PROJECT_DIR")))
-PROJECT_SRC_DIR = Path(typing.cast(str, env.subst("$PROJECT_SRC_DIR")))
+BUILD_DIR = Path(env.subst("$BUILD_DIR"))
+PROJECT_DIR = Path(env.subst("$PROJECT_DIR"))
+PROJECT_SRC_DIR = Path(env.subst("$PROJECT_SRC_DIR"))
 CMAKE_API_DIR = BUILD_DIR / ".cmake" / "api" / "v1"
 CMAKE_API_QUERY_DIR = CMAKE_API_DIR / "query"
 CMAKE_API_REPLY_DIR = CMAKE_API_DIR / "reply"
@@ -69,7 +69,7 @@ from mbed_platformio.pio_variants import PIO_VARIANT_TO_MBED_TARGET
 
 
 def get_mbed_target() -> str:
-    board_type = typing.cast(str, env.subst("$BOARD"))
+    board_type = env.subst("$BOARD")
     variant = PIO_VARIANT_TO_MBED_TARGET[board_type] if board_type in PIO_VARIANT_TO_MBED_TARGET else board_type.upper()
     return board.get("build.mbed_variant", variant)
 
@@ -284,10 +284,10 @@ def rp2xxx_bootloader_custom_commands(env: Environment, framework_targets_map: d
     # First generate bin file from elf
     boot_stage_2_elf = env.GetBuildPath(framework_targets_map["mbed-mcu-rp2-boot-stage-2"]["exe"])[0]
     boot_stage_2_bin = pathlib.Path(boot_stage_2_elf).with_suffix(".bin")
-    env.Command(
+    _ = env.Command(
         target=str(boot_stage_2_bin),
         source=boot_stage_2_elf,
-        action=f"$OBJCOPY -O binary \"{boot_stage_2_elf}\" \"{boot_stage_2_bin!s}\"",
+        action=f'$OBJCOPY -O binary "{boot_stage_2_elf}" "{boot_stage_2_bin!s}"',
     )
 
     # Now use the appropriate script to generate the ASM source file containing the padded and checksummed contents
@@ -299,10 +299,10 @@ def rp2xxx_bootloader_custom_commands(env: Environment, framework_targets_map: d
     )
     script_path = f"{FRAMEWORK_DIR}/targets/TARGET_RASPBERRYPI/pico-sdk/src/{'rp2040' if use_rp2040_script else 'rp2350'}/boot_stage2/pad_checksum"
 
-    env.Command(
+    _ = env.Command(
         target=generated_src_file,
         source=str(boot_stage_2_bin),
-        action=f"\"{sys.executable}\" \"{script_path}\" -s 0xffffffff \"{boot_stage_2_bin!s}\" \"{generated_src_file}\"",
+        action=f'"{sys.executable}" "{script_path}" -s 0xffffffff "{boot_stage_2_bin!s}" "{generated_src_file}"',
     )
 
 
