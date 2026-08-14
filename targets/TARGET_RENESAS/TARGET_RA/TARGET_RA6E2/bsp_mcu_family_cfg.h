@@ -27,7 +27,7 @@ extern "C" {
                 #error "Invalid HOCO frequency chosen (BSP_CFG_HOCO_FREQUENCY) in bsp_clock_cfg.h"
             #endif
 
-            #define BSP_CFG_FLL_ENABLE                 (0)
+            #define BSP_CFG_FLL_ENABLE                 (1)
 
             #define BSP_CORTEX_VECTOR_TABLE_ENTRIES    (16U)
             #define BSP_VECTOR_TABLE_MAX_ENTRIES       (112U)

@@ -83,14 +83,9 @@ void gpio_irq_free(gpio_irq_t *obj)
 
 void gpio_irq_set(gpio_irq_t *obj, gpio_irq_event event, uint32_t enable)
 {
-    /* RA4E1 �� FSP ��֧������ʱ�޸Ĵ�����ʽ����Ҫ���� Open��
-       �������Ҫ֧�� RISE/FALL ��̬�л����������������� Open ͨ�� */
-
     (void)obj;
     (void)event;
     (void)enable;
-
-    /* ���գ�Mbed �� InterruptIn Ĭ��ֻ��Ҫ˫�ش��� */
 }
 
 void gpio_irq_enable(gpio_irq_t *obj)
@@ -101,6 +96,11 @@ void gpio_irq_enable(gpio_irq_t *obj)
 void gpio_irq_disable(gpio_irq_t *obj)
 {
     R_ICU_ExternalIrqDisable(g_icu_ctrl[obj->channel]);
+}
+
+const PinMap *gpio_irq_pinmap(void)
+{
+    return PinMap_IRQ;
 }
 
 #ifdef __cplusplus

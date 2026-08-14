@@ -61,7 +61,7 @@ extern const can_extended_cfg_t g_can0_extended_cfg;
 #ifndef can_callback
 void can_callback(can_callback_args_t * p_args);
 #endif
-#define CAN_NO_OF_MAILBOXES_g_can0 (16)
+#define CAN_NO_OF_MAILBOXES_g_can0 (8)
 /** AGT Timer Instance */
 extern const timer_instance_t g_timer_agt5;
 

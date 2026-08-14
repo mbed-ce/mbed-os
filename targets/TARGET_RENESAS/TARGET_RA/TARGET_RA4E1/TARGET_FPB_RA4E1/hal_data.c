@@ -284,8 +284,8 @@ const can_fifo_interrupt_cfg_t g_can0_fifo_int_cfg =
 
 can_rx_fifo_cfg_t g_can0_rx_fifo_cfg =
 {
-    .rx_fifo_mask1 = 0x1FFFFFFF,
-    .rx_fifo_mask2 = 0x1FFFFFFF,
+    .rx_fifo_mask1 = 0,
+    .rx_fifo_mask2 = 0,
 
     .rx_fifo_id1 =
     {

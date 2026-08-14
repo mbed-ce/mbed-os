@@ -101,6 +101,33 @@ static uint32_t spi_actual_frequency(rspck_div_setting_t *div)
  *  Mbed HAL API
  * -------------------------------------------------------------------------- */
 
+ void spi_get_capabilities(PinName ssel, bool slave, spi_capabilities_t *cap)
+{
+    if (slave) {
+        // unsupported
+    } else {
+        cap->minimum_frequency = 200000;          // 200 kHz
+        cap->maximum_frequency = 2000000;         // 2 MHz
+        cap->word_length = 0x00000080;            // 8bit only
+        cap->support_slave_mode = false;          // not supported
+        cap->hw_cs_handle = false;                // to be determined later based on ssel
+        cap->slave_delay_between_symbols_ns = 0;  // irrelevant in master mode
+        cap->clk_modes = 0x0f;                    // all clock modes
+        cap->tx_rx_buffers_equal_length = false;  // rx/tx buffers can have different sizes
+        cap->async_mode = false;
+    }
+
+    // check if given ssel pin is in the cs pinmap
+    const PinMap *cs_pins = spi_master_cs_pinmap();
+    while (cs_pins->pin != NC) {
+        if (cs_pins->pin == ssel) {
+            cap->hw_cs_handle = true;
+            break;
+        }
+        cs_pins++;
+    }
+}
+
 void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel)
 {
     MBED_ASSERT(obj != NULL);

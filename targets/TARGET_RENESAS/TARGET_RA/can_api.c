@@ -11,15 +11,15 @@
 
 #ifdef DEVICE_CAN_FD
 #include "r_canfd.h"
+#define MBED_CAN_MAILBOX_TX CANFD_TX_BUFFER_FIFO_COMMON_0
 #else
 #include "r_can.h"
+#define MBED_CAN_MAILBOX_TX CAN_MAILBOX_ID_TX_FIFO
 #endif
 
 static can_irq_handler irq_handler;
 
 extern const can_instance_t *const g_can_instances[];
-
-#define MBED_CAN_MAILBOX_TX 0
 
 extern const PinMap PinMap_CAN_RD[];
 extern const PinMap PinMap_CAN_TD[];
@@ -391,8 +391,11 @@ int can_write(can_t *obj, CAN_Message msg)
     can_frame_t frame;
     mbed_to_can_frame(&msg, &frame);
 
-    fsp_err_t err = obj->instance->p_api->write(obj->instance->p_ctrl, MBED_CAN_MAILBOX_TX, &frame);
-
+    fsp_err_t err = FSP_SUCCESS;
+    do {
+        err = obj->instance->p_api->write(obj->instance->p_ctrl, MBED_CAN_MAILBOX_TX, &frame);
+    }
+    while(err == FSP_ERR_CAN_TRANSMIT_FIFO_FULL);
     return (err == FSP_SUCCESS) ? 1 : 0;
 }
 

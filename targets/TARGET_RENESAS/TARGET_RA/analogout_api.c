@@ -11,7 +11,7 @@
 
 static dac_instance_ctrl_t dac_ctrls[2];
 
-void dac_init(dac_t *obj, PinName pin)
+void analogout_init(dac_t *obj, PinName pin)
 {
     MBED_ASSERT(obj);
 
@@ -41,11 +41,11 @@ void dac_init(dac_t *obj, PinName pin)
     R_DAC_Start(obj->ctrl);
 }
 
-void dac_free(dac_t *obj)
+void analogout_free(dac_t *obj)
 {
 }
 
-void dac_write_u16(dac_t *obj, uint16_t value)
+void analogout_write_u16(dac_t *obj, uint16_t value)
 {
     obj->last_value = value;
 
@@ -54,23 +54,23 @@ void dac_write_u16(dac_t *obj, uint16_t value)
     R_DAC_Write(obj->ctrl, dac_val);
 }
 
-uint16_t dac_read_u16(dac_t *obj)
+uint16_t analogout_read_u16(dac_t *obj)
 {
     return obj->last_value;
 }
 
-void dac_write(dac_t *obj, float value)
+void analogout_write(dac_t *obj, float value)
 {
     if (value < 0.0f) value = 0.0f;
     if (value > 1.0f) value = 1.0f;
 
     uint16_t v = (uint16_t)(value * 65535.0f);
-    dac_write_u16(obj, v);
+    analogout_write_u16(obj, v);
 }
 
-float dac_read(dac_t *obj)
+float analogout_read(dac_t *obj)
 {
-    return dac_read_u16(obj) / 65535.0f;
+    return analogout_read_u16(obj) / 65535.0f;
 }
 
 const PinMap *analogout_pinmap()

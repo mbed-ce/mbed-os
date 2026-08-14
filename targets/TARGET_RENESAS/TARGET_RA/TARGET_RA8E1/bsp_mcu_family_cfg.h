@@ -28,7 +28,7 @@
                 #error "Invalid HOCO frequency chosen (BSP_CFG_HOCO_FREQUENCY) in bsp_clock_cfg.h"
             #endif
 
-            #define BSP_CFG_FLL_ENABLE                   (0)
+            #define BSP_CFG_FLL_ENABLE                   (1)
 
             #define BSP_CFG_CLOCK_SETTLING_DELAY_ENABLE  (1)
             #define BSP_CFG_SLEEP_MODE_DELAY_ENABLE      (1)
