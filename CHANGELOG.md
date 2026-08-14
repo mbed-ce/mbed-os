@@ -22,6 +22,8 @@ A message that notes the main changes in the update.
 - Added a new global, `mbed_used_mpu_regions`, which gives the number of MPU regions used by Mbed. This is intended to allow applications to also use the MPU without creating breakages in the future if Mbed uses additional MPU regions.
 - Added new header, `mbed_math_helpers.h`, containing some useful math functions. Currently this contains `mbed_integer_log_2()` and `mbed_is_power_of_two()`
 - MPU configuration code gained the ability to create a noncached section and a ram function section (for code that has to be executed out of RAM). This RAM function section is an exception to the normal limitations on RAM execution.
+- EFM32 Giant Gecko Series 0:
+  - `EFM32GG_STK3700` added upload method config
 - MIMXRT117x: Memory bank configuration is now supported in the linker script.
 - RP2xxx
   - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board with Mbed compared to the non-W version is limited).
@@ -85,6 +87,9 @@ A message that notes the main changes in the update.
   - MIMXRT1050_EVK: Fixed build error due to typos
   - Fixed SPI SCLK frequency being several times higher than set due to clock config error (#564)
 - Fixed memory leak with Nanostack memory manager that caused the stack to run of memory when used with zero-copy Ethernet drivers
+- EFM32:
+  - Fixed build failure on all `EFM32GG990F1024` targets caused falsely added TRNG peripheral
+  - Set `deep-sleep-latency` to 1ms to account for the wake-up delay on `EFM32GG_STK3700` boards
 - LPC17xx:
   - Fixed I2C single-byte API continuing to send bytes after being NACKed
 - RP2xxx:
