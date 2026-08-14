@@ -92,6 +92,8 @@ A message that notes the main changes in the update.
   - Set `deep-sleep-latency` to 1ms to account for the wake-up delay on `EFM32GG_STK3700` boards
 - LPC17xx:
   - Fixed I2C single-byte API continuing to send bytes after being NACKed
+- STM32L4:
+  - Fixed multiple bugs causing hardware-accelerated multi-block AES encryption and decryption to produce incorrect results
 - RP2xxx:
   - Fixed issue where reading from an I2C master in slave mode could put the I2C peripheral in a bad state if the master transferred
     more bytes than expected
