@@ -6112,6 +6112,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "ANALOGOUT"
         ],
+        "device_has_remove": [
+            "TRNG"
+        ],
         "config": {
             "hfrco-band-select": {
                 "help": "Value: One of _CMU_HFRCOCTRL_BAND_28MHZ, _CMU_HFRCOCTRL_BAND_21MHZ, _CMU_HFRCOCTRL_BAND_14MHZ, _CMU_HFRCOCTRL_BAND_11MHZ, _CMU_HFRCOCTRL_BAND_7MHZ, _CMU_HFRCOCTRL_BAND_1MHZ. Be sure to set hfrco-clock-freq accordingly!",
@@ -6138,7 +6141,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "overrides": {
-            "hfrco-clock-freq": "21000000"
+            "hfrco-clock-freq": "21000000",
+            "deep-sleep-latency": 1
         },
         "image_url": "https://www.silabs.com/content/dam/siliconlabs/images/products/microcontrollers/32-bit_mcus/giant_gecko/giant-gecko-starter-kit.jpg"
     },
