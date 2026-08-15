@@ -30,7 +30,7 @@ namespace mbed {
  * @brief Timer implementation using the LP ticker.
  *
  * Does not lock the deep sleep, and counts time correctly even while deep sleeping. However, provides less precision
- * than #Timer. The exact precision varies by target but will be between 250us and 15us.
+ * than Timer. The exact precision varies by target but will be between 250us and 15us.
  *
  * @note When constructed, a LowPowerTimer is stopped and reset to zero time.
  *
