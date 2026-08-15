@@ -189,7 +189,7 @@ public:
      *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
      *                  and send cannot be performed immediately.
      *  @retval         NSAPI_ERROR_DEVICE_ERROR in case of tls-related errors.
-     *                  See @ref mbedtls_ssl_write.
+     *                  See \c mbedtls_ssl_write.
      */
     nsapi_error_t send(const void *data, nsapi_size_t size) override;
 
@@ -205,7 +205,7 @@ public:
      *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
      *                  and send cannot be performed immediately.
      *  @retval         NSAPI_ERROR_DEVICE_ERROR in case of tls-related errors.
-     *                  See @ref mbedtls_ssl_read.
+     *                  See \c mbedtls_ssl_read.
      *  @return         0 if no data is available to be received
      *                  and the peer has performed an orderly shutdown.
      */
@@ -306,7 +306,7 @@ protected:
      *  @retval       NSAPI_ERROR_IN_PROGRESS if the first call did not complete the request.
      *  @retval       NSAPI_ERROR_NO_SOCKET in case the transport socket was not created correctly.
      *  @retval       NSAPI_ERROR_AUTH_FAILURE in case of tls-related authentication errors.
-     *                See @ref mbedtls_ctr_drbg_seed or @ref mbedtls_hmac_drbg_seed, @ref mbedtls_ssl_setup. @ref mbedtls_ssl_handshake.
+     *                See \c mbedtls_ctr_drbg_seed or \c mbedtls_hmac_drbg_seed, \c mbedtls_ssl_setup. \c mbedtls_ssl_handshake.
      */
     nsapi_error_t start_handshake(bool first_call);
 

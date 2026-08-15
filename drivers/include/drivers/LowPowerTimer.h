@@ -27,21 +27,20 @@
 
 namespace mbed {
 /**
- * \defgroup drivers_LowPowerTimer LowPowerTimer class
- * \ingroup drivers-public-api-ticker
- * @{
- */
-
-/** Low power timer
+ * @brief Timer implementation using the LP ticker.
+ *
+ * Does not lock the deep sleep, and counts time correctly even while deep sleeping. However, provides less precision
+ * than #Timer. The exact precision varies by target but will be between 250us and 15us.
+ *
+ * @note When constructed, a LowPowerTimer is stopped and reset to zero time.
  *
  * @note Synchronization level: Interrupt safe
+ * \ingroup drivers_Timer
  */
 class LowPowerTimer : public TimerBase {
 public:
     LowPowerTimer();
 };
-
-/** @}*/
 
 } // namespace mbed
 
