@@ -107,6 +107,7 @@ A message that notes the main changes in the update.
 - Fixed issue where if the same setting was overridden in multiple different `target_override` blocks in mbed_app.json, only one of the overrides would be processed
 - Fixed `Timer` class not being included in Doxygen docs due to misplaced #ifdef
 - Rewrote and improved docs for `Timer` and `LowPowerTimer` classes
+- Functions tagged as `MBED_DEPRECATED` will now show as deprecated in the Doxygen docs
 
 ### Removed
 - Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7.0.0)
