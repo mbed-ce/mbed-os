@@ -5,11 +5,12 @@
 # Notes:
 # 1. The STK3700 carries a SEGGER J-Link OB, so JLINK is the default method.
 # 2. SWD only. Series 0 EFM32 parts have no JTAG (see OpenOCDs target/efm32.cfg), and the J-Link OB
-#    leaves TDO un wired.
-# 3. Flash base is 0x00000000, so no load address is set below.
+#    leaves TDO un wired
+# 3. Flash base is 0x00000000, so no load address is set below
 # 4. PyOCD ships no EFM32/EFR32 support; a CMSIS pack is required:
 #      pyocd pack update && pyocd pack install EFM32GG990F1024
-# 5. OPENOCD is not enabled, since it was not tested and confirmed working
+# 5. On Windows OPENOCD may need the J-Link OBs vendor interface 2 rebound from SEGGERs
+#    driver to WinUSB
 
 # General config parameters
 # -------------------------------------------------------------
@@ -33,11 +34,9 @@ set(PYOCD_CLOCK_SPEED 4000k)
 
 # Config options for OPENOCD
 # -------------------------------------------------------------
-# Not enabled, see note 5 above.
-#
-# set(OPENOCD_UPLOAD_ENABLED TRUE)
-# set(OPENOCD_CHIP_CONFIG_COMMANDS
-#     -f board/efm32.cfg)
+set(OPENOCD_UPLOAD_ENABLED TRUE)
+set(OPENOCD_CHIP_CONFIG_COMMANDS
+    -f board/efm32.cfg)
 
 # Config options for MBED
 # -------------------------------------------------------------
