@@ -31,7 +31,7 @@ using utest::v1::Case;
 // best guess as it assumes that RAM bank 0 is the primary RAM bank, but small devices generally don't have
 // multiple RAM banks anyway.
 
-#if MBED_RAM_SIZE < 32768
+#if MBED_RAM_SIZE < 49152
 constexpr size_t BENCHMARK_SIZE = 200; // uses about 2.4k of RAM
 #else
 constexpr size_t BENCHMARK_SIZE = 2000; // uses about 24k of RAM
