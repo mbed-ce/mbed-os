@@ -90,7 +90,7 @@ void generate_gaussian_double()
     printf("Speed: %.02f kelements/s\n", BENCHMARK_SIZE / std::chrono::duration_cast<std::chrono::duration<float>>(genTimer.elapsed_time()).count() / 1e3);
 }
 
-template<typename FloatT, FloatT const * x, FloatT * meanPtr>
+template<typename FloatT, FloatT const *x, FloatT *meanPtr>
 void calc_mean()
 {
     Timer genTimer;
@@ -113,7 +113,7 @@ void calc_mean()
     printf("Speed: %.02f kelements/s\n", BENCHMARK_SIZE / std::chrono::duration_cast<std::chrono::duration<float>>(genTimer.elapsed_time()).count() / 1e3);
 }
 
-template<typename FloatT, FloatT const * x, FloatT const * meanPtr>
+template<typename FloatT, FloatT const *x, FloatT const *meanPtr>
 void calc_variance()
 {
     Timer genTimer;
