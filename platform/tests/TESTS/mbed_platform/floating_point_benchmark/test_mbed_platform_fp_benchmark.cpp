@@ -27,7 +27,15 @@ using utest::v1::Case;
 
 // Note: Benchmark code adapted from https://github.com/tana/pico_float_bench
 
-constexpr size_t BENCHMARK_SIZE = 4000;
+// On targets with very little RAM, use a much smaller benchmark. Note that this is sort of a
+// best guess as it assumes that RAM bank 0 is the primary RAM bank, but small devices generally don't have
+// multiple RAM banks anyway.
+
+#if MBED_RAM_SIZE < 32768
+constexpr size_t BENCHMARK_SIZE = 400; // uses about 4.8k of RAM
+#else
+constexpr size_t BENCHMARK_SIZE = 2000; // uses about 24k of RAM
+#endif
 
 // Working arrays for FP and DP versions of the benchmark
 float workingArrFloats[BENCHMARK_SIZE];
