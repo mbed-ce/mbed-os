@@ -38,7 +38,7 @@ double meanDouble;
 // Constant random seed, so we should get the same results each time
 constexpr uint32_t randomSeed = 1348720;
 
-template<float* x>
+template<float *x>
 void generate_gaussian_float()
 {
     Timer genTimer;
@@ -64,7 +64,7 @@ void generate_gaussian_float()
     printf("Speed: %.02f kelements/s\n", BENCHMARK_SIZE / std::chrono::duration_cast<std::chrono::duration<float>>(genTimer.elapsed_time()).count() / 1e3);
 }
 
-template<double* x>
+template<double *x>
 void generate_gaussian_double()
 {
     Timer genTimer;
