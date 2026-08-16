@@ -32,7 +32,7 @@ using utest::v1::Case;
 // multiple RAM banks anyway.
 
 #if MBED_RAM_SIZE < 32768
-constexpr size_t BENCHMARK_SIZE = 400; // uses about 4.8k of RAM
+constexpr size_t BENCHMARK_SIZE = 200; // uses about 2.4k of RAM
 #else
 constexpr size_t BENCHMARK_SIZE = 2000; // uses about 24k of RAM
 #endif
