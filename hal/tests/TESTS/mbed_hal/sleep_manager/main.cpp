@@ -29,7 +29,7 @@
 #error [NOT_SUPPORTED] test not supported
 #else
 
-#define SLEEP_DURATION_US 50000ULL
+#define SLEEP_DURATION_DEFAULT_US 50000ULL
 
 #define DEEP_SLEEP_TEST_CHECK_WAIT_US 2000
 // As sleep_manager_can_deep_sleep_test_check() is based on wait_ns
@@ -41,7 +41,28 @@ using utest::v1::Specification;
 using utest::v1::Harness;
 
 #if DEVICE_LPTICKER
-/* Make sure there are enough ticks to cope with more than SLEEP_DURATION_US sleep
+static uint64_t get_us_ticker_rollover_period_us(void)
+{
+    const ticker_info_t *us_ticker_info = get_us_ticker_data()->interface->get_info();
+
+    return ((uint64_t) 1 << us_ticker_info->bits) * US_PER_S / us_ticker_info->frequency;
+}
+
+/* Longest sleep the us ticker can measure and also keep the test as sharp as the target allows
+ */
+static uint32_t get_sleep_duration_us(void)
+{
+    // 10/11 keeps the sleep plus the 10% the assertions tolerate within the counter
+    const uint64_t max_measurable_sleep_us = get_us_ticker_rollover_period_us() * 10 / 11;
+
+    if (max_measurable_sleep_us < SLEEP_DURATION_DEFAULT_US) {
+        return (uint32_t) max_measurable_sleep_us;
+    }
+
+    return (uint32_t) SLEEP_DURATION_DEFAULT_US;
+}
+
+/* Make sure there are enough ticks to cope with more than the sleep duration
  * without hitting the wrap-around.
  */
 void wraparound_lp_protect(void)
@@ -50,7 +71,7 @@ void wraparound_lp_protect(void)
     const ticker_info_t *p_ticker_info = get_lp_ticker_data()->interface->get_info();
 
     const uint32_t max_count = ((1 << p_ticker_info->bits) - 1);
-    const uint32_t delta_ticks = us_to_ticks(SLEEP_DURATION_US * 1.5, p_ticker_info->frequency);
+    const uint32_t delta_ticks = us_to_ticks(get_sleep_duration_us() * 1.5, p_ticker_info->frequency);
 
     if (ticks_now < (max_count - delta_ticks)) {
         return;
@@ -150,8 +171,12 @@ void test_sleep_auto()
     const ticker_irq_handler_type lp_ticker_irq_handler_org = set_lp_ticker_irq_handler(lp_ticker_isr);
     uint32_t us_diff1, us_diff2, lp_diff1, lp_diff2;
 
-    const unsigned int sleep_duration_lp_ticks = us_to_ticks(SLEEP_DURATION_US, lp_ticker_info->frequency);
-    const unsigned int sleep_duration_us_ticks = us_to_ticks(SLEEP_DURATION_US, us_ticker_info->frequency);
+    const uint32_t sleep_duration_us = get_sleep_duration_us();
+    const unsigned int sleep_duration_lp_ticks = us_to_ticks(sleep_duration_us, lp_ticker_info->frequency);
+    const unsigned int sleep_duration_us_ticks = us_to_ticks(sleep_duration_us, us_ticker_info->frequency);
+
+    TEST_ASSERT_MESSAGE(sleep_duration_us * 9 / 10 > DEEP_SLEEP_TOLERANCE_US,
+                        "us ticker rolls over too quickly to differentiate sleep from deep sleep");
 
     // Wait for hardware serial buffers to flush.  This is because serial transmissions generate
     // interrupts on some targets, which wake us from sleep.
@@ -180,6 +205,10 @@ void test_sleep_auto()
     us_diff1 = (start_us_time <= end_us_time) ? (end_us_time - start_us_time) : (us_ticker_mask - start_us_time + end_us_time + 1);
     lp_diff1 = (start_lp_time <= end_lp_time) ? (end_lp_time - start_lp_time) : (lp_ticker_mask - start_lp_time + end_lp_time + 1);
 
+    // Sleep past the us tickers range makes us_diff1 wrap which reads as an early wake-up below
+    TEST_ASSERT_MESSAGE(ticks_to_us(lp_diff1, lp_ticker_info->frequency) < get_us_ticker_rollover_period_us(),
+                        "sleep outlasted the us ticker rollover period, so it cannot be measured");
+
     // Deep sleep locked -- ordinary sleep mode used:
     // * us_ticker powered ON,
     // * lp_ticker powered ON,
@@ -199,7 +228,7 @@ void test_sleep_auto()
     wraparound_lp_protect();
     start_lp_time = lp_ticker_read();
     start_us_time = us_ticker_read();
-    lp_wakeup_ts_raw = start_lp_time + us_to_ticks(SLEEP_DURATION_US, lp_ticker_info->frequency);
+    lp_wakeup_ts_raw = start_lp_time + sleep_duration_lp_ticks;
     lp_wakeup_ts = overflow_protect(lp_wakeup_ts_raw, lp_ticker_info->bits);
     lp_ticker_set_interrupt(lp_wakeup_ts);
 
