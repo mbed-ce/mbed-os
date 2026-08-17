@@ -53,6 +53,9 @@ static void gpio_irq_handler_port(uint32_t port)
         uint32_t event = state->events;
 
         SYSCFG->IO_ISCR = register_mask;
+        if ((SYSCFG->IO_IER & register_mask) == 0U) {
+            continue;
+        }
         if (event == IRQ_NONE) {
             continue;
         }

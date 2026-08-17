@@ -1,7 +1,5 @@
 # NUCLEO_WB09KE target
 
-[![NUCLEO-WB09KE development board](https://www.st.com/bin/ecommerce/api/image.PF274667.en.feature-description-include-personalized-no-cpn-large.jpg)](https://www.st.com/en/evaluation-tools/nucleo-wb09ke.html)
-
 `NUCLEO_WB09KE` supports the ST NUCLEO-WB09KE development board, composed of
 the MB1801 Nucleo-64 mezzanine and MB2032 STM32WB09 RF board. It uses an
 STM32WB09KEV6 MCU and the on-board STLINK-V3EC debugger/programmer.
@@ -12,16 +10,16 @@ STM32WB09KEV6 MCU and the on-board STLINK-V3EC debugger/programmer.
 
 ## Board configuration
 
-| Property | Configuration |
-| --- | --- |
-| Target name | `NUCLEO_WB09KE` |
-| MCU target | [`MCU_STM32WB09xE`](../README.md) |
-| System clock | 64 MHz RC64MPLL, with 64 MHz HSI fallback |
-| HSE | 32 MHz crystal |
-| LSE | 32.768 kHz crystal |
-| Default supply | 3.3 V |
-| Debug probe | STLINK-V3EC over SWD |
-| Console | USART1 through the ST-LINK virtual COM port, 115200 baud |
+| Property       | Configuration                                            |
+| -------------- | -------------------------------------------------------- |
+| Target name    | `NUCLEO_WB09KE`                                        |
+| MCU target     | [`MCU_STM32WB09xE`](../README.md)                       |
+| System clock   | 64 MHz RC64MPLL, with 64 MHz HSI fallback                |
+| HSE            | 32 MHz crystal                                           |
+| LSE            | 32.768 kHz crystal                                       |
+| Default supply | 3.3 V                                                    |
+| Debug probe    | STLINK-V3EC over SWD                                     |
+| Console        | USART1 through the ST-LINK virtual COM port, 115200 baud |
 
 The board physically provides Arduino Uno V3 and ST morpho connectors.
 However, the Mbed target does not advertise an Arduino form factor because the
@@ -31,20 +29,20 @@ port.
 
 ## Standard pin names
 
-| Mbed name | MCU pin | Board function |
-| --- | --- | --- |
-| `CONSOLE_TX` | `PA_1` | ST-LINK VCP receive |
-| `CONSOLE_RX` | `PB_0` | ST-LINK VCP transmit |
-| `LED1` | `PB_1` | User LED LD1 |
-| `LED2` | `PB_4` | User LED LD2 |
-| `LED3` | `PB_2` | User LED LD3 |
-| `BUTTON1` | `PA_0` | User button B1 |
-| `BUTTON2` | `PB_5` | User button B2 |
-| `BUTTON3` | `PB_14` | User button B3 |
-| `DEBUG_SWDIO` | `PA_2` | SWD data |
-| `DEBUG_SWCLK` | `PA_3` | SWD clock |
-| `RCC_OSC32_IN` | `PB_13` | LSE input |
-| `RCC_OSC32_OUT` | `PB_12` | LSE output |
+| Mbed name         | MCU pin   | Board function       |
+| ----------------- | --------- | -------------------- |
+| `CONSOLE_TX`    | `PA_1`  | ST-LINK VCP receive  |
+| `CONSOLE_RX`    | `PB_0`  | ST-LINK VCP transmit |
+| `LED1`          | `PB_1`  | User LED LD1         |
+| `LED2`          | `PB_4`  | User LED LD2         |
+| `LED3`          | `PB_2`  | User LED LD3         |
+| `BUTTON1`       | `PA_0`  | User button B1       |
+| `BUTTON2`       | `PB_5`  | User button B2       |
+| `BUTTON3`       | `PB_14` | User button B3       |
+| `DEBUG_SWDIO`   | `PA_2`  | SWD data             |
+| `DEBUG_SWCLK`   | `PA_3`  | SWD clock            |
+| `RCC_OSC32_IN`  | `PB_13` | LSE input            |
+| `RCC_OSC32_OUT` | `PB_12` | LSE output           |
 
 Some connector pins share board LEDs, buttons, debug signals or oscillator
 functions. Check UM3345 and the solder-bridge configuration before reusing
@@ -77,7 +75,7 @@ measurements, not guaranteed MCU limits.
 
 ## Programming
 
-See the MbedCE [STM32 Deploy & Debug](https://github.com/mbed-ce/mbed-os/wiki/STM32-Deploy&Debug)
+See the MbedCE [STM32 Deploy &amp; Debug](https://github.com/mbed-ce/mbed-os/wiki/STM32-Deploy&Debug)
 guide for the general STM32 programming and debugging workflow.
 
 The default upload method for this target is `STM32CUBE`. The board is
