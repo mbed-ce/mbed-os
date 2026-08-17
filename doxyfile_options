@@ -954,7 +954,8 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                =
+EXCLUDE                = connectivity/drivers/mbedtls/TARGET_NUVOTON/TARGET_M460/ccm/ccm_alt.h \
+                         connectivity/drivers/mbedtls/TARGET_NUVOTON/TARGET_M460/gcm/gcm_alt.h
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -978,6 +979,7 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */cmsis/* \
                          */venv/* \
                          */connectivity/drivers/emac/* \
+                         */connectivity/mbedtls/* \
                          */features/cryptocell/* \
                          */features/frameworks/* \
                          */features/unsupported/* \
@@ -1004,7 +1006,9 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */FEATURE_BLE/libraries/cordio_stack/* \
                          */FEATURE_BLE/libraries/TARGET_*/stack/* \
                          */platform/FEATURE_EXPERIMENTAL_API/FEATURE_PSA/TARGET_TFM/* \
-                         */platform/FEATURE_EXPERIMENTAL_API/FEATURE_PSA/TARGET_MBED_PSA_SRV/test_abstraction_layers/*
+                         */platform/FEATURE_EXPERIMENTAL_API/FEATURE_PSA/TARGET_MBED_PSA_SRV/test_abstraction_layers/* \
+                         */platform/FEATURE_EXPERIMENTAL_API/FEATURE_PSA/TARGET_MBED_PSA_SRV/inc/psa/* \
+                         */platform/FEATURE_EXPERIMENTAL_API/FEATURE_PSA/TARGET_MBED_PSA_SRV/mbedtls/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

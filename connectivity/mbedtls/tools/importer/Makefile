@@ -27,8 +27,8 @@
 #
 
 # Set the mbed TLS release to import (this can/should be edited before import)
-MBED_TLS_RELEASE ?= v2.25.0
-MBED_TLS_REPO_URL ?= git@github.com:ARMmbed/mbedtls.git
+MBED_TLS_RELEASE ?= mbedtls-3.6.7
+MBED_TLS_REPO_URL ?= https://github.com/Mbed-TLS/mbedtls.git
 
 # Translate between mbed TLS namespace and mbed namespace
 TARGET_PREFIX:=../../
@@ -56,14 +56,18 @@ rsync:
 	# Copying mbed TLS into mbed library...
 	rm -rf $(TARGET_SRC)
 	rsync -a --include='*.[hc]' --exclude='*' $(MBED_TLS_DIR)/library/ $(TARGET_SRC)
+	# Normalize a generated upstream source file to the repository's EOF style.
+	perl -0pi -e 's/\n+\z/\n/' $(TARGET_SRC)/ssl_debug_helpers_generated.c
 	#
 	# Copying mbed TLS headers to mbed includes...
 	rm -rf $(TARGET_INC)
 	mkdir -p $(TARGET_INC)
 	rsync -a --delete $(MBED_TLS_API) $(TARGET_INC)
+	rsync -a --delete $(CRYPTO_API) $(TARGET_INC)
+	cp config-compat.h $(TARGET_INC)/mbedtls/config.h
 	#
 	# Export common.h into the include path, so PSA Crypto can find it
-	mv $(TARGET_SRC)/common.h $(TARGET_INC)/mbedtls/
+	cp $(TARGET_SRC)/common.h $(TARGET_INC)/mbedtls/
 	#
 	# Copying licenses
 	cp $(MBED_TLS_DIR)/LICENSE $(TARGET_PREFIX)
@@ -77,14 +81,13 @@ rsync:
 	rsync -a --delete $(MBED_TLS_DIR)/library/psa_*.c $(TARGET_PSA)/
 	rsync -a --delete $(MBED_TLS_DIR)/library/psa_*.h $(TARGET_PSA)/
 	#
-	# Remove PSA-specific C & H files (they go into $(TARGET_PSA))
-	rm -rf $(TARGET_SRC)/psa_*.c
-	rm -rf $(TARGET_SRC)/psa_*.h
+	# Keep PSA sources in the Mbed TLS library. Mbed TLS 3.x uses PSA Crypto
+	# internally even when Mbed's experimental PSA service is not enabled.
 
 deploy: rsync
 	#
 	# Adjusting the default mbed TLS config file to mbed purposes
-	./adjust-config.sh $(MBED_TLS_DIR)/scripts/config.pl $(TARGET_INC)/mbedtls/config.h
+	./adjust-config.sh $(MBED_TLS_DIR)/scripts/config.pl $(TARGET_INC)/mbedtls/mbedtls_config.h
 	#
 	# Adjusting the default mbed TLS check-config file to mbed purposes
 	./adjust-check-config.sh $(TARGET_INC)/mbedtls/check_config.h

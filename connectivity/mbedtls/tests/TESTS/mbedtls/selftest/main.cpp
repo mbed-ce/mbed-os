@@ -38,7 +38,6 @@ using namespace utest::v1;
 #include "mbedtls/sha256.h"
 #include "mbedtls/sha512.h"
 #include "mbedtls/entropy.h"
-#include "mbedtls/entropy_poll.h"
 #include "mbedtls/timing.h"
 
 #include <string.h>
@@ -124,4 +123,3 @@ int main()
 #endif
     return ret;
 }
-
