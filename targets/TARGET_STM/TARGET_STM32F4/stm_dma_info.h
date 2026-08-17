@@ -48,6 +48,17 @@ static const DMALinkInfo SPIRxDMALinks[] = {
         {2, 6, 1}, // SPI6 Rx is DMA2 Stream 6 Channel 1
 };
 
+#if defined(TARGET_STM32F401xC) || defined(TARGET_STM32F401xE) || defined(TARGET_STM32F410xB) || defined(TARGET_STM32F411xE)
+#define STM32_SERIAL_RX_DMA 1
+
+/// Mapping from UART index to DMA link info for Rx
+static const DMALinkInfo UARTRxDMALinks[] = {
+        {2, 5, 4}, // USART1 Rx is DMA2 Stream 5 Channel 4
+        {1, 5, 4}, // USART2 Rx is DMA1 Stream 5 Channel 4
+        {2, 1, 5}, // USART6 Rx is DMA2 Stream 1 Channel 5
+};
+#endif
+
 /// Mapping from QSPI index to DMA link info
 static const DMALinkInfo QSPIDMALinks[] = {
         {2, 7, 3}, // QUADSPI is DMA2 Stream 7 Channel 3

@@ -187,6 +187,12 @@ static void _serial_init_direct(serial_t *obj, const serial_pinmap_t *pinmap)
     obj_s->pin_tx = pinmap->tx_pin;
     obj_s->pin_rx = pinmap->rx_pin;
 
+#if DEVICE_SERIAL_ASYNCH && defined(STM32_SERIAL_RX_DMA)
+    memset(&obj_s->rx_dma_handle, 0, sizeof(obj_s->rx_dma_handle));
+    obj_s->rx_callback = NULL;
+    obj_s->rx_uses_dma = false;
+#endif
+
     init_uart(obj); /* init_uart will be called again in serial_baud function, so don't worry if init_uart returns HAL_ERROR */
 
     // For stdio management in platform/mbed_board.c and platform/mbed_retarget.cpp
@@ -226,6 +232,10 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 void serial_free(serial_t *obj)
 {
     struct serial_s *obj_s = SERIAL_S(obj);
+
+#if DEVICE_SERIAL_ASYNCH && defined(STM32_SERIAL_RX_DMA)
+    serial_rx_dma_free(obj);
+#endif
 
     // Reset UART and disable clock
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
