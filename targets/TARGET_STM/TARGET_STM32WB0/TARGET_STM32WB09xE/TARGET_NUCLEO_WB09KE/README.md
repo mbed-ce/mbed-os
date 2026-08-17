@@ -48,6 +48,31 @@ Some connector pins share board LEDs, buttons, debug signals or oscillator
 functions. Check UM3345 and the solder-bridge configuration before reusing
 those pins.
 
+## Low-power operation
+
+The common Mbed Deepstop implementation is described in the
+[STM32WB0 family documentation](../../README.md#deepsleep). To obtain
+low current on NUCLEO-WB09KE:
+
+- allow Mbed to enter deep sleep; an active `DeepSleepLock` limits the MCU to
+  ordinary sleep;
+- switch off the user LEDs and stop application peripherals before sleeping;
+- leave externally connected headers unloaded where possible;
+- use the board implementation of the weak `gpio_deep_sleep_prepare()` hook,
+  which applies the Nucleo-specific PWR pulls during Deepstop; without these
+  settings, GPIO leakage can dominate the target current measured through JP2;
+- disable debug retention and account for current through ST-LINK, SWD,
+  solder bridges and the current-measurement connection.
+
+The GPIO hook checks the RTC clock source selected in RCC at runtime. It leaves
+`PB12`/`PB13` free when LSE is active and may treat them as unused board pins
+when LSI is active. Pulling these pins while LSE is active can stop the RTC and
+prevent wake-up.
+
+With these conditions, measurements on the tested NUCLEO-WB09KE were about
+2 mA in ordinary Mbed sleep and **1.5 uA** in Mbed deepsleep. These are indicative board
+measurements, not guaranteed MCU limits.
+
 ## Programming
 
 See the MbedCE [STM32 Deploy & Debug](https://github.com/mbed-ce/mbed-os/wiki/STM32-Deploy&Debug)
