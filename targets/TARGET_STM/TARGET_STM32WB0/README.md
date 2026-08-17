@@ -33,6 +33,30 @@ configure time. The vendor `SystemInit` ordering is preserved because it is
 part of the STM32WB0 deep-stop context restoration path. Vector-table size and
 RAM placement are derived from symbols exported by the common linker script.
 
+## Deepsleep
+
+Mbed deep sleep is represented by
+WB0 Deepstop, which switches off the CPU power domain while retaining SRAM and
+the selected slow clock (LSE/LSI).
+
+Deepstop wake-up is reset-style on WB0. Before entry, the target saves the
+CPU, stack, interrupt, timer, GPIO and peripheral context in retained SRAM. The
+reset handler enters `SystemInit()`, which detects the Deepstop wake and calls
+`CPUcontextRestore()`. After the remaining target state is restored, execution
+continues from the suspended Mbed sleep operation rather than restarting
+`main()`.
+
+The RTC wake-up timer supplies the Mbed low-power ticker and supports either
+LSE or LSI. RTOS builds use Mbed tickless idle so that an idle RTX kernel
+can enter Deepstop; without `MBED_TICKLESS`, RTX deliberately locks deep sleep
+and uses ordinary sleep.
+
+The family provides a weak `gpio_deep_sleep_prepare()` hook for board-specific
+PWR pull configuration. A board or custom target may override it to reduce pad
+leakage, but the configuration must preserve every active oscillator, wake,
+debug and externally driven pin. Applying a PWR pull to an LSE pin, for
+example, can stop the RTC clock after Deepstop entry and prevent wake-up.
+
 ## Supported MCUs
 
 - [`MCU_STM32WB09xE`](TARGET_STM32WB09xE/README.md)
@@ -48,6 +72,7 @@ The initial family port provides:
 - RTC with LSE and LSI support;
 - RTC-based low-power ticker;
 - sleep and deep sleep;
+- watchdog and reset-reason APIs;
 - Arm MPU support.
 
 The following hardware blocks are not yet advertised as Mbed devices because
@@ -59,22 +84,18 @@ their Mbed HAL implementations have not been completed and validated for WB0:
 - PWM;
 - asynchronous DMA-backed peripheral APIs;
 - FlashIAP;
-- watchdog and reset-reason APIs;
 - TRNG;
 - Bluetooth Low Energy and proprietary radio support.
 
 The MCU contains several of these peripherals in hardware. Their absence from
 `device_has` describes the current MbedCE port, not the silicon capability.
 
-## Clocks and low power
+## System clocks
 
 The common clock configuration supports these system clock sources:
 
-| Configuration | System clock | External component |
-| --- | ---: | --- |
-| `USE_RC64MPLL` | 64 MHz | 32 MHz HSE crystal |
-| `USE_DIRECT_HSE` | 32 MHz | 32 MHz HSE crystal |
-| `USE_HSI` | 64 MHz | None |
-
-RTC clocking can use an external 32.768 kHz LSE or the internal LSI. The
-low-power ticker uses the RTC wake-up timer rather than an LPTIM peripheral.
+| Configuration | System clock | External component | Note |
+| --- | ---: | --- | --- |
+| `USE_RC64MPLL` | 64 MHz | 32 MHz HSE crystal | Required for BLE radio operation |
+| `USE_DIRECT_HSE` | 32 MHz | 32 MHz HSE crystal | |
+| `USE_HSI` | 64 MHz | None | |

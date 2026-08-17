@@ -119,7 +119,11 @@ void GPIO_Full_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
 
+#if defined(GPIO_PIN_All)
     GPIO_InitStruct.Pin        = GPIO_PIN_All;
+#else
+    GPIO_InitStruct.Pin        = GPIO_PIN_ALL;
+#endif
     GPIO_InitStruct.Mode       = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Speed      = GPIO_SPEED_FREQ_LOW;
 #if !TARGET_STM32F1

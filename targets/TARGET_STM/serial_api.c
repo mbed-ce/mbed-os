@@ -694,7 +694,18 @@ HAL_StatusTypeDef init_uart(serial_t *obj)
     }
 #endif
 
-    return HAL_UART_Init(huart);
+    HAL_StatusTypeDef status = HAL_UART_Init(huart);
+
+#if TARGET_STM32WB0
+    /* Programming the RTC wake-up timer can keep interrupts masked while WB0
+     * waits for the slow-clock WUTWF handshake. Enable the hardware FIFO from
+     * startup so received serial data is retained during that interval. */
+    if (status == HAL_OK) {
+        status = HAL_UARTEx_EnableFifoMode(huart);
+    }
+#endif
+
+    return status;
 }
 
 int8_t get_uart_index(UARTName uart_name)

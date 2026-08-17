@@ -45,3 +45,15 @@ STM32WB0 ROM ABI data occupies the first `0x100` bytes of SRAM. The common
 linker script preserves this area and places the runtime vector table after it.
 The physical SRAM banks are contiguous and are therefore exposed to MbedCE as
 one 64 KiB `SRAM` region.
+
+## Deepsleep (Deepstop) retention
+
+STM32WB09 Deepstop removes power from the CPU domain but retains the four SRAM
+banks and the slow-clock domain. See the
+[STM32WB0 family documentation](../README.md#deepsleep) for the Mbed
+Deepstop entry and context-restoration implementation shared by this family.
+
+On STM32WB09xE, `PB12` and `PB13` provide `OSC32_OUT` and `OSC32_IN`.
+Board-specific Deepstop pull configuration must leave these pins unmodified
+while LSE is selected. They may be treated as ordinary unused pins when the
+actual RTC clock source is LSI.
