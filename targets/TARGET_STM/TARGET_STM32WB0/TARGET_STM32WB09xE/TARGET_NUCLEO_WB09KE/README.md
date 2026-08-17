@@ -1,5 +1,7 @@
 # NUCLEO_WB09KE target
 
+[![NUCLEO-WB09KE development board](https://www.st.com/bin/ecommerce/api/image.PF274667.en.feature-description-include-personalized-no-cpn-large.jpg)](https://www.st.com/en/evaluation-tools/nucleo-wb09ke.html)
+
 `NUCLEO_WB09KE` supports the ST NUCLEO-WB09KE development board, composed of
 the MB1801 Nucleo-64 mezzanine and MB2032 STM32WB09 RF board. It uses an
 STM32WB09KEV6 MCU and the on-board STLINK-V3EC debugger/programmer.
@@ -70,7 +72,7 @@ when LSI is active. Pulling these pins while LSE is active can stop the RTC and
 prevent wake-up.
 
 With these conditions, measurements on the tested NUCLEO-WB09KE were about
-2 mA in ordinary Mbed sleep and **1.5 uA** in Mbed deepsleep. These are indicative board
+2 mA in ordinary Mbed sleep and **1.5 uA** in Mbed deepsleep (full profile and also bare metal profile). These are indicative board
 measurements, not guaranteed MCU limits.
 
 ## Programming
