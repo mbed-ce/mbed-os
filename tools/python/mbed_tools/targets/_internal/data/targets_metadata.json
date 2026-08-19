@@ -161,6 +161,45 @@
             "CORTEX_M",
             "LIKE_CORTEX_M55",
             "CORTEX"
+        ],
+        "Cortex-M85": [
+            "M85",
+            "CORTEX_M",
+            "LIKE_CORTEX_M85",
+            "CORTEX"
+        ],
+        "Cortex-M85-NS": [
+            "M85",
+            "M85_NS",
+            "CORTEX_M",
+            "LIKE_CORTEX_M85",
+            "CORTEX"
+        ],
+        "Cortex-M85F": [
+            "M85",
+            "CORTEX_M",
+            "LIKE_CORTEX_M85",
+            "CORTEX"
+        ],
+        "Cortex-M85F-NS": [
+            "M85",
+            "M85_NS",
+            "CORTEX_M",
+            "LIKE_CORTEX_M85",
+            "CORTEX"
+        ],
+        "Cortex-M85FE": [
+            "M85",
+            "CORTEX_M",
+            "LIKE_CORTEX_M85",
+            "CORTEX"
+        ],
+        "Cortex-M85FE-NS": [
+            "M85",
+            "M85_NS",
+            "CORTEX_M",
+            "LIKE_CORTEX_M85",
+            "CORTEX"
         ]
     }
 }

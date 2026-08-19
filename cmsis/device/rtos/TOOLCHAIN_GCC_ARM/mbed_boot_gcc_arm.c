@@ -88,7 +88,18 @@ void mbed_toolchain_init()
     env_mutex_id = osMutexNew(&env_mutex_attr);
 
     /* Run the C++ global object constructors */
+#ifndef TARGET_MCU_RA
     __libc_init_array();
+#else
+    // workaround: __libc_init_array() crashes on Renesas RA MCUs
+    extern void (* __init_array_start[])(void);
+    extern void (* __init_array_end[])(void);
+    int32_t count = __init_array_end - __init_array_start;
+    for (int32_t i = 0; i < count; i++)
+    {
+        __init_array_start[i]();
+    }
+#endif
 }
 
 extern int __real_main(void);
