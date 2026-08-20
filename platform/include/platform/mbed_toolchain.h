@@ -415,6 +415,9 @@
 #endif
 #endif
 
+// Note: MBED_DEPRECATED is also defined in the Doxygen config to evaluate to Doxygen markup.
+// Since Doxygen does not seem to evaluate macros from included files, it cannot be defined here in the source code.
+
 /** MBED_DEPRECATED_SINCE("version", "message string")
  *  Mark a function declaration as deprecated, noting that the declaration was
  *  deprecated on the specified version. If the function is used then a warning

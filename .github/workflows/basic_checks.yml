@@ -174,7 +174,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/BUILD
 
       - name: Doxygen Action
-        uses: mattnotmitt/doxygen-action@v1.9.5
+        uses: mattnotmitt/doxygen-action@v1.9.8
         with:
           doxyfile-path: ./doxyfile_options
 

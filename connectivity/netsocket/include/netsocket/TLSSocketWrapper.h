@@ -189,7 +189,7 @@ public:
      *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
      *                  and send cannot be performed immediately.
      *  @retval         NSAPI_ERROR_DEVICE_ERROR in case of tls-related errors.
-     *                  See @ref mbedtls_ssl_write.
+     *                  See <a href="https://mbed-tls.readthedocs.io/projects/api/en/development/api/file/ssl_8h/#ssl_8h_1a5bbda87d484de82df730758b475f32e5">mbedtls_ssl_write</a>.
      */
     nsapi_error_t send(const void *data, nsapi_size_t size) override;
 
@@ -205,7 +205,7 @@ public:
      *  @retval         NSAPI_ERROR_WOULD_BLOCK in case non-blocking mode is enabled
      *                  and send cannot be performed immediately.
      *  @retval         NSAPI_ERROR_DEVICE_ERROR in case of tls-related errors.
-     *                  See @ref mbedtls_ssl_read.
+     *                  See <a href="https://mbed-tls.readthedocs.io/projects/api/en/development/api/file/ssl_8h/#_CPPv416mbedtls_ssl_readP19mbedtls_ssl_contextPh6size_t">mbedtls_ssl_read</a>.
      *  @return         0 if no data is available to be received
      *                  and the peer has performed an orderly shutdown.
      */
@@ -306,7 +306,10 @@ protected:
      *  @retval       NSAPI_ERROR_IN_PROGRESS if the first call did not complete the request.
      *  @retval       NSAPI_ERROR_NO_SOCKET in case the transport socket was not created correctly.
      *  @retval       NSAPI_ERROR_AUTH_FAILURE in case of tls-related authentication errors.
-     *                See @ref mbedtls_ctr_drbg_seed or @ref mbedtls_hmac_drbg_seed, @ref mbedtls_ssl_setup. @ref mbedtls_ssl_handshake.
+     *                See <a href="https://mbed-tls.readthedocs.io/projects/api/en/v2.28.7/api/file/ctr__drbg_8h/#ctr__drbg_8h_1ad93d675f998550b4478c1fe6f4f34ebc">mbedtls_ctr_drbg_seed</a>,
+     *                <a href="https://mbed-tls.readthedocs.io/projects/api/en/v3.6.3/api/file/hmac__drbg_8h/#hmac__drbg_8h_1a0af34e5c68f15dfe714b5da94bce8f74">mbedtls_hmac_drbg_seed</a>,
+     *                <a href="https://mbed-tls.readthedocs.io/projects/api/en/development/api/file/ssl_8h/#ssl_8h_1af79cb539a0ee6ac20cf9c574f4c3b343">mbedtls_ssl_setup</a>,
+     *                <a href="https://mbed-tls.readthedocs.io/projects/api/en/development/api/file/ssl_8h/#ssl_8h_1a4a37e497cd08c896870a42b1b618186e">mbedtls_ssl_handshake</a>.
      */
     nsapi_error_t start_handshake(bool first_call);
 
