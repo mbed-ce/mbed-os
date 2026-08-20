@@ -991,10 +991,11 @@ EXCLUDE_PATTERNS       = */tools/* \
                          */mbed-client-randlib/* \
                          */nanostack/sal-stack-nanostack-eventloop/* \
                          */connectivity/drivers/802.15.4_RF/* \
-                         */connectivity/drivers/mbedtls/FEATURE_CRYPTOCELL310/include/cryptocell310/internal/* \
+                         */connectivity/drivers/mbedtls/* \
                          */connectivity/drivers/ble/FEATURE_BLE/TARGET_STM32WB/STM32Cube_FW/* \
                          */connectivity/drivers/wifi/COMPONENT_WHD/* \
                          */connectivity/drivers/wifi/TARGET_STM/COMPONENT_EMW3080B/mx_wifi/* \
+                         */connectivity/mbedtls/* \
                          */components/wifi/* \
                          */UNITTESTS/* \
                          */TESTS/* \
@@ -2340,9 +2341,9 @@ PREDEFINED             = DOXYGEN_ONLY \
                          MBEDTLS_CMAC_C \
                          MBEDTLS_VERSION_C \
                          DEVICEKEY_ENABLED \
-                         "MBED_DEPRECATED_SINCE(d, m)=" \
+                         "MBED_DEPRECATED_SINCE(d, m)=/// \deprecated m [since d ]" \
                          "MBED_ENABLE_IF_CALLBACK_COMPATIBLE(F, M)=" \
-                         MBED_DEPRECATED(s)= \
+                         "MBED_DEPRECATED(s)=/// \deprecated s" \
                          BLE_ROLE_OBSERVER=1 \
                          BLE_ROLE_BROADCASTER=1 \
                          BLE_ROLE_PERIPHERAL=1 \

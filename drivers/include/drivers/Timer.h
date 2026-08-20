@@ -26,85 +26,88 @@ namespace mbed {
 class CriticalSectionLock;
 
 /**
- * \defgroup drivers_Timer Timer class
+ * \file
+ * \defgroup drivers_Timer Timer classes
  * \ingroup drivers-public-api-ticker
  * @{
  */
 
-/** A general purpose timer
+/**
+ * @brief Base class for Timer and LowPowerTimer
  *
  * @note Synchronization level: Interrupt safe
- *
- * Example:
- * @code
- * // Count the time to toggle an LED
- *
- * #include "mbed.h"
- *
- * Timer timer;
- * DigitalOut led(LED1);
- * int begin, end;
- *
- * int main() {
- *     timer.start();
- *     begin = timer.read_us();
- *     led = !led;
- *     end = timer.read_us();
- *     printf("Toggle the led takes %d us", end - begin);
- * }
- * @endcode
  */
 class TimerBase {
 
 public:
-    /** Start the timer
+    /**
+     * @brief Start the timer.
+     *
+     * Will lock deep sleep if this is a \c Timer instance
      */
     void start();
 
-    /** Stop the timer
+    /**
+     * @brief Stop the timer
+     *
+     * Will release the deep sleep lock if this is a \c Timer instance
      */
     void stop();
 
-    /** Reset the timer to 0.
+    /**
+     * @brief Reset the timer to 0.
      *
      * If it was already running, it will continue
      */
     void reset();
 
-    /** Get the time passed in seconds
+    /**
+     * @brief Get the time passed in seconds
      *
-     *  @returns    Time passed in seconds
+     *  @returns    Time passed in floating-point seconds
      */
     MBED_DEPRECATED_SINCE("mbed-os-6.0.0", "Floating point operators should normally be avoided for code size. If really needed, you can use `duration<float>{elapsed_time()}.count()`")
     float read() const;
 
-    /** Get the time passed in milliseconds
+    /**
+     * @brief Get the time passed in milliseconds
      *
-     *  @returns    Time passed in milliseconds
+     *  @returns    Time passed in integer milliseconds
      */
     MBED_DEPRECATED_SINCE("mbed-os-6.0.0", "Use the Chrono-based elapsed_time method.  If integer milliseconds are needed, you can use `duration_cast<milliseconds>(elapsed_time()).count()`")
     int read_ms() const;
 
-    /** Get the time passed in microseconds
+    /**
+     * @brief Get the time passed in microseconds
      *
-     *  @returns    Time passed in microseconds
+     * @returns Time passed in integer microseconds
+     *
+     * \warning Limited to 31 bits -- will not return correct values for times larger than about 35 minutes.
+     *     Use #read_high_resolution_us or #elapsed_time instead as they are not vulnerable to this problem.
      */
     MBED_DEPRECATED_SINCE("mbed-os-6.0.0", "Use the Chrono-based elapsed_time method.  If integer microseconds are needed, you can use `elapsed_time().count()`")
     int read_us() const;
 
-    /** An operator shorthand for read()
+    /**
+     * @brief An operator shorthand for read()
+     *
+     * @returns Time passed in floating-point seconds
      */
     MBED_DEPRECATED_SINCE("mbed-os-6.0.0", "Floating point operators should normally be avoided for code size. If really needed, you can use `duration<float>{elapsed_time()}.count()`")
     operator float() const;
 
-    /** Get in a high resolution type the time passed in microseconds.
-     *  Returns a 64 bit integer.
+    /**
+     * @brief Get (in a high resolution type) the time passed in microseconds.
+     *
+     * @returns Time passed as 64-bit microseconds.
      */
     MBED_DEPRECATED_SINCE("mbed-os-6.0.0", "Use the Chrono-based elapsed_time method.  If integer microseconds are needed, you can use `elapsed_time().count()`")
     us_timestamp_t read_high_resolution_us() const;
 
-    /** Get in a high resolution type the time passed in microseconds.
-     *  Returns a 64 bit integer chrono duration.
+    /**
+     * @brief Get the time passed as chrono microseconds.
+     *
+     * @returns Time passed \c as std::chrono::microseconds
      */
     std::chrono::microseconds elapsed_time() const;
 
@@ -130,9 +133,37 @@ private:
     TimerBase(const TimerBase &t, const CriticalSectionLock &) : TimerBase(t, false) {}
     // Copy storage only - used by delegating constructors
     TimerBase(const TimerBase &t, bool) : _start(t._start), _time(t._time), _ticker_data(t._ticker_data), _lock_deepsleep(t._lock_deepsleep), _running(t._running) {}
-};
 #endif
+};
 
+/**
+ * @brief Timer implementation using the us ticker.
+ *
+ * Locks deep sleep while actively running.
+ *
+ * Example:
+ * \code{.cpp}
+ * // Count the time to toggle an LED
+ *
+ * #include "mbed.h"
+ * #include <cinttypes>
+ *
+ * Timer timer;
+ * DigitalOut led(LED1);
+ *
+ * int main() {
+ *     timer.start();
+ *     const auto begin = timer.elapsed_time();
+ *     led = !led;
+ *     const auto end = timer.elapsed_time();
+ *     printf("Toggling the led takes %" PRIi64 " us", (end - begin).count());
+ * }
+ * \endcode
+ *
+ * @note When constructed, a Timer is stopped and reset to zero time.
+ *
+ * @note Synchronization level: Interrupt safe
+ */
 class Timer : public TimerBase {
 public:
     Timer();
