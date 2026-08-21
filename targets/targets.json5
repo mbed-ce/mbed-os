@@ -4575,7 +4575,77 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271812.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
 
-    // STM32WB Targets -------------------------------------------------------------------------------------------------
+// STM32WB0 Targets -----------------------------------------------------------------------------------------------
+    "MCU_STM32WB0": { // STM32WB0 is not part of the dual-core STM32WB family below.
+        "inherits": [
+            "MCU_STM32"
+        ],
+        "public": false,
+        "core": "Cortex-M0+",
+        "config": {
+            "clock-source": {
+                "help": "Mask value: USE_RC64MPLL (requires 32 MHz HSE) | USE_DIRECT_HSE | USE_HSI",
+                "value": "USE_HSI",
+                "macro_name": "CLOCK_SOURCE"
+            },
+            "lpticker-lptim": {
+                "help": "STM32WB0 uses the RTC wake-up timer for the low-power ticker",
+                "value": 0
+            }
+        },
+        "overrides": {
+            "deep-sleep-latency": 6,
+            // WB0 flash starts at 0x10040000, above Mbed's default MPU ROM boundary.
+            "mpu-rom-end": "0x1fffffff"
+        },
+        "extra_labels_add": [
+            "STM32WB0"
+        ],
+        "macros_add": [
+            "MBED_TICKLESS",
+            "EXTRA_IDLE_STACK_REQUIRED"
+        ],
+        "device_has_remove": [
+            "ANALOGIN", "I2C", "I2CSLAVE", "I2C_ASYNCH",
+            "PWMOUT", "SERIAL_FC",
+            "SPI", "SPISLAVE", "SPI_ASYNCH"
+        ],
+        "device_has_add": [
+            "MPU", "WATCHDOG", "RESET_REASON"
+        ],
+        "is_mcu_family_target": true
+    },
+    "MCU_STM32WB09xE": {
+        "inherits": [
+            "MCU_STM32WB0"
+        ],
+        "public": false,
+        "device_name": "STM32WB09KEVx",
+        "extra_labels_add": [
+            "STM32WB09xE",
+            "STARTUP_STM32WB09"
+        ],
+        "macros_add": [
+            "STM32WB09"
+        ],
+        "memory_bank_config": {
+            "ROM": {
+                "size": 0x7F000 // final 4 KiB for WB0 stack NVM
+            }
+        }
+    },
+    "NUCLEO_WB09KE": {
+        "inherits": [
+            "MCU_STM32WB09xE"
+        ],
+        "overrides": {
+            "clock-source": "USE_RC64MPLL|USE_HSI",
+            "lse-available": 1
+        },
+        "image_url": "https://www.st.com/en/evaluation-tools/nucleo-wb09ke.html"
+    },
+
+// STM32WB Targets ------------------------------------------------------------------------------------------------
     "MCU_STM32WB": {
         "inherits": [
             "MCU_STM32"
@@ -4717,7 +4787,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF271050.en.feature-description-include-personalized-no-cpn-large.jpg"
     },
 
-    // STM32WL Targets -------------------------------------------------------------------------------------------------
+// STM32WL Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32WL": {
         "inherits": [
             "MCU_STM32"
