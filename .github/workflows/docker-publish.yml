@@ -86,7 +86,7 @@ jobs:
           file: ./docker_images/mbed-ce-env/Dockerfile
           outputs: type=image,name=ghcr.io/${{ github.repository_owner }}/mbed-ce-env,push-by-digest=true,name-canonical=true,push=true
 
-  test-container:
+  build-and-test-container:
     if: >
       github.repository == 'mbed-ce/mbed-os' &&
       (github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main')
@@ -137,14 +137,14 @@ jobs:
             cd mbed-ce-hello-world
             mkdir -p build && cd build
             cmake .. -GNinja -DCMAKE_BUILD_TYPE=Develop -DMBED_TARGET=K64F
-            ninja || exit 1
+            ninja
 
   deploy-container:
     if: >
       github.repository == 'mbed-ce/mbed-os' &&
       (github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
-    needs: [prepare-tags, build-container, test-container]
+    needs: [prepare-tags, build-container, build-and-test-container]
 
     steps:
       - name: Set up Docker Buildx

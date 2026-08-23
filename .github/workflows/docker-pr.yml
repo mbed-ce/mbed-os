@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  test-container:
+  build-and-test-container:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -29,6 +29,8 @@ jobs:
 
       - name: Checkout repo
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
 
       - name: Build image locally
         uses: docker/build-push-action@v7
@@ -54,6 +56,7 @@ jobs:
       - name: Checkout mbed-os
         uses: actions/checkout@v7
         with:
+          ref: ${{ github.sha }}
           path: mbed-ce-hello-world/mbed-os
 
       - name: Smoke test local container image
@@ -67,4 +70,4 @@ jobs:
             cd mbed-ce-hello-world
             mkdir -p build && cd build
             cmake .. -GNinja -DCMAKE_BUILD_TYPE=Develop -DMBED_TARGET=K64F
-            ninja || exit 1
+            ninja
