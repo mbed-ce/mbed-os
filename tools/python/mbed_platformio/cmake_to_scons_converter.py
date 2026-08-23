@@ -102,7 +102,7 @@ def compile_source_files(
     :param framework_dir: Path to the Mbed CE framework source
     :param framework_obj_dir: Path to the directory where object files for Mbed CE will be saved.
     """
-    build_dir = pathlib.Path(typing.cast(str, default_env.subst("$BUILD_DIR")))
+    build_dir = pathlib.Path(default_env.subst("$BUILD_DIR"))
 
     build_envs = prepare_build_envs(config, default_env)
     objects = []

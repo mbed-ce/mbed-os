@@ -505,7 +505,7 @@ void device_soft_reconnection_test()
         greentea_parse_kv(_key, _value, sizeof(_key), sizeof(_value));
         TEST_ASSERT_EQUAL_STRING("pass", _key);
 
-        for (int i = 0; i < reconnect_try_count; i++) {
+        for (uint32_t i = 0; i < reconnect_try_count; i++) {
             serial.disconnect();
             wait_us(MIN_DISCONNECT_TIME_US);
             serial.connect();
@@ -653,7 +653,7 @@ utest::v1::status_t greentea_test_setup(const size_t number_of_cases)
     return greentea_test_setup_handler(number_of_cases);
 }
 
-Specification specification(greentea_test_setup, cases, greentea_test_teardown_handler);
+Specification specification(greentea_test_setup, cases, greentea_continue_handlers);
 
 int main()
 {

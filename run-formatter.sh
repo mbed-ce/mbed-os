@@ -6,7 +6,7 @@
 # Script to run the Astyle formatter on the Mbed OS code base.
 # Run before submitting code changes!
 
-git diff --name-only --diff-filter=d origin/master \
+git diff --name-only --diff-filter=d origin/main \
   | ( grep '.*\.\(c\|cpp\|h\|hpp\)$' || true ) \
   | ( grep -v -f .codecheckignore || true ) \
   | while read file; do astyle -n --options=.astylerc "${file}"; done

@@ -32,7 +32,7 @@ namespace mbed {
  * A C++11 Clock representing the HAL lp_ticker.
  *
  * Dummy lock/unlock methods are provided to have the same generic API
- * as UnlockedHighPowerClock. No action is required as the lp_ticker
+ * as HighResClock. No action is required as the lp_ticker
  * runs continuously.
  */
 class LowPowerClock {

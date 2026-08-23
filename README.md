@@ -31,19 +31,17 @@ Folders containing files under different permissive license than Apache 2.0 are 
 
 To start a new project that uses Mbed CE, see the setup guide [here](https://github.com/mbed-ce/mbed-os/wiki/New-Project-Setup-Guide).
 
-We have a [developer website](https://os.mbed.com) for asking questions, engaging with others, finding information on boards and components, using an online IDE and compiler, reading the documentation and learning about what's new and what's coming next in Mbed OS.
-
-Additionally, the [discussions page](https://github.com/mbed-ce/mbed-os/discussions) on this repo can be used for proposing and discussing specific code changes.
+If you'd like to talk to the Mbed CE devs, the [discussions page](https://github.com/mbed-ce/mbed-os/discussions) on this repo can be used to ask for help or to propose and discuss code changes.
 
 ## Documentation
 
 ### Mbed CE Docs
-For the Mbed CE code-level documentation (Doxygen), see [here](https://mbed-ce.github.io/mbed-os/group__mbed-os-public.html).  For an auto-generated listing of target boards supported by Mbed, and the drivers & features each target supports, see the [targets index here](https://mbed-ce.github.io/mbed-ce-test-tools/targets/) and the [drivers index here](https://mbed-ce.github.io/mbed-ce-test-tools/drivers/).
+Our website has several [how-to-use guides](https://mbed-ce.dev/how-to-use/io-basics/) that will get you started using core Mbed OS concepts, and we are working on more over time. For the Mbed CE code-level documentation (Doxygen), see [here](https://mbed-ce.github.io/mbed-os/group__mbed-os-public.html).  For an auto-generated listing of target boards supported by Mbed, and the drivers & features each target supports, see the [targets index here](https://mbed-ce.github.io/mbed-ce-test-tools/targets/) and the [drivers index here](https://mbed-ce.github.io/mbed-ce-test-tools/drivers/).
 
 Mbed CE is still working on more complete documentation infrastructure. Eventually, we hope to migrate all of the docs and examples as well.  However, for now, see below to access those on the original Mbed OS docs site.
 
 ### Original ARM Mbed OS Docs
-For more information about Mbed OS, please see [the published Mbed OS documentation](https://os.mbed.com/docs/latest). It includes general overview information, step-by-step tutorials, porting information and background reference materials about our architecture and tools.
+For more information about Mbed OS, please see [the archived Mbed OS documentation](https://web.archive.org/web/20250622054924/https://os.mbed.com/docs/mbed-os/v6.16/introduction/index.html). It includes general overview information, step-by-step tutorials, porting information and background reference materials about our architecture and tools.
 
 
 

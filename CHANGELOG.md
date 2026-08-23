@@ -22,6 +22,8 @@ A message that notes the main changes in the update.
 - Added a new global, `mbed_used_mpu_regions`, which gives the number of MPU regions used by Mbed. This is intended to allow applications to also use the MPU without creating breakages in the future if Mbed uses additional MPU regions.
 - Added new header, `mbed_math_helpers.h`, containing some useful math functions. Currently this contains `mbed_integer_log_2()` and `mbed_is_power_of_two()`
 - MPU configuration code gained the ability to create a noncached section and a ram function section (for code that has to be executed out of RAM). This RAM function section is an exception to the normal limitations on RAM execution.
+- EFM32 Giant Gecko Series 0:
+  - `EFM32GG_STK3700` added upload method config
 - MIMXRT117x: Memory bank configuration is now supported in the linker script.
 - RP2xxx
   - `RASPBERRY_PI_PICO_W` board target added (though note that the wi-fi module on this board is not currently supported, and would take a huge amount of effort to support, so the utility of this board with Mbed compared to the non-W version is limited).
@@ -85,22 +87,32 @@ A message that notes the main changes in the update.
   - MIMXRT1050_EVK: Fixed build error due to typos
   - Fixed SPI SCLK frequency being several times higher than set due to clock config error (#564)
 - Fixed memory leak with Nanostack memory manager that caused the stack to run of memory when used with zero-copy Ethernet drivers
+- EFM32:
+  - Fixed build failure on all `EFM32GG990F1024` targets caused falsely added TRNG peripheral
+  - Set `deep-sleep-latency` to 1ms to account for the wake-up delay on `EFM32GG_STK3700` boards
 - LPC17xx:
   - Fixed I2C single-byte API continuing to send bytes after being NACKed
+- STM32L4:
+  - Fixed multiple bugs causing hardware-accelerated multi-block AES encryption and decryption to produce incorrect results
 - RP2xxx:
   - Fixed issue where reading from an I2C master in slave mode could put the I2C peripheral in a bad state if the master transferred
     more bytes than expected
   - Fixed issue where reading from an I2C master in slave mode could hang forever if the master ends the transaction early
   - Fixed issue where writing to an I2C master in slave mode would always return success regardless of success/failure
   - Fixed assert failure when calling SPI::write() with a zero-length Tx or Rx buffer
+  - Implemented missing USB endpoint abort function, so `USBDevice::endpoint_abort()` is no longer a no-op
+  - Implemented memory manager for USB DPRAM and proper deallocation of endpoint buffers, so USB will no longer die once a certain number of endpoints are created and destroyed over the life of the application. 
 - RP2040:
   - Fixed RTC not counting until the time was first set (just calling `RealTimeClock::init()` was not enough)
 - Fixed issue where if the same setting was overridden in multiple different `target_override` blocks in mbed_app.json, only one of the overrides would be processed
+- Fixed `Timer` class not being included in Doxygen docs due to misplaced #ifdef
+- Rewrote and improved docs for `Timer` and `LowPowerTimer` classes
+- Functions tagged as `MBED_DEPRECATED` will now show as deprecated in the Doxygen docs
 
 ### Removed
-- Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7)
-- Target ARCH MAX (STM32F407) has been removed due to market availability - discontinued (still possible to use it with release Mbed-os 7)
-- STM32F4 MCUs without dev board were removed 26/34 (still possible to use it with release Mbed-os 7). Will be covered by Custom target.
+- Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7.0.0)
+- Target ARCH MAX (STM32F407) has been removed due to market availability - discontinued (still possible to use it with release Mbed-os 7.0.0)
+- STM32F4 MCUs without dev board were removed 26/34 (still possible to use it with release Mbed-os 7.0.0). Will be covered by Custom target.
 
 ### Security
 

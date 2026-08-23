@@ -4031,6 +4031,36 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "NUCLEO_L496ZG"
         ],
     },
+    "MCU_STM32L4A6xG": {
+        "inherits": [
+            "MCU_STM32L4"
+        ],
+        "public": false,
+        "extra_labels_add": [
+            "STM32L4A6xG"
+        ],
+        "overrides": {
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+        },
+        "macros_add": [
+            "STM32L4A6xx",
+            "MBEDTLS_CONFIG_HW_SUPPORT",
+            "MBED_SPLIT_HEAP"
+        ],
+        "device_has_add": [
+            "USBDEVICE"
+        ]
+    },
+    "NUCLEO_L4A6ZG": {
+        "inherits": [
+            "MCU_STM32L4A6xG"
+        ],
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "device_name": "STM32L4A6ZGTx",
+        "image_url": "https://www.st.com/bin/ecommerce/api/image.PF266521.en.feature-description-include-personalized-no-cpn-medium.jpg"
+    },
     "MCU_STM32L4P5xG": {
         "inherits": [
             "MCU_STM32L4"
@@ -6082,6 +6112,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_has_add": [
             "ANALOGOUT"
         ],
+        "device_has_remove": [
+            "TRNG"
+        ],
         "config": {
             "hfrco-band-select": {
                 "help": "Value: One of _CMU_HFRCOCTRL_BAND_28MHZ, _CMU_HFRCOCTRL_BAND_21MHZ, _CMU_HFRCOCTRL_BAND_14MHZ, _CMU_HFRCOCTRL_BAND_11MHZ, _CMU_HFRCOCTRL_BAND_7MHZ, _CMU_HFRCOCTRL_BAND_1MHZ. Be sure to set hfrco-clock-freq accordingly!",
@@ -6108,7 +6141,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "overrides": {
-            "hfrco-clock-freq": "21000000"
+            "hfrco-clock-freq": "21000000",
+            "deep-sleep-latency": 1
         },
         "image_url": "https://www.silabs.com/content/dam/siliconlabs/images/products/microcontrollers/32-bit_mcus/giant_gecko/giant-gecko-starter-kit.jpg"
     },
@@ -8486,7 +8520,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
         "device_has_remove": [
             "SERIAL_FC",
-            "USBDEVICE",
         ],
         "config": {
             "lpticker-use-lposc": {

@@ -41,10 +41,10 @@ jobs:
           mkdir -p SCANCODE
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
-            | ( grep '.\(c\|cpp\|h\|hpp\|py\)$' || true )
+            | ( grep '\.\(c\|cpp\|h\|hpp\|py\)$' || true )
           echo $?
           git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
-            | ( grep '.\(c\|cpp\|h\|hpp\|py\)$' || true ) \
+            | ( grep '\.\(c\|cpp\|h\|hpp\|py\)$' || true ) \
             | while read file; do cp --parents "${file}" SCANCODE; done
           ls SCANCODE
           scancode -l --json-pp scancode.json SCANCODE
@@ -170,7 +170,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/BUILD
 
       - name: Doxygen Action
-        uses: mattnotmitt/doxygen-action@v1.12.0
+        uses: mattnotmitt/doxygen-action@v1
         with:
           doxyfile-path: ./doxyfile_options
 

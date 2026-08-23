@@ -186,6 +186,15 @@ elseif(MCU_RP235X IN_LIST MBED_TARGET_LABELS)
 	)
 endif()
 
+# tinyalloc, used for managing USB ram
+mbed_setup_submodule(tinyalloc CHECK_FILE tinyalloc.c IF_LABEL MCU_RP2)
+target_sources(mbed-mcu-rp2
+	INTERFACE
+		tinyalloc/tinyalloc.c)
+target_include_directories(mbed-mcu-rp2
+	INTERFACE
+		tinyalloc)
+
 # RP2040 SDK -----------------------------------------------------------------------------------------------------------
 
 target_include_directories(mbed-mcu-rp2040
@@ -230,11 +239,10 @@ target_sources(mbed-mcu-rp235x
 		pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Source/system_RP2350.c
 		pico-sdk/src/rp2_common/hardware_powman/powman.c
 		# floating point helper routines
-#		pico-sdk/src/rp2_common/pico_float/float_aeabi_rp2040.S
-#		pico-sdk/src/rp2_common/pico_float/float_init_rom_rp2040.c
-#		pico-sdk/src/rp2_common/pico_float/float_math.c
-#		pico-sdk/src/rp2_common/pico_float/float_v1_rom_shim_rp2040.S
-#		pico-sdk/src/rp2_common/hardware_divider/divider.S
+		pico-sdk/src/rp2_common/pico_float/float_math.c
+		pico-sdk/src/rp2_common/pico_float/float_conv32_vfp.S
+		pico-sdk/src/rp2_common/pico_float/float_common_m33.S
+		pico-sdk/src/rp2_common/pico_float/float_sci_m33_vfp.S
 )
 
 
@@ -257,11 +265,17 @@ endfunction()
 
 # Enable usage of the RPi Pico optimized floating point routines
 # Following is copied from src/rp2_common/pico_float/CMakeLists.txt
+# Also note that some of these are wrapped only on RP2040 because it does not have an FPU,
+# while others (e.g. trig functions) have optimized versions on RP2040 and RP2350.
+
+# AEABI_ARITHMETIC
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_fadd)
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_fdiv)
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_fmul)
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_frsub)
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_fsub)
+
+# AEABI_CMP
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_cfcmpeq)
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_cfrcmple)
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_cfcmple)
@@ -271,54 +285,65 @@ pico_wrap_function(mbed-mcu-rp2040 __aeabi_fcmple)
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_fcmpge)
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_fcmpgt)
 pico_wrap_function(mbed-mcu-rp2040 __aeabi_fcmpun)
-pico_wrap_function(mbed-mcu-rp2040 __aeabi_i2f)
-pico_wrap_function(mbed-mcu-rp2040 __aeabi_l2f)
-pico_wrap_function(mbed-mcu-rp2040 __aeabi_ui2f)
-pico_wrap_function(mbed-mcu-rp2040 __aeabi_ul2f)
-pico_wrap_function(mbed-mcu-rp2040 __aeabi_f2iz)
-pico_wrap_function(mbed-mcu-rp2040 __aeabi_f2lz)
-pico_wrap_function(mbed-mcu-rp2040 __aeabi_f2uiz)
-pico_wrap_function(mbed-mcu-rp2040 __aeabi_f2ulz)
-pico_wrap_function(mbed-mcu-rp2040 __aeabi_f2d)
-pico_wrap_function(mbed-mcu-rp2040 sqrtf)
-pico_wrap_function(mbed-mcu-rp2040 cosf)
-pico_wrap_function(mbed-mcu-rp2040 sinf)
-pico_wrap_function(mbed-mcu-rp2040 tanf)
-pico_wrap_function(mbed-mcu-rp2040 atan2f)
-pico_wrap_function(mbed-mcu-rp2040 expf)
-pico_wrap_function(mbed-mcu-rp2040 logf)
 
-pico_wrap_function(mbed-mcu-rp2040 ldexpf)
-pico_wrap_function(mbed-mcu-rp2040 copysignf)
-pico_wrap_function(mbed-mcu-rp2040 truncf)
-pico_wrap_function(mbed-mcu-rp2040 floorf)
-pico_wrap_function(mbed-mcu-rp2040 ceilf)
-pico_wrap_function(mbed-mcu-rp2040 roundf)
-pico_wrap_function(mbed-mcu-rp2040 sincosf) # gnu
-pico_wrap_function(mbed-mcu-rp2040 asinf)
-pico_wrap_function(mbed-mcu-rp2040 acosf)
-pico_wrap_function(mbed-mcu-rp2040 atanf)
-pico_wrap_function(mbed-mcu-rp2040 sinhf)
-pico_wrap_function(mbed-mcu-rp2040 coshf)
-pico_wrap_function(mbed-mcu-rp2040 tanhf)
-pico_wrap_function(mbed-mcu-rp2040 asinhf)
-pico_wrap_function(mbed-mcu-rp2040 acoshf)
-pico_wrap_function(mbed-mcu-rp2040 atanhf)
-pico_wrap_function(mbed-mcu-rp2040 exp2f)
-pico_wrap_function(mbed-mcu-rp2040 log2f)
-pico_wrap_function(mbed-mcu-rp2040 exp10f)
-pico_wrap_function(mbed-mcu-rp2040 log10f)
-pico_wrap_function(mbed-mcu-rp2040 powf)
-pico_wrap_function(mbed-mcu-rp2040 powintf) #gnu
-pico_wrap_function(mbed-mcu-rp2040 hypotf)
-pico_wrap_function(mbed-mcu-rp2040 cbrtf)
-pico_wrap_function(mbed-mcu-rp2040 fmodf)
-pico_wrap_function(mbed-mcu-rp2040 dremf)
-pico_wrap_function(mbed-mcu-rp2040 remainderf)
-pico_wrap_function(mbed-mcu-rp2040 remquof)
-pico_wrap_function(mbed-mcu-rp2040 expm1f)
-pico_wrap_function(mbed-mcu-rp2040 log1pf)
-pico_wrap_function(mbed-mcu-rp2040 fmaf)
+# AEABI_CONV_32
+pico_wrap_function(mbed-mcu-rp2040 __aeabi_i2f)
+pico_wrap_function(mbed-mcu-rp2040 __aeabi_ui2f)
+pico_wrap_function(mbed-mcu-rp2040 __aeabi_f2iz)
+pico_wrap_function(mbed-mcu-rp2040 __aeabi_f2uiz)
+
+# AEABI_CONV_64
+pico_wrap_function(mbed-mcu-rp2 __aeabi_l2f)
+pico_wrap_function(mbed-mcu-rp2 __aeabi_ul2f)
+pico_wrap_function(mbed-mcu-rp2 __aeabi_f2lz)
+pico_wrap_function(mbed-mcu-rp2 __aeabi_f2ulz)
+
+# AEABI_CONV_DOUBLE
+pico_wrap_function(mbed-mcu-rp2040 __aeabi_f2d)
+
+# SQRTF
+pico_wrap_function(mbed-mcu-rp2040 sqrtf)
+
+# SCI
+pico_wrap_function(mbed-mcu-rp2 cosf)
+pico_wrap_function(mbed-mcu-rp2 sinf)
+pico_wrap_function(mbed-mcu-rp2 tanf)
+pico_wrap_function(mbed-mcu-rp2 atan2f)
+pico_wrap_function(mbed-mcu-rp2 expf)
+pico_wrap_function(mbed-mcu-rp2 logf)
+pico_wrap_function(mbed-mcu-rp2 sincosf) # gnu
+
+# SCI_EXTRA
+pico_wrap_function(mbed-mcu-rp2 ldexpf)
+pico_wrap_function(mbed-mcu-rp2 copysignf)
+pico_wrap_function(mbed-mcu-rp2 truncf)
+pico_wrap_function(mbed-mcu-rp2 floorf)
+pico_wrap_function(mbed-mcu-rp2 ceilf)
+pico_wrap_function(mbed-mcu-rp2 roundf)
+pico_wrap_function(mbed-mcu-rp2 asinf)
+pico_wrap_function(mbed-mcu-rp2 acosf)
+pico_wrap_function(mbed-mcu-rp2 atanf)
+pico_wrap_function(mbed-mcu-rp2 sinhf)
+pico_wrap_function(mbed-mcu-rp2 coshf)
+pico_wrap_function(mbed-mcu-rp2 tanhf)
+pico_wrap_function(mbed-mcu-rp2 asinhf)
+pico_wrap_function(mbed-mcu-rp2 acoshf)
+pico_wrap_function(mbed-mcu-rp2 atanhf)
+pico_wrap_function(mbed-mcu-rp2 exp2f)
+pico_wrap_function(mbed-mcu-rp2 log2f)
+pico_wrap_function(mbed-mcu-rp2 exp10f)
+pico_wrap_function(mbed-mcu-rp2 log10f)
+pico_wrap_function(mbed-mcu-rp2 powf)
+pico_wrap_function(mbed-mcu-rp2 powintf) #gnu
+pico_wrap_function(mbed-mcu-rp2 hypotf)
+pico_wrap_function(mbed-mcu-rp2 cbrtf)
+pico_wrap_function(mbed-mcu-rp2 fmodf)
+pico_wrap_function(mbed-mcu-rp2 dremf)
+pico_wrap_function(mbed-mcu-rp2 remainderf)
+pico_wrap_function(mbed-mcu-rp2 remquof)
+pico_wrap_function(mbed-mcu-rp2 expm1f)
+pico_wrap_function(mbed-mcu-rp2 log1pf)
+pico_wrap_function(mbed-mcu-rp2 fmaf)
 
 # Subdirs -----------------------------------------------------------------------------------------------------------
 
