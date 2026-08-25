@@ -1,7 +1,7 @@
 name: Documentation
 
 # Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
+# events but only for the main branch
 on:
   push:
     branches: [ main ]
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
     
@@ -21,17 +21,17 @@ jobs:
 
     # Build the HTML documentation
     - name: Doxygen Action
-      uses: mattnotmitt/doxygen-action@v1.9.8 # note: this version needs to stay in sync with the docs-check job in basic_checks
+      uses: mattnotmitt/doxygen-action@v1
       with:
           doxyfile-path: ./doxyfile_options
     
     # Deploy the HTML documentation to GitHub Pages
     - name: GH Pages Deployment
-      uses: peaceiris/actions-gh-pages@v3
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./BUILD/html/
         enable_jekyll: false
         allow_empty_commit: false
         force_orphan: true
-        publish_branch: docs-master
+        publish_branch: docs-main

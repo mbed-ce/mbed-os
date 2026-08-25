@@ -7,23 +7,25 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
+
+env:
+  # Set up the oldest python version that's currently still supported by Python (as of Summer 2026)
+  PYTHON_VERSION: "3.10"
 
 jobs:
   license-check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/armmbed/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-ce-env:main
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          
 
-      - 
-        name: install dependencies
+      - name: install dependencies
         shell: bash
         # TODO scancode 32.0 introduced significant breaking changes to the license
         # detection output format: https://github.com/nexB/scancode-toolkit/releases/tag/v32.0.0
@@ -33,8 +35,7 @@ jobs:
           apt-get install -y libxml2-dev libxslt1-dev
           pip install -U "scancode-toolkit<32.0" "click>=7,<8"
 
-      - 
-        name: license check 
+      - name: license check
         run: |
           set -x
           mkdir -p SCANCODE
@@ -48,11 +49,11 @@ jobs:
           ls SCANCODE
           scancode -l --json-pp scancode.json SCANCODE
           cd tools/python
-          
+
           # Run the evaluation script, which may fail, and save its exit code.
           EVALUATE_EXITCODE=0
           python -m scancode_evaluate.scancode_evaluate ../../scancode.json || EVALUATE_EXITCODE=$?
-          
+
           cat scancode_evaluate.log
           if [ "$EVALUATE_EXITCODE" = 0 ]; then
             echo "License check OK";
@@ -65,16 +66,15 @@ jobs:
   include-check:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/armmbed/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-ce-env:main
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - 
-        name: include check
+      - name: include check
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           # checks mbed.h is not included in MbedOS files except in tests
@@ -86,9 +86,8 @@ jobs:
   style-check:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -96,7 +95,7 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install astyle aspell
-    
+
       - name: UTF-8 Check
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -137,10 +136,9 @@ jobs:
           find  -name "*.s" | tee BUILD/badasm |
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
-      # Set up the oldest python version that's currently still supported by Python (as of Fall 2025)
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
-          python-version: '3.9'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python packages
         run: |
@@ -156,15 +154,13 @@ jobs:
           cd tools
           ruff check --diff python/mbed_tools python/mbed_platformio
           basedpyright
-          
 
   docs-check:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -174,7 +170,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/BUILD
 
       - name: Doxygen Action
-        uses: mattnotmitt/doxygen-action@v1.9.8
+        uses: mattnotmitt/doxygen-action@v1
         with:
           doxyfile-path: ./doxyfile_options
 
@@ -182,12 +178,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
-      # Set up the oldest python version that's currently still supported by Python (as of Fall 2025)
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
-          python-version: '3.9'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python packages
         run: |
@@ -201,12 +196,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
-      # Set up the oldest python version that's currently still supported by Python (as of Fall 2025)
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
-          python-version: '3.9'
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python packages
         run: |
@@ -218,20 +212,17 @@ jobs:
           mbed-tools cmsis-mcu-descr find-unused
           mbed-tools cmsis-mcu-descr check-missing
 
-
   pin-validation:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/armmbed/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-ce-env:main
     steps:
-      -
-        name: Checkout repo
-        uses: actions/checkout@v5
+      - name: Checkout repo
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      -
-        name: validate pins
+      - name: validate pins
         run: |
           set -x
           python3 -m pip install json5
@@ -244,21 +235,14 @@ jobs:
   cmake-native-unit-tests:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/armmbed/mbed-os-env:master-latest
+      image: ghcr.io/mbed-ce/mbed-ce-env:main
     steps:
-      -
-        name: Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v7
 
-      - name: Install python3-venv
+      - name: Build and run unit tests
         run: |
-          apt-get update
-          apt-get install -y python3-venv
-
-      -
-        name: Build and run unit tests
-        run: |
-          set -x     
-          ctest --build-and-test . build --build-generator Ninja --build-options -DMBED_ENABLE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON --test-command ctest --output-on-failure        
+          set -x
+          ctest --build-and-test . build --build-generator Ninja --build-options -DMBED_ENABLE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON --test-command ctest --output-on-failure
           gcovr --gcov-executable gcov -r . ./build -s -e ".*\.h" --exclude-directories=${GITHUB_WORKSPACE}/build/UNITTESTS --exclude-directories=${GITHUB_WORKSPACE}/build/_deps
           ccache -s
