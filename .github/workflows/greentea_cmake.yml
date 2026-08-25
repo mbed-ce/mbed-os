@@ -4,7 +4,8 @@ on: [pull_request]
 jobs:
   build-greentea:
     runs-on: ubuntu-latest
-    container: ghcr.io/armmbed/mbed-os-env:master-latest
+    container:
+      image: ghcr.io/mbed-ce/mbed-ce-env:main
 
     strategy:
       matrix:
@@ -128,24 +129,19 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install python3-venv
-        run: |
-          apt-get update
-          apt-get install -y python3-venv
+        uses: actions/checkout@v7
 
       # Always build with baremetal profile, as it should work with every target
       - name: Build ${{ matrix.target }} with baremetal profile
         # Note: We have to set a wifi network name and password so that the test will compile on devices that use wifi
         run: |
-            rm -rf __build
-            cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }} -DMBED_APP_JSON_PATH=TESTS/configs/greentea_baremetal.json5
-            cmake --build __build
+          rm -rf __build
+          cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }} -DMBED_APP_JSON_PATH=TESTS/configs/greentea_baremetal.json5
+          cmake --build __build
 
       - name: Build ${{ matrix.target }} with full profile
         if: ${{ matrix.profile == 'full' }}
         run: |
-            rm -rf __build
-            cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }} -DMBED_APP_JSON_PATH=TESTS/configs/greentea_full.json5
-            cmake --build __build
+          rm -rf __build
+          cmake -S . -B __build -GNinja -DUPLOAD_METHOD=NONE -DMBED_GREENTEA_WIFI_SECURE_SSID=SomeNetwork -DMBED_GREENTEA_WIFI_SECURE_PASSWORD=SomePassword -DCMAKE_CTEST_ARGUMENTS="--output-on-failure;-V" -DMBED_BUILD_GREENTEA_TESTS=ON -DMBED_GREENTEA_SERIAL_PORT=/dev/ttyDUMMY -DMBED_TARGET=${{ matrix.target }} -DMBED_APP_JSON_PATH=TESTS/configs/greentea_full.json5
+          cmake --build __build
