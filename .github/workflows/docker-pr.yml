@@ -67,8 +67,6 @@ jobs:
           shell: bash
           run: |
             uname -m
-            # Need to mark paths as safe so CMake can git submodule for cmsis/CMSIS_6
-            git config --global --add safe.directory '*'
             cd mbed-ce-hello-world
             mkdir -p build && cd build
             cmake .. -GNinja -DCMAKE_BUILD_TYPE=Develop -DMBED_TARGET=K64F

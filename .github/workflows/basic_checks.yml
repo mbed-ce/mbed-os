@@ -32,8 +32,9 @@ jobs:
         # Need to update Mbed's scripts for the new format.
         run: |
           apt-get update
-          apt-get install -y libxml2-dev libxslt1-dev
-          pip install -U "scancode-toolkit<32.0" "click>=7,<8"
+          apt-get install -y libxml2-dev libxslt1-dev pipx
+          pipx install "scancode-toolkit<32.0"
+          pipx inject scancode-toolkit "click>=7,<8"
 
       - name: license check
         run: |
@@ -225,7 +226,9 @@ jobs:
       - name: validate pins
         run: |
           set -x
-          python3 -m pip install json5
+          python3 -m venv .venv
+          source /venv/bin/activate
+          pip install json5
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
             | ( grep '.*[\\|\/]PinNames.h$' || true ) \
