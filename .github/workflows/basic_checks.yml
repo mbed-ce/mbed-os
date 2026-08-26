@@ -32,7 +32,7 @@ jobs:
         # Need to update Mbed's scripts for the new format.
         run: |
           apt-get update
-          apt-get install -y libxml2-dev libxslt1p-dev libicu-dev pkg-config pipx
+          apt-get install -y libxml2-dev libicu-dev pkg-config pipx
           pipx install "scancode-toolkit<32.0"
           pipx inject scancode-toolkit "click>=7,<8"
           
