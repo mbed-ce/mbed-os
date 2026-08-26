@@ -66,9 +66,9 @@ RUN set -x \
     && : # last line
 
 # ------------------------------------------------------------------------------
-# Configure environment variables to put GCC and pipx-installed stuff on PATH
+# Configure environment variables to put GCC on PATH
 ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi/bin/
-ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}:/root/.local/bin"
+ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}"
 
 # ------------------------------------------------------------------------------
 # Display, check and save environment settings

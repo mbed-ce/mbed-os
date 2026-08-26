@@ -35,6 +35,7 @@ jobs:
           apt-get install -y libxml2-dev libxslt1-dev libicu-dev pkg-config pipx
           pipx install "scancode-toolkit<32.0"
           pipx inject scancode-toolkit "click>=7,<8"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: license check
         run: |
