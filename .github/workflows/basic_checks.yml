@@ -32,9 +32,17 @@ jobs:
         # Need to update Mbed's scripts for the new format.
         run: |
           apt-get update
-          apt-get install -y libxml2-dev libxslt1-dev libicu-dev pkg-config pipx
+          apt-get install -y libxml2-dev libxslt1p-dev libicu-dev pkg-config pipx
           pipx install "scancode-toolkit<32.0"
           pipx inject scancode-toolkit "click>=7,<8"
+          
+          # This is a horrifying, ugly hack. The issue is that spdx-tools, a dependency of scancode, tries to declare
+          # a namespace package in its __init__.py, which is not supported by python 3.12+. However, the version of
+          # scancode we need does not support spdx-tools 0.8.0, which fixed this issue, it requires this exact version.
+          # So, we have to do a little surgery and wipe out this problematic line.
+          echo > $HOME/.local/share/pipx/venvs/scancode-toolkit/lib/python3.12/site-packages/spdx/__init__.py
+          
+          # Put pipx bin dir on PATH
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: license check
