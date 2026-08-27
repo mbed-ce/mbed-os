@@ -43,6 +43,9 @@ RUN set -x \
     && apt clean && rm -rf /var/lib/apt/lists \
     && : # last line
 
+# Disable Git safe directory checking, as it tends to cause a lot of issues on Github CI runners
+RUN git config --global --add safe.directory '*'
+
 # ------------------------------------------------------------------------------
 # Install arm-none-eabi-gcc
 WORKDIR /opt/mbed-os-toolchain
@@ -63,7 +66,7 @@ RUN set -x \
     && : # last line
 
 # ------------------------------------------------------------------------------
-# Configure environment variables
+# Configure environment variables to put GCC on PATH
 ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi/bin/
 ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}"
 
