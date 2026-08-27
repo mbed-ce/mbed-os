@@ -44,7 +44,7 @@ RUN set -x \
     && : # last line
 
 # Disable Git safe directory checking, as it tends to cause a lot of issues on Github CI runners
-RUN git config --global --add safe.directory '*'
+RUN git config --system --add safe.directory '*'
 
 # ------------------------------------------------------------------------------
 # Install arm-none-eabi-gcc
