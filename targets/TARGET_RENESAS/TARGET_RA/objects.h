@@ -94,10 +94,15 @@ struct flash_s {
 #endif
 
 #if DEVICE_SERIAL
+/* The SCI_B peripheral is register incompatible with SCI. All differences are
+ * adapted here so that serial_api.c can use the original SCI names everywhere. */
 #if BSP_PERIPHERAL_SCI_B_PRESENT
     #include "r_sci_b_uart.h"
     typedef sci_b_uart_instance_ctrl_t sci_uart_instance_ctrl_t;
     typedef sci_b_uart_extended_cfg_t sci_uart_extended_cfg_t;
+    typedef sci_b_baud_setting_t baud_setting_t;
+    #define R_SCI_UART_BaudCalculate R_SCI_B_UART_BaudCalculate
+    #define SSR_b CSR_b
 #else
     #include "r_sci_uart.h"
 #endif
@@ -114,16 +119,14 @@ struct serial_s {
 #endif
 
 #if DEVICE_SPI
+/* The SPI_B peripheral has its own driver and register layout. All accesses go
+ * through the generic spi_api_t interface (p_api) selected at init, so no FSP
+ * function names need to be remapped; only types and enum values are aliased. */
 #if BSP_PERIPHERAL_SPI_B_PRESENT
     #include <r_spi_b.h>
-    typedef spi_b_extended_cfg_t spi_extended_cfg_t;
     typedef spi_b_instance_ctrl_t spi_instance_ctrl_t;
-    #define R_SPI_Open          R_SPI_B_Open
-    #define R_SPI_Close         R_SPI_B_Close
-    #define R_SPI_WriteRead     R_SPI_B_WriteRead
-    #define R_SPI_Write         R_SPI_B_Write
-    #define R_SPI_Read          R_SPI_B_Read
-    #define SPI_COMMUNICATION_FULL_DUPLEX SPI_B_COMMUNICATION_FULL_DUPLEX
+    typedef spi_b_extended_cfg_t  spi_extended_cfg_t;
+    #define SPI_COMMUNICATION_FULL_DUPLEX   SPI_B_COMMUNICATION_FULL_DUPLEX
     #define SPI_COMMUNICATION_TRANSMIT_ONLY SPI_B_COMMUNICATION_TRANSMIT_ONLY
 #else
     #include <r_spi.h>
@@ -133,6 +136,7 @@ struct spi_s {
     spi_cfg_t           cfg;       /* Local copy of configuration */
     spi_extended_cfg_t  ext;       /* Local copy of extended configuration */
     spi_instance_ctrl_t *p_ctrl;   /* R_SPI control block (instance-specific) */
+    spi_api_t const     *p_api;    /* Pointer to R_SPI API (R_SPI or R_SPI_B driver) */
     SPIName             channel;   /* SPI_0 / SPI_1 */
     uint32_t            hz;        /* Current frequency */
     uint8_t             bits;      /* Bits per frame (usually 8) */
@@ -149,17 +153,13 @@ struct spi_s {
 #endif
 
 #if DEVICE_I2C
+/* Same pattern as SPI: the IIC_B driver is reached through the generic
+ * i2c_master_api_t interface (p_api), so only types are aliased here. */
 #if BSP_PERIPHERAL_IIC_B_PRESENT
     #include "r_iic_b_master.h"
     typedef iic_b_master_extended_cfg_t   i2c_extended_cfg_t;
     typedef iic_b_master_instance_ctrl_t  i2c_instance_ctrl_t;
     typedef iic_b_master_clock_settings_t iic_master_clock_settings_t;
-    #define R_IIC_MASTER_Open             R_IIC_B_MASTER_Open
-    #define R_IIC_MASTER_Close            R_IIC_B_MASTER_Close
-    #define R_IIC_MASTER_Read             R_IIC_B_MASTER_Read
-    #define R_IIC_MASTER_Write            R_IIC_B_MASTER_Write
-    #define R_IIC_MASTER_Abort            R_IIC_B_MASTER_Abort
-    #define R_IIC_MASTER_SlaveAddressSet  R_IIC_B_MASTER_SlaveAddressSet
 #else
     #include "r_iic_master.h"
     typedef iic_master_extended_cfg_t     i2c_extended_cfg_t;
@@ -170,6 +170,7 @@ struct i2c_s {
     i2c_master_cfg_t      cfg;             /* Local copy of the FSP configuration */
     i2c_extended_cfg_t    ext;             /* Local copy of the extended configuration */
     i2c_instance_ctrl_t  *p_ctrl;          /* Pointer to the FSP control block */
+    i2c_master_api_t const *p_api;         /* Pointer to IIC master API (R_IIC_MASTER or R_IIC_B_MASTER driver) */
     I2CName               i2c;             /* I2C peripheral identifier (I2C_0 / I2C_1 / ...) */
     int                   hz;              /* Current bus frequency in Hz */
 

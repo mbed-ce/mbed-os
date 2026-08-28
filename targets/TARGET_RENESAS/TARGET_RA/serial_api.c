@@ -10,14 +10,6 @@
 
 #define RX_BUF_SIZE 16
 
-#if BSP_PERIPHERAL_SCI_B_PRESENT
-#define baud_setting_t sci_b_baud_setting_t
-#define R_SCI_UART_BaudCalculate R_SCI_B_UART_BaudCalculate
-#define sci_uart_instance_ctrl_t sci_b_uart_instance_ctrl_t
-#define R_SCI0_Type R_SCI_B0_Type
-#define SSR_b CSR_b
-#endif
-
 #if MBED_CONF_TARGET_CONSOLE_UART
 int stdio_uart_inited = 0; // used in platform/mbed_board.c and platform/mbed_retarget.cpp
 serial_t stdio_uart;
@@ -224,21 +216,20 @@ int serial_getc(serial_t *obj)
 void serial_putc(serial_t *obj, int c)
 {
     sci_uart_instance_ctrl_t *ctrl = obj->p_ctrl;
-    R_SCI0_Type *reg = ctrl->p_reg;
     if(ctrl->fifo_depth > 0)
     {
 #if BSP_PERIPHERAL_SCI_B_PRESENT
-        while(reg->FTSR_b.T == ctrl->fifo_depth);
-        reg->TDR_BY = (uint8_t)c;
+        while(ctrl->p_reg->FTSR_b.T == ctrl->fifo_depth);
+        ctrl->p_reg->TDR_BY = (uint8_t)c;
 #else
-        while(reg->FDR_b.T == ctrl->fifo_depth);
-        reg->FTDRHL = (uint16_t)c;
+        while(ctrl->p_reg->FDR_b.T == ctrl->fifo_depth);
+        ctrl->p_reg->FTDRHL = (uint16_t)c;
 #endif
     }
     else
     {
-        reg->TDR = (uint8_t) c;
-        while (reg->SSR_b.TEND == 0);
+        ctrl->p_reg->TDR = (uint8_t) c;
+        while (ctrl->p_reg->SSR_b.TEND == 0);
     }
 }
 

@@ -158,6 +158,7 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
     MBED_ASSERT(inst != NULL);
 
     obj->p_ctrl = (spi_instance_ctrl_t *) inst->p_ctrl;
+    obj->p_api = inst->p_api;
     const spi_cfg_t *cfg_src = inst->p_cfg;
     const spi_extended_cfg_t *ext_src = (const spi_extended_cfg_t *)cfg_src->p_extend;
 
@@ -189,7 +190,7 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
     obj->xfer_done = true;
 #endif
     /* Open SPI */
-    fsp_err_t err = R_SPI_Open(obj->p_ctrl, &obj->cfg);
+    fsp_err_t err = obj->p_api->open(obj->p_ctrl, &obj->cfg);
     if (FSP_SUCCESS != err) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_INITIALIZATION_FAILED), "spi_init");
     }
@@ -205,7 +206,7 @@ void spi_free(spi_t *obj)
     if (!obj) {
         return;
     }
-    R_SPI_Close(obj->p_ctrl);
+    obj->p_api->close(obj->p_ctrl);
 #if MBED_CONF_RTOS_PRESENT
     osSemaphoreDelete(obj->semaphoreId);
     obj->semaphoreId = NULL;
@@ -231,8 +232,8 @@ void spi_format(spi_t *obj, int bits, int mode, int slave)
 
     obj->cfg.operating_mode = SPI_MODE_MASTER;
 
-    R_SPI_Close(obj->p_ctrl);
-    R_SPI_Open(obj->p_ctrl, &obj->cfg);
+    obj->p_api->close(obj->p_ctrl);
+    obj->p_api->open(obj->p_ctrl, &obj->cfg);
 }
 
 static fsp_err_t spi_calculate_bitrate(int hz, rspck_div_setting_t *div)
@@ -252,7 +253,7 @@ static void spi_switch_tx_only_mode(spi_t *obj, bool enable_tx_only)
         obj->ext.spi_comm = SPI_COMMUNICATION_TRANSMIT_ONLY;
 #if BSP_PERIPHERAL_SPI_B_PRESENT
         obj->p_ctrl->p_regs->SPCR &= ~R_SPI_B0_SPCR_SPRIE_Msk;
-        obj->p_ctrl->p_regs->SPCR |= (uint32_t) ((uint32_t)1 << R_SPI_B0_SPCR_TXMD_Pos);
+        obj->p_ctrl->p_regs->SPCR |= R_SPI_B0_SPCR_TXMD_Msk;
 #else
         obj->p_ctrl->p_regs->SPCR &= ~R_SPI0_SPCR_SPRIE_Msk;
         obj->p_ctrl->p_regs->SPCR |= (R_SPI0_SPCR_TXMD_Msk | R_SPI0_SPCR_SPTIE_Msk);
@@ -292,8 +293,8 @@ void spi_frequency(spi_t *obj, int hz)
 
     obj->hz = spi_actual_frequency(&div);
 
-    R_SPI_Close(obj->p_ctrl);
-    R_SPI_Open(obj->p_ctrl, &obj->cfg);
+    obj->p_api->close(obj->p_ctrl);
+    obj->p_api->open(obj->p_ctrl, &obj->cfg);
 }
 
 /* Waiting for SPI transmission to complete */
@@ -325,10 +326,10 @@ int spi_master_write(spi_t *obj, int value)
     spi_switch_tx_only_mode(obj, !obj->has_miso);
 
     if (obj->has_miso) {
-        err = R_SPI_WriteRead(obj->p_ctrl, &tx, &rx, 1, SPI_BIT_WIDTH_8_BITS);
+        err = obj->p_api->writeRead(obj->p_ctrl, &tx, &rx, 1, SPI_BIT_WIDTH_8_BITS);
     }
     else {
-        err = R_SPI_Write(obj->p_ctrl, &tx, 1, SPI_BIT_WIDTH_8_BITS);
+        err = obj->p_api->write(obj->p_ctrl, &tx, 1, SPI_BIT_WIDTH_8_BITS);
     }
     if (FSP_SUCCESS != err) {
         /* On error, return -1 to signal failure */
@@ -395,14 +396,14 @@ int spi_master_block_write(spi_t *obj,
 
         if(!is_tx_only) {
             if(tx_length == 0) {
-                err = R_SPI_Read(obj->p_ctrl, rx_ptr, chunk, SPI_BIT_WIDTH_8_BITS);
+                err = obj->p_api->read(obj->p_ctrl, rx_ptr, chunk, SPI_BIT_WIDTH_8_BITS);
             }
             else {
-                err = R_SPI_WriteRead(obj->p_ctrl, tx_ptr, rx_ptr, chunk, SPI_BIT_WIDTH_8_BITS);
+                err = obj->p_api->writeRead(obj->p_ctrl, tx_ptr, rx_ptr, chunk, SPI_BIT_WIDTH_8_BITS);
             }
         }
         else {
-            err = R_SPI_Write(obj->p_ctrl, tx_ptr, chunk, SPI_BIT_WIDTH_8_BITS);
+            err = obj->p_api->write(obj->p_ctrl, tx_ptr, chunk, SPI_BIT_WIDTH_8_BITS);
         }
 
         if (FSP_SUCCESS != err) {

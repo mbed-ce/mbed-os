@@ -85,7 +85,7 @@ static void ra_i2c_set_address(i2c_t *obj, int address, bool ten_bit)
     {
         uint16_t addr = (uint16_t)(address >> 1);
 
-        fsp_err_t err = R_IIC_MASTER_SlaveAddressSet(
+        fsp_err_t err = obj->i2c.p_api->slaveAddressSet(
             obj->i2c.p_ctrl,
             addr,
             ten_bit ? I2C_MASTER_ADDR_MODE_10BIT : I2C_MASTER_ADDR_MODE_7BIT
@@ -119,6 +119,7 @@ void i2c_init_direct(i2c_t *obj, const i2c_pinmap_t *pinmap)
     MBED_ASSERT(inst != NULL);
 
     obj->i2c.p_ctrl = (i2c_instance_ctrl_t *) inst->p_ctrl;
+    obj->i2c.p_api = inst->p_api;
 
     const i2c_master_cfg_t *cfg_src = inst->p_cfg;
     const i2c_extended_cfg_t *ext_src = (const i2c_extended_cfg_t *) cfg_src->p_extend;
@@ -134,7 +135,7 @@ void i2c_init_direct(i2c_t *obj, const i2c_pinmap_t *pinmap)
 
     obj->i2c.hz = ra_i2c_rate_to_hz(obj->i2c.cfg.rate);
 
-    fsp_err_t err = R_IIC_MASTER_Open(obj->i2c.p_ctrl, &obj->i2c.cfg);
+    fsp_err_t err = obj->i2c.p_api->open(obj->i2c.p_ctrl, &obj->i2c.cfg);
     if (FSP_SUCCESS != err) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_INITIALIZATION_FAILED), "i2c_init_direct");
     }
@@ -164,6 +165,7 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
     MBED_ASSERT(inst != NULL);
 
     obj->i2c.p_ctrl = (i2c_instance_ctrl_t *) inst->p_ctrl;
+    obj->i2c.p_api = inst->p_api;
 
     const i2c_master_cfg_t *cfg_src = inst->p_cfg;
     const i2c_extended_cfg_t *ext_src = (const i2c_extended_cfg_t *) cfg_src->p_extend;
@@ -179,7 +181,7 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl)
 
     obj->i2c.hz = ra_i2c_rate_to_hz(obj->i2c.cfg.rate);
 
-    fsp_err_t err = R_IIC_MASTER_Open(obj->i2c.p_ctrl, &obj->i2c.cfg);
+    fsp_err_t err = obj->i2c.p_api->open(obj->i2c.p_ctrl, &obj->i2c.cfg);
     if (FSP_SUCCESS != err) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_INITIALIZATION_FAILED), "i2c_init");
     }
@@ -192,7 +194,7 @@ void i2c_free(i2c_t *obj)
     }
 
     if (obj->i2c.p_ctrl) {
-        (void) R_IIC_MASTER_Close(obj->i2c.p_ctrl);
+        (void) obj->i2c.p_api->close(obj->i2c.p_ctrl);
     }
 }
 
@@ -224,15 +226,13 @@ void i2c_frequency(i2c_t *obj, int hz)
     } else if (hz <= 400000) {
         obj->i2c.cfg.rate = I2C_MASTER_RATE_FAST;
     } else {
-#ifdef I2C_MASTER_RATE_FASTPLUS
-        obj->cfg.rate = I2C_MASTER_RATE_FASTPLUS;
-#endif
+        obj->i2c.cfg.rate = I2C_MASTER_RATE_FASTPLUS;
     }
 
     obj->i2c.hz = hz;
 
-    R_IIC_MASTER_Close(obj->i2c.p_ctrl);
-    fsp_err_t err = R_IIC_MASTER_Open(obj->i2c.p_ctrl, &obj->i2c.cfg);
+    obj->i2c.p_api->close(obj->i2c.p_ctrl);
+    fsp_err_t err = obj->i2c.p_api->open(obj->i2c.p_ctrl, &obj->i2c.cfg);
     if (FSP_SUCCESS != err) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_INITIALIZATION_FAILED), "i2c_frequency");
     }
@@ -254,7 +254,7 @@ static int i2c_flush_tx_buf(i2c_t *obj, bool restart)
     obj->i2c.xfer_done = false;
     obj->i2c.xfer_aborted = false;
 
-    fsp_err_t err = R_IIC_MASTER_Write(
+    fsp_err_t err = obj->i2c.p_api->write(
         obj->i2c.p_ctrl,
         &obj->i2c.tx_buf[1],
         obj->i2c.tx_len - 1,
@@ -297,7 +297,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
 
     bool restart = obj->i2c.pending_restart;
 
-    fsp_err_t err = R_IIC_MASTER_Read(
+    fsp_err_t err = obj->i2c.p_api->read(
         obj->i2c.p_ctrl,
         (uint8_t *) data,
         (uint32_t) length,
@@ -338,7 +338,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 
         uint8_t dummy = 0;
 
-        fsp_err_t err = R_IIC_MASTER_Write(
+        fsp_err_t err = obj->i2c.p_api->write(
             obj->i2c.p_ctrl,
             &dummy,
             1,
@@ -357,7 +357,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
 
     bool restart = obj->i2c.pending_restart;
 
-    fsp_err_t err = R_IIC_MASTER_Write(
+    fsp_err_t err = obj->i2c.p_api->write(
         obj->i2c.p_ctrl,
         (uint8_t *) data,
         (uint32_t) length,
