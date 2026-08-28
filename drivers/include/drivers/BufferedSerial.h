@@ -267,6 +267,31 @@ public:
         int bits = 8, Parity parity = BufferedSerial::None, int stop_bits = 1
     );
 
+    /**
+     * @brief Get the Rx full watermark, which indicates if the Rx buffer has completely filled at any point.
+     *
+     * This flag is a sign that the buffer size of this buffered serial should be increased.
+     * The watermark may be cleared by calling \c clear_rx_full_watermark() .
+     *
+     * @return True iff the internal Rx buffer has been totally full since the last clear.
+     */
+    bool get_rx_full_watermark() const { return _rx_full_watermark;}
+
+    /// Clear the Rx full watermark. See \c get_rx_full_watermark() for details.
+    void clear_rx_full_watermark() { _rx_full_watermark = false; }
+
+    /// @brief Get the number of bytes currently queued in the Rx buffer in this BufferedSerial instance.
+    ///
+    /// This does NOT include any bytes queued in the hardware UART peripheral and not added to the buffer yet.
+    /// So, there may be more than this number of total bytes that have been received from the line so far.
+    size_t rx_buffer_size() const { return _rxbuf.size(); }
+
+    /// @brief Get the number of bytes currently queued in the Tx buffer in this BufferedSerial instance.
+    ///
+    /// This does NOT include any bytes queued in the hardware UART peripheral waiting to be sent out.
+    /// So, there may be more than this number of total bytes queued to be sent out.
+    size_t tx_buffer_size() const { return _txbuf.size(); }
+
 #if DEVICE_SERIAL_FC
     // For now use the base enum - but in future we may have extra options
     // such as XON/XOFF or manual GPIO RTSCTS.
@@ -338,6 +363,7 @@ private:
     bool _tx_irq_enabled = false;
     bool _rx_irq_enabled = false;
     InterruptIn *_dcd_irq = nullptr;
+    bool _rx_full_watermark = false;
 
     /** Device Hanged up
      *  Determines if the device hanged up on us.
