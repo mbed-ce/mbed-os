@@ -122,6 +122,7 @@ instantiations
 KVStore
 cpp
 PRIi
+dequeuing
 _doxy_
 nothrow
 conf

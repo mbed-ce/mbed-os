@@ -55,5 +55,3 @@
     [] Covered by existing mbed-os tests (Greentea or Unittest)
     [] Tests / results supplied as part of this PR
     
-    
-----------------------------------------------------------------------------------------------------------------
