@@ -270,27 +270,43 @@ public:
     /**
      * @brief Get the Rx full watermark, which indicates if the Rx buffer has completely filled at any point.
      *
-     * This flag is a sign that the buffer size of this buffered serial should be increased.
+     * When the Rx buffer becomes full, %BufferedSerial stops dequeuing data from the UART hardware until
+     * the application reads some data out of the buffer. If the hardware FIFO also runs out of space during
+     * this time, additional Rx data may be lost. So, this flag is a sign that either the application needs
+     * to read data from this %BufferedSerial more often, or the buffer size should be increased.
+     *
      * The watermark may be cleared by calling \c clear_rx_full_watermark() .
      *
-     * @return True iff the internal Rx buffer has been totally full since the last clear.
+     * @return True iff the internal Rx buffer has been totally full since initialization or the last clear.
      */
-    bool get_rx_full_watermark() const { return _rx_full_watermark;}
+    bool get_rx_full_watermark() const
+    {
+        return _rx_full_watermark;
+    }
 
     /// Clear the Rx full watermark. See \c get_rx_full_watermark() for details.
-    void clear_rx_full_watermark() { _rx_full_watermark = false; }
+    void clear_rx_full_watermark()
+    {
+        _rx_full_watermark = false;
+    }
 
     /// @brief Get the number of bytes currently queued in the Rx buffer in this BufferedSerial instance.
     ///
     /// This does NOT include any bytes queued in the hardware UART peripheral and not added to the buffer yet.
     /// So, there may be more than this number of total bytes that have been received from the line so far.
-    size_t rx_buffer_size() const { return _rxbuf.size(); }
+    size_t rx_buffer_size() const
+    {
+        return _rxbuf.size();
+    }
 
     /// @brief Get the number of bytes currently queued in the Tx buffer in this BufferedSerial instance.
     ///
     /// This does NOT include any bytes queued in the hardware UART peripheral waiting to be sent out.
     /// So, there may be more than this number of total bytes queued to be sent out.
-    size_t tx_buffer_size() const { return _txbuf.size(); }
+    size_t tx_buffer_size() const
+    {
+        return _txbuf.size();
+    }
 
 #if DEVICE_SERIAL_FC
     // For now use the base enum - but in future we may have extra options
