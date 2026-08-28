@@ -21,7 +21,9 @@ jobs:
       # Note: For this CI job we use MBED_CREATE_PYTHON_VENV=FALSE so that we can make sure
       # this mode works.
       - name: Build the multiple_executables example
+        shell: bash
         run: |
+          source .venv/bin/activate
           cd tools/cmake/tests/multiple_executables/
           mkdir cmake_build
           cd cmake_build
