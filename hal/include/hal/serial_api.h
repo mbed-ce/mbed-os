@@ -147,6 +147,9 @@ extern "C" {
  * the ::serial_irq_handler is called instantly.
  * * ::serial_getc returns the character from serial buffer.
  * * ::serial_getc is a blocking call (waits for the character).
+ * * If ::serial_getc is not called often enough relative to incoming data, the UART's Rx register and/or FIFO may overflow.
+ *    If this does occur, data may be lost. However, calling \c serial_getc() again will read out
+ *    at least some of the received data, and reception can continue normally after the overflow.
  * * ::serial_putc sends a character.
  * * ::serial_putc is a blocking call (waits for a peripheral to be available).
  * * ::serial_readable returns non-zero value if a character can be read, 0 otherwise.

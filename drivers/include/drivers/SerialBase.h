@@ -75,7 +75,7 @@ public:
         /// When this flow control is active, the RTS signal will normally be asserted (low),
         /// but will go deasserted (high) if the Mbed MCU might not have Rx buffer space to store another byte.
         /// Note that in this configuration the RTS signal actually operates as a "ready to receive" (RTR) output,
-        /// not a true RTS.
+        /// not a true RTS. This is a misnomer that has (horrifyingly) persisted in the standard for decades.
         RTS,
 
         /// RS-232 CTS flow control. This is used to prevent the Mbed MCU from sending more bytes than the
