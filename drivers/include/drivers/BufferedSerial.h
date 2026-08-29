@@ -380,7 +380,7 @@ private:
     bool _tx_irq_enabled = false;
     bool _rx_irq_enabled = false;
     InterruptIn *_dcd_irq = nullptr;
-    mstd::atomic<bool> _rx_overflow_flag = false;
+    mstd::atomic<bool> _rx_overflow_flag{};
 
     /** Device Hanged up
      *  Determines if the device hanged up on us.
