@@ -28,6 +28,7 @@
 #include "rtos/Mutex.h"
 #include "platform/CircularBuffer.h"
 #include "platform/NonCopyable.h"
+#include <mstd_atomic>
 
 #ifndef MBED_CONF_DRIVERS_UART_SERIAL_RXBUF_SIZE
 #define MBED_CONF_DRIVERS_UART_SERIAL_RXBUF_SIZE  256
@@ -268,26 +269,26 @@ public:
     );
 
     /**
-     * @brief Get the Rx full watermark, which indicates if the Rx buffer has completely filled at any point.
+     * @brief Get the Rx overflow flag, which indicates if the Rx buffer has completely filled at any point.
      *
      * When the Rx buffer becomes full, %BufferedSerial stops dequeuing data from the UART hardware until
      * the application reads some data out of the buffer. If the hardware FIFO also runs out of space during
      * this time, additional Rx data may be lost. So, this flag is a sign that either the application needs
      * to read data from this %BufferedSerial more often, or the buffer size should be increased.
      *
-     * The watermark may be cleared by calling \c clear_rx_full_watermark() .
+     * The flag may be cleared by calling \c clear_rx_overflow_flag() .
      *
      * @return True iff the internal Rx buffer has been totally full since initialization or the last clear.
      */
-    bool get_rx_full_watermark() const
+    bool get_rx_overflow_flag() const
     {
-        return _rx_full_watermark;
+        return _rx_overflow_flag;
     }
 
-    /// Clear the Rx full watermark. See \c get_rx_full_watermark() for details.
-    void clear_rx_full_watermark()
+    /// Clear the Rx overflow flag. See \c get_rx_overflow_flag() for details.
+    void clear_rx_overflow_flag()
     {
-        _rx_full_watermark = false;
+        _rx_overflow_flag = false;
     }
 
     /// @brief Get the number of bytes currently queued in the Rx buffer in this BufferedSerial instance.
@@ -379,7 +380,7 @@ private:
     bool _tx_irq_enabled = false;
     bool _rx_irq_enabled = false;
     InterruptIn *_dcd_irq = nullptr;
-    bool _rx_full_watermark = false;
+    mstd::atomic<bool> _rx_overflow_flag = false;
 
     /** Device Hanged up
      *  Determines if the device hanged up on us.

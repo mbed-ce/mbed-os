@@ -282,7 +282,7 @@ void BufferedSerial::rx_irq(void)
     }
 
     if (_rx_irq_enabled && _rxbuf.full()) {
-        _rx_full_watermark = true;
+        _rx_overflow_flag = true;
         disable_rx_irq();
     }
 
