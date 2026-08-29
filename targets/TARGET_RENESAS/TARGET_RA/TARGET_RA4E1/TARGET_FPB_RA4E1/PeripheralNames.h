@@ -25,7 +25,6 @@ extern "C" {
 #endif
 
 typedef enum {
-    UART_0 = 0,
     UART_3 = 3,
     UART_4 = 4,
     UART_9 = 9
@@ -76,6 +75,11 @@ typedef enum {
 
 typedef enum {
     SPI_0 = 0,
+    /* SCI channels used in simple SPI mode. SCI0 drives the Arduino UNO
+     * header (D11 = MOSI, D12 = MISO, D13 = SCLK); CS (D10) is software
+     * controlled because the SCI has no master SS output. */
+    SPI_SCI_BASE = 100,
+    SPI_SCI0 = SPI_SCI_BASE,
 } SPIName;
 
 typedef enum {
@@ -100,7 +104,7 @@ typedef enum {
 #define STDIO_UART UART_9
 
 #define IRQ_CHANNELS_COUNT   (14)
-#define UART_COUNT (4)
+#define UART_COUNT (3)
 #define CAN_COUNT  (1)
 
 #ifdef __cplusplus

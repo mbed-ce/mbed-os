@@ -132,12 +132,19 @@ struct serial_s {
     #include <r_spi.h>
 #endif
 
+/* A SCI channel can also be used in simple SPI mode (r_sci_spi driver). */
+#include <r_sci_spi.h>
+
 struct spi_s {
     spi_cfg_t           cfg;       /* Local copy of configuration */
-    spi_extended_cfg_t  ext;       /* Local copy of extended configuration */
+    union {
+        spi_extended_cfg_t     spi; /* R_SPI / R_SPI_B extended configuration */
+        sci_spi_extended_cfg_t sci; /* R_SCI_SPI extended configuration */
+    } ext;                         /* Local copy of extended configuration (interpreted per driver) */
     spi_instance_ctrl_t *p_ctrl;   /* R_SPI control block (instance-specific) */
-    spi_api_t const     *p_api;    /* Pointer to R_SPI API (R_SPI or R_SPI_B driver) */
-    SPIName             channel;   /* SPI_0 / SPI_1 */
+    spi_api_t const     *p_api;    /* Pointer to R_SPI API (R_SPI, R_SPI_B or R_SCI_SPI driver) */
+    bool                is_sci;    /* True if this instance uses the R_SCI_SPI driver */
+    SPIName             channel;   /* SPI_0 / SPI_1 / SPI_SCI0 */
     uint32_t            hz;        /* Current frequency */
     uint8_t             bits;      /* Bits per frame (usually 8) */
     uint8_t             mode;      /* SPI mode 0..3 */

@@ -39,8 +39,15 @@ static const spi_instance_t *ra_spi_instance_from_channel(SPIName ch)
 #if BSP_FEATURE_SPI_NUM_CHANNELS >= 2
         case SPI_1: return &g_spi1;
 #endif
-        default:    return NULL;
+        default: break;
     }
+#ifdef RA_SCI_SPI_INSTANCE
+    /* Board-specific SCI-in-SPI-mode instance (e.g. SPI on Arduino header) */
+    if (ch >= SPI_SCI_BASE) {
+        return RA_SCI_SPI_INSTANCE;
+    }
+#endif
+    return NULL;
 }
 
 static void ra_spi_configure_pins(PinName mosi, PinName miso, PinName sclk, PinName ssel)
@@ -95,6 +102,15 @@ static uint32_t spi_actual_frequency(rspck_div_setting_t *div)
     uint32_t divisor = (2U * (spbr + 1U)) << brdv;
 
     return spi_source_clock / divisor;
+}
+
+/* Actual frequency of a SCI channel in simple SPI mode (mddr disabled). */
+static uint32_t sci_spi_actual_frequency(const sci_spi_div_setting_t *div)
+{
+    uint32_t sci_source_clock = R_FSP_SystemClockHzGet(BSP_FEATURE_SCI_CLOCK);
+    uint32_t divisor = (1U << (2U * (div->cks + 1U))) * (uint32_t) (div->brr + 1U);
+
+    return sci_source_clock / divisor;
 }
 
 /* --------------------------------------------------------------------------
@@ -159,24 +175,32 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
 
     obj->p_ctrl = (spi_instance_ctrl_t *) inst->p_ctrl;
     obj->p_api = inst->p_api;
-    const spi_cfg_t *cfg_src = inst->p_cfg;
-    const spi_extended_cfg_t *ext_src = (const spi_extended_cfg_t *)cfg_src->p_extend;
+    obj->is_sci = (inst->p_api == &g_spi_on_sci);
 
-    /* Shallow copy cfg and ext into local storage so we can tweak bitrate/mode later */
+    const spi_cfg_t *cfg_src = inst->p_cfg;
+
+    /* Shallow copy cfg and ext into local storage so we can tweak bitrate/mode later.
+     * The extended configuration layout depends on the driver (R_SPI vs R_SCI_SPI). */
     obj->cfg = *cfg_src;
-    if (ext_src) {
-        obj->ext = *ext_src;
-        obj->cfg.p_extend = &obj->ext;
+    if (obj->is_sci) {
+        obj->ext.sci = *(const sci_spi_extended_cfg_t *) cfg_src->p_extend;
+        obj->cfg.p_extend = &obj->ext.sci;
+        obj->hz = sci_spi_actual_frequency(&obj->ext.sci.clk_div);
     } else {
-        obj->cfg.p_extend = NULL;
+        const spi_extended_cfg_t *ext_src = (const spi_extended_cfg_t *) cfg_src->p_extend;
+        if (ext_src) {
+            obj->ext.spi = *ext_src;
+            obj->cfg.p_extend = &obj->ext.spi;
+        } else {
+            obj->cfg.p_extend = NULL;
+        }
+        const spi_extended_cfg_t *ext = (const spi_extended_cfg_t *) obj->cfg.p_extend;
+        obj->hz = (ext != NULL) ? spi_actual_frequency((rspck_div_setting_t *) &ext->spck_div) : 0;
     }
 
     obj->cfg.p_context = obj;
     obj->bits = 8;
     obj->mode = 0;
-
-    spi_extended_cfg_t *ext = (spi_extended_cfg_t *)obj->cfg.p_extend;
-    obj->hz = spi_actual_frequency(&ext->spck_div);
 
 #if MBED_CONF_RTOS_PRESENT
     if(obj->semaphoreId == NULL)
@@ -246,30 +270,25 @@ static fsp_err_t spi_calculate_bitrate(int hz, rspck_div_setting_t *div)
     return err;
 }
 
-static void spi_switch_tx_only_mode(spi_t *obj, bool enable_tx_only)
+/* Calculate the divider for the requested bit rate and store it in the local
+ * extended configuration copy. Returns the actual frequency achieved. */
+static uint32_t spi_update_bitrate(spi_t *obj, int hz)
 {
-    if(enable_tx_only)
-    {
-        obj->ext.spi_comm = SPI_COMMUNICATION_TRANSMIT_ONLY;
-#if BSP_PERIPHERAL_SPI_B_PRESENT
-        obj->p_ctrl->p_regs->SPCR &= ~R_SPI_B0_SPCR_SPRIE_Msk;
-        obj->p_ctrl->p_regs->SPCR |= R_SPI_B0_SPCR_TXMD_Msk;
-#else
-        obj->p_ctrl->p_regs->SPCR &= ~R_SPI0_SPCR_SPRIE_Msk;
-        obj->p_ctrl->p_regs->SPCR |= (R_SPI0_SPCR_TXMD_Msk | R_SPI0_SPCR_SPTIE_Msk);
-#endif
+    if (obj->is_sci) {
+        sci_spi_div_setting_t div;
+        if (FSP_SUCCESS != R_SCI_SPI_CalculateBitrate((uint32_t) hz, &div, false)) {
+            return obj->hz;
+        }
+        obj->ext.sci.clk_div = div;
+        return sci_spi_actual_frequency(&div);
     }
-    else
-    {
-        obj->ext.spi_comm = SPI_COMMUNICATION_FULL_DUPLEX;
-#if BSP_PERIPHERAL_SPI_B_PRESENT
-        obj->p_ctrl->p_regs->SPCR |= R_SPI_B0_SPCR_SPRIE_Msk;
-        obj->p_ctrl->p_regs->SPCR &= ~R_SPI_B0_SPCR_TXMD_Msk;
-#else
-        obj->p_ctrl->p_regs->SPCR |= R_SPI0_SPCR_SPRIE_Msk;
-        obj->p_ctrl->p_regs->SPCR &= ~(R_SPI0_SPCR_TXMD_Msk | R_SPI0_SPCR_SPTIE_Msk);
-#endif
+
+    rspck_div_setting_t div;
+    if (FSP_SUCCESS != spi_calculate_bitrate(hz, &div)) {
+        return obj->hz;
     }
+    obj->ext.spi.spck_div = div;
+    return spi_actual_frequency(&div);
 }
 
 void spi_frequency(spi_t *obj, int hz)
@@ -280,21 +299,42 @@ void spi_frequency(spi_t *obj, int hz)
         hz = 1000000;
     }
 
-    rspck_div_setting_t div;
-
-    fsp_err_t err = spi_calculate_bitrate(hz, &div);
-    if (err != FSP_SUCCESS) {
-        hz = 1000000;
-        spi_calculate_bitrate(hz, &div);
-    }
-
-    spi_extended_cfg_t *ext = (spi_extended_cfg_t *)obj->cfg.p_extend;
-    ext->spck_div = div;
-
-    obj->hz = spi_actual_frequency(&div);
+    obj->hz = spi_update_bitrate(obj, hz);
 
     obj->p_api->close(obj->p_ctrl);
     obj->p_api->open(obj->p_ctrl, &obj->cfg);
+}
+
+static void spi_switch_tx_only_mode(spi_t *obj, bool enable_tx_only)
+{
+    /* The R_SCI_SPI driver discards received data on write(), no register
+     * switch is needed for SCI channels. */
+    if (obj->is_sci) {
+        return;
+    }
+
+    if(enable_tx_only)
+    {
+        obj->ext.spi.spi_comm = SPI_COMMUNICATION_TRANSMIT_ONLY;
+#if BSP_PERIPHERAL_SPI_B_PRESENT
+        obj->p_ctrl->p_regs->SPCR &= ~R_SPI_B0_SPCR_SPRIE_Msk;
+        obj->p_ctrl->p_regs->SPCR |= R_SPI_B0_SPCR_TXMD_Msk;
+#else
+        obj->p_ctrl->p_regs->SPCR &= ~R_SPI0_SPCR_SPRIE_Msk;
+        obj->p_ctrl->p_regs->SPCR |= (R_SPI0_SPCR_TXMD_Msk | R_SPI0_SPCR_SPTIE_Msk);
+#endif
+    }
+    else
+    {
+        obj->ext.spi.spi_comm = SPI_COMMUNICATION_FULL_DUPLEX;
+#if BSP_PERIPHERAL_SPI_B_PRESENT
+        obj->p_ctrl->p_regs->SPCR |= R_SPI_B0_SPCR_SPRIE_Msk;
+        obj->p_ctrl->p_regs->SPCR &= ~R_SPI_B0_SPCR_TXMD_Msk;
+#else
+        obj->p_ctrl->p_regs->SPCR |= R_SPI0_SPCR_SPRIE_Msk;
+        obj->p_ctrl->p_regs->SPCR &= ~(R_SPI0_SPCR_TXMD_Msk | R_SPI0_SPCR_SPTIE_Msk);
+#endif
+    }
 }
 
 /* Waiting for SPI transmission to complete */

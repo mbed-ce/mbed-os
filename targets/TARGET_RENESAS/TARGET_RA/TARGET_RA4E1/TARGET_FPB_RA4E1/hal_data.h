@@ -18,6 +18,8 @@
 #include "r_timer_api.h"
 #include "r_dmac.h"
 #include "r_transfer_api.h"
+#include "r_dtc.h"
+#include "r_sci_spi.h"
 #include "r_sci_uart.h"
 #include "r_uart_api.h"
 #include "r_spi.h"
@@ -165,17 +167,6 @@ void NULL(timer_callback_args_t * p_args);
             void uart_callback(uart_callback_args_t * p_args);
             #endif
 /** UART on SCI Instance. */
-            extern const uart_instance_t      g_uart0;
-
-            /** Access the UART instance using these structures when calling API functions directly (::p_api is not used). */
-            extern sci_uart_instance_ctrl_t     g_uart0_ctrl;
-            extern const uart_cfg_t g_uart0_cfg;
-            extern const sci_uart_extended_cfg_t g_uart0_cfg_extend;
-
-            #ifndef uart_callback
-            void uart_callback(uart_callback_args_t * p_args);
-            #endif
-/** UART on SCI Instance. */
             extern const uart_instance_t      g_uart3;
 
             /** Access the UART instance using these structures when calling API functions directly (::p_api is not used). */
@@ -186,6 +177,31 @@ void NULL(timer_callback_args_t * p_args);
             #ifndef uart_callback
             void uart_callback(uart_callback_args_t * p_args);
             #endif
+/* SCI0 is used in simple SPI mode on the Arduino UNO header, not as a UART. */
+/* Transfer on DTC Instance. */
+extern const transfer_instance_t g_transfer1;
+
+/** Access the DTC instance using these structures when calling API functions directly (::p_api is not used). */
+extern dtc_instance_ctrl_t g_transfer1_ctrl;
+extern const transfer_cfg_t g_transfer1_cfg;
+
+/* Transfer on DTC Instance. */
+extern const transfer_instance_t g_transfer2;
+
+/** Access the DTC instance using these structures when calling API functions directly (::p_api is not used). */
+extern dtc_instance_ctrl_t g_transfer2_ctrl;
+extern const transfer_cfg_t g_transfer2_cfg;
+
+/** SPI on SCI Instance. */
+extern const spi_instance_t g_spi_sci0;
+
+/** Access the SPI instance using these structures when calling API functions directly (::p_api is not used). */
+extern sci_spi_instance_ctrl_t g_spi_sci0_ctrl;
+extern const spi_cfg_t g_spi_sci0_cfg;
+extern const sci_spi_extended_cfg_t g_spi_sci0_ext_cfg;
+
+/* SCI-SPI instance used by spi_api.c for SPIName values >= SPI_SCI_BASE */
+#define RA_SCI_SPI_INSTANCE (&g_spi_sci0)
 /* Transfer on DMAC Instance. */
 extern const transfer_instance_t g_transfer0;
 

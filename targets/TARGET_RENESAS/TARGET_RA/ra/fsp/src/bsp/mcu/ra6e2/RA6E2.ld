@@ -1,415 +1,291 @@
-RAM_START = 0x20000000;
-RAM_LENGTH = 0x0000a000;
-FLASH_START = 0x00000000;
-FLASH_LENGTH = 0x00040000;
-DATA_FLASH_START = 0x08000000;
-DATA_FLASH_LENGTH = 0x00001000;
-QSPI_FLASH_START = 0x60000000;
-QSPI_FLASH_LENGTH = 0x04000000;
-OPTION_SETTING_OFS0_START = 0x0100a100;
-OPTION_SETTING_OFS0_LENGTH = 0x00000004;
-OPTION_SETTING_OSIS_START = 0x0100a120;
-OPTION_SETTING_OSIS_LENGTH = 0x00000010;
-OPTION_SETTING_OFS1_SEC_START = 0x0100a200;
-OPTION_SETTING_OFS1_SEC_LENGTH = 0x00000004;
-OPTION_SETTING_BPS_SEC_START = 0x0100a240;
-OPTION_SETTING_BPS_SEC_LENGTH = 0x00000004;
-OPTION_SETTING_PBPS_SEC_START = 0x0100a260;
-OPTION_SETTING_PBPS_SEC_LENGTH = 0x00000004;
+/*
+ * mbed Microcontroller Library
+ * Copyright (c) 2026 ARM Limited
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Linker script for Renesas RA6E2, restructured from the FSP-generated layout.
+ *
+ * The FSP BSP copies .data and zeroes .bss in Reset_Handler using the ranges
+ * listed in g_init_info (bsp_linker.c). The corresponding symbols
+ * (__ram_from_flash$$*, __ram_zero$$*, __ram_*_nocache$$*) are therefore load
+ * bearing and must stay exactly as they are.
+ *
+ * The OPTION_SETTING regions map the option bytes emitted by bsp_linker.c into
+ * the final image. Do not remove them: programming a new or factory-reset chip
+ * without these bytes leaves the part in an undefined state (debug port,
+ * bank and block protection configuration).
+ */
+
+/* Space reserved for the relocatable vector table at the start of SRAM.
+ * All RA MCUs have 16 system exceptions + 96 device IRQs = 112 vectors. */
 __vector_table_size__ = 112 * 4;
+
+M_CRASH_DATA_RAM_SIZE = 0x100;
 
 MEMORY
 {
-  RAM (rwx) : ORIGIN = MBED_CONFIGURED_RAM_BANK_SRAM1_START, LENGTH = MBED_CONFIGURED_RAM_BANK_SRAM1_SIZE
-  FLASH (rx) : ORIGIN = MBED_CONFIGURED_ROM_BANK_Flash_START, LENGTH = MBED_CONFIGURED_ROM_BANK_Flash_SIZE
-  DATA_FLASH (rx) : ORIGIN = DATA_FLASH_START, LENGTH = DATA_FLASH_LENGTH
-  QSPI_FLASH (rx) : ORIGIN = QSPI_FLASH_START, LENGTH = QSPI_FLASH_LENGTH
-  OPTION_SETTING_OFS0 (r) : ORIGIN = OPTION_SETTING_OFS0_START, LENGTH = OPTION_SETTING_OFS0_LENGTH
-  OPTION_SETTING_OSIS (r) : ORIGIN = OPTION_SETTING_OSIS_START, LENGTH = OPTION_SETTING_OSIS_LENGTH
-  OPTION_SETTING_OFS1_SEC (r) : ORIGIN = OPTION_SETTING_OFS1_SEC_START, LENGTH = OPTION_SETTING_OFS1_SEC_LENGTH
-  OPTION_SETTING_BPS_SEC (r) : ORIGIN = OPTION_SETTING_BPS_SEC_START, LENGTH = OPTION_SETTING_BPS_SEC_LENGTH
-  OPTION_SETTING_PBPS_SEC (r) : ORIGIN = OPTION_SETTING_PBPS_SEC_START, LENGTH = OPTION_SETTING_PBPS_SEC_LENGTH
+    FLASH (rx)  : ORIGIN = MBED_CONFIGURED_ROM_BANK_Flash_START, LENGTH = MBED_CONFIGURED_ROM_BANK_Flash_SIZE
+    RAM   (rwx) : ORIGIN = MBED_CONFIGURED_RAM_BANK_SRAM1_START, LENGTH = MBED_CONFIGURED_RAM_BANK_SRAM1_SIZE
+
+    /* Option setting bytes (see bsp_linker.c) */
+    OPTION_SETTING_OFS0     (r) : ORIGIN = 0x0100A100, LENGTH = 0x4
+    OPTION_SETTING_OSIS     (r) : ORIGIN = 0x0100A120, LENGTH = 0x10
+    OPTION_SETTING_OFS1_SEC (r) : ORIGIN = 0x0100A200, LENGTH = 0x4
+    OPTION_SETTING_BPS_SEC  (r) : ORIGIN = 0x0100A240, LENGTH = 0x4
+    OPTION_SETTING_PBPS_SEC (r) : ORIGIN = 0x0100A260, LENGTH = 0x4
 }
 
-/* code entry point...need to define to keep crt0 _start out */
+/* Linker script to place sections and symbols. It defines following symbols,
+ * which code can use without definition:
+ *   __etext, _sidata
+ *   __data_start__, __data_end__, _sdata, _edata
+ *   __preinit_array_start, __preinit_array_end
+ *   __init_array_start, __init_array_end
+ *   __fini_array_start, __fini_array_end
+ *   __bss_start__, __bss_end__, _sbss, _ebss
+ *   __StackTop, __StackLimit, __stack, _estack
+ *   __HeapBase, __HeapLimit, __end__, end
+ *   __exidx_start, __exidx_end
+ *   __vector_ram_start__, __vector_ram_end__
+ */
 ENTRY(Reset_Handler)
-/* Library configurations */
-GROUP(libgcc.a libc.a libm.a)
-
 
 SECTIONS
 {
-  /***** QSPI_FLASH memory section allocations ******/
-  .qspi_flash.startof  (READONLY) :
-  {
-       __ddsc_QSPI_FLASH_START = . ;
+    /* ================================ FLASH ================================ */
 
-  }  > QSPI_FLASH
-  /***** RAM memory section allocations ******/
-  .ram.startof  :
-  {
-       __ddsc_RAM_START = . ;
+    .text :
+    {
+        /* MCU vector table */
+        KEEP(*(.fixed_vectors))
+        KEEP(*(.application_vectors))
 
-  }  > RAM
-  /* Stick the vector table at start of SRAM */
-  .vector_ram (NOLOAD) :
-  {
-      __vector_ram_start__ = .;
-      . += __vector_table_size__;
-      __vector_ram_end__ = .;
-  } > RAM
-  __ram_dtc_vector$$  (NOLOAD) :
-  {
-      __ram_dtc_vector$$Base = . ;
-  *(.fsp_dtc_vector_table)
-      __ram_dtc_vector$$Limit = . ;
-  }  > RAM
-  /* ram initialized from qspi_flash */
-  __ram_from_qspi_flash$$  :
-  {
-      __ram_from_qspi_flash$$Base = . ;__ram_from_qspi_flash$$Load = LOADADDR(__ram_from_qspi_flash$$) ;
-  /* section.ram.from_qspi_flash */
-  *(.ram_from_qspi_flash)
-  /* section.ram.code_from_qspi_flash */
-  *(.ram_code_from_qspi_flash)
-      __ram_from_qspi_flash$$Limit = . ;
-  }  > RAM AT > QSPI_FLASH
+        *(.text*)
+        KEEP(*(.init))
+        KEEP(*(.fini))
 
-  __qspi_flash_readonly$$  (READONLY) :
-  {
-      __qspi_flash_readonly$$Base = . ;
-  /* section.qspi_flash.readonly */
-  *(.qspi_flash)
-  /* section.qspi_flash.code */
-  *(.qspi_flash_code)
-      __qspi_flash_readonly$$Limit = . ;
-  }  > QSPI_FLASH
-  __qspi_flash_noinit$$  (NOLOAD) :
-  {
-      __qspi_flash_noinit$$Base = . ;
-  /* section.qspi_flash.noinit */
-  *(.qspi_flash_noinit)
-      __qspi_flash_noinit$$Limit = . ;
-  }  > QSPI_FLASH
-  .qspi_flash.endof ALIGN(.,512) (READONLY) :
-  {
-       __ddsc_QSPI_FLASH_END = . ;
+        /* .ctors */
+        *crtbegin.o(.ctors)
+        *crtbegin?.o(.ctors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+        *(SORT(.ctors.*))
+        *(.ctors)
 
-  }  > QSPI_FLASH
+        /* .dtors */
+        *crtbegin.o(.dtors)
+        *crtbegin?.o(.dtors)
+        *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+        *(SORT(.dtors.*))
+        *(.dtors)
 
-  /***** DATA_FLASH memory section allocations ******/
-  .data_flash.startof  (READONLY) :
-  {
-       __ddsc_DATA_FLASH_START = . ;
+        *(.rodata*)
 
-  }  > DATA_FLASH
-  /***** RAM memory section allocations ******/
-  /* ram initialized from data_flash */
-  __ram_from_data_flash$$  :
-  {
-      __ram_from_data_flash$$Base = . ;__ram_from_data_flash$$Load = LOADADDR(__ram_from_data_flash$$) ;
-  /* section.ram.from_data_flash */
-  *(.ram_from_data_flash)
-  /* section.ram.code_from_data_flash */
-  *(.ram_code_from_data_flash)
-      __ram_from_data_flash$$Limit = . ;
-  }  > RAM AT > DATA_FLASH
+        *(.got.plt)
+        *(.got)
 
-  __data_flash_readonly$$  (READONLY) :
-  {
-      __data_flash_readonly$$Base = . ;
-  /* section.data_flash.readonly */
-  *(.data_flash)
-  /* section.data_flash.code */
-  *(.data_flash_code)
-      __data_flash_readonly$$Limit = . ;
-  }  > DATA_FLASH
-  __data_flash_noinit$$  (NOLOAD) :
-  {
-      __data_flash_noinit$$Base = . ;
-  /* section.data_flash.noinit */
-  *(.data_flash_noinit)
-      __data_flash_noinit$$Limit = . ;
-  }  > DATA_FLASH
-  .data_flash.endof ALIGN(.,512) (READONLY) :
-  {
-       __ddsc_DATA_FLASH_END = . ;
+        KEEP(*(.mcuboot_sce9_key))
+        KEEP(*(.version))
+    } > FLASH
 
-  }  > DATA_FLASH
+    .preinit_array :
+    {
+        PROVIDE_HIDDEN(__preinit_array_start = .);
+        KEEP(*(.preinit_array))
+        PROVIDE_HIDDEN(__preinit_array_end = .);
+    } > FLASH
 
-  /***** FLASH memory section allocations ******/
-  .flash.startof  (READONLY) :
-  {
-       __ddsc_FLASH_START = . ;
+    .init_array :
+    {
+        PROVIDE_HIDDEN(__init_array_start = .);
+        KEEP(*(SORT(.init_array.*)))
+        KEEP(*(.init_array))
+        PROVIDE_HIDDEN(__init_array_end = .);
+    } > FLASH
 
-  }  > FLASH
-  /* MCU vector table */
-  .text  (READONLY) :
-  {
-      __flash_vectors$$Base = . ; _VECTORS = . ;
-  KEEP(*(.fixed_vectors))
-  KEEP(*(.application_vectors))
-      __flash_vectors$$Limit = . ;
-  }  > FLASH
-  __flash_noinit$$  (NOLOAD) :
-  {
-      __flash_noinit$$Base = . ;
-  /* section.flash.noinit */
-  *(.flash_noinit)
-      __flash_noinit$$Limit = . ;
-  }  > FLASH
+    .fini_array :
+    {
+        PROVIDE_HIDDEN(__fini_array_start = .);
+        KEEP(*(SORT(.fini_array.*)))
+        KEEP(*(.fini_array))
+        PROVIDE_HIDDEN(__fini_array_end = .);
+    } > FLASH
 
-  .text  (READONLY) :
-  {
-      __flash_readonly$$Base = . ;
-  /* section.flash.readonly */
-  *(.flash)
-  /* section.flash.code */
-  *(.flash_code)
-  *(.text*)
-  *(.rodata*)
-  KEEP(*(.mcuboot_sce9_key))
-  KEEP(*(.version))
-      __flash_readonly$$Limit = . ;
-  }  > FLASH
-  __flash_ctor$$  (READONLY) :
-  {
+    /* .ARM.extab sections contain exception unwinding information */
+    .ARM.extab :
+    {
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
+    } > FLASH
 
-  *crtbegin.o(.ctors)
-  *crtbegin?.o(.ctors)
-  EXCLUDE_FILE (*crtend?.o *crtend.o) *(.ctors)
-  *(SORT(.ctors.*))
-  *(.ctors)
-  *crtbegin.o(.dtors)
-  *crtbegin?.o(.dtors)
-  EXCLUDE_FILE (*crtend?.o *crtend.o) *(.dtors)
-  *(SORT(.dtors.*))
-  *(.dtors)
+    /* .ARM.exidx sections contain index entries for section unwinding */
+    __exidx_start = .;
+    .ARM.exidx :
+    {
+        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+    } > FLASH
+    __exidx_end = .;
 
-  }  > FLASH
-  __flash_preinit_array$$  (READONLY) :
-  {
-       __preinit_array_start = . ;
-  KEEP(*(.preinit_array))
-       __preinit_array_end = . ;
-  }  > FLASH
-  __flash_.got$$  (READONLY) :
-  {
+    __etext = .;
+    _sidata = LOADADDR(.data);
 
-  *(.got.plt)
-  *(.got)
+    /* ================================= RAM ================================= */
 
-  }  > FLASH
-  __flash_init_array$$  (READONLY) :
-  {
-       __init_array_start = . ;
-  KEEP(*(SORT(.init_array.*)))
-  KEEP(*(.init_array))
-       __init_array_end = . ;
-  }  > FLASH
-  __flash_fini_array$$  (READONLY) :
-  {
-       __fini_array_start = . ;
-  KEEP(*(SORT(.fini_array.*)))
-  KEEP(*(.fini_array))
-       __fini_array_end = . ;
-  }  > FLASH
-  /* .ARM.extab sections contain exception unwinding information. */
-  __flash_arm.extab$$  (READONLY) :
-  {
+    /* Relocatable vector table used by the mbed NVIC API */
+    .vector_ram (NOLOAD) :
+    {
+        __vector_ram_start__ = .;
+        . += __vector_table_size__;
+        __vector_ram_end__ = .;
+    } > RAM
 
-  *(.ARM.extab*)
-  *(.gnu.linkonce.armextab.*)
+#if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
+    /* Crash data ram, right after the vector table */
+    .crash_data_ram (NOLOAD) :
+    {
+        . = ALIGN(8);
+        __CRASH_DATA_RAM__ = .;
+        __CRASH_DATA_RAM_START__ = .;
+        KEEP(*(.keep.crash_data_ram))
+        *(.m_crash_data_ram)
+        . += M_CRASH_DATA_RAM_SIZE;
+        . = ALIGN(8);
+        __CRASH_DATA_RAM_END__ = .;
+    } > RAM
+#endif
 
-  }  > FLASH
-  /* .ARM.exidx sections contains index entries for section unwinding. */
-  __flash_arm.exidx$$  (READONLY) :
-  {
-       __exidx_start = . ;
-  *(.ARM.exidx*)
-  *(.gnu.linkonce.armexidx.*)
-       __exidx_end = . ;
-  }  > FLASH
+    /* DTC vector table (r_dtc driver). Left un-KEPT so that it is garbage
+     * collected when the DTC driver is not used. */
+    .fsp_dtc_vector_table (NOLOAD) :
+    {
+        __ram_dtc_vector$$Base = .;
+        *(.fsp_dtc_vector_table)
+        __ram_dtc_vector$$Limit = .;
+    } > RAM
 
-  __etext = .;
+    /* Initialized data. Copied from FLASH by Reset_Handler through the
+     * __ram_from_flash$$* range in g_init_info. */
+    .data :
+    {
+        __data_start__ = .;
+        _sdata = .;
+        __ram_from_flash$$Base = .;
+        *(.ram_from_flash)
+        *(.ram_code_from_flash)
+        *(.data*)
+        __ram_from_flash$$Limit = .;
+        __data_end__ = .;
+        _edata = .;
+    } > RAM AT > FLASH
+    __ram_from_flash$$Load = LOADADDR(.data);
 
-  /***** RAM memory section allocations ******/
-  /* ram initialized from flash */
-  .data  :
-  {
-    __data_start__ = .;
-    _sdata = .;
-    __ram_from_flash$$Base = . ;__ram_from_flash$$Load = LOADADDR(.data) ;
-  /* section.ram.from_flash */
-  *(.ram_from_flash)
-  /* section.ram.code_from_flash */
-  *(.ram_code_from_flash)
-  *(.data*)
-      __ram_from_flash$$Limit = . ;
-    __data_end__ = .;
-    _edata = .;
-  }  > RAM AT > FLASH
-  /* Non-initialized, non-cached ram */
-  __ram_noinit_nocache$$  (NOLOAD) : ALIGN(32)
-  {
-      __ram_noinit_nocache$$Base = . ;
-  /* section.ram.noinit_nocache */
-  *(.ram_noinit_nocache)
-      __ram_noinit_nocache$$Limit = . ;
-  }  > RAM
-  /* Zeroed, non-cached ram */
-  .bss  (NOLOAD) :
-  {
-  	__bss_start__ = .;
-    _sbss = .;
-    __ram_zero_nocache$$Base = . ;
-  /* section.ram.zero_nocache */
-  *(.ram_nocache)
-    . = ALIGN(32);
-      __ram_zero_nocache$$Limit = . ;
-  }  > RAM
-  /* Non-initialized ram */
-  .bss  (NOLOAD) :
-  {
-      __ram_noinit$$Base = . ;
-    /* Main stack region */
-    __StackLimit = .;
-  *(.bss.g_main_stack)
-    __StackTop = .;
-    /* Other no-init data */
-  *(.ram_noinit)
-  *(.noinit)
-      __ram_noinit$$Limit = . ;
-  }  > RAM
-  /* Zeroed ram */
-  .bss  (NOLOAD) :
-  {
-      __ram_zero$$Base = . ;
-  /* section.ram.zero */
-  *(.ram)
-  *(.bss*)
-      __ram_zero$$Limit = . ;
-      __bss_end__ = .;
-      _ebss = .;
-  }  > RAM
-  /* Thread Stacks */
-  __ram_thread_stack$$  (NOLOAD) : ALIGN(8)
-  {
-      __ram_thread_stack$$Base = . ;
-  KEEP(*(.stack?*))
-      __ram_thread_stack$$Limit = . ;
-  }  > RAM
-  .ram.endof ALIGN(.,512) :
-  {
-       __ddsc_RAM_END = . ;
-        /* Heap region */
+    /* Non-cached RAM. Covered by the MPU nocache range in g_init_info, which
+     * spans from __ram_noinit_nocache$$Base to __ram_zero_nocache$$Limit. */
+    __ram_noinit_nocache$$ (NOLOAD) : ALIGN(32)
+    {
+        __ram_noinit_nocache$$Base = .;
+        *(.ram_noinit_nocache)
+        __ram_noinit_nocache$$Limit = .;
+    } > RAM
+
+    __ram_zero_nocache$$ (NOLOAD) :
+    {
+        __bss_start__ = .;
+        _sbss = .;
+        __ram_zero_nocache$$Base = .;
+        *(.ram_nocache)
+        . = ALIGN(32);
+        __ram_zero_nocache$$Limit = .;
+    } > RAM
+
+    /* Main stack and no-init data. The main stack is entered before the C
+     * runtime runs, so it must not be zeroed or copied. */
+    .noinit (NOLOAD) :
+    {
+        __ram_noinit$$Base = .;
+        __StackLimit = .;
+        *(.bss.g_main_stack)
+        __StackTop = .;
+        _estack = __StackTop;
+        PROVIDE(__stack = __StackTop);
+        *(.ram_noinit)
+        *(.noinit)
+        __ram_noinit$$Limit = .;
+    } > RAM
+
+    /* Zeroed data. Zeroed by Reset_Handler through the __ram_zero$$ range. */
+    .bss (NOLOAD) :
+    {
+        __ram_zero$$Base = .;
+        *(.ram)
+        *(.bss*)
+        *(COMMON)
+        . = ALIGN(8);
+        __ram_zero$$Limit = .;
+        __bss_end__ = .;
+        _ebss = .;
+    } > RAM
+
+    /* Thread stacks placed with an explicit section attribute */
+    __ram_thread_stack$$ (NOLOAD) : ALIGN(8)
+    {
+        __ram_thread_stack$$Base = .;
+        KEEP(*(.stack?*))
+        __ram_thread_stack$$Limit = .;
+    } > RAM
+
+    /* Heap, filling the remainder of SRAM */
+    .heap (NOLOAD) :
+    {
         __HeapBase = .;
         __end__ = .;
         PROVIDE(end = .);
         *(.bss.g_heap)
-        __HeapLimit = ORIGIN(RAM) + LENGTH(RAM);
-  }  > RAM
+        . = ORIGIN(RAM) + LENGTH(RAM);
+        __HeapLimit = .;
+    } > RAM
 
-  .flash.endof ALIGN(.,512) (READONLY) :
-  {
-       __ddsc_FLASH_END = . ;
+    ASSERT(__HeapBase <= ORIGIN(RAM) + LENGTH(RAM), "region RAM overflowed with stack, data and bss")
 
-  }  > FLASH
+    /* ===================== EMPTY FSP INIT TABLE RANGES ===================== */
 
-  /***** OPTION_SETTING_OFS0 memory section allocations ******/
-  .option_setting_ofs0.startof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_OFS0_START = . ;
+    /* Zero-length ranges referenced by g_init_info (bsp_linker.c). No Mbed
+     * build places data in QSPI flash or data flash, so Base == Limit and
+     * the BSP init code skips them. */
+    __ram_from_qspi_flash$$Base  = ORIGIN(RAM);
+    __ram_from_qspi_flash$$Limit = ORIGIN(RAM);
+    __ram_from_qspi_flash$$Load  = ORIGIN(RAM);
+    __ram_from_data_flash$$Base  = ORIGIN(RAM);
+    __ram_from_data_flash$$Limit = ORIGIN(RAM);
+    __ram_from_data_flash$$Load  = ORIGIN(RAM);
 
-  }  > OPTION_SETTING_OFS0
-  /* Option Function Select Register 0 Secure */
-  __option_setting_ofs0_reg$$  (READONLY) :
-  {
-      __option_setting_ofs0_reg$$Base = . ;
-  KEEP(*(.option_setting_ofs0))
-      __option_setting_ofs0_reg$$Limit = . ;
-  }  > OPTION_SETTING_OFS0
-  .option_setting_ofs0.endof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_OFS0_END = . ;
+    /* ============================ OPTION SETTINGS =========================== */
 
-  }  > OPTION_SETTING_OFS0
+    /* Option Function Select Register 0 Secure */
+    .option_setting_ofs0 :
+    {
+        KEEP(*(.option_setting_ofs0))
+    } > OPTION_SETTING_OFS0
 
-  /***** OPTION_SETTING_OSIS memory section allocations ******/
-  .option_setting_osis.startof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_OSIS_START = . ;
+    /* Option Setting OSIS Register */
+    .option_setting_osis :
+    {
+        KEEP(*(.option_setting_osis))
+    } > OPTION_SETTING_OSIS
 
-  }  > OPTION_SETTING_OSIS
-  /* OCD/Serial Programmer ID setting register Secure */
-  __option_setting_osis_reg$$  (READONLY) :
-  {
-      __option_setting_osis_reg$$Base = . ;
-  KEEP(*(.option_setting_osis))
-      __option_setting_osis_reg$$Limit = . ;
-  }  > OPTION_SETTING_OSIS
-  .option_setting_osis.endof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_OSIS_END = . ;
+    /* Option Function Select Register 1 Secure */
+    .option_setting_ofs1_sec :
+    {
+        KEEP(*(.option_setting_ofs1_sec))
+    } > OPTION_SETTING_OFS1_SEC
 
-  }  > OPTION_SETTING_OSIS
+    /* Block Protect Setting Register Secure */
+    .option_setting_bps_sec :
+    {
+        KEEP(*(.option_setting_bps_sec))
+    } > OPTION_SETTING_BPS_SEC
 
-  /***** OPTION_SETTING_OFS1_SEC memory section allocations ******/
-  .option_setting_ofs1_sec.startof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_OFS1_SEC_START = . ;
-
-  }  > OPTION_SETTING_OFS1_SEC
-  /* Option Function Select Register 1 Secure */
-  __option_setting_ofs1_sec_reg$$  (READONLY) :
-  {
-      __option_setting_ofs1_sec_reg$$Base = . ;
-  KEEP(*(.option_setting_ofs1_sec))
-      __option_setting_ofs1_sec_reg$$Limit = . ;
-  }  > OPTION_SETTING_OFS1_SEC
-  .option_setting_ofs1_sec.endof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_OFS1_SEC_END = . ;
-
-  }  > OPTION_SETTING_OFS1_SEC
-
-  /***** OPTION_SETTING_BPS_SEC memory section allocations ******/
-  .option_setting_bps_sec.startof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_BPS_SEC_START = . ;
-
-  }  > OPTION_SETTING_BPS_SEC
-  /* Block Protect Setting Register Secure */
-  __option_setting_bps_sec_reg$$  (READONLY) :
-  {
-      __option_setting_bps_sec_reg$$Base = . ;
-  KEEP(*(.option_setting_bps_sec))
-      __option_setting_bps_sec_reg$$Limit = . ;
-  }  > OPTION_SETTING_BPS_SEC
-  .option_setting_bps_sec.endof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_BPS_SEC_END = . ;
-
-  }  > OPTION_SETTING_BPS_SEC
-
-  /***** OPTION_SETTING_PBPS_SEC memory section allocations ******/
-  .option_setting_pbps_sec.startof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_PBPS_SEC_START = . ;
-
-  }  > OPTION_SETTING_PBPS_SEC
-  /* Permanent Block Protect Setting Register Secure */
-  __option_setting_pbps_sec_reg$$  (READONLY) :
-  {
-      __option_setting_pbps_sec_reg$$Base = . ;
-  KEEP(*(.option_setting_pbps_sec))
-      __option_setting_pbps_sec_reg$$Limit = . ;
-  }  > OPTION_SETTING_PBPS_SEC
-  .option_setting_pbps_sec.endof  (READONLY) :
-  {
-       __ddsc_OPTION_SETTING_PBPS_SEC_END = . ;
-
-  }  > OPTION_SETTING_PBPS_SEC
-
+    /* Permanent Block Protect Setting Register Secure */
+    .option_setting_pbps_sec :
+    {
+        KEEP(*(.option_setting_pbps_sec))
+    } > OPTION_SETTING_PBPS_SEC
 }
-
