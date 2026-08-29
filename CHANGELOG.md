@@ -21,7 +21,9 @@ A message that notes the main changes in the update.
 - Added a new `MBED_NONCACHED` define which can be used to store global variables in non-cached memory on devices with a data cache. This is supported on STM32F7, STM32H7, and MIMXRT (which I believe are the only currently supported MCUs with a D-cache)
 - Added a new global, `mbed_used_mpu_regions`, which gives the number of MPU regions used by Mbed. This is intended to allow applications to also use the MPU without creating breakages in the future if Mbed uses additional MPU regions.
 - Added new header, `mbed_math_helpers.h`, containing some useful math functions. Currently this contains `mbed_integer_log_2()` and `mbed_is_power_of_two()`
-- MPU configuration code gained the ability to create a noncached section and a ram function section (for code that has to be executed out of RAM). This RAM function section is an exception to the normal limitations on RAM execution.
+- MPU configuration code gained the ability to create a noncached section and a ram function section (for code that has to be executed out of RAM). This RAM function section is an exception to the normal limitations on RAM execution.'
+- Added Rx FIFO overflow flag to `BufferedSerial`. This allows detecting if the Rx buffer has overflowed (likely as a hint that its size should be increased)
+- Added `BufferedSerial::tx_buffer_size()` and `BufferedSerial::rx_buffer_size()` to check the current size of the Tx and Rx buffers.
 - EFM32 Giant Gecko Series 0:
   - `EFM32GG_STK3700` added upload method config
 - MIMXRT117x: Memory bank configuration is now supported in the linker script.
