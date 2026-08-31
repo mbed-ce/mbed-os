@@ -317,8 +317,10 @@ static void spi_switch_tx_only_mode(spi_t *obj, bool enable_tx_only)
     {
         obj->ext.spi.spi_comm = SPI_COMMUNICATION_TRANSMIT_ONLY;
 #if BSP_PERIPHERAL_SPI_B_PRESENT
+        /* TXMD is a 2-bit field: 01 selects transmit-only. Do not use
+         * R_SPI_B0_SPCR_TXMD_Msk here, it covers both bits (0b11). */
         obj->p_ctrl->p_regs->SPCR &= ~R_SPI_B0_SPCR_SPRIE_Msk;
-        obj->p_ctrl->p_regs->SPCR |= R_SPI_B0_SPCR_TXMD_Msk;
+        obj->p_ctrl->p_regs->SPCR |= (uint32_t) (1U << R_SPI_B0_SPCR_TXMD_Pos);
 #else
         obj->p_ctrl->p_regs->SPCR &= ~R_SPI0_SPCR_SPRIE_Msk;
         obj->p_ctrl->p_regs->SPCR |= (R_SPI0_SPCR_TXMD_Msk | R_SPI0_SPCR_SPTIE_Msk);

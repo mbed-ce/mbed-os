@@ -182,17 +182,19 @@ struct i2c_s {
     int                   hz;              /* Current bus frequency in Hz */
 
     /* ---- Mbed HAL transaction state ---- */
-    bool                  pending_restart; /* Indicates whether the next transfer should use a repeated START */
     volatile bool         xfer_done;       /* Set by callback when the current transfer completes */
     volatile bool         xfer_aborted;    /* Set by callback when the current transfer is aborted (NACK, timeout, etc.) */
 
-    /* ---- Raw?byte write mode (required for Mbed I2CEEBlockDevice) ---- */
+    /* ---- Single-byte API buffering (required for Mbed I2CEEBlockDevice) ---- */
+    /* The FSP driver can only do complete transfers, so address and data bytes passed to
+     * i2c_byte_write() are accumulated here and sent as one transfer when the sequence
+     * ends (see i2c_flush_tx_buf() in i2c_api.c). */
     bool                  tx_active;       /* True after i2c_start(), enabling raw byte accumulation */
     uint8_t               tx_buf[256];     /* Accumulated raw bytes to be sent in a single FSP transfer */
     size_t                tx_len;          /* Number of bytes currently stored in tx_buf */
 
-    /* ---- Last device address used (required for i2c_byte_read/write) ---- */
-    int                   last_address;    /* Cached 8?bit I2C address used for the last read/write operation */
+    /* ---- Last device address used (required for i2c_byte_read) ---- */
+    int                   last_address;    /* Cached 8-bit I2C address (write form, LSB = 0) used for the last operation */
 };
 
 #endif /* DEVICE_I2C */

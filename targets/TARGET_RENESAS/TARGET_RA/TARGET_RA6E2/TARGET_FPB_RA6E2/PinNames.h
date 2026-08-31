@@ -30,8 +30,6 @@ typedef enum {
     PIN_OUTPUT
 } PinDirection;
 
-#define PORT_SHIFT  4
-
 typedef enum {
     P0_0 = 0x0000, P0_1, P0_2, P0_3, P0_4, P0_5, P0_6, P0_7, P0_8, P0_9, P0_10, P0_11, P0_12, P0_13, P0_14, P0_15,
     P1_0 = 0x0100, P1_1, P1_2, P1_3, P1_4, P1_5, P1_6, P1_7, P1_8, P1_9, P1_10, P1_11, P1_12, P1_13, P1_14, P1_15,
@@ -87,9 +85,6 @@ typedef enum {
     OpenDrain = 4,
     PullDefault = PullNone
 } PinMode;
-
-#define PINGROUP(pin) (((pin)>>PORT_SHIFT)&0x0f)
-#define PINNO(pin) ((pin)&0x0f)
 
 #ifdef __cplusplus
 }

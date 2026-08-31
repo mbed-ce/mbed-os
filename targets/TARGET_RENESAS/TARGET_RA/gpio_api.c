@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include "gpio_api.h"
+#include "PinNamesTypes.h"
 #include "r_ioport.h"
 #include "common_data.h"
 
@@ -13,12 +14,12 @@ static inline bsp_io_port_pin_t pin_to_bsp(PinName pin)
 
 static inline bsp_io_port_t pin_to_port(PinName pin)
 {
-    return (bsp_io_port_t)(pin >> 8);
+    return (bsp_io_port_t)RA_PORT(pin);
 }
 
 static inline uint32_t pin_to_mask(PinName pin)
 {
-    return (1U << (pin & 0xFF));
+    return (1U << RA_PIN(pin));
 }
 
 void gpio_init(gpio_t *obj, PinName pin)
@@ -29,9 +30,9 @@ void gpio_init(gpio_t *obj, PinName pin)
 
     // Keep IRQ flag
 #if (3U == BSP_FEATURE_IOPORT_VERSION)
-    uint32_t cfg = R_PFS->PORT[pin >> 8].PIN[pin & BSP_IO_PRV_8BIT_MASK].PmnPFS;
+    uint32_t cfg = R_PFS->PORT[RA_PORT(pin)].PIN[RA_PIN(pin)].PmnPFS;
 #else
-    uint32_t cfg = R_PFS->PORT[pin >> 8].PIN[pin & BSP_IO_PRV_8BIT_MASK].PmnPFS;
+    uint32_t cfg = R_PFS->PORT[RA_PORT(pin)].PIN[RA_PIN(pin)].PmnPFS;
 #endif
     R_BSP_PinCfg(pin_to_bsp(pin), (cfg & IOPORT_CFG_IRQ_ENABLE) ? IOPORT_CFG_IRQ_ENABLE: IOPORT_CFG_PORT_DIRECTION_INPUT);
 }
@@ -40,9 +41,9 @@ void gpio_mode(gpio_t *obj, PinMode mode)
 {
     PinName pin = obj->pin;
 #if (3U == BSP_FEATURE_IOPORT_VERSION)
-    uint32_t cfg = R_PFS->PORT[pin >> 8].PIN[pin & BSP_IO_PRV_8BIT_MASK].PmnPFS;
+    uint32_t cfg = R_PFS->PORT[RA_PORT(pin)].PIN[RA_PIN(pin)].PmnPFS;
 #else
-    uint32_t cfg = R_PFS->PORT[pin >> 8].PIN[pin & BSP_IO_PRV_8BIT_MASK].PmnPFS;
+    uint32_t cfg = R_PFS->PORT[RA_PORT(pin)].PIN[RA_PIN(pin)].PmnPFS;
 #endif
 
     switch (mode) {
@@ -68,9 +69,9 @@ void gpio_dir(gpio_t *obj, PinDirection direction)
 {
     PinName pin = obj->pin;
 #if (3U == BSP_FEATURE_IOPORT_VERSION)
-    uint32_t cfg = R_PFS->PORT[pin >> 8].PIN[pin & BSP_IO_PRV_8BIT_MASK].PmnPFS;
+    uint32_t cfg = R_PFS->PORT[RA_PORT(pin)].PIN[RA_PIN(pin)].PmnPFS;
 #else
-    uint32_t cfg = R_PFS->PORT[pin >> 8].PIN[pin & BSP_IO_PRV_8BIT_MASK].PmnPFS;
+    uint32_t cfg = R_PFS->PORT[RA_PORT(pin)].PIN[RA_PIN(pin)].PmnPFS;
 #endif
 
     if (direction == PIN_OUTPUT) {

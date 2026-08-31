@@ -48,3 +48,8 @@
 #define RA_PIN_SPEED(FUNC)     (((FUNC) >> 22) & 0x3)
 #define RA_PIN_ALT(FUNC)       (((FUNC) >> 16) & 0x3F)
 #define RA_PIN_CHANNEL(FUNC)   (((FUNC) >> 8 ) & 0xFF)
+
+/* PinName encoding: Pn_m = (n << 8) | m, which matches the FSP bsp_io_port_pin_t
+ * encoding.  The port number can be used directly as a mbed PortName. */
+#define RA_PORT(X)             (((uint32_t)(X) >> 8) & 0xFF)
+#define RA_PIN(X)              ((uint32_t)(X) & 0xFF)
