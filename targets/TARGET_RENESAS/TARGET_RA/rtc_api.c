@@ -8,6 +8,8 @@
 #include "mbed_mktime.h"
 #include "reset_reason_api.h"
 
+#ifdef DEVICE_RTC
+
 static bool rtc_opened = false;
 
 void rtc_init(void)
@@ -103,3 +105,5 @@ void rtc_free(void)
 {
     /* RTC counts persistently; do not close hardware or stop counter */
 }
+
+#endif

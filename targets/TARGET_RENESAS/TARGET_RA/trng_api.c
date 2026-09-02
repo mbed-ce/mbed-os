@@ -6,17 +6,18 @@
 #include "common_data.h"
 #include "mbed_error.h"
 
-#ifdef TARGET_RA4E1
+#if defined(TARGET_RA4E1) || defined(TARGET_RA6M3)
 
-// In RA4E1, TRNG is part of SCE9
+// In RA4E1 and RA6M3, TRNG is part of SCE
 
-#include "r_sce.h"
+fsp_err_t HW_SCE_McuSpecificInit(void);
+fsp_err_t HW_SCE_RNG_Read (uint32_t * OutData_Text);
 
 void trng_init(trng_t *obj)
 {
     (void)obj;
     fsp_err_t err = FSP_SUCCESS;
-    err = R_SCE_Open(&sce_ctrl, &sce_cfg);
+    err = HW_SCE_McuSpecificInit();;
     if (err != FSP_SUCCESS)
     {
         mbed_error(MBED_ERROR_CODE_OPEN_FAILED, "Failed to open SCE for random number generator", 0, MBED_FILENAME, __LINE__);
@@ -32,7 +33,7 @@ int trng_get_bytes(trng_t *obj, uint8_t *output, size_t length, size_t *actual)
 
     while (generated < length)
     {
-        fsp_err_t err = R_SCE_RandomNumberGenerate(rnd);
+        fsp_err_t err = HW_SCE_RNG_Read(rnd);
 
         if (err != FSP_SUCCESS)
         {
@@ -56,9 +57,9 @@ void trng_free(trng_t *obj)
     (void)obj;
 }
 
-#elif defined(TARGET_RA6E2)
+#elif defined(TARGET_RA6E2) || defined(TARGET_RA4E1)
 
-// In RA6E2, TRNG is standalone and only accessible via registers
+// In RA6E2 and RA4T1, TRNG is standalone and only accessible via registers
 
 void trng_init(trng_t *obj)
 {

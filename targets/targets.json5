@@ -8827,5 +8827,62 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "console-uart": true,
             "console-rtt": false
         },
+    },
+    "MCU_RA6M3": {
+        "inherits": [
+            "MCU_RA"
+        ],
+        "public": false,
+        "core": "Cortex-M4",
+        "device_has_add": [
+            "CAN"
+        ],
+        "extra_labels_add": [
+            "RA6M3"
+        ]
+    },
+    "RA6M3_HMI_BOARD": {
+        "inherits": [
+            "MCU_RA6M3"
+        ],
+        "public": true,
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "overrides": {
+            "console-uart": true,
+            "console-rtt": false
+        },
+        "device_name": "R7FA6M3AH",
+        "image_url": "https://github.com/RT-Thread-Studio/sdk-bsp-ra6m3-hmi-board/blob/main/documents/images/big.png"
+    },
+    "MCU_RA4T1": {
+        "inherits": [
+            "MCU_RA"
+        ],
+        "public": false,
+        "core": "Cortex-M33",
+        "device_has_add": [
+            "CAN",
+            "CAN_FD"
+        ],
+        "device_has_remove": [
+            "RTC"
+        ],
+        "extra_labels_add": [
+            "RA4T1"
+        ]
+    },
+    "EMBEDFIRE_RA4T1_BOARD": {
+        "inherits": [
+            "MCU_RA4T1"
+        ],
+        "public": true,
+        "overrides": {
+            "console-uart": true,
+            "console-rtt": false
+        },
+        "device_name": "R7FA4T1BB",
+        "image_url": "https://doc.embedfire.com/products/link/zh/latest/_images/ebf_ra4t_1.jpg"
     }
 }

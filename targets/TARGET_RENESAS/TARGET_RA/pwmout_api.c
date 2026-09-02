@@ -58,6 +58,13 @@ void pwmout_init(pwmout_t *obj, PinName pin)
         if (obj->p_timer->p_cfg->p_extend) {
             memcpy(&obj->ext_cfg.gpt_ext, obj->p_timer->p_cfg->p_extend, sizeof(gpt_extended_cfg_t));
         }
+        /* The generic timer instances in hal_data are generated with GTIOC output
+         * disabled. Enable the output for the pin actually used by this PwmOut. */
+        if ((uint32_t) unit == (uint32_t) GPT_IO_PIN_GTIOCA) {
+            obj->ext_cfg.gpt_ext.gtioca.output_enabled = true;
+        } else if ((uint32_t) unit == (uint32_t) GPT_IO_PIN_GTIOCB) {
+            obj->ext_cfg.gpt_ext.gtiocb.output_enabled = true;
+        }
         obj->cfg.p_extend = &obj->ext_cfg.gpt_ext;
     } else {
         if (obj->p_timer->p_cfg->p_extend) {
@@ -226,8 +233,12 @@ void pwmout_period_us(pwmout_t *obj, int us)
 
     obj->cfg.period_counts = period_counts;
 
-    /* Re-apply settings via Close -> Open if prescaler (source_div) or clock source (count_source) has changed */
-    if (needs_reopen && obj->initialized) {
+    /* Re-apply settings via Close -> Open if prescaler (source_div) or clock source (count_source) has changed.
+     * Note: must not be gated on obj->initialized. During pwmout_init() the FSP timer is already open
+     * (with the default source_div / count_source from hal_data), and obj->initialized is still 0 there.
+     * Skipping the reopen at that point would leave the hardware running with the default prescaler,
+     * while obj->cfg is already updated in RAM, so later calls would never detect the mismatch. */
+    if (needs_reopen) {
         obj->p_timer->p_api->stop(obj->p_timer->p_ctrl);
         obj->p_timer->p_api->close(obj->p_timer->p_ctrl);
 

@@ -2063,7 +2063,6 @@ static fsp_err_t r_sdhi_transfer_read (sdhi_instance_ctrl_t * const p_ctrl,
 
     /* When the SD_DMAEN.DMAEN bit is 1, set the SD_INFO2_MASK.BWEM bit to 1 and the SD_INFO2_MASK.BREM bit to 1. */
     p_ctrl->p_reg->SD_INFO2_MASK |= SDHI_PRV_SD_INFO2_MASK_BREM_BWEM_MASK;
-    p_ctrl->p_reg->SD_DMAEN       = SDHI_PRV_SD_DMAEN_DMAEN_SET;
 
     uint32_t transfer_settings = (uint32_t) TRANSFER_MODE_BLOCK << TRANSFER_SETTINGS_MODE_BITS;
     transfer_settings |= TRANSFER_ADDR_MODE_INCREMENTED << TRANSFER_SETTINGS_DEST_ADDR_BITS;
@@ -2087,7 +2086,8 @@ static fsp_err_t r_sdhi_transfer_read (sdhi_instance_ctrl_t * const p_ctrl,
     else
 #endif
     {
-        transfer_settings |= TRANSFER_REPEAT_AREA_SOURCE << TRANSFER_SETTINGS_REPEAT_AREA_BITS;
+        transfer_settings |= TRANSFER_REPEAT_AREA_SOURCE <<
+                             TRANSFER_SETTINGS_REPEAT_AREA_BITS;
         p_info->p_dest     = p_data;
     }
 
@@ -2104,9 +2104,12 @@ static fsp_err_t r_sdhi_transfer_read (sdhi_instance_ctrl_t * const p_ctrl,
                                                                             p_ctrl->p_cfg->p_lower_lvl_transfer->p_cfg->p_info);
     FSP_ERROR_RETURN(FSP_SUCCESS == err, err);
 
+    /* Enable DMA requests only after the transfer channel is armed, otherwise a
+     * request edge raised while the channel is disabled is lost. */
+    p_ctrl->p_reg->SD_DMAEN = SDHI_PRV_SD_DMAEN_DMAEN_SET;
+
     return FSP_SUCCESS;
 }
-
 /*******************************************************************************************************************//**
  * Set up transfer to write to device.
  *
@@ -2129,7 +2132,6 @@ static fsp_err_t r_sdhi_transfer_write (sdhi_instance_ctrl_t * const p_ctrl,
 
     /* When the SD_DMAEN.DMAEN bit is 1, set the SD_INFO2_MASK.BWEM bit to 1 and the SD_INFO2_MASK.BREM bit to 1. */
     p_ctrl->p_reg->SD_INFO2_MASK |= SDHI_PRV_SD_INFO2_MASK_BREM_BWEM_MASK;
-    p_ctrl->p_reg->SD_DMAEN       = SDHI_PRV_SD_DMAEN_DMAEN_SET;
 
     uint32_t transfer_settings = (uint32_t) TRANSFER_MODE_BLOCK << TRANSFER_SETTINGS_MODE_BITS;
     transfer_settings |= TRANSFER_ADDR_MODE_INCREMENTED << TRANSFER_SETTINGS_SRC_ADDR_BITS;
@@ -2172,6 +2174,10 @@ static fsp_err_t r_sdhi_transfer_write (sdhi_instance_ctrl_t * const p_ctrl,
                                                                             p_ctrl->p_cfg->p_lower_lvl_transfer->p_cfg->p_info);
     FSP_ERROR_RETURN(FSP_SUCCESS == err, err);
 
+    /* Enable DMA requests only after the transfer channel is armed, otherwise a
+     * request edge raised while the channel is disabled is lost. */
+    p_ctrl->p_reg->SD_DMAEN = SDHI_PRV_SD_DMAEN_DMAEN_SET;
+
     return FSP_SUCCESS;
 }
 
@@ -2188,8 +2194,12 @@ static void r_sdhi_transfer_end (sdhi_instance_ctrl_t * const p_ctrl)
     p_ctrl->transfer_dir           = SDHI_TRANSFER_DIR_NONE;
     p_ctrl->transfer_block_size    = 0U;
 
-    p_ctrl->p_cfg->p_lower_lvl_transfer->p_api->disable(p_ctrl->p_cfg->p_lower_lvl_transfer->p_ctrl);
+    /* Gate off DMA requests before tearing down the DMAC, otherwise a pending
+     * request edge is lost while the transfer channel is disabled and the next
+     * transfer never starts. */
     p_ctrl->p_reg->SD_DMAEN = 0U;
+
+    p_ctrl->p_cfg->p_lower_lvl_transfer->p_api->disable(p_ctrl->p_cfg->p_lower_lvl_transfer->p_ctrl);
 }
 
 /*******************************************************************************************************************//**
