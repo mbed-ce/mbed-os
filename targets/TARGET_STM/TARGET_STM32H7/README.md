@@ -73,6 +73,18 @@ so you just have to create a custom_targets.json file with:
 }
 ```
 
+## STM32H753xx
+
+STM32H753ZI devices use an Arm Cortex-M7 core running at up to 480 MHz and add hardware cryptography.
+
+[st.com STM32H753ZI MCU page](https://www.st.com/en/microcontrollers-microprocessors/stm32h753zi.html)
+
+### NUCLEO_H753ZI
+
+[st.com NUCLEO page](https://www.st.com/en/evaluation-tools/nucleo-h753zi.html)
+
+The NUCLEO_H753ZI and NUCLEO_H743ZI2 use the same MB1364 board design and pinout.
+
 ## STM32H7A3xx
 
 STM32H7A3/7B3 devices are based on an Arm Cortex-M7 core (with double-precision floating point unit) running up to 280 MHz.
@@ -255,4 +267,3 @@ FLASHPATH="C:\Program Files (x86)\STMicroelectronics\STM32Cube\STM32CubeProgramm
 export PATH=$FLASHPATH:$PATH
 STM32_Programmer_CLI -c port=SWD mode=UR -w BUILD/DISCO_H747I_CM4/ARM/mbed-os.bin 0x8100000
 ```
-
