@@ -45,6 +45,10 @@ target_sources(mbed-ra6m3
 		#../ra/fsp/src/r_qspi/r_qspi.c
 		../ra/fsp/src/r_rtc/r_rtc.c
 		../ra/fsp/src/r_sdhi/r_sdhi.c
+		../ra/fsp/src/r_ether/r_ether.c
+		../ra/fsp/src/r_ether_phy/r_ether_phy.c
+		../ra/fsp/src/r_ether_phy/targets/KSZ8091RNB/r_ether_phy_target_ksz8091rnb.c
+		r_ether_phy_target_rtl8201f.c
 		#../ra/fsp/src/r_sci_i2c/r_sci_i2c.c
 		#../ra/fsp/src/r_sci_lin/r_sci_lin.c
 		#../ra/fsp/src/r_sci_smci/r_sci_smci.c

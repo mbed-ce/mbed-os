@@ -14,6 +14,12 @@
         void glcdc_line_detect_isr(void);
         void sdhimmc_accs_isr(void);
         void sdhimmc_card_isr(void);
+
+        /* Ethernet */
+        void ether_eint_isr(void);
+
+        #define VECTOR_NUMBER_EDMAC0_EINT ((IRQn_Type) 42) /* EDMAC0 EINT (Ethernet interrupt) */
+        #define EDMAC0_EINT_IRQn          ((IRQn_Type) 42) /* EDMAC0 EINT (Ethernet interrupt) */
         void r_icu_isr(void);
         void rtc_carry_isr(void);
         void iic_master_rxi_isr(void);

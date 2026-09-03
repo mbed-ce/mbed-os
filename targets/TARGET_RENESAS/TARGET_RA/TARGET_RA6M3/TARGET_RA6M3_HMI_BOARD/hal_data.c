@@ -63,21 +63,21 @@ can_bit_timing_cfg_t g_can1_bit_timing_cfg =
 
 uint32_t g_can1_mailbox_mask[CAN_NO_OF_MAILBOXES_g_can1/4] =
 {
-0x1FFFFFFF,
+0x00000000,
 #if CAN_NO_OF_MAILBOXES_g_can1 > 4
-0x1FFFFFFF,
+0x00000000,
 #endif
 #if CAN_NO_OF_MAILBOXES_g_can1 > 8
-0x1FFFFFFF,
-0x1FFFFFFF,
+0x00000000,
+0x00000000,
 #endif
 #if CAN_NO_OF_MAILBOXES_g_can1 > 16
-0x1FFFFFFF,
-0x1FFFFFFF,
+0x00000000,
+0x00000000,
 #endif
 #if CAN_NO_OF_MAILBOXES_g_can1 > 24
-0x1FFFFFFF,
-0x1FFFFFFF,
+0x00000000,
+0x00000000,
 #endif
 };
 
@@ -86,7 +86,7 @@ can_mailbox_t g_can1_mailbox[CAN_NO_OF_MAILBOXES_g_can1] =
     {
         .mailbox_id              =  0,
         .id_mode                 =  CAN_ID_MODE_STANDARD,
-        .mailbox_type            =  CAN_MAILBOX_TRANSMIT,
+        .mailbox_type            =  CAN_MAILBOX_RECEIVE,
         .frame_type              =  CAN_FRAME_TYPE_REMOTE
 },
     {
@@ -388,19 +388,19 @@ uint32_t g_can0_mailbox_mask[CAN_NO_OF_MAILBOXES_g_can0/4] =
 {
 0x1FFFFFFF,
 #if CAN_NO_OF_MAILBOXES_g_can0 > 4
-0x1FFFFFFF,
+0x00000000,
 #endif
 #if CAN_NO_OF_MAILBOXES_g_can0 > 8
-0x1FFFFFFF,
-0x1FFFFFFF,
+0x00000000,
+0x00000000,
 #endif
 #if CAN_NO_OF_MAILBOXES_g_can0 > 16
-0x1FFFFFFF,
-0x1FFFFFFF,
+0x00000000,
+0x00000000,
 #endif
 #if CAN_NO_OF_MAILBOXES_g_can0 > 24
-0x1FFFFFFF,
-0x1FFFFFFF,
+0x00000000,
+0x00000000,
 #endif
 };
 

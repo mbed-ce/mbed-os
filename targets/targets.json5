@@ -8835,10 +8835,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "public": false,
         "core": "Cortex-M4",
         "device_has_add": [
-            "CAN"
+            "CAN",
+            "EMAC"
         ],
         "extra_labels_add": [
-            "RA6M3"
+            "RA6M3",
+            "RENESAS_EMAC"
         ]
     },
     "RA6M3_HMI_BOARD": {

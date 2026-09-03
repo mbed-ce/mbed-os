@@ -57,7 +57,7 @@ extern const can_extended_cfg_t g_can1_extended_cfg;
 #ifndef can_callback
 void can_callback(can_callback_args_t * p_args);
 #endif
-#define CAN_NO_OF_MAILBOXES_g_can1 (32)
+#define CAN_NO_OF_MAILBOXES_g_can1 (8)
 /** CAN on CAN Instance. */
 extern const can_instance_t g_can0;
 /** Access the CAN instance using these structures when calling API functions directly (::p_api is not used). */
@@ -71,7 +71,7 @@ extern const can_extended_cfg_t g_can0_extended_cfg;
 #ifndef can_callback
 void can_callback(can_callback_args_t * p_args);
 #endif
-#define CAN_NO_OF_MAILBOXES_g_can0 (32)
+#define CAN_NO_OF_MAILBOXES_g_can0 (8)
 /** UART on SCI Instance. */
             extern const uart_instance_t      g_uart9;
 

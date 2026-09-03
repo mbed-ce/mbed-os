@@ -46,8 +46,8 @@
             [39] = spi_tei_isr, /* SPI1 TEI (Transmission complete event) */
             [40] = spi_eri_isr, /* SPI1 ERI (Error) */
             [41] = dmac_int_isr, /* DMAC1 INT (DMAC1 transfer end) */
-            [42] = sci_uart_rxi_isr, /* SCI0 RXI (Receive data full) */
-            [43] = sci_uart_txi_isr, /* SCI0 TXI (Transmit data empty) */
+            [42] = ether_eint_isr, /* EDMAC0 EINT (Ethernet interrupt) */
+            [43] = sci_uart_txi_isr, /* SCI0 TXI (unused, reserved) */
             [44] = sci_uart_tei_isr, /* SCI0 TEI (Transmit end) */
             [45] = sci_uart_eri_isr, /* SCI0 ERI (Receive error) */
             [46] = sci_uart_rxi_isr, /* SCI1 RXI (Receive data full) */
@@ -144,7 +144,7 @@
             [39] = BSP_PRV_VECT_ENUM(EVENT_SPI1_TEI,FIXED), /* SPI1 TEI (Transmission complete event) */
             [40] = BSP_PRV_VECT_ENUM(EVENT_SPI1_ERI,FIXED), /* SPI1 ERI (Error) */
             [41] = BSP_PRV_VECT_ENUM(EVENT_DMAC1_INT,FIXED), /* DMAC1 INT (DMAC1 transfer end) */
-            [42] = BSP_PRV_VECT_ENUM(EVENT_SCI0_RXI,FIXED), /* SCI0 RXI (Receive data full) */
+            [42] = BSP_PRV_VECT_ENUM(EVENT_EDMAC0_EINT,FIXED), /* EDMAC0 EINT (Ethernet interrupt) */
             [43] = BSP_PRV_VECT_ENUM(EVENT_SCI0_TXI,FIXED), /* SCI0 TXI (Transmit data empty) */
             [44] = BSP_PRV_VECT_ENUM(EVENT_SCI0_TEI,FIXED), /* SCI0 TEI (Transmit end) */
             [45] = BSP_PRV_VECT_ENUM(EVENT_SCI0_ERI,FIXED), /* SCI0 ERI (Receive error) */
