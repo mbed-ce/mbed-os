@@ -38,6 +38,7 @@ A message that notes the main changes in the update.
 - RP235x
   - RP235x target family added, containing two boards to start, `RASPBERRY_PI_PICO_2` and `OLIMEX_RP2350_PICO2_XL`
   - LP ticker support added using new POWMAN always-on timer peripheral
+- Added the new `STM32WB0` MCU family with the `STM32WB09xE` MCU and `NUCLEO_WB09KE` development-board targets.
 
 ### Changed
 - Reworked targets CMake code to only recurse into the subdir for the current target family, which should speed up the CMake configure a bit
