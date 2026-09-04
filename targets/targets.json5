@@ -8803,6 +8803,21 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "R7FA6M3AH",
         "image_url": "https://github.com/RT-Thread-Studio/sdk-bsp-ra6m3-hmi-board/blob/main/documents/images/big.png"
     },
+    "EK_RA6M3G": {
+        "inherits": [
+            "MCU_RA6M3"
+        ],
+        "public": true,
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "overrides": {
+            "console-uart": false,
+            "console-rtt": true
+        },
+        "device_name": "R7FA6M3AF",
+        "image_url": "https://www.renesas.com/sites/default/files/styles/product_features_large/public/ek-ra6m3g-evaluation-board_0.jpg"
+    },
     "MCU_RA4T1": {
         "inherits": [
             "MCU_RA"

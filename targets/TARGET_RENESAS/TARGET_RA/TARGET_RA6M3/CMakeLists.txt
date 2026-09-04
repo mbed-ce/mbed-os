@@ -20,6 +20,13 @@ target_sources(mbed-ra6m3
         can_device.c
         bsp_linker.c
         USBPhy_RA6M3.cpp
+        # FSP configuration shared by all RA6M3 boards (EK-RA6M3G, RA6M3 HMI
+        # Board, ...): identical 24 MHz clock tree, peripheral instances and
+        # interrupt vectors.
+        common_data.c
+        hal_data.c
+        hal_warmstart.c
+        vector_data.c
 		../ra/fsp/src/r_adc/r_adc.c
 		../ra/fsp/src/r_agt/r_agt.c
 		#../ra/fsp/src/r_cac/r_cac.c
@@ -222,3 +229,4 @@ if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
 endif()
 
 add_subdirectory(TARGET_RA6M3_HMI_BOARD EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_EK_RA6M3G EXCLUDE_FROM_ALL)

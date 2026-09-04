@@ -140,7 +140,8 @@ void can_callback(can_callback_args_t * p_args);
             #ifndef uart_callback
             void uart_callback(uart_callback_args_t * p_args);
             #endif
-/** SPI on SCI3 Instance (simple SPI mode, used by the RW007 WiFi module). */
+/** SPI on SCI3 Instance (simple SPI mode; on the RA6M3 HMI Board this bus is
+ ** used by the RW007 WiFi module, on other boards it is free for general use). */
 extern const spi_instance_t g_spi_sci3;
 
 /** Access the SPI on SCI3 instance using these structures when calling API functions directly. */

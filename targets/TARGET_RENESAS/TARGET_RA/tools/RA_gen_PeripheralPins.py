@@ -193,11 +193,62 @@ SCI_GROUP_EVEN = {0, 2, 4, 6, 8}
 SCI_GROUP_ODD = {1, 3, 5, 7, 9}
 
 
+def make_sci_spi_rules(channels):
+    """Build PinMap_SPI_* rules for SCI channels used in simple SPI mode.
+
+    An SCI channel driven as SPI is no longer available as a UART, so the
+    matching UART_n entries must be excluded from the UART pin maps (the
+    caller adds them to the exclusion set)."""
+    rules = []
+    for ch in sorted(channels):
+        periph = f"SPI_SCI{ch}"
+        psel = get_sci_periph_macro(ch)
+        rules.append({
+            "array_name": "PinMap_SPI_MOSI",
+            "pattern": rf"SCI({ch}): TXD_MOSI$",
+            "periph_name_override": periph,
+            "pin_mode": "RA_PIN_MODE_PERIPHERAL_PP",
+            "pull": "RA_PIN_PULL_NONE",
+            "periph_sel_macro": psel,
+            "has_channel": False,
+            "speed": "RA_PIN_SPEED_MID",
+        })
+        rules.append({
+            "array_name": "PinMap_SPI_MISO",
+            "pattern": rf"SCI({ch}): RXD_MISO$",
+            "periph_name_override": periph,
+            "pin_mode": "RA_PIN_MODE_PERIPHERAL_PP",
+            "pull": "RA_PIN_PULL_NONE",
+            "periph_sel_macro": psel,
+            "has_channel": False,
+            "speed": None,
+        })
+        rules.append({
+            "array_name": "PinMap_SPI_SCLK",
+            "pattern": rf"SCI({ch}): SCK$",
+            "periph_name_override": periph,
+            "pin_mode": "RA_PIN_MODE_PERIPHERAL_PP",
+            "pull": "RA_PIN_PULL_NONE",
+            "periph_sel_macro": psel,
+            "has_channel": False,
+            "speed": "RA_PIN_SPEED_MID",
+        })
+    return rules
+
+
+def _pin_sort_key(entry):
+    """Sort key to keep PinMap entries ordered by port/pin number."""
+    m = re.match(r"\s*\{P(\d+)_(\d+)", entry)
+    if m:
+        return (0, int(m.group(1)), int(m.group(2)), entry)
+    return (1, 0, 0, entry)
+
+
 def pin_name_to_mbed(pin_id: str) -> str:
-    """p014 -> P0_14"""
-    match = re.match(r"p(\d)(\d+)", pin_id, re.IGNORECASE)
+    """p014 -> P0_14, pa00 -> P10_0 (Renesas port A = port 10)"""
+    match = re.match(r"p([0-9a-f])(\d+)", pin_id, re.IGNORECASE)
     if match:
-        port = match.group(1)
+        port = int(match.group(1), 16)
         pin_num = str(int(match.group(2)))
         return f"P{port}_{pin_num}"
     return pin_id.upper()
@@ -294,9 +345,10 @@ def generate_pin_entry(pin_name: str, periph_name: str, rule: dict, extra: dict 
     return f"    {{{pin_name}, {periph_name}, {macro}({args})}},"
 
 
-def process_peripheral(pin_caps: dict, rule: dict, alt_psel: dict = None) -> list:
+def process_peripheral(pin_caps: dict, rule: dict, alt_psel: dict = None, excluded_periphs: set = None) -> list:
     entries = []
     alt_psel = alt_psel or {}
+    excluded_periphs = excluded_periphs or set()
 
     if "pattern_list" in rule:
         patterns = rule["pattern_list"]
@@ -323,7 +375,9 @@ def process_peripheral(pin_caps: dict, rule: dict, alt_psel: dict = None) -> lis
                     periph_num = rule["periph_num_transform"](periph_num)
 
                 # Build the peripheral name
-                if "periph_prefix" in sub_rule:
+                if "periph_name_override" in rule:
+                    periph_name = rule["periph_name_override"]
+                elif "periph_prefix" in sub_rule:
                     periph_name = f"{sub_rule['periph_prefix']}{periph_num}"
                 elif rule["array_name"].startswith("PinMap_UART"):
                     periph_name = f"UART_{periph_num}"
@@ -341,6 +395,9 @@ def process_peripheral(pin_caps: dict, rule: dict, alt_psel: dict = None) -> lis
                     periph_name = f"IRQ_{periph_num}"
                 else:
                     periph_name = str(periph_num)
+
+                if periph_name in excluded_periphs:
+                    break
 
                 # Peripheral selection macro: prefer the real PSEL of this pin
                 # function from the XML alt/registerSetting element
@@ -415,7 +472,13 @@ def debug_unmatched_caps(pin_caps: dict):
         print("\nAll capabilities matched")
 
 
-def generate_peripheral_pins(xml_content: str, output_path: str, debug: bool = False):
+def generate_peripheral_pins(xml_content: str, output_path: str, debug: bool = False,
+                             excluded_periphs: set = None, sci_spi_channels: set = None):
+    excluded_periphs = set(excluded_periphs or set())
+    sci_spi_channels = set(sci_spi_channels or set())
+    # An SCI channel used in simple SPI mode is not available as a UART.
+    for ch in sci_spi_channels:
+        excluded_periphs.add(f"UART_{ch}")
     pin_caps, alt_psel = parse_xml_components(xml_content)
 
     if debug:
@@ -440,7 +503,16 @@ def generate_peripheral_pins(xml_content: str, output_path: str, debug: bool = F
 
     periph_entries = {}
     for rule in PERIPHERAL_RULES:
-        periph_entries[rule["array_name"]] = process_peripheral(pin_caps, rule, alt_psel)
+        periph_entries[rule["array_name"]] = process_peripheral(pin_caps, rule, alt_psel, excluded_periphs)
+
+    # Merge SCI simple-SPI entries into the SPI pin maps and keep every
+    # array sorted by port/pin number.
+    if sci_spi_channels:
+        for rule in make_sci_spi_rules(sci_spi_channels):
+            periph_entries[rule["array_name"]].extend(
+                process_peripheral(pin_caps, rule, alt_psel))
+    for entries in periph_entries.values():
+        entries.sort(key=_pin_sort_key)
 
     # Generate the output file
     lines = [
@@ -484,22 +556,39 @@ def generate_peripheral_pins(xml_content: str, output_path: str, debug: bool = F
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(f"Usage: {os.path.basename(sys.argv[0])} <PinCfg*.xml> [output.c] [--debug]")
+        print(f"Usage: {os.path.basename(sys.argv[0])} <PinCfg*.xml> [output.c] [--debug] [--exclude PERIPH[,PERIPH...]] [--sci-spi CH[,CH...]]")
         print("")
         print("  <PinCfg*.xml>   Renesas RA Smart Configurator pin-configuration XML file")
         print("  [output.c]      output file, defaults to PeripheralPins.c in the current directory")
         print("  [--debug]       print unmatched pin capabilities")
+        print("  [--exclude ...] comma-separated peripheral names to skip, e.g. --exclude UART_3")
+        print("  [--sci-spi ...] SCI channel(s) used in simple SPI mode, e.g. --sci-spi 3.")
+        print("                  Adds SPI_SCI<n> entries to the SPI pin maps and removes")
+        print("                  the matching UART_<n> entries from the UART pin maps")
         sys.exit(1)
 
     args = [a for a in sys.argv[2:] if not a.startswith("--")]
     debug = "--debug" in sys.argv
+    excluded_periphs = set()
+    sci_spi_channels = set()
+
+    def _parse_int_list(value):
+        return [int(v.strip()) for v in value.split(",") if v.strip()]
+
+    for i, arg in enumerate(sys.argv):
+        if arg == "--exclude" and i + 1 < len(sys.argv):
+            excluded_periphs.update(p.strip() for p in sys.argv[i + 1].split(",") if p.strip())
+        elif arg == "--sci-spi" and i + 1 < len(sys.argv):
+            sci_spi_channels.update(_parse_int_list(sys.argv[i + 1]))
     xml_path = sys.argv[1]
     output_path = args[0] if args else "PeripheralPins.c"
 
     if os.path.exists(xml_path):
         with open(xml_path, "r", encoding="utf-8") as f:
             xml_content = f.read()
-        generate_peripheral_pins(xml_content, output_path, debug=debug)
+        generate_peripheral_pins(xml_content, output_path, debug=debug,
+                                 excluded_periphs=excluded_periphs,
+                                 sci_spi_channels=sci_spi_channels)
     else:
         print(f"XML file not found: {xml_path}")
         sys.exit(1)

@@ -1241,7 +1241,8 @@ const uart_instance_t g_uart4 =
     .p_cfg         = &g_uart4_cfg,
     .p_api         = &g_uart_on_sci
 };
-/* SCI3 is used in simple SPI mode for the RW007 WiFi module, not as a UART. */
+/* SCI3 is used in simple SPI mode (g_spi_sci3 below), not as a UART.
+ * On the RA6M3 HMI Board this bus drives the RW007 WiFi module. */
 sci_spi_instance_ctrl_t g_spi_sci3_ctrl;
 
 /** SPI extended configuration */
