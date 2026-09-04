@@ -8258,6 +8258,168 @@
         "sub_family": "STM32H743",
         "vendor": "STMicroelectronics:13"
     },
+    "STM32H753ZITx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32H7x_2048.FLM",
+                "ram_size": 32768,
+                "ram_start": 536870912,
+                "size": 0x200000,
+                "start": 134217728
+            }
+        ],
+        "family": "STM32H7 Series",
+        "from_pack": {
+            "pack": "STM32H7xx_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "4.1.3"
+        },
+        "memories": {
+            "SRAM_D2": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x48000,
+                "start": 0x30000000,
+                "startup": false
+            },
+            "SRAM_D1": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x80000,
+                "start": 0x24000000,
+                "startup": false
+            },
+            "IROM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x200000,
+                "start": 0x08000000,
+                "startup": true
+            },
+            "SRAM_D3": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x10000,
+                "start": 0x38000000,
+                "startup": false
+            },
+            "SRAM_DTC": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x20000,
+                "start": 0x20000000,
+                "startup": false
+            },
+            "SRAM_ITC": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x10000,
+                "start": 0,
+                "startup": false
+            },
+            "SRAM_BKUP": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "size": 0x1000,
+                "start": 0x38800000,
+                "startup": false
+            }
+        },
+        "name": "STM32H753ZITx",
+        "processor": {
+            "Symmetric": {
+                "core": "CortexM7",
+                "fpu": "DoublePrecision",
+                "mpu": "Present",
+                "units": 1
+            }
+        },
+        "sectors": [
+            [
+                134217728,
+                0x20000
+            ],
+            [
+                1610612736,
+                0x20000
+            ],
+            [
+                0x90000000,
+                65536
+            ],
+            [
+                0x90000000,
+                65536
+            ],
+            [
+                0x90000000,
+                0x20000
+            ],
+            [
+                0x90000000,
+                0x20000
+            ]
+        ],
+        "sub_family": "STM32H753",
+        "vendor": "STMicroelectronics:13"
+    },
     "STM32H745ZITx": {
         "algorithms": [
             {
