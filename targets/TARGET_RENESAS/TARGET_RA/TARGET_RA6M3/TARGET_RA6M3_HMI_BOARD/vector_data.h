@@ -6,7 +6,7 @@
         #endif
                 /* Number of interrupts allocated */
         #ifndef VECTOR_DATA_IRQ_COUNT
-        #define VECTOR_DATA_IRQ_COUNT    (94)
+        #define VECTOR_DATA_IRQ_COUNT    (95)
         #endif
         /* ISR prototypes */
         void gpt_counter_overflow_isr(void);
@@ -231,8 +231,14 @@
         #define FCU_FRDYI_IRQn          ((IRQn_Type) 92) /* FCU FRDYI (Flash ready interrupt) */
         #define VECTOR_NUMBER_FCU_FIFERR ((IRQn_Type) 93) /* FCU FIFERR (Flash access error interrupt) */
         #define FCU_FIFERR_IRQn          ((IRQn_Type) 93) /* FCU FIFERR (Flash access error interrupt) */
+
+        /* USB */
+        void usbfs_int_isr(void);
+
+        #define VECTOR_NUMBER_USBFS_INT ((IRQn_Type) 94) /* USBFS INT (USBFS interrupt) */
+        #define USBFS_INT_IRQn          ((IRQn_Type) 94) /* USBFS INT (USBFS interrupt) */
         /* The number of entries required for the ICU vector table. */
-        #define BSP_ICU_VECTOR_NUM_ENTRIES (94)
+        #define BSP_ICU_VECTOR_NUM_ENTRIES (95)
 
         #ifdef __cplusplus
         }

@@ -8836,7 +8836,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "core": "Cortex-M4",
         "device_has_add": [
             "CAN",
-            "EMAC"
+            "EMAC",
+            "USBDEVICE"
         ],
         "extra_labels_add": [
             "RA6M3",

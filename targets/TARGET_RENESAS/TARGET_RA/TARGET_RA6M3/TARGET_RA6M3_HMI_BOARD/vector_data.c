@@ -98,6 +98,7 @@
             [91] = can_tx_isr, /* CAN1 FIFO TX (Transmit FIFO interrupt) */
             [92] = fcu_frdyi_isr, /* FCU FRDYI (Flash ready interrupt) */
             [93] = fcu_fiferr_isr, /* FCU FIFERR (Flash access error interrupt) */
+            [94] = usbfs_int_isr, /* USBFS INT (USBFS interrupt) */
         };
         #if BSP_FEATURE_ICU_HAS_IELSR
         const bsp_interrupt_event_t g_interrupt_event_link_select[BSP_ICU_VECTOR_NUM_ENTRIES] =
@@ -196,6 +197,7 @@
             [91] = BSP_PRV_VECT_ENUM(EVENT_CAN1_FIFO_TX,FIXED), /* CAN1 FIFO TX (Transmit FIFO interrupt) */
             [92] = BSP_PRV_VECT_ENUM(EVENT_FCU_FRDYI,FIXED), /* FCU FRDYI (Flash ready interrupt) */
             [93] = BSP_PRV_VECT_ENUM(EVENT_FCU_FIFERR,FIXED), /* FCU FIFERR (Flash access error interrupt) */
+            [94] = BSP_PRV_VECT_ENUM(EVENT_USBFS_INT,FIXED), /* USBFS INT (USBFS interrupt) */
         };
         #endif
         #endif

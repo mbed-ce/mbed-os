@@ -19,6 +19,7 @@ target_sources(mbed-ra6m3
         uart_device.c
         can_device.c
         bsp_linker.c
+        USBPhy_RA6M3.cpp
 		../ra/fsp/src/r_adc/r_adc.c
 		../ra/fsp/src/r_agt/r_agt.c
 		#../ra/fsp/src/r_cac/r_cac.c
