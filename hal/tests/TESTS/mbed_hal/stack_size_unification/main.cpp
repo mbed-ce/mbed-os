@@ -20,7 +20,7 @@
 #include "unity.h"
 #include "utest.h"
 
-#ifdef TARGET_RENESAS
+#if defined(TARGET_RENESAS) && !defined(TARGET_RA)
 #error [NOT_SUPPORTED] Cortex-A target not supported for this test
 #else
 
