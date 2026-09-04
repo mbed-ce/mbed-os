@@ -2925,6 +2925,29 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "STM32H743ZITx",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
+    "NUCLEO_H753ZI": {
+        "inherits": [
+            "MCU_STM32H753xI"
+        ],
+        "config": {
+            "d11-configuration": {
+                "help": "Value: PB_5 for the default board configuration, PA_7 in case of solder bridge update (SB33 on/ SB35 off)",
+                "value": "PB_5",
+                "macro_name": "STM32_D11_SPI_ETHERNET_PIN"
+            }
+        },
+        "device_has_add": [
+            "EMAC",
+            "USBDEVICE"
+        ],
+        "overrides": {
+            "network-default-interface-type": "ETHERNET"
+        },
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "device_name": "STM32H753ZITx"
+    },
     "NUCLEO_H723ZG": {
         "inherits": [
             "MCU_STM32H723xG"
