@@ -21,6 +21,7 @@
 #include "mbedtls/cmac.h"
 #if defined(MBEDTLS_CMAC_ALT)
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 #include "mbedtls/platform_util.h"
 #if defined(MBEDTLS_AES_C)
 #include "mbedtls/aes.h"

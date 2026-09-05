@@ -27,6 +27,7 @@
 #include "crys_ecpki_domain.h"
 #include "crys_ec_mont_api.h"
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 #include "mbedtls/platform_util.h"
 #include "cc_internal.h"
 
@@ -109,8 +110,8 @@ int mbedtls_ecdh_gen_public( mbedtls_ecp_group *grp, mbedtls_mpi *d, mbedtls_ecp
           }
 
           MBEDTLS_MPI_CHK( mbedtls_mpi_read_binary( d, kgParams->privKey, priv_key_size ) );
-          MBEDTLS_MPI_CHK( mbedtls_mpi_read_binary(  &Q->X, kgParams->pubKey, public_key_size ) );
-          MBEDTLS_MPI_CHK( mbedtls_mpi_lset( &Q->Z, 1 ) );
+          MBEDTLS_MPI_CHK( mbedtls_mpi_read_binary(  &Q->MBEDTLS_PRIVATE(X), kgParams->pubKey, public_key_size ) );
+          MBEDTLS_MPI_CHK( mbedtls_mpi_lset( &Q->MBEDTLS_PRIVATE(Z), 1 ) );
       }
       else
           ret =  MBEDTLS_ERR_PLATFORM_FEATURE_UNSUPPORTED;
@@ -236,7 +237,7 @@ int mbedtls_ecdh_compute_shared( mbedtls_ecp_group *grp, mbedtls_mpi *z,
             goto cleanup;
         }
 
-        MBEDTLS_MPI_CHK( mbedtls_mpi_write_binary( &Q->X, temp_buf, public_key_size ) );
+        MBEDTLS_MPI_CHK( mbedtls_mpi_write_binary( &Q->MBEDTLS_PRIVATE(X), temp_buf, public_key_size ) );
         ret = convert_CrysError_to_mbedtls_err(
                 CRYS_COMMON_ConvertLswMswWordsToMsbLsbBytes( ecdhParams->pubKey,
                                                              CURVE_25519_KEY_SIZE,
