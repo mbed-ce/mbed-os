@@ -36,7 +36,14 @@
 #define MAX_PACKET_SIZE_EP0  (64)
 #define MAX_PACKET_SIZE_EP1  (64)
 #define MAX_PACKET_SIZE_EP2  (64)
-#define MAX_PACKET_SIZE_EP3  (1023)
+/* Endpoint 3 is the driver's only isochronous-capable endpoint, and
+ * ep3_buffer is allocated at this size whether or not anything claims it.
+ * Configurable so a device that has no isochronous endpoint need not carry
+ * 2 x 1023 bytes of static RAM for one. */
+#ifndef MBED_CONF_TARGET_KINETIS_MAX_PACKET_SIZE_EP3
+#define MBED_CONF_TARGET_KINETIS_MAX_PACKET_SIZE_EP3  (1023)
+#endif
+#define MAX_PACKET_SIZE_EP3  (MBED_CONF_TARGET_KINETIS_MAX_PACKET_SIZE_EP3)
 
 /* Generic endpoints - intended to be portable accross devices */
 /* and be suitable for simple USB devices. */
