@@ -161,6 +161,17 @@ bool USBDevice::_request_get_descriptor()
                     _transfer.direction = Send;
                     success = true;
                     break;
+                default:
+                    // Any index the standard descriptors don't cover: let the
+                    // device class answer for itself. The base implementation
+                    // returns NULL, so an unknown index still fails as before.
+                    if (const uint8_t *desc = string_ext_desc(DESCRIPTOR_INDEX(_transfer.setup.wValue))) {
+                        _transfer.remaining = desc[0];
+                        _transfer.ptr = (uint8_t *)desc;
+                        _transfer.direction = Send;
+                        success = true;
+                    }
+                    break;
             }
             break;
         }
@@ -1684,6 +1695,13 @@ const uint8_t *USBDevice::string_iserial_desc()
         '0', 0, '1', 0, '2', 0, '3', 0, '4', 0, '5', 0, '6', 0, '7', 0, '8', 0, '9', 0, /*bString iSerial - 0123456789*/
     };
     return string_iserial_descriptor;
+}
+
+const uint8_t *USBDevice::string_ext_desc(uint8_t index)
+{
+    // No extra string descriptors by default.
+    (void)index;
+    return NULL;
 }
 
 const uint8_t *USBDevice::string_iconfiguration_desc()

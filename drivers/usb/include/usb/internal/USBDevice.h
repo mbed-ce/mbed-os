@@ -320,6 +320,20 @@ public:
     */
     virtual const uint8_t *string_iinterface_desc();
 
+    /**
+    * Get a string descriptor the device class defines for itself
+    *
+    * Called for any string index the standard descriptors above do not
+    * cover, which lets a class serve strings referenced from its own
+    * descriptors -- a HID report item's String Index, for instance.
+    *
+    * @param index string descriptor index being requested
+    * @returns pointer to the string descriptor, or NULL if this index is
+    * not one the device defines. The default implementation returns NULL
+    * for every index, so the request fails exactly as it did before.
+    */
+    virtual const uint8_t *string_ext_desc(uint8_t index);
+
     /*
     * Get the length of the report descriptor
     *
