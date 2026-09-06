@@ -20,6 +20,9 @@
      defined(TARGET_KL46Z) | \
      defined(TARGET_K64F) | defined(TARGET_K22F) | defined(TARGET_K82F))
 
+#include <stddef.h>   // NULL
+#include <string.h>   // memset
+
 #if defined(TARGET_KSDK2_MCUS)
 #include "fsl_common.h"
 #endif
