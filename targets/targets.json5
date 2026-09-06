@@ -362,6 +362,20 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
 
     // Freescale (now NXP) Kinetis Targets -----------------------------------------------------------------------------
+
+    // Shared settings for the Kinetis parts whose USB support routes through
+    // targets/TARGET_Freescale/USBPhy_Kinetis.cpp. Not a device in its own
+    // right; it exists so the driver's configuration lives with the targets
+    // that build it.
+    "MCU_KINETIS_USB": {
+        "public": false,
+        "config": {
+            "kinetis-max-packet-size-ep3": {
+                "help": "Maximum packet size for endpoint 3, the only endpoint this USB driver allows isochronous transfers on. Its double buffer is allocated at this size whether or not anything claims the endpoint, so a device with no isochronous endpoint -- HID, CDC -- can lower this to recover the RAM. 1023 is a full-size isochronous packet.",
+                "value": 1023
+            }
+        }
+    },
     "KL25Z": {
         "supported_form_factors": [
             "ARDUINO_UNO"
@@ -372,7 +386,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "KLXX"
         ],
         "inherits": [
-            "Target"
+            "Target",
+            "MCU_KINETIS_USB"
         ],
         "device_has": [
             "USTICKER",
@@ -410,7 +425,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH_CMSIS_ALGO"
         ],
         "inherits": [
-            "Target"
+            "Target",
+            "MCU_KINETIS_USB"
         ],
         "device_has": [
             "USTICKER",
@@ -481,7 +497,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO"
         ],
         "inherits": [
-            "MCU_K22F512"
+            "MCU_K22F512",
+            "MCU_KINETIS_USB"
         ],
         "extra_labels_add": [
             "FRDM"
@@ -504,7 +521,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FSL_RTOS_MBED"
         ],
         "inherits": [
-            "Target"
+            "Target",
+            "MCU_KINETIS_USB"
         ],
         "device_has": [
             "USTICKER",
@@ -641,7 +659,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FRDM"
         ],
         "inherits": [
-            "MCU_K64F"
+            "MCU_K64F",
+            "MCU_KINETIS_USB"
         ],
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/407/MFG_FRDM-K64F.JPG"
     },
@@ -734,7 +753,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_TICKLESS"
         ],
         "inherits": [
-            "Target"
+            "Target",
+            "MCU_KINETIS_USB"
         ],
         "device_has": [
             "USTICKER",
