@@ -99,6 +99,7 @@
             [92] = fcu_frdyi_isr, /* FCU FRDYI (Flash ready interrupt) */
             [93] = fcu_fiferr_isr, /* FCU FIFERR (Flash access error interrupt) */
             [94] = usbfs_int_isr, /* USBFS INT (USBFS interrupt) */
+            [95] = dmac_int_isr, /* DMAC2 INT (DMAC2 transfer end, audio duty stream) */
         };
         #if BSP_FEATURE_ICU_HAS_IELSR
         const bsp_interrupt_event_t g_interrupt_event_link_select[BSP_ICU_VECTOR_NUM_ENTRIES] =
@@ -198,6 +199,7 @@
             [92] = BSP_PRV_VECT_ENUM(EVENT_FCU_FRDYI,FIXED), /* FCU FRDYI (Flash ready interrupt) */
             [93] = BSP_PRV_VECT_ENUM(EVENT_FCU_FIFERR,FIXED), /* FCU FIFERR (Flash access error interrupt) */
             [94] = BSP_PRV_VECT_ENUM(EVENT_USBFS_INT,FIXED), /* USBFS INT (USBFS interrupt) */
+            [95] = BSP_PRV_VECT_ENUM(EVENT_DMAC2_INT,FIXED), /* DMAC2 INT (DMAC2 transfer end, audio duty stream) */
         };
         #endif
         #endif

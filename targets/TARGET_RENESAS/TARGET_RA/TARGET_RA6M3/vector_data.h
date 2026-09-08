@@ -6,7 +6,7 @@
         #endif
                 /* Number of interrupts allocated */
         #ifndef VECTOR_DATA_IRQ_COUNT
-        #define VECTOR_DATA_IRQ_COUNT    (95)
+        #define VECTOR_DATA_IRQ_COUNT    (96)
         #endif
         /* ISR prototypes */
         void gpt_counter_overflow_isr(void);
@@ -131,6 +131,8 @@
         #define SPI1_ERI_IRQn          ((IRQn_Type) 40) /* SPI1 ERI (Error) */
         #define VECTOR_NUMBER_DMAC1_INT ((IRQn_Type) 41) /* DMAC1 INT (DMAC1 transfer end) */
         #define DMAC1_INT_IRQn          ((IRQn_Type) 41) /* DMAC1 INT (DMAC1 transfer end) */
+        #define VECTOR_NUMBER_DMAC2_INT ((IRQn_Type) 95) /* DMAC2 INT (DMAC2 transfer end, audio duty stream) */
+        #define DMAC2_INT_IRQn          ((IRQn_Type) 95) /* DMAC2 INT (DMAC2 transfer end, audio duty stream) */
         #define VECTOR_NUMBER_SCI0_RXI ((IRQn_Type) 42) /* SCI0 RXI (Receive data full) */
         #define SCI0_RXI_IRQn          ((IRQn_Type) 42) /* SCI0 RXI (Receive data full) */
         #define VECTOR_NUMBER_SCI0_TXI ((IRQn_Type) 43) /* SCI0 TXI (Transmit data empty) */
@@ -242,7 +244,7 @@
         #define VECTOR_NUMBER_USBFS_INT ((IRQn_Type) 94) /* USBFS INT (USBFS interrupt) */
         #define USBFS_INT_IRQn          ((IRQn_Type) 94) /* USBFS INT (USBFS interrupt) */
         /* The number of entries required for the ICU vector table. */
-        #define BSP_ICU_VECTOR_NUM_ENTRIES (95)
+        #define BSP_ICU_VECTOR_NUM_ENTRIES (96)
 
         #ifdef __cplusplus
         }
