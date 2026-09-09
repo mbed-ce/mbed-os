@@ -685,7 +685,14 @@ HAL_StatusTypeDef init_uart(serial_t *obj)
     }
 #endif
 
-    return HAL_UART_Init(huart);
+    HAL_StatusTypeDef status = HAL_UART_Init(huart);
+#if defined(TARGET_STM32H7) && defined(UART_FIFOMODE_ENABLE)
+    if (status == HAL_OK && IS_UART_FIFO_INSTANCE(huart->Instance)) {
+        // Keep RXNE interrupts so even a single received byte is delivered.
+        status = HAL_UARTEx_EnableFifoMode(huart);
+    }
+#endif
+    return status;
 }
 
 int8_t get_uart_index(UARTName uart_name)
