@@ -134,9 +134,9 @@ SECTIONS
     __etext = .;
     _sidata = .;
 
-    /* Stick the vector table at start of SRAM */
     .vector_ram (NOLOAD) :
     {
+        . = ALIGN(512);
         __vector_ram_start__ = .;
         . += __vector_table_size__;
         __vector_ram_end__ = .;
