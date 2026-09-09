@@ -1,0 +1,26 @@
+var group__nfc_errors =
+[
+    [ "NFC_OK", "group__nfc-errors.html#ga2699271701a488659027b6e0452747d3", null ],
+    [ "NFC_ERR_UNKNOWN", "group__nfc-errors.html#ga8fa9617a341e64078308f18487eec424", null ],
+    [ "NFC_ERR_LENGTH", "group__nfc-errors.html#gaa66eb0acccb188c724fb6bc284703d77", null ],
+    [ "NFC_ERR_NOT_FOUND", "group__nfc-errors.html#gab6da16c5b1aeb45815b0a707cc8e34bd", null ],
+    [ "NFC_ERR_UNSUPPORTED", "group__nfc-errors.html#gaa26877bc46aec27aee909e97d5c5626c", null ],
+    [ "NFC_ERR_PARAMS", "group__nfc-errors.html#ga29542ad50ac16234b7e2e7debdc1ed41", null ],
+    [ "NFC_ERR_BUFFER_TOO_SMALL", "group__nfc-errors.html#ga75594a938cadebfe584e9a71fccc0bd0", null ],
+    [ "NFC_ERR_TIMEOUT", "group__nfc-errors.html#ga80caab0e8e77564de20df872dc368aa9", null ],
+    [ "NFC_ERR_CRC", "group__nfc-errors.html#ga1493c301acd13a0cc5afb842dc2d69ef", null ],
+    [ "NFC_ERR_NOPEER", "group__nfc-errors.html#gaa5c5adda89af9963d641057f85e74d0d", null ],
+    [ "NFC_ERR_PARITY", "group__nfc-errors.html#ga325744225a1991b403889bef46f5f63f", null ],
+    [ "NFC_ERR_FIELD", "group__nfc-errors.html#ga6726cd83b2294cf481d481d2501a3e08", null ],
+    [ "NFC_ERR_COLLISION", "group__nfc-errors.html#ga869f66ec710ccbcbcab3087c0bf67436", null ],
+    [ "NFC_ERR_WRONG_COMM", "group__nfc-errors.html#gab7378e79d476555a5dea7df5331b2712", null ],
+    [ "NFC_ERR_PROTOCOL", "group__nfc-errors.html#gab4f2c982876b1f927e3f7f30dc4d8ec9", null ],
+    [ "NFC_ERR_BUSY", "group__nfc-errors.html#ga6ef07a5e51465e0b5d98c8b910866f7f", null ],
+    [ "NFC_ERR_CONTROLLER", "group__nfc-errors.html#ga887c96dff332a410bde50d5e04a00ec6", null ],
+    [ "NFC_ERR_HALTED", "group__nfc-errors.html#ga0d4b2957c725aa37068b4992b8ce05aa", null ],
+    [ "NFC_ERR_MAC", "group__nfc-errors.html#ga120fcb8053013f687331086b1f3392b5", null ],
+    [ "NFC_ERR_UNDERFLOW", "group__nfc-errors.html#ga331c414471e7162ac3a125b9bccd81e1", null ],
+    [ "NFC_ERR_DISCONNECTED", "group__nfc-errors.html#ga9fbae1cc58e364fc9510150fcef43b4d", null ],
+    [ "NFC_ERR_ABORTED", "group__nfc-errors.html#ga1626226aafd432df71aab90a2379dc1b", null ],
+    [ "nfc_err_t", "group__nfc-errors.html#ga06e97468c14ad76f3de6810fb049b451", null ]
+];
