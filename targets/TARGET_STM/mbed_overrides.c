@@ -61,7 +61,9 @@ extern void SetSysClock(void);
 
 static void LSEDriveConfig(void)
 {
+#if !TARGET_STM32WB0
     HAL_PWR_EnableBkUpAccess();
+#endif
 #if defined(__HAL_RCC_LSEDRIVE_CONFIG)
     __HAL_RCC_LSEDRIVE_CONFIG(LSE_DRIVE_LOAD_LEVEL);
 #else
@@ -117,7 +119,11 @@ void GPIO_Full_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
 
+#if defined(GPIO_PIN_All)
     GPIO_InitStruct.Pin        = GPIO_PIN_All;
+#else
+    GPIO_InitStruct.Pin        = GPIO_PIN_ALL;
+#endif
     GPIO_InitStruct.Mode       = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Speed      = GPIO_SPEED_FREQ_LOW;
 #if !TARGET_STM32F1

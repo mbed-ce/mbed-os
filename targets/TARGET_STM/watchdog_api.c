@@ -19,10 +19,23 @@
 #ifdef DEVICE_WATCHDOG
 
 #include "watchdog_api.h"
-#include "reset_reason_api.h"
 #include "device.h"
 #include "mbed_error.h"
-#include <stdbool.h>
+
+#if defined(TARGET_STM32WB0)
+#include "mbed_wait_api.h"
+#include "rtc_clock_source.h"
+
+#if (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_LSE_OR_LSI) && MBED_CONF_TARGET_LSE_AVAILABLE
+#define WB0_IWDG_USES_LSE 1
+#define IWDG_CLOCK_VALUE LSE_VALUE
+#else
+#define WB0_IWDG_USES_LSE 0
+#define IWDG_CLOCK_VALUE LSI_VALUE
+#endif
+#else
+#define IWDG_CLOCK_VALUE LSI_VALUE
+#endif
 
 #define MAX_IWDG_PR 0x6 // Max value of Prescaler_divider bits (PR) of Prescaler_register (IWDG_PR)
 #define MAX_IWDG_RL 0xFFFUL // Max value of Watchdog_counter_reload_value bits (RL) of Reload_register (IWDG_RLR).
@@ -35,12 +48,12 @@
 // and Watchdog_counter_reload_value bits (RL) of Reload_register (IWDG_RLR)
 // to a timeout value [ms].
 #define PR_RL2UINT64_TIMEOUT_MS(PR_BITS, RL_BITS) \
-    ((PR2PRESCALER_DIV(PR_BITS)) * (RL_BITS) * 1000ULL / (LSI_VALUE))
+    ((PR2PRESCALER_DIV(PR_BITS)) * (RL_BITS) * 1000ULL / (IWDG_CLOCK_VALUE))
 
 // Convert Prescaler_divider bits (PR) of Prescaler_register (IWDG_PR) and a timeout value [ms]
 // to Watchdog_counter_reload_value bits (RL) of Reload_register (IWDG_RLR)
 #define PR_TIMEOUT_MS2RL(PR_BITS, TIMEOUT_MS) \
-    (((TIMEOUT_MS) * (LSI_VALUE) / (PR2PRESCALER_DIV(PR_BITS)) + 999UL) / 1000UL)
+    (((TIMEOUT_MS) * (IWDG_CLOCK_VALUE) / (PR2PRESCALER_DIV(PR_BITS)) + 999UL) / 1000UL)
 
 #define MAX_TIMEOUT_MS_UINT64 PR_RL2UINT64_TIMEOUT_MS(MAX_IWDG_PR, MAX_IWDG_RL)
 #if (MAX_TIMEOUT_MS_UINT64 > UINT32_MAX)
@@ -64,7 +77,46 @@ static uint8_t pick_min_iwdg_pr(const uint32_t timeout_ms)
     return INVALID_IWDG_PR;
 }
 
-IWDG_HandleTypeDef IwdgHandle;
+static IWDG_HandleTypeDef IwdgHandle;
+
+#if defined(TARGET_STM32WB0)
+static void enable_iwdg_clock(void)
+{
+    RCC_OscInitTypeDef oscillator = {0};
+
+#if WB0_IWDG_USES_LSE
+    if (!__HAL_RCC_GET_LSE_READYFLAG()) {
+        oscillator.OscillatorType = RCC_OSCILLATORTYPE_LSE;
+        oscillator.LSEState = RCC_LSE_ON;
+#if MBED_CONF_TARGET_LSE_BYPASS
+        oscillator.OscillatorType |= RCC_OSCILLATORTYPE_LSE_BYPASS;
+        oscillator.LSEBYPASSState = RCC_LSE_BYPASS_ON;
+#else
+        oscillator.LSEBYPASSState = RCC_LSE_BYPASS_OFF;
+#endif
+        if (HAL_RCC_OscConfig(&oscillator) != HAL_OK) {
+            error("Cannot initialize watchdog clock with LSE\n");
+        }
+    }
+    __HAL_RCC_RTC_WDG_BLEWKUP_CLK_CONFIG(RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSE);
+#else
+    if (!__HAL_RCC_GET_LSI_READYFLAG()) {
+        oscillator.OscillatorType = RCC_OSCILLATORTYPE_LSI;
+        oscillator.LSIState = RCC_LSI_ON;
+        if (HAL_RCC_OscConfig(&oscillator) != HAL_OK) {
+            error("Cannot initialize watchdog clock with LSI\n");
+        }
+    }
+    __HAL_RCC_RTC_WDG_BLEWKUP_CLK_CONFIG(RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSI);
+#endif
+
+    if (__HAL_RCC_WDG_IS_CLK_DISABLED()) {
+        __HAL_RCC_WDG_CLK_ENABLE();
+        /* RCC requires two slow-clock cycles before the first IWDG access. */
+        wait_us(100);
+    }
+}
+#endif
 
 watchdog_status_t hal_watchdog_init(const watchdog_config_t *config)
 {
@@ -80,6 +132,11 @@ watchdog_status_t hal_watchdog_init(const watchdog_config_t *config)
     IwdgHandle.Init.Reload    = rl;
 #if defined IWDG_WINR_WIN
     IwdgHandle.Init.Window = IWDG_WINDOW_DISABLE;
+#endif
+
+#if defined(TARGET_STM32WB0)
+    /* WB0 shares its low-speed clock source between RTC, watchdog and BLE wake-up. */
+    enable_iwdg_clock();
 #endif
 
     if (HAL_IWDG_Init(&IwdgHandle) != HAL_OK) {
@@ -125,8 +182,8 @@ watchdog_features_t hal_watchdog_get_platform_features(void)
     features.update_config = true;
     features.disable_watchdog = false;
 
-    /*  STM32 IWDG (Independent Watchdog) is clocked by its own dedicated low-speed clock (LSI) */
-    features.clock_typical_frequency = LSI_VALUE;
+    /* STM32 IWDG normally uses LSI; WB0 uses its selected shared low-speed clock. */
+    features.clock_typical_frequency = IWDG_CLOCK_VALUE;
 
     /*  See LSI oscillator characteristics in Data Sheet */
 #if defined(STM32F1)
@@ -141,6 +198,12 @@ watchdog_features_t hal_watchdog_get_platform_features(void)
     features.clock_max_frequency = 33600;
 #elif defined(STM32G0) || defined(STM32L5) || defined(STM32G4) || defined(STM32WB) || defined(STM32WL) || defined(STM32U0)
     features.clock_max_frequency = 34000;
+#elif defined(STM32WB0)
+#if WB0_IWDG_USES_LSE
+    features.clock_max_frequency = LSE_VALUE;
+#else
+    features.clock_max_frequency = 49000;
+#endif
 #else
 #error "unsupported target"
 #endif

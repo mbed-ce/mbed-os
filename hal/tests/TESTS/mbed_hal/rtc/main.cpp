@@ -100,11 +100,13 @@ void rtc_sleep_test_support(bool deepsleep_mode)
 
 /* Tests ::rtc_init() behavior:
  - rtc_init() can be called multiple times
- - rtc_isenabled() returns false before init and true after
+ - rtc_isenabled() returns false before init, unless the RTC provides the low-power ticker, and true after init
  - RTC returns valid time after being initialized (though that time may be anything). */
 void rtc_init_test()
 {
+#if !DEVICE_LPTICKER || !defined(MBED_CONF_TARGET_LPTICKER_LPTIM) || MBED_CONF_TARGET_LPTICKER_LPTIM
     TEST_ASSERT_FALSE(RealTimeClock::isenabled());
+#endif
 
     for (int i = 0; i < 10; i++) {
         RealTimeClock::init();
