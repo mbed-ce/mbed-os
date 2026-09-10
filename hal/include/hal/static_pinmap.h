@@ -155,11 +155,19 @@ MSTD_CONSTEXPR_FN_14 serial_fc_pinmap_t get_uart_fc_pinmap(const PinName rxflow,
         }
     }
 
-    if ((!rts_map || !cts_map) || (rts_map->peripheral != cts_map->peripheral)) {
+    // Allow only mapping CTS or RTS. However, if both are mapped, they must use the same peripheral.
+    if(rts_map == nullptr && cts_map != nullptr) {
+        return {cts_map->peripheral, cts_map->pin, cts_map->function, NC, (int) NC};
+    }
+    else if(cts_map == nullptr && rts_map != nullptr) {
+        return {rts_map->peripheral, NC, (int) NC, rts_map->pin, rts_map->function};
+    }
+    else if((rts_map == nullptr && cts_map == nullptr) || (rts_map->peripheral != cts_map->peripheral)) {
         return {(int) NC, NC, (int) NC, NC, (int) NC};
     }
-
-    return {cts_map->peripheral, cts_map->pin, cts_map->function, rts_map->pin, rts_map->function};
+    else {
+        return {cts_map->peripheral, cts_map->pin, cts_map->function, rts_map->pin, rts_map->function};
+    }
 }
 #endif // DEVICE_SERIAL_FC
 #endif // DEVICE_SERIAL
