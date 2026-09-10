@@ -212,6 +212,14 @@ public:
      *  @param flow2 the second flow control pin (CTS for RTSCTS)
      */
     void set_flow_control(Flow type, PinName flow1 = NC, PinName flow2 = NC);
+
+    /**
+     * @brief Set the flow control type on the serial port
+     *
+     * @param type the flow control type (Disabled, RTS, CTS, RTSCTS)
+     * @param static_pinmap reference to structure which holds static pinmap
+     */
+    void set_flow_control(Flow type, const serial_fc_pinmap_t &static_pinmap);
 #endif // DEVICE_SERIAL_FC
 };
 

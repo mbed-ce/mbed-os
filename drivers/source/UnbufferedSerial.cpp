@@ -120,6 +120,12 @@ void UnbufferedSerial::set_flow_control(Flow type, PinName flow1, PinName flow2)
     SerialBase::set_flow_control(type, flow1, flow2);
     unlock();
 }
+void UnbufferedSerial::set_flow_control(Flow type, const serial_fc_pinmap_t &static_pinmap)
+{
+    lock();
+    SerialBase::set_flow_control(type, static_pinmap);
+    lock();
+}
 #endif // DEVICE_SERIAL_FC
 
 } // namespace mbed

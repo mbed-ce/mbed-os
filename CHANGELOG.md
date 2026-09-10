@@ -24,6 +24,7 @@ A message that notes the main changes in the update.
 - MPU configuration code gained the ability to create a noncached section and a ram function section (for code that has to be executed out of RAM). This RAM function section is an exception to the normal limitations on RAM execution.'
 - Added Rx FIFO overflow flag to `BufferedSerial`. This allows detecting if the Rx buffer has overflowed (likely as a hint that its size should be increased)
 - Added `BufferedSerial::tx_buffer_size()` and `BufferedSerial::rx_buffer_size()` to check the current size of the Tx and Rx buffers.
+- Added missing functions for enabling serial flow control with a static pinmap
 - EFM32 Giant Gecko Series 0:
   - `EFM32GG_STK3700` added upload method config
 - MIMXRT117x: Memory bank configuration is now supported in the linker script.
@@ -85,6 +86,7 @@ A message that notes the main changes in the update.
 ### Fixed
 - Fixed `realloc(ptr, 0)` leaking the original allocation when heap statistics are enabled
 - Added fixes aimed at improving Greentea stability for KV/FlashIAP (STM32F7) and USBSerial paths.
+- Fixed inability to create a serial flow control static pinmap with only CTS or RTS defined, instead of both.
 - MIMXRT105x:
   - MIMXRT1050_EVK: Fixed build error due to typos
   - Fixed SPI SCLK frequency being several times higher than set due to clock config error (#564)
