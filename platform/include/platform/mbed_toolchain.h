@@ -24,6 +24,20 @@
 #define __error_t_defined 1
 #endif
 
+/* std::nothrow (and the nothrow_t new/delete overloads) is used throughout Mbed code.
+ * libstdc++ (GCC) transitively includes <new> from its C headers, but libc++
+ * (e.g. as used by the Arm Toolchain for Embedded) does not, so include it
+ * explicitly here for all C++ translation units.  This header may end up
+ * included from inside an extern "C" block (through device headers), which
+ * would give the C++ templates in <new> C linkage; the extern "C++" block
+ * below restores the correct linkage in that case.
+ */
+#ifdef __cplusplus
+extern "C++" {
+#include <new>
+}
+#endif
+
 /* Work around ARM Compiler 6 bug - assert does not work in constexpr
  * functions unless you stop it from using its __promise built-in.
  */

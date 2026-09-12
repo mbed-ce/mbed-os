@@ -133,7 +133,7 @@ SECTIONS
     _sidata = .;
 
     /* Put crash data in the otherwise unused D3 SRAM */
-    .crash_data_ram :
+    .crash_data_ram (NOLOAD) :
     {
         . = ALIGN(8);
         __CRASH_DATA_RAM__ = .;
@@ -210,9 +210,12 @@ SECTIONS
 
     .heap_0 (NOLOAD):
     {
+        /* Heap 0 covers all of SRAM left above .bss and below the boot stack.
+         * The bounds are plain symbol assignments instead of a location counter
+         * fill, so the section does not occupy the region and the linker's
+         * memory usage statistics report statically allocated data only. */
         PROVIDE(__mbed_sbrk_start_0 = .);
-        . = ORIGIN(SRAM) + LENGTH(SRAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE;
-        PROVIDE(__mbed_krbs_start_0 = .);
+        PROVIDE(__mbed_krbs_start_0 = ORIGIN(SRAM) + LENGTH(SRAM) - MBED_CONF_TARGET_BOOT_STACK_SIZE);
     } > SRAM
 
     /* .stack_dummy section doesn't contains any symbols. It is only
@@ -234,7 +237,6 @@ SECTIONS
     .heap (NOLOAD):
     {
         PROVIDE(__mbed_sbrk_start = .);
-        . += (ORIGIN(SRAM_D2) + LENGTH(SRAM_D2) - .);
-        PROVIDE(__mbed_krbs_start = .);
+        PROVIDE(__mbed_krbs_start = ORIGIN(SRAM_D2) + LENGTH(SRAM_D2));
     } > SRAM_D2
 }

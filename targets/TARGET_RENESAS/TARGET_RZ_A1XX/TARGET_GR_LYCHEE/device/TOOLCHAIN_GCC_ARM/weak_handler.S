@@ -55,7 +55,6 @@
 
                 .weak    IRQ_Handler
                 .type    IRQ_Handler, %function
-                .global  IRQ_Handler
                 .fnstart
                 .cantunwind
 IRQ_Handler:

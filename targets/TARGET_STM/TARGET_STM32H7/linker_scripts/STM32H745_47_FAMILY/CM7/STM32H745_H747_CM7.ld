@@ -222,7 +222,7 @@ SECTIONS
     ASSERT(__StackLimit >= __HeapLimit, "region SRAM overflowed with stack")
 
     /* Put crash data in the otherwise unused D3 SRAM */
-    .crash_data_ram :
+    .crash_data_ram (NOLOAD) :
     {
         . = ALIGN(8);
         __CRASH_DATA_RAM__ = .;

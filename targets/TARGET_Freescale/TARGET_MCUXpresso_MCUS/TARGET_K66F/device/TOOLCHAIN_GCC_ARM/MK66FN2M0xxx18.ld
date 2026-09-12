@@ -206,7 +206,7 @@ SECTIONS
     __interrupts_ram_end__ = .; /* Define a global symbol at data end */
   } > m_data
   
-  .crash_data_ram :
+  .crash_data_ram (NOLOAD) :
   {
     . = ALIGN(8);
     __CRASH_DATA_RAM__ = .;

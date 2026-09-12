@@ -144,7 +144,7 @@ SECTIONS
 
 #if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
     /* Stick the crash data ram close to start of SRAM after vector table */
-    .crash_data_ram :
+    .crash_data_ram (NOLOAD) :
     {
         . = ALIGN(8);
         __CRASH_DATA_RAM__ = .;

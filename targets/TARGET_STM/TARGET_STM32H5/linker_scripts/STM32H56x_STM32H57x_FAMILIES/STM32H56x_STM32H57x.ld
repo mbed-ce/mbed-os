@@ -84,7 +84,7 @@ SECTIONS
     __etext = .;
     _sidata = .;
 
-    .crash_data_ram :
+    .crash_data_ram (NOLOAD) :
     {
         . = ALIGN(8);
         __CRASH_DATA_RAM__ = .;

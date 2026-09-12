@@ -5,13 +5,11 @@
 if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
     list(APPEND common_options
         "-mthumb"
-        "-mfpu=fpv5-sp-d16"
         "-mfloat-abi=hard"
         "-mcpu=cortex-m85"
     )
 elseif(${MBED_TOOLCHAIN} STREQUAL "ARM")
     list(APPEND common_options
-        "-mfpu=fpv5-sp-d16"
         "-mfloat-abi=hard"
         "-mcpu=cortex-m85"
     )

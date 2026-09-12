@@ -56,6 +56,13 @@ MEMORY
  *   __StackTop
  *   __stack
  */
+/* Force the exception/IRQ handlers to be kept.  They are defined weak in
+ * weak_handler.S and overridden by strong definitions in the RTX Cortex-A
+ * support code (irq_armv7a.S); without this, ld.lld --gc-sections drops the
+ * strong definitions and leaves zero entries in the vector table.
+ */
+EXTERN(Undef_Handler SVC_Handler PAbt_Handler DAbt_Handler IRQ_Handler FIQ_Handler)
+
 ENTRY(Reset_Handler)
 
 SECTIONS
@@ -153,7 +160,7 @@ SECTIONS
         *(NV_DATA)
     } > RAM_NV
 
-    .ttb :
+    .ttb (NOLOAD) :
     {
         Image$$TTB$$ZI$$Base = .;
         . += 0x00004000;

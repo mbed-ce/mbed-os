@@ -8748,7 +8748,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_RA"
         ],
         "public": false,
-        "core": "Cortex-M85FE",
+        "core": "Cortex-M85",
         "device_has_add": [
             "CAN",
             "CAN_FD"

@@ -41,8 +41,7 @@ extern "C" {
  #define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used                              */
  #define __VTOR_PRESENT            1       /*!< Set to 1 if CPU supports Vector Table Offset Register                     */
  #define __MPU_PRESENT             1       /*!< MPU present                                                               */
- #define __FPU_PRESENT             1       /*!< FPU present                                                               */
-
+ #define __FPU_PRESENT             1U       /*!< FPU present                                                               */
 /** @} */ /* End of group Configuration_of_CMSIS */
 
  #include "core_cm4.h"                     /*!< ARM Cortex-M4 processor and core peripherals                              */

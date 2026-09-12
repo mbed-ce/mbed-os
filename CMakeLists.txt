@@ -61,7 +61,7 @@ endif()
 
 # Get version and create project in CMake.
 # This will also find the compilers (if not already found)
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/VERSION MBED_VERSION_FILE_CONTENTS)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/VERSION.md MBED_VERSION_FILE_CONTENTS)
 project(mbed-os LANGUAGES C CXX ASM VERSION ${MBED_VERSION_FILE_CONTENTS})
 
 message(STATUS "Mbed: This is Mbed OS Community Edition version ${mbed-os_VERSION}.")

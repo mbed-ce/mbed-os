@@ -34,8 +34,13 @@ function(mbed_set_profile_options target mbed_toolchain)
                 $<$<COMPILE_LANGUAGE:ASM>:${profile_asm_compile_options}>
         )
 
+        # ATfE's ld.lld is built without zlib support, so debug sections cannot be compressed
+        if(NOT MBED_ATFE)
+            list(APPEND profile_link_options
+                "-Wl,--compress-debug-sections=zlib"
+            )
+        endif()
         list(APPEND profile_link_options
-            "-Wl,--compress-debug-sections=zlib"
             "-Wl,--gc-sections"
             "-Wl,--wrap,main"
             "-Wl,--wrap,_malloc_r"

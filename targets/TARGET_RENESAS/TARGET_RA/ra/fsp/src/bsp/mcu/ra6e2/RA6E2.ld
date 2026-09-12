@@ -232,15 +232,18 @@ SECTIONS
         __ram_thread_stack$$Limit = .;
     } > RAM
 
-    /* Heap, filling the remainder of SRAM */
+    /* Heap, occupying the remainder of SRAM.  Note that __HeapLimit is set to the
+     * end of RAM with a plain symbol assignment instead of advancing the location
+     * counter, so the .heap section does not physically fill the region.  This way
+     * the linker's memory usage statistics (--print-memory-usage) report the
+     * statically allocated data only, not the reserved heap space. */
     .heap (NOLOAD) :
     {
         __HeapBase = .;
         __end__ = .;
         PROVIDE(end = .);
         *(.bss.g_heap)
-        . = ORIGIN(RAM) + LENGTH(RAM);
-        __HeapLimit = .;
+        __HeapLimit = ORIGIN(RAM) + LENGTH(RAM);
     } > RAM
 
     ASSERT(__HeapBase <= ORIGIN(RAM) + LENGTH(RAM), "region RAM overflowed with stack, data and bss")

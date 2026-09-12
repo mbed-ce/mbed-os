@@ -199,7 +199,7 @@ SECTIONS
     PROVIDE(__stack = __StackTop);
 
     /* Put crash data in the otherwise unused D3 SRAM */
-    .crash_data_ram :
+    .crash_data_ram (NOLOAD) :
     {
         /* Advance forward by 1 crash data ram size so that we don't overwrite the CM7's crash data */
         . += M_CRASH_DATA_RAM_SIZE;

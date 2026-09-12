@@ -111,7 +111,7 @@ SECTIONS
     __etext = .;
     _sidata = .;
 
-    .crash_data_ram :
+    .crash_data_ram (NOLOAD) :
     {
         . = ALIGN(8);
         __CRASH_DATA_RAM__ = .;
@@ -127,8 +127,7 @@ SECTIONS
     .heap_0 (COPY):
     {
         __mbed_sbrk_start_0 = .;
-        . += (ORIGIN(SRAM2) + LENGTH(SRAM2) - .);
-        __mbed_krbs_start_0 = .;
+        __mbed_krbs_start_0 = ORIGIN(SRAM2) + LENGTH(SRAM2);
     } > SRAM2
 
     .data : AT (__etext)
@@ -188,9 +187,8 @@ SECTIONS
         end = __end__;
         __mbed_sbrk_start = .;
         *(.heap*)
-        . += (ORIGIN(SRAM1) + LENGTH(SRAM1) - .);
-        __mbed_krbs_start = .;
-        __HeapLimit = .;
+        __mbed_krbs_start = ORIGIN(SRAM1) + LENGTH(SRAM1);
+        __HeapLimit = __mbed_krbs_start;
     } > SRAM1
 
     /* Set stack top to end of SRAM1, and stack limit to be less than that by the boot stack size */

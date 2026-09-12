@@ -58,9 +58,12 @@ extern "C" void __cxa_guard_release(int *guard_object_p);
 // IAR does not provide <mutex> at all - it errors on inclusion
 // ARMC6 provides it, but it is empty unless _ARM_LIBCPP_EXTERNAL_THREADS is defined
 // GCC has it, and only the actual `mutex` types are conditional on _GLIBCXX_HAS_GTHREADS
-// So pick up std stuff, unless ICC, or ARMC6-without-threads
+// Modern libc++ (e.g. Arm Toolchain for Embedded) gates all of <mutex> on _LIBCPP_HAS_THREADS
+// and no longer defines _LIBCPP_HAS_NO_THREADS, so check both spellings
+// So pick up std stuff, unless ICC, or libc++-without-threads
 namespace mstd {
-#if !defined __IAR_SYSTEMS_ICC__ && !defined _LIBCPP_HAS_NO_THREADS
+#if !defined __IAR_SYSTEMS_ICC__ && !defined _LIBCPP_HAS_NO_THREADS && \
+    (!defined _LIBCPP_HAS_THREADS || _LIBCPP_HAS_THREADS)
 using std::defer_lock;
 using std::defer_lock_t;
 using std::try_to_lock;

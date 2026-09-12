@@ -13,9 +13,6 @@
  * Includes   <System Includes> , "Project Includes"
  **********************************************************************************************************************/
 #include <string.h>
-#if defined(__GNUC__) && defined(__llvm__) && !defined(__ARMCC_VERSION) && !defined(__CLANG_TIDY__)
- #include <picotls.h>
-#endif
 #if defined(__ARMCC_VERSION)
  #if defined(__ARMCC_USING_STANDARDLIB)
   #include <rt_misc.h>
@@ -62,15 +59,6 @@
 
 /** System Clock Frequency (Core Clock) */
 uint32_t SystemCoreClock BSP_SECTION_EARLY_INIT;
-
-#if defined(__GNUC__)
-
-/* Nested in __GNUC__ because LLVM generates both __GNUC__ and __llvm__*/
- #if defined(__llvm__) && !defined(__CLANG_TIDY__)
-extern uint32_t __tls_base;
- #endif
-
-#endif
 
 /* Initialize static constructors */
 #if defined(__GNUC__)
@@ -475,12 +463,6 @@ void SystemInit (void)
     /* Initialize data placed in external memories. */
     SystemRuntimeInit(1);
 
- #if defined(__GNUC__) && defined(__llvm__) && !defined(__CLANG_TIDY__) && !(defined __ARMCC_VERSION)
-
-    /* Initialize TLS memory. */
-    _init_tls(&__tls_base);
-    _set_tls(&__tls_base);
- #endif
 #endif
 
 #if defined(__ICCARM__)

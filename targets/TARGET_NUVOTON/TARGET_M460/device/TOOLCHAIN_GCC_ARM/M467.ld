@@ -204,7 +204,7 @@ SECTIONS
         PROVIDE(__end_vector_table__ = .);
     } > RAM_INTERN
     
-    .crash_data_ram :
+    .crash_data_ram (NOLOAD) :
     {
         . = ALIGN(8);
         __CRASH_DATA_RAM__ = .;
