@@ -19,7 +19,7 @@
 
 /* Different compiler support. */
 #include "fsp_common_api.h"
-#include "../../fsp/src/bsp/mcu/all/bsp_compiler_support.h"
+#include "bsp_compiler_support.h"
 
 /***********************************************************************************************************************
  * Macro definitions
