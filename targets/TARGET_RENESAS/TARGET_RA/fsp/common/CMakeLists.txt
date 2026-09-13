@@ -70,6 +70,7 @@ target_sources(mbed-ra4e1
         src/r_iic_slave/r_iic_slave.c
         src/r_sci_uart/r_sci_uart.c
         src/r_spi/r_spi.c
+        src/r_can/r_can.c
 )
 
 # RA6E2 specific code

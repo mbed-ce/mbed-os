@@ -191,7 +191,10 @@ public:
      *
      *  @param baud   The baud rate
      */
-    void set_baud(int baud) { SerialBase::baud(baud); }
+    void set_baud(int baud)
+    {
+        SerialBase::baud(baud);
+    }
 
     using SerialBase::attach;
     using SerialBase::baud;
