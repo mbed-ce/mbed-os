@@ -28,6 +28,7 @@
 #include "hal/us_ticker_api.h"
 #include "hal/lp_ticker_api.h"
 #include "hal/mbed_lp_ticker_wrapper.h"
+#include "mbed_critical.h"
 
 #if !DEVICE_USTICKER
 #error [NOT_SUPPORTED] UsTicker need to be enabled for this test

@@ -17,4 +17,8 @@ target_sources(mbed-ra8e1
 
 target_link_libraries(mbed-ra8e1 INTERFACE mbed-renesas-ra)
 
+if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
+    mbed_set_linker_script(mbed-ra8e1 RA8E1.ld)
+endif()
+
 add_subdirectory(TARGET_FPB_RA8E1 EXCLUDE_FROM_ALL)

@@ -64,6 +64,3 @@ target_sources(mbed-renesas-ra
 # RA8E1 specific code
 target_include_directories(mbed-ra8e1 INTERFACE src/bsp/mcu/ra8e1)
 target_sources(mbed-ra8e1 INTERFACE src/bsp/mcu/ra8e1/bsp_linker.c)
-if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
-    mbed_set_linker_script(mbed-ra8e1 src/bsp/mcu/ra8e1/RA8E1.ld)
-endif()
