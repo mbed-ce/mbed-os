@@ -18,57 +18,10 @@
 #include "platform/mbed_error.h"
 #include "rtc_api_hal.h"
 #include "stm_dma_utils.h"
+#include "low_speed_clock.h"
 
 int mbed_sdk_inited = 0;
 extern void SetSysClock(void);
-
-#if defined(RCC_LSE_HIGHDRIVE_MODE) || defined(RCC_LSEDRIVE_HIGH)
-#   define LSE_CONFIG_AVAILABLE
-#endif
-
-// set defaults for LSE drive load level
-#if defined(LSE_CONFIG_AVAILABLE)
-
-#   if defined(MBED_CONF_TARGET_LSE_DRIVE_LOAD_LEVEL)
-#       define LSE_DRIVE_LOAD_LEVEL    MBED_CONF_TARGET_LSE_DRIVE_LOAD_LEVEL
-#   else
-#       if defined(RCC_LSE_HIGHDRIVE_MODE) // STM32F4
-#           define LSE_DRIVE_LOAD_LEVEL    RCC_LSE_LOWPOWER_MODE
-#       else
-#           define LSE_DRIVE_LOAD_LEVEL    RCC_LSEDRIVE_LOW
-#       endif
-#   endif
-
-
-/**
- * @brief configure the LSE crystal driver load
- * This setting is target hardware dependend and
- * depends on the crystal that is used for LSE clock.
- * For low power requirements, crystals with low load capacitors can be used and
- * driver setting is RCC_LSEDRIVE_LOW.
- * For higher stablity, crystals with higher load capacitys can be used and
- * driver setting is RCC_LSEDRIVE_HIGH.
- *
- * A detailed description about this setting can be found here:
- * https://www.st.com/resource/en/application_note/cd00221665-oscillator-design-guide-for-stm8afals-stm32-mcus-and-mpus-stmicroelectronics.pdf
- *
- * LSE maybe used later, but crystal load drive setting is necessary before
- * enabling LSE.
- *
- * @param None
- * @retval None
- */
-
-static void LSEDriveConfig(void)
-{
-    HAL_PWR_EnableBkUpAccess();
-#if defined(__HAL_RCC_LSEDRIVE_CONFIG)
-    __HAL_RCC_LSEDRIVE_CONFIG(LSE_DRIVE_LOAD_LEVEL);
-#else
-    HAL_RCCEx_SelectLSEMode(LSE_DRIVE_LOAD_LEVEL);
-#endif
-}
-#endif  // LSE_CONFIG_AVAILABLE
 
 /**
  * @brief Setup the target board-specific configuration
@@ -243,15 +196,6 @@ void mbed_sdk_init()
     SystemCoreClockUpdate();
     HAL_Init();
 
-    /* Configure the System clock source, PLL Multiplier and Divider factors,
-       AHB/APBx prescalers and Flash settings */
-#if defined(LSE_CONFIG_AVAILABLE)
-    // LSE oscillator drive capability set before LSE is started
-    if (!LL_RCC_LSE_IsReady()) {
-        LSEDriveConfig();
-    }
-#endif
-
 #if defined(MBED_CONF_TARGET_SYSTEM_POWER_SUPPLY)
 #if IS_PWR_SUPPLY(MBED_CONF_TARGET_SYSTEM_POWER_SUPPLY)
     HAL_PWREx_ConfigSupply(MBED_CONF_TARGET_SYSTEM_POWER_SUPPLY);
@@ -259,7 +203,11 @@ void mbed_sdk_init()
 #error system_power_supply not configured
 #endif
 #endif
-
+#if defined(MBED_CONF_TARGET_LSC_BOOT_STARTUP)
+    lsc_start();
+#endif // MBED_CONF_TARGET_LSC_BOOT_STARTUP
+    /* Configure the System clock source, PLL Multiplier and Divider factors,
+    AHB/APBx prescalers and Flash settings */
     SetSysClock();
     SystemCoreClockUpdate();
 
@@ -283,13 +231,6 @@ void mbed_sdk_init()
     SystemCoreClockUpdate();
     HAL_Init();
 
-#if defined(LSE_CONFIG_AVAILABLE)
-    // LSE oscillator drive capability set before LSE is started
-    if (!LL_RCC_LSE_IsReady()) {
-        LSEDriveConfig();
-    }
-#endif
-
 #if defined(MBED_CONF_TARGET_SYSTEM_POWER_SUPPLY)
 #if IS_PWR_SUPPLY(MBED_CONF_TARGET_SYSTEM_POWER_SUPPLY)
     HAL_PWREx_ConfigSupply(MBED_CONF_TARGET_SYSTEM_POWER_SUPPLY);
@@ -297,7 +238,11 @@ void mbed_sdk_init()
 #error system_power_supply not configured
 #endif
 #endif
-
+#if defined(MBED_CONF_TARGET_LSC_BOOT_STARTUP)
+    lsc_start();
+#endif // MBED_CONF_TARGET_LSC_BOOT_STARTUP
+    /* Configure the System clock source, PLL Multiplier and Divider factors,
+    AHB/APBx prescalers and Flash settings */
     SetSysClock();
     SystemCoreClockUpdate();
 #endif /* DUAL_CORE */
