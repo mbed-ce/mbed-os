@@ -112,7 +112,6 @@ A message that notes the main changes in the update.
 - Fixed `Timer` class not being included in Doxygen docs due to misplaced #ifdef
 - Rewrote and improved docs for `Timer` and `LowPowerTimer` classes
 - Functions tagged as `MBED_DEPRECATED` will now show as deprecated in the Doxygen docs
-- On Windows, Mbed should no longer attempt to use jlink.exe from the Java Development Kit (JDK) when trying to find the SEGGER J-Link tools.
 
 ### Removed
 - Target Uhuru Raven (STM32F7) has been removed due to market availability (it is still possible to use it with release Mbed-os 7.0.0)

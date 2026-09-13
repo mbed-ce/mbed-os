@@ -32,7 +32,6 @@ target_sources(mbed-renesas-ra
         src/r_adc/r_adc.c
         src/r_agt/r_agt.c
         src/r_cac/r_cac.c
-        src/r_canfd/r_canfd.c
         src/r_cgc/r_cgc.c
         src/r_crc/r_crc.c
         src/r_dac/r_dac.c
@@ -44,8 +43,6 @@ target_sources(mbed-renesas-ra
         src/r_gpt/r_gpt.c
         src/r_gpt_three_phase/r_gpt_three_phase.c
         src/r_icu/r_icu.c
-        src/r_iic_master/r_iic_master.c
-        src/r_iic_slave/r_iic_slave.c
         src/r_ioport/r_ioport.c
         src/r_iwdt/r_iwdt.c
         src/r_lpm/r_lpm.c
@@ -56,11 +53,44 @@ target_sources(mbed-renesas-ra
         src/r_sci_lin/r_sci_lin.c
         src/r_sci_smci/r_sci_smci.c
         src/r_sci_spi/r_sci_spi.c
-        src/r_sci_b_uart/r_sci_b_uart.c
-        src/r_spi_b/r_spi_b.c
         src/r_wdt/r_wdt.c
+)
+
+# RA4E1 specific code
+target_include_directories(mbed-ra4e1
+    INTERFACE
+        src/bsp/mcu/ra4e1
+        src/r_sce_protected/crypto_procedures_protected/src/sce9/inc/instances
+        src/r_sce_protected/crypto_procedures_protected/src/sce9/inc/api
+)
+target_sources(mbed-ra4e1
+    INTERFACE
+        src/bsp/mcu/ra4e1/bsp_linker.c
+        src/r_iic_master/r_iic_master.c
+        src/r_iic_slave/r_iic_slave.c
+        src/r_sci_uart/r_sci_uart.c
+        src/r_spi/r_spi.c
+)
+
+# RA6E2 specific code
+target_include_directories(mbed-ra6e2 INTERFACE src/bsp/mcu/ra6e2)
+target_sources(mbed-ra6e2
+    INTERFACE
+        src/bsp/mcu/ra6e2/bsp_linker.c
+        src/r_iic_b_master/r_iic_b_master.c
+        src/r_sci_uart/r_sci_uart.c
+        src/r_spi/r_spi.c
+        src/r_canfd/r_canfd.c
 )
 
 # RA8E1 specific code
 target_include_directories(mbed-ra8e1 INTERFACE src/bsp/mcu/ra8e1)
-target_sources(mbed-ra8e1 INTERFACE src/bsp/mcu/ra8e1/bsp_linker.c)
+target_sources(mbed-ra8e1
+    INTERFACE
+        src/bsp/mcu/ra8e1/bsp_linker.c
+        src/r_iic_master/r_iic_master.c
+        src/r_iic_slave/r_iic_slave.c
+        src/r_sci_b_uart/r_sci_b_uart.c
+        src/r_spi_b/r_spi_b.c
+        src/r_canfd/r_canfd.c
+)
