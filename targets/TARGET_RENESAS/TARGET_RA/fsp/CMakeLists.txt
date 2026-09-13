@@ -1,0 +1,4 @@
+add_subdirectory(common)
+add_subdirectory(TARGET_RA4E1)
+add_subdirectory(TARGET_RA6E2)
+add_subdirectory(TARGET_RA8E1)
