@@ -5781,8 +5781,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "network-default-interface-type": "ETHERNET"
         },
         "image_url": "https://www.renesas.com/sites/default/files/media/images/gr-mango-top.png"
-    },ve
-        git pu
+    },
 
     // Maxim (now Analog Devices) Targets ------------------------------------------------------------------------------
     "MCU_MAX32620": {
