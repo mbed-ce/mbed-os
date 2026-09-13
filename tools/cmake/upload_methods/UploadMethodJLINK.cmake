@@ -68,13 +68,14 @@ exit
 	add_custom_target(flash-${TARGET_NAME}
 		COMMENT "Flashing ${TARGET_NAME} with J-Link..."
 		COMMAND ${JLINK}
-		${JLINK_EXE_SELECT_ARG}
-		-Device \"${JLINK_CPU_NAME}\"
-		-Speed ${JLINK_CLOCK_SPEED}
-		-if ${JLINK_UPLOAD_INTERFACE}
-        -AutoConnect 1
-        -NoGui 1
-		-CommandFile ${COMMAND_FILE_PATH})
+			${JLINK_EXE_SELECT_ARG}
+			-Device ${JLINK_CPU_NAME}
+			-Speed ${JLINK_CLOCK_SPEED}
+			-if ${JLINK_UPLOAD_INTERFACE}
+			-AutoConnect 1
+			-NoGui 1
+			-CommandFile ${COMMAND_FILE_PATH}
+		VERBATIM)
 
 endfunction(gen_upload_target)
 
@@ -117,7 +118,7 @@ add_custom_target(reset
 	COMMENT "Resetting target with J-Link..."
 	COMMAND ${JLINK}
 		${JLINK_EXE_SELECT_ARG}
-		-Device \"${JLINK_CPU_NAME}\"
+		-Device ${JLINK_CPU_NAME}
 		-Speed ${JLINK_CLOCK_SPEED}
 		-if ${JLINK_UPLOAD_INTERFACE}
 		-AutoConnect 1
