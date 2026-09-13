@@ -17,7 +17,3 @@ extern "C" void mbed_sdk_init()
 
     mbed_sdk_inited = 1;
 }
-
-extern "C" void mbed_mpu_init() {
-    // MPU already initialized by Renesas FSP, ignore for now.
-}
