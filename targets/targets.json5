@@ -5888,8 +5888,16 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 //            "CAN",
 //            "CAN_FD"
         ],
+        "device_has_remove": [
+            // Renesas FSP MPU configuration code used (for now), which supplants
+            // normal Mbed MPU config.
+            "MPU"
+        ],
         "extra_labels_add": [
             "RA8E1"
+        ],
+        "macros_add": [
+            "MBED_MPU_CUSTOM" // suppresses warning about "device has MPU but not enabled"
         ]
     },
     "FPB_RA8E1": {
