@@ -35,8 +35,9 @@ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
     set(JLINK_PATH /usr/local/bin)
 endif()
 
-# Annoyingly, on Windows, the Java JDK provides an executable called "jlink.exe", which has nothing to do
-# with SEGGER J-Link.
+# Annoyingly, the Java JDK provides an executable called "jlink.exe".
+# On Linux/Mac this is not an issue because the J-Link program is called JLinkExe,
+# but on windows it's JLink.exe so there is a conflict.
 # We need to prevent this executable from being found instead of the "real" JLink.exe.
 if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
     set(OLD_PATH $ENV{PATH})
