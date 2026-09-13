@@ -42,6 +42,7 @@ target_sources(mbed-stm
         us_ticker.c
         watchdog_api.c
 		stm_dma_utils.c
+        low_speed_clock.c
 )
 
 target_link_libraries(mbed-stm INTERFACE mbed-cmsis-cortex-m)

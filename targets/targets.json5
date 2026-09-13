@@ -783,7 +783,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/117498-CS_FRDM-K82-Board-Top_Mbed.jpg"
     },
 
-    // STM32 Top-Level Target ------------------------------------------------------------------------------------------
+// STM32 Top-Level Target ------------------------------------------------------------------------------------------
     "MCU_STM32": {
         "inherits": [
             "Target"
@@ -797,6 +797,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USE_FULL_LL_DRIVER"
         ],
         "config": {
+            "lsc-boot-startup": {
+                "help": "Define if the Low Speed Clock (LSC = LSE/LSI) can start at boot time, before SetSysClock (0 = No, 1 = Yes), If No, then LSC can be started in SetSysClock or by peripherals - RTC, LPTICKER...",
+                "value": "0"
+            },
             "lse-available": {
                 "help": "Define if a Low Speed External xtal (LSE) is available on the board (0 = No, 1 = Yes). If Yes, the LSE will be used to clock the RTC, LPUART, ... otherwise the Low Speed Internal clock (LSI) will be used",
                 "value": "1"
@@ -806,7 +810,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "0"
             },
             "rtc-clock-source": {
-                "help": "Define the RTC clock source. USE_RTC_CLK_LSE_OR_LSI, USE_RTC_CLK_LSI, USE_RTC_CLK_HSE. LPTICKER is not available for HSE and should be removed from the target configuration.",
+                "help": "Define the RTC clock source. USE_RTC_CLK_LSE_OR_LSI, USE_RTC_CLK_HSE. HSE only for F1, F2, F4 and F7 family. LSE/LSI is driven by lse-available",
                 "value": "USE_RTC_CLK_LSE_OR_LSI"
             },
             "lpuart-clock-source": {
@@ -879,7 +883,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "macro_name": "CLOCK_SOURCE"
             },
             "lse-drive-load-level": {
-                "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
+                "help": "LSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
                 "value": "RCC_LSEDRIVE_LOW"
             },
             "i2c-timing-value-algo": {
@@ -1183,7 +1187,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
 
-    // STM32F3 Targets -------------------------------------------------------------------------------------------------
+// STM32F3 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F3": {
         "inherits": [
             "MCU_STM32"
@@ -1824,7 +1828,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.analog.com/en/_/media/analog/en/evaluation-board-images/images/eval-sdp-ck1ztop-web.gif?rev=2b0d46c94afe490cb3543819752a0471&sc_lang=en&h=270&thn=1&hash=C1A2567A6E5A569665B40C5DCFE1B8C3"
     },
 
-// STM32F7 Targets -------------------------------------------------------------------------------------------------
+    // STM32F7 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F7": {
         "inherits": [
             "MCU_STM32"
@@ -2644,7 +2648,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "overrides": {
             "hse-value": 24000000,
-            "lse-available":  1,
             "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
 
             // ADC reference voltage is same as MCU VDD.
@@ -2685,7 +2688,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32H563xI"
         ],
         "overrides": {
-            "lse-available":  1,
             "clock-source": "USE_PLL_HSE_EXTC|USE_PLL_HSI",
 
             // ADC reference voltage is same as MCU VDD.
@@ -2724,7 +2726,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "overrides": {
             "hse-value": 25000000,
-            "lse-available":  1,
             "clock-source": "USE_PLL_HSE_XTAL|USE_PLL_HSI",
 
             // ADC reference voltage is same as MCU VDD.
@@ -2875,7 +2876,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USBDEVICE"
         ],
         "overrides": {
-            "lse-available":  1,
             "system-power-supply": "PWR_DIRECT_SMPS_SUPPLY",
             "clock-source": "USE_PLL_HSI | USE_PLL_HSE_XTAL",
             "lse-drive-load-level": "RCC_LSEDRIVE_MEDIUMLOW",
@@ -2992,7 +2992,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "overrides": {
             "clock-source": "USE_PLL_HSE_EXTC",
-            "lse-available": 1,
             "network-default-interface-type": "ETHERNET"
         },
         "supported_form_factors": [
@@ -3215,7 +3214,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "QSPI"
         ],
         "overrides": {
-            "lse-available": 1,
             "lpticker-delay-ticks": 0,
             "i2c-timing-value-algo": true
         },
@@ -4344,6 +4342,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "STM32L562QEIxQ",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF268050.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
+
     // STM32U0 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32U0": {
         "inherits": [
@@ -4411,7 +4410,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
 		 "overrides": {
             "clock-source": "USE_PLL_HSI", // Use HSI by default, other options require hardware changes
-            "lse-available":  1,
             "default-adc-vref": 3.3
         },
         "supported_form_factors": [
@@ -4837,7 +4835,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32WLE5JCIx"
     },
-    // NXP i.MX RT Targets ---------------------------------------------------------------------------------------------
+// NXP i.MX RT Targets ---------------------------------------------------------------------------------------------
 
     // Note: "MIMXRT105X" target is for the MIMXRT1051, MIMXRT1052, MIMXRT1061, and MIMXRT1062
     // See here for details: https://github.com/mbed-ce/mbed-os/wiki/MCU-Info-Page:-MIMXRT105x-and-106x
