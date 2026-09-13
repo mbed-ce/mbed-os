@@ -26,6 +26,7 @@ A message that notes the main changes in the update.
 - Added Rx FIFO overflow flag to `BufferedSerial`. This allows detecting if the Rx buffer has overflowed (likely as a hint that its size should be increased)
 - Added `BufferedSerial::tx_buffer_size()` and `BufferedSerial::rx_buffer_size()` to check the current size of the Tx and Rx buffers.
 - Added a hook allowing `USBDevice` subclasses to send additional string descriptors, via the new `USBDevice::string_ext_desc()` virtual.
+- Added missing `UnbufferedSerial::set_baud()` function which was previously not exposed.
 - Added missing functions for enabling serial flow control with a static pinmap
 - EFM32 Giant Gecko Series 0:
   - `EFM32GG_STK3700` added upload method config

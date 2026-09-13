@@ -19,6 +19,7 @@
 #include "unity/unity.h"
 #include "greentea-client/test_env.h"
 
+#include "CircularBuffer.h"
 #include "mbed.h"
 
 using namespace utest::v1;

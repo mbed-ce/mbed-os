@@ -5,6 +5,10 @@ if(NOT "DEVICE_SERIAL=1" IN_LIST MBED_TARGET_DEFINITIONS)
 	set(TEST_SKIPPED "Serial communication not supported for this target")
 endif()
 
+if(NOT "DEVICE_INTERRUPTIN=1" IN_LIST MBED_TARGET_DEFINITIONS)
+	set(TEST_SKIPPED "Interrupt in not supported for this target")
+endif()
+
 mbed_greentea_add_test(
     TEST_NAME
         mbed-drivers-buffered-serial
