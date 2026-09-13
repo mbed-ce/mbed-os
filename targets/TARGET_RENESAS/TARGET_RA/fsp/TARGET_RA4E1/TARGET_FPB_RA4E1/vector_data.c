@@ -46,13 +46,11 @@
             [35] = sci_uart_txi_isr, /* SCI9 TXI (Transmit data empty) */
             [36] = sci_uart_tei_isr, /* SCI9 TEI (Transmit end) */
             [37] = sci_uart_eri_isr, /* SCI9 ERI (Receive error) */
-#if DEVICE_CAN
             [38] = can_error_isr, /* CAN0 ERROR (Error interrupt) */
             [39] = can_rx_isr, /* CAN0 MAILBOX RX (Reception complete interrupt) */
             [40] = can_tx_isr, /* CAN0 MAILBOX TX (Transmission complete interrupt) */
             [41] = can_rx_isr, /* CAN0 FIFO RX (Receive FIFO interrupt) */
             [42] = can_tx_isr, /* CAN0 FIFO TX (Transmit FIFO interrupt) */
-#endif
             [43] = fcu_frdyi_isr, /* FCU FRDYI (Flash ready interrupt) */
             [44] = fcu_fiferr_isr, /* FCU FIFERR (Flash access error interrupt) */
         };
