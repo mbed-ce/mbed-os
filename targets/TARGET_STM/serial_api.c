@@ -383,35 +383,17 @@ void serial_baud(serial_t *obj, int baudrate)
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPUART1;
 #if ((MBED_CONF_TARGET_LPUART_CLOCK_SOURCE) & USE_LPUART_CLK_LSE) && MBED_CONF_TARGET_LSE_AVAILABLE
         if (baudrate <= (int)(LSE_VALUE / 3)) {
-            // Enable LSE in case it is not already done
-            if (!__HAL_RCC_GET_FLAG(RCC_FLAG_LSERDY)) {
-                RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-                RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
-                RCC_OscInitStruct.LSEState       = RCC_LSE_ON;
-                RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_OFF;
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
-                while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID)) {
-                }
+            while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID));
 #endif /* DUAL_CORE */
-                HAL_RCC_OscConfig(&RCC_OscInitStruct);
+            lsc_start();
+            PeriphClkInitStruct.Lpuart1ClockSelection = RCC_LPUART1CLKSOURCE_LSE;
+            HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
-                LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
+            LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
 #endif /* DUAL_CORE */
-            }
-            // Keep it to verify if HAL_RCC_OscConfig didn't exit with a timeout
-            if (__HAL_RCC_GET_FLAG(RCC_FLAG_LSERDY)) {
-#if defined(DUAL_CORE) && (TARGET_STM32H7)
-                while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID)) {
-                }
-#endif /* DUAL_CORE */
-                PeriphClkInitStruct.Lpuart1ClockSelection = RCC_LPUART1CLKSOURCE_LSE;
-                HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
-#if defined(DUAL_CORE) && (TARGET_STM32H7)
-                LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
-#endif /* DUAL_CORE */
-                if (init_uart(obj) == HAL_OK) {
-                    return;
-                }
+            if (init_uart(obj) == HAL_OK) {
+                return;
             }
         }
 #endif
@@ -436,7 +418,7 @@ void serial_baud(serial_t *obj, int baudrate)
                 RCC_OscInitTypeDef RCC_OscInitStruct = {0};
                 RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSI;
                 RCC_OscInitStruct.HSIState            = RCC_HSI_ON;
-                RCC_OscInitStruct.PLL.PLLState        = RCC_PLL_OFF;
+                RCC_OscInitStruct.PLL.PLLState        = RCC_PLL_NONE; // No PLL update
                 RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
     #if defined(DUAL_CORE) && (TARGET_STM32H7)
                 while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID)) {
