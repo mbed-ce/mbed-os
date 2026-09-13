@@ -46,7 +46,6 @@ static RTC_HandleTypeDef RtcHandle;
 
 void rtc_init(void)
 {
-    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
     if (RTC_inited) {
@@ -58,13 +57,9 @@ void rtc_init(void)
     __HAL_RCC_PWR_CLK_ENABLE();
     HAL_PWR_EnableBkUpAccess();
 
-#if defined(DUAL_CORE) && (TARGET_STM32H7)
-    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID)) {
-    }
-#endif /* DUAL_CORE */
-#if (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_HSE)
-    (void)RCC_OscInitStruct;
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+#if (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_HSE)
+    // only F1-7 families have HSE as RTC clock source
 #if defined(RCC_RTCCLKSOURCE_HSE_DIVX)
     PeriphClkInitStruct.RTCClockSelection = (RCC_RTCCLKSOURCE_HSE_DIVX | RTC_HSE_DIV << 16);
 #else
@@ -73,49 +68,26 @@ void rtc_init(void)
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         error("PeriphClkInitStruct RTC failed with HSE\n");
     }
-#elif (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_LSE_OR_LSI) && MBED_CONF_TARGET_LSE_AVAILABLE
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
-    RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_NONE;
-#if MBED_CONF_TARGET_LSE_BYPASS
-    RCC_OscInitStruct.LSEState       = RCC_LSE_BYPASS;
-#else
-    RCC_OscInitStruct.LSEState       = RCC_LSE_ON;
-#endif
+#else // MBED_CONF_TARGET_RTC_CLOCK_SOURCE
 
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        error("Cannot initialize RTC with LSE\n");
-    }
-
+#if defined(DUAL_CORE) && (TARGET_STM32H7)
+    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID));
+#endif /* DUAL_CORE */
+    lsc_start();
+#if MBED_CONF_TARGET_LSE_AVAILABLE
     __HAL_RCC_RTC_CONFIG(RCC_RTCCLKSOURCE_LSE);
-
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
-        error("PeriphClkInitStruct RTC failed with LSE\n");
-    }
-#else /* Fallback to LSI */
-#if TARGET_STM32WB
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI1;
 #else
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI;
-#endif
-    RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_NONE;
-    RCC_OscInitStruct.LSIState       = RCC_LSI_ON;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        error("Cannot initialize RTC with LSI\n");
-    }
-
     __HAL_RCC_RTC_CONFIG(RCC_RTCCLKSOURCE_LSI);
-
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+#endif // MBED_CONF_TARGET_LSE_AVAILABLE
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
-        error("PeriphClkInitStruct RTC failed with LSI\n");
+        error("PeriphClkInitStruct RTC failed with Low Speed Clock\n");
     }
-#endif /* MBED_CONF_TARGET_RTC_CLOCK_SOURCE */
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
     LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
 #endif /* DUAL_CORE */
+#endif // MBED_CONF_TARGET_RTC_CLOCK_SOURCE
 
     // Enable RTC
     __HAL_RCC_RTC_ENABLE();
