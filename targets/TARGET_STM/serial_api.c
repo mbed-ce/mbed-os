@@ -32,6 +32,7 @@
 #if DEVICE_SERIAL
 
 #include "serial_api_hal.h"
+#include "low_speed_clock.h"
 
 // Possible choices of the LPUART_CLOCK_SOURCE configuration set in json file
 #define USE_LPUART_CLK_LSE    0x01

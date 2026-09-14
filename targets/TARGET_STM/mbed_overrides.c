@@ -203,7 +203,7 @@ void mbed_sdk_init()
 #error system_power_supply not configured
 #endif
 #endif
-#if defined(MBED_CONF_TARGET_LSC_BOOT_STARTUP)
+#if MBED_CONF_TARGET_LSC_BOOT_STARTUP
     lsc_start();
 #endif // MBED_CONF_TARGET_LSC_BOOT_STARTUP
     /* Configure the System clock source, PLL Multiplier and Divider factors,
@@ -238,7 +238,7 @@ void mbed_sdk_init()
 #error system_power_supply not configured
 #endif
 #endif
-#if defined(MBED_CONF_TARGET_LSC_BOOT_STARTUP)
+#if MBED_CONF_TARGET_LSC_BOOT_STARTUP
     lsc_start();
 #endif // MBED_CONF_TARGET_LSC_BOOT_STARTUP
     /* Configure the System clock source, PLL Multiplier and Divider factors,

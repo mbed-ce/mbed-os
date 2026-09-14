@@ -1187,7 +1187,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.st.com/bin/ecommerce/api/image.PF262651.en.feature-description-include-personalized-no-cpn-medium.jpg"
     },
 
-// STM32F3 Targets -------------------------------------------------------------------------------------------------
+    // STM32F3 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F3": {
         "inherits": [
             "MCU_STM32"
@@ -1329,7 +1329,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ]
     },
 
-// STM32F4 Targets -------------------------------------------------------------------------------------------------
+    // STM32F4 Targets -------------------------------------------------------------------------------------------------
     "MCU_STM32F4": {
         "inherits": [
             "MCU_STM32"

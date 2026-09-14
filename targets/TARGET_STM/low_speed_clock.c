@@ -80,7 +80,6 @@ static bool lsc_start_lse(void) {
     if (lsc_lse_is_ready()) {
         return true; // Already running
     }
-    bool lse_ready = true;
     // enable power clock and backup access to configure LSE
 #ifdef __HAL_RCC_PWR_CLK_ENABLE
     __HAL_RCC_PWR_CLK_ENABLE();
@@ -94,16 +93,25 @@ static bool lsc_start_lse(void) {
 
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
+#if TARGET_STM32WB0
+#if MBED_CONF_TARGET_LSE_BYPASS
+        rtc_clock.OscillatorType = RCC_OSCILLATORTYPE_LSE_BYPASS;
+        rtc_clock.LSEBYPASSState = RCC_LSE_BYPASS_ON;
+#else
+        rtc_clock.LSEBYPASSState = RCC_LSE_BYPASS_OFF;
+#endif
+#else
 #if MBED_CONF_TARGET_LSE_BYPASS
     RCC_OscInitStruct.LSEState       = RCC_LSE_BYPASS;
 #else
     RCC_OscInitStruct.LSEState       = RCC_LSE_ON;
 #endif
+#endif
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE; // No PLL update
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        lse_ready = false; // Failed to start LSE 
+        return false; 
     }
-    return lse_ready; 
+    return true; 
 }
 #else// MBED_CONF_TARGET_LSE_AVAILABLE
 
@@ -134,7 +142,6 @@ static bool lsc_start_lsi(void) {
     if (lsc_lsi_is_ready()) {
         return true; // Already running
     }
-    bool lsi_ready = true;
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     /* Enable LSI clock */
 #if TARGET_STM32WB
@@ -146,9 +153,9 @@ static bool lsc_start_lsi(void) {
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE; // No PLL update
 
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        lsi_ready = false;
+        return false;
     }
-    return lsi_ready;
+    return true;
 }
 #endif // MBED_CONF_TARGET_LSE_AVAILABLE
 
