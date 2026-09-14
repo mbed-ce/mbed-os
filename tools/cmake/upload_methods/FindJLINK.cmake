@@ -35,9 +35,29 @@ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
     set(JLINK_PATH /usr/local/bin)
 endif()
 
+# Annoyingly, the Java JDK provides an executable called "jlink.exe".
+# On Linux/Mac this is not an issue because the J-Link program is called JLinkExe,
+# but on windows it's JLink.exe so there is a conflict.
+# We need to prevent this executable from being found instead of the "real" JLink.exe.
+if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
+    set(OLD_PATH $ENV{PATH})
+    set(PATH_WITHOUT_JDK )
+    foreach(ENTRY $ENV{PATH})
+        if("${ENTRY}" MATCHES "\\\\jdk-" AND (NOT DEFINED JLINK))
+            message(STATUS "NOT searching for ${JLINK_EXE_NAME}.exe in ${ENTRY} because this looks like part of a Java installation.")
+        else()
+            list(APPEND PATH_WITHOUT_JDK ${ENTRY})
+        endif()
+    endforeach()
+    set(ENV{PATH} "${PATH_WITHOUT_JDK}")
+endif()
+
 find_program(JLINK NAMES ${JLINK_EXE_NAME} PATHS ${JLINK_PATH} DOC "Path to the JLink flash executable")
 find_program(JLINK_GDBSERVER NAMES ${GDBSERVER_EXE_NAME} PATHS ${JLINK_PATH} DOC "Path to the JLink GDB server")
 
-find_package_handle_standard_args(JLINK FOUND_VAR JLINK_FOUND REQUIRED_VARS JLINK JLINK_GDBSERVER)
+if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
+    set(ENV{PATH} "${OLD_PATH}")
+endif()
 
+find_package_handle_standard_args(JLINK FOUND_VAR JLINK_FOUND REQUIRED_VARS JLINK JLINK_GDBSERVER)
 
