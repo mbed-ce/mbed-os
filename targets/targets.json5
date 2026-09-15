@@ -4468,7 +4468,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         },
         "overrides": {
             "lpticker-delay-ticks": 0,
-            "lpuart-clock-source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK"
+            "lpuart-clock-source": "USE_LPUART_CLK_HSI|USE_LPUART_CLK_SYSCLK",
+            "lsc-boot-startup": 1
         },
         "device_has_add": [
             "ANALOGOUT",
