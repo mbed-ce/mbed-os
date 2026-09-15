@@ -4266,7 +4266,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         },
         "overrides": {
-            "lpticker-delay-ticks": 0
+            "lpticker-delay-ticks": 0,
+            "lsc-boot-startup": 1
         },
         "device_has_add": [
             "ANALOGOUT",
