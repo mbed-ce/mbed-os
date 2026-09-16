@@ -186,6 +186,16 @@ public:
      */
     short poll(short events) const override;
 
+    /**
+     * @brief Set the baud rate
+     *
+     *  @param baud   The baud rate
+     */
+    void set_baud(int baud)
+    {
+        SerialBase::baud(baud);
+    }
+
     using SerialBase::attach;
     using SerialBase::baud;
     using SerialBase::format;

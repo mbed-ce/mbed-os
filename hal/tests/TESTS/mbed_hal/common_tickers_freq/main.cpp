@@ -28,6 +28,7 @@
 #include "hal/us_ticker_api.h"
 #include "hal/lp_ticker_api.h"
 #include "hal/mbed_lp_ticker_wrapper.h"
+#include "mbed_critical.h"
 
 #if !DEVICE_USTICKER
 #error [NOT_SUPPORTED] UsTicker need to be enabled for this test
@@ -178,10 +179,10 @@ utest::v1::status_t lp_ticker_case_teardown_handler_t(const Case *const source, 
 // Test cases
 Case cases[] = {
     Case("Microsecond ticker frequency test", us_ticker_case_setup_handler_t, ticker_frequency_test,
-         us_ticker_case_teardown_handler_t),
+    us_ticker_case_teardown_handler_t),
 #if DEVICE_LPTICKER
     Case("Low power ticker frequency test", lp_ticker_case_setup_handler_t, ticker_frequency_test,
-         lp_ticker_case_teardown_handler_t),
+    lp_ticker_case_teardown_handler_t),
 #endif
 };
 

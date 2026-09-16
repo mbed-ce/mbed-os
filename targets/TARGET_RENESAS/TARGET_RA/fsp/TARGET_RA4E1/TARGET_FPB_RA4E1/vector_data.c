@@ -8,7 +8,7 @@
         #if VECTOR_DATA_IRQ_COUNT > 0
         BSP_DONT_REMOVE const fsp_vector_t g_vector_table[BSP_ICU_VECTOR_NUM_ENTRIES] BSP_PLACE_IN_SECTION(BSP_SECTION_APPLICATION_VECTORS) =
         {
-                        [0] = rtc_carry_isr, /* RTC CARRY (Carry interrupt) */
+            [0] = rtc_carry_isr, /* RTC CARRY (Carry interrupt) */
             [1] = gpt_counter_overflow_isr, /* GPT1 COUNTER OVERFLOW (Overflow) */
             [2] = gpt_capture_compare_a_isr, /* GPT1 CAPTURE COMPARE A (Capture/Compare match A) */
             [3] = r_icu_isr, /* ICU IRQ0 (External pin interrupt 0) */
@@ -20,10 +20,10 @@
             [9] = spi_tei_isr, /* SPI0 TEI (Transmission complete event) */
             [10] = spi_eri_isr, /* SPI0 ERI (Error) */
             [11] = dmac_int_isr, /* DMAC0 INT (DMAC0 transfer end) */
-            [12] = sci_uart_rxi_isr, /* SCI0 RXI (Receive data full) */
-            [13] = sci_uart_txi_isr, /* SCI0 TXI (Transmit data empty) */
-            [14] = sci_uart_tei_isr, /* SCI0 TEI (Transmit end) */
-            [15] = sci_uart_eri_isr, /* SCI0 ERI (Receive error) */
+            [12] = sci_spi_rxi_isr, /* SCI0 RXI (Receive data full) */
+            [13] = sci_spi_txi_isr, /* SCI0 TXI (Transmit data empty) */
+            [14] = sci_spi_tei_isr, /* SCI0 TEI (Transmit end) */
+            [15] = sci_spi_eri_isr, /* SCI0 ERI (Receive error) */
             [16] = r_icu_isr, /* ICU IRQ1 (External pin interrupt 1) */
             [17] = r_icu_isr, /* ICU IRQ2 (External pin interrupt 2) */
             [18] = r_icu_isr, /* ICU IRQ3 (External pin interrupt 3) */
