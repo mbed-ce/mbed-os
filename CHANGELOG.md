@@ -97,6 +97,7 @@ A message that notes the main changes in the update.
   - Set `deep-sleep-latency` to 1ms to account for the wake-up delay on `EFM32GG_STK3700` boards
 - LPC17xx:
   - Fixed I2C single-byte API continuing to send bytes after being NACKed
+  - Fix inability to use software RTS/CTS flow control on UART due to incorrect pinmap logic in HAL driver
 - STM32L4:
   - Fixed multiple bugs causing hardware-accelerated multi-block AES encryption and decryption to produce incorrect results
 - RP2xxx:
