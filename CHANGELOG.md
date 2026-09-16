@@ -106,6 +106,7 @@ A message that notes the main changes in the update.
   - Fixed issue where reading from an I2C master in slave mode could hang forever if the master ends the transaction early
   - Fixed issue where writing to an I2C master in slave mode would always return success regardless of success/failure
   - Fixed assert failure when calling SPI::write() with a zero-length Tx or Rx buffer
+  - Fixed PWMs stopping themselves when the period is changed.
   - Implemented missing USB endpoint abort function, so `USBDevice::endpoint_abort()` is no longer a no-op
   - Implemented memory manager for USB DPRAM and proper deallocation of endpoint buffers, so USB will no longer die once a certain number of endpoints are created and destroyed over the life of the application. 
 - RP2040:
