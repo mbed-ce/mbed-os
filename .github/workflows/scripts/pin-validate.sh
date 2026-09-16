@@ -8,10 +8,10 @@ pip install json5 tabulate
 git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
 # What branch/commit should we be comparing against?
-if [ -z "${GITHUB_BASE_REF}" ]; then
-  compare_ref="HEAD~1" # previous commit of main
-else
+if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
   compare_ref="origin/${GITHUB_BASE_REF}" # base branch of PR
+else
+  compare_ref="$GITHUB_EVENT_BEFORE" # previous commit of main
 fi
 
 # Run pinvalidate on each changed file

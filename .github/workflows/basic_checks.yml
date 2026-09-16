@@ -234,7 +234,9 @@ jobs:
 
       - name: validate pins
         shell: bash
-        run: .github/workflows/scripts/pin-validate.sh
+        run: |
+          export GITHUB_EVENT_BEFORE=${{ github.event.before }}
+          .github/workflows/scripts/pin-validate.sh
 
   cmake-native-unit-tests:
     runs-on: ubuntu-latest
