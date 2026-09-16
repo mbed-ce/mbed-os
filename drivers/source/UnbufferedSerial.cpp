@@ -124,7 +124,7 @@ void UnbufferedSerial::set_flow_control(Flow type, const serial_fc_pinmap_t &sta
 {
     lock();
     SerialBase::set_flow_control(type, static_pinmap);
-    lock();
+    unlock();
 }
 #endif // DEVICE_SERIAL_FC
 
