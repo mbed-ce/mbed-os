@@ -1,7 +1,6 @@
 {
-  "name": "cy_psoc6_whd",
+  "name": "cy-psoc6-whd",
   "config": {
-    "present": 1,
     "tx-buffer-header-space": {
       "help": "Header space in bytes that needs to be present in buffers passed from the Mbed EMAC to the WHD driver.",
       "value": 64
