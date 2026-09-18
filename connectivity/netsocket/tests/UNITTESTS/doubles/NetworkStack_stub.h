@@ -71,7 +71,7 @@ public:
 protected:
     virtual nsapi_error_t socket_open(nsapi_socket_t *handle, nsapi_protocol_t proto)
     {
-        if (return_value == NSAPI_ERROR_OK && return_values.front() == NSAPI_ERROR_OK) {
+        if (return_value == NSAPI_ERROR_OK && (return_values.empty() || return_values.front() == NSAPI_ERROR_OK)) {
             // Make sure a non-NULL value is returned if error is not expected
             *handle = reinterpret_cast<nsapi_socket_t *>(1234);
         } else {
@@ -103,7 +103,7 @@ protected:
     virtual nsapi_error_t socket_accept(nsapi_socket_t server,
                                         nsapi_socket_t *handle, SocketAddress *address = 0)
     {
-        if (return_value == NSAPI_ERROR_OK && return_values.front() == NSAPI_ERROR_OK) {
+        if (return_value == NSAPI_ERROR_OK && (return_values.empty() || return_values.front() == NSAPI_ERROR_OK)) {
             // Make sure a non-NULL value is returned if error is not expected
             *handle = reinterpret_cast<nsapi_socket_t *>(1234);
         } else {

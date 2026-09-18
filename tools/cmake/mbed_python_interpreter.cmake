@@ -199,13 +199,20 @@ find_program(ambiq_svl
 # then the package will be installed via Pip.
 # If the install fails or the venv is not being used, FOUND_VAR will be set to false.
 #
-function(mbed_check_or_install_python_package FOUND_VAR PACKAGE_IMPORT_NAME PACKAGE_MIN_VERSION)
+# If a 4th arg is not given, the package will be installed via "PACKAGE_IMPORT_NAME>=PACKAGE_MIN_VERSION".
+# Otherwise, the package will be installed by passing the 4th arg to Pip.
+#
+function(mbed_check_or_install_python_package FOUND_VAR PACKAGE_IMPORT_NAME PACKAGE_MIN_VERSION) # Install constraint
     check_python_package(${PACKAGE_IMPORT_NAME} ${FOUND_VAR} VERSION ${PACKAGE_MIN_VERSION})
 
     if(NOT ${FOUND_VAR})
         # If we are using the Mbed venv, we can install the package automatically.
         if(MBED_CREATE_PYTHON_VENV)
-            set(PACKAGE_INSTALL_CONSTRAINT "${PACKAGE_IMPORT_NAME}>=${PACKAGE_MIN_VERSION}")
+            if("${ARGN}" STREQUAL "")
+                set(PACKAGE_INSTALL_CONSTRAINT "${PACKAGE_IMPORT_NAME}>=${PACKAGE_MIN_VERSION}")
+            else()
+                set(PACKAGE_INSTALL_CONSTRAINT ${ARGN})
+            endif()
             message(STATUS "Mbed: Installing ${PACKAGE_INSTALL_CONSTRAINT} into Mbed's Python virtualenv")
             execute_process(
                     COMMAND ${Python3_EXECUTABLE} -m pip install ${PACKAGE_INSTALL_CONSTRAINT}
