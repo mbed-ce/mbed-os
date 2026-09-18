@@ -12018,6 +12018,82 @@
         "sub_family": "STM32U5A5",
         "vendor": "STMicroelectronics:13"
     },
+// --------------------------- STM32WB0 ---------------------------
+    "STM32WB09KEVx": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "CMSIS/Flash/STM32WB0x_512K.FLM",
+                "ram_size": 0x8000,
+                "ram_start": 0x20000000,
+                "size": 0x80000,
+                "start": 0x10040000,
+                "style": "Keil"
+            }
+        ],
+        "family": "STM32WB0 Series",
+        "from_pack": {
+            "pack": "STM32WB0x_DFP",
+            "url": "https://www.keil.com/pack/",
+            "vendor": "Keil",
+            "version": "1.0.1"
+        },
+        "memories": {
+            // The CMSIS pack calls this Main_Flash. Normalize it for MbedCE linker macros.
+            "ROM": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "size": 0x80000,
+                "start": 0x10040000,
+                "startup": true
+            },
+            // The CMSIS pack splits this contiguous SRAM into SRAM0 through SRAM3.
+            "SRAM": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "size": 0x10000,
+                "start": 0x20000000,
+                "startup": false
+            }
+        },
+        "name": "STM32WB09KEVx",
+        "processors": [
+            {
+                "address": null,
+                "ap": {
+                    "Index": 0
+                },
+                "core": "CortexM0Plus",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "None",
+                // Keil DFP 1.0.1 reports NotPresent, but ST's device header and datasheet specify an 8-region MPU.
+                "mpu": "Present",
+                "name": null,
+                "svd": "CMSIS/SVD/STM32WB09.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "STM32WB09",
+        "vendor": "STMicroelectronics:13"
+    },
+// --------------------------- STM32WB ---------------------------
     "STM32WB15CCUx": {
         "algorithms": [
             {

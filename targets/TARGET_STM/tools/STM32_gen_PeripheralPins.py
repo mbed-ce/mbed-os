@@ -1826,7 +1826,9 @@ for mcu_file in mcu_list:
 
     for EachTargetName in TargetNameList:
         # print("EachTargetName %s" % EachTargetName)
-        m = re.match("(STM32[\w]{2})", EachTargetName)
+        # WB0 is a distinct three-character STM32 family. Match it before the
+        # traditional two-character names so WB09 never enters TARGET_STM32WB.
+        m = re.match(r"(STM32(?:WB0|\w{2}))", EachTargetName)
         if m:
             TARGET_FAMILY = m.group(0)
         else:
