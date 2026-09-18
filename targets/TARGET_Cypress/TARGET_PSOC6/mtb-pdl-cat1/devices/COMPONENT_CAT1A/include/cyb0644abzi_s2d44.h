@@ -467,7 +467,7 @@ typedef enum {
 #define __Vendor_SysTickConfig          0       /*!< Set to 1 if different SysTick Config is used */
 #define __VTOR_PRESENT                  1       /*!< Set to 1 if CPU supports Vector Table Offset Register */
 #define __MPU_PRESENT                   1       /*!< MPU present or not */
-#define __FPU_PRESENT                   1       /*!< FPU present or not */
+#define __FPU_PRESENT                   1U      /*!< FPU present or not */
 #define __CM0P_PRESENT                  1       /*!< CM0P present or not */
 #define __DTCM_PRESENT                  0       /*!< DTCM present or not */
 #define __ICACHE_PRESENT                0       /*!< ICACHE present or not */
