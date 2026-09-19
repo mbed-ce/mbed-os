@@ -25,6 +25,7 @@ A message that notes the main changes in the update.
 - Added Rx FIFO overflow flag to `BufferedSerial`. This allows detecting if the Rx buffer has overflowed (likely as a hint that its size should be increased)
 - Added `BufferedSerial::tx_buffer_size()` and `BufferedSerial::rx_buffer_size()` to check the current size of the Tx and Rx buffers.
 - Added a hook allowing `USBDevice` subclasses to send additional string descriptors, via the new `USBDevice::string_ext_desc()` virtual.
+- Added missing functions for enabling serial flow control with a static pinmap
 - EFM32 Giant Gecko Series 0:
   - `EFM32GG_STK3700` added upload method config
 - MIMXRT117x: Memory bank configuration is now supported in the linker script.
@@ -86,6 +87,7 @@ A message that notes the main changes in the update.
 ### Fixed
 - Fixed `realloc(ptr, 0)` leaking the original allocation when heap statistics are enabled
 - Added fixes aimed at improving Greentea stability for KV/FlashIAP (STM32F7) and USBSerial paths.
+- Fixed inability to create a serial flow control static pinmap with only CTS or RTS defined, instead of both.
 - MIMXRT105x:
   - MIMXRT1050_EVK: Fixed build error due to typos
   - Fixed SPI SCLK frequency being several times higher than set due to clock config error (#564)
@@ -95,6 +97,7 @@ A message that notes the main changes in the update.
   - Set `deep-sleep-latency` to 1ms to account for the wake-up delay on `EFM32GG_STK3700` boards
 - LPC17xx:
   - Fixed I2C single-byte API continuing to send bytes after being NACKed
+  - Fix inability to use software RTS/CTS flow control on UART due to incorrect pinmap logic in HAL driver
 - STM32L4:
   - Fixed multiple bugs causing hardware-accelerated multi-block AES encryption and decryption to produce incorrect results
 - RP2xxx:
@@ -103,6 +106,7 @@ A message that notes the main changes in the update.
   - Fixed issue where reading from an I2C master in slave mode could hang forever if the master ends the transaction early
   - Fixed issue where writing to an I2C master in slave mode would always return success regardless of success/failure
   - Fixed assert failure when calling SPI::write() with a zero-length Tx or Rx buffer
+  - Fixed PWMs stopping themselves when the period is changed.
   - Implemented missing USB endpoint abort function, so `USBDevice::endpoint_abort()` is no longer a no-op
   - Implemented memory manager for USB DPRAM and proper deallocation of endpoint buffers, so USB will no longer die once a certain number of endpoints are created and destroyed over the life of the application. 
 - RP2040:

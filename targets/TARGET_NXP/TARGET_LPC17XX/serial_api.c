@@ -386,7 +386,7 @@ void serial_set_flow_control_direct(serial_t *obj, FlowControl type, const seria
     // Check type(s) of flow control to use
     if (((FlowControlCTS == type) || (FlowControlRTSCTS == type)) && (NC != pinmap->tx_flow_pin)) {
         // Can this be enabled in hardware?
-        if (pinmap->tx_flow_function) {
+        if (pinmap->tx_flow_function != NC) {
             // Enable auto-CTS mode
             uart1->MCR |= UART_MCR_CTSEN_MASK;
             pin_function(pinmap->tx_flow_pin, pinmap->tx_flow_function);
@@ -403,7 +403,7 @@ void serial_set_flow_control_direct(serial_t *obj, FlowControl type, const seria
                        | 1 << 2  // Tx Fifo Reset
                        | 0 << 6; // Rx irq trigger level - 0 = 1 char, 1 = 4 chars, 2 = 8 chars, 3 = 14 chars
          // Can this be enabled in hardware?
-        if (pinmap->rx_flow_function) {
+        if (pinmap->rx_flow_function != NC) {
             // Enable auto-RTS mode
             uart1->MCR |= UART_MCR_RTSEN_MASK;
             pin_function(pinmap->rx_flow_pin, pinmap->rx_flow_function);
@@ -421,20 +421,20 @@ void serial_set_flow_control(serial_t *obj, FlowControl type, PinName rxflow, Pi
     pinmap.rx_flow_pin = rxflow;
     pinmap.tx_flow_pin = txflow;
 
-    UARTName uart_rts = (UARTName)pinmap_find_peripheral(rxflow, PinMap_UART_RTS);
-    if((int)uart_rts == NC) {
+    const UARTName uart_rts = (UARTName)pinmap_find_peripheral(rxflow, PinMap_UART_RTS);
+    if(uart_rts == (UARTName)NC) {
         pinmap.rx_flow_function = NC; // use SW emulation
     }
     else {
         pinmap.rx_flow_function = pinmap_find_function(rxflow, PinMap_UART_RTS);
     }
 
-    UARTName uart_cts = (UARTName)pinmap_find_peripheral(txflow, PinMap_UART_CTS);
-    if((int)uart_cts == NC) {
+    const UARTName uart_cts = (UARTName)pinmap_find_peripheral(txflow, PinMap_UART_CTS);
+    if(uart_cts == (UARTName)NC) {
         pinmap.tx_flow_function = NC; // use SW emulation
     }
     else {
-        pinmap.tx_flow_function = pinmap_find_function(rxflow, PinMap_UART_CTS);
+        pinmap.tx_flow_function = pinmap_find_function(txflow, PinMap_UART_CTS);
     }
 
     pinmap.peripheral = pinmap_merge(uart_rts, uart_cts);

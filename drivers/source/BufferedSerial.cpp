@@ -79,6 +79,13 @@ void BufferedSerial::set_flow_control(Flow type, PinName flow1, PinName flow2)
     SerialBase::set_flow_control(type, flow1, flow2);
     api_unlock();
 }
+
+void BufferedSerial::set_flow_control(Flow type, const serial_fc_pinmap_t &static_pinmap)
+{
+    api_lock();
+    SerialBase::set_flow_control(type, static_pinmap);
+    api_unlock();
+}
 #endif
 
 int BufferedSerial::close()

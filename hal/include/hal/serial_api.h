@@ -115,9 +115,9 @@ typedef struct {
 
 typedef struct {
     int peripheral;
-    PinName tx_flow_pin;
+    PinName tx_flow_pin; // AKA CTS
     int tx_flow_function;
-    PinName rx_flow_pin;
+    PinName rx_flow_pin; // AKA RTS
     int rx_flow_function;
 } serial_fc_pinmap_t;
 
