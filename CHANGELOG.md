@@ -14,6 +14,7 @@ A message that notes the main changes in the update.
 
 ### Added
 
+- Enabled UART FIFOs on supported STM32 peripherals so they can buffer multiple incoming bytes while waiting for interrupts to be handled.
 - Added `i2c_get_capabilities()` function, which can be used to determine what detailed I2C features the hardware supports. This is primarily intended to be used by the Mbed test suite but can also be used in user applications that want to be cross-platform
 - Added support for Real-Time Transfer (RTT), a method of transferring text from a target device using a debugger connection. RTT allows getting UART console-like behavior at a higher speed and with no additional wires to the target.
   - RTT can be used automatically by Mbed via the `target.console-rtt` JSON option, or manually in code by linking the `mbed-rtt` CMake library and using the `RTTHandle` class.
