@@ -55,7 +55,6 @@ void gpio_mode(gpio_t *obj, PinMode mode)
             cfg &= ~IOPORT_CFG_PULLUP_ENABLE;
             cfg |= IOPORT_CFG_NMOS_ENABLE;
             break;
-        case PullDown:
         case PullNone:
         default:
             cfg &= ~(IOPORT_CFG_PULLUP_ENABLE|IOPORT_CFG_NMOS_ENABLE);
@@ -85,7 +84,18 @@ void gpio_dir(gpio_t *obj, PinDirection direction)
 
 void gpio_write(gpio_t *obj, int value)
 {
-    R_BSP_PinWrite(pin_to_bsp(obj->pin), value ? BSP_IO_LEVEL_HIGH : BSP_IO_LEVEL_LOW);
+    const PinName pin = obj->pin;
+
+    // Note: We can do this using either the pin function register (PmnPFS) or the port's output
+    // register (PORT->PODR). However, the datasheet says not to write to PORT->PODR if the port is in
+    // input mode, so this seems more correct.
+    if(value) {
+        R_PFS->PORT[RA_PORT(pin)].PIN[RA_PIN(pin)].PmnPFS |= R_PFS_PORT_PIN_PmnPFS_PODR_Msk;
+    }
+    else {
+        R_PFS->PORT[RA_PORT(pin)].PIN[RA_PIN(pin)].PmnPFS &= ~R_PFS_PORT_PIN_PmnPFS_PODR_Msk;
+    }
+
 }
 
 int gpio_read(gpio_t *obj)

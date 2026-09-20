@@ -20,7 +20,7 @@ extern const external_irq_instance_t g_external_irq13;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq13_ctrl;
-extern const external_irq_cfg_t g_external_irq13_cfg;
+extern external_irq_cfg_t g_external_irq13_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -30,7 +30,7 @@ extern const external_irq_instance_t g_external_irq9;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq9_ctrl;
-extern const external_irq_cfg_t g_external_irq9_cfg;
+extern external_irq_cfg_t g_external_irq9_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -40,7 +40,7 @@ extern const external_irq_instance_t g_external_irq8;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq8_ctrl;
-extern const external_irq_cfg_t g_external_irq8_cfg;
+extern external_irq_cfg_t g_external_irq8_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -50,7 +50,7 @@ extern const external_irq_instance_t g_external_irq7;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq7_ctrl;
-extern const external_irq_cfg_t g_external_irq7_cfg;
+extern external_irq_cfg_t g_external_irq7_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -60,7 +60,7 @@ extern const external_irq_instance_t g_external_irq6;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq6_ctrl;
-extern const external_irq_cfg_t g_external_irq6_cfg;
+extern external_irq_cfg_t g_external_irq6_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -70,7 +70,7 @@ extern const external_irq_instance_t g_external_irq5;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq5_ctrl;
-extern const external_irq_cfg_t g_external_irq5_cfg;
+extern external_irq_cfg_t g_external_irq5_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -80,7 +80,7 @@ extern const external_irq_instance_t g_external_irq4;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq4_ctrl;
-extern const external_irq_cfg_t g_external_irq4_cfg;
+extern external_irq_cfg_t g_external_irq4_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -90,7 +90,7 @@ extern const external_irq_instance_t g_external_irq3;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq3_ctrl;
-extern const external_irq_cfg_t g_external_irq3_cfg;
+extern external_irq_cfg_t g_external_irq3_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -100,7 +100,7 @@ extern const external_irq_instance_t g_external_irq2;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq2_ctrl;
-extern const external_irq_cfg_t g_external_irq2_cfg;
+extern external_irq_cfg_t g_external_irq2_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -110,7 +110,7 @@ extern const external_irq_instance_t g_external_irq1;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq1_ctrl;
-extern const external_irq_cfg_t g_external_irq1_cfg;
+extern external_irq_cfg_t g_external_irq1_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);
@@ -120,7 +120,7 @@ extern const external_irq_instance_t g_external_irq0;
 
 /** Access the ICU instance using these structures when calling API functions directly (::p_api is not used). */
 extern icu_instance_ctrl_t g_external_irq0_ctrl;
-extern const external_irq_cfg_t g_external_irq0_cfg;
+extern external_irq_cfg_t g_external_irq0_cfg;
 
 #ifndef external_irq_callback
 void external_irq_callback(external_irq_callback_args_t * p_args);

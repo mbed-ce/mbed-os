@@ -17,6 +17,7 @@ target_include_directories(mbed-renesas-ra
 target_sources(mbed-renesas-ra
     INTERFACE
 		gpio_api.c
+		gpio_irq_api.c
 		port_api.c
 		us_ticker.c
         serial_api.c

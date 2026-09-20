@@ -12,6 +12,7 @@ target_include_directories(mbed-ra8e1
 target_sources(mbed-ra8e1
     INTERFACE
         uart_device.c
+        gpio_irq_device.c
         PeripheralPins.c
 )
 

@@ -85,7 +85,7 @@ typedef enum {
 
 typedef enum {
     PullUp = 0,
-    PullDown = 3,
+    // Note: Renesas RA does not support pull downs on GPIOs
     PullNone = 2,
     OpenDrain = 4,
     PullDefault = PullNone

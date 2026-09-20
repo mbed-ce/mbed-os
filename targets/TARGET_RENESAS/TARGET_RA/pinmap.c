@@ -23,11 +23,6 @@ void pin_mode(PinName pin, PinMode mode)
                    IOPORT_CFG_PULLUP_ENABLE;
             break;
 
-        case PullDown:
-            // PullDown not supported on RA
-            cfg |= IOPORT_CFG_PORT_DIRECTION_INPUT;
-            break;
-
         case OpenDrain:
             cfg |= IOPORT_CFG_PORT_DIRECTION_OUTPUT |
                    IOPORT_CFG_NMOS_ENABLE;

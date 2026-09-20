@@ -57,6 +57,7 @@ can_bit_timing_cfg_t g_canfd1_data_timing_cfg =
 
 extern const canfd_afl_entry_t p_canfd1_afl[CANFD_CFG_AFL_CH1_RULE_NUM];
 
+#undef CANFD_CFG_COMMONFIFO0
 #define CANFD_CFG_COMMONFIFO0 (((1) << R_CANFD_CFDCFCC_CFE_Pos) | \
                                         ((0) << R_CANFD_CFDCFCC_CFRXIE_Pos) | \
                                         ((1) << R_CANFD_CFDCFCC_CFTXIE_Pos) | \

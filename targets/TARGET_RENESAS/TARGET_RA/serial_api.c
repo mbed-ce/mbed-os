@@ -196,8 +196,7 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
     obj->p_api->close(obj->p_ctrl);
     obj->p_api->open(obj->p_ctrl, cfg);
 
-    void uartCallback(uart_callback_args_t *p_args);
-    obj->p_api->callbackSet(obj->p_ctrl, &uartCallback, NULL, NULL);
+    obj->p_api->callbackSet(obj->p_ctrl, &uart_callback, NULL, NULL);
 }
 
 /* ---------------- Mbed API: blocking getc/putc ---------------- */
