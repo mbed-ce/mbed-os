@@ -46,22 +46,28 @@ static void us_ticker_gpt_set_compare(uint32_t timestamp)
 
 static void us_ticker_gpt_disable_irq(void)
 {
-    R_BSP_IrqDisable(US_TICKER_IRQ);
+    NVIC_DisableIRQ(US_TICKER_IRQ);
 }
 
 static void us_ticker_gpt_clear_irq_flag(void)
 {
     US_TICKER_INSTANCE->GTST = R_GPT0_GTST_TCFA_Msk;
-    R_BSP_IrqClearPending(US_TICKER_IRQ);
+    NVIC_ClearPendingIRQ(US_TICKER_IRQ);
 }
 
 void us_ticker_init(void)
 {
     if (us_ticker_inited) {
+        us_ticker_gpt_disable_irq();
+        us_ticker_gpt_clear_irq_flag();
         return;
     }
 
     us_ticker_gpt_init();
+
+    // The Renesas BSP always enables the end-of-period callback, but only uses it in one-shot mode.
+    // Inefficient! We can save some interrupts by disabling this IRQ.
+    R_BSP_IrqDisable(US_TICKER_VAR.p_cfg->cycle_end_irq);
 
     us_ticker_gpt_disable_irq();
     us_ticker_gpt_clear_irq_flag();
@@ -77,9 +83,8 @@ uint32_t (us_ticker_read)()
 
 void us_ticker_fire_interrupt(void)
 {
-    us_ticker_gpt_clear_irq_flag();
-    R_BSP_IrqEnable(US_TICKER_IRQ);
-    us_ticker_irq_handler();
+    NVIC_EnableIRQ(US_TICKER_IRQ);
+    NVIC_SetPendingIRQ(US_TICKER_IRQ);
 }
 
 void us_ticker_disable_interrupt(void)
@@ -94,21 +99,9 @@ void us_ticker_clear_interrupt(void)
 
 void us_ticker_set_interrupt(timestamp_t timestamp)
 {
-    if (!us_ticker_inited) {
-        us_ticker_init();
-    }
-
-    uint32_t now = us_ticker_read();
-    uint32_t delta = (uint32_t)(timestamp - now);
-
-    if (delta <= 1) {
-        us_ticker_irq_handler();
-        return;
-    }
-
     us_ticker_gpt_set_compare(timestamp);
 
-    R_BSP_IrqEnable(US_TICKER_IRQ);
+    R_BSP_IrqEnable(US_TICKER_IRQ); // clears if already pending
 }
 
 void us_ticker_free(void)
@@ -126,9 +119,12 @@ void us_ticker_free(void)
 
 void usticker_compare_match_callback(timer_callback_args_t * p_args)
 {
-    if(p_args->event == TIMER_EVENT_CAPTURE_A || p_args->event == TIMER_EVENT_CYCLE_END)
+    if(p_args->event == TIMER_EVENT_CAPTURE_A)
     {
+        // Clear and disable IRQ to prevent it from firing again
         us_ticker_gpt_clear_irq_flag();
+        us_ticker_gpt_disable_irq();
+
         us_ticker_irq_handler();
     }
 }
