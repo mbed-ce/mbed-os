@@ -111,7 +111,7 @@ void pwmout_init(pwmout_t *obj, PinName pin)
     obj->channel = pwm_gpio_to_channel(pin);
     obj->pin = pin;
     obj->top_count = MAX_TOP_COUNT;
-    obj->percent = 0.5f;
+    obj->percent = 0;
     obj->cfg = pwm_get_default_config();
     pwm_config_set_wrap(&(obj->cfg), obj->top_count);
 
@@ -233,9 +233,12 @@ void pwmout_period(pwmout_t *obj, float period)
            obj->top_count);
 #endif
 
-    // Set the new divider and top_count values.
+    // Set the new divider and top values, also stop the PWM to avoid glitches
     pwm_config_set_wrap(&(obj->cfg), obj->top_count);
     pwm_init(obj->slice, &(obj->cfg), false);
+
+    // Now reenable the PWM and rewrite the duty cycle.
+    pwmout_write(obj, obj->percent);
 }
 
 /** Set the PWM period specified in miliseconds, keeping the duty cycle the same
