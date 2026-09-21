@@ -136,7 +136,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_HSE(uint8_t bypass)
 
 #if DEVICE_USBDEVICE
     RCC_PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-    PeriphClkIniRCC_PeriphClkInittStruct.UsbClockSelection    = RCC_USBCLKSOURCE_HSI48; /* 48 MHz */
+    RCC_PeriphClkInit.UsbClockSelection    = RCC_USBCLKSOURCE_HSI48; /* 48 MHz */
     if (HAL_RCCEx_PeriphCLKConfig(&RCC_PeriphClkInit) != HAL_OK) {
         return 0; // FAIL
     }
