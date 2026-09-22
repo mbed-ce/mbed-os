@@ -331,15 +331,14 @@ void USBPhyHw::init(USBPhyEvents *events)
         map++;
     }
 
-#if !defined(TARGET_STM32H7)
-    __HAL_RCC_PWR_CLK_ENABLE();
-#endif
-
-#if !defined(TARGET_STM32WB) && !defined(TARGET_STM32H5)
+#if defined(__HAL_RCC_SYSCFG_CLK_ENABLE)
     __HAL_RCC_SYSCFG_CLK_ENABLE();
 #endif
 
-#if defined(PWR_CR2_USV)
+#if defined(PWR_CR2_USV) || defined(PWR_USBSCR_USB33DEN) || defined(PWR_SVMCR_USV)
+#if defined(__HAL_RCC_PWR_CLK_ENABLE)
+    __HAL_RCC_PWR_CLK_ENABLE();
+#endif
     HAL_PWREx_EnableVddUSB();
 #endif
 
