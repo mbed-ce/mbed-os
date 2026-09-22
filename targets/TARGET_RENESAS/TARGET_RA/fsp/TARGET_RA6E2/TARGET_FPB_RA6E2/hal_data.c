@@ -295,7 +295,7 @@ sci_uart_instance_ctrl_t     g_uart9_ctrl;
                 .clock                = SCI_UART_CLOCK_INT,
                 .rx_edge_start          = SCI_UART_START_BIT_FALLING_EDGE,
                 .noise_cancel         = SCI_UART_NOISE_CANCELLATION_DISABLE,
-                .rx_fifo_trigger        = SCI_UART_RX_FIFO_TRIGGER_MAX,
+                .rx_fifo_trigger        = SCI_UART_RX_FIFO_TRIGGER_8,
                 .p_baud_setting         = &g_uart9_baud_setting,
                 .flow_control           = SCI_UART_FLOW_CONTROL_RTS,
                 #if 0xFF != 0xFF
@@ -1210,7 +1210,7 @@ sci_uart_instance_ctrl_t     g_uart0_ctrl;
                 .clock                = SCI_UART_CLOCK_INT,
                 .rx_edge_start          = SCI_UART_START_BIT_FALLING_EDGE,
                 .noise_cancel         = SCI_UART_NOISE_CANCELLATION_DISABLE,
-                .rx_fifo_trigger        = SCI_UART_RX_FIFO_TRIGGER_MAX,
+                .rx_fifo_trigger        = SCI_UART_RX_FIFO_TRIGGER_8,
                 .p_baud_setting         = &g_uart0_baud_setting,
                 .flow_control           = SCI_UART_FLOW_CONTROL_RTS,
                 #if 0xFF != 0xFF

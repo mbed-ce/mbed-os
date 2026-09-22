@@ -41,8 +41,14 @@ namespace mbed {
  */
 
 /**
- * Class implementation for unbuffered I/O for an interrupt driven application
- * or one that needs to have more control.
+ *
+ * @brief Serial implementation using unbuffered I/O for applications which desire real-time control over the serial port.
+ *
+ * Writing to an UnbufferedSerial will block until all characters have been transferred into the serial port hardware,
+ * and reading will block until the next character has been received.
+ *
+ * @note UnbufferedSerial is not thread-safe and requires explicit locking if used by multiple threads.
+ *    If used as an stdio stream, however, the C library provides this locking.
  */
 class UnbufferedSerial:
     private SerialBase,

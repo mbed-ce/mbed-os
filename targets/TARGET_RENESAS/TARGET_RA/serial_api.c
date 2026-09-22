@@ -7,6 +7,8 @@
 #include "serial_api.h"
 #include "pinmap.h"
 #include "hal_data.h"
+#include "mbed_atomic.h"
+#include "mbed_critical.h"
 
 #define RX_BUF_SIZE 16
 
@@ -22,35 +24,9 @@ extern uart_instance_t* const g_uart_instances[];
 
 static uart_irq_handler g_irq_handler = NULL;
 static uint32_t g_irq_id[UART_COUNT];
-static uint8_t g_rx_irq_enabled[UART_COUNT];
-static uint8_t g_tx_irq_enabled[UART_COUNT];
-static volatile uint8_t g_rx_buf[UART_COUNT][RX_BUF_SIZE];
-static volatile uint8_t g_rx_head[UART_COUNT];
-static volatile uint8_t g_rx_tail[UART_COUNT];
 
-static inline int rxbuf_is_full(int idx)
-{
-    return ((g_rx_head[idx] + 1) & (RX_BUF_SIZE - 1)) == g_rx_tail[idx];
-}
-
-static inline int rxbuf_is_empty(int idx)
-{
-    return g_rx_head[idx] == g_rx_tail[idx];
-}
-
-static inline void rxbuf_push(int idx, uint8_t b)
-{
-    g_rx_buf[idx][g_rx_head[idx]] = b;
-    g_rx_head[idx] = (g_rx_head[idx] + 1) & (RX_BUF_SIZE - 1);
-}
-
-static inline uint8_t rxbuf_pop(int idx)
-{
-    uint8_t b = g_rx_buf[idx][g_rx_tail[idx]];
-    g_rx_tail[idx] = (g_rx_tail[idx] + 1) & (RX_BUF_SIZE - 1);
-    return b;
-}
-
+static volatile bool g_rx_irq_enabled[UART_COUNT] = {};
+static volatile bool g_tx_irq_enabled[UART_COUNT] = {};
 
 /* ---------------- PinMap UART channel ---------------- */
 
@@ -67,9 +43,9 @@ static int channel_from_pin(PinName tx, PinName rx)
 
 int instance_index_from_channel(int channel)
 {
-    for(int instane_index = 0; instane_index < UART_COUNT; instane_index++) {
-        if(g_uart_instances[instane_index]->p_cfg->channel == channel) {
-            return instane_index;
+    for(int instance_index = 0; instance_index < UART_COUNT; instance_index++) {
+        if(g_uart_instances[instance_index]->p_cfg->channel == channel) {
+            return instance_index;
         }
     }
     return -1;
@@ -113,6 +89,7 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
     obj->cfg.p_context = obj;
     obj->tx = tx;
     obj->rx = rx;
+    obj->has_rx_char_from_callback = false;
 
     uint8_t stdio_config = false;
 #if defined(MBED_CONF_TARGET_CONSOLE_UART)
@@ -137,11 +114,17 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 #endif /* MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE */
     }
 
-    g_rx_head[obj->instance_index] = 0;
-    g_rx_tail[obj->instance_index] = 0;
+    g_rx_irq_enabled[obj->instance_index] = false;
+    g_tx_irq_enabled[obj->instance_index] = false;
 
     fsp_err_t err = obj->p_api->open(obj->p_ctrl, &obj->cfg);
     MBED_ASSERT(err == FSP_SUCCESS);
+
+    // Disable interrupts for now, until explicitly enabled.
+    R_BSP_IrqDisable(obj->p_ctrl->p_cfg->rxi_irq);
+    R_BSP_IrqDisable(obj->p_ctrl->p_cfg->eri_irq);
+    R_BSP_IrqDisable(obj->p_ctrl->p_cfg->txi_irq);
+    R_BSP_IrqDisable(obj->p_ctrl->p_cfg->tei_irq);
 
 #if MBED_CONF_TARGET_CONSOLE_UART
     // For stdio management in platform/mbed_board.c and platform/mbed_retarget.cpp
@@ -157,8 +140,7 @@ void serial_free(serial_t *obj)
     MBED_ASSERT(obj);
 
     obj->p_api->callbackSet(obj->p_ctrl, NULL, NULL, NULL);
-    g_rx_irq_enabled[obj->instance_index] = 0;
-    g_tx_irq_enabled[obj->instance_index] = 0;
+    obj->p_api->close(obj->p_ctrl);
 }
 
 /* ---------------- Mbed API: baud/format ---------------- */
@@ -203,46 +185,60 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
 
 int serial_getc(serial_t *obj)
 {
-    int idx = obj->instance_index;
-
-    while (rxbuf_is_empty(idx)) {
+    while (!serial_readable(obj)) {
         __NOP();
     }
 
-    return rxbuf_pop(idx);
+    if(obj->has_rx_char_from_callback) {
+        obj->has_rx_char_from_callback = false;
+        const char result = obj->rx_char_from_callback;
+        core_util_critical_section_exit();
+        return result;
+    }
+
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    return obj->p_ctrl->p_reg->RDR_BY & 0xFF;
+#else
+    return obj->p_ctrl->p_reg->FRDRHL & 0xFF;
+#endif
+
 }
 
 void serial_putc(serial_t *obj, int c)
 {
     sci_uart_instance_ctrl_t *ctrl = obj->p_ctrl;
-    if(ctrl->fifo_depth > 0)
-    {
+
+    while(!serial_writable(obj)) {}
+
 #if BSP_PERIPHERAL_SCI_B_PRESENT
-        while(ctrl->p_reg->FTSR_b.T == ctrl->fifo_depth);
-        ctrl->p_reg->TDR_BY = (uint8_t)c;
+    ctrl->p_reg->TDR_BY = (uint8_t)c;
 #else
-        while(ctrl->p_reg->FDR_b.T == ctrl->fifo_depth);
-        ctrl->p_reg->FTDRHL = (uint16_t)c;
+    ctrl->p_reg->FTDRHL = (uint16_t)c;
 #endif
-    }
-    else
-    {
-        ctrl->p_reg->TDR = (uint8_t) c;
-        while (ctrl->p_reg->SSR_b.TEND == 0);
-    }
 }
-
-
 
 int serial_readable(serial_t *obj)
 {
-    return !rxbuf_is_empty(obj->instance_index);
+    if(obj->has_rx_char_from_callback) {
+        return true;
+    }
+
+    // Check if there is at least 1 byte in the Rx FIFO
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    return obj->p_ctrl->p_reg->FRSR_b.R > 0U;
+#else
+    return obj->p_ctrl->p_reg->FDR_b.R > 0U;
+#endif
 }
 
 int serial_writable(serial_t *obj)
 {
-    (void) obj;
-    return 1;
+    // Check if the Tx FIFO is not full
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    return obj->p_ctrl->p_reg->FTSR_b.T < obj->p_ctrl->fifo_depth;
+#else
+    return obj->p_ctrl->p_reg->FDR_b.T < obj->p_ctrl->fifo_depth;
+#endif
 }
 
 /* ---------------- Mbed API: IRQ ---------------- */
@@ -261,8 +257,28 @@ void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
 {
     MBED_ASSERT(obj);
 
-    if (irq == RxIrq) g_rx_irq_enabled[obj->instance_index] = enable;
-    if (irq == TxIrq) g_tx_irq_enabled[obj->instance_index] = enable;
+    if (irq == RxIrq) {
+        if(enable) {
+            R_BSP_IrqEnableNoClear(obj->p_ctrl->p_cfg->rxi_irq); // Rx
+            R_BSP_IrqEnableNoClear(obj->p_ctrl->p_cfg->eri_irq); // Rx error
+        }
+        else {
+            R_BSP_IrqDisable(obj->p_ctrl->p_cfg->rxi_irq);
+            R_BSP_IrqDisable(obj->p_ctrl->p_cfg->eri_irq);
+        }
+        g_rx_irq_enabled[obj->instance_index] = enable;
+    }
+    else if (irq == TxIrq) {
+        if(enable) {
+            R_BSP_IrqEnableNoClear(obj->p_ctrl->p_cfg->txi_irq); // Transmit empty
+            R_BSP_IrqEnableNoClear(obj->p_ctrl->p_cfg->tei_irq); // Transmit end
+        }
+        else {
+            R_BSP_IrqDisable(obj->p_ctrl->p_cfg->txi_irq);
+            R_BSP_IrqDisable(obj->p_ctrl->p_cfg->tei_irq);
+        }
+        g_tx_irq_enabled[obj->instance_index] = enable;
+    }
 }
 
 void serial_break_set(serial_t *obj)
@@ -280,29 +296,18 @@ void serial_break_clear(serial_t *obj)
 void uart_callback(uart_callback_args_t *p_args)
 {
     serial_t *obj = (serial_t *) p_args->p_context;
+    MBED_ASSERT(obj != NULL);
+
     int idx = obj->instance_index;
 
     switch (p_args->event)
     {
         case UART_EVENT_RX_CHAR:
         {
-            rxbuf_push(idx, (uint8_t)p_args->data);
-
-            sci_uart_instance_ctrl_t *p_ctrl = obj->p_ctrl;
-            if (p_ctrl->fifo_depth > 0U) {
-#if BSP_PERIPHERAL_SCI_B_PRESENT
-                while (p_ctrl->p_reg->FRSR_b.R > 0U) {
-                    uint8_t data = p_ctrl->p_reg->RDR_BY & 0xFF;
-#else
-                while (p_ctrl->p_reg->FDR_b.R > 0U) {
-                    uint8_t data = p_ctrl->p_reg->FRDRHL & 0xFF;
-#endif
-                    rxbuf_push(idx, data);
-                    if (rxbuf_is_full(idx)) {
-                        break;
-                    }
-                }
-            }
+            // This event means that the Renesas BSP has already read the first char
+            // and stored it in the event args.
+            obj->has_rx_char_from_callback = true;
+            obj->rx_char_from_callback = (char)p_args->data;
 
             if (g_rx_irq_enabled[idx]) {
                 g_irq_handler(g_irq_id[idx], RxIrq);
@@ -324,9 +329,10 @@ void uart_callback(uart_callback_args_t *p_args)
         case UART_EVENT_ERR_PARITY:
         case UART_EVENT_ERR_FRAMING:
         case UART_EVENT_ERR_OVERFLOW:
-        case UART_EVENT_BREAK_DETECT:
             if (g_rx_irq_enabled[idx])
                 g_irq_handler(g_irq_id[idx], RxIrq);
+            break;
+        default:
             break;
     }
 }

@@ -117,6 +117,10 @@ struct serial_s {
     int instance_index;
     PinName tx;
     PinName rx;
+
+    // Holding variable for chars received from the Rx callback
+    volatile char rx_char_from_callback;
+    volatile bool has_rx_char_from_callback;
 };
 #endif
 
