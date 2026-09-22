@@ -146,11 +146,6 @@ uint8_t SetSysClock_PLL_HSI(void)
     RCC_ClkInitTypeDef RCC_ClkInitStruct;
     RCC_OscInitTypeDef RCC_OscInitStruct;
 
-    /* The voltage scaling allows optimizing the power consumption when the device is
-       clocked below the maximum system frequency, to update the voltage scaling value
-       regarding system frequency refer to product datasheet. */
-    __HAL_RCC_PWR_CLK_ENABLE();
-
     // Select HSI as system clock source to allow modification of the PLL configuration
     RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_SYSCLK;
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
