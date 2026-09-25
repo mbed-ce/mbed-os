@@ -21,7 +21,7 @@
             [10] = spi_eri_isr, /* SPI0 ERI (Error) */
             [11] = dmac_int_isr, /* DMAC0 INT (DMAC0 transfer end) */
             [12] = sci_spi_rxi_isr, /* SCI0 RXI (Receive data full) */
-            [13] = sci_spi_txi_isr, /* SCI0 TXI (Transmit data empty) */
+            [13] = mbed_sci_txi_isr, /* SCI0 TXI (Transmit data empty) */
             [14] = sci_spi_tei_isr, /* SCI0 TEI (Transmit end) */
             [15] = sci_spi_eri_isr, /* SCI0 ERI (Receive error) */
             [16] = r_icu_isr, /* ICU IRQ1 (External pin interrupt 1) */
@@ -35,15 +35,15 @@
             [24] = r_icu_isr, /* ICU IRQ9 (External pin interrupt 9) */
             [25] = r_icu_isr, /* ICU IRQ13 (External pin interrupt 13) */
             [26] = sci_uart_rxi_isr, /* SCI3 RXI (Receive data full) */
-            [27] = sci_uart_txi_isr, /* SCI3 TXI (Transmit data empty) */
+            [27] = mbed_sci_txi_isr, /* SCI3 TXI (Transmit data empty) */
             [28] = sci_uart_tei_isr, /* SCI3 TEI (Transmit end) */
             [29] = sci_uart_eri_isr, /* SCI3 ERI (Receive error) */
             [30] = sci_uart_rxi_isr, /* SCI4 RXI (Receive data full) */
-            [31] = sci_uart_txi_isr, /* SCI4 TXI (Transmit data empty) */
+            [31] = mbed_sci_txi_isr, /* SCI4 TXI (Transmit data empty) */
             [32] = sci_uart_tei_isr, /* SCI4 TEI (Transmit end) */
             [33] = sci_uart_eri_isr, /* SCI4 ERI (Receive error) */
             [34] = sci_uart_rxi_isr, /* SCI9 RXI (Receive data full) */
-            [35] = sci_uart_txi_isr, /* SCI9 TXI (Transmit data empty) */
+            [35] = mbed_sci_txi_isr, /* SCI9 TXI (Transmit data empty) */
             [36] = sci_uart_tei_isr, /* SCI9 TEI (Transmit end) */
             [37] = sci_uart_eri_isr, /* SCI9 ERI (Receive error) */
             [38] = can_error_isr, /* CAN0 ERROR (Error interrupt) */

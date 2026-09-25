@@ -26,7 +26,7 @@
         void spi_eri_isr(void);
         void dmac_int_isr(void);
         void sci_uart_rxi_isr(void);
-        void sci_uart_txi_isr(void);
+        void mbed_sci_txi_isr(void);
         void sci_uart_tei_isr(void);
         void sci_uart_eri_isr(void);
         /* SCI0 is used in simple SPI mode (Arduino UNO header) */
