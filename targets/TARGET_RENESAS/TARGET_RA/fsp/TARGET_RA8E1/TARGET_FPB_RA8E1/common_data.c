@@ -21,7 +21,7 @@ const icu_extended_cfg_t g_external_irq15_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq15_cfg =
+external_irq_cfg_t g_external_irq15_cfg =
 {
     .channel             = 15,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -57,7 +57,7 @@ const icu_extended_cfg_t g_external_irq14_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq14_cfg =
+external_irq_cfg_t g_external_irq14_cfg =
 {
     .channel             = 14,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -93,7 +93,7 @@ const icu_extended_cfg_t g_external_irq12_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq12_cfg =
+external_irq_cfg_t g_external_irq12_cfg =
 {
     .channel             = 12,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -129,7 +129,7 @@ const icu_extended_cfg_t g_external_irq11_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq11_cfg =
+external_irq_cfg_t g_external_irq11_cfg =
 {
     .channel             = 11,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -165,7 +165,7 @@ const icu_extended_cfg_t g_external_irq10_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq10_cfg =
+external_irq_cfg_t g_external_irq10_cfg =
 {
     .channel             = 10,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -201,7 +201,7 @@ const icu_extended_cfg_t g_external_irq13_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq13_cfg =
+external_irq_cfg_t g_external_irq13_cfg =
 {
     .channel             = 13,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -237,7 +237,7 @@ const icu_extended_cfg_t g_external_irq9_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq9_cfg =
+external_irq_cfg_t g_external_irq9_cfg =
 {
     .channel             = 9,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -273,7 +273,7 @@ const icu_extended_cfg_t g_external_irq8_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq8_cfg =
+external_irq_cfg_t g_external_irq8_cfg =
 {
     .channel             = 8,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -309,7 +309,7 @@ const icu_extended_cfg_t g_external_irq7_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq7_cfg =
+external_irq_cfg_t g_external_irq7_cfg =
 {
     .channel             = 7,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -345,7 +345,7 @@ const icu_extended_cfg_t g_external_irq6_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq6_cfg =
+external_irq_cfg_t g_external_irq6_cfg =
 {
     .channel             = 6,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -381,7 +381,7 @@ const icu_extended_cfg_t g_external_irq5_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq5_cfg =
+external_irq_cfg_t g_external_irq5_cfg =
 {
     .channel             = 5,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -417,7 +417,7 @@ const icu_extended_cfg_t g_external_irq4_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq4_cfg =
+external_irq_cfg_t g_external_irq4_cfg =
 {
     .channel             = 4,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -453,7 +453,7 @@ const icu_extended_cfg_t g_external_irq3_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq3_cfg =
+external_irq_cfg_t g_external_irq3_cfg =
 {
     .channel             = 3,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -489,7 +489,7 @@ const icu_extended_cfg_t g_external_irq2_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq2_cfg =
+external_irq_cfg_t g_external_irq2_cfg =
 {
     .channel             = 2,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -525,7 +525,7 @@ const icu_extended_cfg_t g_external_irq1_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq1_cfg =
+external_irq_cfg_t g_external_irq1_cfg =
 {
     .channel             = 1,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,
@@ -561,7 +561,7 @@ const icu_extended_cfg_t g_external_irq0_ext_cfg =
     .filter_src         = EXTERNAL_IRQ_DIGITAL_FILTER_PCLK_DIV,
 };
 
-const external_irq_cfg_t g_external_irq0_cfg =
+external_irq_cfg_t g_external_irq0_cfg =
 {
     .channel             = 0,
     .trigger             = EXTERNAL_IRQ_TRIG_BOTH_EDGE,

@@ -89,6 +89,10 @@ void wait_us(int us)
 // (The NOPs were added to stabilise this - with just the SUB and BCS, it seems that the
 // M7 sometimes takes 1 cycle, sometimes 2, possibly depending on alignment)
 #define LOOP_SCALER 2000
+#elif __CORTEX_M == 85
+// Cortex-M85 features advanced dual-issue superscalar pipeline and branch prediction,
+// taking approx 1.33 cycles per iteration with this loop sequence.
+#define LOOP_SCALER 1333
 #endif
 #elif defined __CORTEX_A
 #if __CORTEX_A == 9 || __CORTEX_A == 5

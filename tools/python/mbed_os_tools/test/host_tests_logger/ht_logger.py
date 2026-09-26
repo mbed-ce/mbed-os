@@ -26,7 +26,7 @@ class HtrunLogger(object):
         logging.basicConfig(
             stream=sys.stdout, format="[+%(relativeCreated)dms][%(name)s]%(message)s", level=logging.DEBUG
         )
-        self.logger = logging.getLogger(name)
+        self.logger: logging.Logger = logging.getLogger(name)
         self.format_str = "[%(logger_level)s] %(message)s"
 
         def __prn_log(self, logger_level, text, timestamp=None):

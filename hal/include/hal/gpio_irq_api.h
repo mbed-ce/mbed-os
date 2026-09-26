@@ -75,8 +75,10 @@ typedef void (*gpio_irq_handler)(uintptr_t context, gpio_irq_event event);
  *
  * @param obj     The GPIO object to initialize
  * @param pin     The GPIO pin name
- * @param handler The handler to be attached to GPIO IRQ
- * @param context The context to be passed back to the handler (context != 0, 0 is reserved)
+ * @param handler The handler function to be attached to GPIO IRQ.
+ *     This handler function will be the same for all gpio_irq instances.
+ * @param context The context to be passed back to the handler (context != 0, 0 is reserved).
+ *     This context value must be remembered for this specific gpio_irq.
  * @return -1 if pin is NC, 0 otherwise
  */
 int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uintptr_t context);
@@ -87,7 +89,13 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uintpt
  */
 void gpio_irq_free(gpio_irq_t *obj);
 
-/** Enable/disable pin IRQ event
+/**
+ * @brief Enable/disable pin IRQ event
+ *
+ * This is called when the user calls \c rise() or \c fall() on an InterruptIn object.
+ *
+ * It should be possible to call this function twice, once with a rise event and once with a fall event,
+ * and the result is that both rising and falling events trigger interrupts.
  *
  * @param obj    The GPIO object
  * @param event  The GPIO IRQ event

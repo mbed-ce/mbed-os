@@ -56,8 +56,21 @@ can_bit_timing_cfg_t g_canfd0_data_timing_cfg =
 
 extern const canfd_afl_entry_t p_canfd0_afl[CANFD_CFG_AFL_CH0_RULE_NUM];
 
+#define CANFD_CFG_COMMONFIFO0 (((1) << R_CANFD_CFDCFCC_CFE_Pos) | \
+                                        ((0) << R_CANFD_CFDCFCC_CFRXIE_Pos) | \
+                                        ((1) << R_CANFD_CFDCFCC_CFTXIE_Pos) | \
+                                        ((7) << R_CANFD_CFDCFCC_CFPLS_Pos) | \
+                                        ((1) << R_CANFD_CFDCFCC_CFM_Pos) | \
+                                        ((0) << R_CANFD_CFDCFCC_CFITSS_Pos) | \
+                                        ((0) << R_CANFD_CFDCFCC_CFITR_Pos) | \
+                                        ((0)  << R_CANFD_CFDCFCC_CFIM_Pos) | \
+                                        ((3U) << R_CANFD_CFDCFCC_CFIGCV_Pos) | \
+                                        ((0) << R_CANFD_CFDCFCC_CFTML_Pos) | \
+                                        ((2) << R_CANFD_CFDCFCC_CFDC_Pos) | \
+                                        (0 << R_CANFD_CFDCFCC_CFITT_Pos))
 
-/* Buffer RAM used: 608 bytes */
+
+/* Buffer RAM used: 1216 bytes */
 canfd_global_cfg_t g_canfd0_global_cfg =
 {
     .global_interrupts = ( 0x3),
@@ -282,7 +295,7 @@ sci_uart_instance_ctrl_t     g_uart9_ctrl;
                 .clock                = SCI_UART_CLOCK_INT,
                 .rx_edge_start          = SCI_UART_START_BIT_FALLING_EDGE,
                 .noise_cancel         = SCI_UART_NOISE_CANCELLATION_DISABLE,
-                .rx_fifo_trigger        = SCI_UART_RX_FIFO_TRIGGER_MAX,
+                .rx_fifo_trigger        = SCI_UART_RX_FIFO_TRIGGER_8,
                 .p_baud_setting         = &g_uart9_baud_setting,
                 .flow_control           = SCI_UART_FLOW_CONTROL_RTS,
                 #if 0xFF != 0xFF
@@ -1197,7 +1210,7 @@ sci_uart_instance_ctrl_t     g_uart0_ctrl;
                 .clock                = SCI_UART_CLOCK_INT,
                 .rx_edge_start          = SCI_UART_START_BIT_FALLING_EDGE,
                 .noise_cancel         = SCI_UART_NOISE_CANCELLATION_DISABLE,
-                .rx_fifo_trigger        = SCI_UART_RX_FIFO_TRIGGER_MAX,
+                .rx_fifo_trigger        = SCI_UART_RX_FIFO_TRIGGER_8,
                 .p_baud_setting         = &g_uart0_baud_setting,
                 .flow_control           = SCI_UART_FLOW_CONTROL_RTS,
                 #if 0xFF != 0xFF
