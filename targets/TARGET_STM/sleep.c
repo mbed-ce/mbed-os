@@ -89,7 +89,9 @@ __WEAK void ForceOscOutofDeepSleep(void)
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
     /* Enable Power Control clock */
-    __HAL_RCC_PWR_CLK_ENABLE();
+#if defined(__HAL_RCC_PWR_CLK_ENABLE)
+            __HAL_RCC_PWR_CLK_ENABLE();
+#endif
 
     /* Get the Oscillators configuration according to the internal RCC registers */
     HAL_RCC_GetOscConfig(&RCC_OscInitStruct);
@@ -199,12 +201,14 @@ __WEAK void hal_deepsleep(void)
     // Request to enter STOP mode with regulator in low power mode
     //PWR_CR1_LPMS_STOP2 -> STM32L4 ; PWR_LOWPOWERMODE_STOP2 -> STM32WL
 #if defined (PWR_CR1_LPMS_STOP2) || defined(PWR_LOWPOWERMODE_STOP2)
+#if defined(__HAL_RCC_PWR_IS_CLK_ENABLED) && defined(__HAL_RCC_PWR_CLK_ENABLE)
     int pwrClockEnabled = __HAL_RCC_PWR_IS_CLK_ENABLED();
-    int lowPowerModeEnabled = PWR->CR1 & PWR_CR1_LPR;
-
     if (!pwrClockEnabled) {
         __HAL_RCC_PWR_CLK_ENABLE();
     }
+#endif
+    int lowPowerModeEnabled = PWR->CR1 & PWR_CR1_LPR;
+
     if (lowPowerModeEnabled) {
         HAL_PWREx_DisableLowPowerRunMode();
     }
@@ -218,9 +222,11 @@ __WEAK void hal_deepsleep(void)
     if (lowPowerModeEnabled) {
         HAL_PWREx_EnableLowPowerRunMode();
     }
+#if defined(__HAL_RCC_PWR_IS_CLK_ENABLED) && defined(__HAL_RCC_PWR_CLK_ENABLE) && defined(__HAL_RCC_PWR_CLK_DISABLE)
     if (!pwrClockEnabled) {
         __HAL_RCC_PWR_CLK_DISABLE();
     }
+#endif
 #elif defined(DUAL_CORE) && (TARGET_STM32H7)
     int lowPowerModeEnabled = LL_PWR_GetRegulModeDS();
 

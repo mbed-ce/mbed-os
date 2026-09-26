@@ -94,10 +94,4 @@ struct trng_s {
 #ifdef __cplusplus
 }
 #endif
-
-/* STM32WL HAL doesn't provide some macro */
-#define __HAL_RCC_PWR_CLK_DISABLE()
-#define __HAL_RCC_PWR_CLK_ENABLE()
-#define __HAL_RCC_PWR_IS_CLK_ENABLED() 1
-
 #endif

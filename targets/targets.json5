@@ -2573,6 +2573,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32"
         ],
         "public": false,
+        "core": "Cortex-M33",
         "extra_labels_add": [
             "STM32H5"
         ],
@@ -2630,7 +2631,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32H5"
         ],
         "public": false,
-        "core": "Cortex-M33",
         "extra_labels_add": [
             "STM32H503xB"
         ],
@@ -2665,7 +2665,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32H5"
         ],
         "public": false,
-        "core": "Cortex-M33",
         "extra_labels_add": [
             "STM32H563xI"
         ],
@@ -2703,7 +2702,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32H5"
         ],
         "public": false,
-        "core": "Cortex-M33",
         "extra_labels_add": [
             "STM32H573xI"
         ],

@@ -10,6 +10,11 @@ add_subdirectory(TARGET_${_stm32_family} EXCLUDE_FROM_ALL)
 
 add_library(mbed-stm INTERFACE)
 
+# STM32 CMSIS device headers define __FPU_PRESENT themselves.
+target_compile_options(mbed-stm INTERFACE
+    -U__FPU_PRESENT
+)
+
 target_include_directories(mbed-stm
     INTERFACE
         .
