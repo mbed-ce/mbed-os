@@ -95,13 +95,6 @@ struct flash_s {
 
 #define HAL_CRC_IS_SUPPORTED(polynomial, width) ((width) == 7 || (width) == 8 || (width) == 16 || (width) == 32)
 
-/* rtc_api.c */
-//#define __HAL_RCC_PWR_CLK_ENABLE()
-
-/* serial_api.c */
-//#define RCC_LPUART1CLKSOURCE_PCLK1  RCC_LPUART1CLKSOURCE_PLL2Q
-//#define RCC_LPUART1CLKSOURCE_SYSCLK RCC_LPUART1CLKSOURCE_PCLK3
-
 #ifdef __cplusplus
 }
 #endif

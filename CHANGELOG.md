@@ -86,6 +86,7 @@ A message that notes the main changes in the update.
 ### Deprecated
 
 ### Fixed
+- STM32: Improved compatibility across HAL variants by removing obsolete clock-control shims and guarding optional RCC/PWR macros.
 - Fixed `realloc(ptr, 0)` leaking the original allocation when heap statistics are enabled
 - Added fixes aimed at improving Greentea stability for KV/FlashIAP (STM32F7) and USBSerial paths.
 - Fixed inability to create a serial flow control static pinmap with only CTS or RTS defined, instead of both.
