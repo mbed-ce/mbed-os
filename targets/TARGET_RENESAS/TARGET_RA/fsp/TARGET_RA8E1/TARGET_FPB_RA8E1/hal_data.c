@@ -470,7 +470,7 @@ sci_b_uart_instance_ctrl_t     g_uart9_ctrl;
                 .data_bits           = UART_DATA_BITS_8,
                 .parity              = UART_PARITY_OFF,
                 .stop_bits           = UART_STOP_BITS_1,
-                .p_callback          = uart_callback,
+                .p_callback          = NULL,
                 .p_context           = NULL,
                 .p_extend            = &g_uart9_cfg_extend,
 #define RA_NOT_DEFINED (1)
@@ -554,7 +554,7 @@ sci_b_uart_instance_ctrl_t     g_uart4_ctrl;
                 .data_bits           = UART_DATA_BITS_8,
                 .parity              = UART_PARITY_OFF,
                 .stop_bits           = UART_STOP_BITS_1,
-                .p_callback          = uart_callback,
+                .p_callback          = NULL,
                 .p_context           = NULL,
                 .p_extend            = &g_uart4_cfg_extend,
 #define RA_NOT_DEFINED (1)
@@ -638,7 +638,7 @@ sci_b_uart_instance_ctrl_t     g_uart3_ctrl;
                 .data_bits           = UART_DATA_BITS_8,
                 .parity              = UART_PARITY_OFF,
                 .stop_bits           = UART_STOP_BITS_1,
-                .p_callback          = uart_callback,
+                .p_callback          = NULL,
                 .p_context           = NULL,
                 .p_extend            = &g_uart3_cfg_extend,
 #define RA_NOT_DEFINED (1)
@@ -722,7 +722,7 @@ sci_b_uart_instance_ctrl_t     g_uart2_ctrl;
                 .data_bits           = UART_DATA_BITS_8,
                 .parity              = UART_PARITY_OFF,
                 .stop_bits           = UART_STOP_BITS_1,
-                .p_callback          = uart_callback,
+                .p_callback          = NULL,
                 .p_context           = NULL,
                 .p_extend            = &g_uart2_cfg_extend,
 #define RA_NOT_DEFINED (1)
@@ -806,7 +806,7 @@ sci_b_uart_instance_ctrl_t     g_uart1_ctrl;
                 .data_bits           = UART_DATA_BITS_8,
                 .parity              = UART_PARITY_OFF,
                 .stop_bits           = UART_STOP_BITS_1,
-                .p_callback          = uart_callback,
+                .p_callback          = NULL,
                 .p_context           = NULL,
                 .p_extend            = &g_uart1_cfg_extend,
 #define RA_NOT_DEFINED (1)
@@ -1775,7 +1775,7 @@ sci_b_uart_instance_ctrl_t     g_uart0_ctrl;
                 .data_bits           = UART_DATA_BITS_8,
                 .parity              = UART_PARITY_OFF,
                 .stop_bits           = UART_STOP_BITS_1,
-                .p_callback          = uart_callback,
+                .p_callback          = NULL,
                 .p_context           = NULL,
                 .p_extend            = &g_uart0_cfg_extend,
 #define RA_NOT_DEFINED (1)

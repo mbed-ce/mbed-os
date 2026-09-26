@@ -10,8 +10,6 @@
 #include "mbed_atomic.h"
 #include "mbed_critical.h"
 
-#define RX_BUF_SIZE 16
-
 #if MBED_CONF_TARGET_CONSOLE_UART
 int stdio_uart_inited = 0; // used in platform/mbed_board.c and platform/mbed_retarget.cpp
 serial_t stdio_uart;
@@ -166,7 +164,6 @@ void serial_free(serial_t *obj)
 {
     MBED_ASSERT(obj);
 
-    obj->p_api->callbackSet(obj->p_ctrl, NULL, NULL, NULL);
     obj->p_api->close(obj->p_ctrl);
 }
 
@@ -211,7 +208,6 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
     obj->p_api->open(obj->p_ctrl, cfg);
 
     // Restore interrupt state cleared by `open`
-    obj->p_api->callbackSet(obj->p_ctrl, &uart_callback, obj, NULL);
     serial_irq_set(obj, RxIrq, g_rx_irq_enabled[obj->instance_index]);
     serial_irq_set(obj, TxIrq, g_tx_irq_enabled[obj->instance_index]);
     sci_configure_tx_interrupts(obj);
@@ -411,31 +407,6 @@ void mbed_sci_eri_isr() {
 #else
     p_ctrl->p_reg->SSR_FIFO = (uint8_t)~(R_SCI0_SSR_FIFO_PER_Msk | R_SCI0_SSR_FIFO_FER_Msk | R_SCI0_SSR_FIFO_ORER_Msk);
 #endif
-}
-
-void uart_callback(uart_callback_args_t *p_args)
-{
-    serial_t *obj = (serial_t *) p_args->p_context;
-    MBED_ASSERT(obj != NULL);
-
-    int idx = obj->instance_index;
-
-    switch (p_args->event)
-    {
-        case UART_EVENT_RX_COMPLETE:
-            if (g_rx_irq_enabled[idx])
-                g_irq_handler(g_irq_id[idx], RxIrq);
-            break;
-
-        case UART_EVENT_ERR_PARITY:
-        case UART_EVENT_ERR_FRAMING:
-        case UART_EVENT_ERR_OVERFLOW:
-            if (g_rx_irq_enabled[idx])
-                g_irq_handler(g_irq_id[idx], RxIrq);
-            break;
-        default:
-            break;
-    }
 }
 
 const PinMap *serial_tx_pinmap()
