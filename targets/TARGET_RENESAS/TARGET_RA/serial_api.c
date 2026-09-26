@@ -55,8 +55,12 @@ int instance_index_from_channel(int channel)
 
 static void sci_configure_tx_interrupts(serial_t * const obj) {
 #if BSP_PERIPHERAL_SCI_B_PRESENT
-    obj->p_ctrl->p_reg->CCR0 |= R_SCI_B0_CCR0_TIE_Msk;
-    obj->p_ctrl->p_reg->CCR0 &= ~R_SCI_B0_CCR0_TEIE_Msk;
+    obj->p_ctrl->p_reg->CCR0_b.TIE = 1;
+    obj->p_ctrl->p_reg->CCR0_b.TEIE = 0;
+#else
+    obj->p_ctrl->p_reg->SCR_b.TIE = 1;
+    obj->p_ctrl->p_reg->SCR_b.TEIE = 0;
+#endif
 
     // Set Tx data empty interrupt threshold to 1/4 of the way full so that, e.g.,
     // we interrupt the core when it can write 12 bytes out of a 16 byte FIFO. The default is to interrupt the core
@@ -65,9 +69,10 @@ static void sci_configure_tx_interrupts(serial_t * const obj) {
     obj->p_ctrl->p_reg->FCR_b.TTRG = obj->p_ctrl->fifo_depth / 4;
 
     // Clear TDRE flag in case it got set from the BSP enabling TEI interrupt
+#if BSP_PERIPHERAL_SCI_B_PRESENT
     obj->p_ctrl->p_reg->CFCLR = R_SCI_B0_CFCLR_TDREC_Msk;
 #else
-    obj->p_ctrl->p_reg->SCR |= R_SCI0_SCR_TIE_Msk | SCI_SCR_TE_MASK;
+    obj->p_ctrl->p_reg->SSR_FIFO = (uint8_t)~(R_SCI0_SSR_FIFO_TEND_Msk);
 #endif
 }
 
@@ -107,7 +112,6 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
     obj->cfg.p_context = obj;
     obj->tx = tx;
     obj->rx = rx;
-    obj->has_rx_char_from_callback = false;
 
     uint8_t stdio_config = false;
 #if defined(MBED_CONF_TARGET_CONSOLE_UART)
@@ -221,13 +225,6 @@ int serial_getc(serial_t *obj)
         __NOP();
     }
 
-    if(obj->has_rx_char_from_callback) {
-        obj->has_rx_char_from_callback = false;
-        const char result = obj->rx_char_from_callback;
-        core_util_critical_section_exit();
-        return result;
-    }
-
 #if BSP_PERIPHERAL_SCI_B_PRESENT
     return obj->p_ctrl->p_reg->RDR_BY & 0xFF;
 #else
@@ -255,10 +252,6 @@ void serial_putc(serial_t *obj, int c)
 
 int serial_readable(serial_t *obj)
 {
-    if(obj->has_rx_char_from_callback) {
-        return true;
-    }
-
     // Check if there is at least 1 byte in the Rx FIFO
 #if BSP_PERIPHERAL_SCI_B_PRESENT
     return obj->p_ctrl->p_reg->FRSR_b.R > 0U;
@@ -317,15 +310,52 @@ void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
 
 void serial_break_set(serial_t *obj)
 {
-    (void)obj;
+    // Disable transmitter
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    obj->p_ctrl->p_reg->CCR0_b.TE = 0;
+#else
+    obj->p_ctrl->p_reg->SCR_b.TE = 0;
+#endif
+
+    // Set break level
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    obj->p_ctrl->p_reg->CCR1_b.SPB2DT = 0;
+#else
+    obj->p_ctrl->p_reg->SPTR_b.SPB2DT = 0;
+#endif
+
+    // Send break
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    obj->p_ctrl->p_reg->CCR1_b.SPB2IO = 1;
+#else
+    obj->p_ctrl->p_reg->SPTR_b.SPB2IO = 1;
+#endif
 }
 
 void serial_break_clear(serial_t *obj)
 {
-    (void)obj;
+    // Clear break
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    obj->p_ctrl->p_reg->CCR1_b.SPB2IO = 0;
+#else
+    obj->p_ctrl->p_reg->SPTR_b.SPB2IO = 0;
+#endif
+
+    // Reenable transmitter
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    obj->p_ctrl->p_reg->CCR0_b.TE = 1;
+#else
+    obj->p_ctrl->p_reg->SCR_b.TE = 1;
+#endif
 }
 
 /* ---------------- UART callback ---------------- */
+
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+typedef sci_b_uart_instance_ctrl_t sci_uart_instance_t;
+#else
+typedef sci_uart_instance_ctrl_t sci_uart_instance_t;
+#endif
 
 void mbed_sci_txi_isr() {
     IRQn_Type irq = R_FSP_CurrentIrqGet();
@@ -334,12 +364,53 @@ void mbed_sci_txi_isr() {
     R_BSP_IrqStatusClear(irq);
 
     /* Recover ISR context saved in open. */
-    sci_b_uart_instance_ctrl_t * const p_ctrl = (sci_b_uart_instance_ctrl_t *) R_FSP_IsrContextGet(irq);
+    sci_uart_instance_t * const p_ctrl = (sci_uart_instance_t *) R_FSP_IsrContextGet(irq);
     serial_t * const obj = p_ctrl->p_context;
 
     // Call Mbed OS IRQ handler
     if (g_tx_irq_enabled[obj->instance_index])
         g_irq_handler(g_irq_id[obj->instance_index], TxIrq);
+}
+
+void mbed_sci_rxi_isr() {
+    IRQn_Type irq = R_FSP_CurrentIrqGet();
+
+    /* Clear pending IRQ to make sure it doesn't fire again after exiting */
+    R_BSP_IrqStatusClear(irq);
+
+    /* Recover ISR context saved in open. */
+    sci_uart_instance_t * const p_ctrl = (sci_uart_instance_t *) R_FSP_IsrContextGet(irq);
+    serial_t * const obj = p_ctrl->p_context;
+
+    // Call Mbed OS IRQ handler
+    if (g_rx_irq_enabled[obj->instance_index]) {
+        g_irq_handler(g_irq_id[obj->instance_index], RxIrq);
+    }
+
+    // Clear Rx FIFO empty flag so interrupt can trigger again
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    p_ctrl->p_reg->CFCLR = R_SCI_B0_CFCLR_RDRFC_Msk;
+#else
+    p_ctrl->p_reg->SSR_FIFO = (uint8_t) ~(R_SCI0_SSR_FIFO_RDF_Msk);
+#endif
+}
+
+void mbed_sci_eri_isr() {
+    IRQn_Type irq = R_FSP_CurrentIrqGet();
+
+    /* Clear pending IRQ to make sure it doesn't fire again after exiting */
+    R_BSP_IrqStatusClear(irq);
+
+    /* Recover ISR context saved in open. */
+    sci_uart_instance_t * const p_ctrl = (sci_uart_instance_t *) R_FSP_IsrContextGet(irq);
+
+    // For now we just clear the flags so that we can keep going. However, it would also be possible
+    // to check the cause of the error in CSR/SSR.
+#if BSP_PERIPHERAL_SCI_B_PRESENT
+    p_ctrl->p_reg->CFCLR = R_SCI_B0_CFCLR_ORERC_Msk | R_SCI_B0_CFCLR_PERC_Msk | R_SCI_B0_CFCLR_FERC_Msk;
+#else
+    p_ctrl->p_reg->SSR_FIFO = (uint8_t)~(R_SCI0_SSR_FIFO_PER_Msk | R_SCI0_SSR_FIFO_FER_Msk | R_SCI0_SSR_FIFO_ORER_Msk);
+#endif
 }
 
 void uart_callback(uart_callback_args_t *p_args)
@@ -351,19 +422,6 @@ void uart_callback(uart_callback_args_t *p_args)
 
     switch (p_args->event)
     {
-        case UART_EVENT_RX_CHAR:
-        {
-            // This event means that the Renesas BSP has already read the first char
-            // and stored it in the event args.
-            obj->has_rx_char_from_callback = true;
-            obj->rx_char_from_callback = (char)p_args->data;
-
-            if (g_rx_irq_enabled[idx]) {
-                g_irq_handler(g_irq_id[idx], RxIrq);
-            }
-            break;
-        }
-
         case UART_EVENT_RX_COMPLETE:
             if (g_rx_irq_enabled[idx])
                 g_irq_handler(g_irq_id[idx], RxIrq);

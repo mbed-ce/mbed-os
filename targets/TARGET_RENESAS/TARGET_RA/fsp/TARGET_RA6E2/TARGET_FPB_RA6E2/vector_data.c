@@ -16,10 +16,10 @@
             [5] = spi_tei_isr, /* SPI0 TEI (Transmission complete event) */
             [6] = spi_eri_isr, /* SPI0 ERI (Error) */
             [7] = dmac_int_isr, /* DMAC0 INT (DMAC0 transfer end) */
-            [8] = sci_uart_rxi_isr, /* SCI0 RXI (Receive data full) */
+            [8] = mbed_sci_rxi_isr, /* SCI0 RXI (Receive data full) */
             [9] = mbed_sci_txi_isr, /* SCI0 TXI (Transmit data empty) */
-            [10] = sci_uart_tei_isr, /* SCI0 TEI (Transmit end) */
-            [11] = sci_uart_eri_isr, /* SCI0 ERI (Receive error) */
+            [10] = NULL,
+            [11] = mbed_sci_eri_isr, /* SCI0 ERI (Receive error) */
             [12] = r_icu_isr, /* ICU IRQ1 (External pin interrupt 1) */
             [13] = r_icu_isr, /* ICU IRQ2 (External pin interrupt 2) */
             [14] = r_icu_isr, /* ICU IRQ3 (External pin interrupt 3) */
@@ -38,10 +38,10 @@
             [27] = r_icu_isr, /* ICU IRQ12 (External pin interrupt 12) */
             [28] = r_icu_isr, /* ICU IRQ13 (External pin interrupt 13) */
             [29] = r_icu_isr, /* ICU IRQ14 (External pin interrupt 14) */
-            [30] = sci_uart_rxi_isr, /* SCI9 RXI (Receive data full) */
+            [30] = mbed_sci_rxi_isr, /* SCI9 RXI (Receive data full) */
             [31] = mbed_sci_txi_isr, /* SCI9 TXI (Transmit data empty) */
-            [32] = sci_uart_tei_isr, /* SCI9 TEI (Transmit end) */
-            [33] = sci_uart_eri_isr, /* SCI9 ERI (Receive error) */
+            [32] = NULL,
+            [33] = mbed_sci_eri_isr, /* SCI9 ERI (Receive error) */
             [34] = spi_rxi_isr, /* SPI1 RXI (Receive buffer full) */
             [35] = spi_tei_isr, /* SPI1 TEI (Transmission complete event) */
             [36] = spi_eri_isr, /* SPI1 ERI (Error) */
@@ -67,7 +67,7 @@
             [7] = BSP_PRV_VECT_ENUM(EVENT_DMAC0_INT,GROUP7), /* DMAC0 INT (DMAC0 transfer end) */
             [8] = BSP_PRV_VECT_ENUM(EVENT_SCI0_RXI,GROUP0), /* SCI0 RXI (Receive data full) */
             [9] = BSP_PRV_VECT_ENUM(EVENT_SCI0_TXI,GROUP1), /* SCI0 TXI (Transmit data empty) */
-            [10] = BSP_PRV_VECT_ENUM(EVENT_SCI0_TEI,GROUP2), /* SCI0 TEI (Transmit end) */
+            [10] = 0, /* unused */
             [11] = BSP_PRV_VECT_ENUM(EVENT_SCI0_ERI,GROUP3), /* SCI0 ERI (Receive error) */
             [12] = BSP_PRV_VECT_ENUM(EVENT_ICU_IRQ1,GROUP4), /* ICU IRQ1 (External pin interrupt 1) */
             [13] = BSP_PRV_VECT_ENUM(EVENT_ICU_IRQ2,GROUP5), /* ICU IRQ2 (External pin interrupt 2) */
@@ -89,7 +89,7 @@
             [29] = BSP_PRV_VECT_ENUM(EVENT_ICU_IRQ14,GROUP5), /* ICU IRQ14 (External pin interrupt 14) */
             [30] = BSP_PRV_VECT_ENUM(EVENT_SCI9_RXI,GROUP6), /* SCI9 RXI (Receive data full) */
             [31] = BSP_PRV_VECT_ENUM(EVENT_SCI9_TXI,GROUP7), /* SCI9 TXI (Transmit data empty) */
-            [32] = BSP_PRV_VECT_ENUM(EVENT_SCI9_TEI,FIXED), /* SCI9 TEI (Transmit end) */
+            [32] = 0, /* unused */
             [33] = BSP_PRV_VECT_ENUM(EVENT_SCI9_ERI,FIXED), /* SCI9 ERI (Receive error) */
             [34] = BSP_PRV_VECT_ENUM(EVENT_SPI1_RXI,FIXED), /* SPI1 RXI (Receive buffer full) */
             [35] = BSP_PRV_VECT_ENUM(EVENT_SPI1_TEI,FIXED), /* SPI1 TEI (Transmission complete event) */
