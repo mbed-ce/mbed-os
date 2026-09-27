@@ -258,16 +258,6 @@ MBED_WEAK uint8_t SetSysClock_PLL_MSI(void)
     HAL_PWREx_EnableVddA();
     HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-#if MBED_CONF_TARGET_LSE_AVAILABLE
-        // Enable LSE Oscillator to automatically calibrate the MSI clock
-        RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
-        RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_NONE; // No PLL update
-        RCC_OscInitStruct.LSEState       = RCC_LSE_ON;   // External 32.768 kHz clock on OSC32_IN/OSC32_OUT
-        if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-            return 0; // FAIL
-        }
-#endif /* MBED_CONF_TARGET_LSE_AVAILABLE */
-
     /* Enable MSI Oscillator and activate PLL with MSI as source */
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_HSI
                                        | RCC_OSCILLATORTYPE_MSI;

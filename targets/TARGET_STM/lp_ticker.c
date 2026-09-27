@@ -1,6 +1,7 @@
 /* mbed Microcontroller Library
  *******************************************************************************
  * Copyright (c) 2018, STMicroelectronics
+ * Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +39,7 @@
 #include "lp_ticker_api.h"
 #include "mbed_error.h"
 #include "mbed_power_mgmt.h"
+#include "low_speed_clock.h"
 #include "platform/mbed_critical.h"
 #include <stdbool.h>
 
@@ -164,62 +166,37 @@ void lp_ticker_init(void)
     LPTICKER_inited = 1;
 
     RCC_PeriphCLKInitTypeDef RCC_PeriphCLKInitStruct = {0};
-    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
-#if MBED_CONF_TARGET_LSE_AVAILABLE
-
-    /* Enable LSE clock */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
-#if MBED_CONF_TARGET_LSE_BYPASS
-    RCC_OscInitStruct.LSEState = RCC_LSE_BYPASS;
-#else
-    RCC_OscInitStruct.LSEState = RCC_LSE_ON;
-#endif
-    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-
-    /* Select the LSE clock as LPTIM peripheral clock */
-    RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPTIM;
-#if (TARGET_STM32L0)
-    RCC_PeriphCLKInitStruct.LptimClockSelection = RCC_LPTIMCLKSOURCE_LSE;
-#else
-#if (LPTIM_MST_BASE == LPTIM1_BASE)
-    RCC_PeriphCLKInitStruct.Lptim1ClockSelection = RCC_LPTIMCLKSOURCE_LSE;
-#elif (LPTIM_MST_BASE == LPTIM3_BASE) || (LPTIM_MST_BASE == LPTIM4_BASE) || (LPTIM_MST_BASE == LPTIM5_BASE)
-    RCC_PeriphCLKInitStruct.Lptim345ClockSelection = RCC_LPTIMCLKSOURCE_LSE;
-#endif /* LPTIM_MST_BASE == LPTIM1 */
-#endif /* TARGET_STM32L0 */
-#else /* MBED_CONF_TARGET_LSE_AVAILABLE */
-
-    /* Enable LSI clock */
-#if TARGET_STM32WB
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI1;
-#else
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI;
-#endif
-    RCC_OscInitStruct.LSIState = RCC_LSI_ON;
-    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-
-    /* Select the LSI clock as LPTIM peripheral clock */
-    RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPTIM;
-#if (TARGET_STM32L0)
-    RCC_PeriphCLKInitStruct.LptimClockSelection = RCC_LPTIMCLKSOURCE_LSI;
-#else
-#if (LPTIM_MST_BASE == LPTIM1_BASE)
-    RCC_PeriphCLKInitStruct.Lptim1ClockSelection = RCC_LPTIMCLKSOURCE_LSI;
-#elif (LPTIM_MST_BASE == LPTIM3_BASE) || (LPTIM_MST_BASE == LPTIM4_BASE) || (LPTIM_MST_BASE == LPTIM5_BASE)
-    RCC_PeriphCLKInitStruct.Lptim345ClockSelection = RCC_LPTIMCLKSOURCE_LSI;
-#endif /* LPTIM_MST_BASE == LPTIM1 */
-#endif /* TARGET_STM32L0 */
-
-#endif /* MBED_CONF_TARGET_LSE_AVAILABLE */
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
-    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID)) {
-    }
+    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID));
 #endif /* DUAL_CORE */
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        error("HAL_RCC_OscConfig ERROR\n");
-        return;
-    }
+    lsc_start();
+#if MBED_CONF_TARGET_LSE_AVAILABLE
+        /* Select the LSE clock as LPTIM peripheral clock */
+        RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPTIM;
+#if (TARGET_STM32L0)
+        RCC_PeriphCLKInitStruct.LptimClockSelection = RCC_LPTIMCLKSOURCE_LSE;
+#else
+#if (LPTIM_MST_BASE == LPTIM1_BASE)
+        RCC_PeriphCLKInitStruct.Lptim1ClockSelection = RCC_LPTIMCLKSOURCE_LSE;
+#elif (LPTIM_MST_BASE == LPTIM3_BASE) || (LPTIM_MST_BASE == LPTIM4_BASE) || (LPTIM_MST_BASE == LPTIM5_BASE)
+        RCC_PeriphCLKInitStruct.Lptim345ClockSelection = RCC_LPTIMCLKSOURCE_LSE;
+#endif /* LPTIM_MST_BASE == LPTIM1 */
+#endif /* TARGET_STM32L0 */
+
+#else /* MBED_CONF_TARGET_LSE_AVAILABLE */
+        /* Select the LSI clock as LPTIM peripheral clock */
+        RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPTIM;
+#if (TARGET_STM32L0)
+        RCC_PeriphCLKInitStruct.LptimClockSelection = RCC_LPTIMCLKSOURCE_LSI;
+#else
+#if (LPTIM_MST_BASE == LPTIM1_BASE)
+        RCC_PeriphCLKInitStruct.Lptim1ClockSelection = RCC_LPTIMCLKSOURCE_LSI;
+#elif (LPTIM_MST_BASE == LPTIM3_BASE) || (LPTIM_MST_BASE == LPTIM4_BASE) || (LPTIM_MST_BASE == LPTIM5_BASE)
+        RCC_PeriphCLKInitStruct.Lptim345ClockSelection = RCC_LPTIMCLKSOURCE_LSI;
+#endif /* LPTIM_MST_BASE == LPTIM1 */
+#endif /* TARGET_STM32L0 */
+#endif /* MBED_CONF_TARGET_LSE_AVAILABLE */
 
     if (HAL_RCCEx_PeriphCLKConfig(&RCC_PeriphCLKInitStruct) != HAL_OK) {
         error("HAL_RCCEx_PeriphCLKConfig ERROR\n");
@@ -229,6 +206,7 @@ void lp_ticker_init(void)
     LPTIM_MST_RCC();
     LPTIM_MST_RESET_ON();
     LPTIM_MST_RESET_OFF();
+
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
     /* Configure EXTI wakeup and configure autonomous mode */
     LPTIM_MST_RCC_CLKAM();
