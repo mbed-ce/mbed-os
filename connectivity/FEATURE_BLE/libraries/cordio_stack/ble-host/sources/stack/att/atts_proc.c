@@ -456,18 +456,20 @@ void attsProcReadReq(attsCcb_t *pCcb, uint16_t len, uint8_t *pPacket)
       if (err == ATT_SUCCESS)
       {
         /* determine length of data to read */
-        readLen = (*pAttr->pLen < (mtu - ATT_READ_RSP_LEN)) ?
+        if(mtu >= ATT_READ_RSP_LEN) {
+          readLen = (*pAttr->pLen < (mtu - ATT_READ_RSP_LEN)) ?
                    *pAttr->pLen : (mtu - ATT_READ_RSP_LEN);
 
-        /* Allocate response buffer */
-        if ((pBuf = attMsgAlloc(L2C_PAYLOAD_START + ATT_READ_RSP_LEN + readLen)) != NULL)
-        {
-          /* build and send PDU */
-          p = pBuf + L2C_PAYLOAD_START;
-          UINT8_TO_BSTREAM(p, ATT_PDU_READ_RSP);
-          memcpy(p, pAttr->pValue, readLen);
+          /* Allocate response buffer */
+          if ((pBuf = attMsgAlloc(L2C_PAYLOAD_START + ATT_READ_RSP_LEN + readLen)) != NULL)
+          {
+            /* build and send PDU */
+            p = pBuf + L2C_PAYLOAD_START;
+            UINT8_TO_BSTREAM(p, ATT_PDU_READ_RSP);
+            memcpy(p, pAttr->pValue, readLen);
 
-          attL2cDataReq(pCcb->pMainCcb, pCcb->slot, (ATT_READ_RSP_LEN + readLen), pBuf);
+            attL2cDataReq(pCcb->pMainCcb, pCcb->slot, (ATT_READ_RSP_LEN + readLen), pBuf);
+          }
         }
       }
     }
@@ -541,8 +543,16 @@ void attsProcReadMultiVarReq(attsCcb_t *pCcb, uint16_t len, uint8_t *pPacket)
           if (err == ATT_SUCCESS)
           {
             /* determine length of data to read */
-            uint16_t readLen = (*pAttr->pLen < (mtu - rspLen - hdrLen)) ?
-                                *pAttr->pLen : (mtu - rspLen - hdrLen);
+            const uint16_t used = ATT_READ_MULT_VAR_RSP_LEN + rspLen;
+
+            // Check that we have enough space first before reading anything!
+            // https://github.com/mbed-ce/mbed-os/security/advisories/GHSA-5qpv-7prj-rgv7
+            if (used > mtu || (mtu - used) < sizeof(uint16_t)) {
+              break;
+            }
+
+            const uint16_t room = mtu - used - sizeof(uint16_t);
+            const uint16_t readLen = WSF_MIN(*pAttr->pLen, room);
 
             UINT16_TO_BSTREAM(p, readLen);
             memcpy(p, pAttr->pValue, readLen);

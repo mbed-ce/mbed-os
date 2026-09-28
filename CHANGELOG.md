@@ -125,6 +125,8 @@ A message that notes the main changes in the update.
 - STM32F4 MCUs without dev board were removed 26/34 (still possible to use it with release Mbed-os 7.0.0). Will be covered by Custom target.
 
 ### Security
+- Patch for [GHSA-5qpv-7prj-rgv7](https://github.com/mbed-ce/mbed-os/security/advisories/GHSA-5qpv-7prj-rgv7), a bug allowing a malicious connected Bluetooth device to force memory corruption of Mbed OS by sending a specific packet.
+  - This can easily be exploited to make the Mbed device crash, and there might potentially be ways to use it to intentionally modify memory as well (though this has not been confirmed).
 
 _______________________________________________________________________________
  
