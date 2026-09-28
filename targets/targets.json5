@@ -783,7 +783,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/117498-CS_FRDM-K82-Board-Top_Mbed.jpg"
     },
 
-    // STM32 Top-Level Target ------------------------------------------------------------------------------------------
+// STM32 Top-Level Target ------------------------------------------------------------------------------------------
     "MCU_STM32": {
         "inherits": [
             "Target"

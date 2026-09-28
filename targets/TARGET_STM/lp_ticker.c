@@ -172,28 +172,28 @@ void lp_ticker_init(void)
 #endif /* DUAL_CORE */
     lsc_start();
 #if MBED_CONF_TARGET_LSE_AVAILABLE
-        /* Select the LSE clock as LPTIM peripheral clock */
-        RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPTIM;
+    /* Select the LSE clock as LPTIM peripheral clock */
+    RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPTIM;
 #if (TARGET_STM32L0)
-        RCC_PeriphCLKInitStruct.LptimClockSelection = RCC_LPTIMCLKSOURCE_LSE;
+    RCC_PeriphCLKInitStruct.LptimClockSelection = RCC_LPTIMCLKSOURCE_LSE;
 #else
 #if (LPTIM_MST_BASE == LPTIM1_BASE)
-        RCC_PeriphCLKInitStruct.Lptim1ClockSelection = RCC_LPTIMCLKSOURCE_LSE;
+     RCC_PeriphCLKInitStruct.Lptim1ClockSelection = RCC_LPTIMCLKSOURCE_LSE;
 #elif (LPTIM_MST_BASE == LPTIM3_BASE) || (LPTIM_MST_BASE == LPTIM4_BASE) || (LPTIM_MST_BASE == LPTIM5_BASE)
-        RCC_PeriphCLKInitStruct.Lptim345ClockSelection = RCC_LPTIMCLKSOURCE_LSE;
+     RCC_PeriphCLKInitStruct.Lptim345ClockSelection = RCC_LPTIMCLKSOURCE_LSE;
 #endif /* LPTIM_MST_BASE == LPTIM1 */
 #endif /* TARGET_STM32L0 */
 
 #else /* MBED_CONF_TARGET_LSE_AVAILABLE */
-        /* Select the LSI clock as LPTIM peripheral clock */
-        RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPTIM;
+    /* Select the LSI clock as LPTIM peripheral clock */
+    RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPTIM;
 #if (TARGET_STM32L0)
-        RCC_PeriphCLKInitStruct.LptimClockSelection = RCC_LPTIMCLKSOURCE_LSI;
+    RCC_PeriphCLKInitStruct.LptimClockSelection = RCC_LPTIMCLKSOURCE_LSI;
 #else
 #if (LPTIM_MST_BASE == LPTIM1_BASE)
-        RCC_PeriphCLKInitStruct.Lptim1ClockSelection = RCC_LPTIMCLKSOURCE_LSI;
+    RCC_PeriphCLKInitStruct.Lptim1ClockSelection = RCC_LPTIMCLKSOURCE_LSI;
 #elif (LPTIM_MST_BASE == LPTIM3_BASE) || (LPTIM_MST_BASE == LPTIM4_BASE) || (LPTIM_MST_BASE == LPTIM5_BASE)
-        RCC_PeriphCLKInitStruct.Lptim345ClockSelection = RCC_LPTIMCLKSOURCE_LSI;
+    RCC_PeriphCLKInitStruct.Lptim345ClockSelection = RCC_LPTIMCLKSOURCE_LSI;
 #endif /* LPTIM_MST_BASE == LPTIM1 */
 #endif /* TARGET_STM32L0 */
 #endif /* MBED_CONF_TARGET_LSE_AVAILABLE */

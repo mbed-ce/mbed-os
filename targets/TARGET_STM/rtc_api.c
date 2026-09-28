@@ -59,7 +59,10 @@ void rtc_init(void)
             __HAL_RCC_PWR_CLK_ENABLE();
 #endif
     HAL_PWR_EnableBkUpAccess();
-
+    
+#if defined(DUAL_CORE) && (TARGET_STM32H7)
+    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID));
+#endif /* DUAL_CORE */
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
 #if (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_HSE)
     // only F1-7 families have HSE as RTC clock source
@@ -72,10 +75,6 @@ void rtc_init(void)
         error("PeriphClkInitStruct RTC failed with HSE\n");
     }
 #else // MBED_CONF_TARGET_RTC_CLOCK_SOURCE
-
-#if defined(DUAL_CORE) && (TARGET_STM32H7)
-    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID));
-#endif /* DUAL_CORE */
     lsc_start();
 #if MBED_CONF_TARGET_LSE_AVAILABLE
     __HAL_RCC_RTC_CONFIG(RCC_RTCCLKSOURCE_LSE);
@@ -87,15 +86,16 @@ void rtc_init(void)
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         error("PeriphClkInitStruct RTC failed with Low Speed Clock\n");
     }
-#if defined(DUAL_CORE) && (TARGET_STM32H7)
-    LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
-#endif /* DUAL_CORE */
 #endif // MBED_CONF_TARGET_RTC_CLOCK_SOURCE
 
     // Enable RTC
     __HAL_RCC_RTC_ENABLE();
 
-#if defined __HAL_RCC_RTCAPB_CLK_ENABLE /* part of STM32L4 / STM32L5 */
+#if defined(DUAL_CORE) && (TARGET_STM32H7)
+    LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
+#endif /* DUAL_CORE */
+
+#if defined __HAL_RCC_RTCAPB_CLK_ENABLE
     __HAL_RCC_RTCAPB_CLK_ENABLE();
 #endif /* __HAL_RCC_RTCAPB_CLK_ENABLE */
 
