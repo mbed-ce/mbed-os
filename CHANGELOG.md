@@ -82,6 +82,7 @@ A message that notes the main changes in the update.
   - Added note to increase RX buffer size to ensure data integrity and system stability
   - Updated code to get RSSI from ESP32 module
   - Exposed `restart()` function of underpining `ESP32` instance to gracefully handle unstable Wi-Fi connections 
+  - Consolidation of STM32 Low Speed Clock control
   
 ### Deprecated
 
