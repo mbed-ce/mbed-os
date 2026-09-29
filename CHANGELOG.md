@@ -14,6 +14,44 @@ A message that notes the main changes in the update.
 
 ### Added
 
+### Changed
+  
+### Deprecated
+
+### Fixed
+
+### Removed
+
+### Security
+
+_______________________________________________________________________________
+ 
+ -->
+
+<!--
+EXAMPLE
+
+## [7.x.y] - 2021-06-02
+
+Lorem Ipsum dolor sit amet.
+
+### Added
+
+- Cat pictures hidden in the library
+- Added beeswax to the gears
+
+### Changed
+
+- Updated localisation files
+
+-->
+
+_______________________________________________________________________________
+
+## [7.1.0] - 2026-09-29
+
+### Added
+
 - Enabled UART FIFOs on supported STM32 peripherals so they can buffer multiple incoming bytes while waiting for interrupts to be handled.
 - Added `i2c_get_capabilities()` function, which can be used to determine what detailed I2C features the hardware supports. This is primarily intended to be used by the Mbed test suite but can also be used in user applications that want to be cross-platform
 - Added support for Real-Time Transfer (RTT), a method of transferring text from a target device using a debugger connection. RTT allows getting UART console-like behavior at a higher speed and with no additional wires to the target.
@@ -55,7 +93,7 @@ A message that notes the main changes in the update.
   - STM32F4 `system_clock.c` were consolidate into five clock configuration files that are choosed by labels in targets.json5
   - Updated STM32F4 config/init files by consolidating Mbed changes with latest upstream templates and Ethernet HAL sections were removed from config (Mbed does not use ST Ethernet stack here)
   - Added target metadata cleanup (`adc-vref`, `hse-value` for all F4 targets).
-  - Replaced per-target linker scripts with one common STM32F4 linker script.CCM RAM was added into STM32F4 linker script (related to F429/F439)
+  - Replaced per-target linker scripts with one common STM32F4 linker script. CCM RAM was added into STM32F4 linker script (related to F429/F439)
   - F4 Vector table size and vector start is now covered by linker script and all cmsis_nvic.h files were removed
   - Startup files are automatically selected from CMSIS submodule according to labels in targets.json5
 - STM32F7
@@ -111,7 +149,7 @@ A message that notes the main changes in the update.
   - Fixed assert failure when calling SPI::write() with a zero-length Tx or Rx buffer
   - Fixed PWMs stopping themselves when the period is changed.
   - Implemented missing USB endpoint abort function, so `USBDevice::endpoint_abort()` is no longer a no-op
-  - Implemented memory manager for USB DPRAM and proper deallocation of endpoint buffers, so USB will no longer die once a certain number of endpoints are created and destroyed over the life of the application. 
+  - Implemented memory manager for USB DPRAM and proper deallocation of endpoint buffers, so USB will no longer die once a certain number of endpoints are created and destroyed over the life of the application.
 - RP2040:
   - Fixed RTC not counting until the time was first set (just calling `RealTimeClock::init()` was not enough)
 - Fixed issue where if the same setting was overridden in multiple different `target_override` blocks in mbed_app.json, only one of the overrides would be processed
@@ -126,28 +164,8 @@ A message that notes the main changes in the update.
 - STM32F4 MCUs without dev board were removed 26/34 (still possible to use it with release Mbed-os 7.0.0). Will be covered by Custom target.
 
 ### Security
-
-_______________________________________________________________________________
- 
- -->
-
-<!--
-EXAMPLE
-
-## [7.x.y] - 2021-06-02
-
-Lorem Ipsum dolor sit amet.
-
-### Added
-
-- Cat pictures hidden in the library
-- Added beeswax to the gears
-
-### Changed
-
-- Updated localisation files
-
--->
+- Patch for [GHSA-5qpv-7prj-rgv7](https://github.com/mbed-ce/mbed-os/security/advisories/GHSA-5qpv-7prj-rgv7), a bug allowing a malicious connected Bluetooth device to force memory corruption of Mbed OS by sending a specific packet.
+  - This can easily be exploited to make the Mbed device crash, and there might potentially be ways to use it to intentionally modify memory as well (though this has not been confirmed).
 
 _______________________________________________________________________________
 
