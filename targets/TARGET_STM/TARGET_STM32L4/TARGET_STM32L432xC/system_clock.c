@@ -236,17 +236,6 @@ MBED_WEAK uint8_t SetSysClock_PLL_MSI(void)
 {
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
-
-#if MBED_CONF_TARGET_LSE_AVAILABLE
-    // Enable LSE Oscillator to automatically calibrate the MSI clock
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
-    RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_NONE; // No PLL update
-    RCC_OscInitStruct.LSEState       = RCC_LSE_ON;   // External 32.768 kHz clock on OSC32_IN/OSC32_OUT
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        return 0; // FAIL
-    }
-#endif /* MBED_CONF_TARGET_LSE_AVAILABLE */
 
     /* Enable MSI Oscillator and activate PLL with MSI as source */
     RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_MSI;
@@ -271,6 +260,7 @@ MBED_WEAK uint8_t SetSysClock_PLL_MSI(void)
 
 #if DEVICE_USBDEVICE
     /* Select MSI output as USB clock source */
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USB;
     PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_MSI; /* 48 MHz */
     HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);

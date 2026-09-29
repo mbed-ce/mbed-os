@@ -133,15 +133,6 @@ uint8_t SetSysClock_PLL_MSI(void)
         return 0; // FAIL
     }
 
-#if MBED_CONF_TARGET_LSE_AVAILABLE
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
-    RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_NONE;
-    RCC_OscInitStruct.LSEState       = RCC_LSE_ON;   // External 32.768 kHz clock on OSC_IN/OSC_OUT
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        return 0; // FAIL
-    }
-#endif /* MBED_CONF_TARGET_LSE_AVAILABLE */
-
     /* Enable MSI Oscillator and activate PLL with MSI as source */
     RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_MSI | RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.MSIState            = RCC_MSI_ON;
