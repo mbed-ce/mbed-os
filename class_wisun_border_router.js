@@ -1,0 +1,25 @@
+var class_wisun_border_router =
+[
+    [ "WisunBorderRouter", "class_wisun_border_router.html#ac94ecad5bcb2974670ed3ce4a33d9995", null ],
+    [ "start", "class_wisun_border_router.html#a9a5f8a4ea010b89c5fe8239dba23adb8", null ],
+    [ "start", "class_wisun_border_router.html#a8d2b22786dac20d5c15660f1b63ba461", null ],
+    [ "start", "class_wisun_border_router.html#a945ade01327626de4a409c5a95733fda", null ],
+    [ "start", "class_wisun_border_router.html#a158a9f898a5397566e3a635ba67d3d9b", null ],
+    [ "stop", "class_wisun_border_router.html#a8c528baf37154d347366083f0f816846", null ],
+    [ "set_rpl_parameters", "class_wisun_border_router.html#a12e7309d58d65dbff9b8296df9973fd2", null ],
+    [ "get_rpl_parameters", "class_wisun_border_router.html#a0a39a8df0b213f1cf2f0d4dea5c84935", null ],
+    [ "validate_rpl_parameters", "class_wisun_border_router.html#adc49b4e3ad3478df79083bf6dddd809d", null ],
+    [ "set_pan_configuration", "class_wisun_border_router.html#a30c24f530dc89f3a3c3a8770e25430bf", null ],
+    [ "get_pan_configuration", "class_wisun_border_router.html#a9d6b9d1b062576abd319291df7d5c749", null ],
+    [ "validate_pan_configuration", "class_wisun_border_router.html#a1d4392583746532cf148fad18d62de64", null ],
+    [ "info_get", "class_wisun_border_router.html#a289c08cac46fc30c796fa3d1af5c16d0", null ],
+    [ "routing_table_get", "class_wisun_border_router.html#a2e33c5280445afd5cf375a510abd8ec4", null ],
+    [ "set_radius_server_ipv6_address", "class_wisun_border_router.html#a7e4135065cc1537d0b65729a4e6d40bb", null ],
+    [ "get_radius_server_ipv6_address", "class_wisun_border_router.html#ab09834a65c0cd5d15c247d7c9892177c", null ],
+    [ "set_radius_shared_secret", "class_wisun_border_router.html#a19a31c965a5055c1a2dac0826860786c", null ],
+    [ "get_radius_shared_secret", "class_wisun_border_router.html#a92aa115df3876e52f9ed070217f66187", null ],
+    [ "set_radius_timing", "class_wisun_border_router.html#a1a949a75d60465ed841a0394853c00d9", null ],
+    [ "get_radius_timing", "class_wisun_border_router.html#ae991a664ee7b6b7fece1629932cfad5f", null ],
+    [ "validate_radius_timing", "class_wisun_border_router.html#ab87eb4797c1769cd409f1fbe234eb5e8", null ],
+    [ "set_dns_query_result", "class_wisun_border_router.html#affb05c6201aac6c70d22b166bdcae1f8", null ]
+];
