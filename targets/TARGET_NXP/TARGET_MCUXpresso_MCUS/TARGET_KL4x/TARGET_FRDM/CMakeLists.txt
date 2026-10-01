@@ -1,0 +1,7 @@
+# Copyright (c) 2021 ARM Limited. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+target_include_directories(mbed-frdm-kl43z
+    INTERFACE
+        .
+)
