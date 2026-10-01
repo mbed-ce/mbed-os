@@ -27,7 +27,7 @@
 #include "platform/mbed_toolchain.h"
 #include "device.h"
 #include "PinNames.h"
-#include "PeripheralNames.h"
+#include "../../../targets/TARGET_NXP/TARGET_MCUXpresso_MCUS/TARGET_KL4x/PeripheralNames.h"
 #include "hal/PinNameAliases.h"
 
 /** \defgroup platform-public-api Platform

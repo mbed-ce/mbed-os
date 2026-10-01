@@ -104,11 +104,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Formatters
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install astyle aspell
-
       - name: UTF-8 Check
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"

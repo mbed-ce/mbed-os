@@ -19,7 +19,7 @@
 
 #include "USBPhyHw_MCUXpresso.h"
 #include "USBEndpoints_MCUXpresso.h"
-#include "fsl_clock_config.h"
+#include "TARGET_KL4x/fsl_clock_config.h"
 
 static USBPhyHw *instance;
 
