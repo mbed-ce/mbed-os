@@ -3,7 +3,6 @@
 
 add_subdirectory(TARGET_K66F EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_K82F EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_KL43Z EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_KW41Z EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_MCU_K22F EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_MCU_K64F EXCLUDE_FROM_ALL)

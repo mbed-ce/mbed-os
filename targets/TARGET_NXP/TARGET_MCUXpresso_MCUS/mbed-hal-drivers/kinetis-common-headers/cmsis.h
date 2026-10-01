@@ -1,6 +1,5 @@
-
-/* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+/*
+ * Copyright (C) 2009-2011 ARM Limited. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,24 +13,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * A generic CMSIS include header, pulling in LPC11U24 specifics
  */
-#ifndef MBED_PLATFORM_H
-#define MBED_PLATFORM_H
 
-#include <cstddef>
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
+#ifndef MBED_CMSIS_H
+#define MBED_CMSIS_H
 
-#include "platform/mbed_retarget.h"
-#include "platform/mbed_toolchain.h"
-#include "device.h"
-#include "PinNames.h"
-#include "../../../targets/TARGET_NXP/TARGET_MCUXpresso_MCUS/TARGET_KL4x/PeripheralNames.h"
-#include "hal/PinNameAliases.h"
-
-/** \defgroup platform-public-api Platform
- * \ingroup mbed-os-public
- */
+#include "fsl_device_registers.h"
+#include "../../TARGET_KL4x/cmsis_nvic.h"
 
 #endif
