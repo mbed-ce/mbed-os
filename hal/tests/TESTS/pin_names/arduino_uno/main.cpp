@@ -67,7 +67,7 @@ void GPIO_test()
     TEST_ASSERT(false);
 }
 
-
+#if DEVICE_ANALOGIN
 template <PinName TestedPin>
 void AnalogIn_test()
 {
@@ -90,8 +90,9 @@ void AnalogIn_test()
     // Pin is not part of analogin PinMap
     TEST_ASSERT(false);
 }
+#endif
 
-
+#if DEVICE_PWMOUT
 template <PinName TestedPin>
 void PWM_test()
 {
@@ -117,7 +118,7 @@ void PWM_test()
     // it's not a mandatory as requirement to be compliant with the Arduino Uno standard for Mbed boards.
     TEST_SKIP_UNLESS_MESSAGE(false, "ARDUINO_UNO: this pin doesn’t support PWM");
 }
-
+#endif
 
 template <PinName TX_pin, PinName RX_pin>
 void UART_test()
@@ -160,13 +161,13 @@ void UART_test()
     }
 
     // 4. check if UART pins can be initialized
-    BufferedSerial TEST(TX_pin, RX_pin);
+    UnbufferedSerial TEST(TX_pin, RX_pin);
 
     // 5. check a basic API call
     TEST.set_baud(115200);
 }
 
-
+#if DEVICE_I2C
 template <PinName SDA_pin, PinName SCL_pin>
 void I2C_test()
 {
@@ -197,8 +198,9 @@ void I2C_test()
 
     I2C i2c(SDA_pin, SCL_pin);
 }
+#endif
 
-
+#if DEVICE_SPI
 template <PinName MOSI_pin, PinName MISO_pin, PinName CLK_pin, PinName CS_pin>
 void SPI_test()
 {
@@ -254,7 +256,7 @@ void SPI_test()
     // Basic API call
     device.frequency(10000000);
 }
-
+#endif
 
 Case cases[] = {
     Case("GPIO A0", GPIO_test<ARDUINO_UNO_A0>),
@@ -280,25 +282,33 @@ Case cases[] = {
     Case("GPIO D14", GPIO_test<ARDUINO_UNO_D14>),
     Case("GPIO D15", GPIO_test<ARDUINO_UNO_D15>),
 
+#if DEVICE_ANALOGIN
     Case("ADC A0", AnalogIn_test<ARDUINO_UNO_A0>),
     Case("ADC A1", AnalogIn_test<ARDUINO_UNO_A1>),
     Case("ADC A2", AnalogIn_test<ARDUINO_UNO_A2>),
     Case("ADC A3", AnalogIn_test<ARDUINO_UNO_A3>),
     Case("ADC A4", AnalogIn_test<ARDUINO_UNO_A4>),
     Case("ADC A5", AnalogIn_test<ARDUINO_UNO_A5>),
+#endif
 
+#if DEVICE_PWMOUT
     Case("PWM D3", PWM_test<ARDUINO_UNO_D3>),
     Case("PWM D5", PWM_test<ARDUINO_UNO_D5>),
     Case("PWM D6", PWM_test<ARDUINO_UNO_D6>),
     Case("PWM D9", PWM_test<ARDUINO_UNO_D9>),
     Case("PWM D10", PWM_test<ARDUINO_UNO_D10>),
     Case("PWM D11", PWM_test<ARDUINO_UNO_D11>),
+#endif
 
     Case("UART", UART_test<ARDUINO_UNO_UART_TX, ARDUINO_UNO_UART_RX>),
 
+#if DEVICE_I2C
     Case("I2C", I2C_test<ARDUINO_UNO_I2C_SDA, ARDUINO_UNO_I2C_SCL>),
+#endif
 
+#if DEVICE_SPI
     Case("SPI", SPI_test<ARDUINO_UNO_SPI_MOSI, ARDUINO_UNO_SPI_MISO, ARDUINO_UNO_SPI_SCK, ARDUINO_UNO_SPI_CS>),
+#endif
 };
 
 utest::v1::status_t greentea_test_setup(const size_t number_of_cases)

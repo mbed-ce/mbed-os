@@ -24,6 +24,7 @@
 #include "hal/us_ticker_api.h"
 #include "hal/lp_ticker_api.h"
 #include "hal/mbed_lp_ticker_wrapper.h"
+#include "mbed_critical.h"
 
 #ifdef MBED_CONF_RTOS_PRESENT
 #ifdef __cplusplus

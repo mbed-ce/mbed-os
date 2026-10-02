@@ -116,7 +116,11 @@ void gpio_mode(gpio_t *obj, PinMode mode);
  */
 void gpio_dir(gpio_t *obj, PinDirection direction);
 
-/** Set the output value
+/**
+ * @brief Set the output value
+ *
+ * @note If the pin is currently an input pin, then the value shall not be written to the hardware yet,
+ *    but should be staged (if possible) in the output register for the event that this pin becomes an output pin.
  *
  * @param obj   The GPIO object (must be connected)
  * @param value The value to be set

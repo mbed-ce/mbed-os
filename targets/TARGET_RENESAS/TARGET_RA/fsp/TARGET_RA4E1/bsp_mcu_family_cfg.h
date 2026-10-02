@@ -11,7 +11,7 @@ extern "C" {
 
             #include "bsp_mcu_device_pn_cfg.h"
             #include "bsp_mcu_device_cfg.h"
-            #include "../../../ra/fsp/src/bsp/mcu/ra4e1/bsp_mcu_info.h"
+            #include "bsp_mcu_info.h"
             #include "bsp_clock_cfg.h"
             #define BSP_MCU_GROUP_RA4E1 (1)
             #define BSP_LOCO_HZ                 (32768)

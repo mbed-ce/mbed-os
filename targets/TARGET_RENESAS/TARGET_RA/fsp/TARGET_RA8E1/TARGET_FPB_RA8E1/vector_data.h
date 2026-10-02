@@ -25,10 +25,9 @@
         void spi_b_tei_isr(void);
         void spi_b_eri_isr(void);
         void dmac_int_isr(void);
-        void sci_b_uart_rxi_isr(void);
-        void sci_b_uart_txi_isr(void);
-        void sci_b_uart_tei_isr(void);
-        void sci_b_uart_eri_isr(void);
+        void mbed_sci_rxi_isr(void);
+        void mbed_sci_txi_isr(void);
+        void mbed_sci_eri_isr(void);
         void canfd_error_isr(void);
         void canfd_channel_tx_isr(void);
         void canfd_common_fifo_rx_isr(void);
