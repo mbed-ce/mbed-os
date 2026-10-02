@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: FPB_RA4E1 */
+/* MBED TARGET LIST: FPB_RA8E1 */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H
