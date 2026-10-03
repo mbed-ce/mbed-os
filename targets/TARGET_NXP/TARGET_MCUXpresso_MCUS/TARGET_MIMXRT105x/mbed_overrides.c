@@ -231,11 +231,6 @@ uint32_t us_ticker_get_clock()
     return BOARD_CLOCKFULLSPEED_PERCLK_CLK_ROOT;
 }
 
-uint32_t serial_get_clock(void)
-{
-    return BOARD_CLOCKFULLSPEED_UART_CLK_ROOT;
-}
-
 void i2c_setup_clock()
 {
     // Not needed on MIMXRT105x

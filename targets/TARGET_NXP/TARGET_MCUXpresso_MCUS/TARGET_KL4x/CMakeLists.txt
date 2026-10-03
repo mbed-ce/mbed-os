@@ -7,13 +7,11 @@ target_include_directories(mbed-mcu-kl43z INTERFACE .)
 
 target_sources(mbed-mcu-kl43z
     INTERFACE
-        pwmout_api.c
-        serial_api.c
-        spi_api.c
-        us_ticker.c
         fsl_clock_config.c
         PeripheralPins.c
         mbed_overrides.c
+        startup_MKL43Z4.S
+        lpuart_device.c
 )
 
 mbed_set_linker_script(mbed-mcu-kl43z ${CMAKE_CURRENT_SOURCE_DIR}/MKL43Z256xxx4.ld)

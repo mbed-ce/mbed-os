@@ -60,12 +60,14 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
 {
     int status;
 
+    const uint32_t sectorSize = flash_get_sector_size(obj, address);
+
     /* We need to prevent flash accesses during erase operation */
     core_util_critical_section_enter();
-    status = FLASH_Erase(&obj->flash_config, address, obj->flash_config.PFlashSectorSize, kFLASH_ApiEraseKey);
+    status = FLASH_Erase(&obj->flash_config, address, sectorSize, kFLASH_ApiEraseKey);
 
     if (status == kStatus_Success) {
-        status = FLASH_VerifyErase(&obj->flash_config, address, obj->flash_config.PFlashSectorSize, kFLASH_MarginValueNormal);
+        status = FLASH_VerifyErase(&obj->flash_config, address, sectorSize, kFTFx_MarginValueNormal);
     }
     core_util_critical_section_exit();
 
@@ -82,12 +84,12 @@ int32_t flash_program_page(flash_t *obj, uint32_t address, const uint8_t *data, 
 
     /* We need to prevent flash accesses during program operation */
     core_util_critical_section_enter();
-    status = FLASH_Program(&obj->flash_config, address, (uint32_t *)data, size);
+    status = FLASH_Program(&obj->flash_config, address, (uint8_t *)data, size);
 
     if (status == kStatus_Success) {
         // Must use kFlashMargin_User, or kFlashMargin_Factory for verify program
         status = FLASH_VerifyProgram(&obj->flash_config, address, size,
-                              (uint32_t *)data, kFLASH_MarginValueUser,
+                              data, kFLASH_MarginValueUser,
                               NULL, NULL);
     }
     core_util_critical_section_exit();

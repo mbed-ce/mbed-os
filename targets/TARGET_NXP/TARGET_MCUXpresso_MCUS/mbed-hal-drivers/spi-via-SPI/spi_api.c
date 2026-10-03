@@ -25,7 +25,7 @@
 #include "pinmap.h"
 #include "mbed_error.h"
 #include "fsl_spi.h"
-#include "peripheral_clock_defines.h"
+#include "../../TARGET_KL4x/peripheral_clock_defines.h"
 #include "PeripheralPins.h"
 
 /* Array of SPI peripheral base address. */
