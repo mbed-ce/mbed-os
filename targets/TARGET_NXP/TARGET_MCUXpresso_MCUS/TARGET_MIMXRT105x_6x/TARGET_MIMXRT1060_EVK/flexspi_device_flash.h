@@ -18,14 +18,9 @@
 #ifndef MBED_OS_MIMXRT_MEMORY_INFO_H
 #define MBED_OS_MIMXRT_MEMORY_INFO_H
 
-#ifdef HYPERFLASH_BOOT
-/* 64MB HyperFlash */
-#define BOARD_FLASH_PAGE_SIZE        (512)
-#define BOARD_FLASH_SECTOR_SIZE      (262144)
-#else
 /* 8MB QSPI Flash */
 #define BOARD_FLASH_PAGE_SIZE        (256)
 #define BOARD_FLASH_SECTOR_SIZE      (4096)
-#endif
+#include "flexspi_qspi_flash_issi_IS25xxxxx.h"
 
 #endif //MBED_OS_MIMXRT_MEMORY_INFO_H

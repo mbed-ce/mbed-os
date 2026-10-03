@@ -5,7 +5,7 @@
 mbed_setup_submodule(
     mbed-mcux-sdk
     CHECK_FILE import-mcux-sdk.py
-    IF_LABEL TARGET_MCUXpresso_MCUS
+    IF_LABEL MCUXpresso_MCUS
 )
 
 # Generic MCUXpresso-based libraries

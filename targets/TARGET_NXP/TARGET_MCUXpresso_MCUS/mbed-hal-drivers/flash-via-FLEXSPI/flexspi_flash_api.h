@@ -15,8 +15,7 @@
  * limitations under the License.
  */
 
-#ifndef MBED_OS_MIMXRT_FLASH_API_H
-#define MBED_OS_MIMXRT_FLASH_API_H
+#pragma once
 
 #include <fsl_common.h>
 
@@ -42,10 +41,8 @@ extern "C" {
  * So, we need to build our own sequences in the application and use them instead of
  * what we booted up with.
  */
-void mimxrt_flash_setup(void);
+void flexspi_flash_setup(void);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif //MBED_OS_MIMXRT_FLASH_API_H
