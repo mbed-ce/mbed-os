@@ -15,8 +15,12 @@
  * limitations under the License.
  */
 #include "serial_api.h"
+#include "lpuart_serial_api.h"
 
 #if DEVICE_SERIAL
+
+// Device-specific code must provide this header
+#include "lpuart_device.h"
 
 // math.h required for floating point operations for baud rate calculation
 #include <math.h>
@@ -27,16 +31,13 @@
 #include "cmsis.h"
 #include "pinmap.h"
 #include "fsl_lpuart.h"
-#include "peripheral_clock_defines.h"
 #include "PeripheralPins.h"
-#include "fsl_clock_config.h"
 
-static uint32_t serial_irq_ids[FSL_FEATURE_SOC_LPUART_COUNT] = {0};
+/* LPUART starts from index 1 */
+static uint32_t serial_irq_ids[FSL_FEATURE_SOC_LPUART_COUNT + LPUART_FIRST_INDEX] = {0};
 static uart_irq_handler irq_handler;
 /* Array of UART peripheral base address. */
 static LPUART_Type *const uart_addrs[] = LPUART_BASE_PTRS;
-/* Array of LPUART bus clock frequencies */
-static clock_name_t const uart_clocks[] = LPUART_CLOCK_FREQS;
 
 int stdio_uart_inited = 0;
 serial_t stdio_uart;
@@ -48,31 +49,24 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
     obj->index = pinmap_merge(uart_tx, uart_rx);
     MBED_ASSERT((int)obj->index != NC);
 
-    /* Set the LPUART clock source */
-    if (obj->index == LPUART_0) {
-        CLOCK_SetLpuart0Clock(1U);
-    } else {
-        CLOCK_SetLpuart1Clock(1U);
-    }
-
     lpuart_config_t config;
     LPUART_GetDefaultConfig(&config);
     config.baudRate_Bps = 9600;
     config.enableTx = false;
     config.enableRx = false;
 
-    LPUART_Init(uart_addrs[obj->index], &config, CLOCK_GetFreq(uart_clocks[obj->index]));
+    LPUART_Init(uart_addrs[obj->index], &config, serial_get_clock(obj->index));
 
     pinmap_pinout(tx, PinMap_UART_TX);
     pinmap_pinout(rx, PinMap_UART_RX);
 
     if (tx != NC) {
         LPUART_EnableTx(uart_addrs[obj->index], true);
-        pin_mode(tx, PullUp);
+        pin_mode(tx, PullDefault);
     }
     if (rx != NC) {
         LPUART_EnableRx(uart_addrs[obj->index], true);
-        pin_mode(rx, PullUp);
+        pin_mode(rx, PullDefault);
     }
 
     if (obj->index == STDIO_UART) {
@@ -89,17 +83,16 @@ void serial_free(serial_t *obj)
 
 void serial_baud(serial_t *obj, int baudrate)
 {
-    LPUART_SetBaudRate(uart_addrs[obj->index], (uint32_t)baudrate, CLOCK_GetFreq(uart_clocks[obj->index]));
+    LPUART_SetBaudRate(uart_addrs[obj->index], (uint32_t)baudrate, serial_get_clock(obj->index));
 }
 
 void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_bits)
 {
     LPUART_Type *base = uart_addrs[obj->index];
-    uint8_t temp;
+    uint32_t temp;
     /* Set bit count and parity mode. */
     temp = base->CTRL & ~(LPUART_CTRL_PE_MASK | LPUART_CTRL_PT_MASK | LPUART_CTRL_M_MASK);
-    if (parity != ParityNone)
-    {
+    if (parity != ParityNone) {
         /* Enable Parity */
         temp |= (LPUART_CTRL_PE_MASK | LPUART_CTRL_M_MASK);
         if (parity == ParityOdd) {
@@ -123,37 +116,26 @@ void serial_format(serial_t *obj, int data_bits, SerialParity parity, int stop_b
 /******************************************************************************
  * INTERRUPTS HANDLING
  ******************************************************************************/
-static inline void uart_irq(uint32_t transmit_empty, uint32_t receive_full, uint32_t index)
+void mbed_lpuart_irq(bool transmit_empty, bool receive_full, size_t index)
 {
     LPUART_Type *base = uart_addrs[index];
 
     /* If RX overrun. */
-    if (LPUART_STAT_OR_MASK & base->STAT)
-    {
+    if (LPUART_STAT_OR_MASK & base->STAT) {
         /* Read base->D, otherwise the RX does not work. */
         (void)base->DATA;
         LPUART_ClearStatusFlags(base, kLPUART_RxOverrunFlag);
     }
 
     if (serial_irq_ids[index] != 0) {
-        if (transmit_empty && (LPUART_GetEnabledInterrupts(uart_addrs[index]) & kLPUART_TxDataRegEmptyInterruptEnable))
+        if (transmit_empty) {
             irq_handler(serial_irq_ids[index], TxIrq);
+        }
 
-        if (receive_full && (LPUART_GetEnabledInterrupts(uart_addrs[index]) & kLPUART_RxDataRegFullInterruptEnable))
+        if (receive_full) {
             irq_handler(serial_irq_ids[index], RxIrq);
+        }
     }
-}
-
-void uart0_irq()
-{
-    uint32_t status_flags = LPUART0->STAT;
-    uart_irq((status_flags & kLPUART_TxDataRegEmptyFlag), (status_flags & kLPUART_RxDataRegFullFlag), 0);
-}
-
-void uart1_irq()
-{
-    uint32_t status_flags = LPUART1->STAT;
-    uart_irq((status_flags & kLPUART_TxDataRegEmptyFlag), (status_flags & kLPUART_RxDataRegFullFlag), 1);
 }
 
 void serial_irq_handler(serial_t *obj, uart_irq_handler handler, uint32_t id)
@@ -165,18 +147,6 @@ void serial_irq_handler(serial_t *obj, uart_irq_handler handler, uint32_t id)
 void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
 {
     IRQn_Type uart_irqs[] = LPUART_RX_TX_IRQS;
-    uint32_t vector = 0;
-
-    switch (obj->index) {
-        case 0:
-            vector = (uint32_t)&uart0_irq;
-            break;
-        case 1:
-            vector = (uint32_t)&uart1_irq;
-            break;
-        default:
-            break;
-    }
 
     if (enable) {
         switch (irq) {
@@ -189,7 +159,6 @@ void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
             default:
                 break;
         }
-        NVIC_SetVector(uart_irqs[obj->index], vector);
         NVIC_EnableIRQ(uart_irqs[obj->index]);
 
     } else { // disable
@@ -237,21 +206,24 @@ void serial_putc(serial_t *obj, int c)
 int serial_readable(serial_t *obj)
 {
     uint32_t status_flags = LPUART_GetStatusFlags(uart_addrs[obj->index]);
-    if (status_flags & kLPUART_RxOverrunFlag)
+    if (status_flags & kLPUART_RxOverrunFlag) {
         LPUART_ClearStatusFlags(uart_addrs[obj->index], kLPUART_RxOverrunFlag);
+    }
     return (status_flags & kLPUART_RxDataRegFullFlag);
 }
 
 int serial_writable(serial_t *obj)
 {
     uint32_t status_flags = LPUART_GetStatusFlags(uart_addrs[obj->index]);
-    if (status_flags & kLPUART_RxOverrunFlag)
+    if (status_flags & kLPUART_RxOverrunFlag) {
         LPUART_ClearStatusFlags(uart_addrs[obj->index], kLPUART_RxOverrunFlag);
+    }
     return (status_flags & kLPUART_TxDataRegEmptyFlag);
 }
 
 void serial_clear(serial_t *obj)
 {
+
 }
 
 void serial_pinout_tx(PinName tx)
@@ -301,30 +273,13 @@ const PinMap *serial_rts_pinmap()
     return PinMap_UART_RTS;
 }
 
-static int serial_is_enabled(uint32_t uart_index)
-{
-    int clock_enabled = 0;
-    switch (uart_index) {
-        case 0:
-            clock_enabled = (SIM->SCGC5 & SIM_SCGC5_LPUART0_MASK) >> SIM_SCGC5_LPUART0_SHIFT;
-            break;
-        case 1:
-            clock_enabled = (SIM->SCGC5 & SIM_SCGC5_LPUART1_MASK) >> SIM_SCGC5_LPUART1_SHIFT;
-            break;
-        default:
-            break;
-    }
-
-    return clock_enabled;
-}
-
 bool serial_check_tx_ongoing()
 {
     LPUART_Type *base;
     int i;
     bool uart_tx_ongoing = false;
 
-    for (i = 0; i < FSL_FEATURE_SOC_LPUART_COUNT; i++) {
+    for (i = LPUART_FIRST_INDEX; i < FSL_FEATURE_SOC_LPUART_COUNT + LPUART_FIRST_INDEX; i++) {
         /* First check if UART is enabled */
         if (!serial_is_enabled(i)) {
             /* UART is not enabled, check the next instance */
