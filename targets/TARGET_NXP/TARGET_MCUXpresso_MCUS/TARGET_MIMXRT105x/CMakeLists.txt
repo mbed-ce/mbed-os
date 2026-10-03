@@ -25,7 +25,6 @@ target_sources(mbed-mimxrt105x
         usb_device_ch9.c
         usb_device_class.c
         analogin_api.c
-        serial_api.c
         sleep.c
         trng_api.c
         us_ticker.c
@@ -33,6 +32,7 @@ target_sources(mbed-mimxrt105x
         PeripheralPins.c
         pinmap.c
         mbed_overrides.c
+        lpuart_device.c
 
         device/system_MIMXRT1052.c
 

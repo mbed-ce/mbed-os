@@ -62,6 +62,8 @@ target_include_directories(mbed-mcu-kl4x
 target_include_directories(mbed-mcu-kl4x
     INTERFACE
         mbed-hal-drivers/kinetis-common-headers
+        mbed-hal-drivers/serial-via-LPUART
+        mbed-hal-drivers/us-ticker-via-TPM-PIT
 )
 target_sources(mbed-mcu-kl4x
     INTERFACE
@@ -69,6 +71,15 @@ target_sources(mbed-mcu-kl4x
         mbed-hal-drivers/gpio-via-GPIO/gpio_api.c
         mbed-hal-drivers/interruptin-via-GPIO-PORT/gpio_irq_api.c
         mbed-hal-drivers/pinmode-via-PORT/pinmap.c
+        mbed-hal-drivers/sleep-via-SMC/sleep.c
+        mbed-hal-drivers/analogin-via-ADC16/analogin_api.c
+        mbed-hal-drivers/serial-via-LPUART/serial_api.c
+        mbed-hal-drivers/us-ticker-via-TPM-PIT/us_ticker.c
+        mbed-hal-drivers/spi-via-SPI/spi_api.c
+        mbed-hal-drivers/i2c-via-I2C/i2c_api.c
+        mbed-hal-drivers/analogout-via-DAC/analogout_api.c
+        mbed-hal-drivers/port-via-PORT/port_api.c
+        mbed-hal-drivers/flash-via-FLASH/flash_api.c
 )
 
 # Link appropriate startup files for KL43

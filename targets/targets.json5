@@ -5080,7 +5080,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FRDM"
         ],
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-KL43Z-BLOCK-DIAGRAM.jpg"
     },
