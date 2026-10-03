@@ -10,6 +10,7 @@ add_library(mbed-stm32l5 INTERFACE)
 
 target_sources(mbed-stm32l5
     INTERFACE
+        clock_cfg/system_clock.c
         analogin_device.c
         analogout_device.c
         flash_api.c
@@ -17,7 +18,6 @@ target_sources(mbed-stm32l5
         i2c_device.c
         pwmout_device.c
         serial_device.c
-        system_clock.c
         spi_api.c
 )
 

@@ -119,8 +119,9 @@ _______________________________________________________________________________
   - Added tested working modules and their firmware version
   - Added note to increase RX buffer size to ensure data integrity and system stability
   - Updated code to get RSSI from ESP32 module
-  - Exposed `restart()` function of underpining `ESP32` instance to gracefully handle unstable Wi-Fi connections
-
+  - Exposed `restart()` function of underpining `ESP32` instance to gracefully handle unstable Wi-Fi connections 
+  - STM32: Refactored and consolidated LSE/LSI oscillator init code. Added new `target.lsc-boot-startup` option to determine whether low speed clock is started at boot (new behavior) or only when first used (old behavior, on most targets)
+  
 ### Deprecated
 
 ### Fixed
