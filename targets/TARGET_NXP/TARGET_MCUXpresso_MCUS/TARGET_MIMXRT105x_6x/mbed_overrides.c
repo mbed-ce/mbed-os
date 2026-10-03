@@ -32,7 +32,7 @@
 #include <mbed_assert.h>
 
 #if DEVICE_FLASH
-#include "mimxrt_flash_api.h"
+#include "flexspi_flash_api.h"
 #endif
 
 #define LPSPI_CLOCK_SOURCE_DIVIDER (7U)
@@ -198,7 +198,7 @@ void mbed_sdk_init()
 
     // Switch to using an application-owned flexspi config instead of what the bootloader sets up
 #if DEVICE_FLASH
-    mimxrt_flash_setup();
+    flexspi_flash_setup();
 #endif
 
     // Initialize us ticker before LPM, because LPM uses it for timing
@@ -406,8 +406,10 @@ void vPortPOST_SLEEP_PROCESSING(clock_mode_t powermode)
 // The default delay function used the full CPU clock frequency, so it produced massive overshoots
 // (delaying 30x longer than intended) when the MCU is exiting sleep (and core clock is reduced to 24MHz).
 // This delay function uses the us ticker which always ticks at the same speed even when the CPU clock is reduced.
-void SDK_DelayAtLeastUs(uint32_t delay_us)
+void SDK_DelayAtLeastUs(uint32_t delay_us, uint32_t coreClock_Hz)
 {
+    (void)coreClock_Hz;
+
     uint32_t initialTickerValue = us_ticker_read();
     uint32_t targetTickerValue = delay_us + initialTickerValue;
 

@@ -66,6 +66,7 @@ target_include_directories(mbed-mcu-mimxrt105x_6x
         mbed-hal-drivers/serial-via-LPUART
         mbed-hal-drivers/usb-low-level-via-imxrt-USB
         mbed-hal-drivers/us-ticker-via-PIT
+        mbed-hal-drivers/flash-via-FLEXSPI
 )
 target_sources(mbed-mcu-mimxrt105x_6x
     INTERFACE
@@ -75,6 +76,7 @@ target_sources(mbed-mcu-mimxrt105x_6x
         mbed-hal-drivers/usb-low-level-via-imxrt-USB/usb_device_class.c
         mbed-hal-drivers/us-ticker-via-PIT/us_ticker.c
         mbed-hal-drivers/pinmode-via-IOMUXC/pinmap.c
+        mbed-hal-drivers/flash-via-FLEXSPI/flash_api.c
 )
 
 # Link appropriate startup files for RT105x

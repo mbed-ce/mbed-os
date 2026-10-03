@@ -8,6 +8,7 @@ target_sources(mbed-mcu-mimxrt105x_6x
         lpuart_device.c
         startup_MIMXRT105x_6x.S
         PeripheralPins.c
+        fsl_flexspi_nor_boot.c
 )
 
 target_include_directories(mbed-mcu-mimxrt105x_6x

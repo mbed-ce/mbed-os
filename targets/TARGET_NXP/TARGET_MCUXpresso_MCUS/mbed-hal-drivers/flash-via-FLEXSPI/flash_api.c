@@ -22,9 +22,7 @@
 #if DEVICE_FLASH
 
 #include "fsl_flexspi.h"
-#include "fsl_cache.h"
-#include "flash_defines.h"
-#include "mimxrt_flash_api.h"
+#include "flexspi_device_flash.h"
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -610,7 +608,8 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address)
     if (status != kStatus_Success) {
         ret = -1;
     } else {
-        DCACHE_InvalidateByRange(address, BOARD_FLASH_SECTOR_SIZE);
+        SCB_InvalidateDCache_by_Addr((void*)address, BOARD_FLASH_SECTOR_SIZE);
+        SCB_InvalidateICache_by_Addr((void*)address, BOARD_FLASH_SECTOR_SIZE);
     }
 
     core_util_critical_section_exit();
@@ -632,7 +631,6 @@ int32_t flash_program_page(flash_t *obj, uint32_t address, const uint8_t *data, 
     } else {
         SCB_InvalidateICache_by_Addr((void*)address, (int32_t)size);
         SCB_InvalidateDCache_by_Addr((void*)address, (int32_t)size);
-        DCACHE_InvalidateByRange(address, size);
     }
 
     core_util_critical_section_exit();
