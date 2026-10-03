@@ -4582,7 +4582,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "HYPERFLASH_BOOT",
             "XIP_BOOT_HEADER_DCD_ENABLE=1",
             "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
-            "SKIP_SYSCLK_INIT" // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
+            "SKIP_SYSCLK_INIT", // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
+            "BOARD_ENET_PHY_ADDR=2"
         ],
         "device_has_add": [
             "FLASH"
@@ -4637,7 +4638,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "macros_add": [
             "XIP_BOOT_HEADER_DCD_ENABLE=1",
             "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
-            "SKIP_SYSCLK_INIT" // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
+            "SKIP_SYSCLK_INIT", // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
+            "BOARD_ENET_PHY_ADDR=2"
         ],
         "device_has_add": [
             "FLASH"
@@ -4685,6 +4687,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "TEENSY_4X",
             "TEENSY_40",
             "MIMXRT1060"
+        ],
+        "macros_add": [
+            // Set to 1 by MIMXRT pullups/pulldowns on CRS_DV and RXD0
+            "BOARD_ENET_PHY_ADDR=1"
         ],
         "overrides": {
             "console-usb": true,

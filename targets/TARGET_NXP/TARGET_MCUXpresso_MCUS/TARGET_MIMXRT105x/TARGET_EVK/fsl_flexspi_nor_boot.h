@@ -9,7 +9,7 @@
 #define __FLEXSPI_NOR_BOOT_H__
 
 #include <stdint.h>
-#include "device.h"
+#include "../../TARGET_MIMXRT105x_6x/device.h"
 #undef __VECTOR_TABLE
 
 /*! @name Driver version */
