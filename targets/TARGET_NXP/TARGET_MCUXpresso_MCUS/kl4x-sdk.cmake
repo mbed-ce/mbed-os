@@ -58,7 +58,7 @@ target_include_directories(mbed-mcu-kl4x
         mbed-mcux-sdk/drivers/smc
 )
 
-# Link appropriate Mbed OS HAL that interface with Kinetis
+# Link appropriate Mbed OS HALs that interface with this MCU
 target_include_directories(mbed-mcu-kl4x
     INTERFACE
         mbed-hal-drivers/kinetis-common-headers

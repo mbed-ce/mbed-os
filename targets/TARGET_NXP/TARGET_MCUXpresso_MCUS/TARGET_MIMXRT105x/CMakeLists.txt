@@ -10,9 +10,9 @@ elseif(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
 endif()
 
 # Target for MIMXRT106x/106x common code.
-add_library(mbed-mimxrt105x INTERFACE)
+add_library(mbed-mcu-mimxrt105x INTERFACE)
 
-target_include_directories(mbed-mimxrt105x
+target_include_directories(mbed-mcu-mimxrt105x
     INTERFACE
         .
         device
@@ -20,7 +20,7 @@ target_include_directories(mbed-mimxrt105x
         board
 )
 
-target_sources(mbed-mimxrt105x
+target_sources(mbed-mcu-mimxrt105x
     INTERFACE
         usb_device_ch9.c
         usb_device_class.c
@@ -107,20 +107,20 @@ target_sources(mbed-mimxrt105x
 
 # Add extra sources used for deep sleep mode
 if("DEVICE_LPTICKER=1" IN_LIST MBED_TARGET_DEFINITIONS)
-    target_sources(mbed-mimxrt105x
+    target_sources(mbed-mcu-mimxrt105x
         INTERFACE
             mimxrt_clock_adjustment.c
             lpm.c)
 endif()
 
-target_link_libraries(mbed-mimxrt105x
+target_link_libraries(mbed-mcu-mimxrt105x
     INTERFACE
         mbed-mcuxpresso-mcus
         mbed-imx
         mbed-nxp-usb
 )
 
-mbed_set_linker_script(mbed-mimxrt105x ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
+mbed_set_linker_script(mbed-mcu-mimxrt105x ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_FILE})
 
 add_subdirectory(TARGET_EVK EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_TEENSY_4X)
