@@ -64,6 +64,7 @@ target_include_directories(mbed-mcu-kl4x
         mbed-hal-drivers/kinetis-common-headers
         mbed-hal-drivers/serial-via-LPUART
         mbed-hal-drivers/us-ticker-via-TPM-PIT
+        mbed-hal-drivers/usb-via-kinetis-USB0
 )
 target_sources(mbed-mcu-kl4x
     INTERFACE
@@ -80,6 +81,9 @@ target_sources(mbed-mcu-kl4x
         mbed-hal-drivers/analogout-via-DAC/analogout_api.c
         mbed-hal-drivers/port-via-PORT/port_api.c
         mbed-hal-drivers/flash-via-FLASH/flash_api.c
+        mbed-hal-drivers/usb-via-kinetis-USB0/USBPhy_Kinetis.cpp
+        mbed-hal-drivers/rtc-via-RTC/rtc_api.c
+        mbed-hal-drivers/pwmout-via-TPM/pwmout_api.c
 )
 
 # Link appropriate startup files for KL43

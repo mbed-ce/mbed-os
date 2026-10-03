@@ -15,11 +15,7 @@
  * limitations under the License.
  */
 
-#if defined(DEVICE_USBDEVICE) && DEVICE_USBDEVICE && \
-    (defined(TARGET_KL25Z) | defined(TARGET_KL43Z) | \
-     defined(TARGET_KL46Z) | \
-     defined(TARGET_K64F) | defined(TARGET_K22F) | defined(TARGET_K82F))
-
+#if defined(DEVICE_USBDEVICE) && DEVICE_USBDEVICE
 #include <stddef.h>   // NULL
 #include <string.h>   // memset
 
@@ -140,7 +136,7 @@ void USBPhyHw::init(USBPhyEvents *events)
     SYSMPU->CESR = 0;
 #endif
 
-#if defined(TARGET_KL43Z) || defined(TARGET_K22F) || defined(TARGET_K64F) || defined(TARGET_K82F)
+#if defined(TARGET_MCU_KL4x) || defined(TARGET_MCU_K2x) || defined(TARGET_MCU_K6x) || defined(TARGET_MCU_K8x)
     // enable USBFS clock
     CLOCK_EnableUsbfs0Clock(kCLOCK_UsbSrcIrc48M, 48000000U);
 #else
