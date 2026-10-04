@@ -581,7 +581,7 @@ void flexspi_nor_flash_read_data_ram(uint32_t addr, uint32_t *buffer, uint32_t s
     memcpy(buffer, (void *)addr, size);
 }
 
-void mimxrt_flash_setup(void)
+void flexspi_flash_setup(void)
 {
     core_util_critical_section_enter();
     flexspi_update_lut_ram();
