@@ -298,16 +298,23 @@ void mbed_mac_address(char *mac) {
 uint8_t mbed_otp_mac_address(char *mac) {
 
 #if TARGET_EVK
+
+#if TARGET_MIMXRT1060
+#define MAC_ADDR2_REG_NAME MAC2
+#else
+#define MAC_ADDR2_REG_NAME GP3
+#endif
+
     /* Check if a valid MAC address is programmed to the fuse bank */
     if ((OCOTP->MAC0 != 0) &&
         (OCOTP->MAC1 != 0) &&
-        (OCOTP->GP3 != 0)) {
+        (OCOTP->MAC_ADDR2_REG_NAME != 0)) {
         uint16_t MAC[3];  // 3 16 bits words for the MAC
 
         // Read the MAC address from the OCOTP MAC registers
         MAC[0] = (uint16_t)OCOTP->MAC0;  // most significant half-word
         MAC[1] = (uint16_t)OCOTP->MAC1;
-        MAC[2] = (uint16_t)OCOTP->GP3;  // least significant half word
+        MAC[2] = (uint16_t)OCOTP->MAC_ADDR2_REG_NAME;  // least significant half word
 
         // The network stack expects an array of 6 bytes
         // so we copy, and shift and copy from the half-word array to the byte array

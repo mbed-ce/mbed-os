@@ -44,7 +44,7 @@ void EnableWeakLDO(void)
     PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
     PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
 
-    SDK_DelayAtLeastUs(40);
+    SDK_DelayAtLeastUs(40, SystemCoreClock);
 }
 
 void DisableWeakLDO(void)
@@ -128,7 +128,7 @@ void ClockSelectXtalOsc(void)
     /* Enable XTAL 24MHz clock source. */
     CLOCK_InitExternalClk(0);
     /* Wait for XTAL stable */
-    SDK_DelayAtLeastUs(200);
+    SDK_DelayAtLeastUs(200, SystemCoreClock);
     /* Switch clock source to external OSC. */
     CLOCK_SwitchOsc(kCLOCK_XtalOsc);
     /*
@@ -168,7 +168,7 @@ void LPM_Init(void)
                               XTALOSC24M_OSC_CONFIG0_ENABLE_MASK;
     XTALOSC24M->OSC_CONFIG1 = XTALOSC24M_OSC_CONFIG1_COUNT_RC_CUR(0x40) | XTALOSC24M_OSC_CONFIG1_COUNT_RC_TRG(0x2DC);
     /* Take some delay */
-    SDK_DelayAtLeastUs(4000);
+    SDK_DelayAtLeastUs(4000, SystemCoreClock);
     /* Add some hysteresis */
     tmp_reg = XTALOSC24M->OSC_CONFIG0;
     tmp_reg &= ~(XTALOSC24M_OSC_CONFIG0_HYST_PLUS_MASK | XTALOSC24M_OSC_CONFIG0_HYST_MINUS_MASK);
@@ -479,7 +479,7 @@ void LPM_EnterSuspend(void)
      * the RBC counter can start counting in case an interrupt is already pending
      * or in case an interrupt arrives just as ARM is about to assert DSM_request.
      */
-    SDK_DelayAtLeastUs(3);
+    SDK_DelayAtLeastUs(3, SystemCoreClock);
 
     /* Recover all the GPC interrupts. */
     for (i = 0; i < LPM_GPC_IMR_NUM; i++)

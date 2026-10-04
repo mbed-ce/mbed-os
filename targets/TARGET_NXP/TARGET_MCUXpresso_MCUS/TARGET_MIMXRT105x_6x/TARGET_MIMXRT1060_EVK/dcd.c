@@ -10,7 +10,7 @@
  * will be overwritten if the respective MCUXpresso Config Tools is used to update this file.
  **********************************************************************************************************************/
 
-#include "xip/dcd.h"
+#include "dcd.h"
 
 /* Component ID definition, used by tools. */
 #ifndef FSL_COMPONENT_ID
