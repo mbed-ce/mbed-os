@@ -4520,7 +4520,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MIMXRT105X"
         ],
         "macros": [
-            "CPU_MIMXRT1052DVL6B",
             "FSL_RTOS_MBED",
             "XIP_BOOT_HEADER_ENABLE=1",
             "XIP_EXTERNAL_FLASH=1",
@@ -4579,6 +4578,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "macros_add": [
+            "CPU_MIMXRT1052DVL6B",
             "HYPERFLASH_BOOT",
             "XIP_BOOT_HEADER_DCD_ENABLE=1",
             "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
@@ -4636,6 +4636,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "macros_add": [
+            "CPU_MIMXRT1062DVL6B",
             "XIP_BOOT_HEADER_DCD_ENABLE=1",
             "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
             "SKIP_SYSCLK_INIT", // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
@@ -4689,6 +4690,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MIMXRT1060"
         ],
         "macros_add": [
+            "CPU_MIMXRT1062DVL6B",
+
             // Set to 1 by MIMXRT pullups/pulldowns on CRS_DV and RXD0
             "BOARD_ENET_PHY_ADDR=1"
         ],
@@ -4740,6 +4743,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "console-uart": false,
             "network-default-interface-type": "ETHERNET"
         },
+        "macros_add": [
+            "CPU_MIMXRT1062DVL6B",
+
+            // Set to 1 by MIMXRT pullups/pulldowns on CRS_DV and RXD0
+            "BOARD_ENET_PHY_ADDR=1"
+        ],
 
         // 8MB QSPI flash
         "memory_banks": {
