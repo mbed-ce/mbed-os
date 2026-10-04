@@ -6,7 +6,6 @@
  */
 
 #include "evkbmimxrt1060_flexspi_nor_config.h"
-#include "mimxrt_memory_info.h"
 
 /* Component ID definition, used by tools. */
 #ifndef FSL_COMPONENT_ID
