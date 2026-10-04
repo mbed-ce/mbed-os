@@ -22,7 +22,7 @@ __attribute__((section(".boot_hdr.conf"), used))
 #pragma location = ".boot_hdr.conf"
 #endif
 
-const flexspi_nor_config_t qspiflash_config = {
+flexspi_nor_config_t qspiflash_config = {
     .memConfig =
         {
             .tag                  = FLEXSPI_CFG_BLK_TAG,
