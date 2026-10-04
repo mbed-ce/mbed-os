@@ -1139,7 +1139,7 @@ FLEXIO3_IRQHandler:
     def_irq_handler    PWM4_2_IRQHandler
     def_irq_handler    PWM4_3_IRQHandler
     def_irq_handler    PWM4_FAULT_IRQHandler
-#if TARGET_MIMXRT1050
+#if TARGET_MIMXRT1060
     def_irq_handler    ENET2_DriverIRQHandler
     def_irq_handler    ENET2_1588_Timer_DriverIRQHandler
     def_irq_handler    CAN3_DriverIRQHandler
