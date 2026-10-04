@@ -193,6 +193,9 @@ void mbed_sdk_init()
     BOARD_ClockFullSpeed();
 #endif
 
+    volatile bool debuggerBreak = false;
+    while(!debuggerBreak) {} 
+
     // Enable non-HardFault exceptions
     SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk | SCB_SHCSR_BUSFAULTENA_Msk | SCB_SHCSR_MEMFAULTENA_Msk;
 

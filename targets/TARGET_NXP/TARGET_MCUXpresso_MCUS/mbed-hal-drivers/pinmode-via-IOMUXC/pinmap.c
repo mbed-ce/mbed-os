@@ -60,7 +60,7 @@ void pin_mode(PinName pin, PinMode mode)
     MBED_ASSERT(pin != (PinName)NC);
     uint32_t gpio_number = pin >> GPIO_PORT_SHIFT;
     uint32_t reg;
-    uint32_t * volatile muxregister = gpio_port_to_iomux_sw_mux_ctl[gpio_number - 1];
+    uint32_t volatile * muxregister = gpio_port_to_iomux_sw_mux_ctl[gpio_number - 1];
 
     if (muxregister == 0) {
         muxregister = get_iomux_sw_mux_ctl(pin);
@@ -69,7 +69,7 @@ void pin_mode(PinName pin, PinMode mode)
     }
 
     /* Get pad register address */
-    uint32_t * volatile configregister = muxregister + mux_ctl_to_pad_ctl_offset[gpio_number - 1];
+    uint32_t volatile * configregister = muxregister + mux_ctl_to_pad_ctl_offset[gpio_number - 1];
 
     reg = *configregister;
     switch (mode) {
@@ -146,7 +146,7 @@ void pin_mode_opendrain(PinName pin, bool enable)
     }
 
     /* Get pad register address */
-    uint32_t * volatile configregister = muxregister + mux_ctl_to_pad_ctl_offset[gpio_number - 1];
+    uint32_t volatile * configregister = muxregister + mux_ctl_to_pad_ctl_offset[gpio_number - 1];
 
     if (enable) {
         *configregister |= IOMUXC_SW_PAD_CTL_PAD_ODE_MASK;
