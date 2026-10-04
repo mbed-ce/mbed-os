@@ -12,7 +12,7 @@ target_sources(mbed-mcu-mimxrt105x_6x INTERFACE
     mbed-mcux-sdk/drivers/lpuart/fsl_lpuart.c
     mbed-mcux-sdk/drivers/lpuart/fsl_lpuart_edma.c
     mbed-mcux-sdk/drivers/flexio/fsl_flexio.c
-    mbed-mcux-sdk/drivers/dcdc/fsl_dcdc.c
+    mbed-mcux-sdk/drivers/dcdc_1/fsl_dcdc.c
     mbed-mcux-sdk/drivers/gpc_1/fsl_gpc.c
     mbed-mcux-sdk/drivers/igpio/fsl_gpio.c
     mbed-mcux-sdk/drivers/pit/fsl_pit.c
@@ -37,7 +37,7 @@ target_include_directories(mbed-mcu-mimxrt105x_6x
         mbed-mcux-sdk/drivers/lpspi
         mbed-mcux-sdk/drivers/lpuart
         mbed-mcux-sdk/drivers/flexio
-        mbed-mcux-sdk/drivers/dcdc
+        mbed-mcux-sdk/drivers/dcdc_1
         mbed-mcux-sdk/drivers/gpc_1
         mbed-mcux-sdk/drivers/igpio
         mbed-mcux-sdk/drivers/vref
