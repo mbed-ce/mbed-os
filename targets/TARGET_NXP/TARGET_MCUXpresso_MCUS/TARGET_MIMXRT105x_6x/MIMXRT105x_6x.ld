@@ -279,6 +279,10 @@ SECTIONS
     __noncachedata_init_end__ = .;   /* create a global symbol at initialized ncache data end */
   } > m_dtcm AT> m_text :ram_ncache_init
   . = __noncachedata_init_end__;
+
+  /* Symbol is used by startup for ncache data initialization */
+  __ncache_init_flash_start = __ram_function_flash_start + (__noncachedata_init_end__ - __noncachedata_start__);
+
   .ncache :
   {
     *(NonCacheable)

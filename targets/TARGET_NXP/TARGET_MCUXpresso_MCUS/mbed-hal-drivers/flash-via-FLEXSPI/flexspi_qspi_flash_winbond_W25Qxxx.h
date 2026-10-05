@@ -41,7 +41,8 @@
 // Shift of the Quad Enable bit in the status register
 #define FLASH_QE_STATUS_OFFSET 6
 
-const static uint32_t customLUT[CUSTOM_LUT_LENGTH] = {
+// Must not be const! Need this to get stored in RAM, not flash
+static uint32_t customLUT[CUSTOM_LUT_LENGTH] = {
     /* Normal read mode -SDR */
     [4 * NOR_CMD_LUT_SEQ_IDX_READ_NORMAL] =
     FLEXSPI_LUT_SEQ(kFLEXSPI_Command_SDR, kFLEXSPI_1PAD, 0x03, kFLEXSPI_Command_RADDR_SDR, kFLEXSPI_1PAD, 0x18),
@@ -109,7 +110,7 @@ const static uint32_t customLUT[CUSTOM_LUT_LENGTH] = {
     FLEXSPI_LUT_SEQ(kFLEXSPI_Command_SDR, kFLEXSPI_1PAD, 0xC7, kFLEXSPI_Command_STOP, kFLEXSPI_1PAD, 0),
 };
 
-const flexspi_device_config_t deviceconfig = {
+flexspi_device_config_t deviceconfig = {
     .flexspiRootClk       = 120000000,
     .flashSize            = (MBED_ROM_BANK_EXT_FLASH_SIZE/1024),
     .CSIntervalUnit       = kFLEXSPI_CsIntervalUnit1SckCycle,
