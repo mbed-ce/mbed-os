@@ -193,9 +193,6 @@ void mbed_sdk_init()
     BOARD_ClockFullSpeed();
 #endif
 
-    volatile bool debuggerBreak = false;
-    while(!debuggerBreak) {} 
-
     // Enable non-HardFault exceptions
     SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk | SCB_SHCSR_BUSFAULTENA_Msk | SCB_SHCSR_MEMFAULTENA_Msk;
 
@@ -416,7 +413,7 @@ void vPortPOST_SLEEP_PROCESSING(clock_mode_t powermode)
 // The default delay function used the full CPU clock frequency, so it produced massive overshoots
 // (delaying 30x longer than intended) when the MCU is exiting sleep (and core clock is reduced to 24MHz).
 // This delay function uses the us ticker which always ticks at the same speed even when the CPU clock is reduced.
-void SDK_DelayAtLeastUs(uint32_t delay_us, uint32_t coreClock_Hz)
+AT_QUICKACCESS_SECTION_CODE(void SDK_DelayAtLeastUs(uint32_t delay_us, uint32_t coreClock_Hz))
 {
     (void)coreClock_Hz;
 
