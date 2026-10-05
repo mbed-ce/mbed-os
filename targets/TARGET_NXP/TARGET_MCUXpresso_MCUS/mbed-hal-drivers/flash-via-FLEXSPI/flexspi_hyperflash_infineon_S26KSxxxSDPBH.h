@@ -24,7 +24,8 @@
 #define HYPERFLASH_CMD_LUT_SEQ_IDX_ERASECHIP 12
 #define CUSTOM_LUT_LENGTH 64
 
-static const uint32_t customLUT[CUSTOM_LUT_LENGTH] = {
+// Must not be const! Need this to get stored in RAM, not flash
+static uint32_t customLUT[CUSTOM_LUT_LENGTH] = {
     /* Read Data */
     [4 * HYPERFLASH_CMD_LUT_SEQ_IDX_READDATA] =
     FLEXSPI_LUT_SEQ(kFLEXSPI_Command_DDR, kFLEXSPI_8PAD, 0xA0, kFLEXSPI_Command_RADDR_DDR, kFLEXSPI_8PAD, 0x18),
