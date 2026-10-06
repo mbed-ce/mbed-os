@@ -231,12 +231,12 @@ uint32_t us_ticker_get_clock()
     return BOARD_CLOCKFULLSPEED_PERCLK_CLK_ROOT;
 }
 
-void i2c_setup_clock()
+void lpi2c_setup_clock()
 {
     // Not needed on MIMXRT105x
 }
 
-uint32_t i2c_get_clock()
+uint32_t lpi2c_get_clock()
 {
     return BOARD_CLOCKFULLSPEED_LPI2C_CLK_ROOT;
 }
