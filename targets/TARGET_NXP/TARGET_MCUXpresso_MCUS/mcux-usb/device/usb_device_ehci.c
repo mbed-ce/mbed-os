@@ -1223,7 +1223,7 @@ usb_status_t USB_DeviceEhciInit(uint8_t controllerId,
 
     ehciState->controllerId = controllerId;
 
-    ehciState->registerBase = (USBHS_Type *)ehci_base[controllerId - kUSB_ControllerEhci0];
+    ehciState->registerBase = (USBHS_Type *)ehci_base[controllerId - kUSB_ControllerEhci0 + (ehci_base[0] == 0 ? 1 : 0)];
 #if (defined(USB_DEVICE_CONFIG_LOW_POWER_MODE) && (USB_DEVICE_CONFIG_LOW_POWER_MODE > 0U))
     ehciState->registerPhyBase = (USBPHY_Type *)USB_EhciPhyGetBase(controllerId);
 
