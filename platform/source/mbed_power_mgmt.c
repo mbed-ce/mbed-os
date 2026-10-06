@@ -35,7 +35,7 @@
 #if DEVICE_SLEEP
 
 // deep sleep locking counter. A target is allowed to deep sleep if counter == 0
-static uint16_t deep_sleep_lock = 0U;
+static __attribute__((unused)) uint16_t deep_sleep_lock = 0U;
 #if defined(MBED_CPU_STATS_ENABLED) && DEVICE_LPTICKER
 static us_timestamp_t sleep_time = 0;
 static us_timestamp_t deep_sleep_time = 0;
@@ -199,25 +199,6 @@ void sleep_tracker_unlock(const char *const filename, int line)
 
 #endif // MBED_SLEEP_TRACING_ENABLED
 
-void sleep_manager_lock_deep_sleep_internal(void)
-{
-    if (core_util_atomic_incr_u16(&deep_sleep_lock, 1) == 0) {
-        MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_OVERFLOW), "DeepSleepLock overflow (> 0xFFFF)", deep_sleep_lock);
-    }
-}
-
-void sleep_manager_unlock_deep_sleep_internal(void)
-{
-    if (core_util_atomic_decr_u16(&deep_sleep_lock, 1) == 0xFFFF) {
-        MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_UNDERFLOW), "DeepSleepLock underflow (< 0)", deep_sleep_lock);
-    }
-}
-
-bool sleep_manager_can_deep_sleep(void)
-{
-    return core_util_atomic_load_u16(&deep_sleep_lock) == 0;
-}
-
 bool sleep_manager_can_deep_sleep_test_check()
 {
     uint32_t check_time_ns = 2000000;
@@ -245,7 +226,7 @@ void sleep_manager_sleep_auto(void)
 #endif
 
 // debug profile should keep debuggers attached, no deep sleep allowed
-#ifdef MBED_DEBUG
+#if MBED_DEBUG || !MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
     hal_sleep();
 #else
     if (sleep_manager_can_deep_sleep()) {
@@ -267,6 +248,29 @@ void sleep_manager_sleep_auto(void)
     }
 #endif
     core_util_critical_section_exit();
+}
+
+#endif
+
+#if DEVICE_SLEEP && MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
+
+void sleep_manager_lock_deep_sleep_internal(void)
+{
+    if (core_util_atomic_incr_u16(&deep_sleep_lock, 1) == 0) {
+        MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_OVERFLOW), "DeepSleepLock overflow (> 0xFFFF)", deep_sleep_lock);
+    }
+}
+
+void sleep_manager_unlock_deep_sleep_internal(void)
+{
+    if (core_util_atomic_decr_u16(&deep_sleep_lock, 1) == 0xFFFF) {
+        MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_UNDERFLOW), "DeepSleepLock underflow (< 0)", deep_sleep_lock);
+    }
+}
+
+bool sleep_manager_can_deep_sleep(void)
+{
+    return core_util_atomic_load_u16(&deep_sleep_lock) == 0;
 }
 
 #else
