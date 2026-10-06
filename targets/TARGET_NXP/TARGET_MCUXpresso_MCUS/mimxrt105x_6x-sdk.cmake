@@ -27,6 +27,7 @@ target_sources(mbed-mcu-mimxrt105x_6x INTERFACE
     mbed-mcux-sdk/drivers/wdog01/fsl_wdog.c
     mbed-mcux-sdk/drivers/rtwdog/fsl_rtwdog.c
     mbed-mcux-sdk/drivers/xbara/fsl_xbara.c
+    mbed-mcux-sdk/drivers/trng/fsl_trng.c
 )
 
 target_include_directories(mbed-mcu-mimxrt105x_6x
@@ -53,6 +54,7 @@ target_include_directories(mbed-mcu-mimxrt105x_6x
         mbed-mcux-sdk/drivers/xbara
         mbed-mcux-sdk/drivers/wdog01
         mbed-mcux-sdk/drivers/rtwdog
+        mbed-mcux-sdk/drivers/trng
 )
 
 # We use the MCUX-based USB driver stack
@@ -77,6 +79,17 @@ target_sources(mbed-mcu-mimxrt105x_6x
         mbed-hal-drivers/us-ticker-via-PIT/us_ticker.c
         mbed-hal-drivers/pinmode-via-IOMUXC/pinmap.c
         mbed-hal-drivers/flash-via-FLEXSPI/flash_api.c
+        mbed-hal-drivers/i2c-via-LPI2C/i2c_api.c
+        mbed-hal-drivers/lpticker-via-GPT/lp_ticker.c
+        mbed-hal-drivers/gpio-and-irq-and-port-via-IGPIO/port_api.c
+        mbed-hal-drivers/gpio-and-irq-and-port-via-IGPIO/gpio_irq_api.c
+        mbed-hal-drivers/gpio-and-irq-and-port-via-IGPIO/gpio_api.c
+        mbed-hal-drivers/analogin-via-RT105x-ADC/analogin_api.c
+        mbed-hal-drivers/trng-via-TRNG/trng_api.c
+        mbed-hal-drivers/spi-via-LPSPI/spi_api.c
+        mbed-hal-drivers/rtc-via-SNVS-LP-SRTC/rtc_api.c
+        mbed-hal-drivers/watchdog-via-RTWDOG/watchdog_api.c
+        mbed-hal-drivers/pwmout-via-FlexPWM/pwmout_api.c
 )
 
 # Link appropriate startup files for RT105x

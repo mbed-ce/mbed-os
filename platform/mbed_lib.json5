@@ -168,6 +168,10 @@
         "mbed-error-emit-greentea-kv": {
             "help": "Option that can be used when building Greentea tests. Causes the mbed_error() function (caused by assert failures and HardFaults) to emit a Greentea key-value pair indicating that an error has occurred.",
             "value": null
+        },
+        "enable-deep-sleep": {
+            "help": "Enable deep sleep if supported by hardware. Set to false to prevent deep sleeping. On some devices deep sleep can prevent debuggers from working properly when the device is asleep. Deep sleep is disabled regardless of this setting when the build type is Debug.",
+            "value": true
         }
     },
     "target_overrides": {
@@ -256,6 +260,12 @@
         },
         "MCU_LPC546XX": {
             "crash-capture-enabled": true
+        },
+        "IMX": {
+            // Deep sleep is disabled by default because the debugger cannot connect (to debug OR flash) when the device
+            // is asleep. This can lead to soft bricking the device if you flash an application that deep sleeps
+            // right after main starts.
+            "enable-deep-sleep": false
         }
     }
 }
