@@ -34,6 +34,7 @@ struct serial_s {
 
 struct gpio_irq_s {
     PinName pin;
+    IRQn_Type irq_n;
     uint32_t event;
     uint32_t enabled;
 };

@@ -5,6 +5,7 @@
 #if DEVICE_INTERRUPTIN
 
 #include "cmsis.h"
+#include "mbed_error.h"
 #include "gpio_irq_api.h"
 #include "pinmap.h"
 #include "platform/mbed_critical.h"
@@ -21,47 +22,51 @@ static gpio_irq_handler irq_handler;
 static gpio_irq_state_t irq_states[GPIO_PORT_COUNT][GPIO_PIN_COUNT];
 static uint32_t active_pins[GPIO_PORT_COUNT];
 
-static GPIO_TypeDef *gpio_port(uint32_t port)
+static uint32_t syscfg_pin_bit(uint32_t port, uint32_t pin)
 {
-    return port == 0U ? GPIOA : GPIOB;
-}
-
-static IRQn_Type gpio_irq_number(uint32_t port)
-{
-    return port == 0U ? GPIOA_IRQn : GPIOB_IRQn;
-}
-
-static uint32_t syscfg_pin_mask(uint32_t port, uint32_t pin)
-{
+    // 32bits for 2 ports with 16 pins each, bit position = pin + (port * 16)
     return 1UL << (pin + (port * 16U));
 }
 
 static void gpio_irq_handler_port(uint32_t port)
 {
-    GPIO_TypeDef *gpio = gpio_port(port);
+    // Get the pending flags of active pins for the port
     uint32_t status = (SYSCFG->IO_ISCR >> (port * 16U)) & active_pins[port];
-
+    
+    // Go trought all pins of the GPIO port and call the callback
+    // for each pin with a pending flag, skip rest
     for (uint32_t pin = 0U; pin < GPIO_PIN_COUNT; pin++) {
-        uint32_t pin_mask = 1UL << pin;
+        uint32_t pin_bit = 1UL << pin;
 
-        if ((status & pin_mask) == 0U) {
+        // Skip pins with no pending event
+        if ((status & pin_bit) == 0U) {
             continue;
         }
 
-        uint32_t register_mask = syscfg_pin_mask(port, pin);
+        // Get pin's callback configuration
+        uint32_t syscfg_bit = syscfg_pin_bit(port, pin);
         gpio_irq_state_t *state = &irq_states[port][pin];
         uint32_t event = state->events;
 
-        SYSCFG->IO_ISCR = register_mask;
-        if ((SYSCFG->IO_IER & register_mask) == 0U) {
+        // Acknowledge pin's pending flag
+        SYSCFG->IO_ISCR = syscfg_bit;
+
+        // Skip callbacks for masked pins
+        if ((SYSCFG->IO_IER & syscfg_bit) == 0U) {
             continue;
         }
+
+        // Skip callbacks without enabled edges
         if (event == IRQ_NONE) {
             continue;
         }
 
+        // Get GPIO port base address
+        GPIO_TypeDef *gpio = (port == PortA) ? GPIOA : GPIOB;
+        // For both-edge mode, get the edge from the current pin level.
+        // For single-edge mode, keep the configured edge.
         if (event == (IRQ_RISE | IRQ_FALL)) {
-            event = (gpio->IDR & pin_mask) != 0U ? IRQ_RISE : IRQ_FALL;
+            event = (gpio->IDR & pin_bit) != 0U ? IRQ_RISE : IRQ_FALL;
         }
 
         irq_handler(state->context, (gpio_irq_event)event);
@@ -86,33 +91,59 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uintpt
 
     uint32_t port = STM_PORT(pin);
     uint32_t pin_index = STM_PIN(pin);
+    uint32_t pin_bit = 1UL << pin_index;
 
-    if ((port >= GPIO_PORT_COUNT) || (pin_index >= GPIO_PIN_COUNT)) {
+    // Check if the GPIO port is valid
+    if (port >= GPIO_PORT_COUNT) {
+        error("InterruptIn error: unsupported gpio port.\n");
         return -1;
     }
 
     core_util_critical_section_enter();
+    
+    bool first_pin = (active_pins[port] == 0U);
 
-    uint32_t pin_mask = 1UL << pin_index;
-    if ((active_pins[port] & pin_mask) != 0U) {
-        core_util_critical_section_exit();
+    // Check if the pin is already in use
+    if ((active_pins[port] & pin_bit) != 0U) {
+        error("InterruptIn error: pin conflict\n");
+        return -1;
+    } else {
+        active_pins[port] |= pin_bit;
+    }
+
+    // Enable SYSCFG Clock
+    __HAL_RCC_SYSCFG_CLK_ENABLE();
+
+    // Enable GPIO clock, select irq handler and interrupt according to GPIO port
+    uint32_t vector = 0;
+    IRQn_Type irq_n;
+    if(port == PortA) {
+        __HAL_RCC_GPIOA_CLK_ENABLE();
+        vector  = (uint32_t)gpioa_irq_handler;
+        irq_n = GPIOA_IRQn;
+    } else if(port == PortB) {
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+        vector  = (uint32_t)gpiob_irq_handler;
+        irq_n = GPIOB_IRQn;
+    } else {
+        error("InterruptIn error: unsupported gpio port.\n");
         return -1;
     }
 
-    __HAL_RCC_SYSCFG_CLK_ENABLE();
-
-    obj->pin = pin;
+    // Save informations for future use
+    obj->pin = pin; // Store pin not pin index
+    obj->irq_n = irq_n;
     obj->event = IRQ_NONE;
     obj->enabled = 1U;
     irq_handler = handler;
     irq_states[port][pin_index].context = context;
     irq_states[port][pin_index].events = IRQ_NONE;
-    active_pins[port] |= pin_mask;
-
-    IRQn_Type irq_n = gpio_irq_number(port);
-    NVIC_SetVector(irq_n, port == 0U ? (uint32_t)gpioa_irq_handler : (uint32_t)gpiob_irq_handler);
-    NVIC_ClearPendingIRQ(irq_n);
-    NVIC_EnableIRQ(irq_n);
+    
+    // Set and enable the interrupt vector if this is the first pin for the port
+    if (first_pin) {
+        NVIC_SetVector(obj->irq_n, vector);
+        NVIC_EnableIRQ(obj->irq_n);
+    }
 
     core_util_critical_section_exit();
     return 0;
@@ -123,26 +154,28 @@ void gpio_irq_free(gpio_irq_t *obj)
     core_util_critical_section_enter();
 
     uint32_t port = STM_PORT(obj->pin);
-    uint32_t pin = STM_PIN(obj->pin);
-    uint32_t pin_mask = 1UL << pin;
-    uint32_t register_mask = syscfg_pin_mask(port, pin);
+    uint32_t pin_index = STM_PIN(obj->pin);
+    uint32_t pin_bit = 1UL << pin_index;
+    uint32_t syscfg_bit = syscfg_pin_bit(port, pin_index);
 
-    SYSCFG->IO_IER &= ~register_mask;
-    SYSCFG->IO_IBER &= ~register_mask;
-    SYSCFG->IO_IEVR &= ~register_mask;
-    SYSCFG->IO_DTR &= ~register_mask;
-    SYSCFG->IO_ISCR = register_mask;
+    // Reset registers for the pin and clear the pending flag
+    SYSCFG->IO_IER &= ~syscfg_bit;
+    SYSCFG->IO_IBER &= ~syscfg_bit;
+    SYSCFG->IO_IEVR &= ~syscfg_bit;
+    SYSCFG->IO_DTR &= ~syscfg_bit;
+    SYSCFG->IO_ISCR = syscfg_bit;
 
-    active_pins[port] &= ~pin_mask;
-    irq_states[port][pin].context = 0U;
-    irq_states[port][pin].events = IRQ_NONE;
+    // Clear the pin from the active pins and reset the irq state
+    active_pins[port] &= ~pin_bit;
+    irq_states[port][pin_index].context = 0U;
+    irq_states[port][pin_index].events = IRQ_NONE;
     obj->event = IRQ_NONE;
     obj->enabled = 0U;
 
+    // Disable the interrupt if no more active pins for the port
     if (active_pins[port] == 0U) {
-        IRQn_Type irq_n = gpio_irq_number(port);
-        NVIC_DisableIRQ(irq_n);
-        NVIC_ClearPendingIRQ(irq_n);
+        NVIC_DisableIRQ(obj->irq_n);
+        NVIC_ClearPendingIRQ(obj->irq_n);
     }
 
     core_util_critical_section_exit();
@@ -151,59 +184,69 @@ void gpio_irq_free(gpio_irq_t *obj)
 void gpio_irq_set(gpio_irq_t *obj, gpio_irq_event event, uint32_t enable)
 {
     uint32_t port = STM_PORT(obj->pin);
-    uint32_t pin = STM_PIN(obj->pin);
-    uint32_t register_mask = syscfg_pin_mask(port, pin);
+    uint32_t pin_index = STM_PIN(obj->pin);
+    uint32_t syscfg_bit = syscfg_pin_bit(port, pin_index);
 
+    // Add or remove the requested edge while preserving the others
     if (enable != 0U) {
         obj->event |= event;
     } else {
         obj->event &= ~event;
     }
-    irq_states[port][pin].events = obj->event;
+    // Update the enabled edges
+    irq_states[port][pin_index].events = obj->event;
 
-    SYSCFG->IO_DTR &= ~register_mask;
+    // Set edge detection
+    SYSCFG->IO_DTR &= ~syscfg_bit;
     if (obj->event == (IRQ_RISE | IRQ_FALL)) {
-        SYSCFG->IO_IBER |= register_mask;
+        // Enable detection of both rising and falling edges.
+        SYSCFG->IO_IBER |= syscfg_bit;
     } else {
-        SYSCFG->IO_IBER &= ~register_mask;
+        // Select a single edge: bit set for rising, cleared for falling.
+        SYSCFG->IO_IBER &= ~syscfg_bit;
         if (obj->event == IRQ_RISE) {
-            SYSCFG->IO_IEVR |= register_mask;
+            SYSCFG->IO_IEVR |= syscfg_bit;
         } else {
-            SYSCFG->IO_IEVR &= ~register_mask;
+            SYSCFG->IO_IEVR &= ~syscfg_bit;
         }
     }
 
-    SYSCFG->IO_ISCR = register_mask;
+    // Discard any pending event from the previous pin configuration.
+    SYSCFG->IO_ISCR = syscfg_bit;
+    // Enable the pin's interrupt only if enabled by the object and an edge is selected.
     if ((obj->enabled != 0U) && (obj->event != IRQ_NONE)) {
-        SYSCFG->IO_IER |= register_mask;
+        SYSCFG->IO_IER |= syscfg_bit;
     } else {
-        SYSCFG->IO_IER &= ~register_mask;
+        SYSCFG->IO_IER &= ~syscfg_bit;
     }
 }
 
 void gpio_irq_enable(gpio_irq_t *obj)
 {
     uint32_t port = STM_PORT(obj->pin);
-    uint32_t pin = STM_PIN(obj->pin);
-    uint32_t register_mask = syscfg_pin_mask(port, pin);
+    uint32_t pin_index = STM_PIN(obj->pin);
+    uint32_t syscfg_bit = syscfg_pin_bit(port, pin_index);
 
     obj->enabled = 1U;
-    SYSCFG->IO_ISCR = register_mask;
+    // Clear any pending event before enabling this pin's interrupt
+    SYSCFG->IO_ISCR = syscfg_bit;
+    // Enable the interrupt source only if at least one edge is configured.
     if (obj->event != IRQ_NONE) {
-        SYSCFG->IO_IER |= register_mask;
+        SYSCFG->IO_IER |= syscfg_bit;
     }
-    NVIC_EnableIRQ(gpio_irq_number(port));
 }
 
 void gpio_irq_disable(gpio_irq_t *obj)
 {
     uint32_t port = STM_PORT(obj->pin);
-    uint32_t pin = STM_PIN(obj->pin);
-    uint32_t register_mask = syscfg_pin_mask(port, pin);
+    uint32_t pin_index = STM_PIN(obj->pin);
+    uint32_t syscfg_bit = syscfg_pin_bit(port, pin_index);
 
     obj->enabled = 0U;
-    SYSCFG->IO_IER &= ~register_mask;
-    SYSCFG->IO_ISCR = register_mask;
+    // Disable only this pin
+    SYSCFG->IO_IER &= ~syscfg_bit;
+    // Discard any pending event for this pin.
+    SYSCFG->IO_ISCR = syscfg_bit;
 }
 
 #endif /* DEVICE_INTERRUPTIN */
