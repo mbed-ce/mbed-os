@@ -42,12 +42,12 @@ static inline uint32_t volatile * get_iomux_sw_mux_ctl(PinName pin)
 
     if ((gpio_pin >= 0) && (gpio_pin < 12)) {
         uint32_t volatile * const base_addr = &IOMUXC->SW_MUX_CTL_PAD[kIOMUXC_SW_MUX_CTL_PAD_GPIO_SD_B1_00];
-        return base_addr + (gpio_pin * 4);
+        return base_addr + gpio_pin;
     } else if ((gpio_pin >= 12) && (gpio_pin < 18)) {
         uint32_t volatile * const base_addr = &IOMUXC->SW_MUX_CTL_PAD[kIOMUXC_SW_MUX_CTL_PAD_GPIO_SD_B0_00];
-        return base_addr + ((gpio_pin - 12) * 4);
+        return base_addr + (gpio_pin - 12);
     } else /* ((gpio_pin >= 18) && (gpio_pin < 28)) */ {
         uint32_t volatile * const base_addr = &IOMUXC->SW_MUX_CTL_PAD[kIOMUXC_SW_MUX_CTL_PAD_GPIO_EMC_32];
-        return base_addr + ((gpio_pin - 18) * 4);
+        return base_addr + (gpio_pin - 18);
     }
 }
