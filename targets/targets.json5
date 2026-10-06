@@ -4540,7 +4540,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USTICKER",
             "LPTICKER",
             "ANALOGIN",
-            "EMAC",
+//            "EMAC",
             "I2C",
             "I2CSLAVE",
             "INTERRUPTIN",
@@ -4553,7 +4553,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPISLAVE",
             "TRNG",
             "WATCHDOG",
-            "USBDEVICE"
+            "USBDEVICE",
+            "FLASH"
         ],
         "overrides": {
             "deep-sleep-latency": 10
@@ -4586,12 +4587,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SKIP_SYSCLK_INIT", // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
             "BOARD_ENET_PHY_ADDR=2"
         ],
-        "device_has_add": [
-            "FLASH"
-        ],
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        },
+//        "overrides": {
+//            "network-default-interface-type": "ETHERNET"
+//        },
         "memory_banks": {
             "SDRAM": {
                 "access": {
@@ -4643,12 +4641,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SKIP_SYSCLK_INIT", // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
             "BOARD_ENET_PHY_ADDR=2"
         ],
-        "device_has_add": [
-            "FLASH"
-        ],
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        },
+//        "overrides": {
+//            "network-default-interface-type": "ETHERNET"
+//        },
         "memory_banks": {
             "SDRAM": {
                 "access": {

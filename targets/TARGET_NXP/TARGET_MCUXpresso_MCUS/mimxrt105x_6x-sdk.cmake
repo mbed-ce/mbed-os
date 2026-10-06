@@ -28,6 +28,7 @@ target_sources(mbed-mcu-mimxrt105x_6x INTERFACE
     mbed-mcux-sdk/drivers/rtwdog/fsl_rtwdog.c
     mbed-mcux-sdk/drivers/xbara/fsl_xbara.c
     mbed-mcux-sdk/drivers/trng/fsl_trng.c
+    mbed-mcux-sdk/drivers/snvs_lp/fsl_snvs_lp.c
 )
 
 target_include_directories(mbed-mcu-mimxrt105x_6x
@@ -55,6 +56,7 @@ target_include_directories(mbed-mcu-mimxrt105x_6x
         mbed-mcux-sdk/drivers/wdog01
         mbed-mcux-sdk/drivers/rtwdog
         mbed-mcux-sdk/drivers/trng
+        mbed-mcux-sdk/drivers/snvs_lp
 )
 
 # We use the MCUX-based USB driver stack
