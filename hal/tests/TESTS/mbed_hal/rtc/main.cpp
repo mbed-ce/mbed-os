@@ -100,7 +100,7 @@ void rtc_sleep_test_support(bool deepsleep_mode)
 
 /* Tests ::rtc_init() behavior:
  - rtc_init() can be called multiple times
- - rtc_isenabled() returns false before init, unless the RTC provides the low-power ticker, and true after init
+ - rtc_isenabled() returns false before init and true after init, though if the RTC provides the LP ticker, this may cause the RTC to be initialized at boot
  - RTC returns valid time after being initialized (though that time may be anything). */
 void rtc_init_test()
 {
