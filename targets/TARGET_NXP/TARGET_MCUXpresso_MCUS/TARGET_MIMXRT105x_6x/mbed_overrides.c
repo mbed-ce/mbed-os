@@ -108,9 +108,9 @@ void BOARD_ConfigMPU(void)
     MPU->RBAR = ARM_MPU_RBAR(3, 0x00000000U);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1GB);
 
-    /* Region 4 setting: Memory with Normal type, not shareable, outer/inner write back [ITCM] */
+    /* Region 4 setting: Memory with Normal type, not shareable, read only, outer/inner write back [ITCM] */
     MPU->RBAR = ARM_MPU_RBAR(4, 0x00000000U);
-    MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_128KB);
+    MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_128KB);
 
     /* Region 5 setting: Memory with Normal type, not shareable, outer/inner write back [DTCM] */
     MPU->RBAR = ARM_MPU_RBAR(5, 0x20000000U);
@@ -216,17 +216,17 @@ void mbed_sdk_init()
 #endif
 }
 
-void spi_setup_clock()
+void lpspi_setup_clock()
 {
     // Not needed on MIMXRT105x
 }
 
-uint32_t spi_get_clock(void)
+uint32_t lpspi_get_clock(void)
 {
     return BOARD_CLOCKFULLSPEED_LPSPI_CLK_ROOT;
 }
 
-uint32_t us_ticker_get_clock()
+uint32_t pit_get_clock()
 {
     return BOARD_CLOCKFULLSPEED_PERCLK_CLK_ROOT;
 }
@@ -241,7 +241,7 @@ uint32_t lpi2c_get_clock()
     return BOARD_CLOCKFULLSPEED_LPI2C_CLK_ROOT;
 }
 
-void pwm_setup(uint32_t instance)
+void flexpwm_setup(uint32_t instance)
 {
     /* Use default clock settings */
     /* Set the PWM Fault inputs to a low value */
@@ -272,7 +272,7 @@ void pwm_setup(uint32_t instance)
     }
 }
 
-uint32_t pwm_get_clock()
+uint32_t flexpwm_get_clock()
 {
     return CLOCK_GetFreq(kCLOCK_IpgClk);
 }
