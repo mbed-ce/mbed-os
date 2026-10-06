@@ -40,7 +40,7 @@ void pin_function(PinName pin, int function)
     if (muxregister == 0) {
         muxregister = get_iomux_sw_mux_ctl(pin);
     } else {
-        muxregister = muxregister + ((pin & 0xFF) * 4);
+        muxregister = muxregister + (pin & 0xFF);
     }
 
     /* Write to the mux register */
@@ -65,7 +65,7 @@ void pin_mode(PinName pin, PinMode mode)
     if (muxregister == 0) {
         muxregister = get_iomux_sw_mux_ctl(pin);
     } else {
-        muxregister = muxregister + ((pin & 0xFF) * 4);
+        muxregister = muxregister + (pin & 0xFF);
     }
 
     /* Get pad register address */
@@ -142,7 +142,7 @@ void pin_mode_opendrain(PinName pin, bool enable)
     if (muxregister == 0) {
         muxregister = get_iomux_sw_mux_ctl(pin);
     } else {
-        muxregister = muxregister + ((pin & 0xFF) * 4);
+        muxregister = muxregister + (pin & 0xFF);
     }
 
     /* Get pad register address */
