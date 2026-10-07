@@ -62,10 +62,7 @@ SECTIONS
     } > FLASH
     __exidx_end = .;
 
-    __etext = .;
-    _sidata = .;
-
-    /* STM32WB0 ROM ABI data occupies the first 0x100 bytes of SRAM. */
+    /* ST ROM/startup RAM virtual registers, fixed at SRAM base + 0x4. */
     .ram_vr MBED_RAM_BANK_SRAM_START + 0x4 (NOLOAD) :
     {
         KEEP(*(.ram_vr))
@@ -78,8 +75,8 @@ SECTIONS
         _ebssblue = .;
     } > RAM
 
-    /* Place the runtime vector table immediately after the ROM ABI area. */
-    .vector_ram MBED_RAM_BANK_SRAM_START + 0x100 (NOLOAD) :
+    /* Place runtime vectors after blueRAM, aligned to 256 bytes for VTOR. */
+    .vector_ram ALIGN(0x100) (NOLOAD) :
     {
         __vector_ram_start__ = .;
         . += __vector_table_size__;
@@ -100,7 +97,8 @@ SECTIONS
     } > RAM
 #endif
 
-    .data : AT (__etext)
+    /* Align both addresses for the startup word copy and account for its Flash image. */
+    .data : ALIGN(4)
     {
         __data_start__ = .;
         _sdata = .;
@@ -124,7 +122,10 @@ SECTIONS
 
         __data_end__ = .;
         _edata = .;
-    } > RAM
+    } > RAM AT> FLASH
+
+    __etext = LOADADDR(.data);
+    _sidata = LOADADDR(.data);
 
     .uninitialized (NOLOAD) :
     {
@@ -146,11 +147,6 @@ SECTIONS
         . = ALIGN(8);
         __bss_end__ = .;
         _ebss = .;
-    } > RAM
-
-    .noinit (NOLOAD) :
-    {
-        *(.noinit*)
     } > RAM
 
     .heap (COPY) :

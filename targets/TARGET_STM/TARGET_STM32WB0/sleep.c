@@ -17,7 +17,7 @@ extern void serial_restore_stdio(void);
 extern void SetSysClock(void);
 extern int mbed_sdk_inited;
 
-#define RETAINED_CONTEXT __attribute__((section(".noinit"), used))
+#define RETAINED_CONTEXT __attribute__((section(".uninitialized"), used))
 #define CSTACK_PREAMBLE_WORDS 20U
 #define GPIO_PORT_COUNT       2U
 
