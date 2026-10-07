@@ -148,7 +148,7 @@ utest::v1::status_t testcase_teardown(const Case *const source, const size_t pas
     return utest::v1::greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
-#if DEVICE_LPTICKER
+#if DEVICE_LPTICKER && MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
 #if DEVICE_USTICKER
 /* This test is based on the fact that the high-speed clocks are turned off
  * in deep sleep mode but remain on in the ordinary sleep mode. Low-speed
@@ -365,7 +365,7 @@ Case cases[] = {
          (utest::v1::case_setup_handler_t) testcase_setup,
          test_lock_eq_ushrt_max,
          (utest::v1::case_teardown_handler_t) testcase_teardown),
-#if DEVICE_LPTICKER
+#if DEVICE_LPTICKER && MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
 #if DEVICE_USTICKER
     Case("sleep_auto calls sleep/deep sleep based on lock",
          (utest::v1::case_setup_handler_t) testcase_setup,
