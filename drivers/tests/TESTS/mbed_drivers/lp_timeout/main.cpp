@@ -62,8 +62,10 @@ Case cases[] = {
     Case("1 s delay during sleep (attach)", test_sleep<LowPowerTimeout, 1000000, LONG_DELTA_US>,
          greentea_failure_handler),
 
+#if MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
     Case("1 s delay during deepsleep (attach)", test_deepsleep<LowPowerTimeout, 1000000, LONG_DELTA_US>,
          greentea_failure_handler),
+#endif
 #endif
 
 #if !defined(SKIP_TIME_DRIFT_TESTS)

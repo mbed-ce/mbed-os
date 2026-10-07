@@ -168,7 +168,7 @@ void test_sleep_reset()
     TEST_ASSERT_MESSAGE(0, "Watchdog did not reset the device as expected.");
 }
 
-#if DEVICE_LPTICKER
+#if DEVICE_LPTICKER && MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
 void test_deepsleep_reset()
 {
     // Phase 2. -- verify the test results.
@@ -331,7 +331,7 @@ Case cases[] = {
     Case("Watchdog reset", case_setup, test_simple_reset),
 #if DEVICE_SLEEP
     Case("Watchdog reset in sleep mode", case_setup, test_sleep_reset),
-#if DEVICE_LPTICKER
+#if DEVICE_LPTICKER && MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
     Case("Watchdog reset in deepsleep mode", case_setup, test_deepsleep_reset),
 #endif
 #endif

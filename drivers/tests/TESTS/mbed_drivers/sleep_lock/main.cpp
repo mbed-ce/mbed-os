@@ -117,7 +117,9 @@ void timer_lock_test()
 }
 
 Case cases[] = {
+#if MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
     Case("DeepSleepLock lock test", deep_sleep_lock_lock_test),
+#endif
     Case("timer lock test", timer_lock_test),
 };
 
