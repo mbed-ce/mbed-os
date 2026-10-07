@@ -159,7 +159,7 @@ Case cases[] = {
     Case("Calc variance [double]", calc_variance<double, workingArrDoubles, &meanDouble>),
 };
 
-utest::v1::Specification specification(test_setup, cases);
+utest::v1::Specification specification(test_setup, cases, utest::v1::greentea_continue_handlers);
 
 int main()
 {

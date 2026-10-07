@@ -28,6 +28,7 @@
 #include "utest.h"
 #include "rtos.h"
 #include <type_traits>
+#include "mbed_critical.h"
 
 #define TEST_ASSERT_DURATION_WITHIN(delta, expected, actual) \
     do { \

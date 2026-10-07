@@ -19,6 +19,7 @@
 #include "unity/unity.h"
 #include "greentea-client/test_env.h"
 
+#include "CircularBuffer.h"
 #include "mbed.h"
 
 using namespace utest::v1;
@@ -55,10 +56,10 @@ void comp_set(COMPLEX_TYPE *object, int a, char b, int c)
  * Then all elements are read from the circular buffer in the FIFO order.
  *
  */
-template<typename T, uint32_t BufferSize, typename CounterType>
+template < typename T, uint32_t BufferSize, typename CounterType >
 void test_input_does_not_exceed_capacity_push_max_pop_max()
 {
-    CircularBuffer<T, BufferSize, CounterType> cb;
+    CircularBuffer < T, BufferSize, CounterType > cb;
     T data = 0;
 
     for (uint32_t i = 0; i < BufferSize; i++) {
@@ -81,10 +82,10 @@ void test_input_does_not_exceed_capacity_push_max_pop_max()
  * Then all elements are read from the circular buffer in the FIFO order.
  *
  */
-template<typename T, uint32_t BufferSize, typename CounterType>
+template < typename T, uint32_t BufferSize, typename CounterType >
 void test_input_does_not_exceed_capacity_push_2_pop_1()
 {
-    CircularBuffer<T, BufferSize, CounterType> cb;
+    CircularBuffer < T, BufferSize, CounterType > cb;
     static const int num_of_elem_push = (2 * BufferSize - 2);
     T push_buffer = 0;
     T pop_buffer = 0;
@@ -119,10 +120,10 @@ void test_input_does_not_exceed_capacity_push_2_pop_1()
  * elements are read from the circular buffer in the FIFO order.
  *
  */
-template<typename T, uint32_t BufferSize, typename CounterType>
+template < typename T, uint32_t BufferSize, typename CounterType >
 void test_input_exceeds_capacity_push_max_plus_1_pop_max()
 {
-    CircularBuffer<T, BufferSize, CounterType> cb;
+    CircularBuffer < T, BufferSize, CounterType > cb;
     static const int num_of_elem_push = (BufferSize + 1);
     T data = 0;
 
@@ -157,10 +158,10 @@ void test_input_exceeds_capacity_push_max_plus_1_pop_max()
  * elements are read from the circular buffer in the FIFO order.
  *
  */
-template<typename T, uint32_t BufferSize, typename CounterType>
+template < typename T, uint32_t BufferSize, typename CounterType >
 void test_input_exceeds_capacity_push_2_pop_1()
 {
-    CircularBuffer<T, BufferSize, CounterType> cb;
+    CircularBuffer < T, BufferSize, CounterType > cb;
     static const int num_of_elem_push = (2 * BufferSize);
     T push_buffer = 0;
     T pop_buffer = 0;
@@ -207,10 +208,10 @@ void test_input_exceeds_capacity_push_2_pop_1()
  * elements are read from the circular buffer in the FIFO order.
  *
  */
-template<uint32_t BufferSize, typename CounterType>
+template < uint32_t BufferSize, typename CounterType >
 void test_input_exceeds_capacity_push_2_pop_1_complex_type()
 {
-    CircularBuffer<COMPLEX_TYPE, BufferSize, CounterType> cb;
+    CircularBuffer < COMPLEX_TYPE, BufferSize, CounterType > cb;
     static const int num_of_elem_push = (2 * BufferSize);
     COMPLEX_TYPE push_buffer = {0};
     COMPLEX_TYPE pop_buffer = {0};
@@ -267,7 +268,7 @@ void test_input_exceeds_capacity_push_2_pop_1_complex_type()
  */
 void test_pop_empty_full_size_after_creation()
 {
-    CircularBuffer<int, 1> cb;
+    CircularBuffer < int, 1 > cb;
     int data = 0;
 
     TEST_ASSERT_TRUE(cb.empty());
@@ -284,10 +285,10 @@ void test_pop_empty_full_size_after_creation()
  * Then empty() function returns true if buffer is empty, false otherwise.
  *
  */
-template<typename T, uint32_t BufferSize>
+template < typename T, uint32_t BufferSize >
 void test_empty()
 {
-    CircularBuffer<T, BufferSize> cb;
+    CircularBuffer < T, BufferSize > cb;
     T data = 0;
 
     /* Push max elements. */
@@ -324,10 +325,10 @@ void test_empty()
  * Then full() function returns true if buffer is full, false otherwise.
  *
  */
-template<typename T, uint32_t BufferSize>
+template < typename T, uint32_t BufferSize >
 void test_full()
 {
-    CircularBuffer<T, BufferSize> cb;
+    CircularBuffer < T, BufferSize > cb;
     T data = 0;
 
     /* Push max elements - 1. */
@@ -360,10 +361,10 @@ void test_full()
  * Then circular buffer is cleared.
  *
  */
-template<typename T, uint32_t BufferSize>
+template < typename T, uint32_t BufferSize >
 void test_reset()
 {
-    CircularBuffer<T, BufferSize> cb;
+    CircularBuffer < T, BufferSize > cb;
     T data = 0xAA;
 
     /* Push max elements. */
@@ -403,7 +404,7 @@ void test_reset()
  */
 void test_counter_type_buffer_size()
 {
-    CircularBuffer<int, 255, unsigned char> cb;
+    CircularBuffer < int, 255, unsigned char > cb;
     int data = 100;
 
     /* Perform some operations. */
@@ -422,7 +423,7 @@ void test_counter_type_buffer_size()
  */
 void test_peek_no_pop()
 {
-    CircularBuffer<int, 3, unsigned char> cb;
+    CircularBuffer < int, 3, unsigned char > cb;
     int data = 0;
     int peek_data = 0;
 
@@ -450,32 +451,32 @@ utest::v1::status_t greentea_failure_handler(const Case *const source, const fai
 
 Case cases[] = {
     Case("Input does not exceed capacity(1) push max, pop max.",
-         test_input_does_not_exceed_capacity_push_max_pop_max<uint32_t, 1, unsigned int>, greentea_failure_handler),
+         test_input_does_not_exceed_capacity_push_max_pop_max < uint32_t, 1, unsigned int >, greentea_failure_handler),
     Case("Input does not exceed capacity(3) push max, pop max.",
-         test_input_does_not_exceed_capacity_push_max_pop_max<char, 3, unsigned int>, greentea_failure_handler),
+         test_input_does_not_exceed_capacity_push_max_pop_max < char, 3, unsigned int >, greentea_failure_handler),
 
     Case("Input does not exceed capacity(5) push 2, pop 1.",
-         test_input_does_not_exceed_capacity_push_2_pop_1<uint32_t, 5, unsigned char>, greentea_failure_handler),
+         test_input_does_not_exceed_capacity_push_2_pop_1 < uint32_t, 5, unsigned char >, greentea_failure_handler),
     Case("Input does not exceed capacity(10) push 2, pop 1.",
-         test_input_does_not_exceed_capacity_push_2_pop_1<char, 10, unsigned char>, greentea_failure_handler),
+         test_input_does_not_exceed_capacity_push_2_pop_1 < char, 10, unsigned char >, greentea_failure_handler),
 
     Case("Input exceeds capacity(1) push max+1, pop max.",
-         test_input_exceeds_capacity_push_max_plus_1_pop_max<uint32_t, 1, unsigned int>, greentea_failure_handler),
+         test_input_exceeds_capacity_push_max_plus_1_pop_max < uint32_t, 1, unsigned int >, greentea_failure_handler),
     Case("Input exceeds capacity(3) push max+1, pop max.",
-         test_input_exceeds_capacity_push_max_plus_1_pop_max<char, 3, unsigned int>, greentea_failure_handler),
+         test_input_exceeds_capacity_push_max_plus_1_pop_max < char, 3, unsigned int >, greentea_failure_handler),
 
     Case("Input exceeds capacity(5) push 2, pop 1.",
-         test_input_exceeds_capacity_push_2_pop_1<uint32_t, 5, unsigned short>, greentea_failure_handler),
+         test_input_exceeds_capacity_push_2_pop_1 < uint32_t, 5, unsigned short >, greentea_failure_handler),
     Case("Input exceeds capacity(10) push 2, pop 1.",
-         test_input_exceeds_capacity_push_2_pop_1<char, 10, unsigned short>, greentea_failure_handler),
+         test_input_exceeds_capacity_push_2_pop_1 < char, 10, unsigned short >, greentea_failure_handler),
 
-    Case("empty() returns true when buffer(3 elements) is empty.", test_empty<uint32_t, 3>, greentea_failure_handler),
-    Case("empty() returns true when buffer(5 elements) is empty.", test_empty<uint32_t, 5>, greentea_failure_handler),
+    Case("empty() returns true when buffer(3 elements) is empty.", test_empty < uint32_t, 3 >, greentea_failure_handler),
+    Case("empty() returns true when buffer(5 elements) is empty.", test_empty < uint32_t, 5 >, greentea_failure_handler),
 
-    Case("full() returns true when buffer(3 elements) is full.", test_full<uint32_t, 3>, greentea_failure_handler),
-    Case("full() returns true when buffer(5 elements) is full.", test_full<uint32_t, 5>, greentea_failure_handler),
+    Case("full() returns true when buffer(3 elements) is full.", test_full < uint32_t, 3 >, greentea_failure_handler),
+    Case("full() returns true when buffer(5 elements) is full.", test_full < uint32_t, 5 >, greentea_failure_handler),
 
-    Case("reset() clears the buffer.", test_reset<uint32_t, 5>, greentea_failure_handler),
+    Case("reset() clears the buffer.", test_reset < uint32_t, 5 >, greentea_failure_handler),
 
     Case("Test pop(), peek(), empty(), full(), size() after CircularBuffer creation.",
          test_pop_empty_full_size_after_creation, greentea_failure_handler),
@@ -483,7 +484,7 @@ Case cases[] = {
     Case("Test CounterType/BufferSize boarder case.", test_counter_type_buffer_size, greentea_failure_handler),
 
     Case("Input exceeds capacity(5) push 2, pop 1 - complex type.",
-         test_input_exceeds_capacity_push_2_pop_1_complex_type<5, unsigned short>, greentea_failure_handler),
+         test_input_exceeds_capacity_push_2_pop_1_complex_type < 5, unsigned short >, greentea_failure_handler),
 
     Case("peek() return data without popping the element.", test_peek_no_pop, greentea_failure_handler),
 };

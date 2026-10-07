@@ -43,9 +43,13 @@ class KiViBufferWalker:
         try:
             self.buff += payload.decode("utf-8")
         except UnicodeDecodeError:
+            # In the case of garbage printed by the target device, try to handle it in an intelligent way.
+            # First strip out anything that's obviously invalid UTF-8. Then, because the console may NOT be in
+            # UTF-8 so it still can't print decoded_payload, reencode as bytes.
             decoded_payload = payload.decode("utf-8", "ignore")
+            reencoded_payload = decoded_payload.encode("utf-8")
             self.logger.prn_wrn(
-                f'UnicodeDecodeError encountered! Raw bytes were {payload!r} and they decoded to "{decoded_payload}"'
+                f'UnicodeDecodeError encountered! Raw bytes were {payload!r} and they decoded to "{reencoded_payload!r}"'
             )
             self.buff += decoded_payload
 
