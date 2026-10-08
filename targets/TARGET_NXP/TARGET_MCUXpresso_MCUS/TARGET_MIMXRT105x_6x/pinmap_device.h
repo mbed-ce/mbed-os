@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
-* Copyright (c) 2026 Jamie Smith
+ * Copyright (c) 2026 Jamie Smith
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

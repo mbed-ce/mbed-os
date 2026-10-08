@@ -13,7 +13,7 @@ add_library(mbed-frdm-k66f INTERFACE)
 target_link_libraries(mbed-frdm-k66f INTERFACE mbed-mcu-k66f)
 
 # Link appropriate SDK drivers for K6x
-target_sources(mbed-mcu-kl4x INTERFACE
+target_sources(mbed-mcu-k6x INTERFACE
         mbed-mcux-sdk/drivers/common/fsl_common.c
         mbed-mcux-sdk/drivers/common/fsl_common_arm.c
         mbed-mcux-sdk/drivers/adc16/fsl_adc16.c
@@ -46,7 +46,7 @@ target_sources(mbed-mcu-kl4x INTERFACE
         mbed-mcux-sdk/drivers/sysmpu/fsl_sysmpu.c
 )
 
-target_include_directories(mbed-mcu-kl4x
+target_include_directories(mbed-mcu-k6x
     INTERFACE
         mbed-mcux-sdk/drivers/common
         mbed-mcux-sdk/drivers/adc16
@@ -70,6 +70,17 @@ target_include_directories(mbed-mcu-kl4x
         mbed-mcux-sdk/drivers/flash
         mbed-mcux-sdk/drivers/rnga
         mbed-mcux-sdk/drivers/sysmpu
+)
+
+# Link appropriate Mbed OS HALs that interface with this MCU
+target_include_directories(mbed-mcu-k6x
+    INTERFACE
+        mbed-hal-drivers/kinetis-common-headers
+        mbed-hal-drivers/us-ticker-via-PIT
+)
+target_sources(mbed-mcu-k6x
+    INTERFACE
+        mbed-hal-drivers/us-ticker-via-PIT/us_ticker.c
 )
 
 # Link appropriate headers and startup files
