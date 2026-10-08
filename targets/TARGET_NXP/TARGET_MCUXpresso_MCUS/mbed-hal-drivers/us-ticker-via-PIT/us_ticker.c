@@ -139,7 +139,7 @@ void us_ticker_set_interrupt(timestamp_t timestamp)
  */
 void us_ticker_fire_interrupt(void)
 {
-    NVIC_SetPendingIRQ(PIT_IRQn);
+    NVIC_SetPendingIRQ(US_TICKER_PIT_IRQ);
 }
 
 void us_ticker_free(void)

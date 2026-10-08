@@ -24,8 +24,6 @@ target_sources(mbed-mcu-k6x INTERFACE
         mbed-mcux-sdk/drivers/dspi/fsl_dspi_edma.c
         mbed-mcux-sdk/drivers/uart/fsl_uart.c
         mbed-mcux-sdk/drivers/uart/fsl_uart_edma.c
-        mbed-mcux-sdk/drivers/lpuart/fsl_lpuart.c
-        mbed-mcux-sdk/drivers/lpuart/fsl_lpuart_edma.c
         mbed-mcux-sdk/drivers/i2c/fsl_i2c.c
         mbed-mcux-sdk/drivers/i2c/fsl_i2c_edma.c
         mbed-mcux-sdk/drivers/vref/fsl_vref.c
@@ -44,6 +42,9 @@ target_sources(mbed-mcu-k6x INTERFACE
         mbed-mcux-sdk/drivers/flash/fsl_ftfx_flexnvm.c
         mbed-mcux-sdk/drivers/rnga/fsl_rnga.c
         mbed-mcux-sdk/drivers/sysmpu/fsl_sysmpu.c
+        mbed-mcux-sdk/drivers/rtc/fsl_rtc.c
+        mbed-mcux-sdk/drivers/lptmr/fsl_lptmr.c
+        mbed-mcux-sdk/drivers/dac/fsl_dac.c
 )
 
 target_include_directories(mbed-mcu-k6x
@@ -70,6 +71,21 @@ target_include_directories(mbed-mcu-k6x
         mbed-mcux-sdk/drivers/flash
         mbed-mcux-sdk/drivers/rnga
         mbed-mcux-sdk/drivers/sysmpu
+        mbed-mcux-sdk/drivers/rtc
+        mbed-mcux-sdk/drivers/port
+        mbed-mcux-sdk/drivers/lptmr
+        mbed-mcux-sdk/drivers/dac
+)
+
+# K66F has a few extra peripherals
+target_sources(mbed-mcu-k66f
+    INTERFACE
+        mbed-mcux-sdk/drivers/lpuart/fsl_lpuart.c
+        mbed-mcux-sdk/drivers/lpuart/fsl_lpuart_edma.c
+)
+target_include_directories(mbed-mcu-k66f
+    INTERFACE
+        mbed-mcux-sdk/drivers/lpuart
 )
 
 # Link appropriate Mbed OS HALs that interface with this MCU
@@ -81,6 +97,17 @@ target_include_directories(mbed-mcu-k6x
 target_sources(mbed-mcu-k6x
     INTERFACE
         mbed-hal-drivers/us-ticker-via-PIT/us_ticker.c
+        mbed-hal-drivers/i2c-via-I2C/i2c_api.c
+        mbed-hal-drivers/serial-via-UART/serial_api.c
+        mbed-hal-drivers/lpticker-via-LPTMR/lp_ticker.c
+        mbed-hal-drivers/gpio-via-GPIO/gpio_api.c
+        mbed-hal-drivers/interruptin-via-GPIO-PORT/gpio_irq_api.c
+        mbed-hal-drivers/flash-via-FLASH/flash_api.c
+        mbed-hal-drivers/port-via-PORT/port_api.c
+        mbed-hal-drivers/qspi-via-QSPI/qspi_api.c
+        mbed-hal-drivers/rtc-via-RTC/rtc_api.c
+        mbed-hal-drivers/analogout-via-DAC/analogout_api.c
+        mbed-hal-drivers/sleep-via-SMC/sleep.c
 )
 
 # Link appropriate headers and startup files
