@@ -1,3 +1,9 @@
+# KL4x family
+add_library(mbed-mcu-kl4x INTERFACE)
+add_library(mbed-mcu-kl43z INTERFACE)
+target_link_libraries(mbed-mcu-kl43z INTERFACE mbed-mcu-kl4x)
+add_library(mbed-frdm-kl43z INTERFACE)
+target_link_libraries(mbed-frdm-kl43z INTERFACE mbed-mcu-kl43z)
 
 # Link appropriate SDK drivers for KL4x
 target_sources(mbed-mcu-kl4x INTERFACE
@@ -86,7 +92,7 @@ target_sources(mbed-mcu-kl4x
         mbed-hal-drivers/pwmout-via-TPM/pwmout_api.c
 )
 
-# Link appropriate startup files for KL43
+# Link appropriate headers and startup files
 target_sources(mbed-mcu-kl43z INTERFACE
     mbed-mcux-sdk/devices_manual/MKL43Z4/system_MKL43Z4.c
     mbed-mcux-sdk/devices_manual/MKL43Z4/drivers/fsl_clock.c
