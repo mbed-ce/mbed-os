@@ -19,7 +19,7 @@
 
 #include "cmsis.h"
 #include "PortNames.h"
-#include "../../TARGET_KL4x/PeripheralNames.h"
+#include "PeripheralNames.h"
 #include "PinNames.h"
 #if DEVICE_SPI_ASYNCH
 #include "fsl_dspi_edma.h"
