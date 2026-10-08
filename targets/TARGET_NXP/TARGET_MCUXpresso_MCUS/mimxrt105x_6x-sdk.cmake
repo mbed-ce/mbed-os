@@ -1,3 +1,18 @@
+add_library(mbed-mcu-mimxrt105x_6x INTERFACE)
+add_library(mbed-mcu-mimxrt105x INTERFACE)
+target_link_libraries(mbed-mcu-mimxrt105x INTERFACE mbed-mcu-mimxrt105x_6x)
+add_library(mbed-mcu-mimxrt106x INTERFACE)
+target_link_libraries(mbed-mcu-mimxrt106x INTERFACE mbed-mcu-mimxrt105x_6x)
+add_library(mbed-mimxrt1050-evk INTERFACE)
+target_link_libraries(mbed-mimxrt1050-evk INTERFACE mbed-mcu-mimxrt105x)
+add_library(mbed-mimxrt1060-evk INTERFACE)
+target_link_libraries(mbed-mimxrt1060-evk INTERFACE mbed-mcu-mimxrt106x)
+add_library(mbed-teensy-4x INTERFACE)
+target_link_libraries(mbed-teensy-4x INTERFACE mbed-mcu-mimxrt106x)
+add_library(mbed-teensy-40 INTERFACE)
+target_link_libraries(mbed-teensy-40 INTERFACE mbed-teensy-4x)
+add_library(mbed-teensy-41 INTERFACE)
+target_link_libraries(mbed-teensy-41 INTERFACE mbed-teensy-4x)
 
 # Link appropriate SDK drivers for MIMXRT
 target_sources(mbed-mcu-mimxrt105x_6x INTERFACE

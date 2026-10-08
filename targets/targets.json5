@@ -5173,7 +5173,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "CRC",
             "ANALOGIN",
             "ANALOGOUT",
-            "EMAC",
             "I2C",
             "I2CSLAVE",
             "INTERRUPTIN",
@@ -5208,7 +5207,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "public": false
     },
-    "K64F": { // AKA FRDM-K64F
+    "FRDM_K64F": {
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
@@ -5216,7 +5215,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SD",
         ],
         "extra_labels_add": [
-            "FRDM"
+            "FRDM",
+            "K64F"
         ],
         "inherits": [
             "MCU_K64F",
