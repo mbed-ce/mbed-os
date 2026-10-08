@@ -1,0 +1,12 @@
+# Copyright (c) 2026 MbedCE Community Contributors (Jan Kamidra)
+# SPDX-License-Identifier: Apache-2.0
+
+# MbedCE upload configuration for the NUCLEO_WB09KE ST-LINK interface.
+set(UPLOAD_METHOD_DEFAULT STM32CUBE)
+
+set(MBED_UPLOAD_ENABLED TRUE)
+set(MBED_RESET_BAUDRATE 115200)
+
+set(STM32CUBE_UPLOAD_ENABLED TRUE)
+set(STM32CUBE_CONNECT_COMMAND -c port=SWD mode=HOTPLUG -hardRst -halt)
+set(STM32CUBE_GDBSERVER_ARGS --swd)

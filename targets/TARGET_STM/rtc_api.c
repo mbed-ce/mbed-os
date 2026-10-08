@@ -47,6 +47,37 @@ static RTC_HandleTypeDef RtcHandle;
 
 void rtc_init(void)
 {
+#if TARGET_STM32WB0
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+
+    if (RTC_inited) {
+        return;
+    }
+    RTC_inited = 1;
+
+#if (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_LSE_OR_LSI) && MBED_CONF_TARGET_LSE_AVAILABLE
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
+    RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+#if MBED_CONF_TARGET_LSE_BYPASS
+    RCC_OscInitStruct.OscillatorType |= RCC_OSCILLATORTYPE_LSE_BYPASS;
+    RCC_OscInitStruct.LSEBYPASSState = RCC_LSE_BYPASS_ON;
+#else
+    RCC_OscInitStruct.LSEBYPASSState = RCC_LSE_BYPASS_OFF;
+#endif
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+        error("Cannot initialize RTC with LSE\n");
+    }
+    __HAL_RCC_RTC_WDG_BLEWKUP_CLK_CONFIG(RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSE);
+#else
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI;
+    RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+        error("Cannot initialize RTC with LSI\n");
+    }
+    __HAL_RCC_RTC_WDG_BLEWKUP_CLK_CONFIG(RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSI);
+#endif
+    __HAL_RCC_RTC_CLK_ENABLE();
+#else
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
     if (RTC_inited) {
@@ -99,8 +130,13 @@ void rtc_init(void)
     __HAL_RCC_RTCAPB_CLK_ENABLE();
 #endif /* __HAL_RCC_RTCAPB_CLK_ENABLE */
 
+#endif /* TARGET_STM32WB0 */
+
     RtcHandle.Instance = RTC;
     RtcHandle.State = HAL_RTC_STATE_RESET;
+#if TARGET_STM32WB0
+    uint32_t calendar_initialized = __HAL_RTC_IS_CALENDAR_INITIALIZED(&RtcHandle);
+#endif
 
 #if TARGET_STM32F1
     RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
@@ -110,7 +146,9 @@ void rtc_init(void)
     RtcHandle.Init.SynchPrediv    = PREDIV_S_VALUE;
     RtcHandle.Init.OutPut         = RTC_OUTPUT_DISABLE;
     RtcHandle.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+#if defined (RTC_OUTPUT_TYPE_OPENDRAIN)
     RtcHandle.Init.OutPutType     = RTC_OUTPUT_TYPE_OPENDRAIN;
+#endif /* defined (RTC_OUTPUT_TYPE_OPENDRAIN) */
 #if defined (RTC_OUTPUT_REMAP_NONE)
     RtcHandle.Init.OutPutRemap    = RTC_OUTPUT_REMAP_NONE;
 #endif /* defined (RTC_OUTPUT_REMAP_NONE) */
@@ -130,6 +168,13 @@ void rtc_init(void)
         error("EnableBypassShadow error\n");
     }
 #endif /* TARGET_STM32F1 || TARGET_STM32F2 */
+
+#if TARGET_STM32WB0
+    // The WB0 reset date precedes the epoch supported by Mbed's STM RTC mapping.
+    if (!calendar_initialized) {
+        rtc_write(0);
+    }
+#endif
 }
 
 void rtc_free(void)
@@ -275,6 +320,12 @@ int rtc_isenabled(void)
 
 #if DEVICE_LPTICKER && !MBED_CONF_TARGET_LPTICKER_LPTIM
 
+#if TARGET_STM32WB0
+#define RTC_WAKEUP_IRQn RTC_IRQn
+#else
+#define RTC_WAKEUP_IRQn RTC_WKUP_IRQn
+#endif
+
 static void _RTC_IRQHandler(void);
 static void (*irq_handler)(void);
 
@@ -414,26 +465,26 @@ void rtc_set_wake_up_timer(timestamp_t timestamp)
     }
 #endif /* RTC_WUTR_WUTOCLR */
 
-    NVIC_SetVector(RTC_WKUP_IRQn, (uint32_t)_RTC_IRQHandler);
+    NVIC_SetVector(RTC_WAKEUP_IRQn, (uint32_t)_RTC_IRQHandler);
     irq_handler = (void (*)(void))lp_ticker_irq_handler;
-    NVIC_EnableIRQ(RTC_WKUP_IRQn);
+    NVIC_EnableIRQ(RTC_WAKEUP_IRQn);
     core_util_critical_section_exit();
 }
 
 void rtc_fire_interrupt(void)
 {
     lp_Fired = 1;
-    NVIC_SetVector(RTC_WKUP_IRQn, (uint32_t)_RTC_IRQHandler);
+    NVIC_SetVector(RTC_WAKEUP_IRQn, (uint32_t)_RTC_IRQHandler);
     irq_handler = (void (*)(void))lp_ticker_irq_handler;
-    NVIC_SetPendingIRQ(RTC_WKUP_IRQn);
-    NVIC_EnableIRQ(RTC_WKUP_IRQn);
+    NVIC_SetPendingIRQ(RTC_WAKEUP_IRQn);
+    NVIC_EnableIRQ(RTC_WAKEUP_IRQn);
 }
 
 void rtc_deactivate_wake_up_timer(void)
 {
     RtcHandle.Instance = RTC;
     HAL_RTCEx_DeactivateWakeUpTimer(&RtcHandle);
-    NVIC_DisableIRQ(RTC_WKUP_IRQn);
+    NVIC_DisableIRQ(RTC_WAKEUP_IRQn);
 }
 
 #endif /* DEVICE_LPTICKER && !MBED_CONF_TARGET_LPTICKER_LPTIM */
