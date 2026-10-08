@@ -18,18 +18,14 @@
 #define _NXP_US_TICKER_DEFINES_H_
 
 #include "fsl_pit.h"
+#include "pit_us_ticker_device.h"
 
 #define US_TICKER_PERIOD_NUM    1
 #define US_TICKER_PERIOD_DEN    1
 
 #define US_TICKER_MASK          0xFFFFFFFF
 
-#if defined(PIT1) && !defined(PIT)
-#define PIT PIT1
-#define PIT_IRQn PIT1_IRQn
-#endif
-
 /* Macro-optimised form of us_ticker_read */
-#define us_ticker_read() (~(PIT_GetCurrentTimerCount(PIT, kPIT_Chnl_1)))
+#define us_ticker_read() (~(PIT_GetCurrentTimerCount(US_TICKER_PIT_INSTANCE, kPIT_Chnl_1)))
 
 #endif /* _NXP_US_TICKER_DEFINES_H_ */
