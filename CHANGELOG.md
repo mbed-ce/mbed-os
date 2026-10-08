@@ -15,6 +15,7 @@ A message that notes the main changes in the update.
 ### Added
 
 ### Changed
+- `K64F` target renamed to `FRDM_K64F` for parity with other Kinetis boards
   
 ### Deprecated
 
