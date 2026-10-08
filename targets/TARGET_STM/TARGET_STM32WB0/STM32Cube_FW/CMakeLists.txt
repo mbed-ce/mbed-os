@@ -7,7 +7,7 @@ mbed_setup_submodule(stm32wb0x-hal-driver CHECK_FILE Src/stm32wb0x_hal.c IF_LABE
 add_library(mbed-stm32wb0cube-fw INTERFACE)
 
 target_sources(mbed-stm32wb0cube-fw INTERFACE
-    cmsis-device-wb0/Source/Templates/system_stm32wb0x.c
+    system_stm32wb0x.c
     stm32wb0x-hal-driver/Src/stm32wb0x_hal.c
     stm32wb0x-hal-driver/Src/stm32wb0x_hal_cortex.c
     stm32wb0x-hal-driver/Src/stm32wb0x_hal_dma.c

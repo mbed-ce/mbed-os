@@ -55,7 +55,9 @@ static void LSEDriveConfig(void)
         rcc_pwr_clk_enable_changed = true;
     }
 #endif
+#if !TARGET_STM32WB0
     HAL_PWR_EnableBkUpAccess();
+#endif
 
 #if defined(__HAL_RCC_LSEDRIVE_CONFIG)
     __HAL_RCC_LSEDRIVE_CONFIG(LSE_DRIVE_LOAD_LEVEL);

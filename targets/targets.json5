@@ -4682,8 +4682,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_STM32WB09xE"
         ],
         "overrides": {
-            "clock-source": "USE_RC64MPLL|USE_HSI",
-            "lse-available": 1
+            "clock-source": "USE_RC64MPLL",
+            "lse-available": 1,
+            "lsc-boot-startup": 1
         },
         "image_url": "https://www.st.com/en/evaluation-tools/nucleo-wb09ke.html"
     },
