@@ -19,7 +19,7 @@
 #define MBED_PERIPHERALPINS_H
 
 #include "pinmap.h"
-#include "../../TARGET_KL4x/PeripheralNames.h"
+#include "PeripheralNames.h"
 
 /************RTC***************/
 extern const PinMap PinMap_RTC[];
