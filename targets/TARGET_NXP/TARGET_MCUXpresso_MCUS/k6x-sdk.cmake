@@ -75,6 +75,7 @@ target_include_directories(mbed-mcu-k6x
         mbed-mcux-sdk/drivers/port
         mbed-mcux-sdk/drivers/lptmr
         mbed-mcux-sdk/drivers/dac
+        mbed-mcux-sdk/drivers/
 )
 
 # K66F has a few extra peripherals
@@ -108,6 +109,12 @@ target_sources(mbed-mcu-k6x
         mbed-hal-drivers/rtc-via-RTC/rtc_api.c
         mbed-hal-drivers/analogout-via-DAC/analogout_api.c
         mbed-hal-drivers/sleep-via-SMC/sleep.c
+        mbed-hal-drivers/reset-reason-via-RCM/reset_reason.c
+        mbed-hal-drivers/trng-via-RNGA/trng_api.c
+        mbed-hal-drivers/watchdog-via-WDOG/watchdog_api.c
+        mbed-hal-drivers/pinmode-via-PORT/pinmap.c
+        mbed-hal-drivers/spi-via-DSPI/spi_api.c
+        mbed-hal-drivers/crc-via-CRC/mbed_crc_api.c
 )
 
 # Link appropriate headers and startup files

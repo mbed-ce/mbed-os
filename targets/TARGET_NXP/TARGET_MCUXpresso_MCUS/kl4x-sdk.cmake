@@ -89,7 +89,8 @@ target_sources(mbed-mcu-kl4x
         mbed-hal-drivers/flash-via-FLASH/flash_api.c
         mbed-hal-drivers/usb-via-kinetis-USB0/USBPhy_Kinetis.cpp
         mbed-hal-drivers/rtc-via-RTC/rtc_api.c
-        mbed-hal-drivers/pwmout-via-TPM/pwmout_api.c
+        mbed-hal-drivers/pwmout-via-FTM/pwmout_api.c
+        mbed-hal-drivers/crc-via-CRC/mbed_crc_api.c
 )
 
 # Link appropriate headers and startup files
