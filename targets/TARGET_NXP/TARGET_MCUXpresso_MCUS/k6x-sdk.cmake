@@ -45,6 +45,7 @@ target_sources(mbed-mcu-k6x INTERFACE
         mbed-mcux-sdk/drivers/rtc/fsl_rtc.c
         mbed-mcux-sdk/drivers/lptmr/fsl_lptmr.c
         mbed-mcux-sdk/drivers/dac/fsl_dac.c
+        mbed-mcux-sdk/drivers/crc/fsl_crc.c
 )
 
 target_include_directories(mbed-mcu-k6x
@@ -75,7 +76,7 @@ target_include_directories(mbed-mcu-k6x
         mbed-mcux-sdk/drivers/port
         mbed-mcux-sdk/drivers/lptmr
         mbed-mcux-sdk/drivers/dac
-        mbed-mcux-sdk/drivers/
+        mbed-mcux-sdk/drivers/crc
 )
 
 # K66F has a few extra peripherals
