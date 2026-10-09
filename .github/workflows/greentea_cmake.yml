@@ -26,13 +26,17 @@ jobs:
             profile: full
           - target: MIMXRT1170_EVK
             profile: full
-
-          # Freescale MCUs
-          - target: K64F
+          - target: FRDM_K64F
             profile: full
-          - target: KL43Z
+          - target: FRDM_KL43Z
             profile: full
           - target: KW41Z
+            profile: full
+
+          # Freescale MCUs
+          - target: KL25Z
+            profile: baremetal
+          - target: KL46Z
             profile: full
 
           # STM32 MCUs

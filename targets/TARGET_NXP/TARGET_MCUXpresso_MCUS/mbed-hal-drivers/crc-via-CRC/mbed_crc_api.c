@@ -16,7 +16,7 @@
  */
 #include "crc_api.h"
 
-#include "drivers/fsl_crc.h"
+#include "fsl_crc.h"
 #include "platform/mbed_assert.h"
 
 #if DEVICE_CRC
