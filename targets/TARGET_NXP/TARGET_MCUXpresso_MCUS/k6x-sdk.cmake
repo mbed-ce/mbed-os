@@ -108,6 +108,7 @@ target_sources(mbed-mcu-k6x
         mbed-hal-drivers/port-via-PORT/port_api.c
         mbed-hal-drivers/qspi-via-QSPI/qspi_api.c
         mbed-hal-drivers/rtc-via-RTC/rtc_api.c
+        mbed-hal-drivers/analogin-via-ADC16/analogin_api.c
         mbed-hal-drivers/analogout-via-DAC/analogout_api.c
         mbed-hal-drivers/sleep-via-SMC/sleep.c
         mbed-hal-drivers/reset-reason-via-RCM/reset_reason.c
@@ -116,6 +117,10 @@ target_sources(mbed-mcu-k6x
         mbed-hal-drivers/pinmode-via-PORT/pinmap.c
         mbed-hal-drivers/spi-via-DSPI/spi_api.c
         mbed-hal-drivers/crc-via-CRC/mbed_crc_api.c
+        mbed-hal-drivers/mac-address-via-SIM/mbed_mac_address.cpp
+        mbed-hal-drivers/usb-via-kinetis-USB0/USBPhy_Kinetis.cpp
+        mbed-hal-drivers/pwmout-via-FTM/pwmout_api.c
+        mbed-hal-drivers/dma-via-DMAMUX/dma_api.c
 )
 
 # Link appropriate headers and startup files
