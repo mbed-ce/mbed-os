@@ -192,12 +192,21 @@ __isr_vector:
     .long   PWM4_2_IRQHandler                               /* PWM4 capture 2, compare 2, or reload 0 interrupt*/
     .long   PWM4_3_IRQHandler                               /* PWM4 capture 3, compare 3, or reload 0 interrupt*/
     .long   PWM4_FAULT_IRQHandler                           /* PWM4 fault or reload error interrupt*/
+#if TARGET_MIMXRT1060
     .long   ENET2_IRQHandler                                /* ENET2 interrupt*/
     .long   ENET2_1588_Timer_IRQHandler                     /* ENET2_1588_Timer interrupt*/
     .long   CAN3_IRQHandler                                 /* CAN3 interrupt*/
     .long   Reserved171_IRQHandler                          /* Reserved interrupt*/
     .long   FLEXIO3_IRQHandler                              /* FLEXIO3 interrupt*/
     .long   GPIO6_7_8_9_IRQHandler                          /* GPIO6, GPIO7, GPIO8, GPIO9 interrupt*/
+#else
+    .long   DefaultISR                                      /* 168*/
+    .long   DefaultISR                                      /* 169*/
+    .long   DefaultISR                                      /* 170*/
+    .long   DefaultISR                                      /* 171*/
+    .long   DefaultISR                                      /* 172*/
+    .long   DefaultISR                                      /* 173*/
+#endif
     .long   DefaultISR                                      /* 174*/
     .long   DefaultISR                                      /* 175*/
     .long   DefaultISR                                      /* 176*/
@@ -906,6 +915,7 @@ ENET_1588_Timer_IRQHandler:
     .thumb_func
     .weak ENET2_IRQHandler
     .type ENET2_IRQHandler, %function
+#if TARGET_MIMXRT1060
 ENET2_IRQHandler:
     ldr   r0,=ENET2_DriverIRQHandler
     bx    r0
@@ -937,7 +947,7 @@ FLEXIO3_IRQHandler:
     ldr   r0,=FLEXIO3_DriverIRQHandler
     bx    r0
     .size FLEXIO3_IRQHandler, . - FLEXIO3_IRQHandler
-
+#endif
 
 /*    Macro to define default handlers. Default handler
  *    will be weak symbol and just dead loops. They can be

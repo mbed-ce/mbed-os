@@ -34,9 +34,6 @@ AT_QUICKACCESS_SECTION_CODE(status_t flexspi_nor_flash_erase_sector_ram(uint32_t
 AT_QUICKACCESS_SECTION_CODE(status_t flexspi_nor_flash_page_program_ram(uint32_t address,
                                                                         const uint32_t *src,
                                                                         uint32_t size));
-AT_QUICKACCESS_SECTION_CODE(void flexspi_nor_flash_read_data_ram(uint32_t addr,
-                                                                 uint32_t *buffer,
-                                                                 uint32_t size));
 AT_QUICKACCESS_SECTION_CODE(void *flexspi_memset(void *buf, int c, size_t n));
 /**
  * @brief Set bytes in memory. If put this code in SRAM, Make sure this code
@@ -331,59 +328,7 @@ status_t flexspi_nor_flash_page_program_ram(uint32_t address, const uint32_t *sr
 }
 
 #else
-AT_QUICKACCESS_SECTION_CODE(status_t flexspi_nor_enable_quad_mode_ram(void));
 AT_QUICKACCESS_SECTION_CODE(status_t flexspi_nor_read_status_register_ram(uint32_t * result));
-
-/*
- * Check if quad SPI mode is enabled and, if not, enable it.
- *
- * Note that I'm not totally sure if this function is needed because I don't think
- * that the application could boot without quad mode enabled, but this might be
- * useful for programming non-boot-device flashes at a later date.
- * Or, if you must run the application on a flash which does not have quad mode enabled,
- * you could temporarily change the boot header read command to use 1-pad read,
- * then rely on this function to update the setting.
- */
-status_t flexspi_nor_enable_quad_mode_ram(void)
-{
-    uint32_t readResult = 0;
-    status_t status = flexspi_nor_read_status_register_ram(&readResult);
-    if (status != kStatus_Success) {
-        return status;
-    }
-
-    if(readResult & (1 << FLASH_QE_STATUS_OFFSET)) {
-        // QSPI mode already enabled, don't need to do anything
-        return kStatus_Success;
-    }
-
-    /* Write enable */
-    status = flexspi_nor_write_enable_ram(0);
-
-    if (status != kStatus_Success) {
-        return status;
-    }
-
-    /* Enable quad mode. */
-    flexspi_transfer_t flashXfer = {};
-    uint32_t writeValue = (1 << FLASH_QE_STATUS_OFFSET);
-    flashXfer.deviceAddress = 0;
-    flashXfer.port          = kFLEXSPI_PortA1;
-    flashXfer.cmdType       = kFLEXSPI_Write;
-    flashXfer.SeqNumber     = 1;
-    flashXfer.seqIndex      = NOR_CMD_LUT_SEQ_IDX_WRITESTATUSREG;
-    flashXfer.data          = &writeValue;
-    flashXfer.dataSize      = 1;
-
-    status = FLEXSPI_TransferBlocking(FLEXSPI, &flashXfer);
-    if (status != kStatus_Success) {
-        return status;
-    }
-
-    status = flexspi_nor_wait_bus_busy_ram();
-
-    return status;
-}
 
 void flexspi_update_lut_ram(void)
 {
@@ -420,8 +365,6 @@ void flexspi_update_lut_ram(void)
     /* Wait for bus idle. */
     while (!FLEXSPI_GetBusIdleStatus(FLEXSPI)) {
     }
-
-    flexspi_nor_enable_quad_mode_ram();
 
     // Just in case any bad data got into the I-cache while we were reconfiguring
     // the flash, wipe it.
@@ -576,11 +519,6 @@ status_t flexspi_nor_flash_page_program_ram(uint32_t address, const uint32_t *sr
 }
 
 #endif
-void flexspi_nor_flash_read_data_ram(uint32_t addr, uint32_t *buffer, uint32_t size)
-{
-    memcpy(buffer, (void *)addr, size);
-}
-
 void flexspi_flash_setup(void)
 {
     core_util_critical_section_enter();
@@ -636,13 +574,6 @@ int32_t flash_program_page(flash_t *obj, uint32_t address, const uint8_t *data, 
     core_util_critical_section_exit();
 
     return ret;
-}
-
-int32_t flash_read(flash_t *obj, uint32_t address, uint8_t *data, uint32_t size)
-{
-    flexspi_nor_flash_read_data_ram(address, (uint32_t *)data, size);
-
-    return 0;
 }
 
 int32_t flash_free(flash_t *obj)
