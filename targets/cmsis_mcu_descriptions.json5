@@ -3042,7 +3042,7 @@
             "version": "11.0.0"
         },
         "memories": {
-            "PROGRAM_FLASH": {
+            "IROM1": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -3053,11 +3053,11 @@
                     "write": false
                 },
                 "default": true,
-                "size": 524288,
+                "size": 0x80000,
                 "start": 0,
                 "startup": true
             },
-            "SRAM_LOWER": {
+            "SRAM_L": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3068,11 +3068,11 @@
                     "write": true
                 },
                 "default": false,
-                "size": 65536,
-                "start": 536805376,
+                "size": 0x10000,
+                "start": 0x1FFF0000,
                 "startup": false
             },
-            "SRAM_UPPER": {
+            "SRAM_U": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3083,8 +3083,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 65536,
-                "start": 536870912,
+                "size": 0x10000,
+                "start": 0x20000000,
                 "startup": false
             }
         },
@@ -3212,7 +3212,7 @@
             "version": "1.5.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM_U": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3223,11 +3223,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 196608,
-                "start": 536870912,
+                "size": 0x30000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IRAM2": {
+            "SRAM_L": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3238,8 +3238,8 @@
                     "write": true
                 },
                 "default": false,
-                "size": 65536,
-                "start": 536805376,
+                "size": 0x10000,
+                "start": 0x1FFF0000,
                 "startup": false
             },
             "IROM1": {
@@ -3295,7 +3295,7 @@
             "version": "1.1.1"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM_U": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3306,11 +3306,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 196608,
-                "start": 536870912,
+                "size": 0x30000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IRAM2": {
+            "SRAM_L": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3321,8 +3321,8 @@
                     "write": true
                 },
                 "default": false,
-                "size": 65536,
-                "start": 536805376,
+                "size": 0x10000,
+                "start": 0x1FFF0000,
                 "startup": false
             },
             "IROM1": {
