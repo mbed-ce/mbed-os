@@ -13,10 +13,13 @@ UNRELEASED CHANGES - add all changes committed to Mbed here pending the next rel
 A message that notes the main changes in the update.
 
 ### Added
+- K66F-based targets (`FRDM_K66F`) gained support for DMA SPI transfers
 
 ### Changed
+- Several targets renamed for parity with other Kinetis boards and overall consistency:
+  - `K64F` -&gt; `FRDM_K64F`
+  - `K66F` -&gt; `FRDM_K66F`
 - Mbed now requires a Python version from 3.10 through 3.14 to compile. Python 3.8 and 3.9 are no longer supported.
-- `K64F` target renamed to `FRDM_K64F` for parity with other Kinetis boards
   
 ### Deprecated
 
