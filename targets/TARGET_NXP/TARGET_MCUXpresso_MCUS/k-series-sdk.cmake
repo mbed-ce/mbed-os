@@ -1,19 +1,29 @@
-add_library(mbed-mcu-k6x INTERFACE)
+# Top-level target
+add_library(mbed-mcu-kinetis-k-series INTERFACE)
+
+# MCU targets
+add_library(mbed-mcu-k22f INTERFACE)
+target_link_libraries(mbed-mcu-k22f INTERFACE mbed-mcu-kinetis-k-series)
 add_library(mbed-mcu-k64f INTERFACE)
-target_link_libraries(mbed-mcu-k64f INTERFACE mbed-mcu-k6x)
+target_link_libraries(mbed-mcu-k64f INTERFACE mbed-mcu-kinetis-k-series)
 add_library(mbed-mcu-k66f INTERFACE)
-target_link_libraries(mbed-mcu-k66f INTERFACE mbed-mcu-k6x)
+target_link_libraries(mbed-mcu-k66f INTERFACE mbed-mcu-kinetis-k-series)
+add_library(mbed-mcu-k82f INTERFACE)
+target_link_libraries(mbed-mcu-k22f INTERFACE mbed-mcu-kinetis-k-series)
+
+# Board targets
 add_library(mbed-hexiwear INTERFACE)
 target_link_libraries(mbed-hexiwear INTERFACE mbed-mcu-k64f)
 add_library(mbed-sdt64b INTERFACE)
 target_link_libraries(mbed-sdt64b INTERFACE mbed-mcu-k64f)
-add_library(mbed-frdm-k64f INTERFACE)
-target_link_libraries(mbed-frdm-k64f INTERFACE mbed-mcu-k64f)
+
 add_library(mbed-frdm-k66f INTERFACE)
 target_link_libraries(mbed-frdm-k66f INTERFACE mbed-mcu-k66f)
+add_library(mbed-frdm-k22f INTERFACE)
+target_link_libraries(mbed-frdm-k22f INTERFACE mbed-mcu-k22f)
 
-# Link appropriate SDK drivers for K6x
-target_sources(mbed-mcu-k6x INTERFACE
+# Link common K series SDK drivers
+target_sources(mbed-mcu-kinetis-k-series INTERFACE
         mbed-mcux-sdk/drivers/common/fsl_common.c
         mbed-mcux-sdk/drivers/common/fsl_common_arm.c
         mbed-mcux-sdk/drivers/adc16/fsl_adc16.c
@@ -46,9 +56,10 @@ target_sources(mbed-mcu-k6x INTERFACE
         mbed-mcux-sdk/drivers/lptmr/fsl_lptmr.c
         mbed-mcux-sdk/drivers/dac/fsl_dac.c
         mbed-mcux-sdk/drivers/crc/fsl_crc.c
+        mbed-mcux-sdk/drivers/sai/fsl_sai.c
 )
 
-target_include_directories(mbed-mcu-k6x
+target_include_directories(mbed-mcu-kinetis-k-series
     INTERFACE
         mbed-mcux-sdk/drivers/common
         mbed-mcux-sdk/drivers/adc16
@@ -77,26 +88,29 @@ target_include_directories(mbed-mcu-k6x
         mbed-mcux-sdk/drivers/lptmr
         mbed-mcux-sdk/drivers/dac
         mbed-mcux-sdk/drivers/crc
+        mbed-mcux-sdk/drivers/sai
 )
 
-# K66F has a few extra peripherals
-target_sources(mbed-mcu-k66f
-    INTERFACE
-        mbed-mcux-sdk/drivers/lpuart/fsl_lpuart.c
-        mbed-mcux-sdk/drivers/lpuart/fsl_lpuart_edma.c
-)
-target_include_directories(mbed-mcu-k66f
-    INTERFACE
-        mbed-mcux-sdk/drivers/lpuart
-)
+# Everything *except* K64F has LPUART
+foreach(TARGET mbed-mcu-k22f mbed-mcu-k66f mbed-mcu-k82f)
+    target_sources(${TARGET}
+        INTERFACE
+            mbed-mcux-sdk/drivers/lpuart/fsl_lpuart.c
+            mbed-mcux-sdk/drivers/lpuart/fsl_lpuart_edma.c
+    )
+    target_include_directories(mbed-mcu-k66f
+        INTERFACE
+            mbed-mcux-sdk/drivers/lpuart
+    )
+endforeach()
 
-# Link appropriate Mbed OS HALs that interface with this MCU
-target_include_directories(mbed-mcu-k6x
+# Link appropriate Mbed OS HALs
+target_include_directories(mbed-mcu-kinetis-k-series
     INTERFACE
         mbed-hal-drivers/kinetis-common-headers
         mbed-hal-drivers/us-ticker-via-PIT
 )
-target_sources(mbed-mcu-k6x
+target_sources(mbed-mcu-kinetis-k-series
     INTERFACE
         mbed-hal-drivers/us-ticker-via-PIT/us_ticker.c
         mbed-hal-drivers/i2c-via-I2C/i2c_api.c
@@ -124,8 +138,17 @@ target_sources(mbed-mcu-k6x
 )
 
 # Link appropriate headers and startup files
+target_compile_definitions(mbed-mcu-kinetis-k-series INTERFACE __PERFORMANCE_IMPLEMENTATION) # for startup ASM
 
-target_compile_definitions(mbed-mcu-k6x INTERFACE __PERFORMANCE_IMPLEMENTATION) # for startup ASM
+target_sources(mbed-mcu-k22f INTERFACE
+        mbed-mcux-sdk/devices/kinetis/MK22F51212/system_MK22F51212.c
+        mbed-mcux-sdk/devices/kinetis/MK22F51212/drivers/fsl_clock.c
+        mbed-mcux-sdk/devices/kinetis/MK22F51212/gcc/startup_MK22F51212.S
+)
+target_include_directories(mbed-mcu-k22f INTERFACE
+        mbed-mcux-sdk/devices/kinetis/MK22F51212/
+        mbed-mcux-sdk/devices/kinetis/MK22F51212/drivers
+)
 
 target_sources(mbed-mcu-k64f INTERFACE
         mbed-mcux-sdk/devices/kinetis/MK64F12/system_MK64F12.c
