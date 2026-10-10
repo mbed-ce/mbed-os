@@ -40,37 +40,6 @@
  */
 
 #include <stdint.h>
-#include <mimxrt_memory_info.h>
-
-extern void Reset_Handler(void);
-extern unsigned long _estack;
-extern unsigned long __USED_FLASH_SIZE;
-
-
-
-__attribute__ ((section(".boot_hdr.boot_data"), used))
-const uint32_t BootData[3] = {
-	0x60000000,
-	(uint32_t)&__USED_FLASH_SIZE,
-	0
-};
-
-
-__attribute__ ((section(".csf"), used))
-const uint32_t hab_csf[768];	// placeholder for HAB signature
-
-
-__attribute__ ((section(".boot_hdr.ivt"), used))
-const uint32_t ImageVectorTable[8] = {
-	0x432000D1,		// header
-	(uint32_t)&Reset_Handler,// program entry
-	0,			// reserved
-	0,			// dcd
-	(uint32_t)BootData,	// abs address of boot data
-	(uint32_t)ImageVectorTable, // self
-	(uint32_t)hab_csf,	// command sequence file
-	0			// reserved
-};
 
 __attribute__ ((section(".boot_hdr.conf"), used))
 uint32_t FlexSPI_NOR_Config[128] = {
@@ -122,11 +91,19 @@ uint32_t FlexSPI_NOR_Config[128] = {
 	0,			// dataValidTime
 	0x00000000,		// busyBitPolarity,busyOffset
 
+	// Read sequence.
+	// 0 - Send command 0xEB via SDR SPI (Fast Read Quad I/O)
+	// 1 - Send 24-bit row address via SDR QSPI
+	// 2 - Send 6 dummy cycles (datasheet says this should be 4, bit confused here but not changing it)
+	// 3 - Read data via SDR QSPI
 	0x0A1804EB,		// lookupTable[0]		0x80
 	0x26043206,		// lookupTable[1]
 	0,			// lookupTable[2]
 	0,			// lookupTable[3]
 
+	// Read Status Register sequence.
+	// 0 - Send command 0x05 via SDR SPI (Read Status Register 1)
+	// 1 - Read data via SDR SPI
 	0x24040405,		// lookupTable[4]		0x90
 	0,			// lookupTable[5]
 	0,			// lookupTable[6]
@@ -137,6 +114,8 @@ uint32_t FlexSPI_NOR_Config[128] = {
 	0,			// lookupTable[10]
 	0,			// lookupTable[11]
 
+	// Write Enable sequence
+	// 0 - Send command 0x06 via SDR SPI (Write Enable)
 	0x00000406,		// lookupTable[12]		0xB0
 	0,			// lookupTable[13]
 	0,			// lookupTable[14]
@@ -147,6 +126,9 @@ uint32_t FlexSPI_NOR_Config[128] = {
 	0,			// lookupTable[18]
 	0,			// lookupTable[19]
 
+	// Sector Erase sequence
+	// 0 - Send command 0x20 via SDR SPI (Sector Erase)
+	// 1 - Send 24-bit address via SDR SPI
 	0x08180420,		// lookupTable[20]		0xD0
 	0,			// lookupTable[21]
 	0,			// lookupTable[22]
@@ -162,11 +144,18 @@ uint32_t FlexSPI_NOR_Config[128] = {
 	0,			// lookupTable[30]
 	0,			// lookupTable[31]
 
+	// Block Erase sequence
+	// 0 - Send command 0xD8 via SDR SPI (64kB Block Erase)
+	// 1 - Send 24-bit address via SDR SPI
 	0x081804D8,		// lookupTable[32]		0x100
 	0,			// lookupTable[33]
 	0,			// lookupTable[34]
 	0,			// lookupTable[35]
 
+	// Page Program sequence
+	// 0 - Send command 0x02 via SDR SPI (Page Program)
+	// 1 - Send 24-bit address via SDR SPI
+	// 2 - Send write data via SDR SPI
 	0x08180402,		// lookupTable[36]		0x110
 	0x00002004,		// lookupTable[37]
 	0,			// lookupTable[38]
@@ -177,6 +166,8 @@ uint32_t FlexSPI_NOR_Config[128] = {
 	0,			// lookupTable[42]
 	0,			// lookupTable[43]
 
+	// Chip Erase sequence
+	// 0 - Send command 0x60 via SDR SPI (Chip Erase)
 	0x00000460,		// lookupTable[44]		0x130
 	0,			// lookupTable[45]
 	0,			// lookupTable[46]
