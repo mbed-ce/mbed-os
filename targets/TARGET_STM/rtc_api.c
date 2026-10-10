@@ -36,6 +36,20 @@
 #include "mbed_critical.h"
 #include "low_speed_clock.h"
 
+#if MBED_CONF_TARGET_LSE_AVAILABLE
+#if TARGET_STM32WB0
+#define RTC_LS_CLOCK_SOURCE RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSE
+#else
+#define RTC_LS_CLOCK_SOURCE RCC_RTCCLKSOURCE_LSE
+#endif // TARGET_STM32WB0
+#else
+#if TARGET_STM32WB0
+#define RTC_LS_CLOCK_SOURCE RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSI
+#else
+#define RTC_LS_CLOCK_SOURCE RCC_RTCCLKSOURCE_LSI
+#endif // TARGET_STM32WB0
+#endif // MBED_CONF_TARGET_LSE_AVAILABLE
+
 #if DEVICE_LPTICKER && !MBED_CONF_TARGET_LPTICKER_LPTIM
 volatile uint32_t LPTICKER_counter = 0;
 volatile uint32_t LPTICKER_RTC_time = 0;
@@ -47,37 +61,6 @@ static RTC_HandleTypeDef RtcHandle;
 
 void rtc_init(void)
 {
-#if TARGET_STM32WB0
-    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-
-    if (RTC_inited) {
-        return;
-    }
-    RTC_inited = 1;
-
-#if (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_LSE_OR_LSI) && MBED_CONF_TARGET_LSE_AVAILABLE
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
-    RCC_OscInitStruct.LSEState = RCC_LSE_ON;
-#if MBED_CONF_TARGET_LSE_BYPASS
-    RCC_OscInitStruct.OscillatorType |= RCC_OSCILLATORTYPE_LSE_BYPASS;
-    RCC_OscInitStruct.LSEBYPASSState = RCC_LSE_BYPASS_ON;
-#else
-    RCC_OscInitStruct.LSEBYPASSState = RCC_LSE_BYPASS_OFF;
-#endif
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        error("Cannot initialize RTC with LSE\n");
-    }
-    __HAL_RCC_RTC_WDG_BLEWKUP_CLK_CONFIG(RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSE);
-#else
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI;
-    RCC_OscInitStruct.LSIState = RCC_LSI_ON;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        error("Cannot initialize RTC with LSI\n");
-    }
-    __HAL_RCC_RTC_WDG_BLEWKUP_CLK_CONFIG(RCC_RTC_WDG_BLEWKUP_CLKSOURCE_LSI);
-#endif
-    __HAL_RCC_RTC_CLK_ENABLE();
-#else
     RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
     if (RTC_inited) {
@@ -89,38 +72,49 @@ void rtc_init(void)
 #if defined(__HAL_RCC_PWR_CLK_ENABLE)
             __HAL_RCC_PWR_CLK_ENABLE();
 #endif
+#ifndef STM32WB0
     HAL_PWR_EnableBkUpAccess();
+#endif
     
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
     while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID));
 #endif /* DUAL_CORE */
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
 #if (MBED_CONF_TARGET_RTC_CLOCK_SOURCE == USE_RTC_CLK_HSE)
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
     // only F1-7 families have HSE as RTC clock source
 #if defined(RCC_RTCCLKSOURCE_HSE_DIVX)
     PeriphClkInitStruct.RTCClockSelection = (RCC_RTCCLKSOURCE_HSE_DIVX | RTC_HSE_DIV << 16);
 #else
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_HSE_DIV128;
-#endif
+#endif // defined(RCC_RTCCLKSOURCE_HSE_DIVX)
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         error("PeriphClkInitStruct RTC failed with HSE\n");
     }
 #else // MBED_CONF_TARGET_RTC_CLOCK_SOURCE
+
+#if !MBED_CONF_TARGET_LSC_BOOT_STARTUP
     lsc_start();
-#if MBED_CONF_TARGET_LSE_AVAILABLE
-    __HAL_RCC_RTC_CONFIG(RCC_RTCCLKSOURCE_LSE);
-    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+#endif // !MBED_CONF_TARGET_LSC_BOOT_STARTUP
+
+#if TARGET_STM32WB0
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC_WDG_BLEWKUP;
+    PeriphClkInitStruct.RTCWDGBLEWKUPClockSelection = RTC_LS_CLOCK_SOURCE;
 #else
-    __HAL_RCC_RTC_CONFIG(RCC_RTCCLKSOURCE_LSI);
-    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
-#endif // MBED_CONF_TARGET_LSE_AVAILABLE
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+    PeriphClkInitStruct.RTCClockSelection = RTC_LS_CLOCK_SOURCE;
+#endif // TARGET_STM32WB0
+
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
         error("PeriphClkInitStruct RTC failed with Low Speed Clock\n");
     }
 #endif // MBED_CONF_TARGET_RTC_CLOCK_SOURCE
 
     // Enable RTC
+#if defined(__HAL_RCC_RTC_ENABLE)
     __HAL_RCC_RTC_ENABLE();
+#else
+    LL_RCC_EnableRTC();
+#endif
 
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
     LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
@@ -130,12 +124,17 @@ void rtc_init(void)
     __HAL_RCC_RTCAPB_CLK_ENABLE();
 #endif /* __HAL_RCC_RTCAPB_CLK_ENABLE */
 
-#endif /* TARGET_STM32WB0 */
 
     RtcHandle.Instance = RTC;
     RtcHandle.State = HAL_RTC_STATE_RESET;
-#if TARGET_STM32WB0
-    uint32_t calendar_initialized = __HAL_RTC_IS_CALENDAR_INITIALIZED(&RtcHandle);
+
+#if !TARGET_STM32F1
+    bool calendar_initialized =
+#if defined(RTC_ICSR_INITS)
+        (RTC->ICSR & RTC_ICSR_INITS) != 0;
+#else
+        (RTC->ISR & RTC_ISR_INITS) != 0;
+#endif
 #endif
 
 #if TARGET_STM32F1
@@ -169,8 +168,7 @@ void rtc_init(void)
     }
 #endif /* TARGET_STM32F1 || TARGET_STM32F2 */
 
-#if TARGET_STM32WB0
-    // The WB0 reset date precedes the epoch supported by Mbed's STM RTC mapping.
+#if !TARGET_STM32F1
     if (!calendar_initialized) {
         rtc_write(0);
     }

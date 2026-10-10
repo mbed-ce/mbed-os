@@ -100,6 +100,11 @@ void rtc_reset_test()
 int main()
 {
     rtc_reset_test();
+    while (true) {
+    // Do not let main return after the test. Otherwise, the idle thread may
+    // enter deep sleep, disabling SWD on some targets (STM32WB0) and preventing the test
+    // runner from continuing to next test.
+    }
 }
 
 #endif // !DEVICE_RTC

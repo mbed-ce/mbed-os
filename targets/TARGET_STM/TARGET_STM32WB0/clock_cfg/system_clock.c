@@ -39,24 +39,6 @@ uint8_t SetSysClock_DIRECT_HSE(void);
 uint8_t SetSysClock_HSI(void);
 #endif
 
-static void restore_rtc_clock(void)
-{
-    static uint8_t initial_clock_setup_done;
-
-    // The RTC calendar is retained across reset, but its clocking may not be.
-    // Later calls to SetSysClock restore the system clock after sleep and must
-    // not restart RTC clocking.
-    __HAL_RCC_RTC_CLK_ENABLE();
-    if (!initial_clock_setup_done && ((RTC->ISR & RTC_ISR_INITS) != 0U)) {
-        RCC_OscInitTypeDef rtc_clock = {0};
-        lsc_start();
-        if (HAL_RCC_OscConfig(&rtc_clock) != HAL_OK) {
-            error("RTC clock restore failed\n");
-        }
-    }
-    initial_clock_setup_done = 1U;
-}
-
 static void configure_smps_clock(void)
 {
     RCC_PeriphCLKInitTypeDef peripheral_clock = {0};
@@ -70,8 +52,6 @@ static void configure_smps_clock(void)
 
 void SetSysClock(void)
 {
-    restore_rtc_clock();
-
 #if ((CLOCK_SOURCE) & USE_RC64MPLL)
     // Prefer the 64 MHz HSE-assisted clock when an HSE crystal is fitted.
     if (SetSysClock_RC64MPLL() == 0U)

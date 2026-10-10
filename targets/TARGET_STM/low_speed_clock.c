@@ -114,9 +114,18 @@ static bool lsc_lse_is_enabled(void)
  */
 static bool lsc_start_lse(void)
 {
-    if (lsc_lse_is_enabled() && lsc_lse_is_ready()) {
+static bool lse_configured = false;
+#if TARGET_STM32WB0
+
+    if (lse_configured && lsc_lse_is_enabled() && lsc_lse_is_ready() &&
+            (LL_RCC_LSCO_GetSource() == LL_RCC_LSCO_CLKSOURCE_LSE)) {
+        return true; // Already configured during this boot
+    }
+#else
+    if (lse_configured && lsc_lse_is_enabled() && lsc_lse_is_ready()) {
         return true; // Already running
     }
+#endif
 
 #if defined(LSE_CONFIG_AVAILABLE)
     // LSE oscillator drive capability set before LSE is started
@@ -146,6 +155,7 @@ static bool lsc_start_lse(void)
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         return false;
     }
+    lse_configured = true;
     return true;
 }
 #else // MBED_CONF_TARGET_LSE_AVAILABLE
@@ -194,9 +204,18 @@ static bool lsc_lsi_is_enabled(void)
  */
 static bool lsc_start_lsi(void)
 {
-    if (lsc_lsi_is_enabled() && lsc_lsi_is_ready()) {
+    static bool lsi_configured = false;
+#if TARGET_STM32WB0
+
+    if (lsi_configured && lsc_lsi_is_enabled() && lsc_lsi_is_ready() &&
+            (LL_RCC_LSCO_GetSource() == LL_RCC_LSCO_CLKSOURCE_LSI)) {
+        return true; // Already configured during this boot
+    }
+#else
+    if (lsi_configured && lsc_lsi_is_enabled() && lsc_lsi_is_ready()) {
         return true; // Already running
     }
+#endif
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     /* Enable LSI clock */
 #if TARGET_STM32WB
@@ -212,6 +231,7 @@ static bool lsc_start_lsi(void)
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         return false;
     }
+    lsi_configured = true;
     return true;
 }
 #endif // MBED_CONF_TARGET_LSE_AVAILABLE

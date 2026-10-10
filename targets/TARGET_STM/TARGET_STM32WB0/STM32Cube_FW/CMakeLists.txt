@@ -18,7 +18,6 @@ target_sources(mbed-stm32wb0cube-fw INTERFACE
     stm32wb0x-hal-driver/Src/stm32wb0x_hal_pwr.c
     stm32wb0x-hal-driver/Src/stm32wb0x_hal_pwr_ex.c
     stm32wb0x-hal-driver/Src/stm32wb0x_hal_rcc.c
-    stm32wb0x-hal-driver/Src/stm32wb0x_hal_rcc_ex.c
     stm32wb0x-hal-driver/Src/stm32wb0x_hal_rtc.c
     stm32wb0x-hal-driver/Src/stm32wb0x_hal_rtc_ex.c
     stm32wb0x-hal-driver/Src/stm32wb0x_hal_tim.c
@@ -30,6 +29,7 @@ target_sources(mbed-stm32wb0cube-fw INTERFACE
     stm32wb0x-hal-driver/Src/stm32wb0x_ll_rcc.c
     stm32wb0x-hal-driver/Src/stm32wb0x_ll_system.c
     stm32wb0x-hal-driver/Src/stm32wb0x_ll_tim.c
+    Mbed_HAL_overrides/stm32wb0x_hal_rcc_ex.c
 )
 
 target_include_directories(mbed-stm32wb0cube-fw INTERFACE
