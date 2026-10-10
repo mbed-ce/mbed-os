@@ -11,10 +11,22 @@ target_sources(mbed-mcu-k64f
         TARGET_MCU_K64F/PeripheralPins.c
 )
 
+target_include_directories(mbed-mcu-k66f INTERFACE TARGET_MCU_K66F)
+target_sources(mbed-mcu-k66f
+    INTERFACE
+        TARGET_MCU_K66F/PeripheralPins.c
+)
+
 target_include_directories(mbed-frdm-k64f INTERFACE TARGET_FRDM_K64F)
 target_sources(mbed-frdm-k64f
     INTERFACE
         TARGET_FRDM_K64F/fsl_clock_config.c
+)
+
+target_include_directories(mbed-frdm-k66f INTERFACE TARGET_FRDM_K66F)
+target_sources(mbed-frdm-k66f
+    INTERFACE
+        TARGET_FRDM_K66F/fsl_clock_config.c
 )
 
 target_include_directories(mbed-hexiwear INTERFACE TARGET_HEXIWEAR)

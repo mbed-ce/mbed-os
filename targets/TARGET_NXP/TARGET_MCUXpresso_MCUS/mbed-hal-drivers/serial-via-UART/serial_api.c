@@ -193,11 +193,13 @@ void uart4_irq()
     uart_irq((status_flags & UART_S1_TDRE_MASK), (status_flags & UART_S1_RDRF_MASK), 4);
 }
 
+#ifdef UART5
 void uart5_irq()
 {
     uint32_t status_flags = UART5->S1;
     uart_irq((status_flags & UART_S1_TDRE_MASK), (status_flags & UART_S1_RDRF_MASK), 5);
 }
+#endif
 
 void serial_irq_handler(serial_t *obj, uart_irq_handler handler, uint32_t id)
 {
@@ -226,9 +228,11 @@ void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
         case 4:
             vector = (uint32_t)&uart4_irq;
             break;
+#ifdef UART5
         case 5:
             vector = (uint32_t)&uart5_irq;
             break;
+#endif
         default:
             break;
     }
@@ -823,9 +827,11 @@ static int serial_is_enabled(uint32_t uart_index)
         case 4:
             clock_enabled = (SIM->SCGC1 & SIM_SCGC1_UART4_MASK) >> SIM_SCGC1_UART4_SHIFT;
             break;
+#ifdef UART5
         case 5:
             clock_enabled = (SIM->SCGC1 & SIM_SCGC1_UART5_MASK) >> SIM_SCGC1_UART5_SHIFT;
             break;
+#endif
         default:
             break;
     }
