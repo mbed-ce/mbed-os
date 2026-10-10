@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: SDT64B */
+/* MBED TARGET LIST: FRDM_K66F */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H
@@ -25,9 +25,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* If this macro is defined, then constexpr utility functions for pin-map seach can be used. */
-#define STATIC_PINMAP_READY 1
 
 typedef enum {
     PIN_INPUT,
@@ -198,119 +195,54 @@ typedef enum {
     PTE30 = (4 << GPIO_PORT_SHIFT | 30),
     PTE31 = (4 << GPIO_PORT_SHIFT | 31),
 
+    // USB Pins
+    CONSOLE_TX = PTB17,
+    CONSOLE_RX = PTB16,
+
+    // Arduino Headers
+    ARDUINO_UNO_D0 = PTC3,
+    ARDUINO_UNO_D1 = PTC4,
+    ARDUINO_UNO_D2 = PTC16,
+    ARDUINO_UNO_D3 = PTC8,
+    ARDUINO_UNO_D4 = PTC12,
+    ARDUINO_UNO_D5 = PTC5,
+    ARDUINO_UNO_D6 = PTC2,
+    ARDUINO_UNO_D7 = PTA25,
+    ARDUINO_UNO_D8 = PTB18,
+    ARDUINO_UNO_D9 = PTB19,
+    ARDUINO_UNO_D10 = PTD0,
+    ARDUINO_UNO_D11 = PTD2,
+    ARDUINO_UNO_D12 = PTD3,
+    ARDUINO_UNO_D13 = PTD1,
+    ARDUINO_UNO_D14 = PTC11,
+    ARDUINO_UNO_D15 = PTC10,
+
+    ARDUINO_UNO_A0 = PTB7,
+    ARDUINO_UNO_A1 = PTB6,
+    ARDUINO_UNO_A2 = PTB5,
+    ARDUINO_UNO_A3 = PTB4,
+    ARDUINO_UNO_A4 = PTB3,
+    ARDUINO_UNO_A5 = PTB2,
+
     DAC0_OUT = 0xFEFE, /* DAC does not have Pin Name in RM */
-    NOT_CONNECTED = (int)0xFFFFFFFF,
-
-    // Analog
-    A0 = PTB6,
-    A1 = PTB7,
-    A2 = DAC0_OUT,
-    //A3 = DAC1_OUT,
-
-    // General Pin Input Output (GPIO)
-    GPIO0 = PTC1,
-    GPIO1 = PTC5,
-    GPIO2 = PTD6,
-    GPIO3 = PTC9,
-    GPIO4 = PTC3,
-    GPIO5 = PTC6,
-    GPIO6 = NOT_CONNECTED,
-
-    // Pulse Width Modulation (PWM)
-    PWM0 = GPIO2,
-    PWM1 = GPIO3,
-    PWM2 = GPIO0,
-    PWM3 = GPIO1,
-
-    // LEDs
-    LED0 = GPIO0,
-    LED1 = GPIO1,
-    LED2 = GPIO2,
-   
-    LED_RED   = LED0,
-    LED_GREEN = LED1,
-    LED_BLUE  = LED2,
-
-    // USB bridge and SWD UART connected UART pins
-    CONSOLE_TX = PTC15,
-    CONSOLE_RX = PTC14,
-
-    // UART pins
-    UART0_RX  = PTC16,
-    UART0_TX  = PTC17,
-    UART0_CTS = PTC19,
-    UART0_RTS = PTC18,
-
-    UART1_RX  = CONSOLE_RX,
-    UART1_TX  = CONSOLE_TX,
-    UART1_CTS = PTC13,
-    UART1_RTS = PTC12,
-
-    UART2_RX  = PTD8,
-    UART2_TX  = PTD9,
-    UART2_CTS = PTD11,
-    UART2_RTS = PTD10,
-
-    // I2C pins
-    I2C0_SCL = PTC10,
-    I2C0_SDA = PTC11,
-
-    I2C1_SCL = PTB2,
-    I2C1_SDA = PTB3,
-
-    I2C2_SCL = NOT_CONNECTED,
-    I2C2_SDA = NOT_CONNECTED,
-
-    // SPI pins
-    SPI0_SCK  = PTB11,
-    SPI0_MOSI = PTB16,
-    SPI0_MISO = PTB17,
-    SPI0_SS0  = PTB10,
-    SPI0_SS1  = PTB9,
-    SPI0_SS2  = PTB8,
-
-    SPI1_SCK  = PTB21,
-    SPI1_MOSI = PTB22,
-    SPI1_MISO = PTB23,
-    SPI1_SS0  = PTB20,
-    SPI1_SS1  = PTB19,
-    SPI1_SS2  = PTB18,
-
-    SPI2_SCK  = PTD1,
-    SPI2_MOSI = PTD2,
-    SPI2_MISO = PTD3,
-    SPI2_SS0  = PTD0,
-    SPI2_SS1  = PTD4,
-    SPI2_SS2  = PTD5,
-
-    SPI3_SCK  = NOT_CONNECTED,
-    SPI3_MOSI = NOT_CONNECTED,
-    SPI3_MISO = NOT_CONNECTED,
-    SPI3_SS0  = NOT_CONNECTED,
-    SPI3_SS1  = NOT_CONNECTED,
-    SPI3_SS2  = NOT_CONNECTED,
-
-    // SWD UART
-    SWD_TGT_TX  = UART1_TX,
-    SWD_TGT_RX  = UART1_RX,
-    SWD_TGT_CTS = UART1_CTS,
-    SWD_TGT_RTS = UART1_RTS,
-
-    // Generics
-    SERIAL_TX = UART0_TX,
-    SERIAL_RX = UART0_RX,
-    I2C_SCL = I2C0_SCL,
-    I2C_SDA = I2C0_SDA,
-    SPI_MOSI = SPI0_MOSI,
-    SPI_MISO = SPI0_MISO,
-    SPI_SCK = SPI0_SCK,
-    SPI_CS = SPI0_SS0,
-    PWM_OUT = PWM0,
 
     // Not connected
-    NC = NOT_CONNECTED
+    NC = (int)0xFFFFFFFF
 } PinName;
 
+// LEDs
+#define LED_RED   PTC9
+#define LED_GREEN PTE6
+#define LED_BLUE  PTA11
+
+// Standardized LED names
+#define LED1 LED_RED
+#define LED2 LED_GREEN
+#define LED3 LED_BLUE
+
+// Standardized button names
+#define BUTTON1 PTD11
+#define BUTTON2 PTA10
 
 typedef enum {
     PullNone = 0,

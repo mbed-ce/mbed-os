@@ -13,9 +13,12 @@ UNRELEASED CHANGES - add all changes committed to Mbed here pending the next rel
 A message that notes the main changes in the update.
 
 ### Added
+- K66F-based targets (`FRDM_K66F`) gained support for DMA SPI transfers
 
 ### Changed
-- `K64F` target renamed to `FRDM_K64F` for parity with other Kinetis boards
+- Several targets renamed for parity with other Kinetis boards and overall consistency:
+  - `K64F` -&gt; `FRDM_K64F`
+  - `K66F` -&gt; `FRDM_K66F`
   
 ### Deprecated
 

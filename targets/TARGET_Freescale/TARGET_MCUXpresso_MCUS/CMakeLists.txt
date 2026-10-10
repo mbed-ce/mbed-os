@@ -1,11 +1,9 @@
 # Copyright (c) 2020-2021 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-add_subdirectory(TARGET_K66F EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_K82F EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_KW41Z EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_MCU_K22F EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_MCU_K64F EXCLUDE_FROM_ALL)
 add_subdirectory(middleware/wireless/TARGET_FRAMEWORK_5_3_3 EXCLUDE_FROM_ALL)
 
 # We append freescale to the name as this should be unique but NXP/Freescale are in the tree covering
