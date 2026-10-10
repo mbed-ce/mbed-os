@@ -21,3 +21,4 @@ mbed_set_linker_script(mbed-mcu-mimxrt105x_6x ${CMAKE_CURRENT_SOURCE_DIR}/MIMXRT
 
 add_subdirectory(TARGET_MIMXRT1050_EVK)
 add_subdirectory(TARGET_MIMXRT1060_EVK)
+add_subdirectory(TARGET_TEENSY_4X)

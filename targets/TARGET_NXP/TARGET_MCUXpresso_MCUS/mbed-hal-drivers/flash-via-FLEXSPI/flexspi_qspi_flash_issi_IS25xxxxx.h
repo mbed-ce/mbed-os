@@ -32,14 +32,11 @@
 #define NOR_CMD_LUT_SEQ_IDX_ERASECHIP 5
 #define CUSTOM_LUT_LENGTH 60
 
-// Polarity of the BUSY bit in the status register -- 1 here means the flash is BUSY wheb
+// Polarity of the BUSY bit in the status register -- 1 here means the flash is busy when BUSY is set.
 #define FLASH_BUSY_STATUS_POL 1
 
 // Shift of the BUSY bit in the status register
 #define FLASH_BUSY_STATUS_OFFSET 0
-
-// Shift of the Quad Enable bit in the status register
-#define FLASH_QE_STATUS_OFFSET 6
 
 // Must not be const! Need this to get stored in RAM, not flash
 static uint32_t customLUT[CUSTOM_LUT_LENGTH] = {
@@ -111,7 +108,7 @@ static uint32_t customLUT[CUSTOM_LUT_LENGTH] = {
 };
 
 flexspi_device_config_t deviceconfig = {
-    .flexspiRootClk       = 120000000,
+    .flexspiRootClk       = 120000000, // set in FlexSPI configuration block in evkbmimxrt1060_flexspi_nor_config.c
     .flashSize            = (MBED_ROM_BANK_EXT_FLASH_SIZE/1024),
     .CSIntervalUnit       = kFLEXSPI_CsIntervalUnit1SckCycle,
     .CSInterval           = 0,
