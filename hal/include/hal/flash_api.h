@@ -67,7 +67,9 @@ int32_t flash_erase_sector(flash_t *obj, uint32_t address);
 
 /** Read data starting at defined address
  *
- * This function has a WEAK implementation using memcpy for backwards compatibility.
+ * This function has a WEAK implementation using memcpy for the case where the flash is memory-
+ * mapped and there is no downside to using memory-mapped access.
+ *
  * @param obj The flash object
  * @param address Address to begin reading from
  * @param data The buffer to read data into
