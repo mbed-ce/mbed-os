@@ -815,7 +815,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "value": "USE_RTC_CLK_LSE_OR_LSI"
             },
             "lpuart-clock-source": {
-                "help": "Define the LPUART clock source. LSE clock source will only be used when baudrate is slow (<= LSE freq / 3).  Mask values: USE_LPUART_CLK_LSE, USE_LPUART_CLK_PCLK1, USE_LPUART_CLK_PCLK3, USE_LPUART_CLK_HSI, USE_LPUART_CLK_SYSCLK.",
+                "help": "Define the LPUART clock source. LSE clock source will only be used when baudrate is slow (<= LSE freq / 3).  Mask values: USE_LPUART_CLK_LSE, USE_LPUART_CLK_PCLK1, USE_LPUART_CLK_PCLK3, USE_LPUART_CLK_HSI, USE_LPUART_CLK_SYSCLK, USE_LPUART_CLK_16M(STM32WB0 only).",
                 "value": "USE_LPUART_CLK_LSE|USE_LPUART_CLK_PCLK1|USE_LPUART_CLK_PCLK3|USE_LPUART_CLK_SYSCLK"
             },
             "stdio-uart-tx": {
@@ -4639,7 +4639,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "deep-sleep-latency": 6,
             // WB0 flash starts at 0x10040000, above Mbed's default MPU ROM boundary.
-            "mpu-rom-end": "0x1fffffff"
+            "mpu-rom-end": "0x1fffffff",
+            "lpuart-clock-source": "USE_LPUART_CLK_LSE|USE_LPUART_CLK_16M"
         },
         "extra_labels_add": [
             "STM32WB0"

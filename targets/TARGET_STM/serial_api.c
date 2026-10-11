@@ -40,6 +40,7 @@
 #define USE_LPUART_CLK_HSI    0x04
 #define USE_LPUART_CLK_PCLK3  0x08
 #define USE_LPUART_CLK_SYSCLK 0x10
+#define USE_LPUART_CLK_16M    0x20 // STM32WB0
 
 int stdio_uart_inited = 0; // used in platform/mbed_board.c and platform/mbed_retarget.cpp
 serial_t stdio_uart;
@@ -382,21 +383,17 @@ void serial_baud(serial_t *obj, int baudrate)
     if (obj_s->uart == LPUART_1) {
         RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
         PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LPUART1;
-#if TARGET_STM32WB0
-        PeriphClkInitStruct.LPUART1ClockSelection = RCC_LPUART1_CLKSOURCE_16M;
-        if ((HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) ||
-                (init_uart(obj) != HAL_OK)) {
-            debug("Cannot initialize LPUART with baud rate %u\n", baudrate);
-        }
-        return;
-#else
 #if ((MBED_CONF_TARGET_LPUART_CLOCK_SOURCE) & USE_LPUART_CLK_LSE) && MBED_CONF_TARGET_LSE_AVAILABLE
         if (baudrate <= (int)(LSE_VALUE / 3)) {
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
             while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID));
 #endif /* DUAL_CORE */
             lsc_start();
+#if TARGET_STM32WB0
+            PeriphClkInitStruct.LPUART1ClockSelection = RCC_LPUART1_CLKSOURCE_LSE;
+#else
             PeriphClkInitStruct.Lpuart1ClockSelection = RCC_LPUART1CLKSOURCE_LSE;
+#endif
             HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
             LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
@@ -404,6 +401,13 @@ void serial_baud(serial_t *obj, int baudrate)
             if (init_uart(obj) == HAL_OK) {
                 return;
             }
+        }
+#endif
+#if (TARGET_STM32WB0 && (MBED_CONF_TARGET_LPUART_CLOCK_SOURCE) & USE_LPUART_CLK_16M)
+        PeriphClkInitStruct.LPUART1ClockSelection = RCC_LPUART1_CLKSOURCE_16M;
+        HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
+        if (init_uart(obj) == HAL_OK) {
+            return;
         }
 #endif
 #if ((MBED_CONF_TARGET_LPUART_CLOCK_SOURCE) & USE_LPUART_CLK_PCLK1)
@@ -476,7 +480,6 @@ void serial_baud(serial_t *obj, int baudrate)
         {
             debug("Cannot initialize LPUART with baud rate %u using any enabled clock source\n", baudrate);
         }
-#endif /* TARGET_STM32WB0 */
     }
 #endif /* LPUART1_BASE */
 
@@ -640,6 +643,13 @@ HAL_StatusTypeDef init_uart(serial_t *obj)
     huart->Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
 #endif
 #if defined(UART_PRESCALER_DIV1) // G0/G4/H7/L4/L5/U5/WB/WL
+#if TARGET_STM32WB0
+    if ((huart->Instance == LPUART1) &&
+            (__HAL_RCC_GET_LPUART1_CLK_CONFIG() ==
+             RCC_LPUART1_CLKSOURCE_LSE)) {
+        huart->Init.ClockPrescaler = UART_PRESCALER_DIV1;
+    } else
+#endif
     if (obj_s->baudrate < 4800) {
         huart->Init.ClockPrescaler = UART_PRESCALER_DIV16;
     } else {
