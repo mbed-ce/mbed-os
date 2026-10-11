@@ -13,6 +13,8 @@
 #include "stm32wb0x_ll_system.h"
 #include "stm32wb0x_ll_usart.h"
 
+#define LSC_IWDG_USE_LSE // LSE is possible to use as clock source for IWDG on STM32WB0x
+
 struct port_s {
     PortName port;
     uint32_t mask;

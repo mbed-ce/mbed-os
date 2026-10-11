@@ -116,7 +116,6 @@ static bool lsc_start_lse(void)
 {
 static bool lse_configured = false;
 #if TARGET_STM32WB0
-
     if (lse_configured && lsc_lse_is_enabled() && lsc_lse_is_ready() &&
             (LL_RCC_LSCO_GetSource() == LL_RCC_LSCO_CLKSOURCE_LSE)) {
         return true; // Already configured during this boot
