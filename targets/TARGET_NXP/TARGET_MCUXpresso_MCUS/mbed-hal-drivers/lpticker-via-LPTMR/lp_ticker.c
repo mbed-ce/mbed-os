@@ -21,6 +21,12 @@
 #include "fsl_lptmr.h"
 #include "cmsis.h"
 
+#if TARGET_MCU_K8x
+#define LPTMR0_IRQ LPTMR0_LPTMR1_IRQn
+#else
+#define LPTMR0_IRQ LPTMR0_IRQn
+#endif
+
 const ticker_info_t* lp_ticker_get_info()
 {
     static const ticker_info_t info = {
@@ -58,9 +64,9 @@ void lp_ticker_init(void)
         lptmrConfig.enableFreeRunning = true;
         LPTMR_Init(LPTMR0, &lptmrConfig);
         LPTMR_DisableInterrupts(LPTMR0, kLPTMR_TimerInterruptEnable);
-        NVIC_ClearPendingIRQ(LPTMR0_IRQn);
-        NVIC_SetVector(LPTMR0_IRQn, (uint32_t)lptmr_isr);
-        EnableIRQ(LPTMR0_IRQn);
+        NVIC_ClearPendingIRQ(LPTMR0_IRQ);
+        NVIC_SetVector(LPTMR0_IRQ, (uint32_t)lptmr_isr);
+        EnableIRQ(LPTMR0_IRQ);
 
         lp_ticker_inited = true;
     } else {
@@ -94,7 +100,7 @@ void lp_ticker_set_interrupt(timestamp_t timestamp)
 
 void lp_ticker_fire_interrupt(void)
 {
-    NVIC_SetPendingIRQ(LPTMR0_IRQn);
+    NVIC_SetPendingIRQ(LPTMR0_IRQ);
 }
 
 /** Disable low power ticker interrupt
@@ -116,7 +122,7 @@ void lp_ticker_clear_interrupt(void)
 void lp_ticker_free(void)
 {
     LPTMR_DisableInterrupts(LPTMR0, kLPTMR_TimerInterruptEnable);
-    NVIC_DisableIRQ(LPTMR0_IRQn);
+    NVIC_DisableIRQ(LPTMR0_IRQ);
 }
 
 #endif /* DEVICE_LPTICKER */

@@ -22,25 +22,31 @@
 #include "fsl_trng.h"
 #include "trng_api.h"
 
+#ifdef TRNG0
+#define TRNG_INST TRNG0 // Kinetis-style names
+#else
+#define TRNG_INST TRNG // MIMXRT-style names
+#endif
+
 void trng_init(trng_t *obj)
 {
     (void)obj;
     trng_config_t trngConfig;
     TRNG_GetDefaultConfig(&trngConfig);
-    TRNG_Init(TRNG, &trngConfig);
+    TRNG_Init(TRNG_INST, &trngConfig);
 }
 
 void trng_free(trng_t *obj)
 {
     (void)obj;
-    TRNG_Deinit(TRNG);
+    TRNG_Deinit(TRNG_INST);
 }
 
 int trng_get_bytes(trng_t *obj, uint8_t *output, size_t length, size_t *output_length)
 {
     (void)obj;
 
-    if(TRNG_GetRandomData(TRNG, output, length) != kStatus_Success) {
+    if(TRNG_GetRandomData(TRNG_INST, output, length) != kStatus_Success) {
         return -1;
     }
     *output_length = length;
