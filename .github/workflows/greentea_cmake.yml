@@ -28,6 +28,8 @@ jobs:
             profile: full
           - target: FRDM_K64F
             profile: full
+          - target: FRDM_K22F
+            profile: full
           - target: FRDM_KL43Z
             profile: full
           - target: KW41Z
