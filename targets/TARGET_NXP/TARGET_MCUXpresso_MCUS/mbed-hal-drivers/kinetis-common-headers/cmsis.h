@@ -21,6 +21,6 @@
 #define MBED_CMSIS_H
 
 #include "fsl_device_registers.h"
-#include "../../TARGET_KL4x/cmsis_nvic.h"
+#include "cmsis_nvic.h"
 
 #endif

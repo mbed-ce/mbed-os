@@ -5,6 +5,7 @@ target_include_directories(mbed-mcu-k66f INTERFACE .)
 target_sources(mbed-mcu-k66f
     INTERFACE
         PeripheralPins.c
+        uart_serial_device.c
 )
 
 add_subdirectory(TARGET_FRDM_K66F)

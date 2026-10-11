@@ -11,3 +11,4 @@ mbed_set_linker_script(mbed-mcu-kinetis-k-series ${CMAKE_CURRENT_SOURCE_DIR}/Kin
 add_subdirectory(TARGET_MCU_K22F)
 add_subdirectory(TARGET_MCU_K64F)
 add_subdirectory(TARGET_MCU_K66F)
+add_subdirectory(TARGET_MCU_K82F)

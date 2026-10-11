@@ -13,7 +13,7 @@ UNRELEASED CHANGES - add all changes committed to Mbed here pending the next rel
 A message that notes the main changes in the update.
 
 ### Added
-- K66F-based targets (`FRDM_K66F`) gained support for DMA SPI transfers
+- All Kinetis K-series-based targets gained support for DMA SPI transfers. This used to only be implemented for K64F-based targets.
 
 ### Changed
 - Several targets renamed for parity with other Kinetis boards and overall consistency:
@@ -28,6 +28,7 @@ A message that notes the main changes in the update.
 - Fixed assert failure due to double free in Nanostack Ethernet packet layer
 - Fixed pinmap error that occured when you powered down and then re-powered-up the CYW43xxx Wi-Fi driver (WhdSTAInterface)
 - Fixed spurious "Error setting semaphore" message when powering down CYW43xxx Wi-Fi driver
+- All Kinetis board definitions now use the modern `ARDUINO_UNO` form factor instead of the deprecated `ARDUINO` form factor
 
 ### Removed
 

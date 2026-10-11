@@ -132,7 +132,7 @@ static void _qspi_write_read_test(Qspi &qspi, qspi_bus_width_t write_inst_width,
         WAIT_FOR(SECTOR_ERASE_MAX_TIME, qspi);
 
         timer.stop();
-        erase_time = timer.read_us();
+        erase_time = std::chrono::round<std::chrono::microseconds>(timer.elapsed_time()).count();
 
         // switching to extended-SPI/DPI/QPI mode here for write operation
         // for DPI/QPI qspi.cmd is automatically switched to 2_2_2/4_4_4 mode
@@ -163,7 +163,7 @@ static void _qspi_write_read_test(Qspi &qspi, qspi_bus_width_t write_inst_width,
             WAIT_FOR(PAGE_PROG_MAX_TIME, qspi);
 
             timer.stop();
-            write_time = timer.read_us();
+            write_time = std::chrono::round<std::chrono::microseconds>(timer.elapsed_time()).count();
         }
 
         // switching back to single channel SPI
@@ -189,7 +189,7 @@ static void _qspi_write_read_test(Qspi &qspi, qspi_bus_width_t write_inst_width,
             TEST_ASSERT_EQUAL(read_size, buf_len);
 
             timer.stop();
-            read_time = timer.read_us();
+            read_time = std::chrono::round<std::chrono::microseconds>(timer.elapsed_time()).count();
         }
         qspi.cmd.set_dummy_cycles(0);
 

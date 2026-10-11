@@ -26,6 +26,9 @@ void mbed_sdk_init()
     uint32_t u32cTPR_counter = 0;
 
     BOARD_BootClockRUN();
+#ifdef LPUART0
+    CLOCK_SetLpuartClock(2U); // Select OSCERCLK for LPUART clock source
+#endif
 
     CLOCK_EnableClock(kCLOCK_Rtc0);
 
@@ -66,3 +69,11 @@ void NMI_Handler(void)
 uint32_t pit_get_clock() {
     return CLOCK_GetFreq(kCLOCK_BusClk);
 }
+
+#if DEVICE_QSPI
+// Get the QSPI clock frequency
+uint32_t qspi_get_freq(void)
+{
+    return CLOCK_GetFreq(kCLOCK_McgPll0Clk);
+}
+#endif

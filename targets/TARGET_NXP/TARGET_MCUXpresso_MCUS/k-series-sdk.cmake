@@ -9,18 +9,7 @@ target_link_libraries(mbed-mcu-k64f INTERFACE mbed-mcu-kinetis-k-series)
 add_library(mbed-mcu-k66f INTERFACE)
 target_link_libraries(mbed-mcu-k66f INTERFACE mbed-mcu-kinetis-k-series)
 add_library(mbed-mcu-k82f INTERFACE)
-target_link_libraries(mbed-mcu-k22f INTERFACE mbed-mcu-kinetis-k-series)
-
-# Board targets
-add_library(mbed-hexiwear INTERFACE)
-target_link_libraries(mbed-hexiwear INTERFACE mbed-mcu-k64f)
-add_library(mbed-sdt64b INTERFACE)
-target_link_libraries(mbed-sdt64b INTERFACE mbed-mcu-k64f)
-
-add_library(mbed-frdm-k66f INTERFACE)
-target_link_libraries(mbed-frdm-k66f INTERFACE mbed-mcu-k66f)
-add_library(mbed-frdm-k22f INTERFACE)
-target_link_libraries(mbed-frdm-k22f INTERFACE mbed-mcu-k22f)
+target_link_libraries(mbed-mcu-k82f INTERFACE mbed-mcu-kinetis-k-series)
 
 # Link common K series SDK drivers
 target_sources(mbed-mcu-kinetis-k-series INTERFACE
@@ -32,8 +21,6 @@ target_sources(mbed-mcu-kinetis-k-series INTERFACE
         mbed-mcux-sdk/drivers/dmamux/fsl_dmamux.c
         mbed-mcux-sdk/drivers/dspi/fsl_dspi.c
         mbed-mcux-sdk/drivers/dspi/fsl_dspi_edma.c
-        mbed-mcux-sdk/drivers/uart/fsl_uart.c
-        mbed-mcux-sdk/drivers/uart/fsl_uart_edma.c
         mbed-mcux-sdk/drivers/i2c/fsl_i2c.c
         mbed-mcux-sdk/drivers/i2c/fsl_i2c_edma.c
         mbed-mcux-sdk/drivers/vref/fsl_vref.c
@@ -43,7 +30,6 @@ target_sources(mbed-mcu-kinetis-k-series INTERFACE
         mbed-mcux-sdk/drivers/gpio/fsl_gpio.c
         mbed-mcux-sdk/drivers/llwu/fsl_llwu.c
         mbed-mcux-sdk/drivers/pit/fsl_pit.c
-        mbed-mcux-sdk/drivers/cmt/fsl_cmt.c
         mbed-mcux-sdk/drivers/ftm/fsl_ftm.c
         mbed-mcux-sdk/drivers/wdog/fsl_wdog.c
         mbed-mcux-sdk/drivers/flash/fsl_ftfx_controller.c
@@ -51,7 +37,6 @@ target_sources(mbed-mcu-kinetis-k-series INTERFACE
         mbed-mcux-sdk/drivers/flash/fsl_ftfx_cache.c
         mbed-mcux-sdk/drivers/flash/fsl_ftfx_flexnvm.c
         mbed-mcux-sdk/drivers/rnga/fsl_rnga.c
-        mbed-mcux-sdk/drivers/sysmpu/fsl_sysmpu.c
         mbed-mcux-sdk/drivers/rtc/fsl_rtc.c
         mbed-mcux-sdk/drivers/lptmr/fsl_lptmr.c
         mbed-mcux-sdk/drivers/dac/fsl_dac.c
@@ -67,7 +52,6 @@ target_include_directories(mbed-mcu-kinetis-k-series
         mbed-mcux-sdk/drivers/edma
         mbed-mcux-sdk/drivers/dmamux
         mbed-mcux-sdk/drivers/dspi
-        mbed-mcux-sdk/drivers/uart
         mbed-mcux-sdk/drivers/lpuart
         mbed-mcux-sdk/drivers/i2c
         mbed-mcux-sdk/drivers/vref
@@ -77,12 +61,9 @@ target_include_directories(mbed-mcu-kinetis-k-series
         mbed-mcux-sdk/drivers/gpio
         mbed-mcux-sdk/drivers/llwu
         mbed-mcux-sdk/drivers/pit
-        mbed-mcux-sdk/drivers/cmt
         mbed-mcux-sdk/drivers/ftm
         mbed-mcux-sdk/drivers/wdog
         mbed-mcux-sdk/drivers/flash
-        mbed-mcux-sdk/drivers/rnga
-        mbed-mcux-sdk/drivers/sysmpu
         mbed-mcux-sdk/drivers/rtc
         mbed-mcux-sdk/drivers/port
         mbed-mcux-sdk/drivers/lptmr
@@ -104,6 +85,37 @@ foreach(TARGET mbed-mcu-k22f mbed-mcu-k66f mbed-mcu-k82f)
     )
 endforeach()
 
+# Everything except K82F has regular UART and RNGA
+foreach(TARGET mbed-mcu-k22f mbed-mcu-k64f mbed-mcu-k66f)
+    target_sources(${TARGET}
+        INTERFACE
+            mbed-mcux-sdk/drivers/uart/fsl_uart.c
+            mbed-mcux-sdk/drivers/uart/fsl_uart_edma.c
+    )
+    target_include_directories(${TARGET}
+        INTERFACE
+            mbed-mcux-sdk/drivers/uart
+            mbed-mcux-sdk/drivers/rnga
+    )
+endforeach ()
+
+# SysMPU is on everything except K2x
+foreach(TARGET mbed-mcu-k64f mbed-mcu-k66f mbed-mcu-k82f)
+    target_sources(${TARGET} INTERFACE mbed-mcux-sdk/drivers/sysmpu/fsl_sysmpu.c)
+    target_include_directories(${TARGET} INTERFACE mbed-mcux-sdk/drivers/sysmpu)
+endforeach()
+
+# K8x has QSPI and TRNG
+target_sources(mbed-mcu-k82f
+    INTERFACE
+        mbed-mcux-sdk/drivers/qspi/fsl_qspi.c
+        mbed-mcux-sdk/drivers/qspi/fsl_qspi_edma.c
+        mbed-mcux-sdk/drivers/trng/fsl_trng.c)
+target_include_directories(mbed-mcu-k82f
+    INTERFACE
+        mbed-mcux-sdk/drivers/qspi
+        mbed-mcux-sdk/drivers/trng)
+
 # Link appropriate Mbed OS HALs
 target_include_directories(mbed-mcu-kinetis-k-series
     INTERFACE
@@ -114,7 +126,6 @@ target_sources(mbed-mcu-kinetis-k-series
     INTERFACE
         mbed-hal-drivers/us-ticker-via-PIT/us_ticker.c
         mbed-hal-drivers/i2c-via-I2C/i2c_api.c
-        mbed-hal-drivers/serial-via-UART/serial_api.c
         mbed-hal-drivers/lpticker-via-LPTMR/lp_ticker.c
         mbed-hal-drivers/gpio-via-GPIO/gpio_api.c
         mbed-hal-drivers/interruptin-via-GPIO-PORT/gpio_irq_api.c
@@ -126,7 +137,6 @@ target_sources(mbed-mcu-kinetis-k-series
         mbed-hal-drivers/analogout-via-DAC/analogout_api.c
         mbed-hal-drivers/sleep-via-SMC/sleep.c
         mbed-hal-drivers/reset-reason-via-RCM/reset_reason.c
-        mbed-hal-drivers/trng-via-RNGA/trng_api.c
         mbed-hal-drivers/watchdog-via-WDOG/watchdog_api.c
         mbed-hal-drivers/pinmode-via-PORT/pinmap.c
         mbed-hal-drivers/spi-via-DSPI/spi_api.c
@@ -135,6 +145,30 @@ target_sources(mbed-mcu-kinetis-k-series
         mbed-hal-drivers/usb-via-kinetis-USB0/USBPhy_Kinetis.cpp
         mbed-hal-drivers/pwmout-via-FTM/pwmout_api.c
         mbed-hal-drivers/dma-via-DMAMUX/dma_api.c
+)
+
+# Everything except K82F has regular UART and RNG
+foreach(TARGET mbed-mcu-k22f mbed-mcu-k64f mbed-mcu-k66f)
+    target_sources(${TARGET}
+        INTERFACE
+            mbed-hal-drivers/serial-via-UART/serial_api.c
+            mbed-hal-drivers/trng-via-RNGA/trng_api.c
+    )
+    target_include_directories(${TARGET}
+        INTERFACE
+            mbed-hal-drivers/serial-via-UART/
+    )
+endforeach ()
+
+# K82F uses LPUART and TRNG
+target_include_directories(mbed-mcu-k82f
+    INTERFACE
+        mbed-hal-drivers/serial-via-LPUART
+)
+target_sources(mbed-mcu-k82f
+    INTERFACE
+        mbed-hal-drivers/serial-via-LPUART/serial_api.c
+        mbed-hal-drivers/trng-via-TRNG/trng_api.c
 )
 
 # Link appropriate headers and startup files
@@ -148,6 +182,7 @@ target_sources(mbed-mcu-k22f INTERFACE
 target_include_directories(mbed-mcu-k22f INTERFACE
         mbed-mcux-sdk/devices/kinetis/MK22F51212/
         mbed-mcux-sdk/devices/kinetis/MK22F51212/drivers
+        mbed-mcux-sdk/devices/kinetis/MK22F51212/periph
 )
 
 target_sources(mbed-mcu-k64f INTERFACE
@@ -168,4 +203,13 @@ target_sources(mbed-mcu-k66f INTERFACE
 target_include_directories(mbed-mcu-k66f INTERFACE
         mbed-mcux-sdk/devices/kinetis/MK66F18/
         mbed-mcux-sdk/devices/kinetis/MK66F18/drivers
+)
+
+target_sources(mbed-mcu-k82f INTERFACE
+        mbed-mcux-sdk/devices/kinetis/MK82F25615/system_MK82F25615.c
+        mbed-mcux-sdk/devices/kinetis/MK82F25615/drivers/fsl_clock.c
+)
+target_include_directories(mbed-mcu-k82f INTERFACE
+        mbed-mcux-sdk/devices/kinetis/MK82F25615/
+        mbed-mcux-sdk/devices/kinetis/MK82F25615/drivers
 )

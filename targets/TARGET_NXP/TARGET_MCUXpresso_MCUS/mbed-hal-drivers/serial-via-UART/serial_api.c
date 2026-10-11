@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 #include "serial_api.h"
+#include "uart_serial_api.h"
 
 #if DEVICE_SERIAL
 
@@ -181,17 +182,21 @@ void uart2_irq()
     uart_irq((status_flags & UART_S1_TDRE_MASK), (status_flags & UART_S1_RDRF_MASK), 2);
 }
 
+#ifdef UART3
 void uart3_irq()
 {
     uint32_t status_flags = UART3->S1;
     uart_irq((status_flags & UART_S1_TDRE_MASK), (status_flags & UART_S1_RDRF_MASK), 3);
 }
+#endif
 
+#ifdef UART4
 void uart4_irq()
 {
     uint32_t status_flags = UART4->S1;
     uart_irq((status_flags & UART_S1_TDRE_MASK), (status_flags & UART_S1_RDRF_MASK), 4);
 }
+#endif
 
 #ifdef UART5
 void uart5_irq()
@@ -222,12 +227,16 @@ void serial_irq_set(serial_t *obj, SerialIrq irq, uint32_t enable)
         case 2:
             vector = (uint32_t)&uart2_irq;
             break;
+#ifdef UART3
         case 3:
             vector = (uint32_t)&uart3_irq;
             break;
+#endif
+#ifdef UART4
         case 4:
             vector = (uint32_t)&uart4_irq;
             break;
+#endif
 #ifdef UART5
         case 5:
             vector = (uint32_t)&uart5_irq;
@@ -806,37 +815,6 @@ void serial_rx_abort_asynch(serial_t *obj)
 
     /* Re-enable entry to deep sleep mode */
     sleep_manager_unlock_deep_sleep();
-}
-
-static int serial_is_enabled(uint32_t uart_index)
-{
-    int clock_enabled = 0;
-    switch (uart_index) {
-        case 0:
-            clock_enabled = (SIM->SCGC4 & SIM_SCGC4_UART0_MASK) >> SIM_SCGC4_UART0_SHIFT;
-            break;
-        case 1:
-            clock_enabled = (SIM->SCGC4 & SIM_SCGC4_UART1_MASK) >> SIM_SCGC4_UART1_SHIFT;
-            break;
-        case 2:
-            clock_enabled = (SIM->SCGC4 & SIM_SCGC4_UART2_MASK) >> SIM_SCGC4_UART2_SHIFT;
-            break;
-        case 3:
-            clock_enabled = (SIM->SCGC4 & SIM_SCGC4_UART3_MASK) >> SIM_SCGC4_UART3_SHIFT;
-            break;
-        case 4:
-            clock_enabled = (SIM->SCGC1 & SIM_SCGC1_UART4_MASK) >> SIM_SCGC1_UART4_SHIFT;
-            break;
-#ifdef UART5
-        case 5:
-            clock_enabled = (SIM->SCGC1 & SIM_SCGC1_UART5_MASK) >> SIM_SCGC1_UART5_SHIFT;
-            break;
-#endif
-        default:
-            break;
-    }
-
-    return clock_enabled;
 }
 
 bool serial_check_tx_ongoing()
