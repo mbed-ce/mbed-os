@@ -19,6 +19,8 @@ A message that notes the main changes in the update.
 - Several targets renamed for parity with other Kinetis boards and overall consistency:
   - `K64F` -&gt; `FRDM_K64F`
   - `K66F` -&gt; `FRDM_K66F`
+  - `K22F` -&gt; `FRDM_K22F`
+  - `K82F` -&gt; `FRDM_K82F`
   
 ### Deprecated
 
@@ -26,6 +28,7 @@ A message that notes the main changes in the update.
 - All Kinetis board definitions now use the modern `ARDUINO_UNO` form factor instead of the deprecated `ARDUINO` form factor
 
 ### Removed
+- `LPC54114` target removed (due to low usage and the high effort that would be required to update it)
 
 ### Security
 
