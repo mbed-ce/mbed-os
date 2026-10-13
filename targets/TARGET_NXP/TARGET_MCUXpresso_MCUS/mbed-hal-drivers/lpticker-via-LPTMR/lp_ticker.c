@@ -60,7 +60,7 @@ void lp_ticker_init(void)
         /* Use 32kHz drive */
         CLOCK_SetXtal32Freq(OSC32K_CLK_HZ);
 
-        lptmrConfig.prescalerClockSource = kLPTMR_PrescalerClock_2;
+        lptmrConfig.prescalerClockSource = kLPTMR_PrescalerClock_2; // ERCLK32K
         lptmrConfig.enableFreeRunning = true;
         LPTMR_Init(LPTMR0, &lptmrConfig);
         LPTMR_DisableInterrupts(LPTMR0, kLPTMR_TimerInterruptEnable);

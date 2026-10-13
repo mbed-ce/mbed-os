@@ -18,43 +18,18 @@
 
 #include "fsl_rtc.h"
 #include "fsl_clock_config.h"
+#include "rtc_api.h"
 
 // called before main
 void mbed_sdk_init()
 {
-    rtc_config_t rtc_basic_config;
-    uint32_t u32cTPR_counter = 0;
-
     BOARD_BootClockRUN();
 #ifdef LPUART0
     CLOCK_SetLpuartClock(2U); // Select OSCERCLK for LPUART clock source
 #endif
 
-    CLOCK_EnableClock(kCLOCK_Rtc0);
-
-    /* Check if the Rtc oscillator is enabled */
-    if ((RTC->CR & RTC_CR_OSCE_MASK) == 0u) {
-        /*Init the RTC with default configuration*/
-        RTC_GetDefaultConfig(&rtc_basic_config);
-
-        /* Setup the 32K RTC OSC */
-        RTC_Init(RTC, &rtc_basic_config);
-
-        /* Enable the RTC 32KHz oscillator */
-        RTC->CR |= RTC_CR_OSCE_MASK;
-
-        /* Start the RTC time counter */
-        RTC_StartTimer(RTC);
-
-        /* Verify TPR register reaches 4096 counts */
-        while (u32cTPR_counter < 4096) {
-            u32cTPR_counter = RTC->TPR;
-        }
-        /* 32kHz Oscillator is ready. */
-        RTC_Deinit(RTC);
-    }
-
-    CLOCK_DisableClock(kCLOCK_Rtc0);
+    // Ensure RTC oscillator is enabled (as this also drives LP ticker)
+    rtc_init();
 }
 
 // Change the NMI pin to an input. This allows NMI pin to
