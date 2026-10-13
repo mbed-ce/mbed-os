@@ -20,6 +20,8 @@
 
 #include "pinmap.h"
 #include "fsl_rtc.h"
+#include "mbed_error.h"
+#include "mbed_wait_api.h"
 #include "PeripheralPins.h"
 
 static bool rtc_enabled = false;
@@ -29,10 +31,34 @@ void rtc_init(void)
     rtc_config_t rtcConfig;
 
     if (!rtc_enabled) {
+        CLOCK_EnableClock(kCLOCK_Rtc0);
+
+        /*Init the RTC with default configuration*/
         RTC_GetDefaultConfig(&rtcConfig);
+
+#if !(defined(FSL_FEATURE_RTC_HAS_CLOCK_OUTPUT) && FSL_FEATURE_RTC_HAS_CLOCK_OUTPUT == 0)
+        // Enable clock output to other peripherals (in particular, the LPTMR).
+        // Gotta love that this was added via an SDK update, changing the default behavior.
+        // No notes, Freescale. Incredible work here. Only took me an hour of debugging to find this...
+        rtcConfig.clockOutput = true;
+#endif
+
+        /* Setup the 32K RTC OSC */
         RTC_Init(RTC, &rtcConfig);
 
+        /* Enable the RTC 32KHz oscillator */
+        RTC->CR |= RTC_CR_OSCE_MASK;
+
+        /* Start the RTC time counter */
         RTC_StartTimer(RTC);
+
+        // Check that RTC is actually counting
+        const uint16_t origTPR = RTC->TPR;
+        wait_us(500);
+        if(RTC->TPR == origTPR) {
+            MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_RTC, EDEADLK), \
+                   "No clock detected on ERCLK32K, RTC oscillator missing or nonfunctional?\n");
+        }
     }
 
     rtc_enabled = true;
@@ -41,10 +67,7 @@ void rtc_init(void)
 void rtc_free(void)
 {
     if (rtc_enabled) {
-#if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
-        /* Gate the module clock */
-        CLOCK_DisableClock(kCLOCK_Rtc0);
-#endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
+        // Do not actually disable the RTC peripheral as it drives the LP ticker clock as well
         rtc_enabled = false;
     }
 }
