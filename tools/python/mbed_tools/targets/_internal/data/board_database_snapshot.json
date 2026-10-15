@@ -3396,7 +3396,7 @@
         ]
     },
     {
-        "board_type": "K66F",
+        "board_type": "FRDM_K66F",
         "board_name": "FRDM-K66F",
         "product_code": "0311",
         "target_type": "platform",
@@ -3438,7 +3438,7 @@
         ]
     },
     {
-        "board_type": "KL43Z",
+        "board_type": "FRDM_KL43Z",
         "board_name": "FRDM-KL43Z",
         "product_code": "0262",
         "target_type": "platform",
@@ -3503,7 +3503,7 @@
         "mbed_enabled": []
     },
     {
-        "board_type": "K64F",
+        "board_type": "FRDM_K64F",
         "board_name": "mbed 6LoWPAN Border Router USB",
         "product_code": "7403",
         "target_type": "platform",
@@ -3513,7 +3513,7 @@
         "mbed_enabled": []
     },
     {
-        "board_type": "K64F",
+        "board_type": "FRDM_K64F",
         "board_name": "mbed 6LoWPAN Border Router HAT",
         "product_code": "7402",
         "target_type": "platform",

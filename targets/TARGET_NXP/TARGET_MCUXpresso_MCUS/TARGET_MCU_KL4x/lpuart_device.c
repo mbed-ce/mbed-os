@@ -39,11 +39,8 @@ bool serial_is_enabled(uint32_t uart_index)
     return clock_enabled;
 }
 
-/* Array of LPUART bus clock frequencies */
-static clock_name_t const uart_clocks[] = LPUART_CLOCK_FREQS;
-
 uint32_t serial_get_clock(size_t index) {
-    return CLOCK_GetFreq(uart_clocks[index]);
+    return CLOCK_GetFreq(kCLOCK_McgIrc48MClk);
 }
 
 
