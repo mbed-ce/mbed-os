@@ -62,6 +62,7 @@ void stack_size_unification_test()
 
 utest::v1::status_t test_setup(const size_t number_of_cases)
 {
+    printf("Hello! This is KL43Z.\n");
     GREENTEA_SETUP(10, "default_auto");
     return verbose_test_setup_handler(number_of_cases);
 }
