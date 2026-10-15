@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(TARGET_RA4E1 EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_RA4M1 EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_RA6E2 EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_RA8E1 EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_RA6M3 EXCLUDE_FROM_ALL)

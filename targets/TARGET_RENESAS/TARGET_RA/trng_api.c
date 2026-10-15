@@ -54,9 +54,9 @@ void trng_free(trng_t *obj)
     (void)obj;
 }
 
-#elif defined(TARGET_RA6M3) || defined(TARGET_RA6M5)
+#elif defined(TARGET_RA4M1) || defined(TARGET_RA6M3) || defined(TARGET_RA6M5)
 
-// in RA6M3 and RA6M5, TRNG is part of SCE
+// in RA4M1, RA6M3 and RA6M5, TRNG is part of SCE
 
 fsp_err_t HW_SCE_McuSpecificInit(void);
 fsp_err_t HW_SCE_RNG_Read (uint32_t * OutData_Text);

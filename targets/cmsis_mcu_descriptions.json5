@@ -14854,6 +14854,7 @@
         },
         "vendor": "RPi:170"
     },
+// ------------------------- RENESAS RA ---------------------------
 	"R7FA4E10D": {
         "algorithms": [
             {
@@ -15571,6 +15572,129 @@
             }
         ],
         "sub_family": "RA6M3_2M",
+        "vendor": "Renesas:117"
+    },
+    "R7FA4M1AB": {
+        "algorithms": [
+            {
+                "default": true,
+                "file_name": "Flash/RA4M1_256K.FLM",
+                "ram_size": 10240,
+                "ram_start": 536870912,
+                "size": 262144,
+                "start": 0,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "Flash/RA4M1_DATA.FLM",
+                "ram_size": 10240,
+                "ram_start": 536870912,
+                "size": 8192,
+                "start": 1074790400,
+                "style": "Keil"
+            },
+            {
+                "default": true,
+                "file_name": "Flash/RA4M1_CONF.FLM",
+                "ram_size": 10240,
+                "ram_start": 536870912,
+                "size": 52,
+                "start": 16842752,
+                "style": "Keil"
+            }
+        ],
+        "family": "RA4M1 Series",
+        "from_pack": {
+            "pack": "RA_DFP",
+            "url": "https://www2.renesas.eu/Keil_MDK_Packs/",
+            "vendor": "Renesas",
+            "version": "6.3.0"
+        },
+        "memories": {
+            "ConfigROM": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": false,
+                "p_name": null,
+                "size": 52,
+                "start": 16842752,
+                "startup": false
+            },
+            "DataFlash": {
+                "access": {
+                    "execute": false,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": false,
+                "p_name": null,
+                "size": 8192,
+                "start": 1074790400,
+                "startup": false
+            },
+            "Flash": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": false
+                },
+                "default": true,
+                "p_name": null,
+                "size": 262144,
+                "start": 0,
+                "startup": true
+            },
+            "SRAM1": {
+                "access": {
+                    "execute": true,
+                    "non_secure": false,
+                    "non_secure_callable": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": true,
+                "p_name": null,
+                "size": 32768,
+                "start": 536870912,
+                "startup": false
+            }
+        },
+        "name": "R7FA4M1AB",
+        "processors": [
+            {
+                "address": null,
+                "ap": {
+                    "Index": 0
+                },
+                "core": "CortexM4",
+                "default_reset_sequence": null,
+                "dp": 0,
+                "fpu": "SinglePrecision",
+                "mpu": "Present",
+                "name": null,
+                "svd": "SVD/R7FA4M1AB.svd",
+                "unit": 0
+            }
+        ],
+        "sub_family": "RA4M1_256K",
         "vendor": "Renesas:117"
     },
     "R7FA4T1BB": {
