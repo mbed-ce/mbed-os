@@ -33,18 +33,6 @@
 
 #include "fsl_clock.h"
 
-/* Array for UART module clocks */
-#define UART_CLOCK_FREQS                                   \
-    {                                                      \
-        kCLOCK_IpInvalid, kCLOCK_IpInvalid, UART2_CLK_SRC  \
-    }
-
-/* Array for LPUART module clocks */
-#define LPUART_CLOCK_FREQS                         \
-    {                                              \
-        kCLOCK_McgIrc48MClk, kCLOCK_McgIrc48MClk   \
-    }
-
 /* Array for I2C module clocks */
 #define I2C_CLOCK_FREQS               \
     {                                 \

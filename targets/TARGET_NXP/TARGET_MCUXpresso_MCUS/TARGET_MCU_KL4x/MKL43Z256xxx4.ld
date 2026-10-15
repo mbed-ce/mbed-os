@@ -60,14 +60,26 @@ __stack_size__ = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0400;
 M_VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x0200 : 0x0;
+FLASH_VTOR_TABLE_SIZE = 0x400;
+FLASH_CONFIG_FIELD_SIZE = 0x10;
+
+/* If we are not configured to execute out of the start of ROM, then a bootloader is
+ * present.  This tells us whether we need to add the Flash Configuration Field at the start of flash. */
+#if MBED_CONFIGURED_ROM_BANK_PROGRAM_FLASH_START == 0
+#define IS_BOOTLOADER_PRESENT 0
+#else
+#define IS_BOOTLOADER_PRESENT 1
+#endif
+
+#if IS_BOOTLOADER_PRESENT && MBED_CONFIGURED_ROM_BANK_PROGRAM_FLASH_START < 0x410
+#error MBED_CONFIGURED_ROM_BANK_PROGRAM_FLASH_START too small and will overwrite interrupts and flash config
+#endif
 
 /* Specify the memory areas */
 MEMORY
 {
-  m_interrupts          (RX)  : ORIGIN = 0x00000000, LENGTH = 0x00000200
-  m_flash_config        (RX)  : ORIGIN = 0x00000400, LENGTH = 0x00000010
-  m_text                (RX)  : ORIGIN = 0x00000410, LENGTH = 0x0003FBF0
-  m_data                (RW)  : ORIGIN = 0x1FFFE000, LENGTH = 0x00008000
+  m_text (RX)  : ORIGIN = MBED_CONFIGURED_ROM_BANK_PROGRAM_FLASH_START, LENGTH = MBED_CONFIGURED_ROM_BANK_PROGRAM_FLASH_SIZE
+  m_data (RW)  : ORIGIN = MBED_CONFIGURED_RAM_BANK_SRAM_START, LENGTH = MBED_CONFIGURED_RAM_BANK_SRAM_SIZE
 }
 
 /* Define output sections */
@@ -80,14 +92,19 @@ SECTIONS
     . = ALIGN(8);
     KEEP(*(.isr_vector))     /* Startup code */
     . = ALIGN(8);
-  } > m_interrupts
+  } > m_text
 
-  .flash_config :
+  /* FCF to absolute address of 0x400, but only if bootloader is not present. */
+#if !IS_BOOTLOADER_PRESENT
+  .flash_config FLASH_VTOR_TABLE_SIZE :
   {
-    . = ALIGN(8);
     KEEP(*(.FlashConfig))    /* Flash Configuration Field (FCF) */
-    . = ALIGN(8);
-  } > m_flash_config
+  } > m_text
+#else
+  /DISCARD/ : {
+    *(.FlashConfig)
+  }
+#endif
 
   /* The program code and other data goes into internal flash */
   .text :
