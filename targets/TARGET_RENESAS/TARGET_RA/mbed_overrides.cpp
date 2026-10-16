@@ -15,12 +15,13 @@ extern "C" void mbed_sdk_init()
     /* Enable Pin access globally */
     R_BSP_PinAccessEnable();
 
-#if defined(TARGET_ARDUINO_UNO_R4_MINIMA)
-    /* The Arduino UNO R4 bootloader disables global interrupts
-     * (PRIMASK = 1) before jumping to the application. Without
-     * re-enabling them, every exception (peripheral IRQs, SVC, PendSV,
-     * SysTick) is silently blocked, which breaks the RTOS scheduler
-     * and all interrupt-driven peripherals.
+#if defined(TARGET_ARDUINO_UNO_R4_MINIMA) || defined(TARGET_ARDUINO_UNO_R4_WIFI)
+    /* The Arduino UNO R4 bootloader (DFU on Minima, UART/bossac via the
+     * ESP32-S3 bridge on WiFi) disables global interrupts (PRIMASK = 1)
+     * before jumping to the application. Without re-enabling them, every
+     * exception (peripheral IRQs, SVC, PendSV, SysTick) is silently
+     * blocked, which breaks the RTOS scheduler and all interrupt-driven
+     * peripherals.
      *
      * Before re-enabling, clear all stale pending interrupts left by
      * the bootloader (e.g. RTC carry, USB events from DFU) so they

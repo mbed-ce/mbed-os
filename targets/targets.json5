@@ -8695,7 +8695,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_RA"
         ],
         "public": false,
-        "core": "Cortex-M33",
+        "core": "Cortex-M33FE",
         "device_has_add": [
             "CAN"
         ],
@@ -8723,7 +8723,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_RA"
         ],
         "public": false,
-        "core": "Cortex-M4",
+        "core": "Cortex-M4F",
         "device_has_add": [
             "CAN",
             "USBDEVICE"
@@ -8756,12 +8756,36 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "R7FA4M1AB",
         "image_url": "https://www.datocms-assets.com/150482/1781539893-uno-r4-minima.png"
     },
+    "ARDUINO_UNO_R4_WIFI": {
+        "inherits": [
+            "MCU_RA4M1"
+        ],
+        "public": true,
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "overrides": {
+            "lse-available": 0,
+            "rtc-clock-source": "RTC_CLOCK_SOURCE_LOCO",
+            "console-uart": true,
+            "console-usb": false
+        },
+        "OUTPUT_EXT": "bin",
+        "memory_bank_config": {
+            "Flash": {
+                "start": 0x4000,
+                "size": 0x3C000
+            }
+        },
+        "device_name": "R7FA4M1AB",
+        "image_url": "https://www.datocms-assets.com/150482/1781539893-uno-r4-wifi.png"
+    },
     "MCU_RA6E2": {
         "inherits": [
             "MCU_RA"
         ],
         "public": false,
-        "core": "Cortex-M33",
+        "core": "Cortex-M33FE",
         "device_has_add": [
             "CAN",
             "CAN_FD"
@@ -8861,7 +8885,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_RA"
         ],
         "public": false,
-        "core": "Cortex-M33",
+        "core": "Cortex-M33FE",
         "device_has_add": [
             "CAN",
             "CAN_FD"
@@ -8890,7 +8914,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_RA"
         ],
         "public": false,
-        "core": "Cortex-M33",
+        "core": "Cortex-M33FE",
         "device_has_add": [
             "CAN",
             "CAN_FD",
