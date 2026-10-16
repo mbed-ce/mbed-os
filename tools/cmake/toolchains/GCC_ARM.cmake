@@ -88,6 +88,8 @@ if(MBED_ATFE)
         list(APPEND common_options "--config=${MBED_ATFE_CONFIG}")
     elseif(EXISTS "${ARM_NONE_EABI_TOOLCHAIN_HINTS}/newlib-nano.cfg")
         list(APPEND common_options "--config=newlib-nano.cfg")
+    elseif(EXISTS "${ARM_NONE_EABI_TOOLCHAIN_HINTS}/newlib.cfg")
+        list(APPEND common_options "--config=newlib.cfg")
     endif()
 
     # Do not pass any explicit C/C++ runtime libraries here: the clang driver appends the
