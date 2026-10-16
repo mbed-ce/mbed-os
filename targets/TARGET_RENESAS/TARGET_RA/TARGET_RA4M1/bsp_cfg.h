@@ -5,22 +5,6 @@
             extern "C" {
             #endif
 
-            /* The FSP system code enables the FPU (SCB->CPACR) under
-             * "#if __FPU_USED". That macro was provided by the CMSIS 5
-             * compiler headers, but Mbed CE ships CMSIS 6 which no longer
-             * defines it. Derive it from the compiler builtin so the FPU
-             * actually gets switched on when the toolchain generates
-             * hardware floating point code (ATfE/clang default for the
-             * Cortex-M4F is softfp with FPU instructions enabled - without
-             * CPACR the first FPU instruction raises a UsageFault). */
-            #if !defined(__FPU_USED)
-             #if defined(__ARM_FP) && (__ARM_FP >= 1)
-              #define __FPU_USED 1
-             #else
-              #define __FPU_USED 0
-             #endif
-            #endif
-
             #include "bsp_clock_cfg.h"
             #include "bsp_mcu_family_cfg.h"
             #include "bsp_mcu_ofs_cfg.h"
