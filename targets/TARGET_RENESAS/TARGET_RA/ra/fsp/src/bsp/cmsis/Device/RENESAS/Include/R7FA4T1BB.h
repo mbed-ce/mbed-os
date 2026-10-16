@@ -42,9 +42,9 @@ extern "C" {
  #define __VTOR_PRESENT            1       /*!< Set to 1 if CPU supports Vector Table Offset Register                     */
  #define __MPU_PRESENT             1       /*!< MPU present                                                               */
  #define __FPU_PRESENT             1U       /*!< FPU present                                                               */
- #define __FPU_DP                  0       /*!< Double Precision FPU                                                      */
- #define __DSP_PRESENT             1       /*!< DSP extension present                                                     */
- #define __SAUREGION_PRESENT       0       /*!< SAU region present                                                        */
+ #define __FPU_DP                  0U       /*!< Double Precision FPU                                                      */
+ #define __DSP_PRESENT             1U       /*!< DSP extension present                                                     */
+ #define __SAUREGION_PRESENT       0U       /*!< SAU region present                                                        */
 
 /** @} */ /* End of group Configuration_of_CMSIS */
 

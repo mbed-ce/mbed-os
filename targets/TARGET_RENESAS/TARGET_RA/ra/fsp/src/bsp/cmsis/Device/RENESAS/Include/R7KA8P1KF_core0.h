@@ -42,12 +42,12 @@ extern "C" {
  #define __VTOR_PRESENT            1       /*!< Set to 1 if CPU supports Vector Table Offset Register                     */
  #define __MPU_PRESENT             1       /*!< MPU present                                                               */
  #define __FPU_PRESENT             1U       /*!< FPU present                                                               */
- #define __FPU_DP                  0       /*!< Double Precision FPU                                                      */
- #define __DSP_PRESENT             1       /*!< DSP extension present                                                     */
- #define __ICACHE_PRESENT          1       /*!< Instruction Cache present                                                 */
- #define __DCACHE_PRESENT          1       /*!< Data Cache present                                                        */
- #define __SAUREGION_PRESENT       1       /*!< SAU region present                                                        */
- #define __PMU_PRESENT             1       /*!< PMU present                                                               */
+ #define __FPU_DP                  0U       /*!< Double Precision FPU                                                      */
+ #define __DSP_PRESENT             1U       /*!< DSP extension present                                                     */
+ #define __ICACHE_PRESENT          1U       /*!< Instruction Cache present                                                 */
+ #define __DCACHE_PRESENT          1U       /*!< Data Cache present                                                        */
+ #define __SAUREGION_PRESENT       1U       /*!< SAU region present                                                        */
+ #define __PMU_PRESENT             1U       /*!< PMU present                                                               */
  #define __PMU_NUM_EVENTCNT        8       /*!< PMU Event Counters                                                        */
 
 /** @} */ /* End of group Configuration_of_CMSIS */

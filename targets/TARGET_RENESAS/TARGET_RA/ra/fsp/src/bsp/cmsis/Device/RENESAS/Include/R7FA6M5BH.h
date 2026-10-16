@@ -39,12 +39,12 @@ extern "C" {
  #define __CM33_REV                0x0004U /*!< CM33 Core Revision                                                        */
  #define __NVIC_PRIO_BITS          4       /*!< Number of Bits used for Priority Levels                                   */
  #define __Vendor_SysTickConfig    0       /*!< Set to 1 if different SysTick Config is used                              */
- #define __VTOR_PRESENT            1       /*!< Set to 1 if CPU supports Vector Table Offset Register                     */
- #define __MPU_PRESENT             1       /*!< MPU present                                                               */
- #define __FPU_PRESENT             1       /*!< FPU present                                                               */
- #define __FPU_DP                  0       /*!< Double Precision FPU                                                      */
- #define __DSP_PRESENT             1       /*!< DSP extension present                                                     */
- #define __SAUREGION_PRESENT       0       /*!< SAU region present                                                        */
+ #define __VTOR_PRESENT            1U       /*!< Set to 1 if CPU supports Vector Table Offset Register                     */
+ #define __MPU_PRESENT             1U       /*!< MPU present                                                               */
+ #define __FPU_PRESENT             1U       /*!< FPU present                                                               */
+ #define __FPU_DP                  0U       /*!< Double Precision FPU                                                      */
+ #define __DSP_PRESENT             1U       /*!< DSP extension present                                                     */
+ #define __SAUREGION_PRESENT       0U       /*!< SAU region present                                                        */
 
 /** @} */ /* End of group Configuration_of_CMSIS */
 
