@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2006-2019 ARM Limited
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,24 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MBED_GPIO_OBJECT_H
-#define MBED_GPIO_OBJECT_H
+#ifndef _NXP_US_TICKER_DEFINES_H_
+#define _NXP_US_TICKER_DEFINES_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "fsl_ctimer.h"
 
-typedef struct {
-    PinName pin;
-} gpio_t;
+#define US_TICKER_PERIOD_NUM    1
+#define US_TICKER_PERIOD_DEN    1
 
-static inline int gpio_is_connected(const gpio_t *obj)
-{
-    return obj->pin != (PinName)NC;
-}
+#define US_TICKER_MASK          0xFFFFFFFF
 
-#ifdef __cplusplus
-}
-#endif
+/* Macro-optimised form of us_ticker_read */
+#define us_ticker_read() (CTIMER->TC)
 
-#endif
+#endif /* _NXP_US_TICKER_DEFINES_H_ */
