@@ -7,10 +7,16 @@ add_library(mbed-mcu-lpc546xx INTERFACE)
 target_link_libraries(mbed-mcu-lpc546xx INTERFACE mbed-mcu-lpc54xxx)
 
 # Link common SDK drivers
-target_sources(mbed-mcu-lpc5xxxx
+target_sources(mbed-mcu-lpc54xxx
     INTERFACE
         mbed-mcux-sdk/drivers/common/fsl_common_arm.c
         mbed-mcux-sdk/drivers/flexcomm/fsl_flexcomm.c
+        mbed-mcux-sdk/drivers/flexcomm/usart/fsl_usart.c
+        mbed-mcux-sdk/drivers/flexcomm/usart/fsl_usart_dma.c
+        mbed-mcux-sdk/drivers/flexcomm/spi/fsl_spi.c
+        mbed-mcux-sdk/drivers/flexcomm/spi/fsl_spi_dma.c
+        mbed-mcux-sdk/drivers/flexcomm/i2c/fsl_i2c.c
+        mbed-mcux-sdk/drivers/flexcomm/i2c/fsl_i2c_dma.c
         mbed-mcux-sdk/drivers/lpc_enet/fsl_enet.c
         mbed-mcux-sdk/drivers/mcan/fsl_mcan.c
         mbed-mcux-sdk/drivers/spifi/fsl_spifi.c
@@ -35,10 +41,13 @@ target_sources(mbed-mcu-lpc5xxxx
         mbed-mcux-sdk/drivers/sha/fsl_sha.c
 )
 
-target_include_directories(mbed-mcu-lpc5xxxx
+target_include_directories(mbed-mcu-lpc54xxx
     INTERFACE
         mbed-mcux-sdk/drivers/common
         mbed-mcux-sdk/drivers/flexcomm
+        mbed-mcux-sdk/drivers/flexcomm/usart
+        mbed-mcux-sdk/drivers/flexcomm/spi
+        mbed-mcux-sdk/drivers/flexcomm/i2c
         mbed-mcux-sdk/drivers/lpc_enet
         mbed-mcux-sdk/drivers/mcan
         mbed-mcux-sdk/drivers/spifi
@@ -64,6 +73,23 @@ target_include_directories(mbed-mcu-lpc5xxxx
         mbed-mcux-sdk/drivers/sha
 )
 
+# Link Mbed HAL drivers
+target_sources(mbed-mcu-lpc54xxx
+    INTERFACE
+        mbed-hal-drivers/serial-via-FLEXCOMM/serial_api.c
+        mbed-hal-drivers/gpio-via-LPC-GPIO/gpio_api.c
+        mbed-hal-drivers/interruptin-via-PINT/gpio_irq_api.c
+        mbed-hal-drivers/trng-via-RNG/trng_api.c
+        mbed-hal-drivers/analogin-via-LPC-ADC/analogin_api.c
+        mbed-hal-drivers/us-ticker-via-CTIMER/us_ticker.c
+        mbed-hal-drivers/port-via-LPC-GPIO/port_api.c
+)
+
+target_include_directories(mbed-mcu-lpc54xxx
+    INTERFACE
+        mbed-hal-drivers/us-ticker-via-CTIMER
+)
+
 # Link appropriate headers and startup files
 target_sources(mbed-mcu-lpc546xx INTERFACE
         mbed-mcux-sdk/devices/lpc/LPC54628/system_LPC54628.c
@@ -75,5 +101,5 @@ target_sources(mbed-mcu-lpc546xx INTERFACE
 target_include_directories(mbed-mcu-lpc546xx INTERFACE
         mbed-mcux-sdk/devices/lpc/LPC54628/
         mbed-mcux-sdk/devices/lpc/LPC54628/drivers
-        mbed-mcux-sdk/devices/lpc/LPC54628/pe
+        mbed-mcux-sdk/devices/lpc/LPC54628/periph
 )
