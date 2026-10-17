@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Jamie Smith
+# SPDX-License-Identifier: Apache-2.0
+
 # KL4x family
 add_library(mbed-mcu-kl4x INTERFACE)
 add_library(mbed-mcu-kl43z INTERFACE)
@@ -89,6 +92,7 @@ target_sources(mbed-mcu-kl4x
         mbed-hal-drivers/flash-via-FLASH/flash_api.c
         mbed-hal-drivers/usb-via-kinetis-USB0/USBPhy_Kinetis.cpp
         mbed-hal-drivers/rtc-via-RTC/rtc_api.c
+        mbed-hal-drivers/pwmout-via-TPM/pwmout_api.c
 )
 
 # Link appropriate headers and startup files

@@ -21,6 +21,7 @@ A message that notes the main changes in the update.
   - `K66F` -&gt; `FRDM_K66F`
   - `K22F` -&gt; `FRDM_K22F`
   - `K82F` -&gt; `FRDM_K82F`
+  - `LPC546XX` -&gt; `LPCXPRESSO54628`
   
 ### Deprecated
 
