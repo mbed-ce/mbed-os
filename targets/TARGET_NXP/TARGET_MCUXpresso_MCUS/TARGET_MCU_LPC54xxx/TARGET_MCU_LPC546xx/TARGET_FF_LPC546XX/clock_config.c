@@ -58,7 +58,7 @@ board: LPCXpresso54628
 
 #include "fsl_power.h"
 #include "fsl_clock.h"
-#include "../../../TARGET_MCU_LPC546XX/TARGET_FF_LPC546XX/clock_config.h"
+#include "clock_config.h"
 
 /*******************************************************************************
  * Definitions

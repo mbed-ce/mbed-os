@@ -33,7 +33,7 @@ static gpio_irq_handler irq_handler;
 /* Array of PORT IRQ number. */
 static const IRQn_Type pint_irqs[] = PINT_IRQS;
 
-void pint_intr_callback(pint_pin_int_t pintr, uint32_t pmatch_status)
+void pint_intr_callback(pint_pin_int_t pintr, pint_status_t * status)
 {
     uint32_t ch_bit = (1 << pintr);
 
@@ -47,14 +47,12 @@ void pint_intr_callback(pint_pin_int_t pintr, uint32_t pmatch_status)
         return;
     }
 
-    if ((PINT->IENR & ch_bit) && (PINT->RISE & ch_bit)){
+    if ((PINT->IENR & ch_bit) && status->riseFlag){
         irq_handler(channel_contexts[pintr], IRQ_RISE);
-        PINT->RISE = ch_bit;
     }
 
-    if ((PINT->IENF & ch_bit) && (PINT->FALL & ch_bit)) {
+    if ((PINT->IENF & ch_bit) && status->fallFlag) {
         irq_handler(channel_contexts[pintr], IRQ_FALL);
-        PINT->FALL = ch_bit;
     }
     PINT_PinInterruptClrStatus(PINT, pintr);
 }
@@ -100,6 +98,7 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uintpt
 
     /* Initialize PINT */
     PINT_Init(PINT);
+    PINT_SetCallback(PINT, pint_intr_callback);
 
     NVIC_EnableIRQ(pint_irqs[obj->ch]);
 
@@ -119,24 +118,21 @@ void gpio_irq_set(gpio_irq_t *obj, gpio_irq_event event, uint32_t enable)
     if (!(PINT->ISEL & ch_bit))
         PINT->IST = ch_bit;
 
-    // Edge trigger
-    PINT->ISEL &= ~ch_bit;
-
     /* Setup Pin Interrupt for rising or falling edge */
     if (enable) {
         if (event == IRQ_RISE) {
             /* Checking if falling edge interrupt is already enabled on this pin */
             if (PINT->IENF & (1U << obj->ch)) {
-                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableBothEdges, pint_intr_callback);
+                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableBothEdges);
             } else {
-                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableRiseEdge, pint_intr_callback);
+                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableRiseEdge);
             }
         } else {
             /* Checking if rising edge interrupt is already enabled on this pin */
             if (PINT->IENR & (1U << obj->ch)) {
-                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableBothEdges, pint_intr_callback);
+                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableBothEdges);
             } else {
-                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableFallEdge, pint_intr_callback);
+                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableFallEdge);
             }
         }
     } else {
@@ -144,19 +140,19 @@ void gpio_irq_set(gpio_irq_t *obj, gpio_irq_event event, uint32_t enable)
             /* Checking if falling edge interrupt is already enabled on this pin */
             if (PINT->IENF & (1U << obj->ch)) {
                 /* Leave falling edge interrupt enabled */
-                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableFallEdge, pint_intr_callback);
+                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableFallEdge);
             } else {
                 /* Both rising and falling edge interrupt are disabled */
-                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableNone, pint_intr_callback);
+                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableNone);
             }
         } else {
             /* Checking if rising edge interrupt is already enabled on this pin */
             if (PINT->IENR & (1U << obj->ch)) {
                 /* Leave rising edge interrupt enabled */
-                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableRiseEdge, pint_intr_callback);
+                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableRiseEdge);
             } else {
                 /* Both rising and falling edge interrupt are disabled */
-                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableNone, pint_intr_callback);
+                PINT_PinInterruptConfig(PINT, (pint_pin_int_t)obj->ch, kPINT_PinIntEnableNone);
             }
         }
 

@@ -4962,7 +4962,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_MPU_CUSTOM"
         ],
         "inherits": [
-            "MCU_LPC5xxxx"
+            "MCU_LPC54xxx"
         ],
         "device_has": [
             "USTICKER",
