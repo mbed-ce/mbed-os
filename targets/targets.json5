@@ -4938,7 +4938,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/MIMXRT1170-EVKB-TOP-IMG.jpg"
     },
-    "MCU_LPC5xxxx": {
+    "MCU_LPC54xxx": {
         "inherits": ["Target"],
         "core": "Cortex-M4F",
         "extra_labels_add": [
@@ -4990,7 +4990,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "network-default-interface-type": "ETHERNET"
         }
     },
-    "LPC546XX": { // AKA LPCXpresso54608
+    "LPCXPRESSO54628": {
         "supported_form_factors": [
             "ARDUINO"
         ],

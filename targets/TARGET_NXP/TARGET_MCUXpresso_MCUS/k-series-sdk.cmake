@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Jamie Smith
+# SPDX-License-Identifier: Apache-2.0
+
 # Top-level target
 add_library(mbed-mcu-kinetis-k-series INTERFACE)
 

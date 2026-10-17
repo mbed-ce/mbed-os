@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Jamie Smith
+# SPDX-License-Identifier: Apache-2.0
+
 target_sources(mbed-mcu-mimxrt105x_6x
     INTERFACE
         lpm.c
