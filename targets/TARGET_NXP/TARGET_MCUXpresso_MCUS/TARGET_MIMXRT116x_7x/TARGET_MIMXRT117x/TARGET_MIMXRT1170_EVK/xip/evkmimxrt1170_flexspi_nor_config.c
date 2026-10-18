@@ -35,7 +35,7 @@ const flexspi_nor_config_t qspiflash_config = {
             .deviceType           = kFlexSpiDeviceType_SerialNOR,
             .sflashPadType        = kSerialFlash_4Pads,
             .serialClkFreq        = kFlexSpiSerialClk_133MHz,
-            .sflashA1Size         = 16u * 1024u * 1024u,
+            .sflashA1Size         = MBED_ROM_BANK_EXT_FLASH_SIZE,
             .lookupTable =
                 {
                     // Read LUTs

@@ -65,6 +65,7 @@ target_include_directories(mbed-mcu-mimxrt116x_7x INTERFACE
         mbed-mcux-sdk/drivers/mecc
         mbed-mcux-sdk/drivers/xecc
         mbed-mcux-sdk/drivers/edma
+        mbed-mcux-sdk/drivers/dmamux
         mbed-mcux-sdk/drivers/igpio
         mbed-mcux-sdk/drivers/qtmr_1
         mbed-mcux-sdk/drivers/pwm
@@ -84,6 +85,39 @@ target_include_directories(mbed-mcu-mimxrt116x_7x INTERFACE
         mbed-mcux-sdk/drivers/xrdc2
         mbed-mcux-sdk/drivers/mcm
 )
+
+# Link appropriate Mbed OS HALs that interface with this MCU
+target_include_directories(mbed-mcu-mimxrt116x_7x
+    INTERFACE
+        mbed-hal-drivers/mimxrt-common-headers
+        mbed-hal-drivers/fsl-os-abstraction
+        mbed-hal-drivers/serial-via-LPUART
+        mbed-hal-drivers/usb-low-level-via-imxrt-USB
+        mbed-hal-drivers/us-ticker-via-PIT
+        mbed-hal-drivers/flash-via-FLEXSPI
+)
+target_sources(mbed-mcu-mimxrt116x_7x
+    INTERFACE
+        mbed-hal-drivers/fsl-os-abstraction/fsl_os_abstraction_mbed.c
+        mbed-hal-drivers/serial-via-LPUART/serial_api.c
+        mbed-hal-drivers/usb-low-level-via-imxrt-USB/usb_device_ch9.c
+        mbed-hal-drivers/usb-low-level-via-imxrt-USB/usb_device_class.c
+        mbed-hal-drivers/us-ticker-via-PIT/us_ticker.c
+        mbed-hal-drivers/pinmode-via-IOMUXC/pinmap.c
+        mbed-hal-drivers/flash-via-FLEXSPI/flash_api.c
+        mbed-hal-drivers/i2c-via-LPI2C/i2c_api.c
+        mbed-hal-drivers/lpticker-via-GPT/lp_ticker.c
+        mbed-hal-drivers/gpio-and-irq-and-port-via-IGPIO/port_api.c
+        mbed-hal-drivers/gpio-and-irq-and-port-via-IGPIO/gpio_irq_api.c
+        mbed-hal-drivers/gpio-and-irq-and-port-via-IGPIO/gpio_api.c
+        mbed-hal-drivers/analogin-via-RT105x-ADC/analogin_api.c
+        mbed-hal-drivers/spi-via-LPSPI/spi_api.c
+        mbed-hal-drivers/watchdog-via-RTWDOG/watchdog_api.c
+        mbed-hal-drivers/pwmout-via-FlexPWM/pwmout_api.c
+)
+
+# We use the MCUX-based USB driver stack
+target_link_libraries(mbed-mcu-mimxrt116x_7x INTERFACE mbed-nxp-usb)
 
 # Link appropriate startup files for RT117x
 target_sources(mbed-mcu-mimxrt117x INTERFACE
