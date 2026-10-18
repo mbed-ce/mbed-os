@@ -133,13 +133,14 @@ void BOARD_ConfigMPU(void)
 
 }
 
+void BOARD_EarlyInit(void) {
+    BOARD_ConfigMPU();
+}
 
 // called before main
 void mbed_sdk_init()
 {
-    BOARD_ConfigMPU();
     BOARD_BootClockRUN();
-
 }
 
 void spi_setup_clock()

@@ -30,6 +30,10 @@ void mbed_sdk_init()
 {
     BOARD_BootClockFROHF96M(); /* Boot up FROHF96M for SPIFI to use*/
     LPC_CLOCK_RUN; /* Increase clock to full speed based on chip ID */
+
+#ifdef MBED_RAM_BANK_SDRAM_START
+    mbed_lpc546xx_init_sdram();
+#endif
 }
 
 // Get the QSPI clock frequency
