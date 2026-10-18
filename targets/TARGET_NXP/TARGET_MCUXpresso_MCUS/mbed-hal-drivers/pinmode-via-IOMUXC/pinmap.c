@@ -21,12 +21,16 @@
 
 #include "pinmap_device.h"
 
-// Only some MIMXRT-series chips have keeper functionality
-#ifdef IOMUXC_SW_PAD_CTL_PAD_PKE_MASK
-#define HAS_KEEPER 1
+// MIMXRT11xx-series chips have a simpler pullup/pulldown
+// config system that does not have configurable strength.
+// Oddly, those chips still define the relevant bitfields in their headers,
+// they just don't seem to actually existin HW.
+#ifdef IOMUXC_SW_PAD_CTL_PAD_PDRV_MASK
+#define SIMPLE_PULLUP_PULLDOWN 1
 #else
-#define HAS_KEEPER 0
+#define SIMPLE_PULLUP_PULLDOWN 0
 #endif
+
 
 void pin_function(PinName pin, int function)
 {
@@ -72,57 +76,62 @@ void pin_mode(PinName pin, PinMode mode)
     uint32_t volatile * configregister = muxregister + mux_ctl_to_pad_ctl_offset[gpio_number - 1];
 
     reg = *configregister;
+
+#if SIMPLE_PULLUP_PULLDOWN
+    reg &= ~IOMUXC_SW_PAD_CTL_PAD_PULL_MASK;
+    switch (mode) {
+        case PullNone:
+            reg |= IOMUXC_SW_PAD_CTL_PAD_PULL(0b11); // No pull
+            break;
+        case PullDown:
+            reg |= IOMUXC_SW_PAD_CTL_PAD_PULL(0b10); // Pull down
+            break;
+        case PullUp:
+            reg |= IOMUXC_SW_PAD_CTL_PAD_PULL(0b01); // Pull up
+            break;
+        default:
+            break;
+    }
+#else
     switch (mode) {
         case PullNone:
             /* Write 0 to the PUE bit & 1 to the PKE bit to set the pad to keeper mode */
             reg &= ~(IOMUXC_SW_PAD_CTL_PAD_PUE_MASK);
-#if HAS_KEEPER
             reg |= (IOMUXC_SW_PAD_CTL_PAD_PKE_MASK);
-#endif
             break;
         case PullDown:
             /* Write 1 to PKE & PUE bit to enable the pull configuration and 0 to PUS bit for 100K pull down */
             reg &= ~(IOMUXC_SW_PAD_CTL_PAD_PUS_MASK);
             reg |= IOMUXC_SW_PAD_CTL_PAD_PUE_MASK;
-#if HAS_KEEPER
             reg |= IOMUXC_SW_PAD_CTL_PAD_PKE_MASK;
-#endif
             break;
         case PullUp_47K:
             /* Write 1 to PKE & PUE bit to enable the pull configuration and 1 to PUS bit for 47K pull up*/
             reg &= ~(IOMUXC_SW_PAD_CTL_PAD_PUS_MASK);
             reg |= IOMUXC_SW_PAD_CTL_PAD_PUS(1);
             reg |= IOMUXC_SW_PAD_CTL_PAD_PUE_MASK;
-#if HAS_KEEPER
             reg |= IOMUXC_SW_PAD_CTL_PAD_PKE_MASK;
-#endif
             break;
         case PullUp_100K:
             /* Write 1 to PKE & PUE bit to enable the pull configuration and 2 to PUS bit for 100K pull up*/
             reg &= ~(IOMUXC_SW_PAD_CTL_PAD_PUS_MASK);
             reg |= IOMUXC_SW_PAD_CTL_PAD_PUS(2);
             reg |= IOMUXC_SW_PAD_CTL_PAD_PUE_MASK;
-#if HAS_KEEPER
             reg |= IOMUXC_SW_PAD_CTL_PAD_PKE_MASK;
-#endif
             break;
         case PullUp_22K:
             /* Write 1 to PKE & PUE bit to enable the pull configuration and 3 to PUS bit for 22K pull up*/
             reg &= ~(IOMUXC_SW_PAD_CTL_PAD_PUS_MASK);
             reg |= IOMUXC_SW_PAD_CTL_PAD_PUS(3);
             reg |= IOMUXC_SW_PAD_CTL_PAD_PUE_MASK;
-#if HAS_KEEPER
             reg |= IOMUXC_SW_PAD_CTL_PAD_PKE_MASK;
-#endif
             break;
         default:
             break;
     }
+#endif
 
     /* Below settings for DSE and SPEED fields per test results */
-    reg = (reg & ~(IOMUXC_SW_PAD_CTL_PAD_DSE_MASK | IOMUXC_SW_PAD_CTL_PAD_SPEED_MASK)) |
-           IOMUXC_SW_PAD_CTL_PAD_DSE(6) | IOMUXC_SW_PAD_CTL_PAD_SPEED(2);
-
     reg = (reg & ~IOMUXC_SW_PAD_CTL_PAD_DSE_MASK) | IOMUXC_SW_PAD_CTL_PAD_DSE(6);
 #ifdef IOMUXC_SW_PAD_CTL_PAD_SPEED
     reg = (reg & ~IOMUXC_SW_PAD_CTL_PAD_SPEED_MASK) | IOMUXC_SW_PAD_CTL_PAD_SPEED(2);

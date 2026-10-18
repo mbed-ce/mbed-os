@@ -143,54 +143,7 @@ void mbed_sdk_init()
     BOARD_BootClockRUN();
 }
 
-void spi_setup_clock()
-{
-   
-}
-
-uint32_t spi_get_clock(void)
-{
-    return 1;
-}
-
-void us_ticker_setup_clock()
-{
- //  CLOCK_EnableClock(s_pitClocks[PIT_GetInstance(base)]);
-}
-
-uint32_t us_ticker_get_clock()
-{
-return CLOCK_GetRootClockFreq(kCLOCK_Root_Bus);
-}
-
-void serial_setup_clock(void)
-{
-      BOARD_ConfigMPU();
-      BOARD_BootClockRUN();
-
-}
-
-uint32_t serial_get_clock(void)
-{
-    return CLOCK_GetRootClockFreq(kCLOCK_Root_Lpuart1);;
-}
-
-void i2c_setup_clock()
-{
-  
-}
-
-uint32_t i2c_get_clock()
-{
-    return 1;
-}
-
-uint32_t pwm_get_clock()
-{
-    return CLOCK_GetFreq(kCLOCK_Root_Bus);
-}
-
-void pwm_setup(uint32_t instance)
+void flexpwm_setup(uint32_t instance)
 {
     /* Use default clock settings */
     /* Set the PWM Fault inputs to a low value */
@@ -221,5 +174,37 @@ void pwm_setup(uint32_t instance)
     }
 }
 
+uint32_t pit_get_clock()
+{
+    return BOARD_BOOTCLOCKRUN_BUS_CLK_ROOT;
+}
 
+void lpspi_setup_clock()
+{
+    // Not needed on MIMXRT105x
+}
 
+uint32_t lpspi_get_clock(void)
+{
+    return BOARD_BOOTCLOCKRUN_LPSPI1_CLK_ROOT;
+}
+
+void lpi2c_setup_clock()
+{
+    // Not needed on MIMXRT105x
+}
+
+uint32_t lpi2c_get_clock()
+{
+    return BOARD_BOOTCLOCKRUN_LPI2C1_CLK_ROOT;
+}
+
+uint32_t flexpwm_get_clock()
+{
+    return BOARD_BOOTCLOCKRUN_BUS_CLK_ROOT;
+}
+
+uint32_t pwm_get_clock()
+{
+    return BOARD_BOOTCLOCKRUN_BUS_CLK_ROOT;
+}
