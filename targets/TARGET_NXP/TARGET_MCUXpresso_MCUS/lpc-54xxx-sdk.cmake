@@ -83,6 +83,12 @@ target_sources(mbed-mcu-lpc54xxx
         mbed-hal-drivers/analogin-via-LPC-ADC/analogin_api.c
         mbed-hal-drivers/us-ticker-via-CTIMER/us_ticker.c
         mbed-hal-drivers/port-via-LPC-GPIO/port_api.c
+        mbed-hal-drivers/i2c-via-FLEXCOMM/i2c_api.c
+        mbed-hal-drivers/rtc-via-LPC-RTC/rtc_api.c
+        mbed-hal-drivers/spi-via-FLEXCOMM/spi_api.c
+        mbed-hal-drivers/sleep-via-LPC-SYSCON-POWER/sleep.c
+        mbed-hal-drivers/pinmode-via-IOCON/pinmap.c
+        mbed-hal-drivers/flash-via-FLASHIAP/flash_api.c
 )
 
 target_include_directories(mbed-mcu-lpc54xxx
