@@ -19,20 +19,17 @@
 #include "clock_config.h"
 #include "fsl_flashiap.h"
 #include "fsl_power.h"
+#include "device.h"
 
 #include "MbedCRC.h"
+
+extern "C" void mbed_lpc546xx_init_sdram();
 
 // called before main
 void mbed_sdk_init()
 {
-    if (SYSCON->DEVICE_ID0 == 0xFFF54628) {
-        BOARD_BootClockFROHF96M(); /* Boot up FROHF96M for SPIFI to use*/
-        /* LPC54628 runs at a higher core speed */
-        BOARD_BootClockPLL220M();
-    } else {
-        BOARD_BootClockFROHF96M(); /* Boot up FROHF96M for SPIFI to use*/
-        BOARD_BootClockPLL180M();
-    }
+    BOARD_BootClockFROHF96M(); /* Boot up FROHF96M for SPIFI to use*/
+    LPC_CLOCK_RUN; /* Increase clock to full speed based on chip ID */
 }
 
 // Get the QSPI clock frequency
