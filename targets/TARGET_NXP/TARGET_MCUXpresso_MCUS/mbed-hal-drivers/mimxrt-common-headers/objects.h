@@ -18,7 +18,7 @@
 #define MBED_OBJECTS_H
 
 #include "cmsis.h"
-#include "../../TARGET_MIMXRT105x_6x/PortNames.h"
+#include "PortNames.h"
 #include "PeripheralNames.h"
 #include "PinNames.h"
 
