@@ -4926,6 +4926,22 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "components_add": [
             "QSPIF"
         ],
+        "memory_banks": {
+            "SDRAM": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x1000000,
+                // 16MiB
+                "start": 0x80000000,
+                "startup": false
+            },
+        },
         "device_name": "LPC54628J512ET180",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/LPCXpresso54608_back.png"
     },
