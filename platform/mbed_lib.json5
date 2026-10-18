@@ -255,7 +255,7 @@
         "MCU_STM32H7": {
             "crash-capture-enabled": true
         },
-        "MIMXRT105X": {
+        "MCU_MIMXRT105X": {
             "crash-capture-enabled": true
         },
         "MCU_LPC546XX": {

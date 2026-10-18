@@ -4516,9 +4516,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
 
     // NXP MCUXpresso Targets ---------------------------------------------------------------------------------------------
 
-    // Note: "MIMXRT105X" target is for the MIMXRT1051, MIMXRT1052, MIMXRT1061, and MIMXRT1062
+    // Note: "MIMXRT105X" target is for the MIMXRT1051, MIMXRT1052, MIMXRT1061, and MIMXRT1062.
+    // In fact, most features of this target should apply to all current MIMXRT10xx family MCUs,
+    // but Mbed doesn't currently support any other targets in that family, and NXP doesn't follow
+    // a very logical part numbering scheme, so it's hard to say whether future parts will break this
+    // relationship. So, leaving this for now but may rename it later.
     // See here for details: https://github.com/mbed-ce/mbed-os/wiki/MCU-Info-Page:-MIMXRT105x-and-106x
-    "MIMXRT105X": {
+    "MCU_MIMXRT105X": {
         "core": "Cortex-M7FD",
         "public": false,
         "extra_labels": [
@@ -4579,7 +4583,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
      },
     "MIMXRT1050_EVK": {
         "inherits": [
-            "MIMXRT105X"
+            "MCU_MIMXRT105X"
         ],
         "extra_labels_add": [
             "EVK",
@@ -4634,7 +4638,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "MIMXRT1060_EVK": {
         "inherits": [
-            "MIMXRT105X"
+            "MCU_MIMXRT105X"
         ],
         "extra_labels_add": [
             "EVK",
@@ -4688,7 +4692,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "TEENSY_40": {
         "inherits": [
-            "MIMXRT105X"
+            "MCU_MIMXRT105X"
         ],
         "extra_labels_add": [
             "TEENSY_4X",
@@ -4737,7 +4741,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "TEENSY_41": {
         "inherits": [
-            "MIMXRT105X"
+            "MCU_MIMXRT105X"
         ],
         "extra_labels_add": [
             "TEENSY_4X",
@@ -4783,20 +4787,20 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "MIMXRT1062DVL6B",
         "image_url": "https://www.pjrc.com/store/teensy41_4.jpg"
     },
-    "MIMXRT1170_EVK": {
-        "supported_form_factors": [
-            "ARDUINO_UNO"
-        ],
+    // Family target for MIMXRT116x/117x MCUs.
+    // This target does not apply to MIMXRT118x which has a fundamentally very different
+    // architecture.
+    "MCU_MIMXRT116x_7x": {
         "core": "Cortex-M7FD",
-        "extra_labels": [
+        inherits: [
+            "Target"
+        ],
+        "extra_labels_add": [
             "NXP",
             "MCUXpresso_MCUS",
-            "EVK",
-            "MIMXRT1170",
             "IMX"
         ],
-        "macros": [
-            "CPU_MIMXRT1176DVMAA_cm7",
+        "macros_add": [
             "FSL_RTOS_MBED",
             "XIP_BOOT_HEADER_ENABLE=1",
             "XIP_EXTERNAL_FLASH=1",
@@ -4809,10 +4813,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_TICKLESS",
             "DATA_SECTION_IS_CACHEABLE=1"
         ],
-        "inherits": [
-            "Target"
-        ],
-        "device_has": [
+        "device_has_add": [
             "ANALOGIN",
             "FLASH",
             "INTERRUPTIN",
@@ -4825,8 +4826,31 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER",
             "USTICKER"
         ],
+        public: false,
+    },
+    "MCU_MIMXRT117x": {
+        inherits: [
+            "MCU_MIMXRT116x_7x"
+        ],
+        "extra_labels_add": [
+            "MIMXRT1170",
+        ],
+        "macros_add": [
+            "CPU_MIMXRT1176DVMAA_cm7",
+        ],
+        public: false
+    },
+    "MIMXRT1170_EVK": {
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "extra_labels_add": [
+            "EVK",
+        ],
+        "inherits": [
+            "MCU_MIMXRT117x"
+        ],
         "device_name": "MIMXRT1176DVMAA",
-
         memory_banks: {
             // EVK board has W25Q512NWEIQ flash mounted
             "EXT_FLASH": {
@@ -4858,7 +4882,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "startup": false
             }
         },
-
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/MIMXRT1170-EVKB-TOP-IMG.jpg"
     },
     "MCU_LPC54xxx": {

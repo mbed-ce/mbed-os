@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Jamie Smith
+# SPDX-License-Identifier: Apache-2.0
+
 add_library(mbed-mcu-mimxrt105x_6x INTERFACE)
 add_library(mbed-mcu-mimxrt105x INTERFACE)
 target_link_libraries(mbed-mcu-mimxrt105x INTERFACE mbed-mcu-mimxrt105x_6x)
