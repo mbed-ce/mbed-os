@@ -4992,7 +4992,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "LPCXPRESSO54628": {
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "inherits": [
             "MCU_LPC546XX"

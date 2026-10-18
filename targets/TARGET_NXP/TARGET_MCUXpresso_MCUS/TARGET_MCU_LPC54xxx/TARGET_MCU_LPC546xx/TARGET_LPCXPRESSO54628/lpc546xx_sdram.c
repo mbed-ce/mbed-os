@@ -62,7 +62,7 @@ void mbed_lpc546xx_init_sdram(void)
     dynTiming.tRas_Ns = SDRAM_TRAS_NS;
     dynTiming.tSrex_Ns = SDRAM_TSREX_NS;
     dynTiming.tApr_Ns = SDRAM_TAPR_NS;
-    dynTiming.tWr_Ns = (1000000000 / CLOCK_GetFreq(kCLOCK_EMC) + SDRAM_TWRDELT_NS); /* one clk + 6ns */
+    dynTiming.tWr_Ns = (1000000000 / CLOCK_GetEmcClkFreq() + SDRAM_TWRDELT_NS); /* one clk + 6ns */
     dynTiming.tDal_Ns = dynTiming.tWr_Ns + dynTiming.tRp_Ns;
     dynTiming.tRc_Ns = SDRAM_TRC_NS;
     dynTiming.tRfc_Ns = SDRAM_RFC_NS;

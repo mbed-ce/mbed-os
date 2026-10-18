@@ -184,44 +184,27 @@ typedef enum {
     P4_15 = (4 <<  PORT_SHIFT | 15),
     P4_16 = (4 <<  PORT_SHIFT | 16),
 
-    LED_RED   = P2_2,
-
-    // mbed original LED naming
-    LED1 = P3_14,
-    LED2 = P3_3,
-    LED3 = LED_RED,
-    LED4 = LED_RED,
-
-    //Push buttons
-    SW2 = P0_6,
-    SW3 = P0_5,
-    SW4 = P0_4,
-    SW5 = P1_1,
-
     // USB Pins
     CONSOLE_TX = P0_30,
     CONSOLE_RX = P0_29,
 
     // Arduino Headers
-    D0 = P3_26,
-    D1 = P3_27,
-    D2 = P3_2,
-    D3 = P4_5,
-    D4 = P3_10,
-    D5 = P3_14,
-    D6 = P3_1,
-    D7 = P1_22,
-    D8 = P4_7,
-    D9 = P2_1,
-    D10 = P3_30,
-    D11 = P3_21,
-    D12 = P3_22,
-    D13 = P3_20,
-    D14 = P3_23,
-    D15 = P3_24,
-
-    I2C_SCL = D15,
-    I2C_SDA = D14,
+    ARDUINO_UNO_D0 = P3_26,
+    ARDUINO_UNO_D1 = P3_27,
+    ARDUINO_UNO_D2 = P3_2,
+    ARDUINO_UNO_D3 = P4_5,
+    ARDUINO_UNO_D4 = P3_10,
+    ARDUINO_UNO_D5 = P3_14,
+    ARDUINO_UNO_D6 = P3_1,
+    ARDUINO_UNO_D7 = P1_22,
+    ARDUINO_UNO_D8 = P4_7,
+    ARDUINO_UNO_D9 = P2_1,
+    ARDUINO_UNO_D10 = P3_30,
+    ARDUINO_UNO_D11 = P3_21,
+    ARDUINO_UNO_D12 = P3_22,
+    ARDUINO_UNO_D13 = P3_20,
+    ARDUINO_UNO_D14 = P3_23,
+    ARDUINO_UNO_D15 = P3_24,
 
     /**** QSPI FLASH pins ****/
     QSPI_FLASH1_IO0 = P0_24,
@@ -231,17 +214,27 @@ typedef enum {
     QSPI_FLASH1_SCK = P0_26,
     QSPI_FLASH1_CSN = P0_23,
 
-    A0 = P0_16,
-    A1 = P0_31,
-    A2 = P1_0,
-    A3 = P2_0,
-    A4 = P3_4,
-    A5 = P1_1,
+    ARDUINO_UNO_A0 = P0_16,
+    ARDUINO_UNO_A1 = P0_31,
+    ARDUINO_UNO_A2 = P1_0,
+    ARDUINO_UNO_A3 = P2_0,
+    ARDUINO_UNO_A4 = P3_4,
+    ARDUINO_UNO_A5 = P1_1,
 
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
 
+// Board LEDs
+#define LED1 P3_14
+#define LED2 P3_3
+#define LED3 P2_2
+
+// Push buttons
+#define BUTTON1 P0_6
+#define BUTTON2 P0_5
+#define BUTTON3 P0_4
+#define BUTTON4 P1_1
 
 typedef enum {
     PullNone = 0,
