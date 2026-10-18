@@ -62,7 +62,7 @@
 #elif defined(TARGET_FRDM_K82F)
 #include "NXP/K82F/flash_config.h"
 
-#elif defined(TARGET_LPC546XX)
+#elif defined(TARGET_LPCXPRESSO54628)
 #include "NXP/LPC546XX/flash_config.h"
 
 #elif(  defined(TARGET_CY8CKIT_062_BLE) ||          \

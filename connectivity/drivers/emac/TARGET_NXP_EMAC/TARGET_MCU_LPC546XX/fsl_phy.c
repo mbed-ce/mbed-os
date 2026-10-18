@@ -54,19 +54,6 @@
 extern uint32_t ENET_GetInstance(ENET_Type *base);
 
 /*******************************************************************************
- * Variables
- ******************************************************************************/
-
-#if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
-/*! @brief Pointers to enet clocks for each instance. */
-#if defined(FSL_FEATURE_SOC_ENET_COUNT) && (FSL_FEATURE_SOC_ENET_COUNT > 0)
-extern clock_ip_name_t s_enetClock[FSL_FEATURE_SOC_ENET_COUNT];
-#elif defined(FSL_FEATURE_SOC_LPC_ENET_COUNT) && (FSL_FEATURE_SOC_LPC_ENET_COUNT > 0)
-extern clock_ip_name_t s_enetClock[FSL_FEATURE_SOC_LPC_ENET_COUNT];
-#endif
-#endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
-
-/*******************************************************************************
  * Code
  ******************************************************************************/
 

@@ -39,6 +39,7 @@ target_sources(mbed-mcu-lpc54xxx
         mbed-mcux-sdk/drivers/fmc/fsl_fmc.c
         mbed-mcux-sdk/drivers/rng/fsl_rng.c
         mbed-mcux-sdk/drivers/sha/fsl_sha.c
+        mbed-mcux-sdk/drivers/emc/fsl_emc.c
 )
 
 target_include_directories(mbed-mcu-lpc54xxx
@@ -71,6 +72,7 @@ target_include_directories(mbed-mcu-lpc54xxx
         mbed-mcux-sdk/drivers/otp
         mbed-mcux-sdk/drivers/rng
         mbed-mcux-sdk/drivers/sha
+        mbed-mcux-sdk/drivers/emc
 )
 
 # Link Mbed HAL drivers
@@ -89,6 +91,7 @@ target_sources(mbed-mcu-lpc54xxx
         mbed-hal-drivers/sleep-via-LPC-SYSCON-POWER/sleep.c
         mbed-hal-drivers/pinmode-via-IOCON/pinmap.c
         mbed-hal-drivers/flash-via-FLASHIAP/flash_api.c
+        mbed-hal-drivers/qspi-via-SPIFI/qspi_api.c
 )
 
 target_include_directories(mbed-mcu-lpc54xxx
