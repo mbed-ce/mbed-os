@@ -206,7 +206,20 @@ typedef enum {
     GPIO_LPSR_13 = ((6 << GPIO_PORT_SHIFT) | 13),
     GPIO_LPSR_14 = ((6 << GPIO_PORT_SHIFT) | 14),
     GPIO_LPSR_15 = ((6 << GPIO_PORT_SHIFT) | 15),
- 
+
+    WAKEUP = ((13 << GPIO_PORT_SHIFT) | 0),
+    PMIC_ON_REQ = ((13 << GPIO_PORT_SHIFT) | 1),
+    PMIC_STBY_REQ = ((13 << GPIO_PORT_SHIFT) | 2),
+    GPIO_SNVS_00 = ((13 << GPIO_PORT_SHIFT) | 3),
+    GPIO_SNVS_01 = ((13 << GPIO_PORT_SHIFT) | 4),
+    GPIO_SNVS_02 = ((13 << GPIO_PORT_SHIFT) | 5),
+    GPIO_SNVS_03 = ((13 << GPIO_PORT_SHIFT) | 6),
+    GPIO_SNVS_04 = ((13 << GPIO_PORT_SHIFT) | 7),
+    GPIO_SNVS_05 = ((13 << GPIO_PORT_SHIFT) | 8),
+    GPIO_SNVS_06 = ((13 << GPIO_PORT_SHIFT) | 9),
+    GPIO_SNVS_07 = ((13 << GPIO_PORT_SHIFT) | 10),
+    GPIO_SNVS_08 = ((13 << GPIO_PORT_SHIFT) | 11),
+    GPIO_SNVS_09 = ((13 << GPIO_PORT_SHIFT) | 12),
  
     // USB Pins
     CONSOLE_TX = GPIO_AD_24,
@@ -245,12 +258,9 @@ typedef enum {
 
 typedef enum {
     PullNone = 0,
-    PullDown = 1,
-    PullUp_47K  = 2,
-    PullUp_100K = 3,
-    PullUp_22K  = 4,
-    PullDefault = PullUp_47K,
-    PullUp = PullUp_47K
+    PullDown = 1, // 10-100k pulldown, per datasheet
+    PullUp = 2, // 10-100k pullup, per datasheet
+    PullDefault = PullDown
 } PinMode;
 
 #ifdef __cplusplus
