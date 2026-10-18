@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 #include "pinmap.h"
-#include "clock_config.h"
+#include "../../TARGET_MIMXRT116x_7x/TARGET_MIMXRT117x/TARGET_MIMXRT1170_EVK/clock_config.h"
 #include "fsl_clock.h"
 #include "fsl_iomuxc.h"
 #include "fsl_gpio.h"
