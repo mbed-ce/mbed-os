@@ -22,11 +22,14 @@ extern "C" {
 #endif
 
 typedef enum {
-    Gpio1 = 1,
-    Gpio2 = 2,
-    Gpio3 = 3,
-    Gpio4 = 4,
-    Gpio5 = 5
+    Gpio1 = 1, // GPIO_EMC_B1_00 through GPIO_EMC_B1_31
+    Gpio2 = 2, // GPIO_EMC_B1_32 through GPIO_EMC_B1_41, GPIO_EMC_B2_xx, GPIO_AD_00
+    Gpio3 = 3, // GPIO_AD_01 through GPIO_AD_32
+    Gpio4 = 4, // GPIO_AD_33 through GPIO_AD_35, GPIO_SD_Bx_xx, GPIO_DISP_B1_00 through GPIO_DISP_B1_10
+    Gpio5 = 5, // GPIO_DISP_B1_11, GPIO_DISP_B2_xx
+    Gpio6 = 6, // GPIO_LPSR_xx
+    // Logical GPIOs 7 through 12 are mirrors of GPIOs 1-6
+    Gpio13 = 13, // WAKEUP, PMIC_ON_REQ, PMIC_STBY_REQ, GPIO_SNVS_xx
 } PortName;
 
 #ifdef __cplusplus

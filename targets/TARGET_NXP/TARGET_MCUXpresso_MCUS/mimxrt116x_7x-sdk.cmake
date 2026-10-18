@@ -10,6 +10,7 @@ target_link_libraries(mbed-mcu-mimxrt117x INTERFACE mbed-mcu-mimxrt116x_7x)
 target_sources(mbed-mcu-mimxrt116x_7x INTERFACE
         mbed-mcux-sdk/drivers/common/fsl_common.c
         mbed-mcux-sdk/drivers/common/fsl_common_arm.c
+        mbed-mcux-sdk/drivers/cache/armv7-m7/fsl_cache.c
         mbed-mcux-sdk/drivers/adc_etc/fsl_adc_etc.c
         mbed-mcux-sdk/drivers/lpi2c/fsl_lpi2c.c
         mbed-mcux-sdk/drivers/lpi2c/fsl_lpi2c_edma.c
@@ -51,6 +52,7 @@ target_sources(mbed-mcu-mimxrt116x_7x INTERFACE
 
 target_include_directories(mbed-mcu-mimxrt116x_7x INTERFACE
         mbed-mcux-sdk/drivers/common
+        mbed-mcux-sdk/drivers/cache/armv7-m7
         mbed-mcux-sdk/drivers/adc_etc
         mbed-mcux-sdk/drivers/lpi2c
         mbed-mcux-sdk/drivers/lpspi
@@ -110,10 +112,10 @@ target_sources(mbed-mcu-mimxrt116x_7x
         mbed-hal-drivers/gpio-and-irq-and-port-via-IGPIO/port_api.c
         mbed-hal-drivers/gpio-and-irq-and-port-via-IGPIO/gpio_irq_api.c
         mbed-hal-drivers/gpio-and-irq-and-port-via-IGPIO/gpio_api.c
-        mbed-hal-drivers/analogin-via-RT105x-ADC/analogin_api.c
         mbed-hal-drivers/spi-via-LPSPI/spi_api.c
         mbed-hal-drivers/watchdog-via-RTWDOG/watchdog_api.c
         mbed-hal-drivers/pwmout-via-FlexPWM/pwmout_api.c
+        mbed-hal-drivers/analogin-via-LPADC/analogin_api.c
 )
 
 # We use the MCUX-based USB driver stack

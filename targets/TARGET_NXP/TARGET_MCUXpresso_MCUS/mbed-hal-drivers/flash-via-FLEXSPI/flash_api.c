@@ -19,6 +19,12 @@
 #include "mbed_toolchain.h"
 #include "mbed_critical.h"
 
+// For devices with multiple flexspis
+#if !defined(FLEXSPI) && defined(FLEXSPI1)
+#define FLEXSPI FLEXSPI1
+#define FlexSPI_AMBA_BASE FlexSPI1_AMBA_BASE
+#endif
+
 #if DEVICE_FLASH
 
 #include "fsl_flexspi.h"

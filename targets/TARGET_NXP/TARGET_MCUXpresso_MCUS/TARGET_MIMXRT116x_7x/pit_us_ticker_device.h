@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2009-2011 ARM Limited. All rights reserved.
+/* mbed Microcontroller Library
+ * Copyright (c) 2026 Jamie Smith
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,14 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * A generic CMSIS include header, pulling in LPC11U24 specifics
  */
 
-#ifndef MBED_CMSIS_H
-#define MBED_CMSIS_H
+#pragma once
 
-#include "fsl_device_registers.h"
-#include "cmsis_nvic.h"
-
-#endif
+#define US_TICKER_PIT_IRQ PIT1_IRQn
+#define US_TICKER_PIT_INSTANCE PIT1
