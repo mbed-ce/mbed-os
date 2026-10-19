@@ -5118,7 +5118,13 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-KL43Z-BLOCK-DIAGRAM.jpg"
     },
-    "KW41Z": {
+    // MCU family target for Kinetis KWx1 devices. Note that the part number situation here is kinda
+    // backwards: KW21, KW31, and KW41 are all part of this MCU family, but KW40, KW45, and KW47
+    // are all fundamentally different MCUs with a different core. NXP, why you do this??
+    "MCU_KWx1": {
+        "inherits": [
+            "Target"
+        ],
         "core": "Cortex-M0+",
         "extra_labels": [
             "Freescale",
@@ -5129,7 +5135,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FRAMEWORK_5_3_3"
         ],
         "macros": [
-            "CPU_MKW41Z512VHT4",
             "FSL_RTOS_MBED",
             "MBED_TICKLESS"
         ],
@@ -5155,14 +5160,26 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "FLASH",
             "802_15_4_PHY"
         ],
-        "device_name": "MKW41Z512xxx4",
-        "overrides": {
-            "network-default-interface-type": "MESH"
-        },
         public: false,
         "is_mcu_family_target": true
     },
-    "FRDM_K41Z": {
+    "MCU_KW41Z": {
+        "inherits": [
+            "MCU_KWx1"
+        ],
+        "macros_add": [
+            "CPU_MKW41Z512VHT4"
+        ],
+        "overrides": {
+            "network-default-interface-type": "MESH"
+        },
+        "device_name": "MKW41Z512xxx4",
+        public: false
+    },
+    "FRDM_KW41Z": {
+        "inherits": [
+            "MCU_KW41Z"
+        ],
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
