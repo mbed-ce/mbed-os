@@ -39,7 +39,6 @@ target_sources(mbed-mcu-kwx1
         mbed-mcux-sdk/drivers/vref/fsl_vref.c
         mbed-mcux-sdk/drivers/dcdc/fsl_dcdc.c
         mbed-mcux-sdk/drivers/ltc/fsl_ltc.c
-        mbed-mcux-sdk/drivers/ltc/fsl_ltc_dpa.c
         mbed-mcux-sdk/drivers/ltc/fsl_ltc_edma.c
 )
 
@@ -57,6 +56,7 @@ target_include_directories(mbed-mcu-kwx1
         mbed-mcux-sdk/drivers/cmp
         mbed-mcux-sdk/drivers/flash
         mbed-mcux-sdk/drivers/gpio
+        mbed-mcux-sdk/drivers/port
         mbed-mcux-sdk/drivers/llwu
         mbed-mcux-sdk/drivers/lptmr
         mbed-mcux-sdk/drivers/pit
@@ -69,6 +69,20 @@ target_include_directories(mbed-mcu-kwx1
         mbed-mcux-sdk/drivers/vref
         mbed-mcux-sdk/drivers/dcdc
         mbed-mcux-sdk/drivers/ltc
+)
+
+# Link appropriate Mbed OS HALs that interface with this MCU
+target_include_directories(mbed-mcu-kwx1
+    INTERFACE
+        mbed-hal-drivers/kinetis-common-headers
+        mbed-hal-drivers/serial-via-LPUART
+        mbed-hal-drivers/us-ticker-via-TPM-PIT
+)
+target_sources(mbed-mcu-kwx1
+    INTERFACE
+        mbed-hal-drivers/gpio-via-GPIO/gpio_api.c
+        mbed-hal-drivers/serial-via-LPUART/serial_api.c
+        mbed-hal-drivers/us-ticker-via-TPM-PIT/us_ticker.c
 )
 
 # Link appropriate headers and startup files
