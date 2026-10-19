@@ -1,13 +1,11 @@
 # STM32WB0 family
 
 The STM32WB0 family contains low-power wireless microcontrollers based on an
-Arm Cortex-M0+ application core and a 2.4 GHz radio subsystem. The core runs at
-up to 64 MHz and the family provides Bluetooth Low Energy and proprietary
-2.4 GHz radio hardware.
+Arm Cortex-M0+ core that runs at up to 64 MHz and the family provides Bluetooth Low Energy and proprietary 2.4 GHz radio hardware.
 
 STM32WB0 is a separate product family from STM32WB. STM32WB0 devices use their
 own CMSIS device package, HAL driver and startup flow; they must not be placed
-under `TARGET_STM32WB`.
+under `TARGET_STM32WB0`.
 
 - [STM32WB0 family page](https://www.st.com/en/microcontrollers-microprocessors/stm32wb0-series.html)
 - [STM32CubeWB0](https://github.com/STMicroelectronics/STM32CubeWB0)
@@ -16,10 +14,10 @@ under `TARGET_STM32WB`.
 
 ## Vendor dependencies
 
-| Component | Version | Pinned revision |
-| --- | --- | --- |
-| CMSIS device package | `v1.4.0` | `f893ef4a3886f53f8042daca733cfcde9b708ed2` |
-| STM32WB0 HAL driver | `v1.5.0` | `9469b33cff37a3c01cccdd9935a0fa7676aacc08` |
+| Component            | Version    |
+| -------------------- | ---------- |
+| CMSIS device package | `v1.4.0` |
+| STM32WB0 HAL driver  | `v1.5.0` |
 
 ## MbedCE target structure
 
@@ -51,6 +49,14 @@ LSE or LSI. RTOS builds use Mbed tickless idle so that an idle RTX kernel
 can enter Deepstop; without `MBED_TICKLESS`, RTX deliberately locks deep sleep
 and uses ordinary sleep.
 
+Enabled `InterruptIn` pins that have a corresponding PWR wake line are armed
+automatically immediately before Deepstop. After wake and context restoration,
+the retained PWR wake source is dispatched through the original Mbed rising or
+falling callback. The PWR block supports one polarity per pin; when both edges
+are attached, the target arms the next possible edge based on the pin's level
+at Deepstop entry. A pin without a PWR wake mapping remains usable as an
+ordinary `InterruptIn`, but cannot wake the MCU from Deepstop.
+
 The family provides a weak `gpio_deep_sleep_prepare()` hook for board-specific
 PWR pull configuration. A board or custom target may override it to reduce pad
 leakage, but the configuration must preserve every active oscillator, wake,
@@ -66,9 +72,8 @@ example, can stop the RTC clock after Deepstop entry and prevent wake-up.
 The initial family port provides:
 
 - digital GPIO and port I/O;
-- `InterruptIn`;
 - USART and LPUART serial operation;
-- microsecond ticker and `wait_ns`;
+- microsecond ticker
 - RTC with LSE and LSI support;
 - RTC-based low-power ticker;
 - sleep and deep sleep;
@@ -94,8 +99,8 @@ The MCU contains several of these peripherals in hardware. Their absence from
 
 The common clock configuration supports these system clock sources:
 
-| Configuration | System clock | External component | Note |
-| --- | ---: | --- | --- |
-| `USE_RC64MPLL` | 64 MHz | 32 MHz HSE crystal | Required for BLE radio operation |
-| `USE_DIRECT_HSE` | 32 MHz | 32 MHz HSE crystal | |
-| `USE_HSI` | 64 MHz | None | |
+| Configuration      | System clock | External component | Note                                               |
+| ------------------ | -----------: | ------------------ | -------------------------------------------------- |
+| `USE_RC64MPLL`   |       64 MHz | 32 MHz HSE crystal | Required for BLE radio operation and also default! |
+| `USE_DIRECT_HSE` |       32 MHz | 32 MHz HSE crystal |                                                    |
+| `USE_HSI`        |       64 MHz | None               |                                                    |

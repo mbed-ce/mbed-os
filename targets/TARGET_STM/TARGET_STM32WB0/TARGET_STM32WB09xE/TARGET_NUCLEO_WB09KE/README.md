@@ -14,9 +14,9 @@ STM32WB09KEV6 MCU and the on-board STLINK-V3EC debugger/programmer.
 | -------------- | -------------------------------------------------------- |
 | Target name    | `NUCLEO_WB09KE`                                        |
 | MCU target     | [`MCU_STM32WB09xE`](../README.md)                       |
-| System clock   | 64 MHz RC64MPLL, with 64 MHz HSI fallback                |
+| System clock   | 64 MHz RC64MPLL (default)                                |
 | HSE            | 32 MHz crystal                                           |
-| LSE            | 32.768 kHz crystal                                       |
+| LSE            | 32.768 kHz crystal (default on)                          |
 | Default supply | 3.3 V                                                    |
 | Debug probe    | STLINK-V3EC over SWD                                     |
 | Console        | USART1 through the ST-LINK virtual COM port, 115200 baud |
@@ -70,8 +70,7 @@ when LSI is active. Pulling these pins while LSE is active can stop the RTC and
 prevent wake-up.
 
 With these conditions, measurements on the tested NUCLEO-WB09KE were about
-2 mA in ordinary Mbed sleep and **1.5 uA** in Mbed deepsleep (full profile and also bare metal profile). These are indicative board
-measurements, not guaranteed MCU limits.
+2 mA in ordinary Mbed sleep and **1.5 uA** in Mbed deepsleep (full profile and also bare metal profile). These are indicative board measurements, not guaranteed MCU limits.
 
 ## Programming
 
@@ -80,11 +79,9 @@ guide for the general STM32 programming and debugging workflow.
 
 The default upload method for this target is `STM32CUBE`. The board is
 connected through SWD in hot-plug mode because normal reset-mode connection is
-not reliable:
+not reliable.
 
-```text
--c port=SWD mode=HOTPLUG -hardRst -halt
-```
+If the debug probe cannot connect to the target, the MCU is probably in DeepStop mode. To recover it, move the onboard JP1 jumper to the **BOOT** position, press  **Reset** , deploy the firmware, move JP1 back to its normal position, and press **Reset** again.
 
 Raw binary files are programmed at the application flash base
 `0x10040000`. The generated MbedCE flash target supplies this address
