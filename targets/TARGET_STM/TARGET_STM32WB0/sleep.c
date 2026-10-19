@@ -8,6 +8,9 @@
 #include "gpio_low_power.h"
 #include "mbed_critical.h"
 #include "us_ticker_data.h"
+#if DEVICE_INTERRUPTIN
+#include "gpio_irq_deepsleep.h"
+#endif
 
 extern void save_timer_ctx(void);
 extern void restore_timer_ctx(void);
@@ -21,9 +24,9 @@ extern int mbed_sdk_inited;
 #define CSTACK_PREAMBLE_WORDS 20U
 #define GPIO_PORT_COUNT       2U
 
-/* Deepstop retains the SRAM banks in place. These variables hold copies of
- * CPU and peripheral registers needed to resume Mbed after the reset-style
- * wake. The .noinit section prevents startup from modifying those copies.
+/* STM32WB0 Deepstop retains the SRAM banks in place. These variables hold copies of
+ * CPU and some peripheral registers needed to resume Mbed after the
+ * wake-up. The .uninitialized section prevents startup from modifying those copies.
  */
 static uint32_t saved_vtor RETAINED_CONTEXT;
 static uint32_t saved_nvic_iser RETAINED_CONTEXT;
@@ -46,7 +49,7 @@ static uint32_t saved_cpu_context[12] RETAINED_CONTEXT;
  */
 static uint32_t saved_cstack_preamble[CSTACK_PREAMBLE_WORDS] RETAINED_CONTEXT;
 
-/* Keep an explicit copy of the Mbed GPIO configuration across the wake path. */
+/** Keep an explicit copy of the Mbed GPIO configuration across the wake path. */
 typedef struct {
     uint32_t moder;
     uint32_t otyper;
@@ -198,11 +201,11 @@ static void save_device_context(void)
 /** Restore MCU configuration registers after clocks become available again. */
 static void restore_device_context(void)
 {
-    /* Enable the peripheral clocks before accessing GPIO and SYSCFG. */
+    // Enable the peripheral clocks before accessing GPIO and SYSCFG.
     RCC->AHBENR |= saved_ahbenr;
     RCC->APB1ENR |= saved_apb1enr;
 
-    /* Restore output values before GPIO modes to avoid visible output glitches. */
+    // Restore output values before GPIO modes to avoid visible output glitches.
     for (uint32_t index = 0U; index < GPIO_PORT_COUNT; index++) {
         GPIO_TypeDef *gpio = gpio_port(index);
         gpio->ODR = saved_gpio[index].odr;
@@ -214,17 +217,17 @@ static void restore_device_context(void)
         gpio->MODER = saved_gpio[index].moder;
     }
 
-    /* Restore InterruptIn edge selection, clear stale events, then re-enable
-     * the configured GPIO interrupt sources.
-     */
+    // Restore InterruptIn edge selection, then re-enable the configured GPIO
+    // interrupt sources. Do not clear IO_ISCR here: if a GPIO interrupt made
+    // WFI cancel the Deepstop entry, its pending flag must reach the normal
+    // GPIO IRQ handler after the critical section ends.
     SYSCFG->IO_IER = 0;
     SYSCFG->IO_DTR = saved_syscfg_io_dtr;
     SYSCFG->IO_IBER = saved_syscfg_io_iber;
     SYSCFG->IO_IEVR = saved_syscfg_io_ievr;
-    SYSCFG->IO_ISCR = UINT32_MAX;
     SYSCFG->IO_IER = saved_syscfg_io_ier;
 
-    /* Restore the vector table, interrupt priorities, and system tick. */
+    // Restore the vector table, interrupt priorities, and system tick.
     SCB->VTOR = saved_vtor;
     NVIC->ISER[0] = saved_nvic_iser;
     for (uint32_t index = 0U; index < 8U; index++) {
@@ -249,38 +252,39 @@ void hal_sleep(void)
 /** Enter STM32WB0 Deepstop and resume the suspended Mbed execution context. */
 void hal_deepsleep(void)
 {
-    /* Do not stop the peripheral while a serial transmission is active. */
+    // Do not stop the peripheral while a serial transmission is active.
     if (serial_is_tx_ongoing()) {
         return;
     }
 
     core_util_critical_section_enter();
 
-    /* Save Mbed timer state and MCU registers before their power domain is
-     * switched off. SRAM contents themselves remain in their original banks.
-     */
+    // Save Mbed timer state and MCU registers before their power domain is
+    // switched off. SRAM contents themselves remain in their original banks.
     save_timer_ctx();
     save_device_context();
     mbed_sdk_inited = 0;
 
-    /* Apply GPIO pull settings required by the selected board in Deepstop. */
+    // Apply GPIO pull settings required by the selected board in Deepstop.
     gpio_deep_sleep_prepare();
+#if DEVICE_INTERRUPTIN
+    gpio_irq_prepare_deepsleep();
+#endif
 
-    /* Keep the low-speed clock running for the Mbed low-power ticker. */
+    // Keep the low-speed clock running for the Mbed low-power ticker.
     PWR_DEEPSTOPTypeDef config = {0};
     config.deepStopMode = PWR_DEEPSTOP_WITH_SLOW_CLOCK_ON;
 
-    /* Disable debug retention modes before entering low-power Deepstop. */
+    // Disable debug retention modes before entering low-power Deepstop.
     LL_PWR_DisableDEEPSTOP2();
 #if defined(PWR_CR2_DBGRET)
     LL_PWR_DisableDBGRET();
 #endif
-    /* Follow ST's PWR_DEEPSTOP_RTC entry sequence.  Deactivating the RTC
-     * wake-up timer first clears RTC_ISR.WUTF and removes the internal wake
-     * level.  The mirrored PWR flag can then be cleared before the timer is
-     * re-enabled.  Clearing only the PWR flag while WUTF is still active does
-     * not reliably re-arm the edge detector on STM32WB0.
-     */
+    // Follow ST's PWR_DEEPSTOP_RTC entry sequence.  Deactivating the RTC
+    // wake-up timer first clears RTC_ISR.WUTF and removes the internal wake
+    // level.  The mirrored PWR flag can then be cleared before the timer is
+    // re-enabled.  Clearing only the PWR flag while WUTF is still active does
+    // not reliably re-arm the edge detector on STM32WB0.
     RTC_HandleTypeDef rtc_handle = {0};
     uint32_t wake_counter = RTC->WUTR;
     uint32_t wake_clock = RTC->CR & RTC_CR_WUCKSEL;
@@ -293,22 +297,20 @@ void hal_deepsleep(void)
 
     HAL_PWR_ConfigDEEPSTOP(&config);
 
-    /* This call returns only after the reset handler enters SystemInit(),
-     * SystemInit() calls CPUcontextRestore(), and the saved CPU frame is loaded.
-     */
+    // This call returns only after the reset handler enters SystemInit(),
+    // SystemInit() calls CPUcontextRestore(), and the saved CPU frame is loaded.
     CPUcontextSave();
 
-    /* Repair stack data used temporarily by the reset startup code. */
+    // Repair stack data used temporarily by the reset startup code.
     restore_cstack_preamble();
 
-    /* Return the clocks and peripherals to their pre-Deepstop state. */
+    // Return the clocks and peripherals to their pre-Deepstop state.
     CLEAR_BIT(SCB->SCR, SCB_SCR_SLEEPDEEP_Msk);
     SetSysClock();
     restore_device_context();
 
-    /* Recreate Mbed drivers whose hardware state is not covered by the generic
-     * register snapshot, then restore the low-power ticker schedule.
-     */
+    // Recreate Mbed drivers whose hardware state is not covered by the generic
+    // register snapshot, then restore the low-power ticker schedule.
     serial_restore_stdio();
     init_16bit_timer();
     restore_timer_ctx();
@@ -316,6 +318,14 @@ void hal_deepsleep(void)
     LL_PWR_DisableGPIORET();
 #endif
     mbed_sdk_inited = 1;
+
+#if DEVICE_INTERRUPTIN
+    // Read the PWR flags as late as possible so GPIO events which occur while
+    // restoring the MCU are included. A GPIO event which cancelled Deepstop
+    // before the final PWR flag clear remains pending in SYSCFG instead.
+    uint32_t wakeup_sources = LL_PWR_GetWakeupSource();
+    gpio_irq_dispatch_deepsleep_wakeup(wakeup_sources);
+#endif
 
     core_util_critical_section_exit();
 }

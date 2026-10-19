@@ -5,6 +5,7 @@
 #if DEVICE_INTERRUPTIN
 
 #include "cmsis.h"
+#include "gpio_irq_deepsleep.h"
 #include "mbed_error.h"
 #include "gpio_irq_api.h"
 #include "pinmap.h"
@@ -247,6 +248,254 @@ void gpio_irq_disable(gpio_irq_t *obj)
     SYSCFG->IO_IER &= ~syscfg_bit;
     // Discard any pending event for this pin.
     SYSCFG->IO_ISCR = syscfg_bit;
+}
+
+/* DeepStop GPIO wake-up support ------------------------------------------- */
+
+static uint32_t armed_deepsleep_rising;
+static uint32_t armed_deepsleep_falling;
+static uint32_t armed_deepsleep_sources;
+static uint32_t saved_pwr_cr3;
+static uint32_t saved_pwr_cr4;
+static uint32_t saved_pwr_cr6;
+static uint32_t saved_pwr_cr7;
+
+/** Return the PWR wake source corresponding to a GPIO port and pin. */
+static uint32_t pwr_wakeup_source(uint32_t port, uint32_t pin)
+{
+    if (port == PortA) {
+        switch (pin) {
+#if defined(PWR_WAKEUP_PA0)
+            case 0U: return PWR_WAKEUP_PA0;
+#endif
+#if defined(PWR_WAKEUP_PA1)
+            case 1U: return PWR_WAKEUP_PA1;
+#endif
+#if defined(PWR_WAKEUP_PA2)
+            case 2U: return PWR_WAKEUP_PA2;
+#endif
+#if defined(PWR_WAKEUP_PA3)
+            case 3U: return PWR_WAKEUP_PA3;
+#endif
+#if defined(PWR_WAKEUP_PA4)
+            case 4U: return PWR_WAKEUP_PA4;
+#endif
+#if defined(PWR_WAKEUP_PA5)
+            case 5U: return PWR_WAKEUP_PA5;
+#endif
+#if defined(PWR_WAKEUP_PA6)
+            case 6U: return PWR_WAKEUP_PA6;
+#endif
+#if defined(PWR_WAKEUP_PA7)
+            case 7U: return PWR_WAKEUP_PA7;
+#endif
+#if defined(PWR_WAKEUP_PA8)
+            case 8U: return PWR_WAKEUP_PA8;
+#endif
+#if defined(PWR_WAKEUP_PA9)
+            case 9U: return PWR_WAKEUP_PA9;
+#endif
+#if defined(PWR_WAKEUP_PA10)
+            case 10U: return PWR_WAKEUP_PA10;
+#endif
+#if defined(PWR_WAKEUP_PA11)
+            case 11U: return PWR_WAKEUP_PA11;
+#endif
+#if defined(PWR_WAKEUP_PA12)
+            case 12U: return PWR_WAKEUP_PA12;
+#endif
+#if defined(PWR_WAKEUP_PA13)
+            case 13U: return PWR_WAKEUP_PA13;
+#endif
+#if defined(PWR_WAKEUP_PA14)
+            case 14U: return PWR_WAKEUP_PA14;
+#endif
+#if defined(PWR_WAKEUP_PA15)
+            case 15U: return PWR_WAKEUP_PA15;
+#endif
+            default: return 0U;
+        }
+    }
+
+    if (port == PortB) {
+        switch (pin) {
+#if defined(PWR_WAKEUP_PB0)
+            case 0U: return PWR_WAKEUP_PB0;
+#endif
+#if defined(PWR_WAKEUP_PB1)
+            case 1U: return PWR_WAKEUP_PB1;
+#endif
+#if defined(PWR_WAKEUP_PB2)
+            case 2U: return PWR_WAKEUP_PB2;
+#endif
+#if defined(PWR_WAKEUP_PB3)
+            case 3U: return PWR_WAKEUP_PB3;
+#endif
+#if defined(PWR_WAKEUP_PB4)
+            case 4U: return PWR_WAKEUP_PB4;
+#endif
+#if defined(PWR_WAKEUP_PB5)
+            case 5U: return PWR_WAKEUP_PB5;
+#endif
+#if defined(PWR_WAKEUP_PB6)
+            case 6U: return PWR_WAKEUP_PB6;
+#endif
+#if defined(PWR_WAKEUP_PB7)
+            case 7U: return PWR_WAKEUP_PB7;
+#endif
+#if defined(PWR_WAKEUP_PB8)
+            case 8U: return PWR_WAKEUP_PB8;
+#endif
+#if defined(PWR_WAKEUP_PB9)
+            case 9U: return PWR_WAKEUP_PB9;
+#endif
+#if defined(PWR_WAKEUP_PB10)
+            case 10U: return PWR_WAKEUP_PB10;
+#endif
+#if defined(PWR_WAKEUP_PB11)
+            case 11U: return PWR_WAKEUP_PB11;
+#endif
+#if defined(PWR_WAKEUP_PB12)
+            case 12U: return PWR_WAKEUP_PB12;
+#endif
+#if defined(PWR_WAKEUP_PB13)
+            case 13U: return PWR_WAKEUP_PB13;
+#endif
+#if defined(PWR_WAKEUP_PB14)
+            case 14U: return PWR_WAKEUP_PB14;
+#endif
+#if defined(PWR_WAKEUP_PB15)
+            case 15U: return PWR_WAKEUP_PB15;
+#endif
+            default: return 0U;
+        }
+    }
+
+    return 0U;
+}
+
+/** Restore the PWR wake-up pin settings that existed before DeepStop. */
+static void restore_deepsleep_sources(void)
+{
+    uint32_t cr3_mask = armed_deepsleep_sources & 0x0000FFFFU;
+    uint32_t cr6_mask = armed_deepsleep_sources >> 16;
+
+    // For each GPIO wake-up pin:
+    // 1. disable the wake-up pin;
+    // 2. restore its previous edge selection;
+    // 3. enable it again only if it was enabled before sleep.
+    // Other PWR wake-up sources, such as RTC and BLE, are not changed.
+    if (cr3_mask != 0U) {
+        CLEAR_BIT(PWR->CR3, cr3_mask);
+        MODIFY_REG(PWR->CR4, cr3_mask, saved_pwr_cr4 & cr3_mask);
+        SET_BIT(PWR->CR3, saved_pwr_cr3 & cr3_mask);
+    }
+    if (cr6_mask != 0U) {
+        CLEAR_BIT(PWR->CR6, cr6_mask);
+        MODIFY_REG(PWR->CR7, cr6_mask, saved_pwr_cr7 & cr6_mask);
+        SET_BIT(PWR->CR6, saved_pwr_cr6 & cr6_mask);
+    }
+    armed_deepsleep_sources = 0U;
+}
+
+/** Prepare GPIO IRQ before Deepstop for next wakeup. */
+void gpio_irq_prepare_deepsleep(void)
+{
+    armed_deepsleep_rising = 0U;
+    armed_deepsleep_falling = 0U;
+
+    // Save the current PWR wake-up settings.
+    saved_pwr_cr3 = PWR->CR3;
+    saved_pwr_cr4 = PWR->CR4;
+    saved_pwr_cr6 = PWR->CR6;
+    saved_pwr_cr7 = PWR->CR7;
+
+    // Check every pin of every port.
+    for (uint32_t port = 0U; port < GPIO_PORT_COUNT; port++) {
+        GPIO_TypeDef *gpio = (port == PortA) ? GPIOA : GPIOB;
+
+        for (uint32_t pin = 0U; pin < GPIO_PIN_COUNT; pin++) {
+            uint32_t pin_bit = 1UL << pin;
+            uint32_t syscfg_bit = syscfg_pin_bit(port, pin);
+            uint32_t wakeup_source = pwr_wakeup_source(port, pin);
+            gpio_irq_event event;
+
+            // Skip unused or disabled pins and pins without a PWR wake-up line.
+            if (((active_pins[port] & pin_bit) == 0U) ||
+                    ((SYSCFG->IO_IER & syscfg_bit) == 0U) ||
+                    (wakeup_source == 0U)) {
+                continue;
+            }
+
+            event = (gpio_irq_event)irq_states[port][pin].events;
+            if (event == (IRQ_RISE | IRQ_FALL)) {
+                // PWR wake-up logic can check only one edge at a time.
+                event = ((gpio->IDR & pin_bit) != 0U) ? IRQ_FALL : IRQ_RISE;
+            }
+
+            if ((event != IRQ_RISE) && (event != IRQ_FALL)) {
+                continue;
+            }
+
+            // The normal SYSCFG interrupt-pending flag is lost in DeepStop,
+            // so remember which callback must run if this pin wakes the MCU.
+            if (event == IRQ_RISE) {
+                armed_deepsleep_rising |= syscfg_bit;
+            } else {
+                armed_deepsleep_falling |= syscfg_bit;
+            }
+
+            // Remember the PWR wake-up pin that was changed and enable it for
+            // the selected edge.
+            armed_deepsleep_sources |= wakeup_source;
+            HAL_PWR_EnableWakeUpPin(wakeup_source,
+                                    event == IRQ_RISE ? PWR_WUP_RISIEDG :
+                                    PWR_WUP_FALLEDG);
+        }
+    }
+}
+
+/** Dispatch callbacks for GPIO pins reported by the PWR wake-up logic. */
+void gpio_irq_dispatch_deepsleep_wakeup(uint32_t wakeup_sources)
+{
+    // Restore the PWR settings saved before sleep.
+    restore_deepsleep_sources();
+
+    // Check every pin of each port. Call its callback only when PWR reports
+    // that this pin woke the MCU.
+    for (uint32_t port = 0U; port < GPIO_PORT_COUNT; port++) {
+        for (uint32_t pin = 0U; pin < GPIO_PIN_COUNT; pin++) {
+            uint32_t pin_bit = 1UL << pin;
+            uint32_t syscfg_bit = syscfg_pin_bit(port, pin);
+            uint32_t wakeup_source = pwr_wakeup_source(port, pin);
+            gpio_irq_event event = IRQ_NONE;
+            gpio_irq_state_t *state = &irq_states[port][pin];
+
+            // Read the edge that was selected before entering DeepStop.
+            if ((armed_deepsleep_rising & syscfg_bit) != 0U) {
+                event = IRQ_RISE;
+            } else if ((armed_deepsleep_falling & syscfg_bit) != 0U) {
+                event = IRQ_FALL;
+            }
+
+            // Skip pins that did not wake the MCU or are no longer enabled.
+            if ((event == IRQ_NONE) ||
+                    (wakeup_source == 0U) ||
+                    ((wakeup_sources & wakeup_source) == 0U) ||
+                    ((active_pins[port] & pin_bit) == 0U) ||
+                    ((SYSCFG->IO_IER & syscfg_bit) == 0U) ||
+                    ((state->events & event) == 0U)) {
+                continue;
+            }
+
+            // The same edge may also be pending in SYSCFG if WFI returned
+            // before the MCU powered down. Clear it to avoid a second callback.
+            SYSCFG->IO_ISCR = syscfg_bit;
+            irq_handler(state->context, event);
+        }
+    }
+    armed_deepsleep_rising = 0U;
+    armed_deepsleep_falling = 0U;
 }
 
 #endif /* DEVICE_INTERRUPTIN */
