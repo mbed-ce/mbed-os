@@ -98,16 +98,13 @@ jobs:
 
   style-check:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mbed-ce/mbed-ce-env:main
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
-
-      - name: Install Formatters
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install astyle aspell
 
       - name: UTF-8 Check
         run: |
@@ -154,16 +151,21 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python packages
+        shell: bash
         run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
           pip install -e ./tools[linters]
 
       - name: Check Python Formatting
         run: |
+          source .venv/bin/activate
           cd tools
           ruff format --diff
 
       - name: Check Python Lint
         run: |
+          source .venv/bin/activate
           cd tools
           ruff check --diff python/mbed_tools python/mbed_platformio
           basedpyright

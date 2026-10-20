@@ -1,27 +1,28 @@
 # Copyright (c) 2020-2021 ARM Limited. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-add_subdirectory(TARGET_IMX EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_LPC EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_LPC54114 EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_MCU_LPC546XX EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_MIMXRT105x EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_MIMXRT1170 EXCLUDE_FROM_ALL)
-add_subdirectory(middleware/TARGET_USB EXCLUDE_FROM_ALL)
-
-add_library(mbed-mcuxpresso-mcus INTERFACE)
-
-target_include_directories(mbed-mcuxpresso-mcus
-    INTERFACE
-        .
-        middleware/osa
+# Clone SDK submodule
+mbed_setup_submodule(
+    mbed-mcux-sdk
+    CHECK_FILE import-mcux-sdk.py
+    IF_LABEL MCUXpresso_MCUS
 )
 
-target_sources(mbed-mcuxpresso-mcus
-    INTERFACE
-        USBPhy_MCUXpresso.cpp
+# Generic MCUXpresso-based libraries
+add_subdirectory(mcux-usb)
 
-        middleware/osa/fsl_os_abstraction_mbed.c
-)
+# MCU targets
+include(${CMAKE_CURRENT_SOURCE_DIR}/kl4x-sdk.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/k-series-sdk.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/mimxrt105x_6x-sdk.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/mimxrt116x_7x-sdk.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/lpc-54xxx-sdk.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/kwx1-sdk.cmake)
 
-target_link_libraries(mbed-mcuxpresso-mcus INTERFACE mbed-nxp)
+# Target dirs
+add_subdirectory(TARGET_MCU_KL4x)
+add_subdirectory(TARGET_MIMXRT105x_6x)
+add_subdirectory(TARGET_MCU_KINETIS_K_SERIES)
+add_subdirectory(TARGET_MCU_LPC54xxx)
+add_subdirectory(TARGET_MIMXRT116x_7x)
+add_subdirectory(TARGET_MCU_KWx1)

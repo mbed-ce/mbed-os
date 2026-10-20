@@ -31,3 +31,6 @@
 [submodule "targets/TARGET_RASPBERRYPI/tinyalloc"]
 	path = targets/TARGET_RASPBERRYPI/tinyalloc
 	url = https://github.com/dzyong/tinyalloc.git
+[submodule "targets/TARGET_NXP/TARGET_MCUXpresso_MCUS/mbed-mcux-sdk"]
+	path = targets/TARGET_NXP/TARGET_MCUXpresso_MCUS/mbed-mcux-sdk
+	url = https://github.com/mbed-ce/mbed-mcux-sdk.git

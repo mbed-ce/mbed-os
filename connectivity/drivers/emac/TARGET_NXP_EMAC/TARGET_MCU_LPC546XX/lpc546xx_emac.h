@@ -159,7 +159,7 @@ private:
     emac_mem_buf_t *low_level_input();
     static void thread_function(void* pvParameters);
     void phy_task();
-    static void ethernet_callback(ENET_Type *base, enet_handle_t *handle, enet_event_t event, uint8_t channel, void *param);
+    static void ethernet_callback(ENET_Type *base, enet_handle_t *handle, enet_event_t event, uint8_t channel, enet_tx_reclaim_info_t *txReclaimInfo, void *param);
 
     mbed_rtos_storage_thread_t thread_cb;
     osThreadId_t thread; /**< Processing thread */

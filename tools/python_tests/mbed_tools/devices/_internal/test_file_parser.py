@@ -221,7 +221,7 @@ def build_segger_html(model="j-link-ob"):
     )
 
 
-def build_board_html(target_url="http://www.nxp.com/FRDM-K64F"):
+def build_board_html(target_url="http://www.nxp.com/FRDM-FRDM_K64F"):
     return f"""<html><head><meta http-equiv="refresh" content="0; url={target_url}"/></head><body></body></html>"""
 
 

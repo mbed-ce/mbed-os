@@ -3,7 +3,10 @@
 
 add_subdirectory(TARGET_LPC11XX_11CXX EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_LPC17XX EXCLUDE_FROM_ALL)
-add_subdirectory(TARGET_MCUXpresso_MCUS EXCLUDE_FROM_ALL)
+
+if(TARGET_MCUXpresso_MCUS IN_LIST MBED_TARGET_DEFINITIONS)
+    add_subdirectory(TARGET_MCUXpresso_MCUS EXCLUDE_FROM_ALL)
+endif()
 
 add_library(mbed-nxp INTERFACE)
 
