@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: KW41Z */
+/* MBED TARGET LIST: FRDM_KW41Z */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H

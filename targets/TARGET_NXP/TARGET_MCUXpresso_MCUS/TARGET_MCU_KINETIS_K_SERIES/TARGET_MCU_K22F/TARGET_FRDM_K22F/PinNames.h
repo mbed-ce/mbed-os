@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: K22F */
+/* MBED TARGET LIST: FRDM_K22F */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H
