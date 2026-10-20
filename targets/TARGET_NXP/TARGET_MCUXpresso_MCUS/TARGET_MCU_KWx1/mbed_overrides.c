@@ -24,9 +24,11 @@
 void mbed_sdk_init()
 {
     BOARD_BootClockRUN();
-#ifdef LPUART0
+
+    /* Set the TPM clock source to be OSCERCLK, do not change as TPM2 is used for the usticker */
+    CLOCK_SetTpmClock(2U);
+
     CLOCK_SetLpuartClock(2U); // Select OSCERCLK for LPUART clock source
-#endif
 
     // Ensure RTC oscillator is enabled (as this also drives LP ticker)
     rtc_init();
@@ -38,9 +40,14 @@ void mbed_sdk_init()
 void NMI_Handler(void)
 {
     gpio_t gpio;
-    gpio_init_in(&gpio, PTA4);
+    gpio_init_in(&gpio, PTB18);
 }
 
 uint32_t pit_get_clock() {
     return CLOCK_GetFreq(kCLOCK_BusClk);
+}
+
+uint32_t tpm_get_clock() {
+    /* TPM clock source is set to OSCERCLK during init */
+    return CLOCK_GetFreq(kCLOCK_Osc0ErClk);
 }

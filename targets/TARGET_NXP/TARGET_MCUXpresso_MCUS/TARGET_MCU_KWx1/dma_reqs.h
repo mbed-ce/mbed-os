@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Freescale Semiconductor, Inc.
+ * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,38 +28,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "fsl_rcm.h"
+#ifndef _FSL_DMA_REQS_H_
+#define _FSL_DMA_REQS_H_
 
-void RCM_ConfigureResetPinFilter(RCM_Type *base, const rcm_reset_pin_filter_config_t *config)
-{
-    assert(config);
+#include "fsl_common.h"
 
-#if (defined(FSL_FEATURE_RCM_REG_WIDTH) && (FSL_FEATURE_RCM_REG_WIDTH == 32))
-    uint32_t reg;
-
-    reg = (((uint32_t)config->enableFilterInStop << RCM_RPC_RSTFLTSS_SHIFT) | (uint32_t)config->filterInRunWait);
-    if (config->filterInRunWait == kRCM_FilterBusClock)
-    {
-        reg |= ((uint32_t)config->busClockFilterCount << RCM_RPC_RSTFLTSEL_SHIFT);
+/* Array for DSPI DMA TX requests */
+#define SPI_DMA_TX_REQUEST_NUMBERS                                      \
+    {                                                                   \
+        kDmaRequestMux0SPI0Tx, kDmaRequestMux0SPI1Tx \
     }
-    base->RPC = reg;
-#else
-    base->RPFC = ((uint8_t)(config->enableFilterInStop << RCM_RPFC_RSTFLTSS_SHIFT) | (uint8_t)config->filterInRunWait);
-    if (config->filterInRunWait == kRCM_FilterBusClock)
-    {
-        base->RPFW = config->busClockFilterCount;
+
+/* Array for DSPI DMA RX requests */
+#define SPI_DMA_RX_REQUEST_NUMBERS                                      \
+    {                                                                   \
+        kDmaRequestMux0SPI0Rx, kDmaRequestMux0SPI1Rx \
     }
-#endif /* FSL_FEATURE_RCM_REG_WIDTH */
-}
 
-#if (defined(FSL_FEATURE_RCM_HAS_BOOTROM) && FSL_FEATURE_RCM_HAS_BOOTROM)
-void RCM_SetForceBootRomSource(RCM_Type *base, rcm_boot_rom_config_t config)
-{
-    uint32_t reg;
-
-    reg = base->FM;
-    reg &= ~RCM_FM_FORCEROM_MASK;
-    reg |= ((uint32_t)config << RCM_FM_FORCEROM_SHIFT);
-    base->FM = reg;
-}
-#endif /* #if FSL_FEATURE_RCM_HAS_BOOTROM */
+#endif /* _FSL_DMA_REQS_H_ */

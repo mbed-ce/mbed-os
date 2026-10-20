@@ -32,6 +32,8 @@
 #include "fsl_xcvr.h"
 #include "ifr_radio.h"
 #include "fsl_os_abstraction.h"
+#include <stddef.h>
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -259,10 +261,10 @@ uint32_t read_resource_ifr(uint32_t read_addr)
     FTFA->FCCOB3 = flash_addr7_0;
     FTFA->FCCOB8 = 0x00;
 
-    OSA_InterruptDisable();
+    core_util_critical_section_enter();
     FTFA->FSTAT = FTFA_FSTAT_CCIF_MASK;
     while ((FTFA_FSTAT_CCIF_MASK & FTFA->FSTAT) == 0); /* Wait till CCIF=1 */
-    OSA_InterruptEnable();
+    core_util_critical_section_exit();
 
     /* Start reading */
     read_data31_24 = FTFA->FCCOB4; /* FTFA->FCCOB[4] */

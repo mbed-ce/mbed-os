@@ -17,10 +17,10 @@ jobs:
           ## compiles as possible -- e.g. prefer a board with ethernet to one without so that we
           ## can compile the netsocket tests.
 
-          # NXP MCUs
+          # NXP MCUs.
           - target: LPC1768
             profile: full
-          - target: LPC546XX
+          - target: LPCXPRESSO_54628
             profile: full
           - target: MIMXRT1060_EVK
             profile: full
@@ -32,7 +32,7 @@ jobs:
             profile: full
           - target: FRDM_KL43Z
             profile: full
-          - target: KW41Z
+          - target: FRDM_KW41Z
             profile: full
 
           # Freescale MCUs

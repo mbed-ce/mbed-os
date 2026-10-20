@@ -44,3 +44,8 @@ void NMI_Handler(void)
     gpio_t gpio;
     gpio_init_in(&gpio, PTA4);
 }
+
+uint32_t tpm_get_clock() {
+    /* TPM clock source is set to IRC48M during init */
+    return CLOCK_GetFreq(kCLOCK_McgIrc48MClk);
+}

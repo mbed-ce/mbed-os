@@ -32,6 +32,8 @@
 #ifndef MBED_CMSIS_NVIC_H
 #define MBED_CMSIS_NVIC_H
 
+extern uint32_t __VECTOR_RAM[];
+
 /* Symbols defined by the linker script */
 #define NVIC_NUM_VECTORS        (16 + 32)        // CORE + MCU Peripherals
 #define NVIC_RAM_VECTOR_ADDRESS (__VECTOR_RAM)    // Vectors positioned at start of RAM
