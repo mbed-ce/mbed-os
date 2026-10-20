@@ -64,8 +64,7 @@ __stack_size__ = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0400;
 M_VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x0400 : 0x0;
 M_CRASH_DATA_RAM_SIZE = 0x100;
-FLASH_VTOR_TABLE_SIZE = 0x400;
-FLASH_CONFIG_FIELD_SIZE = 0x10;
+FLASH_CONFIG_FIELD_OFFSET = 0x400;
 
 /* If we are not configured to execute out of the start of ROM, then a bootloader is
  * present.  This tells us whether we need to add the Flash Configuration Field at the start of flash. */
@@ -116,7 +115,7 @@ SECTIONS
 
   /* FCF to absolute address of 0x400, but only if bootloader is not present. */
 #if !IS_BOOTLOADER_PRESENT
-  .flash_config FLASH_VTOR_TABLE_SIZE :
+  .flash_config FLASH_CONFIG_FIELD_OFFSET :
   {
     KEEP(*(.FlashConfig))    /* Flash Configuration Field (FCF) */
   } > m_text :text

@@ -48,12 +48,12 @@ ENTRY(Reset_Handler)
 
 __ram_vector_table__ = 1;
 
-#if !defined(MBED_APP_START)
-  #define MBED_APP_START 0
-#endif
-
-#if !defined(MBED_APP_SIZE)
-  #define MBED_APP_SIZE 0x80000
+/* If we are not configured to execute out of the start of ROM, then a bootloader is
+ * present.  This tells us whether we need to add the Flash Configuration Field at the start of flash. */
+#if MBED_CONFIGURED_ROM_BANK_IROM1_START == 0
+#define IS_BOOTLOADER_PRESENT 0
+#else
+#define IS_BOOTLOADER_PRESENT 1
 #endif
 
 #if !defined(MBED_CONF_TARGET_BOOT_STACK_SIZE)
@@ -64,14 +64,13 @@ __stack_size__ = MBED_CONF_TARGET_BOOT_STACK_SIZE;
 
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0400;
 M_VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x0200 : 0x0;
+FLASH_CONFIG_FIELD_OFFSET = 0x400;
 
 /* Specify the memory areas */
 MEMORY
 {
-  m_interrupts          (RX)  : ORIGIN = MBED_APP_START, LENGTH = 0x00000200
-  m_flash_config        (RX)  : ORIGIN = MBED_APP_START + 0x400, LENGTH = 0x00000010
-  m_text                (RX)  : ORIGIN = MBED_APP_START + 0x410, LENGTH = MBED_APP_SIZE - 0x410
-  m_data                (RW)  : ORIGIN = 0x1FFF8000, LENGTH = 0x00020000
+  m_text      (RX)  : ORIGIN = MBED_CONFIGURED_ROM_BANK_IROM1_START, LENGTH = MBED_CONFIGURED_ROM_BANK_IROM1_SIZE
+  m_data      (RW)  : ORIGIN = MBED_RAM_BANK_IRAM1_START, LENGTH = MBED_RAM_BANK_IRAM1_SIZE
 }
 
 /* Define output sections */
@@ -84,14 +83,19 @@ SECTIONS
     . = ALIGN(8);
     KEEP(*(.isr_vector))     /* Startup code */
     . = ALIGN(8);
-  } > m_interrupts
+  } > m_text
 
-  .flash_config :
+  /* FCF to absolute address of 0x400, but only if bootloader is not present. */
+#if !IS_BOOTLOADER_PRESENT
+  .flash_config FLASH_CONFIG_FIELD_OFFSET :
   {
-    . = ALIGN(8);
     KEEP(*(.FlashConfig))    /* Flash Configuration Field (FCF) */
-    . = ALIGN(8);
-  } > m_flash_config
+  } > m_text
+#else
+  /DISCARD/ : {
+    *(.FlashConfig)
+  }
+#endif
 
   /* The program code and other data goes into internal flash */
   .text :

@@ -4936,7 +4936,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "network-default-interface-type": "ETHERNET"
         }
     },
-    "LPCXPRESSO54628": {
+    "LPCXPRESSO_54628": {
         "supported_form_factors": [
             "ARDUINO_UNO"
         ],
@@ -5065,7 +5065,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "USTICKER",
             "LPTICKER",
             "RTC",
-            "CRC",
             "ANALOGIN",
             "ANALOGOUT",
             "I2C",
@@ -5079,6 +5078,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SLEEP",
             "SPI",
             "SPISLAVE",
+            "SPI_ASYNCH",
             "TRNG",
             "FLASH",
             "802_15_4_PHY"
