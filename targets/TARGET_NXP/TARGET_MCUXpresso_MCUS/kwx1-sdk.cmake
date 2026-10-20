@@ -40,6 +40,7 @@ target_sources(mbed-mcu-kwx1
         mbed-mcux-sdk/drivers/dcdc/fsl_dcdc.c
         mbed-mcux-sdk/drivers/ltc/fsl_ltc.c
         mbed-mcux-sdk/drivers/ltc/fsl_ltc_edma.c
+        mbed-mcux-sdk/drivers/rtc/fsl_rtc.c
 )
 
 target_include_directories(mbed-mcu-kwx1
@@ -69,20 +70,40 @@ target_include_directories(mbed-mcu-kwx1
         mbed-mcux-sdk/drivers/vref
         mbed-mcux-sdk/drivers/dcdc
         mbed-mcux-sdk/drivers/ltc
+        mbed-mcux-sdk/drivers/rtc
 )
+
+# Flag to MCUX SDK that we have a ram vector table
+target_compile_definitions(mbed-mcu-kwx1 INTERFACE ENABLE_RAM_VECTOR_TABLE)
 
 # Link appropriate Mbed OS HALs that interface with this MCU
 target_include_directories(mbed-mcu-kwx1
     INTERFACE
         mbed-hal-drivers/kinetis-common-headers
+        mbed-hal-drivers/fsl-os-abstraction
         mbed-hal-drivers/serial-via-LPUART
         mbed-hal-drivers/us-ticker-via-TPM-PIT
 )
 target_sources(mbed-mcu-kwx1
     INTERFACE
+        mbed-hal-drivers/fsl-os-abstraction/fsl_os_abstraction_mbed.c
         mbed-hal-drivers/gpio-via-GPIO/gpio_api.c
         mbed-hal-drivers/serial-via-LPUART/serial_api.c
         mbed-hal-drivers/us-ticker-via-TPM-PIT/us_ticker.c
+        mbed-hal-drivers/pwmout-via-TPM/pwmout_api.c
+        mbed-hal-drivers/spi-via-DSPI/spi_api.c
+        mbed-hal-drivers/trng-via-TRNG/trng_api.c
+        mbed-hal-drivers/lpticker-via-LPTMR/lp_ticker.c
+        mbed-hal-drivers/rtc-via-RTC/rtc_api.c
+        mbed-hal-drivers/analogin-via-ADC16/analogin_api.c
+        mbed-hal-drivers/analogout-via-DAC/analogout_api.c
+        mbed-hal-drivers/i2c-via-I2C/i2c_api.c
+        mbed-hal-drivers/interruptin-via-GPIO-PORT/gpio_irq_api.c
+        mbed-hal-drivers/port-via-PORT/port_api.c
+        mbed-hal-drivers/sleep-via-SMC/sleep.c
+        mbed-hal-drivers/flash-via-FLASH/flash_api.c
+        mbed-hal-drivers/pinmode-via-PORT/pinmap.c
+        mbed-hal-drivers/dma-via-DMAMUX/dma_api.c
 )
 
 # Link appropriate headers and startup files

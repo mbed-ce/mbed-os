@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: LPCXPRESSO54628 */
+/* MBED TARGET LIST: LPCXPRESSO_54628 */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H

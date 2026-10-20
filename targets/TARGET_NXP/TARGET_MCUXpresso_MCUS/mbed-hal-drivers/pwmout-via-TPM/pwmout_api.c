@@ -28,6 +28,8 @@ static float pwm_clock_mhz;
 /* Array of TPM peripheral base address. */
 static TPM_Type *const tpm_addrs[] = TPM_BASE_PTRS;
 
+extern uint32_t tpm_get_clock();
+
 void pwmout_init(pwmout_t *obj, PinName pin)
 {
     PWMName pwm = (PWMName)pinmap_peripheral(pin, PinMap_PWM);
@@ -35,10 +37,7 @@ void pwmout_init(pwmout_t *obj, PinName pin)
 
     obj->pwm_name = pwm;
 
-    uint32_t pwm_base_clock;
-
-    /* TPM clock source is set to IRC48M during init */
-    pwm_base_clock = CLOCK_GetFreq(kCLOCK_McgIrc48MClk);
+    const uint32_t pwm_base_clock = tpm_get_clock();
     float clkval = (float)pwm_base_clock / 1000000.0f;
     uint32_t clkdiv = 0;
     while (clkval > 1) {

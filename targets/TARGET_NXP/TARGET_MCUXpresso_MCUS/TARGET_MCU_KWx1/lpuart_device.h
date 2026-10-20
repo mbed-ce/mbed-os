@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2019 ARM Limited
+ * Copyright (c) 2026 Jamie Smith
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef _FSL_US_TICKER_DEFINES_H_
-#define _FSL_US_TICKER_DEFINES_H_
 
-#include "fsl_pit.h"
+#pragma once
 
-#define US_TICKER_PERIOD_NUM    1
-#define US_TICKER_PERIOD_DEN    1
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
 
-#define US_TICKER_MASK          0xFFFFFFFF
+#define LPUART_FIRST_INDEX 0
 
-/* Macro-optimised form of us_ticker_read */
-#define us_ticker_read() (~(PIT_GetCurrentTimerCount(PIT, kPIT_Chnl_1)))
-
-#endif /* _FSL_US_TICKER_DEFINES_H_ */
+bool serial_is_enabled(uint32_t uart_index);
+uint32_t serial_get_clock(size_t index);

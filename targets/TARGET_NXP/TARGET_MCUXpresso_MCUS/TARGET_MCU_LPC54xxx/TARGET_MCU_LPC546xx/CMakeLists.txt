@@ -11,4 +11,4 @@ target_sources(mbed-mcu-lpc546xx INTERFACE
 )
 
 add_subdirectory(TARGET_FF_LPC546XX)
-add_subdirectory(TARGET_LPCXPRESSO54628)
+add_subdirectory(TARGET_LPCXPRESSO_54628)
