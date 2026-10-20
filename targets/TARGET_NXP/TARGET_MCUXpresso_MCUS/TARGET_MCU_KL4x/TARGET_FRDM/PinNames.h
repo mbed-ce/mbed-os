@@ -89,22 +89,6 @@ typedef enum {
     PTE30 = (4 << GPIO_PORT_SHIFT | 30),
     PTE31 = (4 << GPIO_PORT_SHIFT | 31),
 
-    LED_RED = PTE31,
-    LED_GREEN = PTD5,
-
-    // mbed original LED naming
-    LED1 = LED_GREEN,
-    LED2 = LED_RED,
-    LED3 = LED_GREEN,
-    LED4 = LED_RED,
-
-    //Push buttons
-    SW1 = PTA4,
-    SW3 = PTC3,
-    // Standardized button names
-    BUTTON1 = SW1,
-    BUTTON2 = SW3,
-
     // USB Pins
     CONSOLE_TX = PTA2,
     CONSOLE_RX = PTA1,
@@ -139,6 +123,17 @@ typedef enum {
     NC = (int)0xFFFFFFFF
 } PinName;
 
+// Standard LED names
+#define LED1 PTD5
+#define LED2 PTE31
+
+// Board LED names
+#define LED_RED LED2
+#define LED_GREEN LED1
+
+// Standardized button names
+#define BUTTON1 PTA4
+#define BUTTON2 PTC3
 
 typedef enum {
     PullNone = 0,
