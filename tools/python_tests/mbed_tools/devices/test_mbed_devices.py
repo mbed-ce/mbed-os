@@ -73,7 +73,7 @@ class TestGetConnectedDevices:
 @mock.patch("mbed_tools.devices.devices.find_all_connected_devices")
 class TestFindConnectedDevice:
     def test_finds_device_with_matching_name(self, mock_find_connected_devices):
-        target_name = "K64F"
+        target_name = "FRDM_K64F"
         mock_find_connected_devices.return_value = [
             mock.Mock(mbed_board=mock.Mock(board_type=target_name, spec=True), serial_number="123", spec=True)
         ]
@@ -83,7 +83,7 @@ class TestFindConnectedDevice:
         assert target_name == dev.mbed_board.board_type
 
     def test_finds_device_with_matching_name_identifier(self, mock_find_connected_devices):
-        target_name = "K64F"
+        target_name = "FRDM_K64F"
         target_identifier = 1
         mock_find_connected_devices.return_value = [
             mock.Mock(mbed_board=mock.Mock(board_type=target_name, spec=True), serial_number="123", spec=True),
@@ -95,7 +95,7 @@ class TestFindConnectedDevice:
         assert dev.serial_number == "456"
 
     def test_raises_when_multiple_matching_name_no_identifier(self, mock_find_connected_devices):
-        target_name = "K64F"
+        target_name = "FRDM_K64F"
         mock_find_connected_devices.return_value = [
             mock.Mock(
                 serial_port="tty.0",
@@ -114,10 +114,10 @@ class TestFindConnectedDevice:
         ]
 
         with pytest.raises(DeviceLookupFailedError, match="Multiple"):
-            find_connected_device("K64F", None)
+            find_connected_device("FRDM_K64F", None)
 
     def test_raises_when_identifier_out_of_bounds(self, mock_find_connected_devices):
-        target_name = "K64F"
+        target_name = "FRDM_K64F"
         mock_find_connected_devices.return_value = [
             mock.Mock(
                 serial_port="tty.0",
@@ -136,13 +136,13 @@ class TestFindConnectedDevice:
         ]
 
         with pytest.raises(DeviceLookupFailedError, match="valid"):
-            find_connected_device("K64F", 2)
+            find_connected_device("FRDM_K64F", 2)
 
 
 @mock.patch("mbed_tools.devices.devices.get_connected_devices")
 class TestFindAllConnectedDevices:
     def test_finds_all_devices_with_matching_name(self, mock_get_connected_devices):
-        target_name = "K64F"
+        target_name = "FRDM_K64F"
         mock_get_connected_devices.return_value = mock.Mock(
             identified_devices=[
                 mock.Mock(mbed_board=mock.Mock(board_type=target_name, spec=True), serial_number="456", spec=True),
@@ -162,10 +162,10 @@ class TestFindAllConnectedDevices:
         mock_get_connected_devices.return_value = mock.Mock(identified_devices=[], spec=True)
 
         with pytest.raises(NoDevicesFoundError):
-            find_all_connected_devices("K64F")
+            find_all_connected_devices("FRDM_K64F")
 
     def test_raises_when_device_matching_target_name_not_found(self, mock_get_connected_devices):
-        target_name = "K64F"
+        target_name = "FRDM_K64F"
         connected_target_name = "DISCO"
         connected_target_serial_port = "tty.BLEH"
         connected_target_mount_point = [pathlib.Path("/dap")]

@@ -260,7 +260,7 @@ Remount count: 0
         self.assertEqual(len(to_check), 1)
         self.assertEqual(to_check[0]["mount_point"], None)
         self.assertEqual(to_check[0]["device_type"], "unknown")
-        self.assertEqual(to_check[0]["platform_name"], "K64F")
+        self.assertEqual(to_check[0]["platform_name"], "FRDM_K64F")
 
     def test_list_manufacture_ids(self):
         table_str = self.base.list_manufacture_ids()
@@ -404,21 +404,21 @@ Remount count: 0
             self.assertIsNotNone(ret[0])
             self.assertIsNotNone(ret_with_details[0])
             self.assertEqual(ret[0]["target_id"], ret[0]["target_id_usb_id"])
-            self.assertEqual(ret[0]["platform_name"], "K64F")
+            self.assertEqual(ret[0]["platform_name"], "FRDM_K64F")
             self.assertEqual(ret[0], ret_with_details[0])
             _up_fs.assert_not_called()
 
-            filter_in = lambda m: m["platform_name"] == "K64F"
+            filter_in = lambda m: m["platform_name"] == "FRDM_K64F"
             ret = self.base.list_mbeds(FSInteraction.Never, filter_in, read_details_txt=False)
             ret_with_details = self.base.list_mbeds(FSInteraction.Never, filter_in, read_details_txt=True)
             self.assertIsNotNone(ret[0])
             self.assertIsNotNone(ret_with_details[0])
             self.assertEqual(ret[0]["target_id"], ret[0]["target_id_usb_id"])
-            self.assertEqual(ret[0]["platform_name"], "K64F")
+            self.assertEqual(ret[0]["platform_name"], "FRDM_K64F")
             self.assertEqual(ret[0], ret_with_details[0])
             _up_fs.assert_not_called()
 
-            filter_out = lambda m: m["platform_name"] != "K64F"
+            filter_out = lambda m: m["platform_name"] != "FRDM_K64F"
             ret = self.base.list_mbeds(FSInteraction.Never, filter_out, read_details_txt=False)
             ret_with_details = self.base.list_mbeds(FSInteraction.Never, filter_out, read_details_txt=True)
             _up_fs.assert_not_called()
@@ -498,7 +498,7 @@ Remount count: 0
     def test_get_supported_platforms(self):
         supported_platforms = self.base.get_supported_platforms()
         self.assertTrue(isinstance(supported_platforms, dict))
-        self.assertEqual(supported_platforms["0240"], "K64F")
+        self.assertEqual(supported_platforms["0240"], "FRDM_K64F")
 
     def test_fs_before(self):
         device = {

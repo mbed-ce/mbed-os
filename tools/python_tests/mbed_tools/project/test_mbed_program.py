@@ -14,7 +14,7 @@ from mbed_tools.project._internal.project_data import MbedProgramFiles, BUILD_DI
 from python_tests.mbed_tools.project.factories import make_mbed_program_files, make_mbed_os_files
 
 
-DEFAULT_BUILD_SUBDIR = pathlib.Path("K64F", "develop", "GCC_ARM")
+DEFAULT_BUILD_SUBDIR = pathlib.Path("FRDM_K64F", "develop", "GCC_ARM")
 
 
 def from_new_set_target_toolchain(program_root):

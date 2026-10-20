@@ -26,7 +26,7 @@ class TestMbedProgramFiles:
         root = pathlib.Path(tmp_path, "foo")
         make_mbed_program_files(root)
 
-        program = MbedProgramFiles.from_existing(root, pathlib.Path("K64F", "develop", "GCC_ARM"))
+        program = MbedProgramFiles.from_existing(root, pathlib.Path("FRDM_K64F", "develop", "GCC_ARM"))
 
         assert program.app_config_file.exists()
         assert program.mbed_os_ref.exists()
@@ -41,7 +41,7 @@ class TestMbedProgramFiles:
         root = pathlib.Path(tmp_path, "foo")
         make_mbed_program_files(root, APP_CONFIG_FILE_NAME_JSON)
 
-        program = MbedProgramFiles.from_existing(root, pathlib.Path("K64F", "develop", "GCC_ARM"))
+        program = MbedProgramFiles.from_existing(root, pathlib.Path("FRDM_K64F", "develop", "GCC_ARM"))
 
         assert program.app_config_file.exists()
         assert program.mbed_os_ref.exists()
