@@ -98,6 +98,8 @@ jobs:
 
   style-check:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mbed-ce/mbed-ce-env:main
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7

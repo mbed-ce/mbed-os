@@ -195,39 +195,39 @@ typedef enum {
     PTE30 = (4 << GPIO_PORT_SHIFT | 30),
     PTE31 = (4 << GPIO_PORT_SHIFT | 31),
 
-    LED_RED   = PTC8,
-    LED_GREEN = PTD0,
-    LED_BLUE  = PTC9,
-
-    // mbed original LED naming
-    LED1 = LED_RED,
-    LED2 = LED_GREEN,
-    LED3 = LED_BLUE,
-    LED4 = LED_RED,
-
-    // Standardized button names
-    BUTTON1 = PTA12,
-    BUTTON2 = PTA13,
-    BUTTON3 = PTA15,
-
     // USB Pins
     CONSOLE_TX = PTB17,
     CONSOLE_RX = PTB16,
 
-    I2C_SCL = PTC10,
-    I2C_SDA = PTC11,
-
     DAC0_OUT = 0xFEFE, /* DAC does not have Pin Name in RM */
-
-    SPI_MOSI   = PTE3,
-    SPI_MISO   = PTE1,
-    SPI_SCK    = PTE2,
-    SPI_CS     = PTE4,
 
     // Not connected
     NC = (int)0xFFFFFFFF
 } PinName;
 
+// Standardized button names
+#define BUTTON1 PTA12
+#define BUTTON2 PTA13
+#define BUTTON3 PTA15
+
+// Original LED names
+#define LED_RED PTC8
+#define LED_GREEN PTD0
+#define LED_BLUE PTC9
+
+// Standardized LED names
+#define LED1 LED_RED
+#define LED2 LED_GREEN
+#define LED3 LED_BLUE
+
+// Busses
+#define SPI_MOSI PTE3
+#define SPI_MISO PTE1
+#define SPI_SCK PTE2
+#define SPI_CS PTE4
+
+#define I2C_SCL PTC10
+#define I2C_SDA PTC11
 
 typedef enum {
     PullNone = 0,

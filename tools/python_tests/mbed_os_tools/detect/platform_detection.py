@@ -184,7 +184,7 @@ class PlatformDetectionTestCase(unittest.TestCase):
                 "product_id": "0204",
             },
             {
-                "platform_name": "K64F",
+                "platform_name": "FRDM_K64F",
                 "device_type": "daplink",
                 "target_id": "0240000032044e45000a700a997b00356781000097969900",
                 "target_id_usb_id": "0240000032044e45000a700a997b00356781000097969900",

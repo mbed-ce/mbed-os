@@ -17,7 +17,7 @@ class TestConfigureCommand(TestCase):
     def test_generate_config_called_with_correct_arguments(self, program, generate_config):
         CliRunner().invoke(configure, ["-m", "k64f", "-t", "gcc_arm", "-o", "some_output_dir"])
 
-        generate_config.assert_called_once_with("K64F", "GCC_ARM", program.from_existing())
+        generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program.from_existing())
 
     @mock.patch("mbed_tools.cli.configure.generate_config")
     @mock.patch("mbed_tools.cli.configure.MbedProgram")
@@ -26,7 +26,7 @@ class TestConfigureCommand(TestCase):
             configure, ["-m", "k64f", "-t", "gcc_arm", "--mbed-os-path", "./extern/mbed-os", "-o", "some_output_dir"]
         )
 
-        generate_config.assert_called_once_with("K64F", "GCC_ARM", program.from_existing())
+        generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program.from_existing())
 
     @mock.patch("mbed_tools.cli.configure.generate_config")
     @mock.patch("mbed_tools.cli.configure.MbedProgram")
@@ -38,7 +38,7 @@ class TestConfigureCommand(TestCase):
             ["-t", "gcc_arm", "-m", "k64f", "--custom-targets-json", custom_targets_json_path, "-o", "some_output_dir"],
         )
 
-        generate_config.assert_called_once_with("K64F", "GCC_ARM", program)
+        generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program)
         self.assertEqual(program.files.custom_targets_json, custom_targets_json_path)
 
     @mock.patch("mbed_tools.cli.configure.generate_config")
@@ -50,7 +50,7 @@ class TestConfigureCommand(TestCase):
             configure, ["-t", "gcc_arm", "-m", "k64f", "--app-config", app_config_path, "-o", "some_output_dir"]
         )
 
-        generate_config.assert_called_once_with("K64F", "GCC_ARM", program)
+        generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program)
         self.assertEqual(program.files.app_config_file, app_config_path)
 
     @mock.patch("mbed_tools.cli.configure.generate_config")
@@ -65,4 +65,4 @@ class TestConfigureCommand(TestCase):
         CliRunner().invoke(configure, ["-t", toolchain, "-m", target, "-o", "some_output_dir"])
 
         program.from_existing.assert_called_once_with(pathlib.Path("."), pathlib.Path("some_output_dir"))
-        generate_config.assert_called_once_with("K64F", "GCC_ARM", test_program)
+        generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", test_program)
