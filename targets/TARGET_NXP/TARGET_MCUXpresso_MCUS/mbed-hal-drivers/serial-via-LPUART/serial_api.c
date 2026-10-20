@@ -128,11 +128,11 @@ void mbed_lpuart_irq(bool transmit_empty, bool receive_full, size_t index)
     }
 
     if (serial_irq_ids[index] != 0) {
-        if (transmit_empty) {
+        if (transmit_empty && (LPUART_GetEnabledInterrupts(uart_addrs[index]) & kLPUART_TxDataRegEmptyInterruptEnable)) {
             irq_handler(serial_irq_ids[index], TxIrq);
         }
 
-        if (receive_full) {
+        if (receive_full && (LPUART_GetEnabledInterrupts(uart_addrs[index]) & kLPUART_RxDataRegFullInterruptEnable)) {
             irq_handler(serial_irq_ids[index], RxIrq);
         }
     }

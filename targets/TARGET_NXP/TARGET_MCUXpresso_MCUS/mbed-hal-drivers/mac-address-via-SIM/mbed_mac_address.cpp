@@ -23,7 +23,7 @@ void mbed_mac_address(char *mac) {
     // Generate a random MAC address using the chip's 4 word unique ID.
     // This is not suitable for production use, but will ensure there are
     // no MAC conflicts.
-    sim_uid_t uid;
+    sim_uid_t uid{};
     SIM_GetUniqueId(&uid);
 
     // The flash unique ID is 128 bits, but we need a unique ID no more

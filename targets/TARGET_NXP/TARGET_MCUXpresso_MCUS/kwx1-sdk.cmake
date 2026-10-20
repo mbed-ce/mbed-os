@@ -104,6 +104,7 @@ target_sources(mbed-mcu-kwx1
         mbed-hal-drivers/flash-via-FLASH/flash_api.c
         mbed-hal-drivers/pinmode-via-PORT/pinmap.c
         mbed-hal-drivers/dma-via-DMAMUX/dma_api.c
+        mbed-hal-drivers/mac-address-via-SIM/mbed_mac_address.cpp
 )
 
 # Link appropriate headers and startup files

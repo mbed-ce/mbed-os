@@ -14,6 +14,7 @@ A message that notes the main changes in the update.
 
 ### Added
 - All Kinetis K-series and KWx1-series targets gained support for DMA SPI transfers. This used to only be implemented for K64F-based targets.
+- Flash API is now supported on Teensy4.0/4.1
 
 ### Changed
 - All MCUX SDK drivers for all NXP devices have been updated to the latest version
