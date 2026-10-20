@@ -77,7 +77,7 @@ target_include_directories(mbed-mcu-kl4x
 )
 target_sources(mbed-mcu-kl4x
     INTERFACE
-        mbed-hal-drivers/lpticker-via-lptmr/lp_ticker.c
+        mbed-hal-drivers/lpticker-via-LPTMR/lp_ticker.c
         mbed-hal-drivers/gpio-via-GPIO/gpio_api.c
         mbed-hal-drivers/interruptin-via-GPIO-PORT/gpio_irq_api.c
         mbed-hal-drivers/pinmode-via-PORT/pinmap.c
