@@ -222,15 +222,6 @@ typedef enum {
     PWM2 = GPIO0,
     PWM3 = GPIO1,
 
-    // LEDs
-    LED0 = GPIO0,
-    LED1 = GPIO1,
-    LED2 = GPIO2,
-   
-    LED_RED   = LED0,
-    LED_GREEN = LED1,
-    LED_BLUE  = LED2,
-
     // USB bridge and SWD UART connected UART pins
     CONSOLE_TX = PTC15,
     CONSOLE_RX = PTC14,
@@ -251,45 +242,6 @@ typedef enum {
     UART2_CTS = PTD11,
     UART2_RTS = PTD10,
 
-    // I2C pins
-    I2C0_SCL = PTC10,
-    I2C0_SDA = PTC11,
-
-    I2C1_SCL = PTB2,
-    I2C1_SDA = PTB3,
-
-    I2C2_SCL = NOT_CONNECTED,
-    I2C2_SDA = NOT_CONNECTED,
-
-    // SPI pins
-    SPI0_SCK  = PTB11,
-    SPI0_MOSI = PTB16,
-    SPI0_MISO = PTB17,
-    SPI0_SS0  = PTB10,
-    SPI0_SS1  = PTB9,
-    SPI0_SS2  = PTB8,
-
-    SPI1_SCK  = PTB21,
-    SPI1_MOSI = PTB22,
-    SPI1_MISO = PTB23,
-    SPI1_SS0  = PTB20,
-    SPI1_SS1  = PTB19,
-    SPI1_SS2  = PTB18,
-
-    SPI2_SCK  = PTD1,
-    SPI2_MOSI = PTD2,
-    SPI2_MISO = PTD3,
-    SPI2_SS0  = PTD0,
-    SPI2_SS1  = PTD4,
-    SPI2_SS2  = PTD5,
-
-    SPI3_SCK  = NOT_CONNECTED,
-    SPI3_MOSI = NOT_CONNECTED,
-    SPI3_MISO = NOT_CONNECTED,
-    SPI3_SS0  = NOT_CONNECTED,
-    SPI3_SS1  = NOT_CONNECTED,
-    SPI3_SS2  = NOT_CONNECTED,
-
     // SWD UART
     SWD_TGT_TX  = UART1_TX,
     SWD_TGT_RX  = UART1_RX,
@@ -299,18 +251,58 @@ typedef enum {
     // Generics
     SERIAL_TX = UART0_TX,
     SERIAL_RX = UART0_RX,
-    I2C_SCL = I2C0_SCL,
-    I2C_SDA = I2C0_SDA,
-    SPI_MOSI = SPI0_MOSI,
-    SPI_MISO = SPI0_MISO,
-    SPI_SCK = SPI0_SCK,
-    SPI_CS = SPI0_SS0,
+
     PWM_OUT = PWM0,
 
     // Not connected
     NC = NOT_CONNECTED
 } PinName;
 
+// LEDs
+#define LED0 PTC1
+#define LED1 PTC5
+#define LED2 PTD6
+
+#define LED_RED LED0
+#define LED_GREEN LED1
+#define LED_BLUE LED2
+
+// I2C pins
+#define I2C0_SCL PTC10
+#define I2C0_SDA PTC11
+
+#define I2C1_SCL PTB2
+#define I2C1_SDA PTB3
+
+#define I2C_SCL I2C0_SCL
+#define I2C_SDA I2C0_SDA
+
+// SPI pins
+#define SPI0_SCK PTB11
+#define SPI0_MOSI PTB16
+#define SPI0_MISO PTB17
+#define SPI0_SS0 PTB10
+#define SPI0_SS1 PTB9
+#define SPI0_SS2 PTB8
+
+#define SPI1_SCK PTB21
+#define SPI1_MOSI PTB22
+#define SPI1_MISO PTB23
+#define SPI1_SS0 PTB20
+#define SPI1_SS1 PTB19
+#define SPI1_SS2 PTB18
+
+#define SPI2_SCK PTD1
+#define SPI2_MOSI PTD2
+#define SPI2_MISO PTD3
+#define SPI2_SS0 PTD0
+#define SPI2_SS1 PTD4
+#define SPI2_SS2 PTD5
+
+#define SPI_MOSI SPI0_MOSI
+#define SPI_MISO SPI0_MISO
+#define SPI_SCK SPI0_SCK
+#define SPI_CS SPI0_SS0
 
 typedef enum {
     PullNone = 0,

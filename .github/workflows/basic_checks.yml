@@ -151,7 +151,10 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python packages
+        shell: bash
         run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
           pip install -e ./tools[linters]
 
       - name: Check Python Formatting
