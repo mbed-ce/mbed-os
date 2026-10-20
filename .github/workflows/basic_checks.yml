@@ -114,6 +114,7 @@ jobs:
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
       - name: Install Python packages
+        shell: bash
         run: |
           python3 -m venv .venv
           source .venv/bin/activate

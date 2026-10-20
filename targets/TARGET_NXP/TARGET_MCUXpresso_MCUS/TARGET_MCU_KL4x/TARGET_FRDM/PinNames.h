@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: KL43Z */
+/* MBED TARGET LIST: FRDM_KL43Z */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H
