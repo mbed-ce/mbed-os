@@ -17,7 +17,7 @@
  * width can be changed between transfers at no cost. Master mode only.
  * One FSP transfer per chunk; sized to the 16-bit DTC count limit (the RA8
  * boards here use the DMAC, which counts 32-bit). */
-#define SPI_MAX_CHUNK_BYTES 65535
+#define SPI_MAX_CHUNK_BYTES 65504
 
 extern const PinMap PinMap_SPI_MOSI[];
 extern const PinMap PinMap_SPI_MISO[];

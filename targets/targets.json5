@@ -8936,6 +8936,35 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "R7FA6M5BF",
         "image_url": "https://img.alicdn.com/imgextra/i4/2216994161539/O1CN01IVJyyO1NEuaTyruZt_!!4611686018427380611-0-item_pic.jpg"
     },
+    "EK_RA6M5": {
+        "inherits": [
+            "MCU_RA6M5"
+        ],
+        "public": true,
+        "device_name": "R7FA6M5BF",
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "image_url": "https://www.renesas.com/en/products/microcontrollers-microprocessors/ra-cortex-m-mcus/ek-ra6m5-evaluation-kit-ra6m5-mcu-group",
+        "device_has_add": [
+            "OSPI",
+            "EMAC"
+        ],
+        "extra_labels_add": [
+            "MX25LM51245G",
+            "RENESAS_EMAC"
+        ],
+        "components_add": [
+            "QSPIF",
+            "OSPIF"
+        ],
+        "overrides": {
+            // The on-board J-Link OB virtual COM port is not wired to the RA6M5,
+            // so SEGGER RTT over the debug probe is the default console.
+            "console-uart": false,
+            "console-rtt": true
+        }
+    },
     "MCU_RA8P1": {
         "inherits": [
             "MCU_RA"

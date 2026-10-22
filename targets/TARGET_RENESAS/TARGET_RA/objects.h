@@ -116,6 +116,23 @@ struct qspi_s {
 };
 #endif
 
+#if DEVICE_OSPI
+struct ospi_s {
+    PinName io0;
+    PinName io1;
+    PinName io2;
+    PinName io3;
+    PinName io4;
+    PinName io5;
+    PinName io6;
+    PinName io7;
+    PinName sclk;
+    PinName ssel;
+    PinName dqs;
+    int hz;          /* Requested bus frequency in Hz (see ospi_api.c) */
+};
+#endif
+
 #if DEVICE_SERIAL
 /* The SCI_B peripheral is register incompatible with SCI. All differences are
  * adapted here so that serial_api.c can use the original SCI names everywhere. */

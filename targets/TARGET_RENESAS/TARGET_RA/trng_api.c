@@ -6,9 +6,10 @@
 #include "common_data.h"
 #include "mbed_error.h"
 
-#if defined(TARGET_RA4E1)
+#if defined(TARGET_RA4E1) || defined(TARGET_RA6M5)
 
-// In RA4E1, TRNG is part of SCE9 protected mode
+// In RA4E1 and RA6M5, TRNG is provided by the SCE driver included in the
+// target support (SCE9 protected procedures).
 
 void trng_init(trng_t *obj)
 {
@@ -54,7 +55,7 @@ void trng_free(trng_t *obj)
     (void)obj;
 }
 
-#elif defined(TARGET_RA4M1) || defined(TARGET_RA6M3) || defined(TARGET_RA6M5)
+#elif defined(TARGET_RA4M1) || defined(TARGET_RA6M3)
 
 // in RA4M1, RA6M3 and RA6M5, TRNG is part of SCE
 

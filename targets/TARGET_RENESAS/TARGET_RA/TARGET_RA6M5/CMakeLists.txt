@@ -25,12 +25,16 @@ target_sources(mbed-ra6m5
 		../ra/fsp/src/r_crc/r_crc.c
 		../ra/fsp/src/r_dac/r_dac.c
 		../ra/fsp/src/r_dmac/r_dmac.c
+		../ra/fsp/src/r_ether/r_ether.c
+		../ra/fsp/src/r_ether_phy/r_ether_phy.c
+		../ra/fsp/src/r_ether_phy/targets/KSZ8091RNB/r_ether_phy_target_ksz8091rnb.c
 		../ra/fsp/src/r_flash_hp/r_flash_hp.c
 		../ra/fsp/src/r_gpt/r_gpt.c
 		../ra/fsp/src/r_icu/r_icu.c
 		../ra/fsp/src/r_iic_master/r_iic_master.c
 		../ra/fsp/src/r_ioport/r_ioport.c
-		../ra/fsp/src/r_qspi/r_qspi.c
+		../ra/fsp/src/r_ospi/r_ospi.c
+        ../ra/fsp/src/r_qspi/r_qspi.c
 		../ra/fsp/src/r_rtc/r_rtc.c
 		# ../ra/fsp/src/r_sdhi/r_sdhi.c
 		../ra/fsp/src/r_sci_uart/r_sci_uart.c
@@ -228,3 +232,4 @@ if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
 endif()
 
 add_subdirectory(TARGET_DONGSHAN_RA6M5 EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_EK_RA6M5 EXCLUDE_FROM_ALL)

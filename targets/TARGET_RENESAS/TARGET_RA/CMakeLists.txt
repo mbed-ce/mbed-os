@@ -56,6 +56,7 @@ target_sources(mbed-renesas-ra
         i2c_api.c
         can_api.c
         qspi_api.c
+        ospi_api.c
         reset_reason.c
         pinmap.c
         mbed_overrides.cpp
