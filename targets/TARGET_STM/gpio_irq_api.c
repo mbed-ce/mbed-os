@@ -39,12 +39,6 @@
 #include "gpio_irq_device.h"
 #include "platform/mbed_critical.h"
 
-#define EDGE_NONE (0)
-#define EDGE_RISE (1)
-#define EDGE_FALL (2)
-#define EDGE_BOTH (3)
-
-
 typedef struct gpio_channel {
     uint32_t pin_mask;                   // bitmask representing which pins are configured for receiving interrupts
     uintptr_t channel_contexts[MAX_PIN_LINE];  // mbed "gpio_irq_t gpio_irq" field of instance
@@ -432,7 +426,7 @@ int gpio_irq_init(gpio_irq_t *obj, PinName pin, gpio_irq_handler handler, uintpt
     // Save informations for future use
     obj->irq_n = pin_lines_desc[pin_index].irq_n;
     obj->irq_index =  pin_lines_desc[pin_index].irq_index;
-    obj->event = EDGE_NONE;
+    obj->event = IRQ_NONE;
     obj->pin = pin;
 
     gpio_channel = &channels[irq_index];

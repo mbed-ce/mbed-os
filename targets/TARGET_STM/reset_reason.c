@@ -22,6 +22,28 @@
 
 reset_reason_t hal_reset_reason_get(void)
 {
+#if defined(TARGET_STM32WB0)
+    /* The WB0 ROM bootloader clears RCC->CSR and preserves its value in RAM_VR. */
+    if (LL_RCC_IsActiveFlag_WDGRST()) {
+        return RESET_REASON_WATCHDOG;
+    }
+
+    if (LL_RCC_IsActiveFlag_SFTRST()) {
+        return RESET_REASON_SOFTWARE;
+    }
+
+    if (LL_RCC_IsActiveFlag_PORRST()) {
+        return RESET_REASON_POWER_ON;
+    }
+
+    if (LL_RCC_IsActiveFlag_PADRST()) {
+        return RESET_REASON_PIN_RESET;
+    }
+
+    if (LL_RCC_IsActiveFlag_LOCKUPRST()) {
+        return RESET_REASON_LOCKUP;
+    }
+#else
 #ifdef RCC_FLAG_LPWRRST
     if (__HAL_RCC_GET_FLAG(RCC_FLAG_LPWRRST)) {
         return RESET_REASON_WAKE_LOW_POWER;
@@ -81,6 +103,7 @@ reset_reason_t hal_reset_reason_get(void)
         return RESET_REASON_PIN_RESET;
     }
 #endif
+#endif // TARGET_STM32WB0
 
     return RESET_REASON_UNKNOWN;
 }
@@ -88,7 +111,9 @@ reset_reason_t hal_reset_reason_get(void)
 
 uint32_t hal_reset_reason_get_raw(void)
 {
-#if TARGET_STM32H7 || TARGET_STM32H5
+#if defined(TARGET_STM32WB0)
+    return RAM_VR.ResetReason;
+#elif TARGET_STM32H7 || TARGET_STM32H5
     return RCC->RSR;
 #else /* TARGET_STM32H7 || TARGET_STM32H5*/
     return RCC->CSR;

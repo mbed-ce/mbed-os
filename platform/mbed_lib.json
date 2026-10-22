@@ -238,6 +238,9 @@
             "crash-capture-enabled": true,
             "fatal-error-auto-reboot-enabled": true
         },
+        "NUCLEO_WB09KE": {
+            "platform.stdio-minimal-console-only": true
+        },
         "ARM_MUSCA_B1": {
             "stdio-convert-newlines": true
         },
