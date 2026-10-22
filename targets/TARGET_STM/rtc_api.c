@@ -116,6 +116,11 @@ void rtc_init(void)
     LL_RCC_EnableRTC();
 #endif
 
+#if (TARGET_STM32WB0)
+    // RTCEN requires two slow-clock cycles to synchronize with the RTC domain.
+    HAL_Delay(1U);
+#endif
+
 #if defined(DUAL_CORE) && (TARGET_STM32H7)
     LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, HSEM_CR_COREID_CURRENT);
 #endif /* DUAL_CORE */
