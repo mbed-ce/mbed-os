@@ -252,7 +252,7 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
 #endif
     /* Open SPI */
     fsp_err_t err = s->p_api->open(s->p_ctrl, &s->cfg);
-    if (FSP_SUCCESS != err) {
+    if (FSP_SUCCESS != err && FSP_ERR_ALREADY_OPEN != err) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_SPI, MBED_ERROR_CODE_INITIALIZATION_FAILED), "spi_init");
     }
 }
@@ -451,6 +451,10 @@ int spi_master_write(spi_t *obj, int value)
     }
     spi_wait(obj);
 
+#if BSP_CFG_DCACHE_ENABLED
+    SCB_InvalidateDCache_by_Addr((void *) &rx, sizeof(rx));
+#endif
+
     return (int) rx;
 }
 
@@ -541,6 +545,11 @@ int spi_master_block_write(spi_t *obj,
 
         offset += chunk;
     }
+#if BSP_CFG_DCACHE_ENABLED
+    if(rx_length != 0) {
+        SCB_InvalidateDCache_by_Addr((void *) rx_buffer, rx_length);
+    }
+#endif
 
     return total;
 }

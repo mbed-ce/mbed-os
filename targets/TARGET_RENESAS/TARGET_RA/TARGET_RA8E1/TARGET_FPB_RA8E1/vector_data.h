@@ -21,9 +21,9 @@
         void iic_master_txi_isr(void);
         void iic_master_tei_isr(void);
         void iic_master_eri_isr(void);
-        void spi_b_rxi_isr(void);
         void spi_b_tei_isr(void);
         void spi_b_eri_isr(void);
+        void spi_b_rxi_isr(void);
         void dmac_int_isr(void);
         void sci_b_uart_rxi_isr(void);
         void sci_b_uart_txi_isr(void);
@@ -73,14 +73,14 @@
         #define ICU_IRQ9_IRQn          ((IRQn_Type) 16) /* ICU IRQ9 (External pin interrupt 9) */
         #define VECTOR_NUMBER_ICU_IRQ13 ((IRQn_Type) 17) /* ICU IRQ13 (External pin interrupt 13) */
         #define ICU_IRQ13_IRQn          ((IRQn_Type) 17) /* ICU IRQ13 (External pin interrupt 13) */
-        #define VECTOR_NUMBER_SPI0_RXI ((IRQn_Type) 18) /* SPI0 RXI (Receive buffer full) */
-        #define SPI0_RXI_IRQn          ((IRQn_Type) 18) /* SPI0 RXI (Receive buffer full) */
-        #define VECTOR_NUMBER_SPI0_TEI ((IRQn_Type) 19) /* SPI0 TEI (Transmission complete event) */
-        #define SPI0_TEI_IRQn          ((IRQn_Type) 19) /* SPI0 TEI (Transmission complete event) */
-        #define VECTOR_NUMBER_SPI0_ERI ((IRQn_Type) 20) /* SPI0 ERI (Error) */
-        #define SPI0_ERI_IRQn          ((IRQn_Type) 20) /* SPI0 ERI (Error) */
-        #define VECTOR_NUMBER_DMAC0_INT ((IRQn_Type) 21) /* DMAC0 INT (DMAC0 transfer end) */
-        #define DMAC0_INT_IRQn          ((IRQn_Type) 21) /* DMAC0 INT (DMAC0 transfer end) */
+        #define VECTOR_NUMBER_SPI0_TEI ((IRQn_Type) 18) /* SPI0 TEI (Transmission complete event) */
+        #define SPI0_TEI_IRQn          ((IRQn_Type) 18) /* SPI0 TEI (Transmission complete event) */
+        #define VECTOR_NUMBER_SPI0_ERI ((IRQn_Type) 19) /* SPI0 ERI (Error) */
+        #define SPI0_ERI_IRQn          ((IRQn_Type) 19) /* SPI0 ERI (Error) */
+        #define VECTOR_NUMBER_DMAC0_INT ((IRQn_Type) 20) /* DMAC0 INT (DMAC0 transfer end) */
+        #define DMAC0_INT_IRQn          ((IRQn_Type) 20) /* DMAC0 INT (DMAC0 transfer end) */
+        #define VECTOR_NUMBER_DMAC2_INT ((IRQn_Type) 21) /* DMAC2 INT (DMAC2 transfer end) */
+        #define DMAC2_INT_IRQn          ((IRQn_Type) 21) /* DMAC2 INT (DMAC2 transfer end) */
         #define VECTOR_NUMBER_ICU_IRQ10 ((IRQn_Type) 22) /* ICU IRQ10 (External pin interrupt 10) */
         #define ICU_IRQ10_IRQn          ((IRQn_Type) 22) /* ICU IRQ10 (External pin interrupt 10) */
         #define VECTOR_NUMBER_ICU_IRQ11 ((IRQn_Type) 23) /* ICU IRQ11 (External pin interrupt 11) */

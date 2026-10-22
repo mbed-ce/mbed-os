@@ -1823,6 +1823,49 @@ const uart_instance_t g_uart0 =
     .p_api         = &g_uart_on_sci_b
 };
 
+dmac_instance_ctrl_t g_transfer2_ctrl;
+transfer_info_t g_transfer2_info =
+{
+    .transfer_settings_word_b.dest_addr_mode = TRANSFER_ADDR_MODE_INCREMENTED,
+    .transfer_settings_word_b.repeat_area    = TRANSFER_REPEAT_AREA_DESTINATION,
+    .transfer_settings_word_b.irq            = TRANSFER_IRQ_END,
+    .transfer_settings_word_b.chain_mode     = TRANSFER_CHAIN_MODE_DISABLED,
+    .transfer_settings_word_b.src_addr_mode  = TRANSFER_ADDR_MODE_FIXED,
+    .transfer_settings_word_b.size           = TRANSFER_SIZE_1_BYTE,
+    .transfer_settings_word_b.mode           = TRANSFER_MODE_NORMAL,
+    .p_dest                                  = (void *) NULL,
+    .p_src                                   = (void const *) NULL,
+    .num_blocks                              = 0,
+    .length                                  = 0,
+};
+const dmac_extended_cfg_t g_transfer2_extend =
+{
+    .offset              = 1,
+    .src_buffer_size     = 1,
+#if defined(VECTOR_NUMBER_DMAC2_INT)
+    .irq                 = VECTOR_NUMBER_DMAC2_INT,
+#else
+    .irq                 = FSP_INVALID_VECTOR,
+#endif
+    .ipl                 = (10),
+    .channel             = 2,
+    .p_callback          = g_spi0_rx_transfer_callback,
+    .p_context           = NULL,
+    .activation_source   = ELC_EVENT_SPI0_RXI,
+};
+const transfer_cfg_t g_transfer2_cfg =
+{
+    .p_info              = &g_transfer2_info,
+    .p_extend            = &g_transfer2_extend,
+};
+/* Instance structure to use this module. */
+const transfer_instance_t g_transfer2 =
+{
+    .p_ctrl        = &g_transfer2_ctrl,
+    .p_cfg         = &g_transfer2_cfg,
+    .p_api         = &g_transfer_on_dmac
+};
+
 dmac_instance_ctrl_t g_transfer0_ctrl;
 transfer_info_t g_transfer0_info =
 {
@@ -1879,7 +1922,7 @@ void g_spi0_tx_transfer_callback (dmac_callback_args_t * p_args)
 }
 #endif
 
-#if (RA_NOT_DEFINED) != (RA_NOT_DEFINED)
+#if (RA_NOT_DEFINED) != (1)
 
 /* If the transfer module is DMAC, define a DMAC transfer callback. */
 #include "r_dmac.h"
@@ -1942,7 +1985,7 @@ const spi_cfg_t g_spi0_cfg =
     .eri_irq             = FSP_INVALID_VECTOR,
 #endif
 
-    .rxi_ipl             = (10),
+    .rxi_ipl             = (BSP_IRQ_DISABLED),
     .txi_ipl             = (BSP_IRQ_DISABLED),
     .tei_ipl             = (12),
     .eri_ipl             = (12),

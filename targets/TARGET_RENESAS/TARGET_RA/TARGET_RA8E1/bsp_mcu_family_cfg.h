@@ -142,7 +142,7 @@
 #endif
 #ifndef BSP_TZ_CFG_MSSAR
 #define BSP_TZ_CFG_MSSAR (\
-            (((2 > 0) ? 0U : 1U) << 22) /* DTC_DMAC */ | \
+            (((3 > 0) ? 0U : 1U) << 22) /* DTC_DMAC */ | \
             (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 31) /* ELC */)
 #endif
 
@@ -241,7 +241,7 @@
 #define BSP_TZ_CFG_DMACCHSAR (\
             (((1 > 0) ? 0U : 1U) << 0U) /* DMAC Channel 0 */ | \
             (((1 > 0) ? 0U : 1U) << 1U) /* DMAC Channel 1 */ | \
-            (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 2U) /* DMAC Channel 2 */ | \
+            (((1 > 0) ? 0U : 1U) << 2U) /* DMAC Channel 2 */ | \
             (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 3U) /* DMAC Channel 3 */ | \
             (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 4U) /* DMAC Channel 4 */ | \
             (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 5U) /* DMAC Channel 5 */ | \
