@@ -4634,7 +4634,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "lpticker-lptim": {
                 "help": "STM32WB0 uses the RTC wake-up timer for the low-power ticker",
                 "value": 0
-            }
+            },
+            "lse-drive-load-level": {
+                "help": "HSE drive load level  RCC_LSEDRIVE_LOW | RCC_LSEDRIVE_MEDIUMLOW | RCC_LSEDRIVE_MEDIUMHIGH | RCC_LSEDRIVE_HIGH",
+                "value": "RCC_LSEDRIVE_LOW"
+            },
         },
         "overrides": {
             "deep-sleep-latency": 6,
@@ -4684,6 +4688,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "overrides": {
             "clock-source": "USE_RC64MPLL",
+            "lse-drive-load-level": "RCC_LSEDRIVE_MEDIUMLOW",
             "lse-available": 1,
             "lsc-boot-startup": 1
         },
