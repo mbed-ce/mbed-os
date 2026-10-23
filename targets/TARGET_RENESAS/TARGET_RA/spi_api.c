@@ -426,7 +426,8 @@ int spi_master_write(spi_t *obj, int value)
     uint32_t rx = 0;
 
 #if BSP_CFG_DCACHE_ENABLED
-    SCB_CleanDCache_by_Addr((void *) &tx, sizeof(tx));
+    SCB_CleanDCache_by_Addr((volatile void *) &tx, sizeof(tx));
+    SCB_CleanDCache_by_Addr((volatile void *) &rx, sizeof(rx));
 #endif
 
     spi_bit_width_t width = spi_frame_width_get(s);
@@ -452,7 +453,7 @@ int spi_master_write(spi_t *obj, int value)
     spi_wait(obj);
 
 #if BSP_CFG_DCACHE_ENABLED
-    SCB_InvalidateDCache_by_Addr((void *) &rx, sizeof(rx));
+    SCB_InvalidateDCache_by_Addr((volatile void *) &rx, sizeof(rx));
 #endif
 
     return (int) rx;
@@ -488,9 +489,11 @@ int spi_master_block_write(spi_t *obj,
     uint32_t dummy_rx;
 
 #if BSP_CFG_DCACHE_ENABLED
-    if(tx_length != 0)
-    {
+    if(tx_length != 0) {
         SCB_CleanDCache_by_Addr((volatile void *)tx_buffer, tx_length);
+    }
+    if(rx_length != 0) {
+        SCB_CleanDCache_by_Addr((volatile void *) rx_buffer, rx_length);
     }
 #endif
     bool is_tx_only = !s->has_miso || rx_buffer == NULL || rx_length == 0;
@@ -547,7 +550,7 @@ int spi_master_block_write(spi_t *obj,
     }
 #if BSP_CFG_DCACHE_ENABLED
     if(rx_length != 0) {
-        SCB_InvalidateDCache_by_Addr((void *) rx_buffer, rx_length);
+        SCB_InvalidateDCache_by_Addr((volatile void *) rx_buffer, rx_length);
     }
 #endif
 
