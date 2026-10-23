@@ -100,17 +100,17 @@ jobs:
 
       - name: File Naming Checks
         run: |
-          set -x
+          mkdir BUILD
           # Assert that all binary libraries are named correctly
           # The strange command below asserts that there are exactly 0 libraries
-          # that do not start with lib
+          # in this directory tree that do not start with lib
           find "(" -name "*.a" -or -name "*.ar" ")" -and -not -name "lib*" |
           tee BUILD/badlibs |
           sed -e "s/^/Bad library name found: /" && [ ! -s BUILD/badlibs ]
           # Assert that all assembler files are named correctly
           # The strange command below asserts that there are exactly 0 files
-          # that do end with .s
-          find  -name "*.s" | tee BUILD/badasm |
+          # in this git repo that do end with .s
+          git ls-files "**/*.s" "*.s" | tee BUILD/badasm |
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
       - uses: actions/setup-python@v7
