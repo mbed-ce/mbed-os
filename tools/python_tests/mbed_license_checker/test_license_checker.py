@@ -32,12 +32,12 @@ def test_invalid_license_expression():
 
     with mock.patch("mbed_license_checker.license_checker.open", mock.mock_open(read_data=text)) as mock_file:
         with pytest.raises(license_checker.LicenseCheckFailedError, match="Failed to parse license expression"):
-            assert license_checker.find_license_in_file(mock_file) is None
+            license_checker.find_license_in_file(mock_file)
 
 
 def test_no_license_expression():
     """
-    Test that None is returned if there is no license data
+    Test that an exception is thrown if there is no license data
     """
 
     text = """
@@ -46,7 +46,8 @@ text here
     """
 
     with mock.patch("mbed_license_checker.license_checker.open", mock.mock_open(read_data=text)) as mock_file:
-        assert license_checker.find_license_in_file(mock_file) is None
+        with pytest.raises(license_checker.LicenseCheckFailedError, match="No SPDX-License-Identifier found"):
+            license_checker.find_license_in_file(mock_file)
 
 
 def test_single_permissive_license():
