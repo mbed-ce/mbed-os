@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import typing
 from dataclasses import dataclass
-from typing import Any, Iterable, List, Literal, Optional, Union
+from typing import Any, Literal
 
 import pydantic
 
@@ -21,12 +21,13 @@ from mbed_tools.schemas import ConfigSettingValue
 
 if typing.TYPE_CHECKING:
     import pathlib
+    from collections.abc import Iterable
 
 logger = logging.getLogger(__name__)
 
 
 def from_file(
-    config_source_file_path: pathlib.Path, target_filters: Iterable[str], default_name: Optional[str] = None
+    config_source_file_path: pathlib.Path, target_filters: Iterable[str], default_name: str | None = None
 ) -> dict:
     """Load a JSON config file and prepare the contents as a config source."""
     return prepare(
@@ -38,7 +39,7 @@ def from_file(
 
 
 def prepare(
-    context: str, input_data: dict, source_name: Optional[str] = None, target_filters: Optional[Iterable[str]] = None
+    context: str, input_data: dict, source_name: str | None = None, target_filters: Iterable[str] | None = None
 ) -> dict:
     """
     Prepare a config source for entry into the Config object.
@@ -124,7 +125,7 @@ def check_and_transform_config_name(context: str, config_namespace: str, config_
 
 def from_mbed_lib_json_file(
     mbed_lib_json_path: pathlib.Path, target_filters: Iterable[str]
-) -> dict[str, Union[list, str, dict]]:
+) -> dict[str, list | str | dict]:
     """
     Prepare a config source for entry into the Config object.
 
@@ -231,8 +232,8 @@ class ConfigSetting:
     namespace: str
     name: str
     value: schemas.ConfigSettingValue
-    help_text: Optional[str] = None
-    macro_name: Optional[str] = None
+    help_text: str | None = None
+    macro_name: str | None = None
     accepted_values: set[schemas.ConfigSettingValue] | None = None
     required: bool | None = None
     value_max: int | float | None = None
@@ -287,7 +288,7 @@ class Override:
     namespace: str
     name: str
     value: schemas.ConfigSettingValue
-    modifier: Optional[Literal["add", "remove"]] = None
+    modifier: Literal["add", "remove"] | None = None
 
     def __post_init__(self) -> None:
         """Parse modifiers and convert list values to sets."""
@@ -301,7 +302,7 @@ class Override:
         self.value = _sanitise_value(self.value)
 
 
-def _extract_config_settings(context: str, namespace: str, config_data: dict) -> List[ConfigSetting]:
+def _extract_config_settings(context: str, namespace: str, config_data: dict) -> list[ConfigSetting]:
     settings = []
     for name, item in config_data.items():
         logger.debug("Extracting config setting from '%s': '%s'='%s'", namespace, name, item)
@@ -342,7 +343,7 @@ def _extract_target_overrides(
     namespace: str,
     target_override_data: dict[str, dict[str, schemas.ConfigSettingValue]],
     allowed_target_labels: Iterable[str],
-) -> List[Override]:
+) -> list[Override]:
     overrides = []
     for target_type, target_overrides in target_override_data.items():
         if target_type == "*" or target_type in allowed_target_labels:
@@ -353,7 +354,7 @@ def _extract_target_overrides(
 
 def _extract_overrides(
     context: str, namespace: str, override_data: dict[str, schemas.ConfigSettingValue]
-) -> List[Override]:
+) -> list[Override]:
     overrides = []
     for name, value in override_data.items():
         split_results = name.split(".", maxsplit=1)

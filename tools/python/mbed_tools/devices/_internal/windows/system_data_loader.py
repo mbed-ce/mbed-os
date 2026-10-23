@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
-from typing import Dict, Generator, Generic, List, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Generic, cast
 
 from typing_extensions import TypeVar
 
@@ -22,6 +22,9 @@ from mbed_tools.devices._internal.windows.serial_port import SerialPort
 from mbed_tools.devices._internal.windows.usb_controller import UsbController
 from mbed_tools.devices._internal.windows.usb_hub import UsbHub
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
 # All Windows system data of interest in order to retrieve the information for DeviceCandidate.
 SYSTEM_DATA_TYPES = [
     UsbHub,
@@ -34,7 +37,7 @@ SYSTEM_DATA_TYPES = [
 ]
 
 
-def load_all(cls: type) -> Tuple[type, List[ComponentDescriptor]]:
+def load_all(cls: type) -> tuple[type, list[ComponentDescriptor]]:
     """Loads all elements present in the system referring to a specific type."""
     return (cls, list(ComponentDescriptorWrapper(cls).element_generator()))
 
@@ -51,7 +54,7 @@ class SystemDataLoader:
 
     def __init__(self) -> None:
         """Initialiser."""
-        self._system_data: Optional[Dict[type, List[ComponentDescriptor]]] = None
+        self._system_data: dict[type, list[ComponentDescriptor]] | None = None
 
     def _load(self) -> None:
         """Loads all system data in parallel."""
@@ -60,15 +63,15 @@ class SystemDataLoader:
         self._system_data = dict(results)
 
     @property
-    def system_data(self) -> Dict[type, List[ComponentDescriptor]]:
+    def system_data(self) -> dict[type, list[ComponentDescriptor]]:
         """Gets all system data."""
         if not self._system_data:
             self._load()
-        return cast(Dict[type, List[ComponentDescriptor]], self._system_data)
+        return cast(dict[type, list[ComponentDescriptor]], self._system_data)
 
-    def get_system_data(self, cls: type[ComponentT]) -> List[ComponentT]:
+    def get_system_data(self, cls: type[ComponentT]) -> list[ComponentT]:
         """Gets the system data for a particular type."""
-        return cast(List[ComponentT], self.system_data.get(cls, []))
+        return cast(list[ComponentT], self.system_data.get(cls, []))
 
 
 class ComponentsLoader(Generic[ComponentT]):

@@ -5,8 +5,9 @@
 """Command to list all Mbed enabled devices connected to the host computer."""
 
 import json
+from collections.abc import Iterable
 from operator import attrgetter
-from typing import Iterable, List, Literal, Optional, Tuple
+from typing import Literal
 
 import click
 from tabulate import tabulate
@@ -54,9 +55,9 @@ def _sort_devices(devices: Iterable[Device]) -> Iterable[Device]:
     return sorted(devices, key=attrgetter("mbed_board.board_name", "serial_number"))
 
 
-def _get_devices_ids(devices: Iterable[Device]) -> List[Tuple[Optional[int], Device]]:
+def _get_devices_ids(devices: Iterable[Device]) -> list[tuple[int | None, Device]]:
     """Create tuple of ID and Device for each Device. ID is None when only one Device exists with a given board name."""
-    devices_ids: List[Tuple[Optional[int], Device]] = []
+    devices_ids: list[tuple[int | None, Device]] = []
     n = 0
     for device in devices:
         board_name = device.mbed_board.board_name
@@ -109,7 +110,7 @@ def _build_json_output(devices: Iterable[Device]) -> str:
     return json.dumps(devices_data, indent=4)
 
 
-def _get_build_targets(board: Board, identifier: Optional[int]) -> List[str]:
+def _get_build_targets(board: Board, identifier: int | None) -> list[str]:
     if identifier is not None:
         return [f"{board.board_type}_{variant}[{identifier}]" for variant in board.build_variant] + [
             f"{board.board_type}[{identifier}]"

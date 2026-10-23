@@ -5,7 +5,7 @@
 """Defines a Disk drive."""
 
 import re
-from typing import NamedTuple, Optional, Tuple, cast
+from typing import NamedTuple, cast
 
 from typing_extensions import override
 
@@ -111,7 +111,7 @@ class DiskDrive(ComponentDescriptor):
 class Win32DiskIdParser:
     """Parser of a standard Win32 Disk."""
 
-    def _parse_pnpid(self, pnpid: str) -> Tuple[str, str]:
+    def _parse_pnpid(self, pnpid: str) -> tuple[str, str]:
         if is_undefined_value(pnpid):
             return (UNKNOWN_VALUE, UNKNOWN_VALUE)
         parts = pnpid.split("\\")
@@ -124,7 +124,7 @@ class Win32DiskIdParser:
             return (processed_uid.lower(), raw_id)
         return (UNKNOWN_VALUE, UNKNOWN_VALUE)
 
-    def parse(self, pnpid: str, serial_number: Optional[str]) -> WindowsUID:
+    def parse(self, pnpid: str, serial_number: str | None) -> WindowsUID:
         """
         Parses the UID value based on multiple fields.
 

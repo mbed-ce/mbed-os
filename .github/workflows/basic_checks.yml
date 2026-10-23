@@ -13,6 +13,11 @@ env:
   # Set up the oldest python version that's currently still supported by Python (as of Summer 2026)
   PYTHON_VERSION: "3.10"
 
+defaults:
+  run:
+    # Use bash instead of sh for commands so that 'source' works
+    shell: bash
+
 jobs:
   license-check:
     runs-on: ubuntu-latest
@@ -25,56 +30,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: install dependencies
-        shell: bash
-        # TODO scancode 32.0 introduced significant breaking changes to the license
-        # detection output format: https://github.com/nexB/scancode-toolkit/releases/tag/v32.0.0
-        # Need to update Mbed's scripts for the new format.
+      - name: Install Python packages
         run: |
-          apt-get update
-          apt-get install -y libxml2-dev libicu-dev pkg-config pipx
-          pipx install "scancode-toolkit<32.0"
-          
-          # Scancode's command line option code seems to have issues with Click >=8.5, produces an error
-          # about conflicting command line options (even though they were not passed on the command line!).
-          pipx inject --force scancode-toolkit 'click<8.5.0'
-          
-          # This is a horrifying, ugly hack. The issue is that spdx-tools, a dependency of scancode, tries to declare
-          # a namespace package in its __init__.py, which is not supported by python 3.12+. However, the version of
-          # scancode we need does not support spdx-tools 0.8.0, which fixed this issue, it requires this exact version.
-          # So, we have to do a little surgery and wipe out this problematic line.
-          echo > $HOME/.local/share/pipx/venvs/scancode-toolkit/lib/python3.14/site-packages/spdx/__init__.py
-          
-          # Put pipx bin dir on PATH
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install -e ./tools[license_check]
 
       - name: license check
         run: |
-          set -x
-          mkdir -p SCANCODE
+          source .venv/bin/activate
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
-            | ( grep '\.\(c\|cpp\|h\|hpp\|py\)$' || true )
-          echo $?
-          git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
-            | ( grep '\.\(c\|cpp\|h\|hpp\|py\)$' || true ) \
-            | while read file; do cp --parents "${file}" SCANCODE; done
-          ls SCANCODE
-          scancode -l --json-pp scancode.json SCANCODE
-          cd tools/python
-
-          # Run the evaluation script, which may fail, and save its exit code.
-          EVALUATE_EXITCODE=0
-          python -m scancode_evaluate.scancode_evaluate ../../scancode.json || EVALUATE_EXITCODE=$?
-
-          cat scancode_evaluate.log
-          if [ "$EVALUATE_EXITCODE" = 0 ]; then
-            echo "License check OK";
-            true;
-          else
-            echo "License check failed, please review license issues found in files";
-            false;
-          fi
+          .github/workflows/scripts/check-licenses.sh
+          
 
   include-check:
     runs-on: ubuntu-latest
@@ -98,16 +65,13 @@ jobs:
 
   style-check:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/mbed-ce/mbed-ce-env:main
     steps:
       - name: Checkout repo
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
-
-      - name: Install Formatters
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install astyle aspell
 
       - name: UTF-8 Check
         run: |
@@ -136,17 +100,17 @@ jobs:
 
       - name: File Naming Checks
         run: |
-          set -x
+          mkdir BUILD
           # Assert that all binary libraries are named correctly
           # The strange command below asserts that there are exactly 0 libraries
-          # that do not start with lib
+          # in this directory tree that do not start with lib
           find "(" -name "*.a" -or -name "*.ar" ")" -and -not -name "lib*" |
           tee BUILD/badlibs |
           sed -e "s/^/Bad library name found: /" && [ ! -s BUILD/badlibs ]
           # Assert that all assembler files are named correctly
           # The strange command below asserts that there are exactly 0 files
-          # that do end with .s
-          find  -name "*.s" | tee BUILD/badasm |
+          # in this git repo that do end with .s
+          git ls-files "**/*.s" "*.s" | tee BUILD/badasm |
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
       - uses: actions/setup-python@v7
@@ -155,15 +119,18 @@ jobs:
 
       - name: Install Python packages
         run: |
-          pip install -e ./tools[linters]
+          python3 -m venv .venv
+          source .venv/bin/activate
 
       - name: Check Python Formatting
         run: |
+          source .venv/bin/activate
           cd tools
           ruff format --diff
 
       - name: Check Python Lint
         run: |
+          source .venv/bin/activate
           cd tools
           ruff check --diff python/mbed_tools python/mbed_platformio
           basedpyright
@@ -236,7 +203,6 @@ jobs:
           fetch-depth: 0
 
       - name: validate pins
-        shell: bash
         run: |
           export GITHUB_EVENT_BEFORE=${{ github.event.before }}
           .github/workflows/scripts/pin-validate.sh

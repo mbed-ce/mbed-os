@@ -1,5 +1,5 @@
 # Copyright (c) 2020-2021 ARM Limited. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: Apache-2.0 AND BSD-3-Clause
 
 # This is the boilerplate for Mbed OS
 

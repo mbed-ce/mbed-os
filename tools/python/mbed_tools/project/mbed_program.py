@@ -7,7 +7,6 @@
 import logging
 import pathlib
 from pathlib import Path
-from typing import Dict, Optional
 from urllib.parse import urlparse
 
 from mbed_tools.project._internal.project_data import (
@@ -45,7 +44,7 @@ class MbedProgram:
 
     @classmethod
     def from_existing(
-        cls, dir_path: Path, build_dir: Path, mbed_os_path: Optional[Path] = None, check_mbed_os: bool = True
+        cls, dir_path: Path, build_dir: Path, mbed_os_path: Path | None = None, check_mbed_os: bool = True
     ) -> "MbedProgram":
         """
         Create an MbedProgram from an existing program directory.
@@ -81,7 +80,7 @@ class MbedProgram:
         return cls(program, mbed_os, program_root)
 
 
-def parse_url(name_or_url: str) -> Dict[str, str]:
+def parse_url(name_or_url: str) -> dict[str, str]:
     """
     Create a valid github/armmbed url from a program name.
 
