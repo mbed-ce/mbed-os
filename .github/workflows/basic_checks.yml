@@ -13,6 +13,11 @@ env:
   # Set up the oldest python version that's currently still supported by Python (as of Summer 2026)
   PYTHON_VERSION: "3.10"
 
+defaults:
+  run:
+    # Use bash instead of sh for commands so that 'source' works
+    shell: bash
+
 jobs:
   license-check:
     runs-on: ubuntu-latest
@@ -26,7 +31,6 @@ jobs:
           fetch-depth: 0
 
       - name: Install Python packages
-        shell: bash
         run: |
           python3 -m venv .venv
           source .venv/bin/activate
@@ -68,11 +72,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
-
-      - name: Install Formatters
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install astyle aspell
 
       - name: UTF-8 Check
         run: |
@@ -119,7 +118,6 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python packages
-        shell: bash
         run: |
           python3 -m venv .venv
           source .venv/bin/activate
@@ -205,7 +203,6 @@ jobs:
           fetch-depth: 0
 
       - name: validate pins
-        shell: bash
         run: |
           export GITHUB_EVENT_BEFORE=${{ github.event.before }}
           .github/workflows/scripts/pin-validate.sh
