@@ -25,6 +25,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Python packages
+        shell: bash
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install -e ./tools[license_check]
+
       - name: install dependencies
         shell: bash
         # TODO scancode 32.0 introduced significant breaking changes to the license

@@ -190,9 +190,10 @@ class Win7TestCase(unittest.TestCase):
         dummy_val = "dummy_val"
         volume_string_1 = "_??_USBSTOR#Disk&Ven_MBED&Prod_VFS&Rev_0.1#0240000032044e4500367009997b00086781000097969900&0#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}"
         volume_string_2 = "_??_USBSTOR#Disk&Ven_MBED&Prod_VFS&Rev_0.1#1234000032044e4500367009997b00086781000097969900&0#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}"
-        with patch("mbed_os_tools.detect.windows._iter_vals") as _iter_vals, patch(
-            "mbed_os_tools.detect.windows._is_mbed_volume"
-        ) as _is_mbed_volume:
+        with (
+            patch("mbed_os_tools.detect.windows._iter_vals") as _iter_vals,
+            patch("mbed_os_tools.detect.windows._is_mbed_volume") as _is_mbed_volume,
+        ):
             _winreg.OpenKey.return_value = dummy_val
             _iter_vals.return_value = [
                 ("dummy_device", "this is not a valid volume string"),
@@ -215,9 +216,10 @@ class Win7TestCase(unittest.TestCase):
     def test_get_disks(self):
         dummy_key = "dummy_key"
         volume_strings = ["dummy_volume_1", "dummy_volume_2"]
-        with patch("mbed_os_tools.detect.windows._get_values_with_numeric_keys") as _num_keys, patch(
-            "mbed_os_tools.detect.windows._is_mbed_volume"
-        ) as _is_mbed_volume:
+        with (
+            patch("mbed_os_tools.detect.windows._get_values_with_numeric_keys") as _num_keys,
+            patch("mbed_os_tools.detect.windows._is_mbed_volume") as _is_mbed_volume,
+        ):
             _winreg.OpenKey.return_value = dummy_key
             _num_keys.return_value = volume_strings
             _is_mbed_volume.return_value = True
@@ -245,9 +247,10 @@ class Win7TestCase(unittest.TestCase):
     def test_get_usb_storage_devices(self):
         dummy_key = "dummy_key"
         volume_strings = ["dummy_usb_storage_1", "dummy_usb_storage_2"]
-        with patch("mbed_os_tools.detect.windows._get_values_with_numeric_keys") as _num_keys, patch(
-            "mbed_os_tools.detect.windows._is_mbed_volume"
-        ) as _is_mbed_volume:
+        with (
+            patch("mbed_os_tools.detect.windows._get_values_with_numeric_keys") as _num_keys,
+            patch("mbed_os_tools.detect.windows._is_mbed_volume") as _is_mbed_volume,
+        ):
             _winreg.OpenKey.return_value = dummy_key
             _num_keys.return_value = volume_strings
             _is_mbed_volume.return_value = True

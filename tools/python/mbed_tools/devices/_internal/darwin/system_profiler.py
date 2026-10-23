@@ -9,11 +9,14 @@ from __future__ import annotations
 import plistlib
 import re
 import subprocess
-from typing import Dict, Iterable, List, Union, cast
+from typing import TYPE_CHECKING, cast
 
 from typing_extensions import TypedDict
 
-USBDeviceTree = Dict  # mypy does not work with recursive types, which "_items" would require
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+USBDeviceTree = dict  # mypy does not work with recursive types, which "_items" would require
 
 
 class USBDeviceMedia(TypedDict, total=False):
@@ -30,25 +33,25 @@ class USBDevice(TypedDict, total=False):
     vendor_id: str
     product_id: str
     serial_num: str
-    Media: List[USBDeviceMedia]
+    Media: list[USBDeviceMedia]
 
 
-def get_all_usb_devices_data() -> List[USBDeviceTree | USBDevice]:
+def get_all_usb_devices_data() -> list[USBDeviceTree | USBDevice]:
     """Returns parsed output of `system_profiler` call."""
     output = subprocess.check_output(["/usr/sbin/system_profiler", "-xml", "SPUSBDataType"], stderr=subprocess.DEVNULL)
     if output:
-        return cast(List[Union[USBDeviceTree, USBDevice]], plistlib.loads(output))
+        return cast(list[USBDeviceTree | USBDevice], plistlib.loads(output))
     return []
 
 
-def get_end_usb_devices_data() -> List[USBDevice]:
+def get_end_usb_devices_data() -> list[USBDevice]:
     """Returns only end devices from the output of `system_profiler` call."""
     data = get_all_usb_devices_data()
     leaf_devices = _extract_leaf_devices(data)
     return _filter_end_devices(leaf_devices)
 
 
-def _extract_leaf_devices(data: Iterable[USBDeviceTree | USBDevice]) -> List[USBDevice]:
+def _extract_leaf_devices(data: Iterable[USBDeviceTree | USBDevice]) -> list[USBDevice]:
     """
     Flattens the structure returned by `system_profiler` call.
 
@@ -64,7 +67,7 @@ def _extract_leaf_devices(data: Iterable[USBDeviceTree | USBDevice]) -> List[USB
     return end_devices
 
 
-def _filter_end_devices(data: Iterable[USBDevice]) -> List[USBDevice]:
+def _filter_end_devices(data: Iterable[USBDevice]) -> list[USBDevice]:
     """
     Removes devices that don't look like end devices.
 

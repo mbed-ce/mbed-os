@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import itertools
 from collections import deque
-from typing import TYPE_CHECKING, Any, Deque, Dict, List
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from mbed_tools.schemas import TargetJSON
@@ -26,7 +26,7 @@ ALL_ACCUMULATING_ATTRIBUTES = ACCUMULATING_ATTRIBUTES + tuple(
 )
 
 
-def get_accumulating_attributes_for_target(all_targets_data: Dict[str, TargetJSON], target_name: str) -> Dict[str, Any]:
+def get_accumulating_attributes_for_target(all_targets_data: dict[str, TargetJSON], target_name: str) -> dict[str, Any]:
     """
     Parses the data for all targets and returns the accumulating attributes for the specified target.
 
@@ -41,7 +41,7 @@ def get_accumulating_attributes_for_target(all_targets_data: Dict[str, TargetJSO
     return _determine_accumulated_attributes(accumulating_order)
 
 
-def _targets_accumulate_hierarchy(all_targets_data: Dict[str, TargetJSON], target_name: str) -> List[dict[str, Any]]:
+def _targets_accumulate_hierarchy(all_targets_data: dict[str, TargetJSON], target_name: str) -> list[dict[str, Any]]:
     """
     List all ancestors of a target in order of accumulation inheritance (breadth-first).
 
@@ -66,9 +66,9 @@ def _targets_accumulate_hierarchy(all_targets_data: Dict[str, TargetJSON], targe
     Returns:
         A list of dicts representing each target in the hierarchy.
     """
-    targets_in_order: List[Dict[str, Any]] = []
+    targets_in_order: list[dict[str, Any]] = []
 
-    still_to_visit: Deque[TargetJSON] = deque()
+    still_to_visit: deque[TargetJSON] = deque()
     still_to_visit.appendleft(all_targets_data[target_name])
 
     while still_to_visit:
@@ -84,7 +84,7 @@ def _targets_accumulate_hierarchy(all_targets_data: Dict[str, TargetJSON], targe
     return targets_in_order
 
 
-def _add_attribute_element(accumulator: Dict[str, Any], attribute_name: str, elements_to_add: List[Any]) -> None:
+def _add_attribute_element(accumulator: dict[str, Any], attribute_name: str, elements_to_add: list[Any]) -> None:
     """
     Adds an attribute element to an attribute.
 
@@ -97,7 +97,7 @@ def _add_attribute_element(accumulator: Dict[str, Any], attribute_name: str, ele
         accumulator[attribute_name].append(element)
 
 
-def _remove_attribute_element(accumulator: Dict[str, Any], attribute_name: str, elements_to_remove: List[Any]) -> None:
+def _remove_attribute_element(accumulator: dict[str, Any], attribute_name: str, elements_to_remove: list[Any]) -> None:
     """
     Removes an attribute element from an attribute.
 
@@ -125,8 +125,8 @@ def _remove_attribute_element(accumulator: Dict[str, Any], attribute_name: str, 
 
 
 def _calculate_attribute_elements(
-    attribute_name: str, starting_state: Dict[str, Any], applicable_accumulation_order: List[dict]
-) -> Dict[str, Any]:
+    attribute_name: str, starting_state: dict[str, Any], applicable_accumulation_order: list[dict]
+) -> dict[str, Any]:
     """
     Adds and removes elements for an attribute based on the definitions encountered in the hierarchy.
 
@@ -157,8 +157,8 @@ def _calculate_attribute_elements(
 
 
 def _calculate_attribute_for_target(
-    attribute_name: str, target: Dict[str, Any], targets_in_order: List[dict]
-) -> Dict[str, Any]:
+    attribute_name: str, target: dict[str, Any], targets_in_order: list[dict]
+) -> dict[str, Any]:
     """
     Finds a single accumulated attribute for a target from its list of ancestors.
 
@@ -176,7 +176,7 @@ def _calculate_attribute_for_target(
     return _calculate_attribute_elements(attribute_name, starting_state, applicable_accumulation_order)
 
 
-def _find_nearest_defined_attribute(targets_in_order: List[dict], attribute_name: str) -> Dict[str, Any]:
+def _find_nearest_defined_attribute(targets_in_order: list[dict], attribute_name: str) -> dict[str, Any]:
     """
     Returns the definition of a particular attribute first encountered in the accumulation order.
 
@@ -193,7 +193,7 @@ def _find_nearest_defined_attribute(targets_in_order: List[dict], attribute_name
     return {}
 
 
-def _determine_accumulated_attributes(targets_in_order: List[dict]) -> Dict[str, Any]:
+def _determine_accumulated_attributes(targets_in_order: list[dict]) -> dict[str, Any]:
     """
     Finds all the accumulated attributes for a target from its list of ancestors.
 

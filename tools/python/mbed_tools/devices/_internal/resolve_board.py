@@ -12,7 +12,6 @@ For more information on the mbed-targets package visit https://github.com/ARMmbe
 """
 
 import logging
-from typing import Optional
 
 from mbed_tools.devices._internal.exceptions import NoBoardForCandidateError, ResolveBoardError
 from mbed_tools.devices._internal.file_parser import OnlineId
@@ -22,9 +21,7 @@ from mbed_tools.targets.exceptions import MbedTargetsError, UnknownBoardError
 logger = logging.getLogger(__name__)
 
 
-def resolve_board(
-    product_code: Optional[str] = None, online_id: Optional[OnlineId] = None, serial_number: str = ""
-) -> Board:
+def resolve_board(product_code: str | None = None, online_id: OnlineId | None = None, serial_number: str = "") -> Board:
     """
     Resolves a board object from the platform database.
 

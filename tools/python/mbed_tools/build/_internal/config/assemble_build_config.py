@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Iterable, List, Optional, Set
+from typing import TYPE_CHECKING
 
 import pydantic
 
@@ -19,6 +19,7 @@ from mbed_tools.lib.json_helpers import decode_json_file
 from mbed_tools.schemas import MbedAppJSON
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from mbed_tools.project import MbedProgram
@@ -44,7 +45,7 @@ def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
         target_attributes: Mapping of target specific config parameters.
         program: MbedProgram to build the config for
     """
-    mbed_lib_files: Set[Path] = set()
+    mbed_lib_files: set[Path] = set()
 
     for path in [program.root, program.mbed_os.root]:
         mbed_lib_files.update(find_files("mbed_lib.json", path.absolute().resolve()))
@@ -77,7 +78,7 @@ def assemble_config(target_attributes: dict, program: MbedProgram) -> Config:
 
 
 def _assemble_config_from_sources(
-    target_attributes: dict, mbed_lib_files: List[Path], mbed_app_file: Optional[Path] = None
+    target_attributes: dict, mbed_lib_files: list[Path], mbed_app_file: Path | None = None
 ) -> tuple[Config, list[Path]]:
     config = Config(**source.prepare("merged target JSON", target_attributes, source_name="target"))
     mbed_app_json_dict = None
@@ -138,9 +139,9 @@ def _get_file_filter_overrides(mbed_app_data: dict) -> dict:
 class FileFilterData:
     """Data used to navigate mbed-os directories for config files."""
 
-    labels: Set[str]
-    features: Set[str]
-    components: Set[str]
+    labels: set[str]
+    features: set[str]
+    components: set[str]
 
     @classmethod
     def from_config(cls, config: Config) -> FileFilterData:

@@ -7,7 +7,6 @@
 import logging
 import pathlib
 import re
-from typing import List, Optional, Tuple
 
 from typing_extensions import TypedDict, override
 
@@ -24,8 +23,8 @@ class CandidateDeviceData(TypedDict):
     vendor_id: str
     product_id: str
     serial_number: str
-    mount_points: Tuple[pathlib.Path, ...]
-    serial_port: Optional[str]
+    mount_points: tuple[pathlib.Path, ...]
+    serial_port: str | None
 
 
 class InvalidCandidateDeviceDataError(ValueError):
@@ -36,7 +35,7 @@ class DarwinDeviceDetector(DeviceDetector):
     """Darwin specific implementation of device detection."""
 
     @override
-    def find_candidates(self) -> List[CandidateDevice]:
+    def find_candidates(self) -> list[CandidateDevice]:
         """Return a list of CandidateDevices."""
         usb_devices_data = system_profiler.get_end_usb_devices_data()
         candidates = []
@@ -81,7 +80,7 @@ def _format_vendor_id(vendor_id: str) -> str:
     return vendor_id.split(maxsplit=1)[0]
 
 
-def _get_mount_points(device_data: system_profiler.USBDevice) -> Tuple[pathlib.Path, ...]:
+def _get_mount_points(device_data: system_profiler.USBDevice) -> tuple[pathlib.Path, ...]:
     """Returns mount points for a given device, empty list if device has no mount points."""
     storage_identifiers = [media["bsd_name"] for media in device_data.get("Media", []) if "bsd_name" in media]
     mount_points = []
@@ -94,7 +93,7 @@ def _get_mount_points(device_data: system_profiler.USBDevice) -> Tuple[pathlib.P
     return tuple(mount_points)
 
 
-def _get_serial_port(device_data: system_profiler.USBDevice) -> Optional[str]:
+def _get_serial_port(device_data: system_profiler.USBDevice) -> str | None:
     """Returns serial port for a given device, None if serial port cannot be determined."""
     device_name = device_data.get("_name")
     if not device_name:
