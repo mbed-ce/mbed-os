@@ -1,4 +1,12 @@
 """
+Basic license checker script for Mbed. This script:
+- Filters passed files based on a list of directories and extensions that should have their licenses checked
+- Finds 'SPDX-License-Identifier:' in each file
+- Validates that the license identifier names a valid license and is permissive (using the license_expression package)
+- Prints a report of any violating licenses
+"""
+
+"""
 SPDX-License-Identifier: Apache-2.0
 
 Copyright (c) 2026 Jamie Smith. All rights reserved.
@@ -15,7 +23,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations
 """
-
+import fnmatch
 import pathlib
 import re
 import sys
@@ -150,6 +158,11 @@ def verify_permissive(path: pathlib.Path) -> None:
     :raises LicenseCheckFailedError: if this is not the case
     """
 
+    # Is the file empty? If so we don't need to check the license
+    # (this is common in __init__.py's)
+    if path.stat().st_size == 0:
+        return
+
     file_license_expression = find_license_in_file(path)
 
     if not is_permissive_license(file_license_expression):
@@ -182,11 +195,13 @@ def scan_licenses(root_paths: Iterable[pathlib.Path]) -> bool:
     """
     root_paths = [dir.resolve() for dir in root_paths]
 
-    # Discover files to check
+    # Discover files to check matching the given patterns
     files_to_check: list[pathlib.Path] = []
     for root_path in root_paths:
         if root_path.is_file():
-            files_to_check.append(root_path)
+            for pattern in FILE_PATTERNS_TO_CHECK:
+                if fnmatch.fnmatch(root_path.name, pattern):
+                    files_to_check.append(root_path)
         else:
             # List all files
             for pattern in FILE_PATTERNS_TO_CHECK:
