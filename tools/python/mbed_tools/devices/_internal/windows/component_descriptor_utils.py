@@ -5,7 +5,7 @@
 """Utilities with regards to Win32 component descriptors."""
 
 from collections import OrderedDict
-from typing import Any, NamedTuple, Union
+from typing import Any, NamedTuple
 
 UNKNOWN_VALUE = "Unknown"
 
@@ -33,5 +33,5 @@ def retain_value_or_default(value: Any) -> Any:
 
 def data_object_to_dict(data_object: NamedTuple) -> dict:
     """Gets a data object as a dictionary."""
-    internal_dictionary: Union[dict, OrderedDict] = data_object._asdict()
+    internal_dictionary: dict | OrderedDict = data_object._asdict()
     return dict(internal_dictionary) if isinstance(internal_dictionary, OrderedDict) else internal_dictionary

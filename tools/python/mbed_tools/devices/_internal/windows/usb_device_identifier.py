@@ -5,7 +5,8 @@
 """Defines a USB Identifier."""
 
 import re
-from typing import Dict, List, NamedTuple, Optional, Pattern, cast
+from re import Pattern
+from typing import NamedTuple, cast
 
 from typing_extensions import override
 
@@ -27,14 +28,14 @@ class UsbIdentifier(NamedTuple):
         MI: Multiple Interface, a 2 digit interface number.
     """
 
-    UID: Optional[WindowsUID] = None
-    VID: Optional[str] = None
-    PID: Optional[str] = None
-    REV: Optional[str] = None
-    MI: Optional[str] = None
+    UID: WindowsUID | None = None
+    VID: str | None = None
+    PID: str | None = None
+    REV: str | None = None
+    MI: str | None = None
 
     @staticmethod
-    def get_patterns_dict() -> Dict[str, Pattern]:
+    def get_patterns_dict() -> dict[str, Pattern]:
         """Returns a dictionary of all the regexes."""
         return {p: re.compile(f"^{p}_(.*)$") for p in UsbIdentifier._fields[1:]}
 
@@ -85,7 +86,7 @@ class Win32DeviceIdParser:
     See https://docs.microsoft.com/en-us/windows-hardware/drivers/install/standard-usb-identifiers
     """
 
-    def parse_uid(self, raw_id: str, serial_number: Optional[str] = None) -> WindowsUID:
+    def parse_uid(self, raw_id: str, serial_number: str | None = None) -> WindowsUID:
         """
         Parses the UID value.
 
@@ -114,7 +115,7 @@ class Win32DeviceIdParser:
             if match:
                 valuable_information[k] = match.group(1)
 
-    def split_id_elements(self, parts: List[str], serial_number: Optional[str] = None) -> dict:
+    def split_id_elements(self, parts: list[str], serial_number: str | None = None) -> dict:
         """Splits the different elements of an Device ID."""
         information = {}
         information[KEY_UID] = self.parse_uid(parts[-1], serial_number)
@@ -124,7 +125,7 @@ class Win32DeviceIdParser:
             self.record_id_element(element, information, patterns_dict)
         return information
 
-    def parse(self, id_string: Optional[str], serial_number: Optional[str] = None) -> "UsbIdentifier":
+    def parse(self, id_string: str | None, serial_number: str | None = None) -> "UsbIdentifier":
         r"""
         Parses the device id string and retrieves the different elements of interest.
 
@@ -153,7 +154,7 @@ class Win32DeviceIdParser:
         return UsbIdentifier(**self.split_id_elements(parts, serial_number))
 
 
-def parse_device_id(id_string: Optional[str], serial_number: Optional[str] = None) -> UsbIdentifier:
+def parse_device_id(id_string: str | None, serial_number: str | None = None) -> UsbIdentifier:
     """
     Parses the device id string and retrieves the different elements of interest.
 

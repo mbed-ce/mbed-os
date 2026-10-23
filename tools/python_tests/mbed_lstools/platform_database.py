@@ -67,9 +67,10 @@ class EmptyPlatformDatabaseTests(unittest.TestCase):
 
     def test_broken_database(self):
         """Verify that the platform database correctly reset's its database"""
-        with patch("mbed_os_tools.detect.platform_database.open") as _open, patch(
-            "mbed_os_tools.detect.platform_database._older_than_me"
-        ) as _older:
+        with (
+            patch("mbed_os_tools.detect.platform_database.open") as _open,
+            patch("mbed_os_tools.detect.platform_database._older_than_me") as _older,
+        ):
             _older.return_value = False
             stringio = MagicMock()
             _open.side_effect = (IOError("Bogus"), stringio)
@@ -90,9 +91,10 @@ class EmptyPlatformDatabaseTests(unittest.TestCase):
 
     def test_old_database(self):
         """Verify that the platform database correctly updates's its database"""
-        with patch("mbed_os_tools.detect.platform_database.open") as _open, patch(
-            "mbed_os_tools.detect.platform_database.getmtime"
-        ) as _getmtime:
+        with (
+            patch("mbed_os_tools.detect.platform_database.open") as _open,
+            patch("mbed_os_tools.detect.platform_database.getmtime") as _getmtime,
+        ):
             file_mock = MagicMock()
             file_mock.read.return_value = ""
             _open.return_value.__enter__.return_value = file_mock

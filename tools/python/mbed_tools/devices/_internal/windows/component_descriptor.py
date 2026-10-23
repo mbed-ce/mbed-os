@@ -6,7 +6,8 @@
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Generator, List, NamedTuple, Optional, cast
+from collections.abc import Generator
+from typing import Any, NamedTuple, cast
 
 import pythoncom  # pyright: ignore[reportMissingModuleSource]
 import win32com.client  # pyright: ignore[reportMissingModuleSource]
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 class ComponentDescriptor(ABC):
     """Win32 component descriptor."""
 
-    def __init__(self, win32_definition: type, win32_class_name: str, win32_filter: Optional[str] = None) -> None:
+    def __init__(self, win32_definition: type, win32_class_name: str, win32_filter: str | None = None) -> None:
         """
         Initialiser.
 
@@ -51,7 +52,7 @@ class ComponentDescriptor(ABC):
         return self._win32_class_name
 
     @property
-    def field_names(self) -> List[str]:
+    def field_names(self) -> list[str]:
         """Returns the names of all the fields of the descriptor."""
         return list(getattr(self._win32_definition, NAMED_TUPLE_FIELDS_ATTRIBUTE))
 
@@ -61,7 +62,7 @@ class ComponentDescriptor(ABC):
         """Returns the device ID field."""
 
     @property
-    def win32_filter(self) -> Optional[str]:
+    def win32_filter(self) -> str | None:
         """
         Filter applied on a Win32 category.
 
@@ -106,7 +107,7 @@ class Win32Wrapper:
         pythoncom.CoInitialize()
         self.wmi = win32com.client.GetObject("winmgmts:")
 
-    def _read_cdispatch_fields(self, win32_element: Any, element_fields_list: List[str]) -> dict:
+    def _read_cdispatch_fields(self, win32_element: Any, element_fields_list: list[str]) -> dict:
         """Reads all the fields from a cdispatch object returned by pywin32."""
         if not win32_element:
             return {}
@@ -126,7 +127,7 @@ class Win32Wrapper:
         instance.set_data_values(self._read_cdispatch_fields(win32_element, instance.field_names))
         return cast(ComponentDescriptor, instance)
 
-    def _get_list_iterator(self, win32_class_name: str, list_filter: Optional[str]) -> Generator[Any, None, None]:
+    def _get_list_iterator(self, win32_class_name: str, list_filter: str | None) -> Generator[Any, None, None]:
         if list_filter:
             # Note: This is a WQL query, not true SQL, and there does not appear to be a way to bind parameters.
             query = f"Select * from {win32_class_name} where {list_filter}"  # noqa: S608
@@ -134,7 +135,7 @@ class Win32Wrapper:
         return self.wmi.InstancesOf(win32_class_name)
 
     def element_generator(
-        self, to_cls: type, win32_class_name: str, list_filter: Optional[str]
+        self, to_cls: type, win32_class_name: str, list_filter: str | None
     ) -> Generator["ComponentDescriptor", None, None]:
         """Gets a generator over all elements currently registered in the system."""
         for element in self._get_list_iterator(win32_class_name, list_filter):

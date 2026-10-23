@@ -8,12 +8,13 @@ from __future__ import annotations
 
 import logging
 from collections import UserDict
-from typing import Any, Hashable, Iterable, List
+from typing import Any
 
 import typing_extensions
 
 if typing_extensions.TYPE_CHECKING:
     import pathlib
+    from collections.abc import Hashable, Iterable
 
     from mbed_tools.build._internal.config.source import ConfigSetting, Override
 
@@ -32,7 +33,7 @@ class Config(UserDict):
     # List of JSON files used to create this config.  Dumped to CMake at the end of configuration
     # so that it can regenerate configuration if the JSONs change.
     # All paths will be relative to the Mbed program root directory, or absolute if outside said directory.
-    json_sources: List[pathlib.Path]
+    json_sources: list[pathlib.Path]
 
     def __init__(self, **kwargs: dict[str, Any]) -> None:
         self.json_sources = []
@@ -94,7 +95,7 @@ class Config(UserDict):
                 setting.value = override.value
                 setting.check_value()
 
-    def _update_config_section(self, config_settings: List[ConfigSetting]) -> None:
+    def _update_config_section(self, config_settings: list[ConfigSetting]) -> None:
         for setting in config_settings:
             logger.debug("Adding config setting: '%s.%s'", setting.namespace, setting.name)
             if setting in self.data.get(CONFIG_SECTION, []):
