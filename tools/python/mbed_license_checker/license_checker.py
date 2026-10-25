@@ -1,5 +1,7 @@
 """
-Basic license checker script for Mbed. This script:
+Basic license checker script for Mbed.
+
+This script:
 - Filters passed files based on a list of directories and extensions that should have their licenses checked
 - Finds 'SPDX-License-Identifier:' in each file
 - Validates that the license identifier names a valid license and is permissive (using the license_expression package)
@@ -75,7 +77,6 @@ def get_permissive_license_mapping() -> dict[license_expression.LicenseSymbol, b
     Oddly this information is contained within the license index JSON file inside `license_expression`,
     but is NOT made public by the API.
     """
-
     # Convert JSON into a map of LicenseSymbol() entries.
     # This is similar to the logic in license_expression.build_spdx_licensing()
     return {
@@ -102,48 +103,46 @@ def find_license_in_file(file: pathlib.Path) -> license_expression.LicenseExpres
 
     :raises LicenseCheckFailedError: on error
     """
-
     # Read the first 10kB of the file. That allows for the license expression to not be at the
     # exact start of the file but should be faster than reading the entire thing.
-    with open(file, "r", encoding="utf-8") as opened_file:
+    with open(file, encoding="utf-8") as opened_file:  # noqa: PTH123
         try:
             first_10k = opened_file.read(10000)
         except UnicodeDecodeError as ex:
-            raise LicenseCheckFailedError("Failed to read file (not UTF-8 encoded?): " + str(ex))
+            raise LicenseCheckFailedError("Failed to read file (not UTF-8 encoded?): " + str(ex)) from ex
 
     # Find the first instance of an SPDX license identifier
     match = SPDX_LICENSE_REGEX.search(first_10k)
     if match is None:
-        raise LicenseCheckFailedError("No SPDX-License-Identifier found.")
+        msg = "No SPDX-License-Identifier found."
+        raise LicenseCheckFailedError(msg)
 
     # Try to parse as a license identifier
     try:
         return cast(license_expression.LicenseExpression, licensing.parse(match.group(1), validate=True, strict=True))
     except license_expression.ExpressionError as ex:
-        raise LicenseCheckFailedError(
-            f"Failed to parse license expression in {str(file)}: '{match.group(1)}': {str(ex)}"
-        )
+        message = f"Failed to parse license expression in {file!s}: '{match.group(1)}': {ex!s}"
+        raise LicenseCheckFailedError(message) from ex
 
 
-def is_permissive_license(license: license_expression.LicenseExpression) -> bool:
+def is_permissive_license(license_expr: license_expression.LicenseExpression) -> bool:
     """
     Detect whether a license expression allows permissive licensing
     """
-
     # Simple case: just one license
-    if isinstance(license, license_expression.LicenseSymbol):
-        return permissive_license_mapping[license]
+    if isinstance(license_expr, license_expression.LicenseSymbol):
+        return permissive_license_mapping[license_expr]
 
     # The LicenseExpression class is really just a boolean expression from the `boolean` package.
     # Each license is represented as a symbol in the boolean expression.
     # So, all we gotta do is "substitute" the expression with actual boolean values
     # to find out if it is true (permissive) or false (not permissive)
-    substituted_expr = license.subs(
+    substituted_expr = license_expr.subs(
         {
             license_symbol: licensing.TRUE
             if permissive_license_mapping[cast(license_expression.LicenseSymbol, license_symbol)]
             else licensing.FALSE
-            for license_symbol in license.symbols
+            for license_symbol in license_expr.symbols
         }
     )
 
@@ -157,7 +156,6 @@ def verify_permissive(path: pathlib.Path) -> None:
 
     :raises LicenseCheckFailedError: if this is not the case
     """
-
     # Is the file empty? If so we don't need to check the license
     # (this is common in __init__.py's)
     if path.stat().st_size == 0:
@@ -166,9 +164,8 @@ def verify_permissive(path: pathlib.Path) -> None:
     file_license_expression = find_license_in_file(path)
 
     if not is_permissive_license(file_license_expression):
-        raise LicenseCheckFailedError(
-            f"Detected license {file_license_expression!s} which is not known to be permissive."
-        )
+        message = f"Detected license {file_license_expression!s} which is not known to be permissive."
+        raise LicenseCheckFailedError(message)
 
 
 EXCLUDE_PATH_PATTERNS = [
@@ -193,7 +190,7 @@ def scan_licenses(root_paths: Iterable[pathlib.Path]) -> bool:
     :param root_dirs: Files and directories to scan
     :return: True if all files were OK, false if there were some errors.
     """
-    root_paths = [dir.resolve() for dir in root_paths]
+    root_paths = [path.resolve() for path in root_paths]
 
     # Discover files to check matching the given patterns
     files_to_check: list[pathlib.Path] = []
@@ -240,7 +237,7 @@ def scan_licenses(root_paths: Iterable[pathlib.Path]) -> bool:
     return False
 
 
-def main():
+def main() -> None:
     if len(sys.argv) == 1:
         print(f"Usage: {sys.argv[0]} <files and directories to scan>")
         sys.exit(1)
