@@ -56,7 +56,15 @@ SPIName spi_get_peripheral_name(PinName mosi, PinName miso, PinName sclk)
     return spi_per;
 }
 
+// If STATIC_PINMAP_READY is not defined for this device, use the default implementation of
+// spi_init_direct() which calls spi_init().
+#if STATIC_PINMAP_READY
+#define SPI_INIT_DIRECT spi_init_direct
 void spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
+#else
+#define SPI_INIT_DIRECT _spi_init_direct
+static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
+#endif
 {
     obj->spi.instance = pinmap->peripheral;
     MBED_ASSERT((int)obj->spi.instance != NC);
@@ -104,7 +112,7 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
 
     const spi_pinmap_t explicit_spi_pinmap = {peripheral, mosi, mosi_function, miso, miso_function, sclk, sclk_function, ssel, ssel_function};
 
-    spi_init_direct(obj, &explicit_spi_pinmap);
+    SPI_INIT_DIRECT(obj, &explicit_spi_pinmap);
 }
 
 void spi_free(spi_t *obj)

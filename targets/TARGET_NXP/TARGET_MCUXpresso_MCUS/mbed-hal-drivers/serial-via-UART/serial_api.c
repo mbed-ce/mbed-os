@@ -50,7 +50,15 @@ static clock_name_t const uart_clocks[] = UART_CLOCK_FREQS;
 int stdio_uart_inited = 0;
 serial_t stdio_uart;
 
+// If STATIC_PINMAP_READY is not defined for this device, use the default implementation of
+// serial_init_direct() which calls serial_init().
+#if STATIC_PINMAP_READY
+#define SERIAL_INIT_DIRECT serial_init_direct
 void serial_init_direct(serial_t *obj, const serial_pinmap_t *pinmap)
+#else
+#define SERIAL_INIT_DIRECT _serial_init_direct
+static void _serial_init_direct(serial_t *obj, const serial_pinmap_t *pinmap)
+#endif
 {
     obj->serial.index = (uint32_t)pinmap->peripheral;
     MBED_ASSERT((int)obj->serial.index != NC);
@@ -101,7 +109,7 @@ void serial_init(serial_t *obj, PinName tx, PinName rx)
 
     const serial_pinmap_t explicit_uart_pinmap = {peripheral, tx, tx_function, rx, rx_function, 0};
 
-    serial_init_direct(obj, &explicit_uart_pinmap);
+    SERIAL_INIT_DIRECT(obj, &explicit_uart_pinmap);
 }
 
 void serial_free(serial_t *obj)
@@ -366,7 +374,16 @@ const PinMap *serial_rts_pinmap()
 /*
  * Only hardware flow control is implemented in this API.
  */
+
+// If STATIC_PINMAP_READY is not defined for this device, use the default implementation of
+// serial_init_direct() which calls serial_init().
+#if STATIC_PINMAP_READY
+#define SERIAL_SET_FLOW_CONTROL_DIRECT serial_set_flow_control_direct
 void serial_set_flow_control_direct(serial_t *obj, FlowControl type, const serial_fc_pinmap_t *pinmap)
+#else
+#define SERIAL_SET_FLOW_CONTROL_DIRECT _serial_set_flow_control_direct
+static void _serial_set_flow_control_direct(serial_t *obj, FlowControl type, const serial_fc_pinmap_t *pinmap)
+#endif
 {
     switch (type) {
         case FlowControlRTS:
@@ -407,7 +424,7 @@ void serial_set_flow_control(serial_t *obj, FlowControl type, PinName rxflow, Pi
 
     const serial_fc_pinmap_t explicit_uart_fc_pinmap = {0, txflow, tx_flow_function, rxflow, rx_flow_function};
 
-    serial_set_flow_control_direct(obj, type, &explicit_uart_fc_pinmap);
+    SERIAL_SET_FLOW_CONTROL_DIRECT(obj, type, &explicit_uart_fc_pinmap);
 }
 
 #endif
