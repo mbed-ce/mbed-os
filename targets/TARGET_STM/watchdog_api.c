@@ -21,43 +21,15 @@
 #include "watchdog_api.h"
 #include "device.h"
 #include "mbed_error.h"
-
-
+#include "low_speed_clock.h"
 
 #if MBED_CONF_TARGET_LSE_AVAILABLE && defined(LSC_IWDG_USE_LSE)
-#   include "low_speed_clock.h"
 #   define IWDG_USES_LSE 1
 #   define IWDG_CLOCK_VALUE LSE_VALUE
 #else
 #   define IWDG_USES_LSE 0
 #   define IWDG_CLOCK_VALUE LSI_VALUE
 #endif
-
-/*  See LSC oscillator characteristics in Data Sheet */
-static const uint32_t STM32_LSC_MAX_FREQUENCY =
-#if IWDG_USES_LSE // LSE for targets that support LSE, otherwise LSI is used
-    LSE_VALUE
-#elif defined(STM32F1)
-    60000U
-#elif defined(STM32L0) || defined(STM32L1)
-    56000U
-#elif defined(STM32F2) || defined(STM32F4) || defined(STM32F7)
-    47000U
-#elif defined(STM32F0) || defined(STM32F3)
-    50000U
-#elif defined(STM32H7) || defined(STM32L4) || \
-      defined(STM32U5) || defined(STM32H5)
-    33600U
-#elif defined(STM32G0) || defined(STM32L5) || \
-      defined(STM32G4) || defined(STM32WB) || \
-      defined(STM32WL) || defined(STM32U0)
-    34000U
-#elif defined(STM32WB0)
-    49000U
-#else
-#error "Unsupported STM32 target"
-#endif
-;
 
 #define MAX_IWDG_PR 0x6 // Max value of Prescaler_divider bits (PR) of Prescaler_register (IWDG_PR)
 #define MAX_IWDG_RL 0xFFFUL // Max value of Watchdog_counter_reload_value bits (RL) of Reload_register (IWDG_RLR).
@@ -172,7 +144,11 @@ watchdog_features_t hal_watchdog_get_platform_features(void)
     features.update_config = true;
     features.disable_watchdog = false;
     features.clock_typical_frequency = IWDG_CLOCK_VALUE;
-    features.clock_max_frequency = STM32_LSC_MAX_FREQUENCY;
+#if IWDG_USES_LSE // LSE for targets that support LSE, otherwise LSI is used
+    features.clock_max_frequency =LSE_VALUE;
+#else
+    features.clock_max_frequency = STM32_LSI_MAX_FREQUENCY;
+#endif
     return features;
 }
 
