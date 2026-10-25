@@ -113,10 +113,6 @@ jobs:
           git ls-files "**/*.s" "*.s" | tee BUILD/badasm |
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
-      - uses: actions/setup-python@v7
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
       - name: Install Python packages
         run: |
           python3 -m venv .venv
