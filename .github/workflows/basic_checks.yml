@@ -122,6 +122,9 @@ jobs:
           python3 -m venv .venv
           source .venv/bin/activate
           pip install -e ./tools[linters]
+          # Additional dep groups needed for linting to pass
+          pip install -e ./tools[platformio]
+          pip install -e ./tools[license_check]
 
       - name: Check Python Formatting
         run: |
