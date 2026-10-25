@@ -15,7 +15,7 @@ class TestConfigureCommand(TestCase):
     @mock.patch("mbed_tools.cli.configure.generate_config")
     @mock.patch("mbed_tools.cli.configure.MbedProgram")
     def test_generate_config_called_with_correct_arguments(self, program, generate_config):
-        CliRunner().invoke(configure, ["-m", "k64f", "-t", "gcc_arm", "-o", "some_output_dir"])
+        CliRunner().invoke(configure, ["-m", "FRDM_K64F", "-t", "gcc_arm", "-o", "some_output_dir"])
 
         generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program.from_existing())
 
@@ -23,7 +23,7 @@ class TestConfigureCommand(TestCase):
     @mock.patch("mbed_tools.cli.configure.MbedProgram")
     def test_generate_config_called_with_mbed_os_path(self, program, generate_config):
         CliRunner().invoke(
-            configure, ["-m", "k64f", "-t", "gcc_arm", "--mbed-os-path", "./extern/mbed-os", "-o", "some_output_dir"]
+            configure, ["-m", "FRDM_K64F", "-t", "gcc_arm", "--mbed-os-path", "./extern/mbed-os", "-o", "some_output_dir"]
         )
 
         generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program.from_existing())
@@ -35,7 +35,7 @@ class TestConfigureCommand(TestCase):
         custom_targets_json_path = pathlib.Path("custom", "custom_targets.json")
         CliRunner().invoke(
             configure,
-            ["-t", "gcc_arm", "-m", "k64f", "--custom-targets-json", custom_targets_json_path, "-o", "some_output_dir"],
+            ["-t", "gcc_arm", "-m", "FRDM_K64F", "--custom-targets-json", custom_targets_json_path, "-o", "some_output_dir"],
         )
 
         generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program)
@@ -47,7 +47,7 @@ class TestConfigureCommand(TestCase):
         program = program.from_existing()
         app_config_path = pathlib.Path("alternative_config.json")
         CliRunner().invoke(
-            configure, ["-t", "gcc_arm", "-m", "k64f", "--app-config", app_config_path, "-o", "some_output_dir"]
+            configure, ["-t", "gcc_arm", "-m", "FRDM_K64F", "--app-config", app_config_path, "-o", "some_output_dir"]
         )
 
         generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program)
@@ -60,7 +60,7 @@ class TestConfigureCommand(TestCase):
         program.reset_mock()  # clear call count from previous line
 
         toolchain = "gcc_arm"
-        target = "k64f"
+        target = "FRDM_K64F"
 
         CliRunner().invoke(configure, ["-t", toolchain, "-m", target, "-o", "some_output_dir"])
 
