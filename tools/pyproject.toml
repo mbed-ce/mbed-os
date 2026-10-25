@@ -86,7 +86,8 @@ linters = [
     "psutil",
     "pyudev>=0.24",
     "beautifulsoup4",
-    "lxml"
+    "lxml",
+    "license-expression",
 ]
 greentea = [
     ## Additional requirements to install into the Mbed environment when running Greentea tests
