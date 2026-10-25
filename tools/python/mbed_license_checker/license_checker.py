@@ -149,7 +149,7 @@ def is_permissive_license(license_expr: license_expression.LicenseExpression) ->
     # Simplify to true or false
     # Note: For some reason pyright seems to hit a false positive issue in CI on the following line.
     # It doesn't reproduce locally :((
-    return cast(bool, substituted_expr.simplify()) # pyright: ignore [reportCallIssue]
+    return cast(bool, substituted_expr.simplify())  # pyright: ignore [reportCallIssue]
 
 
 def verify_permissive(path: pathlib.Path) -> None:
