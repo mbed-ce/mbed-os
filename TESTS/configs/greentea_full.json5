@@ -37,9 +37,12 @@
     },
     "target_overrides": {
         "MCU_LPC17XX": {
-            // Configure Nanostack for Ethernet mode only by default. This is sufficient for our tests and is
-            // needed because not every target has enough flash space for all of Nanostack (it can be more than
-            // 400kiB when you include the Mbed TLS deps it pulls in!)
+            // Configure Nanostack for Ethernet mode only. This is sufficient for our tests and is
+            // needed because not every target has enough flash space for all of Nanostack (seems like
+            // the total size of Mbed + Nanostack + Mbed TLS is almost 600 kB of flash!)
+            "nanostack.configuration": "ethernet_host"
+        },
+        "MCU_LPC546XX": {
             "nanostack.configuration": "ethernet_host"
         }
     }
