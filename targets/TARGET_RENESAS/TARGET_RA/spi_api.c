@@ -221,6 +221,11 @@ void spi_init(spi_t *obj, PinName mosi, PinName miso, PinName sclk, PinName ssel
         const spi_extended_cfg_t *ext_src = (const spi_extended_cfg_t *) cfg_src->p_extend;
         if (ext_src) {
             s->ext.spi = *ext_src;
+#if !BSP_PERIPHERAL_SPI_B_PRESENT
+            /* The old SPI IP has no per-transfer burst mode switching; always
+             * run with inter-frame delay (see spi_switch_burst_mode). */
+            s->ext.spi.burst_interframe_delay = SPI_BURST_TRANSFER_WITH_DELAY;
+#endif
             s->cfg.p_extend = &s->ext.spi;
         } else {
             s->cfg.p_extend = NULL;
@@ -362,6 +367,58 @@ void spi_frequency(spi_t *obj, int hz)
     s->p_api->open(s->p_ctrl, &s->cfg);
 }
 
+/* Select the burst transfer mode per transfer direction on the SPI_B IP.
+ * Without inter-frame delay the frames are clocked back-to-back (maximum
+ * throughput), but the receive side then gets no slack to service the RX FIFO
+ * between frames: the r_spi_b driver documents that transfers receiving data
+ * with DTC/DMAC can raise RX overflow errors at high bitrates. Transfers that
+ * receive nothing (TX only) are not affected, because the master simply waits
+ * when the TX FIFO runs dry. Use the no-delay burst for TX-only transfers and
+ * the inter-frame delay for everything else. The old SPI IP has no dynamic
+ * switching: it always runs with inter-frame delay (forced in spi_init). */
+static void spi_switch_burst_mode(struct spi_s *s, bool tx_only)
+{
+    if (s->is_sci) {
+        return;
+    }
+
+#if BSP_PERIPHERAL_SPI_B_PRESENT
+    /* The FSP driver reads burst_interframe_delay on every transfer (TX DMA
+     * length, SSLKP handling, transmission of the last frame) through
+     * p_ctrl->p_cfg, which can reference another spi_t's configuration copy
+     * when several Mbed SPI objects share one FSP channel (LCD and SD card
+     * on the same bus here). Always update the driver-visible copy and keep
+     * the local copy in sync so that a later close()/open() cycle reapplies
+     * the same mode. */
+    spi_b_extended_cfg_t *ext = (spi_b_extended_cfg_t *) s->p_ctrl->p_cfg->p_extend;
+    spi_b_burst_transfer_without_delay_t mode = SPI_B_BURST_TRANSFER_WITH_DELAY;
+    if (tx_only && (SPI_B_SSL_MODE_SPI == ext->spi_clksyn)) {
+        /* Burst transfer without delay is not supported in clock synchronous
+         * operation (rejected by R_SPI_B_Open). */
+        mode = SPI_B_BURST_TRANSFER_WITHOUT_DELAY;
+    }
+
+    if (ext->burst_interframe_delay == mode) {
+        return;
+    }
+
+    ext->burst_interframe_delay = mode;
+    s->ext.spi.burst_interframe_delay = mode;
+
+    /* Reprogram while idle (SPE = 0): this runs between transfers. */
+    if (SPI_B_BURST_TRANSFER_WITHOUT_DELAY == mode) {
+        s->p_ctrl->p_regs->SPCR |= R_SPI_B0_SPCR_BFDS_Msk;
+        s->p_ctrl->p_regs->SPDCR2 |= R_SPI_B0_SPDCR2_TTRG_Msk;
+    }
+    else {
+        s->p_ctrl->p_regs->SPCR &= ~R_SPI_B0_SPCR_BFDS_Msk;
+        s->p_ctrl->p_regs->SPDCR2 &= ~R_SPI_B0_SPDCR2_TTRG_Msk;
+    }
+#else
+    (void) tx_only;
+#endif
+}
+
 static void spi_switch_tx_only_mode(struct spi_s *s, bool enable_tx_only)
 {
     /* The R_SCI_SPI driver discards received data on write(), no register
@@ -370,8 +427,15 @@ static void spi_switch_tx_only_mode(struct spi_s *s, bool enable_tx_only)
         return;
     }
 
+    /* Update the driver-visible extended configuration too: the FSP DMA
+     * callbacks and ISRs read spi_comm through p_ctrl->p_cfg, which can point
+     * at another spi_t's copy when several Mbed SPI objects share one FSP
+     * channel. */
+    spi_extended_cfg_t *ext = (spi_extended_cfg_t *) s->p_ctrl->p_cfg->p_extend;
+
     if(enable_tx_only)
     {
+        ext->spi_comm = SPI_COMMUNICATION_TRANSMIT_ONLY;
         s->ext.spi.spi_comm = SPI_COMMUNICATION_TRANSMIT_ONLY;
 #if BSP_PERIPHERAL_SPI_B_PRESENT
         /* TXMD is a 2-bit field: 01 selects transmit-only. Do not use
@@ -385,6 +449,7 @@ static void spi_switch_tx_only_mode(struct spi_s *s, bool enable_tx_only)
     }
     else
     {
+        ext->spi_comm = SPI_COMMUNICATION_FULL_DUPLEX;
         s->ext.spi.spi_comm = SPI_COMMUNICATION_FULL_DUPLEX;
 #if BSP_PERIPHERAL_SPI_B_PRESENT
         s->p_ctrl->p_regs->SPCR |= R_SPI_B0_SPCR_SPRIE_Msk;
@@ -394,6 +459,8 @@ static void spi_switch_tx_only_mode(struct spi_s *s, bool enable_tx_only)
         s->p_ctrl->p_regs->SPCR &= ~(R_SPI0_SPCR_TXMD_Msk | R_SPI0_SPCR_SPTIE_Msk);
 #endif
     }
+
+    spi_switch_burst_mode(s, enable_tx_only);
 }
 
 /* Mark a synchronous transfer as started (routes the FSP callback). */

@@ -41,6 +41,7 @@ target_sources(mbed-ra8p1
 		../ra/fsp/src/r_doc/r_doc.c
 		../ra/fsp/src/r_dtc/r_dtc.c
 		../ra/fsp/src/r_elc/r_elc.c
+		../ra/fsp/src/r_glcdc/r_glcdc.c
 		../ra/fsp/src/r_gpt/r_gpt.c
 		../ra/fsp/src/r_gpt_three_phase/r_gpt_three_phase.c
 		../ra/fsp/src/r_icu/r_icu.c
