@@ -34,5 +34,13 @@
         "target.console-usb": false,
         "target.console-uart": true,
         "target.console-rtt": false
+    },
+    "target_overrides": {
+        "MCU_LPC17XX": {
+            // Configure Nanostack for Ethernet mode only by default. This is sufficient for our tests and is
+            // needed because not every target has enough flash space for all of Nanostack (it can be more than
+            // 400kiB when you include the Mbed TLS deps it pulls in!)
+            "nanostack.configuration": "ethernet_host"
+        }
     }
 }
