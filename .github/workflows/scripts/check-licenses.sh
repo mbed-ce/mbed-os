@@ -11,4 +11,6 @@ fi
 changed_files=$(git diff --name-only --diff-filter=d "origin/$main_branch")
 
 # Check licenses
-mbed-license-checker $changed_files
+if [ -n "$changed_files" ]; then
+  mbed-license-checker $changed_files
+fi
