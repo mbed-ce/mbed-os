@@ -1196,7 +1196,7 @@ Nanostack &Nanostack::get_instance()
 #define NANOSTACK 0x99119911
 #if MBED_CONF_NSAPI_DEFAULT_STACK == NANOSTACK
 #undef NANOSTACK
-OnboardNetworkStack &OnboardNetworkStack::get_default_instance()
+MBED_WEAK OnboardNetworkStack &OnboardNetworkStack::get_default_instance()
 {
     return Nanostack::get_instance();
 }
