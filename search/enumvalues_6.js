@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['gamepad_0',['GAMEPAD',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da273c15ddc1f5abadaf24cd191e7db5e0',1,'ble::adv_data_appearance_t']]],
+  ['gatt_5fop_5fsigned_5fwrite_5fcmd_1',['GATT_OP_SIGNED_WRITE_CMD',['../classble_1_1_gatt_client.html#a5471c5942a59a16d20317a0ce8ddcb3fa2eef017fbd7b8a3a13c09fe5b6bfc4ce',1,'ble::GattClient']]],
+  ['gatt_5fop_5fwrite_5fcmd_2',['GATT_OP_WRITE_CMD',['../classble_1_1_gatt_client.html#a5471c5942a59a16d20317a0ce8ddcb3fa69f202fc42fd92cd4ac68bdd032bf207',1,'ble::GattClient']]],
+  ['gatt_5fop_5fwrite_5freq_3',['GATT_OP_WRITE_REQ',['../classble_1_1_gatt_client.html#a5471c5942a59a16d20317a0ce8ddcb3fa9eaf2e07866edd30d10fb81da996aa8d',1,'ble::GattClient']]],
+  ['gcc_5farm_4',['GCC_ARM',['../group__platform__stats.html#ggacb8271c806c9aa06c40a7a423b7c5050a7fc80a9f8fc4906a309e9cbf33148a5a',1,'mbed_stats.h']]],
+  ['generic_5fbarcode_5fscanner_5',['GENERIC_BARCODE_SCANNER',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da8f566c81366b293c3392ae081735d034',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fblood_5fpressure_6',['GENERIC_BLOOD_PRESSURE',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da9d339d0e86910397f3ffba86b1992631',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fclock_7',['GENERIC_CLOCK',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da2f92a9a8e180663dd9693a4d26143bb3',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fcomputer_8',['GENERIC_COMPUTER',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da22ea8b20573813a67440622631c04951',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fcycling_9',['GENERIC_CYCLING',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da85f186e47eb93ca3c7d0ee3e2978e4e6',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fdisplay_10',['GENERIC_DISPLAY',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2dab332a5936187a7c4f9ae5be61b6d1f58',1,'ble::adv_data_appearance_t']]],
+  ['generic_5feye_5fglasses_11',['GENERIC_EYE_GLASSES',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da134532fd735d90bd22a38fdcb8cc6bb7',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fglucose_5fmeter_12',['GENERIC_GLUCOSE_METER',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2dad29f9017ab680e6c2412cc0fa6f6a9d4',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fheart_5frate_5fsensor_13',['GENERIC_HEART_RATE_SENSOR',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2dadcca749900eaa0f73bb545d5d5918b04',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fkeyring_14',['GENERIC_KEYRING',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da09b45e1a3db977a5065cc89696e9e1e9',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fmedia_5fplayer_15',['GENERIC_MEDIA_PLAYER',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2daeec5dfc4b580dd2b4a9eb71bd79299b5',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fphone_16',['GENERIC_PHONE',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2dad454ff2f6628ead4d34ad470d5aa74ac',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fremote_5fcontrol_17',['GENERIC_REMOTE_CONTROL',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da6a116cd46e1b655b9f32c437a9c0f430',1,'ble::adv_data_appearance_t']]],
+  ['generic_5frunning_5fwalking_5fsensor_18',['GENERIC_RUNNING_WALKING_SENSOR',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2daa9e66ea1d2a03d958a07dbb61720bedd',1,'ble::adv_data_appearance_t']]],
+  ['generic_5ftag_19',['GENERIC_TAG',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da76f9ca89769eb1b9906ee8ac2f291239',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fthermometer_20',['GENERIC_THERMOMETER',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2dac1f0e5b0e498f642f1a3aae20094ff15',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fwatch_21',['GENERIC_WATCH',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2dacc51f45e3f63cd7643b89312382eb113',1,'ble::adv_data_appearance_t']]],
+  ['generic_5fweight_5fscale_22',['GENERIC_WEIGHT_SCALE',['../structble_1_1adv__data__appearance__t.html#a7aead736a07eaf25623ad7bfa1f0ee2da0982186a2a2563d7a424076ac3ef71c4',1,'ble::adv_data_appearance_t']]]
+];
