@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 import win32api  # pyright: ignore[reportMissingModuleSource]
 import win32con  # pyright: ignore[reportMissingModuleSource]
@@ -44,7 +44,7 @@ class RegKey:
         self._hkey.Close()
 
 
-def get_children_instance_id(pnpid: str) -> Optional[str]:
+def get_children_instance_id(pnpid: str) -> str | None:
     """
     Gets the USB children instance ID from the plug and play ID.
 

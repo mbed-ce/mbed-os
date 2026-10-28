@@ -9,7 +9,7 @@ An instance of `mbed_tools.targets.board.Board` can be retrieved by calling one 
 """
 
 import logging
-from typing import Callable
+from collections.abc import Callable
 
 from mbed_tools.targets.board import Board
 from mbed_tools.targets.boards import Boards

@@ -6,15 +6,12 @@ build-backend = "hatchling.build"
 name = "mbed-ce-tools"
 version = "0.0.1"
 description = 'Tools for building and testing Mbed OS Community Edition'
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 dependencies = [
     # memap dependencies ---------------------------------------------------------------------
     "intelhex>=2.3.0,<3.0.0",
-
-    # 3.12.0 both added HRuleStyle and deprecated the old constants in one single release :/
-    "prettytable>=2.0,<3.12.0; python_version < '3.9'",
-    "prettytable>=3.12.0; python_version >= '3.9'",
+    "prettytable>=3.12.0",
 
     # mbed_tools dependencies ----------------------------------------------------------------
     "jinja2>=2.11.3",
@@ -71,6 +68,9 @@ unit-tests = [
     "mock",
     "coverage",
 
+    # Needed for license-checker tests
+    "license-expression",
+
     # Even though beautifulsoup4 and lxml are only used by the mac version
     # of mbed ls tools, they're needed on all platforms for its unit test.
     "beautifulsoup4",
@@ -86,7 +86,8 @@ linters = [
     "psutil",
     "pyudev>=0.24",
     "beautifulsoup4",
-    "lxml"
+    "lxml",
+    "license-expression",
 ]
 greentea = [
     ## Additional requirements to install into the Mbed environment when running Greentea tests
@@ -109,6 +110,11 @@ platformio = [
     "click"
 ]
 
+# Install this group to get support for checking licenses in contributed code
+license_check = [
+    "license-expression"
+]
+
 [tool.hatch.build.targets.wheel]
 packages = [
     "python/mbed_host_tests",
@@ -126,6 +132,7 @@ mbedls = "mbed_lstools.main:mbedls_main"
 mbed-tools = "mbed_tools.cli.main:cli"
 memap = "memap.memap:main"
 ambiq_svl = "ambiq_svl.svl:cli"
+mbed-license-checker = "mbed_license_checker.license_checker:main"
 
 [tool.ruff]
 line-length = 120
@@ -208,14 +215,6 @@ ignore = [
     'S603',    # subprocess-without-shell-equals-true - without disabling this, subprocess cannot be used at all!
     'ERA001',  # commented-out-code
     'T201',    # print
-
-    # For now allow old-style type annotations. Currently there's lots of code that uses them, and I am
-    # not sure if there is a way to upgrade them automatically. And since this project still supports
-    # back to Python 3.8, you can't actually use the new style of annotations without using the future annotations feature.
-    "FA100",   # future-rewritable-type-annotation
-    "UP045",   # non-pep604-annotation-optional
-    "UP006",   # non-pep585-annotation
-    "UP007"    # non-pep604-annotation-union
 ]
 
 # Allow "unsafe" fixes to be done automatically for the following:
@@ -243,12 +242,13 @@ split-on-trailing-comma = false
 
 [tool.basedpyright]
 
-# Don't warn about things deprecated more recently than python 3.8
-pythonVersion = "3.8"
+# Don't warn about things deprecated more recently than python 3.10
+pythonVersion = "3.10"
 
 include = [
     "python/mbed_tools/**",
-    "python/mbed_platformio/**"
+    "python/mbed_platformio/**",
+    "python/mbed_license_checker/**"
 ]
 
 # For right now, we can configure basedpyright in relatively permissive mode.

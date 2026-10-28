@@ -15,6 +15,7 @@ A message that notes the main changes in the update.
 ### Added
 
 ### Changed
+- Mbed now requires a Python version from 3.10 through 3.14 to compile. Python 3.8 and 3.9 are no longer supported.
   
 ### Deprecated
 

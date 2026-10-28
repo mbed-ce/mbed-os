@@ -7,7 +7,6 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ class MbedProgramFiles:
         cmake_build_dir: The CMake build tree.
     """
 
-    app_config_file: Optional[Path]
+    app_config_file: Path | None
     mbed_os_ref: Path
     cmakelists_file: Path
     cmake_build_dir: Path
@@ -65,7 +64,7 @@ class MbedProgramFiles:
             root_path: The path containing the MbedProgramFiles.
             build_dir: The directory to use for CMake build.
         """
-        app_config: Optional[Path] = None
+        app_config: Path | None = None
         if (root_path / APP_CONFIG_FILE_NAME_JSON5).exists():
             app_config = root_path / APP_CONFIG_FILE_NAME_JSON5
         elif (root_path / APP_CONFIG_FILE_NAME_JSON).exists():

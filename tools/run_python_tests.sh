@@ -44,8 +44,8 @@ $PYTHON -m coverage run "$COVERAGE_EXCLUDES" -m pytest python_tests/mbed_tools
 echo ">> Running pytest for memap package"
 $PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m pytest python_tests/memap
 
-echo ">> Running pytest for scancode_evaluate package"
-$PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m pytest python_tests/scancode_evaluate
+echo ">> Running pytest for mbed_license_checker package"
+$PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m pytest python_tests/mbed_license_checker
 
 # Note: For some reason, they decided not to add a "_test" suffix on the
 # test case filenames for some packages.  So, the "-p *.py" argument is needed to

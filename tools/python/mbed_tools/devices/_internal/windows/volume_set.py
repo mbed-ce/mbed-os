@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-from typing import List, NamedTuple
+from typing import NamedTuple
 
 import win32.win32api  # pyright: ignore[reportMissingModuleSource]
 import win32.win32file  # pyright: ignore[reportMissingModuleSource]
@@ -60,7 +60,7 @@ class VolumeInformation(NamedTuple):
     DriveType: DriveType  # As defined by GetDriveType
 
 
-def _get_windows_volume_information(volume: str) -> List[str | int]:
+def _get_windows_volume_information(volume: str) -> list[str | int]:
     try:
         return list(win32.win32api.GetVolumeInformation(volume))
     except Exception as e:

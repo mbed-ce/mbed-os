@@ -6,7 +6,7 @@
 
 import logging
 from pathlib import Path
-from typing import List, Optional, Tuple, cast
+from typing import cast
 
 import psutil
 import pyudev
@@ -22,7 +22,7 @@ class LinuxDeviceDetector(DeviceDetector):
     """Linux specific implementation of device detection."""
 
     @override
-    def find_candidates(self) -> List[CandidateDevice]:
+    def find_candidates(self) -> list[CandidateDevice]:
         """Return a list of CandidateDevices."""
         context = pyudev.Context()
         candidates = []
@@ -49,7 +49,7 @@ class LinuxDeviceDetector(DeviceDetector):
         return candidates
 
 
-def _find_serial_port_for_device(disk_serial_id: str) -> Optional[str]:
+def _find_serial_port_for_device(disk_serial_id: str) -> str | None:
     """Try to find a serial port associated with the given device."""
     for tty_dev in pyudev.Context().list_devices(subsystem="tty"):
         if tty_dev.properties.get("ID_SERIAL_SHORT") == disk_serial_id:
@@ -57,6 +57,6 @@ def _find_serial_port_for_device(disk_serial_id: str) -> Optional[str]:
     return None
 
 
-def _find_fs_mounts_for_device(device_file_path: str) -> Tuple[Path, ...]:
+def _find_fs_mounts_for_device(device_file_path: str) -> tuple[Path, ...]:
     """Find the file system mount point for a block device file path."""
     return tuple(Path(part.mountpoint) for part in psutil.disk_partitions() if part.device == device_file_path)

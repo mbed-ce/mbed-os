@@ -58,11 +58,12 @@ class BasicTestCase(unittest.TestCase):
             },
             {"mount_point": None, "target_id_usb_id": "00000000000", "serial_port": "not_valid"},
         ]
-        with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm, patch(
-            "mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready"
-        ) as _mpr, patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get, patch(
-            "mbed_os_tools.detect.lstools_base.listdir"
-        ) as _listdir:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm,
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+            patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+        ):
             _mpr.return_value = True
             _read_htm.return_value = ("0241BEEFDEAD", {})
             _get.return_value = {"platform_name": "foo_target"}
@@ -83,11 +84,12 @@ class BasicTestCase(unittest.TestCase):
             },
             {"mount_point": "dummy_mount_point", "target_id_usb_id": "", "serial_port": "not_valid"},
         ]
-        with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm, patch(
-            "mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready"
-        ) as _mpr, patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get, patch(
-            "mbed_os_tools.detect.lstools_base.listdir"
-        ) as _listdir:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm,
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+            patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+        ):
             _mpr.return_value = True
             _read_htm.side_effect = [("0241BEEFDEAD", {}), (None, {})]
             _get.return_value = {"platform_name": "foo_target"}
@@ -109,11 +111,12 @@ class BasicTestCase(unittest.TestCase):
             }
         ]
         for qos in [FSInteraction.BeforeFilter, FSInteraction.AfterFilter]:
-            with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm, patch(
-                "mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready"
-            ) as _mpr, patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get, patch(
-                "mbed_os_tools.detect.lstools_base.listdir"
-            ) as _listdir:
+            with (
+                patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm,
+                patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+                patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get,
+                patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+            ):
                 _mpr.return_value = True
                 _read_htm.return_value = ("not_in_target_db", {})
                 _get.return_value = None
@@ -129,9 +132,10 @@ class BasicTestCase(unittest.TestCase):
         self.base.return_value = [
             {"mount_point": "dummy_mount_point", "target_id_usb_id": "0240DEADBEEF", "serial_port": "dummy_serial_port"}
         ]
-        with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr, patch(
-            "mbed_os_tools.detect.lstools_base.listdir"
-        ) as _listdir:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+        ):
             _mpr.return_value = True
             _listdir.side_effect = OSError
             to_check = self.base.list_mbeds()
@@ -146,9 +150,11 @@ class BasicTestCase(unittest.TestCase):
                     "serial_port": "dummy_serial_port",
                 }
             ]
-            with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr, patch(
-                "mbed_os_tools.detect.lstools_base.listdir"
-            ) as _listdir, patch("mbed_os_tools.detect.lstools_base.open", mock, create=True):
+            with (
+                patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+                patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+                patch("mbed_os_tools.detect.lstools_base.open", mock, create=True),
+            ):
                 _mpr.return_value = True
                 _listdir.return_value = ["MBED.HTM", "DETAILS.TXT"]
                 to_check = self.base.list_mbeds()
@@ -193,9 +199,11 @@ Remount count: 0
                 return DEFAULT
 
         m = mock_open(read_data=details_txt_contents)
-        with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr, patch(
-            "mbed_os_tools.detect.lstools_base.listdir"
-        ) as _listdir, patch("mbed_os_tools.detect.lstools_base.open", m, create=True) as mocked_open:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+            patch("mbed_os_tools.detect.lstools_base.open", m, create=True) as mocked_open,
+        ):
             mocked_open.side_effect = _handle_open
             _mpr.return_value = True
             _listdir.return_value = ["PRODINFO.HTM", "DETAILS.TXT"]
@@ -213,11 +221,12 @@ Remount count: 0
                     "serial_port": "dummy_serial_port",
                 }
             ]
-            with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr, patch(
-                "mbed_os_tools.detect.lstools_base.listdir"
-            ) as _listdir, patch(
-                "mbed_os_tools.detect.lstools_base.MbedLsToolsBase._update_device_from_htm"
-            ) as _htm, patch("mbed_os_tools.detect.lstools_base.open", mock, create=True):
+            with (
+                patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+                patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+                patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._update_device_from_htm") as _htm,
+                patch("mbed_os_tools.detect.lstools_base.open", mock, create=True),
+            ):
                 _mpr.return_value = True
                 _htm.side_effect = None
                 _listdir.return_value = ["MBED.HTM", "DETAILS.TXT"]
@@ -238,9 +247,10 @@ Remount count: 0
         self.base.return_value = [
             {"mount_point": "dummy_mount_point", "target_id_usb_id": "0240DEADBEEF", "serial_port": "dummy_serial_port"}
         ]
-        with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr, patch(
-            "mbed_os_tools.detect.lstools_base.listdir"
-        ) as _listdir:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+        ):
             _mpr.return_value = True
             _listdir.side_effect = OSError
             to_check = self.base.list_mbeds()
@@ -322,9 +332,10 @@ Remount count: 0
                 "product_id": "0204",
             }
         ]
-        with patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get, patch(
-            "mbed_os_tools.detect.lstools_base.listdir"
-        ) as _listdir:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+        ):
             _get.return_value = {"platform_name": "foo_target"}
             to_check = self.base.list_mbeds()
             # _get.assert_any_call('0240', device_type='daplink', verbose_data=True)
@@ -374,9 +385,10 @@ Remount count: 0
             "serial_port": "invalid_serial_port",
         }
         self.base.return_value = [device]
-        with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._update_device_from_fs") as _up_fs, patch(
-            "mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready"
-        ) as mount_point_ready:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._update_device_from_fs") as _up_fs,
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as mount_point_ready,
+        ):
             mount_point_ready.return_value = True
 
             filter = None
@@ -413,11 +425,12 @@ Remount count: 0
             "mount_point": "invalid_mount_point",
             "serial_port": "invalid_serial_port",
         }
-        with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm, patch(
-            "mbed_os_tools.detect.lstools_base.MbedLsToolsBase._details_txt"
-        ) as _up_details, patch(
-            "mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready"
-        ) as mount_point_ready, patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm,
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._details_txt") as _up_details,
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as mount_point_ready,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+        ):
             new_device_id = "00017531642046"
             _read_htm.return_value = (new_device_id, {})
             _listdir.return_value = ["mbed.htm", "details.txt"]
@@ -486,11 +499,12 @@ Remount count: 0
             "mount_point": "invalid_mount_point",
             "serial_port": "invalid_serial_port",
         }
-        with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm, patch(
-            "mbed_os_tools.detect.lstools_base.MbedLsToolsBase._details_txt"
-        ) as _up_details, patch(
-            "mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready"
-        ) as mount_point_ready, patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm,
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._details_txt") as _up_details,
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as mount_point_ready,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+        ):
             new_device_id = "00017575430420"
             _read_htm.return_value = (new_device_id, {})
             _listdir.return_value = ["mbed.htm", "details.txt"]
@@ -556,8 +570,9 @@ class RetargetTestCase(unittest.TestCase):
 
         _open = mock_open(read_data=json.dumps(retarget_data))
 
-        with patch("mbed_os_tools.detect.lstools_base.isfile") as _isfile, patch(
-            "mbed_os_tools.detect.lstools_base.open", _open, create=True
+        with (
+            patch("mbed_os_tools.detect.lstools_base.isfile") as _isfile,
+            patch("mbed_os_tools.detect.lstools_base.open", _open, create=True),
         ):
             self.base = DummyLsTools()
             _open.assert_called()
@@ -569,11 +584,12 @@ class RetargetTestCase(unittest.TestCase):
         self.base.return_value = [
             {"mount_point": "dummy_mount_point", "target_id_usb_id": "0240DEADBEEF", "serial_port": None}
         ]
-        with patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm, patch(
-            "mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready"
-        ) as _mpr, patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get, patch(
-            "mbed_os_tools.detect.lstools_base.listdir"
-        ) as _listdir:
+        with (
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase._read_htm_ids") as _read_htm,
+            patch("mbed_os_tools.detect.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+            patch("mbed_os_tools.detect.lstools_base.PlatformDatabase.get") as _get,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+        ):
             _mpr.return_value = True
             _read_htm.return_value = ("0240DEADBEEF", {})
             _get.return_value = {"platform_name": "foo_target"}
