@@ -66,7 +66,7 @@ def build_mbed_ce(source_dir: pathlib.Path, build_dir: pathlib.Path, configurati
     # Build CMake args
     cmake_command: list[str] = [
         cmake_executable,
-        str(source_dir),
+        str(source_dir.resolve()),
         "-GNinja",
         "-DMBED_TARGET=" + configuration.mbed_target,
         "-DUPLOAD_METHOD=" + configuration.upload_method,
@@ -128,7 +128,7 @@ def run_ctest(
         ctest_executable,
         "--output-on-failure",
         "--output-junit",
-        str(result_junit_path),
+        str(result_junit_path.resolve()),
         "--test-output-size-passed",
         "100000",
         "--test-output-size-failed",

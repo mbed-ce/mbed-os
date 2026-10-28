@@ -34,7 +34,10 @@ def decode_json_file(path: Path) -> Any:
             # json5 for a better one (slow!).
             try:
                 with path.open() as json_file:
-                    parsed_file = json5.load(json_file)
+                    try:
+                        parsed_file = json5.load(json_file)
+                    except ValueError as ex:
+                        raise ex from None # break association with the outer exception for a cleaner stacktrace
                     logger.warning(
                         f"JSON5 file {path} could not be decoded with pyjson5 but was decodable with"
                         f"json5. Error from pyjson5 was: {ex!s}"
