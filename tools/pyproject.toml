@@ -141,7 +141,7 @@ mbed-tools = "mbed_tools.cli.main:cli"
 memap = "memap.memap:main"
 ambiq_svl = "ambiq_svl.svl:cli"
 mbed-license-checker = "mbed_license_checker.license_checker:main"
-mbed-test-executor = "mbed_ci_scripts.test_executor"
+mbed-test-executor = "mbed_ci_scripts.test_executor:main"
 
 [tool.ruff]
 line-length = 120

@@ -185,7 +185,7 @@ def main() -> None:
     # Load configuration
     config_deserialized_json = decode_json_file(config_file)
     loaded_config = TestExecutorConfig.model_validate(config_deserialized_json)
-    allowed_test_failures_json = source_dir / "targets" / "allowed_test_failures.json5"
+    allowed_test_failures_json = pathlib.Path(__file__).parent / "allowed_test_failures.json5"
     allowed_test_failures = AllowedTestFailures.model_validate(decode_json_file(allowed_test_failures_json))
 
     # Configure and build
