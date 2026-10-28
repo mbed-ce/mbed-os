@@ -48,7 +48,7 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> t
         Config object (UserDict).
         Path to the generated config file.
     """
-    targets_data = _load_raw_targets_data(program)
+    targets_data = load_raw_targets_data(program)
     target_build_attributes = get_target_by_name(target_name, targets_data)
     incorporate_memory_bank_data_from_cmsis(target_build_attributes, program)
     config = assemble_config(target_build_attributes, program)
@@ -70,7 +70,10 @@ def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> t
     return config, cmake_config_file_path
 
 
-def _load_raw_targets_data(program: MbedProgram) -> dict[str, TargetJSON]:
+def load_raw_targets_data(program: MbedProgram) -> dict[str, TargetJSON]:
+    """
+    Load the data from targets.json5 and custom_targets.json5 into a dict of TargetJSON objects.
+    """
     targets_data = decode_json_file(program.mbed_os.targets_json_file)
     if program.files.custom_targets_json.exists():
         custom_targets_data = decode_json_file(program.files.custom_targets_json)
