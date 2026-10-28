@@ -1,0 +1,31 @@
+name: device-farm-build.yml
+on: [pull_request]
+defaults:
+  run:
+    # Use bash instead of sh for commands so that 'source' works
+    shell: bash
+
+jobs:
+  build-and-test-via-device-farm:
+    runs-on: [self-hosted, device-farmer-1]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Update venv
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -e ./tools[ci_scripts]
+      - name: Run test executor
+        run: |
+          source .venv/bin/activate
+          mkdir build
+          mkdir results
+          mbed-test-executor ~/device-farmer-config.json5 . build results
+      - name: Archive artifacts
+        if: always() # Run even if tests failed
+        uses: actions/upload-artifact@v7
+        with:
+          name: report-device-farmer-1
+          path:
+            results/**

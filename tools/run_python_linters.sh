@@ -31,7 +31,7 @@ echo ">> Formatting with ruff..."
 ruff format
 
 echo ">> Linting with ruff..."
-ruff check --fix python/mbed_tools python/mbed_platformio python/mbed_license_checker
+ruff check --fix python/mbed_tools python/mbed_platformio python/mbed_license_checker python/mbed_ci_scripts
 
 echo ">> Linting and type checking with basedpyright..."
 basedpyright
