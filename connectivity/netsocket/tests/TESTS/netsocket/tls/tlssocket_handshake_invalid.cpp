@@ -46,30 +46,37 @@ void TLSSOCKET_HANDSHAKE_INVALID()
     SocketAddress a;
 
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, net->gethostbyname("expired.badssl.com", &a));
+    sock.set_hostname("expired.badssl.com");
     a.set_port(https_port);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_AUTH_FAILURE, sock.connect(a));
 
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, net->gethostbyname("wrong.host.badssl.com", &a));
+    sock.set_hostname("wrong.host.badssl.com");
     a.set_port(https_port);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_AUTH_FAILURE, sock.connect(a));
 
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, net->gethostbyname("self-signed.badssl.com", &a));
+    sock.set_hostname("self-signed.badssl.com");
     a.set_port(https_port);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_AUTH_FAILURE, sock.connect(a));
 
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, net->gethostbyname("untrusted-root.badssl.com", &a));
+    sock.set_hostname("untrusted-root.badssl.com");
     a.set_port(https_port);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_AUTH_FAILURE, sock.connect(a));
 
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, net->gethostbyname("revoked.badssl.com", &a));
+    sock.set_hostname("revoked.badssl.com");
     a.set_port(https_port);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_AUTH_FAILURE, sock.connect(a));
 
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, net->gethostbyname("pinning-test.badssl.com", &a));
+    sock.set_hostname("pinning-test.badssl.com");
     a.set_port(https_port);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_AUTH_FAILURE, sock.connect(a));
 
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, net->gethostbyname("sha1-intermediate.badssl.com", &a));
+    sock.set_hostname("sha1-intermediate.badssl.com");
     a.set_port(https_port);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_AUTH_FAILURE, sock.connect(a));
 

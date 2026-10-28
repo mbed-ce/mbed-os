@@ -52,6 +52,7 @@ static nsapi_error_t _tlssocket_connect_to_daytime_srv(TLSSocket &sock)
 
     sock.set_timeout(10000); // Set timeout for case TLSSocket does not support peer closed indication
 
+    sock.set_hostname(ECHO_SERVER_ADDR);
     return sock.connect(tls_addr);
 }
 
