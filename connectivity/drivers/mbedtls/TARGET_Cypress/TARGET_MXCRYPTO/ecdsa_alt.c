@@ -25,6 +25,9 @@
  *
  */
 
+/* This adapter implements Mbed TLS internals. */
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE
 #else

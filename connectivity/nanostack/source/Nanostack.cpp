@@ -761,7 +761,7 @@ nsapi_size_or_error_t Nanostack::do_sendto(void *handle, const ns_address_t *add
     iov.iov_base = const_cast<void *>(data);
     iov.iov_len = size;
     msg.msg_name = const_cast<ns_address_t *>(address);
-    msg.msg_namelen = address ? sizeof * address : 0;
+    msg.msg_namelen = address ? sizeof *address : 0;
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
     msg.msg_control = NULL;

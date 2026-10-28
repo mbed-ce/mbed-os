@@ -73,7 +73,7 @@ void mbedtls_sha1_clone( mbedtls_sha1_context *dst, const mbedtls_sha1_context *
 /*
  * SHA-1 context setup
  */
-int mbedtls_sha1_starts_ret( mbedtls_sha1_context *ctx )
+int mbedtls_sha1_starts( mbedtls_sha1_context *ctx )
 {
     SHA1_VALIDATE_RET( ctx != NULL );
 
@@ -83,7 +83,7 @@ int mbedtls_sha1_starts_ret( mbedtls_sha1_context *ctx )
 /*
  * SHA-1 process buffer
  */
-int mbedtls_sha1_update_ret( mbedtls_sha1_context *ctx,
+int mbedtls_sha1_update( mbedtls_sha1_context *ctx,
                              const unsigned char *input,
                              size_t ilen )
 {
@@ -99,7 +99,7 @@ int mbedtls_sha1_update_ret( mbedtls_sha1_context *ctx,
 /*
  * SHA-1 final digest
  */
-int mbedtls_sha1_finish_ret( mbedtls_sha1_context *ctx, unsigned char output[20])
+int mbedtls_sha1_finish( mbedtls_sha1_context *ctx, unsigned char output[20])
 {
     SHA1_VALIDATE_RET( ctx != NULL );
     SHA1_VALIDATE_RET( (unsigned char *)output != NULL );
