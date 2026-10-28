@@ -43,7 +43,13 @@ void TLSSOCKET_ECHOTEST_BURST()
 {
     SKIP_IF_TCP_UNSUPPORTED();
     TLSSocket *sock = new TLSSocket;
-    tlssocket_connect_to_echo_srv(*sock);
+    nsapi_error_t connect_result = tlssocket_connect_to_echo_srv(*sock);
+    if (connect_result != NSAPI_ERROR_OK) {
+        sock->close();
+        delete sock;
+        TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, connect_result);
+        return;
+    }
     sock->sigio(callback(_sigio_handler, ThisThread::get_id()));
 
     // TX buffer to be preserved for comparison
@@ -66,7 +72,7 @@ void TLSSOCKET_ECHOTEST_BURST()
         int bytes2recv = sent;
         while (bytes2recv) {
             recvd = sock->recv(&(tls_global::rx_buffer[sent - bytes2recv]), bytes2recv);
-            if (recvd < 0) {
+            if (recvd <= 0) {
                 tr_error("[Round#%02d] network error %d\n", i, recvd);
                 TEST_FAIL();
                 TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->close());
@@ -85,7 +91,13 @@ void TLSSOCKET_ECHOTEST_BURST_NONBLOCK()
 {
     SKIP_IF_TCP_UNSUPPORTED();
     TLSSocket *sock = new TLSSocket;
-    tlssocket_connect_to_echo_srv(*sock);
+    nsapi_error_t connect_result = tlssocket_connect_to_echo_srv(*sock);
+    if (connect_result != NSAPI_ERROR_OK) {
+        sock->close();
+        delete sock;
+        TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, connect_result);
+        return;
+    }
     sock->set_blocking(false);
     sock->sigio(callback(_sigio_handler, ThisThread::get_id()));
 
@@ -105,7 +117,7 @@ void TLSSOCKET_ECHOTEST_BURST_NONBLOCK()
                     goto END;
                 }
                 continue;
-            } else if (sent < 0) {
+            } else if (sent <= 0) {
                 tr_error("[%02d] network error %d\n", i, sent);
                 TEST_FAIL();
                 goto END;
@@ -119,14 +131,14 @@ void TLSSOCKET_ECHOTEST_BURST_NONBLOCK()
 
         bt_left = BURST_SIZE;
         while (bt_left > 0) {
-            recvd = sock->recv(&(tls_global::rx_buffer[BURST_SIZE - bt_left]), BURST_SIZE);
+            recvd = sock->recv(&(tls_global::rx_buffer[BURST_SIZE - bt_left]), bt_left);
             if (recvd == NSAPI_ERROR_WOULD_BLOCK) {
                 if (osSignalWait(SIGNAL_SIGIO, SIGIO_TIMEOUT).status == osEventTimeout) {
                     tr_error("[bt#%02d] packet timeout...", i);
                     break;
                 }
                 continue;
-            } else if (recvd < 0) {
+            } else if (recvd <= 0) {
                 tr_error("[%02d] network error %d\n", i, recvd);
                 break;
             }
