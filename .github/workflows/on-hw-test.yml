@@ -19,6 +19,9 @@ jobs:
       - name: Run test executor
         run: |
           source .venv/bin/activate
+          # The toolchain path set in /etc/environment does not seem to get picked up by the Actions runner
+          # (I think because it's started by a SystemD service?) so we have to set it manually.
+          export PATH=/usr/local/gcc-arm/bin:$PATH
           mkdir build
           mkdir results
           mbed-test-executor ~/device-farmer-config.json5 . build results
