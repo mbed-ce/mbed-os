@@ -77,7 +77,9 @@ unit-tests = [
     "lxml"
 ]
 linters = [
-    "ruff",
+    # Note: Ruff is pinned because we have had a few instances where ruff updates have introduced new
+    # failing checks and made CI start failing.
+    "ruff<0.18",
     "basedpyright",
 
     # To pass Pyright we need all the platform-dependent packages
@@ -215,6 +217,7 @@ ignore = [
     'S603',    # subprocess-without-shell-equals-true - without disabling this, subprocess cannot be used at all!
     'ERA001',  # commented-out-code
     'T201',    # print
+    'ICN001',  # Unconventional (or, apparently, no) import alias
 ]
 
 # Allow "unsafe" fixes to be done automatically for the following:

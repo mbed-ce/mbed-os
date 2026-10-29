@@ -76,14 +76,25 @@ jobs:
       - name: UTF-8 Check
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            compare_ref="origin/${GITHUB_BASE_REF}" # base branch of PR
+          else
+            compare_ref="$GITHUB_EVENT_BEFORE" # previous commit of main
+          fi
+
           # Make sure we're not introducing any text which is not UTF-8 encoded
-          git diff origin/${GITHUB_BASE_REF} -U0 | ( grep -a '^+' || true ) | ( ! grep -axv '.*' )
+          git diff $compare_ref -U0 | ( grep -a '^+' || true ) | ( ! grep -axv '.*' )
 
       - name: astyle checks
         run: |
           set -x
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            compare_ref="origin/${GITHUB_BASE_REF}" # base branch of PR
+          else
+            compare_ref="$GITHUB_EVENT_BEFORE" # previous commit of main
+          fi
+          git diff --name-only --diff-filter=d $compare_ref \
             | ( grep '.*\.\(c\|cpp\|h\|hpp\)$' || true ) \
             | ( grep -v -f .codecheckignore || true ) \
             | while read file; do astyle -n --options=.astylerc "${file}"; done
@@ -114,6 +125,7 @@ jobs:
           sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
 
       - name: Install Python packages
+        shell: bash
         run: |
           python3 -m venv .venv
           source .venv/bin/activate

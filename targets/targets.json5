@@ -99,7 +99,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "Target"
         ],
-        "features": [
+        "features_add": [
             "PSA"
         ],
         "public": false,
@@ -109,10 +109,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "PSA_Target"
         ],
-        "extra_labels": [
+        "extra_labels_add": [
             "MBED_PSA_SRV"
         ],
-        "device_has": [
+        "device_has_add": [
             "TRNG"
         ],
         "public": false
@@ -361,7 +361,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "image_url": "https://files.seeedstudio.com/wiki/Arch_Pro/img/Arch_pro.jpg"
     },
 
-    // Freescale (now NXP) Kinetis Targets -----------------------------------------------------------------------------
+    // Freescale Kinetis Targets -----------------------------------------------------------------------------
+    // Note that as of Mbed CE 7.2+, this only includes targets which do not use MCUX SDK.
+    // Targets which do use MCX SDK have been moved to the NXP target dirs.
 
     // Shared settings for the Kinetis parts whose USB support routes through
     // targets/TARGET_Freescale/USBPhy_Kinetis.cpp. Not a device in its own
@@ -376,6 +378,14 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             }
         }
     },
+
+    // Target family for Kinetis KL series
+    "MCU_KINETIS_KL_SERIES": {
+        inherits: ["Target"],
+        public: false,
+        "is_mcu_family_target": true
+    },
+
     "KL25Z": {
         "supported_form_factors": [
             "ARDUINO_UNO"
@@ -386,7 +396,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "KLXX"
         ],
         "inherits": [
-            "Target",
+            "MCU_KINETIS_KL_SERIES",
             "MCU_KINETIS_USB"
         ],
         "device_has": [
@@ -447,341 +457,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "MKL46Z256VLL4",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/BOARD-FRDM-KL46Z-PRODUCT-SHOT.png"
-    },
-    "MCU_K22F512": {
-        "core": "Cortex-M4F",
-        "extra_labels": [
-            "Freescale",
-            "MCUXpresso_MCUS",
-            "KSDK2_MCUS",
-            "MCU_K22F",
-            "MCU_K22F512",
-            "FRDM",
-            "KPSDK_MCUS",
-            "KPSDK_CODE"
-        ],
-        "public": false,
-        "macros": [
-            "CPU_MK22FN512VLH12",
-            "FSL_RTOS_MBED",
-            "MBED_TICKLESS"
-        ],
-        "inherits": [
-            "Target",
-            "MCU_KINETIS_USB"
-        ],
-        "device_has": [
-            "USTICKER",
-            "LPTICKER",
-            "RTC",
-            "ANALOGIN",
-            "ANALOGOUT",
-            "I2C",
-            "I2CSLAVE",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "SERIAL",
-            "SLEEP",
-            "SPI",
-            "SPISLAVE",
-            "TRNG",
-            "USBDEVICE",
-            "FLASH"
-        ],
-        "device_name": "MK22FN512VLH12"
-    },
-    "K22F": {
-        "supported_form_factors": [
-            "ARDUINO"
-        ],
-        "inherits": [
-            "MCU_K22F512",
-        ],
-        "extra_labels_add": [
-            "FRDM"
-        ],
-        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-K22F-ANGLE.jpg"
-    },
-    "KL43Z": {
-        "supported_form_factors": [
-            "ARDUINO"
-        ],
-        "core": "Cortex-M0+",
-        "extra_labels": [
-            "Freescale",
-            "MCUXpresso_MCUS",
-            "KSDK2_MCUS",
-            "FRDM"
-        ],
-        "macros": [
-            "CPU_MKL43Z256VLH4",
-            "FSL_RTOS_MBED"
-        ],
-        "inherits": [
-            "Target",
-            "MCU_KINETIS_USB"
-        ],
-        "device_has": [
-            "USTICKER",
-            "LPTICKER",
-            "RTC",
-            "ANALOGIN",
-            "ANALOGOUT",
-            "I2C",
-            "I2CSLAVE",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "SERIAL",
-            "SLEEP",
-            "SPI",
-            "SPISLAVE",
-            "USBDEVICE",
-            "FLASH"
-        ],
-        "device_name": "MKL43Z256VLH4",
-        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-KL43Z-BLOCK-DIAGRAM.jpg"
-    },
-    "KW41Z": {
-        "supported_form_factors": [
-            "ARDUINO_UNO"
-        ],
-        "core": "Cortex-M0+",
-        "extra_labels": [
-            "Freescale",
-            "MCUXpresso_MCUS",
-            "KSDK2_MCUS",
-            "FRDM",
-            "FRAMEWORK_5_3_3"
-        ],
-        "macros": [
-            "CPU_MKW41Z512VHT4",
-            "FSL_RTOS_MBED",
-            "MBED_TICKLESS"
-        ],
-        "inherits": [
-            "Target"
-        ],
-        "device_has": [
-            "USTICKER",
-            "LPTICKER",
-            "RTC",
-            "ANALOGIN",
-            "ANALOGOUT",
-            "I2C",
-            "I2CSLAVE",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "SERIAL",
-            "SLEEP",
-            "SPI",
-            "SPISLAVE",
-            "TRNG",
-            "FLASH",
-            "802_15_4_PHY"
-        ],
-        "device_name": "MKW41Z512xxx4",
-        "overrides": {
-            "network-default-interface-type": "MESH"
-        },
-        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-KW41Z_OG.jpg"
-    },
-    "MCU_K64F": {
-        "core": "Cortex-M4F",
-        "extra_labels_add": [
-            "Freescale",
-            "MCUXpresso_MCUS",
-            "KSDK2_MCUS",
-            "KPSDK_MCUS",
-            "KPSDK_CODE",
-            "Freescale_EMAC"
-        ],
-        "macros_add": [
-            "CPU_MK64FN1M0VMD12",
-            "FSL_RTOS_MBED",
-            "MBED_SPLIT_HEAP",
-            "MBED_TICKLESS"
-        ],
-        "inherits": [
-            "PSA_V7_M",
-            "MCU_KINETIS_USB"
-        ],
-        "device_has_add": [
-            "USTICKER",
-            "LPTICKER",
-            "RTC",
-            "CRC",
-            "ANALOGIN",
-            "ANALOGOUT",
-            "EMAC",
-            "I2C",
-            "I2CSLAVE",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "RESET_REASON",
-            "SERIAL",
-            "SERIAL_FC",
-            "SERIAL_ASYNCH",
-            "SLEEP",
-            "SPI",
-            "SPI_ASYNCH",
-            "SPISLAVE",
-            "TRNG",
-            "FLASH",
-            "USBDEVICE",
-            "WATCHDOG"
-        ],
-        "device_name": "MK64FN1M0xxx12",
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        },
-        "is_mcu_family_target": true,
-        "public": false
-    },
-    "K64F": { // AKA FRDM-K64F
-        "supported_form_factors": [
-            "ARDUINO_UNO"
-        ],
-        "components_add": [
-            "SD",
-        ],
-        "extra_labels_add": [
-            "FRDM"
-        ],
-        "inherits": [
-            "MCU_K64F"
-        ],
-        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/407/MFG_FRDM-K64F.JPG"
-    },
-    "SDT64B": {
-        "inherits": [
-            "MCU_K64F"
-        ],
-        "extra_labels_add": [
-            "K64F"
-        ],
-        "supported_form_factors": [],
-        "image_url": "https://os.mbed.com/media/cache/platforms/SDT64B_size.png.250x250_q85.png"
-    },
-    "HEXIWEAR": {
-        "inherits": [
-            "MCU_K64F"
-        ],
-        "image_url": "https://os.mbed.com/media/cache/platforms/Hexiwear_Platform_Image_19Ja2aX_pNSWsjb.png.250x250_q85.png",
-    },
-    "K66F": { // AKA FRDM-K66F
-        "supported_form_factors": [
-            "ARDUINO"
-        ],
-        "components_add": [
-            "SD",
-        ],
-        "core": "Cortex-M4F",
-        "extra_labels_add": [
-            "Freescale",
-            "MCUXpresso_MCUS",
-            "KSDK2_MCUS",
-            "FRDM",
-            "Freescale_EMAC"
-        ],
-        "macros_add": [
-            "CPU_MK66FN2M0VMD18",
-            "FSL_RTOS_MBED",
-            "MBED_SPLIT_HEAP",
-            "MBED_TICKLESS"
-        ],
-        "inherits": [
-            "PSA_V7_M",
-            "MCU_KINETIS_USB"
-        ],
-        "device_has_add": [
-            "USTICKER",
-            "LPTICKER",
-            "RTC",
-            "ANALOGIN",
-            "ANALOGOUT",
-            "EMAC",
-            "I2C",
-            "I2CSLAVE",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "SERIAL",
-            "SERIAL_FC",
-            "SERIAL_ASYNCH",
-            "SLEEP",
-            "SPI",
-            "SPISLAVE",
-            "TRNG",
-            "FLASH"
-        ],
-        "device_name": "MK66FN2M0xxx18",
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        },
-        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-K66F-BD.jpg"
-    },
-    "K82F": { // AKA FRDM-K82F
-        "supported_form_factors": [
-            "ARDUINO"
-        ],
-        "components_add": [
-            "SPIF",
-        ],
-        "core": "Cortex-M4F",
-        "extra_labels": [
-            "Freescale",
-            "MCUXpresso_MCUS",
-            "KSDK2_MCUS",
-            "FRDM"
-        ],
-        "macros": [
-            "CPU_MK82FN256VDC15",
-            "FSL_RTOS_MBED",
-            "MBED_TICKLESS"
-        ],
-        "inherits": [
-            "Target",
-            "MCU_KINETIS_USB"
-        ],
-        "device_has": [
-            "USTICKER",
-            "LPTICKER",
-            "RTC",
-            "ANALOGIN",
-            "ANALOGOUT",
-            "I2C",
-            "I2CSLAVE",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "PWMOUT",
-            "SERIAL",
-            "SLEEP",
-            "SPI",
-            "SPISLAVE",
-            "TRNG",
-            "FLASH",
-            "USBDEVICE",
-            "QSPI"
-        ],
-        "device_name": "MK82FN256xxx15",
-        "is_mcu_family_target": true,
-        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/117498-CS_FRDM-K82-Board-Top_Mbed.jpg"
     },
 
 // STM32 Top-Level Target ------------------------------------------------------------------------------------------
@@ -4915,11 +4590,16 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "device_name": "STM32WLE5JCIx"
     },
-    // NXP i.MX RT Targets ---------------------------------------------------------------------------------------------
 
-    // Note: "MIMXRT105X" target is for the MIMXRT1051, MIMXRT1052, MIMXRT1061, and MIMXRT1062
+    // NXP MCUXpresso Targets ---------------------------------------------------------------------------------------------
+
+    // Note: "MIMXRT105X" target is for the MIMXRT1051, MIMXRT1052, MIMXRT1061, and MIMXRT1062.
+    // In fact, most features of this target should apply to all current MIMXRT10xx family MCUs,
+    // but Mbed doesn't currently support any other targets in that family, and NXP doesn't follow
+    // a very logical part numbering scheme, so it's hard to say whether future parts will break this
+    // relationship. So, leaving this for now but may rename it later.
     // See here for details: https://github.com/mbed-ce/mbed-os/wiki/MCU-Info-Page:-MIMXRT105x-and-106x
-    "MIMXRT105X": {
+    "MCU_MIMXRT105X": {
         "core": "Cortex-M7FD",
         "public": false,
         "extra_labels": [
@@ -4931,7 +4611,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MIMXRT105X"
         ],
         "macros": [
-            "CPU_MIMXRT1052DVL6B",
             "FSL_RTOS_MBED",
             "XIP_BOOT_HEADER_ENABLE=1",
             "XIP_EXTERNAL_FLASH=1",
@@ -4950,8 +4629,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "RTC",
             "SLEEP",
             "USTICKER",
+            "LPTICKER",
             "ANALOGIN",
-            "EMAC",
+//            "EMAC",
             "I2C",
             "I2CSLAVE",
             "INTERRUPTIN",
@@ -4964,7 +4644,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPISLAVE",
             "TRNG",
             "WATCHDOG",
-            "USBDEVICE"
+            "USBDEVICE",
+            "FLASH"
         ],
         "overrides": {
             "deep-sleep-latency": 10
@@ -4979,7 +4660,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
      },
     "MIMXRT1050_EVK": {
         "inherits": [
-            "MIMXRT105X"
+            "MCU_MIMXRT105X"
         ],
         "extra_labels_add": [
             "EVK",
@@ -4990,17 +4671,16 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "macros_add": [
+            "CPU_MIMXRT1052DVL6B",
             "HYPERFLASH_BOOT",
             "XIP_BOOT_HEADER_DCD_ENABLE=1",
             "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
-            "SKIP_SYSCLK_INIT" // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
+            "SKIP_SYSCLK_INIT", // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
+            "BOARD_ENET_PHY_ADDR=2"
         ],
-        "device_has_add": [
-            "FLASH"
-        ],
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        },
+//        "overrides": {
+//            "network-default-interface-type": "ETHERNET"
+//        },
         "memory_banks": {
             "SDRAM": {
                 "access": {
@@ -5035,7 +4715,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "MIMXRT1060_EVK": {
         "inherits": [
-            "MIMXRT105X"
+            "MCU_MIMXRT105X"
         ],
         "extra_labels_add": [
             "EVK",
@@ -5046,16 +4726,15 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "ARDUINO_UNO"
         ],
         "macros_add": [
+            "CPU_MIMXRT1062DVL6B",
             "XIP_BOOT_HEADER_DCD_ENABLE=1",
             "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE",
-            "SKIP_SYSCLK_INIT" // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
+            "SKIP_SYSCLK_INIT", // Don't configure PLL2 (Sys PLL) in clock_config.c as it's configured by DCD
+            "BOARD_ENET_PHY_ADDR=2"
         ],
-        "device_has_add": [
-            "FLASH"
-        ],
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        },
+//        "overrides": {
+//            "network-default-interface-type": "ETHERNET"
+//        },
         "memory_banks": {
             "SDRAM": {
                 "access": {
@@ -5090,12 +4769,18 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "TEENSY_40": {
         "inherits": [
-            "MIMXRT105X"
+            "MCU_MIMXRT105X"
         ],
         "extra_labels_add": [
             "TEENSY_4X",
             "TEENSY_40",
             "MIMXRT1060"
+        ],
+        "macros_add": [
+            "CPU_MIMXRT1062DVL6B",
+
+            // Set to 1 by MIMXRT pullups/pulldowns on CRS_DV and RXD0
+            "BOARD_ENET_PHY_ADDR=1"
         ],
         "overrides": {
             "console-usb": true,
@@ -5133,7 +4818,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "TEENSY_41": {
         "inherits": [
-            "MIMXRT105X"
+            "MCU_MIMXRT105X"
         ],
         "extra_labels_add": [
             "TEENSY_4X",
@@ -5145,6 +4830,12 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "console-uart": false,
             "network-default-interface-type": "ETHERNET"
         },
+        "macros_add": [
+            "CPU_MIMXRT1062DVL6B",
+
+            // Set to 1 by MIMXRT pullups/pulldowns on CRS_DV and RXD0
+            "BOARD_ENET_PHY_ADDR=1"
+        ],
 
         // 8MB QSPI flash
         "memory_banks": {
@@ -5173,20 +4864,20 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "device_name": "MIMXRT1062DVL6B",
         "image_url": "https://www.pjrc.com/store/teensy41_4.jpg"
     },
-    "MIMXRT1170_EVK": {
-        "supported_form_factors": [
-            "ARDUINO_UNO"
-        ],
+    // Family target for MIMXRT116x/117x MCUs.
+    // This target does not apply to MIMXRT118x which has a fundamentally very different
+    // architecture.
+    "MCU_MIMXRT116x_7x": {
         "core": "Cortex-M7FD",
-        "extra_labels": [
+        inherits: [
+            "Target"
+        ],
+        "extra_labels_add": [
             "NXP",
             "MCUXpresso_MCUS",
-            "EVK",
-            "MIMXRT1170",
             "IMX"
         ],
-        "macros": [
-            "CPU_MIMXRT1176DVMAA_cm7",
+        "macros_add": [
             "FSL_RTOS_MBED",
             "XIP_BOOT_HEADER_ENABLE=1",
             "XIP_EXTERNAL_FLASH=1",
@@ -5199,10 +4890,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_TICKLESS",
             "DATA_SECTION_IS_CACHEABLE=1"
         ],
-        "inherits": [
-            "Target"
-        ],
-        "device_has": [
+        "device_has_add": [
             "ANALOGIN",
             "FLASH",
             "INTERRUPTIN",
@@ -5215,8 +4903,31 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "LPTICKER",
             "USTICKER"
         ],
+        public: false,
+    },
+    "MCU_MIMXRT117x": {
+        inherits: [
+            "MCU_MIMXRT116x_7x"
+        ],
+        "extra_labels_add": [
+            "MIMXRT1170",
+        ],
+        "macros_add": [
+            "CPU_MIMXRT1176DVMAA_cm7",
+        ],
+        public: false
+    },
+    "MIMXRT1170_EVK": {
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "extra_labels_add": [
+            "EVK",
+        ],
+        "inherits": [
+            "MCU_MIMXRT117x"
+        ],
         "device_name": "MIMXRT1176DVMAA",
-
         memory_banks: {
             // EVK board has W25Q512NWEIQ flash mounted
             "EXT_FLASH": {
@@ -5248,61 +4959,21 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
                 "startup": false
             }
         },
-
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/MIMXRT1170-EVKB-TOP-IMG.jpg"
     },
-
-    // NXP LPC5xxxx Targets --------------------------------------------------------------------------------------------
-    "LPC54114": { // AKA LPCXpresso54114
-        "supported_form_factors": [
-            "ARDUINO"
-        ],
+    "MCU_LPC54xxx": {
+        "inherits": ["Target"],
         "core": "Cortex-M4F",
-        "extra_labels": [
-            "NXP",
-            "MCUXpresso_MCUS",
-            "LPC54114_M4",
-            "LPCXpresso",
-            "LPC"
-        ],
-        "macros": [
-            "CPU_LPC54114J256BD64_cm4",
-            "FSL_RTOS_MBED",
-            "MBED_TICKLESS"
-        ],
-        "inherits": [
-            "Target"
-        ],
-        "device_has": [
-            "USTICKER",
-            "RTC",
-            "ANALOGIN",
-            "I2C",
-            "I2CSLAVE",
-            "INTERRUPTIN",
-            "PORTIN",
-            "PORTINOUT",
-            "PORTOUT",
-            "SERIAL",
-            "SLEEP",
-            "SPI",
-            "SPISLAVE",
-            "FLASH",
-            "MPU"
-        ],
-        "overrides": {
-            "tickless-from-us-ticker": true,
-            "init-us-ticker-at-boot": true
-        },
-        "device_name": "LPC54114J256BD64",
-        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/691/OM13089UL.JPG"
-    },
-    "MCU_LPC546XX": {
-        "core": "Cortex-M4F",
-        "extra_labels": [
+        "extra_labels_add": [
             "NXP",
             "MCUXpresso_MCUS",
             "LPC",
+        ],
+        "is_mcu_family_target": true,
+        public: false
+    },
+    "MCU_LPC546XX": {
+        "extra_labels_add": [
             "NXP_EMAC"
         ],
         "public": false,
@@ -5314,7 +4985,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MBED_MPU_CUSTOM"
         ],
         "inherits": [
-            "Target"
+            "MCU_LPC54xxx"
         ],
         "device_has": [
             "USTICKER",
@@ -5340,12 +5011,11 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "tickless-from-us-ticker": true,
             "init-us-ticker-at-boot": true,
             "network-default-interface-type": "ETHERNET"
-        },
-        "is_mcu_family_target": true
+        }
     },
-    "LPC546XX": { // AKA LPCXpresso54608
+    "LPCXPRESSO_54628": {
         "supported_form_factors": [
-            "ARDUINO"
+            "ARDUINO_UNO"
         ],
         "inherits": [
             "MCU_LPC546XX"
@@ -5356,6 +5026,22 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "components_add": [
             "QSPIF"
         ],
+        "memory_banks": {
+            "SDRAM": {
+                "access": {
+                    "execute": false,
+                    "peripheral": false,
+                    "read": true,
+                    "secure": false,
+                    "write": true
+                },
+                "default": false,
+                "size": 0x1000000,
+                // 16MiB
+                "start": 0x80000000,
+                "startup": false
+            },
+        },
         "device_name": "LPC54628J512ET180",
         "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/LPCXpresso54608_back.png"
     },
@@ -5370,7 +5056,349 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         // SCLK is connected to SPI3, while MOSI and MISO are connected to SPI5. So, the flash is
         // impossible to use, at least without bodge wires!
         "device_name": "LPC54606J512BD100",
-        "image_url": "https://os.mbed.com/media/cache/platforms/t17_VBxJMp4.png.250x250_q85.png"
+        "image_url": "https://www.l-tek.com/wp-content/uploads/2018/04/L-Tek-FF-LPC546xx.png"
+    },
+    "MCU_KL4x": {
+        "core": "Cortex-M0+",
+        "extra_labels": [
+            "Freescale",
+            "NXP",
+            "MCUXpresso_MCUS",
+            "KSDK2_MCUS",
+        ],
+        "macros": [
+            "FSL_RTOS_MBED"
+        ],
+        "inherits": [
+            "MCU_KINETIS_KL_SERIES",
+            "MCU_KINETIS_USB"
+        ],
+        "device_has": [
+            "USTICKER",
+            "LPTICKER",
+            "RTC",
+            "ANALOGIN",
+            "ANALOGOUT",
+            "I2C",
+            "I2CSLAVE",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "SERIAL",
+            "SLEEP",
+            "SPI",
+            "SPISLAVE",
+            "USBDEVICE",
+            "FLASH"
+        ],
+        is_mcu_family_target: true,
+        public: false
+    },
+    "MCU_KL43Z": {
+        inherits: [
+            "MCU_KL4x"
+        ],
+        public: false,
+        "macros_add": [
+            "CPU_MKL43Z256VLH4"
+        ],
+        "device_name": "MKL43Z256VLH4"
+    },
+    "FRDM_KL43Z": {
+        inherits: [
+            "MCU_KL43Z"
+        ],
+        "extra_labels_add": [
+            "FRDM"
+        ],
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-KL43Z-BLOCK-DIAGRAM.jpg"
+    },
+    // MCU family target for Kinetis KWx1 devices. Note that the part number situation here is kinda
+    // backwards: KW21, KW31, and KW41 are all part of this MCU family, but KW40, KW45, and KW47
+    // are all fundamentally different MCUs with a different core. NXP, why you do this??
+    "MCU_KWx1": {
+        "inherits": [
+            "Target"
+        ],
+        "core": "Cortex-M0+",
+        "extra_labels": [
+            "Freescale",
+            "NXP",
+            "MCUXpresso_MCUS",
+            "KSDK2_MCUS",
+            "FRDM",
+            "FRAMEWORK_5_3_3"
+        ],
+        "macros": [
+            "FSL_RTOS_MBED",
+            "MBED_TICKLESS"
+        ],
+        "device_has": [
+            "USTICKER",
+            "LPTICKER",
+            "RTC",
+            "ANALOGIN",
+            "ANALOGOUT",
+            "I2C",
+            "I2CSLAVE",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "SERIAL",
+            "SLEEP",
+            "SPI",
+            "SPISLAVE",
+            "SPI_ASYNCH",
+            "TRNG",
+            "FLASH",
+            "802_15_4_PHY"
+        ],
+        public: false,
+        "is_mcu_family_target": true
+    },
+    "MCU_KW41Z": {
+        "inherits": [
+            "MCU_KWx1"
+        ],
+        "macros_add": [
+            "CPU_MKW41Z512VHT4"
+        ],
+        "overrides": {
+            "network-default-interface-type": "MESH"
+        },
+        "device_name": "MKW41Z512xxx4",
+        public: false
+    },
+    "FRDM_KW41Z": {
+        "inherits": [
+            "MCU_KW41Z"
+        ],
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-KW41Z_OG.jpg"
+    },
+
+    // Kinetis "K Series" device family.
+    // Note that this includes Kinetis MCUs like K22 and K64, but not KL43 or KW41.
+    "MCU_KINETIS_K_SERIES": {
+        "core": "Cortex-M4F",
+        inherits: [
+            "Target",
+            "MCU_KINETIS_USB"
+        ],
+        "extra_labels_add": [
+            "Freescale",
+            "NXP",
+            "MCUXpresso_MCUS",
+        ],
+        "is_mcu_family_target": true,
+        "public": false,
+        "macros": [
+            "FSL_RTOS_MBED",
+            "MBED_TICKLESS",
+            "MBED_SPLIT_HEAP"
+        ],
+        "device_has": [
+            "USTICKER",
+            "LPTICKER",
+            "CRC",
+            "RTC",
+            "ANALOGIN",
+            "ANALOGOUT",
+            "I2C",
+            "I2CSLAVE",
+            "INTERRUPTIN",
+            "PORTIN",
+            "PORTINOUT",
+            "PORTOUT",
+            "PWMOUT",
+            "RESET_REASON",
+            "SERIAL",
+            "SERIAL_FC",
+            "SERIAL_ASYNCH",
+            "SLEEP",
+            "SPI",
+            "SPI_ASYNCH",
+            "SPISLAVE",
+            "TRNG",
+            "USBDEVICE",
+            "FLASH",
+            "WATCHDOG"
+        ]
+    },
+    "MCU_K2x": {
+        inherits: [
+            "MCU_KINETIS_K_SERIES"
+        ],
+        "public": false,
+    },
+    "MCU_K22F": {
+        inherits: [
+            "MCU_K2x"
+        ],
+        "public": false,
+        "macros_add": [
+            "CPU_MK22FN512VLH12"
+        ],
+        "device_name": "MK22FN512VLH12"
+    },
+    "FRDM_K22F": {
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "inherits": [
+            "MCU_K22F",
+        ],
+        "extra_labels_add": [
+            "FRDM"
+        ],
+        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-K22F-ANGLE.jpg"
+    },
+    "MCU_K6x": {
+        "core": "Cortex-M4F",
+        "macros_add": [
+            "MBED_SPLIT_HEAP",
+        ],
+        "inherits": [
+            "PSA_V7_M",
+            "MCU_KINETIS_K_SERIES"
+        ],
+        "device_has_add": [
+//             "EMAC",
+        ],
+        "is_mcu_family_target": true,
+        "public": false
+    },
+    "MCU_K64F": {
+        "inherits": ["MCU_K6x"],
+        "device_name": "MK64FN1M0xxx12",
+        "macros_add": [
+            "CPU_MK64FN1M0VMD12"
+        ],
+        "extra_labels_add": [
+            "K64F"
+        ],
+        "public": false
+    },
+    "FRDM_K64F": {
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "components_add": [
+            "SD",
+        ],
+        "extra_labels_add": [
+            "FRDM",
+        ],
+        "inherits": [
+            "MCU_K64F",
+        ],
+//        "overrides": {
+//            "network-default-interface-type": "ETHERNET"
+//        },
+        "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/407/MFG_FRDM-K64F.JPG"
+    },
+    "SDT64B": {
+        "inherits": [
+            "MCU_K64F"
+        ],
+        "extra_labels_add": [
+            "K64F"
+        ],
+        "supported_form_factors": [],
+//        "overrides": {
+//            "network-default-interface-type": "ETHERNET"
+//        },
+        "image_url": "https://os.mbed.com/media/cache/platforms/SDT64B_size.png.250x250_q85.png"
+    },
+    "HEXIWEAR": {
+        "inherits": [
+            "MCU_K64F"
+        ],
+        "image_url": "https://os.mbed.com/media/cache/platforms/Hexiwear_Platform_Image_19Ja2aX_pNSWsjb.png.250x250_q85.png",
+    },
+    "MCU_K66F": {
+        "inherits": [
+            "MCU_K6x"
+        ],
+        "macros_add": [
+            "CPU_MK66FN2M0VMD18",
+            "FSL_RTOS_MBED",
+        ],
+        "extra_labels_add": [
+            "K66F"
+        ],
+        "device_name": "MK66FN2M0xxx18",
+        "overrides": {
+            "network-default-interface-type": "ETHERNET"
+        },
+        "public": false,
+    },
+    "FRDM_K66F": {
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "components_add": [
+            "SD",
+        ],
+        "extra_labels_add": [
+            "FRDM"
+        ],
+        "inherits": [
+            "MCU_K66F",
+        ],
+//        "overrides": {
+//            "network-default-interface-type": "ETHERNET"
+//        },
+        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/FRDM-K66F-BD.jpg"
+    },
+    "MCU_K8x": {
+        "inherits": [
+            "MCU_KINETIS_K_SERIES",
+            "MCU_KINETIS_USB"
+        ],
+        "device_has_add": [
+            "QSPI"
+        ],
+        "device_has_remove": [
+            // K8x uses LPUART instead of UART, and the Mbed driver for this peripheral currently does
+            // not support async serial.
+            "SERIAL_ASYNCH"
+        ],
+        "public": false,
+    },
+    "MCU_K82F": {
+        inherits: [
+            "MCU_K8x"
+        ],
+        "device_name": "MK82FN256xxx15",
+        macros_add: [
+            "CPU_MK82FN256VDC15"
+        ],
+        "public": false
+    },
+    "FRDM_K82F": {
+        "supported_form_factors": [
+            "ARDUINO_UNO"
+        ],
+        "components_add": [
+            "SPIF",
+        ],
+        "extra_labels_add": [
+            "FRDM"
+        ],
+        "inherits": [
+            "MCU_K82F",
+        ],
+        "image_url": "https://www.nxp.com/assets/images/en/dev-board-image/117498-CS_FRDM-K82-Board-Top_Mbed.jpg"
     },
 
     // ARM MPS2 FPGA prototyping targets -------------------------------------------------------------------------------
