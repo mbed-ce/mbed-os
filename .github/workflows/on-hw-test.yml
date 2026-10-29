@@ -36,7 +36,7 @@ jobs:
           # Temporary - use dev script to generate website. Will rework this once multiple device farmer machines
           # exist.
           source .venv/bin/activate
-          python3 -m tools.python.mbed_ci_scripts.generate_result_website results/mbed-tests.db results/site
+          python3 -m tools.python.mbed_ci_scripts.generate_result_website results/test_results.db results/site
       - name: Archive artifacts
         if: always() # Run even if tests failed
         uses: actions/upload-artifact@v7
