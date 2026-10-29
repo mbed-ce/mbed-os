@@ -1,3 +1,15 @@
+"""
+Generates an HTML website with various "dynamic" data about the current Mbed version.
+
+This includes:
+- The hierarchy of targets
+- All existing drivers/features and what they do
+- Matrix of test results for each target.
+
+Copyright (c) 2026 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
+"""
+
 import binascii
 import collections
 import html

@@ -7,6 +7,11 @@ defaults:
 
 jobs:
   build-and-test-via-device-farm:
+
+    # Flag to Python that output from the test executor script should be printed to the console in real time
+    env:
+      PYTHONUNBUFFERED: "1"
+
     runs-on: [self-hosted, device-farmer-1]
     steps:
       - name: Checkout
@@ -25,6 +30,13 @@ jobs:
           mkdir build
           mkdir results
           mbed-test-executor ~/device-farmer-config.json5 . build results
+      - name: Generate website
+        if: always() # Run even if tests failed
+        run: |
+          # Temporary - use dev script to generate website. Will rework this once multiple device farmer machines
+          # exist.
+          source .venv/bin/activate
+          python3 -m tools.python.mbed_ci_scripts.generate_result_website results/mbed-tests.db results/site
       - name: Archive artifacts
         if: always() # Run even if tests failed
         uses: actions/upload-artifact@v7

@@ -1,12 +1,14 @@
 """
 Script to parse the XML resulting from an Mbed test run and add the results to a given Mbed test database.
+
+Copyright (c) 2026 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
 """
 
 import pathlib
 import re
 from typing import cast
 
-import junitparser.junitparser
 from junitparser import JUnitXml
 
 from . import mbed_test_database
@@ -114,26 +116,30 @@ def parse_test_run(
     """
     Parse a JUnit file containing a test run and add/update the test information within into the database.
     """
-    # Note: JUnitXml.fromfile() returns the TestSuite directly because there is only one test suite in the
-    # CTest-generated XML files. This confuses the crap out of type checkers and requires lots of casting.
-    junit_report = cast(junitparser.junitparser.TestSuite, cast(object, JUnitXml.fromfile(str(junit_xml_path))))
+    junit_report = JUnitXml.fromfile(str(junit_xml_path))
 
-    test_report: junitparser.junitparser.TestCase
-    for test_report in junit_report:
-        # First record info about the larger test.  We can do this entirely using the data recorded by CTest.
-        if test_report.is_passed:
-            test_suite_result = TestResult.PASSED
-        elif test_report.is_skipped:
-            test_suite_result = TestResult.SKIPPED
-        else:
-            test_suite_result = TestResult.FAILED
-        test_name = cast(str, test_report.classname)
+    for test_suite in junit_report:
+        for test_report in test_suite:
+            # First record info about the larger test.  We can do this entirely using the data recorded by CTest.
+            if test_report.is_passed:
+                test_suite_result = TestResult.PASSED
+            elif test_report.is_skipped:
+                test_suite_result = TestResult.SKIPPED
+            else:
+                test_suite_result = TestResult.FAILED
+            test_name = cast(str, test_report.classname)
 
-        database.add_test_record(
-            test_name, mbed_target, cast(float, test_report.time), test_suite_result, cast(str, test_report.system_out)
-        )
+            database.add_test_record(
+                test_name,
+                mbed_target,
+                cast(float, test_report.time),
+                test_suite_result,
+                cast(str, test_report.system_out),
+            )
 
-        if test_suite_result != TestResult.SKIPPED:
-            # Now things get a bit more complicated as we have to parse Greentea's output directly to determine
-            # the list of tests.
-            _parse_test_suite(database, mbed_target, test_name, cast(str, test_report.system_out), test_suite_result)
+            if test_suite_result != TestResult.SKIPPED:
+                # Now things get a bit more complicated as we have to parse Greentea's output directly to determine
+                # the list of tests.
+                _parse_test_suite(
+                    database, mbed_target, test_name, cast(str, test_report.system_out), test_suite_result
+                )

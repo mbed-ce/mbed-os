@@ -10,6 +10,16 @@ execute_process(
 
 # Then run and communicate with the test
 # -----------------------------------------------------------------------
+
+# Before starting, do we need to acquire a lock? If so, acquire it
+if(NOT "@EXCLUSIVE_GROUP_LOCK_FILE@" STREQUAL "")
+	file(LOCK @EXCLUSIVE_GROUP_LOCK_FILE@ TIMEOUT 0 RESULT TRY_LOCK_SUCCESSFUL)
+	if(NOT TRY_LOCK_SUCCESSFUL STREQUAL "0")
+		message("Another test in group @MBED_GREENTEA_EXCLUSIVE_GROUP@ is currently running, waiting...")
+		file(LOCK @EXCLUSIVE_GROUP_LOCK_FILE@)
+	endif()
+endif()
+
 set(MBEDHTRUN_ARGS @MBED_HTRUN_ARGUMENTS@) # filled in by configure script
 
 # Print out command

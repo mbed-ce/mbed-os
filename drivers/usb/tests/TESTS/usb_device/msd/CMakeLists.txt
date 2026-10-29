@@ -21,4 +21,6 @@ mbed_greentea_add_test(
     TEST_REQUIRED_LIBS
         mbed-usb-msd
         mbed-storage-fat
+    EXCLUSIVE_GROUP
+        mbed-usb-device-msd
 )

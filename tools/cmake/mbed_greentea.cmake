@@ -17,6 +17,10 @@ set(MBED_GREENTEA_SERIAL_PORT "" CACHE STRING "Serial port name to talk to the M
 #    size is known and is less than this.
 # NEEDED_RAM_KIB - Minimum RAM size, in kiB, needed to run this test. Test will be skipped if RAM bank 0
 #    size is known and is less than this.
+# EXCLUSIVE_GROUP - Specifies an exclusive group that this test is a part of. Only one test within a given
+#    exclusive group may run at a time. This is used for test executor machines where tests for many
+#    targets run in parallel, in order to prevent tests for multiple targets from fighting over
+#    specific machine features (e.g. USB device mounting)
 #
 # calling the macro:
 # if(some_condition)
@@ -48,6 +52,7 @@ function(mbed_greentea_add_test)
         TEST_SKIPPED
         NEEDED_FLASH_KIB
         NEEDED_RAM_KIB
+        EXCLUSIVE_GROUP
     )
     set(multipleValueArgs
         TEST_INCLUDE_DIRS
@@ -196,6 +201,13 @@ function(mbed_greentea_add_test)
         list(APPEND MBED_HTRUN_ARGUMENTS "--baud-rate=${MBED_STDIO_BAUD}")
     endif()
 
+    # If EXCLUSIVE_GROUP is specified, set up lock file
+    if(DEFINED MBED_GREENTEA_EXCLUSIVE_GROUP)
+        set(LOCK_DIR ${CMAKE_SOURCE_DIR}/.mbed-greentea-exclusive-locks)
+        file(MAKE_DIRECTORY ${LOCK_DIR})
+        set(EXCLUSIVE_GROUP_LOCK_FILE ${LOCK_DIR}/${MBED_GREENTEA_EXCLUSIVE_GROUP}.lock)
+        file(TOUCH ${EXCLUSIVE_GROUP_LOCK_FILE})
+    endif()
 
     # Configure the CMake script which runs the test.
     # We have to use a helper script in order to run both the flashing and htrun in one test
