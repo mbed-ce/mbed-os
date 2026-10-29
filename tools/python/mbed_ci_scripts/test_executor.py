@@ -91,11 +91,9 @@ def build_mbed_ce(source_dir: pathlib.Path, build_dir: pathlib.Path, configurati
 
     print(f">> Configuring Mbed for {configuration.mbed_target}...")
     cmake_result = subprocess.run(
-        cmake_command, check=False, cwd=str(build_dir), text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-    )
+        cmake_command, check=False, cwd=str(build_dir))
     if cmake_result.returncode != 0:
-        print("CMake configuration failed. Output was:")
-        print(cmake_result.stdout)
+        print("CMake configuration failed.")
         sys.exit(1)
     print(f">> Configuring Mbed for {configuration.mbed_target} -- done")
 
@@ -104,13 +102,9 @@ def build_mbed_ce(source_dir: pathlib.Path, build_dir: pathlib.Path, configurati
         [ninja_executable],
         check=False,
         cwd=str(build_dir),
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
     )
     if build_result.returncode != 0:
-        print("Build failed. Output was:")
-        print(build_result.stdout)
+        print("Build failed.")
         sys.exit(1)
     print(f">> Building Mbed for {configuration.mbed_target} -- done")
 

@@ -74,13 +74,17 @@ unit-tests = [
     # Even though beautifulsoup4 and lxml are only used by the mac version
     # of mbed ls tools, they're needed on all platforms for its unit test.
     "beautifulsoup4",
-    "lxml"
+    "lxml",
+
+    # Needed for CI scripts tests
+    "graphviz",
+    "junitparser"
 ]
 linters = [
     "ruff",
     "basedpyright",
 
-    # To pass Pyright we need all the platform-dependent packages
+    # To pass Pyright we need all the platform-dependent/optional packages
     "platformio",
     "SCons",
     "psutil",
