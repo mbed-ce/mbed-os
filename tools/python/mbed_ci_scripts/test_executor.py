@@ -5,6 +5,9 @@ Test Executor performs the following steps:
 1. Read a config file for what boards are connected to the current machine and how to talk to them
 2. Compile Mbed for each of the available boards. (compile jobs happen one at a time, since each one will use all the cores on the machine)
 3. Run a CTest job for each of the boards. This happens in parallel.
+
+Copyright (c) 2026 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
 """
 
 import pathlib

@@ -1,11 +1,11 @@
 """
 Schema for a JSON5 file listing allowed test failures
+
+Copyright (c) 2026 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
 """
 
 import enum
-import pathlib
-import sys
-from collections import defaultdict
 
 import pydantic
 
@@ -45,48 +45,6 @@ class AllowedTestFailures(pydantic.BaseModel):
 
     allowed_failures: dict[str, dict[str, TestCaseInfo]]
     "Allowed failures, by test name and then test case name."
-
-    @staticmethod
-    def extract_from_test_db(db: MbedTestDatabase) -> "AllowedTestFailures":
-        """
-        Build the list of allowed failures from an already-populated test database.
-
-        Assumes that all tests which failed in this test run should be allowed.
-        Mainly useful for initially creating the list for a new target.
-        """
-        tests_to_targets_to_results = db.get_test_results()
-
-        failures_dict = defaultdict(dict)
-
-        for test_name in tests_to_targets_to_results:
-            all_results = tests_to_targets_to_results[test_name].values()
-            if any(result == TestResult.FAILED for result in all_results):
-                # This test failed for at least one target. Which one(s)?
-                test_case_target_results = db.get_test_details(test_name)
-
-                for test_case in test_case_target_results:
-                    all_results = test_case_target_results[test_case].values()
-
-                    if (
-                        all(result in {TestResult.FAILED, TestResult.PRIOR_TEST_CASE_CRASHED} for result in all_results)
-                        and len(all_results) > 1
-                    ):
-                        # Test case failed for all targets that it was run for.
-                        failures_dict[test_name][test_case] = AllowedTestFailures.TestCaseInfo(
-                            default=TestCaseStatus.FAILING,
-                        )
-                    else:
-                        # Test case failed for specific targets
-                        target_failures = {}
-                        for target, result in test_case_target_results[test_case].items():
-                            if result in {TestResult.FAILED, TestResult.PRIOR_TEST_CASE_CRASHED}:
-                                target_failures[target] = TestCaseStatus.FAILING
-
-                        failures_dict[test_name][test_case] = AllowedTestFailures.TestCaseInfo(
-                            target_overrides=target_failures
-                        )
-
-        return AllowedTestFailures(allowed_failures=dict(sorted(failures_dict.items())))
 
     def check_against_test_db(self, db: MbedTestDatabase) -> tuple[bool, str]:
         """
@@ -134,15 +92,3 @@ class AllowedTestFailures(pydantic.BaseModel):
                     # Note: if the test case is set to FLAKY then we allow any test result.
 
         return success, report
-
-
-def main() -> None:
-    # Simple main function that processes a test database and generates an allowed-test-failures file.
-    # Used for creating the initial allowed-test-failures document.
-    db = MbedTestDatabase(pathlib.Path(sys.argv[1]))
-    allowed_failures = AllowedTestFailures.extract_from_test_db(db)
-    print(allowed_failures.model_dump_json(indent=2, exclude_defaults=True, exclude_none=True, exclude_unset=True))
-
-
-if __name__ == "__main__":
-    main()

@@ -1,5 +1,8 @@
 """
-Module for creating and accessing an SQLite database of Mbed test results
+Module for creating and accessing an SQLite database of Mbed test results.
+
+Copyright (c) 2026 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
 """
 
 from __future__ import annotations

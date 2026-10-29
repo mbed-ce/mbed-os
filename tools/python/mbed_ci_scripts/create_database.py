@@ -2,6 +2,9 @@
 Script to create a database for storing Mbed testing information and initially populate it with data.
 
 If the output file path already exists it will be deleted and recreated.
+
+Copyright (c) 2026 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
 """
 
 import pathlib
