@@ -21,3 +21,9 @@ def test_smoke_creating_mbed_test_database() -> None:
     with warnings.catch_warnings():
         db.create_database()
         db.populate_targets_and_drivers(MBED_OS_ROOT_DIR)
+
+    # Spot check some of the database contents
+    mcu_family_targets = db.get_mcu_family_targets()
+    assert "MCU_LPC17XX" in mcu_family_targets
+    assert "MCU_STM32H7" in mcu_family_targets
+    assert "LPC1768" not in mcu_family_targets
