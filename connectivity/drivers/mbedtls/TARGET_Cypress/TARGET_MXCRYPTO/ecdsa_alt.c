@@ -25,6 +25,9 @@
  *
  */
 
+/* This adapter implements Mbed TLS internals. */
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE
 #else
@@ -35,6 +38,7 @@
 
 #include "mbedtls/ecdsa.h"
 #include "mbedtls/asn1write.h"
+#include "mbedtls/error.h"
 #include "mbedtls/platform_util.h"
 
 #if defined(MBEDTLS_ECDSA_SIGN_ALT)
@@ -130,10 +134,10 @@ int mbedtls_ecdsa_sign( mbedtls_ecp_group *grp, mbedtls_mpi *r, mbedtls_mpi *s,
     MBEDTLS_MPI_CHK((tmp_k == NULL) ? MBEDTLS_ERR_ECP_ALLOC_FAILED : 0);
 
     ecdsa_status = Cy_Crypto_Core_ECC_MakePrivateKey(crypto_obj.base, key.curveID, tmp_k, f_rng, p_rng);
-    MBEDTLS_MPI_CHK((ecdsa_status == CY_CRYPTO_SUCCESS) ? 0 : MBEDTLS_ERR_ECP_HW_ACCEL_FAILED);
+    MBEDTLS_MPI_CHK((ecdsa_status == CY_CRYPTO_SUCCESS) ? 0 : MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED);
 
     ecdsa_status = Cy_Crypto_Core_ECC_SignHash(crypto_obj.base, buf, blen, sig, &key, tmp_k);
-    MBEDTLS_MPI_CHK((ecdsa_status == CY_CRYPTO_SUCCESS) ? 0 : MBEDTLS_ERR_ECP_HW_ACCEL_FAILED);
+    MBEDTLS_MPI_CHK((ecdsa_status == CY_CRYPTO_SUCCESS) ? 0 : MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED);
 
     /* Prepare a signature to load into an mpi format */
     Cy_Crypto_Core_InvertEndianness(sig, bytesize);
@@ -226,7 +230,7 @@ int mbedtls_ecdsa_verify( mbedtls_ecp_group *grp,
     Cy_Crypto_Core_InvertEndianness(key.pubkey.y, bytesize);
 
     ecdsa_ver_status = Cy_Crypto_Core_ECC_VerifyHash(crypto_obj.base, sig, buf, blen, &stat, &key);
-    MBEDTLS_MPI_CHK((ecdsa_ver_status != CY_CRYPTO_SUCCESS) ? MBEDTLS_ERR_ECP_HW_ACCEL_FAILED : 0);
+    MBEDTLS_MPI_CHK((ecdsa_ver_status != CY_CRYPTO_SUCCESS) ? MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED : 0);
 
     MBEDTLS_MPI_CHK((stat == 1) ? 0 : MBEDTLS_ERR_ECP_VERIFY_FAILED);
 

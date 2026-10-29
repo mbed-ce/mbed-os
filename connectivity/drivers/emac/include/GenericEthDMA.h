@@ -534,6 +534,9 @@ namespace mbed {
     public:
         CompositeEMAC::ErrCode init() override {
             rxPoolPayloadSize = memory_manager->get_pool_alloc_unit(RX_BUFFER_ALIGN);
+            // Keep cache invalidation inside the receive buffer, including its last cache line.
+            rxPoolPayloadSize -= rxPoolPayloadSize % RX_BUFFER_ALIGN;
+            MBED_ASSERT(rxPoolPayloadSize > 0);
             rxBuildIndex = 0;
             rxNextIndex = 0;
 

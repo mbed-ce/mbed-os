@@ -92,12 +92,16 @@ nsapi_error_t tlssocket_connect_to_srv(TLSSocket &sock, uint16_t port)
 {
     SocketAddress tls_addr;
 
-    get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &tls_addr);
+    nsapi_error_t err = get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &tls_addr);
+    if (err != NSAPI_ERROR_OK) {
+        tr_error("Error from gethostbyname: %d\n", err);
+        return err;
+    }
     tls_addr.set_port(port);
 
     tr_info("MBED: Server '%s', port %d\n", tls_addr.get_ip_address(), tls_addr.get_port());
 
-    nsapi_error_t err = sock.open(get_network_interface());
+    err = sock.open(get_network_interface());
     if (err != NSAPI_ERROR_OK) {
         tr_error("Error from sock.open: %d\n", err);
         return err;
@@ -109,6 +113,7 @@ nsapi_error_t tlssocket_connect_to_srv(TLSSocket &sock, uint16_t port)
         return err;
     }
 
+    sock.set_hostname(ECHO_SERVER_ADDR);
     err = sock.connect(tls_addr);
     if (err != NSAPI_ERROR_OK) {
         tr_error("Error from sock.connect: %d\n", err);

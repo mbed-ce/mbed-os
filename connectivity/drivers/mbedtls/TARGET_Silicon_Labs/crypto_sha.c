@@ -234,7 +234,7 @@ void mbedtls_sha256_clone( mbedtls_sha256_context *dst,
 /*
  * SHA-256 context setup
  */
-int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224 )
+int mbedtls_sha256_starts( mbedtls_sha256_context *ctx, int is224 )
 {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
@@ -260,7 +260,7 @@ int mbedtls_internal_sha256_process( mbedtls_sha256_context *ctx,
 /*
  * SHA-256 process buffer
  */
-int mbedtls_sha256_update_ret( mbedtls_sha256_context *ctx,
+int mbedtls_sha256_update( mbedtls_sha256_context *ctx,
                                const unsigned char *input,
                                size_t ilen )
 {
@@ -310,8 +310,8 @@ int mbedtls_sha256_update_ret( mbedtls_sha256_context *ctx,
 /*
  * SHA-256 final digest
  */
-int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx,
-                               unsigned char output[32] )
+int mbedtls_sha256_finish( mbedtls_sha256_context *ctx,
+                               unsigned char *output )
 {
     int             err;
     uint32_t        last, padn;
@@ -328,11 +328,11 @@ int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx,
     last = ctx->total[0] & 0x3F;
     padn = ( last < 56 ) ? ( 56 - last ) : ( 120 - last );
 
-    err = mbedtls_sha256_update_ret( ctx, sha_padding, padn );
+    err = mbedtls_sha256_update( ctx, sha_padding, padn );
     if( err != 0 ) {
         return err;
     }
-    err = mbedtls_sha256_update_ret( ctx, msglen, 8 );
+    err = mbedtls_sha256_update( ctx, msglen, 8 );
     if( err != 0 ) {
         return err;
     }
@@ -387,7 +387,7 @@ void mbedtls_sha1_clone( mbedtls_sha1_context *dst,
  *
  * \returns        error code
  */
-int mbedtls_sha1_starts_ret( mbedtls_sha1_context *ctx )
+int mbedtls_sha1_starts( mbedtls_sha1_context *ctx )
 {
     ctx->total[0] = 0;
     ctx->total[1] = 0;
@@ -404,7 +404,7 @@ int mbedtls_sha1_starts_ret( mbedtls_sha1_context *ctx )
  *
  * \returns        error code
  */
-int mbedtls_sha1_update_ret( mbedtls_sha1_context *ctx,
+int mbedtls_sha1_update( mbedtls_sha1_context *ctx,
                              const unsigned char *input,
                              size_t ilen )
 {
@@ -459,7 +459,7 @@ int mbedtls_sha1_update_ret( mbedtls_sha1_context *ctx,
  *
  * \returns        error code
  */
-int mbedtls_sha1_finish_ret( mbedtls_sha1_context *ctx,
+int mbedtls_sha1_finish( mbedtls_sha1_context *ctx,
                              unsigned char output[20] )
 {
     int err;
@@ -477,11 +477,11 @@ int mbedtls_sha1_finish_ret( mbedtls_sha1_context *ctx,
     last = ctx->total[0] & 0x3F;
     padn = ( last < 56 ) ? ( 56 - last ) : ( 120 - last );
 
-    err = mbedtls_sha1_update_ret( ctx, sha_padding, padn );
+    err = mbedtls_sha1_update( ctx, sha_padding, padn );
     if( err != 0 ) {
         return err;
     }
-    err = mbedtls_sha1_update_ret( ctx, msglen, 8 );
+    err = mbedtls_sha1_update( ctx, msglen, 8 );
     if( err != 0 ) {
         return err;
     }

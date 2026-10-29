@@ -43,6 +43,9 @@
  *     <http://eprint.iacr.org/2004/342.pdf>
  */
 
+/* This adapter implements Mbed TLS internals. */
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE
 #else
@@ -78,7 +81,8 @@
 #endif
 
 #include <string.h>
-#include "mbedtls/ecp_internal.h"
+#include "ecp_internal_alt.h"
+#include "mbedtls/error.h"
 
 #include "crypto_common.h"
 
@@ -2657,10 +2661,38 @@ cleanup:
     return( ret );
 }
 
+/* Private-key export with the output length, as in Mbed TLS 3.6. */
+int mbedtls_ecp_write_key_ext( const mbedtls_ecp_keypair *key,
+                             size_t *olen, unsigned char *buf, size_t buflen )
+{
+    size_t len = ( key->grp.nbits + 7 ) / 8;
+    if( len > buflen )
+    {
+        *olen = 0;
+        return MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL;
+    }
+    *olen = len;
+
+    if( key->d.n == 0 )
+        return MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
+
+#if defined(ECP_MONTGOMERY)
+    if( mbedtls_ecp_get_type( &key->grp ) == MBEDTLS_ECP_TYPE_MONTGOMERY )
+        return mbedtls_mpi_write_binary_le( &key->d, buf, len );
+#endif
+#if defined(ECP_SHORTWEIERSTRASS)
+    if( mbedtls_ecp_get_type( &key->grp ) == MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS )
+        return mbedtls_mpi_write_binary( &key->d, buf, len );
+#endif
+
+    return MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
+}
+
 /*
  * Check a public-private key pair
  */
-int mbedtls_ecp_check_pub_priv( const mbedtls_ecp_keypair *pub, const mbedtls_ecp_keypair *prv )
+int mbedtls_ecp_check_pub_priv( const mbedtls_ecp_keypair *pub, const mbedtls_ecp_keypair *prv,
+                              int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
 {
     int ret;
     mbedtls_ecp_point Q;
@@ -2681,10 +2713,10 @@ int mbedtls_ecp_check_pub_priv( const mbedtls_ecp_keypair *pub, const mbedtls_ec
     mbedtls_ecp_group_init( &grp );
 
     /* mbedtls_ecp_mul() needs a non-const group... */
-    mbedtls_ecp_group_copy( &grp, &prv->grp );
+    MBEDTLS_MPI_CHK( mbedtls_ecp_group_copy( &grp, &prv->grp ) );
 
     /* Also checks d is valid */
-    MBEDTLS_MPI_CHK( mbedtls_ecp_mul( &grp, &Q, &prv->d, &prv->grp.G, NULL, NULL ) );
+    MBEDTLS_MPI_CHK( mbedtls_ecp_mul( &grp, &Q, &prv->d, &prv->grp.G, f_rng, p_rng ) );
 
     if( mbedtls_mpi_cmp_mpi( &Q.X, &prv->Q.X ) ||
         mbedtls_mpi_cmp_mpi( &Q.Y, &prv->Q.Y ) ||

@@ -27,7 +27,7 @@
 #define MBEDTLS_SHA1_ALT
 #define MBEDTLS_SHA256_ALT
 //#define MBEDTLS_SHA512_ALT
-#define MBEDTLS_CCM_ALT
+/* Use Mbed TLS CCM: the CC310 adapter lacks the multipart API. */
 //#define MBEDTLS_CMAC_ALT
 #define MBEDTLS_ECDSA_VERIFY_ALT
 #define MBEDTLS_ECDSA_SIGN_ALT

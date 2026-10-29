@@ -17,14 +17,15 @@
 
 #if defined(DEVICE_TRNG) || defined(FEATURE_PSA)
 
+#include "mbed_trng.h"
 #include "hal/trng_api.h"
 #include "platform/SingletonPtr.h"
 #include "rtos/Mutex.h"
 
 SingletonPtr<rtos::Mutex> mbedtls_mutex;
 
-extern "C"
-int mbedtls_hardware_poll( void *data, unsigned char *output, size_t len, size_t *olen ) {
+int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen)
+{
 #if defined(DEVICE_TRNG)
     trng_t trng_obj;
     mbedtls_mutex->lock();

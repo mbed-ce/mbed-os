@@ -22,6 +22,7 @@
 #if defined(MBEDTLS_CCM_ALT)
 #include <string.h>
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 #include "mbedtls/platform_util.h"
 #include "mbedtls/aes.h"
 #include "crys_aesccm_error.h"

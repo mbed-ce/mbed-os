@@ -25,6 +25,9 @@
  *
  */
 
+/* This adapter implements Mbed TLS internals. */
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE
 #else
@@ -35,6 +38,7 @@
 
 #include "mbedtls/ecp.h"
 #include "mbedtls/platform_util.h"
+#include "crypto_common.h"
 
 #include <string.h>
 
