@@ -23,7 +23,8 @@ class TestConfigureCommand(TestCase):
     @mock.patch("mbed_tools.cli.configure.MbedProgram")
     def test_generate_config_called_with_mbed_os_path(self, program, generate_config):
         CliRunner().invoke(
-            configure, ["-m", "FRDM_K64F", "-t", "gcc_arm", "--mbed-os-path", "./extern/mbed-os", "-o", "some_output_dir"]
+            configure,
+            ["-m", "FRDM_K64F", "-t", "gcc_arm", "--mbed-os-path", "./extern/mbed-os", "-o", "some_output_dir"],
         )
 
         generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program.from_existing())
@@ -35,7 +36,16 @@ class TestConfigureCommand(TestCase):
         custom_targets_json_path = pathlib.Path("custom", "custom_targets.json")
         CliRunner().invoke(
             configure,
-            ["-t", "gcc_arm", "-m", "FRDM_K64F", "--custom-targets-json", custom_targets_json_path, "-o", "some_output_dir"],
+            [
+                "-t",
+                "gcc_arm",
+                "-m",
+                "FRDM_K64F",
+                "--custom-targets-json",
+                custom_targets_json_path,
+                "-o",
+                "some_output_dir",
+            ],
         )
 
         generate_config.assert_called_once_with("FRDM_K64F", "GCC_ARM", program)
