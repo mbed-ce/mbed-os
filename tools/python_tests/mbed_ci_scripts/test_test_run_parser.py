@@ -1,5 +1,8 @@
 """
-Test suite for test_run_parser
+Test suite for test_run_parser.
+
+Copyright (c) 2026 Jamie Smith
+SPDX-License-Identifier: Apache-2.0
 """
 
 from collections import OrderedDict
