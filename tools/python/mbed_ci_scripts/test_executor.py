@@ -90,8 +90,7 @@ def build_mbed_ce(source_dir: pathlib.Path, build_dir: pathlib.Path, configurati
     cmake_command.extend(f"-D{var}={val}" for var, val in configuration.extra_cmake_options.items())
 
     print(f">> Configuring Mbed for {configuration.mbed_target}...")
-    cmake_result = subprocess.run(
-        cmake_command, check=False, cwd=str(build_dir))
+    cmake_result = subprocess.run(cmake_command, check=False, cwd=str(build_dir))
     if cmake_result.returncode != 0:
         print("CMake configuration failed.")
         sys.exit(1)
@@ -237,6 +236,7 @@ def main() -> None:
     else:
         _ = (test_result_dir / "report.txt").write_text(report, encoding="utf-8")
         print("Some tests failed :( Report has been written to report.txt in the test result dir.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
