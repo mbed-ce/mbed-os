@@ -1,0 +1,334 @@
+{
+  "allowed_failures": {
+    "test-mbed-connectivity-netsocket-lwipstack-udp": {
+      UDPSOCKET_ECHOTEST_NONBLOCK_CONNECT_SEND_RECV: {
+        "target_overrides": {
+          "NUCLEO_H563ZI": "flaky"
+        }
+      }
+    },
+    "test-mbed-connectivity-netsocket-nanostack-tcp": {
+      // This entire test suite currently BusFaults immediately on LPC1768, with indicators pointing
+      // to `hal_sleep()` as the source. No idea why. The hard faults do not occur when the debugger
+      // is connected :(((
+      "test-mbed-connectivity-netsocket-nanostack-tcp": {
+        "target_overrides": {
+          "LPC1768": "failing"
+        }
+      }
+    },
+
+    // Currently targets that use legacy EMAC drivers (e.g. K64F) do not pass the
+    // EMAC test all the way
+    "test-mbed-connectivity-network-emac": {
+      "EMAC multicast filter": {
+        "target_overrides": {
+          "K64F": "failing",
+        }
+      },
+      "EMAC memory": {
+        "target_overrides": {
+          "K64F": "flaky",
+        }
+      },
+      "EMAC power down and power up": {
+        "target_overrides": {
+          "K64F": "flaky",
+        }
+      },
+      "EMAC unicast again after power cycle": {
+        "target_overrides": {
+          "K64F": "failing",
+        }
+      }
+    },
+    "test-mbed-hal-common-tickers": {
+      "Microsecond ticker init is safe to call repeatedly": {},
+      "Microsecond ticker info test": {},
+      "Microsecond ticker interrupt test": {},
+      "Microsecond ticker disable test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "Microsecond ticker past interrupt test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "Microsecond ticker reschedule test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "Microsecond ticker fire interrupt": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "Microsecond ticker overflow test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "Microsecond ticker increment test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "Microsecond ticker speed test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "lp ticker init is safe to call repeatedly": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "lp ticker info test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "lp ticker interrupt test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "lp ticker disable test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "lp ticker past interrupt test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "lp ticker reschedule test": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "lp ticker fire interrupt": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "lp ticker overflow test": {
+        "target_overrides": {
+          "K64F": "failing",
+        }
+      },
+      "lp ticker increment test": {
+        "target_overrides": {
+          "K64F": "failing",
+        }
+      },
+      "lp ticker speed test": {
+        "target_overrides": {
+          "K64F": "failing",
+        }
+      }
+    },
+    "test-mbed-hal-rtc-time": {
+      "test is leap year - RTC leap years full support": {},
+      "test-mbed-hal-rtc-time": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "test is leap year - RTC leap years partial support": {},
+      "test make time boundary values - RTC leap years full support": {},
+      "test make time boundary values - RTC leap years partial support": {},
+      "test make time - invalid param": {},
+      "test local time - invalid param": {},
+      "test set_time twice": {}
+    },
+    "test-mbed-hal-rtc-time-conv": {
+      "test make time and local time - RTC leap years full support": {},
+      "test-mbed-hal-rtc-time-conv": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "test make time and local time - RTC leap years partial support": {}
+    },
+    "test-mbed-hal-sleep": {
+      "sleep - source of wake-up - us ticker": {},
+      "test-mbed-hal-sleep": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "deep-sleep - source of wake-up - lp ticker": {},
+      "deep-sleep - high-speed clocks are turned off": {}
+    },
+    "test-mbed-hal-sleep-manager": {
+      "deep sleep lock/unlock": {},
+      "test-mbed-hal-sleep-manager": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "deep sleep locked USHRT_MAX times": {},
+      "sleep_auto calls sleep/deep sleep based on lock": {},
+      "deep sleep lock/unlock test_check": {}
+    },
+    "test-mbed-hal-sleep-manager-racecondition": {
+      "deep sleep lock/unlock is thread safe": {},
+      "test-mbed-hal-sleep-manager-racecondition": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "deep sleep lock/unlock is IRQ safe": {}
+    },
+    "test-mbed-hal-stack-size-unification": {
+      "Stack size unification test": {},
+      "test-mbed-hal-stack-size-unification": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      }
+    },
+    "test-mbed-hal-ticker": {
+      "test-mbed-hal-ticker": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+    },
+    "test-mbed-hal-trng": {
+      "TRNG: trng_test": {
+        "target_overrides": {
+          "NRF52840_DK": "failing"
+        }
+      },
+      "test-mbed-hal-trng": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      }
+    },
+    "test-mbed-hal-us-ticker": {
+      "test-mbed-hal-us-ticker": {
+        "target_overrides": {
+          "K64F": "failing"
+        }
+      },
+      "us ticker info test": {}
+    },
+    "test-mbed-rtos-event-flags": {
+      "Test clear/set with prohibited flag": {
+        "target_overrides": {
+          "NUCLEO_U083RC": "failing"
+        }
+      },
+      "Test set/get/clear for full flag range": {
+        "target_overrides": {
+          "NUCLEO_U083RC": "failing"
+        }
+      },
+      "Test multi-eventflags wait_all": {
+        "target_overrides": {
+          "NUCLEO_U083RC": "failing"
+        }
+      },
+      "Test multi-eventflags wait_any": {
+        "target_overrides": {
+          "NUCLEO_U083RC": "failing"
+        }
+      },
+      "Test multi-eventflags wait_any no clear": {
+        "target_overrides": {
+          "NUCLEO_U083RC": "failing"
+        }
+      }
+    },
+    "test-mbed-usb-device-basic": {
+      "usb control basic test": {
+        "target_overrides": {
+          // Saw this error once:
+          // <<< get_set_configuration_test >>>
+          //[+967ms][HTST][INF] TEST FAILED: [/home/jamie/Mbed/mbed-os/drivers/usb/tests/TESTS/host_tests/pyusb_basic.py]:418, set_configuration request (deconfigure) failed ([Errno 16] Resource busy).
+          "LPC1768": "flaky"
+        },
+      },
+      "usb control stall test": {
+        "target_overrides": {
+          "LPC1768": "flaky"
+        }
+      },
+      "usb control sizes test": {
+        "target_overrides": {
+          "LPC1768": "flaky"
+        }
+      },
+      "usb control stress test": {
+        "target_overrides": {
+          "LPC1768": "flaky"
+        }
+      },
+      "usb device reset test": {
+        "target_overrides": {
+          "LPC1768": "flaky"
+        }
+      },
+      "usb soft reconnection test": {
+        default: "flaky"
+      },
+      "usb repeated construction destruction test": {
+        default: "flaky"
+      },
+      "endpoint test data correctness": {
+        default: "flaky"
+      },
+      "endpoint test halt": {
+        default: "flaky"
+      },
+      "endpoint test parallel transfers": {
+        default: "flaky"
+      },
+      "endpoint test parallel transfers ctrl": {
+        default: "flaky"
+      },
+      "endpoint test abort": {
+        default: "flaky"
+      },
+      "endpoint test data toggle reset": {
+        "default": "failing"
+      }
+    },
+    "test-mbed-usb-device-serial": {
+      "CDC RX single bytes concurrent": {
+        default: "flaky"
+      },
+      "CDC RX multiple bytes": {
+        default: "flaky"
+      },
+      "CDC RX multiple bytes concurrent": {
+        "default": "failing"
+      },
+      "CDC loopback": {
+        "default": "failing"
+      },
+      "Serial USB reconnect": {
+        "default": "failing"
+      },
+      "Serial terminal reopen": {
+        "default": "failing"
+      },
+      "Serial getc": {
+        "default": "failing"
+      },
+      "Serial printf/scanf": {
+        "default": "failing"
+      },
+      "Serial line coding change": {
+        "default": "failing"
+      }
+    }
+  }
+}

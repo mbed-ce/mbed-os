@@ -16,4 +16,6 @@ mbed_greentea_add_test(
         ${TEST_SKIPPED}
     TEST_REQUIRED_LIBS
         mbed-usb
+    EXCLUSIVE_GROUP
+        mbed-usb-device-serial
 )

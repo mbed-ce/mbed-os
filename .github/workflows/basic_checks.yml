@@ -129,7 +129,7 @@ jobs:
         run: |
           source .venv/bin/activate
           cd tools
-          ruff check --diff python/mbed_tools python/mbed_platformio python/mbed_license_checker
+          ruff check --diff python/mbed_tools python/mbed_platformio python/mbed_license_checker python/mbed_ci_scripts
           basedpyright
 
   docs-check:

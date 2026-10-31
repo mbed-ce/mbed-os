@@ -27,7 +27,7 @@ using namespace utest::v1;
 
 namespace {
 static const int SIGNAL_SIGIO = 0x1;
-static const int SIGIO_TIMEOUT = 5000; //[ms]
+static const auto SIGIO_TIMEOUT = 500ms;
 static const int PKT_NUM = 2;
 }
 
@@ -62,7 +62,7 @@ void UDPSOCKET_RECV_TIMEOUT()
         timer.stop();
 
         if (recvd == NSAPI_ERROR_WOULD_BLOCK) {
-            osSignalWait(SIGNAL_SIGIO, SIGIO_TIMEOUT);
+            rtos::ThisThread::flags_wait_any_for(SIGNAL_SIGIO, SIGIO_TIMEOUT);
             tr_info("MBED: recvfrom() took: %" PRIi64 "ms", std::chrono::duration_cast<std::chrono::milliseconds>(timer.elapsed_time()).count());
             if (timer.elapsed_time() > 150ms) {
                 TEST_ASSERT(150ms - timer.elapsed_time() < 51ms);

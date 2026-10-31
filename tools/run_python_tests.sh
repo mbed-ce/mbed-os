@@ -44,6 +44,11 @@ $PYTHON -m coverage run "$COVERAGE_EXCLUDES" -m pytest python_tests/mbed_tools
 echo ">> Running pytest for memap package"
 $PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m pytest python_tests/memap
 
+echo ">> Running pytest for mbed_ci_scripts package"
+# Annoyingly Pytest gets confused by classes that start with "Test" so we have to disable that
+# via changing the name search pattern via -o python_classes
+$PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m pytest -o python_classes=NoClassTestsHere python_tests/mbed_ci_scripts
+
 echo ">> Running pytest for mbed_license_checker package"
 $PYTHON -m coverage run "$COVERAGE_EXCLUDES" -a -m pytest python_tests/mbed_license_checker
 
