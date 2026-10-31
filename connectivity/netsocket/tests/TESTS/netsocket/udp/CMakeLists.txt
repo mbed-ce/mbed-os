@@ -38,6 +38,10 @@ mbed_greentea_add_test(
         ${TEST_SKIPPED}
 )
 
+if(NOT NETWORK_SUPPORTS_IPV6)
+    set(TEST_SKIPPED "This test requires an IPv6 internet connection!")
+endif()
+
 mbed_greentea_add_test(
     TEST_NAME
         mbed-connectivity-netsocket-nanostack-udp

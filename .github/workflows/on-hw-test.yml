@@ -16,6 +16,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # Allow previous build dir to persist to reduce build time
+          clean: false
       - name: Update venv
         run: |
           python3 -m venv .venv

@@ -49,22 +49,22 @@ sudo apt-get install python3-hidapi python3-usb
     port and sending the `AT commands`, which it does for every new
     `/dev/ttyACM` device registered in system.
 4. Install the `udisks2` package, which the test script uses to mount USB disks.  Additionally, you may need to disable any automounting of disks provided by your file manager / distro.
-5. Last but not least, at least on Ubuntu, you may need to change permission settings such that udisks2 actually allows ordinary users to mount disks.  You are supposed to do this with a [polkit rule](https://askubuntu.com/a/1457819/1612342), but I had absolutely no luck getting this to work.  So instead I had to edit `/usr/share/polkit-1/actions/org.freedesktop.UDisks2.policy` and change the first
-```
-    <defaults>
-      <allow_any>auth_admin</allow_any>
-      <allow_inactive>auth_admin</allow_inactive>
-      <allow_active>yes</allow_active>
-    </defaults>
-```
-block to
-```
-    <defaults>
-      <allow_any>yes</allow_any>
-      <allow_inactive>yes</allow_inactive>
-      <allow_active>yes</allow_active>
-    </defaults>
-```
+5. Last but not least, at least on Ubuntu, you may need to change permission settings such that udisks2 actually allows ordinary users to mount disks.  You are supposed to do this with a [polkit rule](https://askubuntu.com/a/1457819/1612342), but I had absolutely no luck getting this to work.  So instead I had to edit `/usr/share/polkit-1/actions/org.freedesktop.UDisks2.policy` and change all of the
+    ```
+        <defaults>
+          <allow_any>auth_admin</allow_any>
+          <allow_inactive>auth_admin</allow_inactive>
+          <allow_active>yes</allow_active>
+        </defaults>
+    ```
+    blocks to
+    ```
+        <defaults>
+          <allow_any>yes</allow_any>
+          <allow_inactive>yes</allow_inactive>
+          <allow_active>yes</allow_active>
+        </defaults>
+    ```
 
 ### Mac
 No setup method has been verified for this platform.
