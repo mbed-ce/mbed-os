@@ -32,6 +32,7 @@ set(OPENOCD_UPLOAD_ENABLED TRUE)
 set(OPENOCD_CHIP_CONFIG_COMMANDS
         -f interface/cmsis-dap.cfg
         -s ${CMAKE_CURRENT_LIST_DIR}/openocd_cfgs/max32xxx
+        -c "adapter speed 4000"
         -f target/max32670.cfg)
 
 # Config options for PYOCD
