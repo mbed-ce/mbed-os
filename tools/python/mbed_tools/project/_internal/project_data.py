@@ -27,6 +27,7 @@ CUSTOM_TARGETS_JSON5_FILE_NAME = "custom_targets.json5"
 MBED_OS_REFERENCE_URL = "https://github.com/ARMmbed/mbed-os"
 MBED_OS_REFERENCE_ID = "master"
 
+
 @dataclass
 class MbedProgramFiles:
     """

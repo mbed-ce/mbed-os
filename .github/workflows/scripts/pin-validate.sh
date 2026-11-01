@@ -15,7 +15,7 @@ else
 fi
 
 # Run pinvalidate on each changed file
-git diff --name-only --diff-filter=d "$compare_ref" \
+git diff --name-only --diff-filter=d "$compare_ref" -- targets \
   | ( grep '.*[\\|\/]PinNames.h$' || true ) \
   | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vvvfp "${file}"; done
 
