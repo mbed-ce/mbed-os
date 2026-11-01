@@ -28,6 +28,7 @@
 #include "whd_types.h"
 #include "whd_network_types.h"
 #include "cyhal.h"
+#include "cy_utils.h"
 #if defined(COMPONENT_BSP_DESIGN_MODUS) || defined(COMPONENT_CUSTOM_DESIGN_MODUS)
 #include "cycfg.h"
 #endif
