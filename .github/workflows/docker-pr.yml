@@ -69,5 +69,5 @@ jobs:
             uname -m
             cd mbed-ce-hello-world
             mkdir -p build && cd build
-            cmake .. -GNinja -DCMAKE_BUILD_TYPE=Develop -DMBED_TARGET=K64F
+            cmake .. -GNinja -DCMAKE_BUILD_TYPE=Develop -DMBED_TARGET=FRDM_K64F
             ninja

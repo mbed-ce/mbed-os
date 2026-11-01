@@ -118,10 +118,10 @@ void spi_frequency(spi_t *obj, int hz)
     spibase->TCR = (LPSPI_GetTcr(spibase) & ~LPSPI_TCR_PRESCALE_MASK) | LPSPI_TCR_PRESCALE(tcrPrescaleValue);
 
     // Also set delay times to match the new frequency
-    const uint32_t oneClockPeriodNanosec = (uint32_t)ceilf(1e9f/obj->frequency);
-    LPSPI_MasterSetDelayTimes(spibase, oneClockPeriodNanosec, kLPSPI_PcsToSck, (uint32_t)hz);
-    LPSPI_MasterSetDelayTimes(spibase, oneClockPeriodNanosec, kLPSPI_LastSckToPcs, (uint32_t)hz);
-    LPSPI_MasterSetDelayTimes(spibase, oneClockPeriodNanosec, kLPSPI_BetweenTransfer, (uint32_t)hz);
+    const uint32_t oneClockPeriodNanosec = (uint32_t)ceilf(1e9f/hz);
+    LPSPI_MasterSetDelayTimes(spibase, oneClockPeriodNanosec, kLPSPI_PcsToSck, busClock);
+    LPSPI_MasterSetDelayTimes(spibase, oneClockPeriodNanosec, kLPSPI_LastSckToPcs, busClock);
+    LPSPI_MasterSetDelayTimes(spibase, oneClockPeriodNanosec, kLPSPI_BetweenTransfer, busClock);
 
     /* Enable the LPSPI module */
     LPSPI_Enable(spibase, true);

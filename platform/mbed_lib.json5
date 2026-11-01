@@ -182,11 +182,7 @@
             "crash-capture-enabled": true,
             "fatal-error-auto-reboot-enabled": true
         },
-        "K64F": {
-            "crash-capture-enabled": true,
-            "fatal-error-auto-reboot-enabled": true
-        },
-        "K66F": {
+        "MCU_KINETIS_K_SERIES": {
             "crash-capture-enabled": true,
             "fatal-error-auto-reboot-enabled": true
         },

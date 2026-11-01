@@ -150,7 +150,7 @@ The command-line tool and Python API check the current directory for a file name
 }
 ```
 
-For example, to change the `serial_port` of the K64F with a `target_id` of `0240000032044e4500257009997b00386781000097969900`, the `mbedls.json` file contains the following:
+For example, to change the `serial_port` of the FRDM_K64F with a `target_id` of `0240000032044e4500257009997b00386781000097969900`, the `mbedls.json` file contains the following:
 
 ```json
 {
@@ -167,7 +167,7 @@ $ mbedls
 +---------------+----------------------+-------------+-------------+--------------------------------------------------+-----------------+
 | platform_name | platform_name_unique | mount_point | serial_port | target_id                                        | daplink_version |
 +---------------+----------------------+-------------+-------------+--------------------------------------------------+-----------------+
-| K64F          | K64F[0]              | D:          | COM99       | 0240000032044e4500257009997b00386781000097969900 | 0244            |
+| FRDM_K64F          | FRDM_K64F[0]              | D:          | COM99       | 0240000032044e4500257009997b00386781000097969900 | 0244            |
 +---------------+----------------------+-------------+-------------+--------------------------------------------------+-----------------+
 ```
 

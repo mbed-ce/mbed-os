@@ -13,7 +13,7 @@
                 "UART_ODD_PARITY_NOT_SUPPORTED"
             ]
         },
-        "K64F": {
+        "MCU_K64F": {
             "target.macros_add": [
                 "UART_7BITS_NOT_SUPPORTED",
                 "UART_9BITS_NOT_SUPPORTED"

@@ -5337,9 +5337,9 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "K66F"
         ],
         "device_name": "MK66FN2M0xxx18",
-        "overrides": {
-            "network-default-interface-type": "ETHERNET"
-        },
+//        "overrides": {
+//            "network-default-interface-type": "ETHERNET"
+//        },
         "public": false,
     },
     "FRDM_K66F": {
@@ -5393,7 +5393,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "SPIF",
         ],
         "extra_labels_add": [
-            "FRDM"
+            "FRDM",
+            "K82F"
         ],
         "inherits": [
             "MCU_K82F",

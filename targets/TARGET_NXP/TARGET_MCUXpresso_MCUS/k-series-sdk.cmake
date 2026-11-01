@@ -82,7 +82,7 @@ foreach(TARGET mbed-mcu-k22f mbed-mcu-k66f mbed-mcu-k82f)
             mbed-mcux-sdk/drivers/lpuart/fsl_lpuart.c
             mbed-mcux-sdk/drivers/lpuart/fsl_lpuart_edma.c
     )
-    target_include_directories(mbed-mcu-k66f
+    target_include_directories(${TARGET}
         INTERFACE
             mbed-mcux-sdk/drivers/lpuart
     )
