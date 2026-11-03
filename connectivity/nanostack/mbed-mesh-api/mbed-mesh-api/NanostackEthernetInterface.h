@@ -19,6 +19,7 @@
 
 #include "EthInterface.h"
 #include "MeshInterfaceNanostack.h"
+#include "mstd_atomic"
 #include "NanostackEthernetPhy.h"
 
 class Nanostack::EthernetInterface final : public Nanostack::Interface {
@@ -37,6 +38,7 @@ private:
     friend class NanostackEthernetInterface;
     EthernetInterface(NanostackEthernetPhy &phy) : Interface(phy) {}
     nsapi_error_t initialize();
+    mstd::atomic<bool> enet_tasklet_started = false;
 protected:
     NanostackEthernetPhy &get_phy() const
     {
