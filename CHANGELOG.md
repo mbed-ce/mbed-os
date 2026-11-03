@@ -20,6 +20,7 @@ A message that notes the main changes in the update.
 ### Deprecated
 
 ### Fixed
+- ResetReason API now works correctly on STM32H7 devices with the Arduino bootloader (e.g. Arduino Giga and Arduino Portenta H7)
 
 ### Removed
 
