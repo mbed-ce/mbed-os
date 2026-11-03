@@ -1425,6 +1425,7 @@ static whd_result_t whd_bus_sdio_unregister_oob_intr(whd_driver_t whd_driver)
     const whd_oob_config_t *config = &whd_driver->bus_priv->sdio_config.oob_config;
 
     cyhal_gpio_register_irq(config->host_oob_pin, config->intr_priority, NULL, NULL);
+    cyhal_gpio_free(config->host_oob_pin);
 
     return WHD_SUCCESS;
 }
