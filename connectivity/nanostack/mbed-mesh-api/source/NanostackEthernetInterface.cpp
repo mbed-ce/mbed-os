@@ -102,7 +102,7 @@ nsapi_error_t NanostackEthernetInterface::do_initialize()
 
 nsapi_error_t Nanostack::EthernetInterface::bringdown()
 {
-    if(!enet_tasklet_started) {
+    if (!enet_tasklet_started) {
         return NSAPI_ERROR_NO_CONNECTION;
     }
 
