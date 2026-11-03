@@ -216,13 +216,9 @@ void whd_thread_quit(whd_driver_t whd_driver)
     whd_thread_info_t *thread_info = &whd_driver->thread_info;
     whd_result_t result;
 
-    /* signal main thread and wake it */
+    /* Signal main thread and wake it. OK if semaphore already set (thread might already be pending wakeup). */
     thread_info->thread_quit_flag = WHD_TRUE;
-    result = cy_rtos_set_semaphore(&thread_info->transceive_semaphore, WHD_FALSE);
-    if (result != WHD_SUCCESS)
-    {
-        WPRINT_WHD_ERROR( ("Error setting semaphore in %s at %d \n", __func__, __LINE__) );
-    }
+    (void)cy_rtos_set_semaphore(&thread_info->transceive_semaphore, WHD_FALSE);
 
     /* Wait for the WHD thread to end */
     cy_rtos_join_thread(&thread_info->whd_thread);
