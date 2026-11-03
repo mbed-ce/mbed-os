@@ -120,6 +120,8 @@ nsapi_error_t Nanostack::EthernetInterface::bringdown()
         return NSAPI_ERROR_DEVICE_ERROR;
     }
 
+    enet_tasklet_started = false;
+
     if (_blocking) {
         bool acquired = disconnect_semaphore.try_acquire_for(30s);
 
