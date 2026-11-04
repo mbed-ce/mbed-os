@@ -822,7 +822,7 @@ LWIP &LWIP::get_instance()
 #define LWIP 0x11991199
 #if MBED_CONF_NSAPI_DEFAULT_STACK == LWIP
 #undef LWIP
-OnboardNetworkStack &OnboardNetworkStack::get_default_instance()
+MBED_WEAK OnboardNetworkStack &OnboardNetworkStack::get_default_instance()
 {
     return LWIP::get_instance();
 }

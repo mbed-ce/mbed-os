@@ -12,6 +12,9 @@
 /*   to a stable set of APIs once all the feedback has been considered.    */
 /***************************************************************************/
 
+/** @defgroup experimental-crypto-psa Experimental PSA APIs
+ */
+
 /** @defgroup PSA-Attestation PSA-Attestation
     @ingroup experimental-crypto-psa
  * @{

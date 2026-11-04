@@ -761,7 +761,7 @@ nsapi_size_or_error_t Nanostack::do_sendto(void *handle, const ns_address_t *add
     iov.iov_base = const_cast<void *>(data);
     iov.iov_len = size;
     msg.msg_name = const_cast<ns_address_t *>(address);
-    msg.msg_namelen = address ? sizeof * address : 0;
+    msg.msg_namelen = address ? sizeof *address : 0;
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
     msg.msg_control = NULL;
@@ -1196,7 +1196,7 @@ Nanostack &Nanostack::get_instance()
 #define NANOSTACK 0x99119911
 #if MBED_CONF_NSAPI_DEFAULT_STACK == NANOSTACK
 #undef NANOSTACK
-OnboardNetworkStack &OnboardNetworkStack::get_default_instance()
+MBED_WEAK OnboardNetworkStack &OnboardNetworkStack::get_default_instance()
 {
     return Nanostack::get_instance();
 }

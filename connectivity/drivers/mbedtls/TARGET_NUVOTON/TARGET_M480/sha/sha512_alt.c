@@ -107,7 +107,7 @@ void mbedtls_sha512_clone(mbedtls_sha512_context *dst,
 /*
  * SHA-512 context setup
  */
-int mbedtls_sha512_starts_ret(mbedtls_sha512_context *ctx, int is384)
+int mbedtls_sha512_starts(mbedtls_sha512_context *ctx, int is384)
 {
     if (ctx->active_ctx == &ctx->hw_ctx) {
         mbedtls_sha512_hw_starts(&ctx->hw_ctx, is384);
@@ -120,7 +120,7 @@ int mbedtls_sha512_starts_ret(mbedtls_sha512_context *ctx, int is384)
 /*
  * SHA-512 process buffer
  */
-int mbedtls_sha512_update_ret(mbedtls_sha512_context *ctx, const unsigned char *input, size_t ilen)
+int mbedtls_sha512_update(mbedtls_sha512_context *ctx, const unsigned char *input, size_t ilen)
 {
     if (ctx->active_ctx == &ctx->hw_ctx) {
         mbedtls_sha512_hw_update(&ctx->hw_ctx, input, ilen);
@@ -133,7 +133,7 @@ int mbedtls_sha512_update_ret(mbedtls_sha512_context *ctx, const unsigned char *
 /*
  * SHA-512 final digest
  */
-int mbedtls_sha512_finish_ret(mbedtls_sha512_context *ctx, unsigned char output[64])
+int mbedtls_sha512_finish(mbedtls_sha512_context *ctx, unsigned char *output)
 {
     if (ctx->active_ctx == &ctx->hw_ctx) {
         mbedtls_sha512_hw_finish(&ctx->hw_ctx, output);
