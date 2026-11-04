@@ -1779,9 +1779,9 @@ buffer_t *icmpv6_build_na(protocol_interface_info_entry_t *cur, bool solicited, 
     buf->interface = cur;
 
     if (aro) {
-        tr_info("Build NA ARO");
+        tr_debug("Build NA ARO");
     } else {
-        tr_info("Build NA");
+        tr_debug("Build NA");
     }
 
     return (buf);

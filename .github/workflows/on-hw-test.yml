@@ -1,0 +1,49 @@
+name: device-farm-build.yml
+on: [pull_request]
+defaults:
+  run:
+    # Use bash instead of sh for commands so that 'source' works
+    shell: bash
+
+jobs:
+  build-and-test-via-device-farm:
+
+    # Flag to Python that output from the test executor script should be printed to the console in real time
+    env:
+      PYTHONUNBUFFERED: "1"
+
+    runs-on: [self-hosted, device-farmer-1]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Allow previous build dir to persist to reduce build time
+          clean: false
+      - name: Update venv
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install -e ./tools[ci_scripts]
+      - name: Run test executor
+        run: |
+          source .venv/bin/activate
+          # The toolchain path set in /etc/environment does not seem to get picked up by the Actions runner
+          # (I think because it's started by a SystemD service?) so we have to set it manually.
+          export PATH=/usr/local/gcc-arm/bin:$PATH
+          mkdir -p build
+          mkdir -p results
+          mbed-test-executor ~/device-farmer-config.json5 . build results
+      - name: Generate website
+        if: always() # Run even if tests failed
+        run: |
+          # Temporary - use dev script to generate website. Will rework this once multiple device farmer machines
+          # exist.
+          source .venv/bin/activate
+          python3 -m tools.python.mbed_ci_scripts.generate_result_website results/test_results.db results/site
+      - name: Archive artifacts
+        if: always() # Run even if tests failed
+        uses: actions/upload-artifact@v7
+        with:
+          name: report-device-farmer-1
+          path:
+            results/**

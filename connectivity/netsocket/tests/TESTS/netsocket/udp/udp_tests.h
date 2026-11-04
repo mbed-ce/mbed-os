@@ -50,7 +50,7 @@ static constexpr seconds TESTS_TIMEOUT(MBED_GREENTEA_TEST_UDPSOCKET_TIMEOUT_S);
 #if MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == MESH && MBED_CONF_NSAPI_DEFAULT_MESH_TYPE == WISUN
 static constexpr seconds TESTS_TIMEOUT = 25min;
 #else
-static constexpr seconds TESTS_TIMEOUT = 20min;
+static constexpr seconds TESTS_TIMEOUT = 10min;
 #endif
 #endif
 

@@ -17,6 +17,10 @@ if(NOT "DEVICE_QSPI=1" IN_LIST MBED_TARGET_DEFINITIONS)
 	set(TEST_SKIPPED "QSPI is not supported for this target")
 endif()
 
+# Not supported yet, see mbed-ce#638
+if("ARDUINO_GIGA" IN_LIST MBED_TARGET_LABELS)
+	set(TEST_SKIPPED "QSPI is not implemented for this target")
+endif()
 
 list(
     APPEND

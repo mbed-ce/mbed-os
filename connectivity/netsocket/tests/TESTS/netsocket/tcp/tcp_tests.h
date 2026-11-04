@@ -56,7 +56,7 @@ static const std::chrono::seconds TESTS_TIMEOUT(MBED_GREENTEA_TEST_TCPSOCKET_TIM
 #if MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE == MESH && MBED_CONF_NSAPI_DEFAULT_MESH_TYPE == WISUN
 static const std::chrono::seconds TESTS_TIMEOUT(25 * 60);
 #else
-static const std::chrono::seconds TESTS_TIMEOUT(10 * 60);
+static const std::chrono::seconds TESTS_TIMEOUT(5 * 60);
 #endif
 #endif
 
