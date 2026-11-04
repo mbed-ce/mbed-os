@@ -24,6 +24,10 @@
       "EMAC multicast filter": {
         "target_overrides": {
           "K64F": "failing",
+
+          // Currently the CYW43xxx wifi driver cannot pass this test.
+          "ARDUINO_GIGA_CM7": "failing",
+          "CY8CPROTO_062S3_4343W": "failing"
         }
       },
       "EMAC memory": {

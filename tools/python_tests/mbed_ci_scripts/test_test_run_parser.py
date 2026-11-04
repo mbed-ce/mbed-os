@@ -71,3 +71,49 @@ def test_parse_regular_test_suite_run():
 [+8344ms][CONN][RXD] <greentea test suite>:156::FAIL: Expected 'The quick brown fox jumps over the lazy dog.\\n' Was 'xThe quick brown fox jumps over the lazy dog.'
 [+8345ms][CONN][INF] found KV pair in stream: {{__testcase_finish;Receive test string from PC once (1200 baud);0;1}}"""
     )
+
+
+def test_parse_hanging_test_suite_run() -> None:
+    """
+    Parse a test suite run where an infinite hang occurs after a test case
+    """
+
+    test_suite_name = "test-mbed-connectivity-network-nanostack-wifi"
+    test_suite_text = (THIS_SCRIPT_DIR / "hanging_test_suite_run.txt").read_text()
+    test_suite_result = TestResult.FAILED
+
+    # Create a database for test use with one target.
+    db = MbedTestDatabase()
+    db.create_database()
+    db.add_target("TEST_TARGET", is_mcu_family=True, mcu_family_target="TEST_TARGET")
+
+    # Satisfy foreign key constraint by adding the test to the tests table
+    db.add_test_record(test_suite_name, "TEST_TARGET", 0, test_suite_result, test_suite_text)
+
+    # Run test runner
+    test_run_parser._parse_test_suite(
+        db, "TEST_TARGET", "test-mbed-connectivity-network-nanostack-wifi", test_suite_text, test_suite_result
+    )
+
+    # Check data in database
+    assert db.get_tests() == [test_suite_name]
+    assert db.get_test_results() == {test_suite_name: {"TEST_TARGET": TestResult.FAILED}}
+
+    expected_test_cases = {
+        "WIFI-CONSTRUCTOR": {"TEST_TARGET": TestResult.PASSED},
+        "WIFI-CONNECT-NOCREDENTIALS": {"TEST_TARGET": TestResult.FAILED},
+        "WIFI-SET-CREDENTIAL": {"TEST_TARGET": TestResult.PASSED},
+        "WIFI-SET-CHANNEL": {"TEST_TARGET": TestResult.PASSED},
+        "WIFI-CONNECT-PARAMS-NULL": {"TEST_TARGET": TestResult.PASSED},
+        "WIFI-SCAN-NULL": {"TEST_TARGET": TestResult.PASSED},
+        "WIFI-SCAN": {"TEST_TARGET": TestResult.PASSED},
+        "WIFI-GET-RSSI": {"TEST_TARGET": TestResult.PASSED},  # This one hangs after passing
+        "WIFI-CONNECT-DISCONNECT-REPEAT": {"TEST_TARGET": TestResult.PRIOR_TEST_CASE_CRASHED},
+        "WIFI-CONNECT-PARAMS-VALID-SECURE": {"TEST_TARGET": TestResult.PRIOR_TEST_CASE_CRASHED},
+        "WIFI-CONNECT-PARAMS-CHANNEL": {"TEST_TARGET": TestResult.PRIOR_TEST_CASE_CRASHED},
+        "WIFI-CONNECT-PARAMS-CHANNEL-FAIL": {"TEST_TARGET": TestResult.PRIOR_TEST_CASE_CRASHED},
+        "WIFI-CONNECT-SECURE-FAIL": {"TEST_TARGET": TestResult.PRIOR_TEST_CASE_CRASHED},
+        "WIFI_CONNECT_DISCONNECT_NONBLOCK": {"TEST_TARGET": TestResult.PRIOR_TEST_CASE_CRASHED},
+    }
+    actual_test_cases = db.get_test_details("test-mbed-connectivity-network-nanostack-wifi")
+    assert expected_test_cases == actual_test_cases
