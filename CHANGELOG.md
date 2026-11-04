@@ -20,6 +20,7 @@ A message that notes the main changes in the update.
 ### Deprecated
 
 ### Fixed
+- ResetReason API now works correctly on STM32H7 devices with the Arduino bootloader (e.g. Arduino Giga and Arduino Portenta H7)
 - Fixed assert failure due to double free in Nanostack Ethernet packet layer
 - Fixed pinmap error that occured when you powered down and then re-powered-up the CYW43xxx Wi-Fi driver (WhdSTAInterface)
 - Fixed spurious "Error setting semaphore" message when powering down CYW43xxx Wi-Fi driver
