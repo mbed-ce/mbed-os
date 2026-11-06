@@ -22,11 +22,21 @@
 /* Array of PORT peripheral base address. */
 static PORT_Type *const port_addrs[] = PORT_BASE_PTRS;
 
+const size_t num_ports = sizeof(port_addrs) / sizeof(port_addrs[0]);
+
+static void assert_valid_pin(PinName pin) {
+    // If someone passes an invalid PinName (e.g. DAC0_OUT), this would result in a crash / undefined behavior
+    // due to accessing past the end of port_addrs. Detect this and bail.
+    if ((size_t)(pin >> GPIO_PORT_SHIFT) >= num_ports) {
+        MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_GPIO, MBED_ERROR_CODE_INVALID_ARGUMENT), "Invalid PinName passed to pin_function()/pin_mode()!", pin);
+    }
+}
+
 void pin_function(PinName pin, int function)
 {
     MBED_ASSERT(pin != (PinName)NC);
+    assert_valid_pin(pin);
     clock_ip_name_t port_clocks[] = PORT_CLOCKS;
-
     CLOCK_EnableClock(port_clocks[pin >> GPIO_PORT_SHIFT]);
 
     PORT_SetPinMux(port_addrs[pin >> GPIO_PORT_SHIFT], pin & 0xFF, (port_mux_t)function);
@@ -35,28 +45,32 @@ void pin_function(PinName pin, int function)
 void pin_mode(PinName pin, PinMode mode)
 {
     MBED_ASSERT(pin != (PinName)NC);
+    assert_valid_pin(pin);
     uint32_t instance = pin >> GPIO_PORT_SHIFT;
     uint32_t pinName = pin & 0xFF;
     PORT_Type *base = port_addrs[instance];
     uint32_t reg = base->PCR[pinName];
 
-    switch (mode) {
-        case PullNone:
-            /* Write 0 to the PE, PS and ISF bits */
-            reg &= ~(PORT_PCR_PE_MASK | PORT_PCR_PS_MASK | PORT_PCR_ISF_MASK);
-            break;
-        case PullDown:
-            /* Write 0 to PS and ISF bits and 1 to the PE bit to enable the pull configuration */
-            reg &= ~(PORT_PCR_PS_MASK | PORT_PCR_ISF_MASK);
-            reg |= PORT_PCR_PE_MASK;
-            break;
-        case PullUp:
-            /* Write 0 ISF bit, 1 to the PE & PS bits to enable the pull up configuration */
-            reg &= ~(PORT_PCR_ISF_MASK);
-            reg |= (PORT_PCR_PE_MASK | PORT_PCR_PS_MASK);
-            break;
-        default:
-            break;
+    // Clear interrupt (for now)
+    reg &= ~(PORT_PCR_ISF_MASK);
+
+    if (mode & PullUp) {
+        /* Write 1 to the PE & PS bits to enable the pull up configuration */
+        reg |= (PORT_PCR_PE_MASK | PORT_PCR_PS_MASK);
+    }
+    else if (mode & PullDown) {
+        /* Write 0 to PS bit and 1 to the PE bit to enable the pull configuration */
+        reg &= ~PORT_PCR_PS_MASK;
+        reg |= PORT_PCR_PE_MASK;
+    }
+    else {
+        /* Write 0 to the PE and PS bits */
+        reg &= ~(PORT_PCR_PE_MASK | PORT_PCR_PS_MASK);
+    }
+
+    // Enable open-drain mode if requested
+    if (mode & OpenDrain) {
+        reg |= PORT_PCR_ODE_MASK;
     }
 
     base->PCR[pinName] = reg;

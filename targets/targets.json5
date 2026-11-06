@@ -5301,9 +5301,10 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "inherits": [
             "MCU_K64F",
         ],
-//        "overrides": {
+        "overrides": {
+            "default-adc-vref": 3.3,
 //            "network-default-interface-type": "ETHERNET"
-//        },
+        },
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/407/MFG_FRDM-K64F.JPG"
     },
     "SDT64B": {
