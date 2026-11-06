@@ -68,10 +68,12 @@ void pin_mode(PinName pin, PinMode mode)
         reg &= ~(PORT_PCR_PE_MASK | PORT_PCR_PS_MASK);
     }
 
-    // Enable open-drain mode if requested
+    // Enable open-drain mode if requested and supported
+#ifdef PORT_PCR_ODE_MASK
     if (mode & OpenDrain) {
         reg |= PORT_PCR_ODE_MASK;
     }
+#endif
 
     base->PCR[pinName] = reg;
 }
