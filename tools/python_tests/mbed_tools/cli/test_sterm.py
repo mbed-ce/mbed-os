@@ -60,9 +60,9 @@ def test_attempts_to_detect_device_if_no_port_given(mock_get_devices, mock_termi
 
 def test_attempts_to_find_connected_target_if_target_given(mock_find_device, mock_terminal):
     expected_port = "tty.k64f"
-    mock_find_device.return_value = mock.Mock(serial_port=expected_port, mbed_board=mock.Mock(board_type="K64F"))
+    mock_find_device.return_value = mock.Mock(serial_port=expected_port, mbed_board=mock.Mock(board_type="FRDM_K64F"))
 
-    CliRunner().invoke(sterm, ["-m", "K64F"])
+    CliRunner().invoke(sterm, ["-m", "FRDM_K64F"])
 
     mock_terminal.run.assert_called_once_with(expected_port, 9600, echo=True)
 
@@ -71,7 +71,7 @@ def test_returns_serial_port_for_first_device_detected_if_no_target_given(mock_g
     expected_port = "tty.k64f"
     mock_get_devices.return_value = mock.Mock(
         identified_devices=[
-            mock.Mock(serial_port=expected_port, mbed_board=mock.Mock(board_type="K64F")),
+            mock.Mock(serial_port=expected_port, mbed_board=mock.Mock(board_type="FRDM_K64F")),
             mock.Mock(serial_port="tty.disco", mbed_board=mock.Mock(board_type="DISCO")),
         ]
     )
@@ -83,9 +83,9 @@ def test_returns_serial_port_for_first_device_detected_if_no_target_given(mock_g
 
 def test_returns_serial_port_for_device_if_identifier_given(mock_find_device, mock_terminal):
     expected_port = "tty.k64f"
-    mock_find_device.return_value = mock.Mock(serial_port=expected_port, mbed_board=mock.Mock(board_type="K64F"))
+    mock_find_device.return_value = mock.Mock(serial_port=expected_port, mbed_board=mock.Mock(board_type="FRDM_K64F"))
 
-    CliRunner().invoke(sterm, ["-m", "K64F[1]"])
+    CliRunner().invoke(sterm, ["-m", "FRDM_K64F[1]"])
 
     mock_terminal.run.assert_called_once_with(expected_port, 9600, echo=True)
 
@@ -98,7 +98,7 @@ def test_raises_when_fails_to_find_default_device(mock_get_devices, mock_termina
 
 
 def test_not_run_if_target_identifier_not_int(mock_get_devices, mock_terminal):
-    target = "K64F[foo]"
+    target = "FRDM_K64F[foo]"
     CliRunner().invoke(sterm, ["-m", target], catch_exceptions=False)
     mock_get_devices.assert_not_called()
     mock_terminal.assert_not_called()

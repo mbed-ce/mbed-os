@@ -83,21 +83,6 @@ $ mbedhtrun -f /path/to/file/binary.bin -d D: -p COM4 --sync=0
 * `--sync=-1`- `__sync` packets will be sent unless we will reach timeout or proper response is sent from DUT.
 * `--sync=N` - Where N is integer > 0. Send up to N `__sync` packets to target platform. Response is sent unless we get response from target platform or timeout occurs.
 
-### Global Resource Manager connection
-
-Flash local file `/path/to/file/binary.bin` to remote device resource (platform `K64F`) provided by `remote_client` GRM service available on IP address `10.2.203.31` and port: `8000`. Force serial port connection to remote device `9600` with baudrate:
-
-```
-$ mbedhtrun -p :9600 -f /path/to/file/binary.bin -m K64F --grm remote_client:10.2.203.31:8000
-```
-
-Command line switch `--grm` has format: `<module_name>:<IP_address>:<port_number>`.
-  * `<module_name>` - name of Python module to load as remote resource manager.
-  * `<IP_address>` and `<port_number>` - IP address and port of remote resource manager.
-
-**Note**: Switch -m <platform_name> is required to tell Global Resource Management which platform to request.
-**Note**: Command line switch `--grm` implicitly forces `--skip-flashing` and `--skip-reset` because both flags are used for locally available DUTs.
-
 ### Fast Model connection
 
 This option is designed for htrun to use Arm Fast Models.

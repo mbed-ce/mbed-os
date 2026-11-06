@@ -13,8 +13,20 @@ UNRELEASED CHANGES - add all changes committed to Mbed here pending the next rel
 A message that notes the main changes in the update.
 
 ### Added
+- All Kinetis K-series and KWx1-series targets gained support for DMA SPI transfers. This used to only be implemented for K64F-based targets.
+- Flash API is now supported on Teensy4.0/4.1
 
 ### Changed
+- All MCUX SDK drivers for all NXP devices have been updated to the latest version
+- MCUX SDK drivers are now stored in an [external submodule](https://github.com/mbed-ce/mbed-mcux-sdk) which is only cloned when needed. This should reduce the size of the Mbed OS source tree by a fair amount.
+- Several targets renamed for parity with other Kinetis boards and overall consistency:
+  - `KL43Z` -&gt; `FRDM_KL43Z`
+  - `K64F` -&gt; `FRDM_K64F`
+  - `K66F` -&gt; `FRDM_K66F`
+  - `K22F` -&gt; `FRDM_K22F`
+  - `K82F` -&gt; `FRDM_K82F`
+  - `KW41Z` -&gt; `FRDM_KW41Z`
+  - `LPC546XX` -&gt; `LPCXPRESSO_54628`
 - Mbed now requires a Python version from 3.10 through 3.14 to compile. Python 3.8 and 3.9 are no longer supported.
   
 ### Deprecated
@@ -24,8 +36,10 @@ A message that notes the main changes in the update.
 - Fixed assert failure due to double free in Nanostack Ethernet packet layer
 - Fixed pinmap error that occured when you powered down and then re-powered-up the CYW43xxx Wi-Fi driver (WhdSTAInterface)
 - Fixed spurious "Error setting semaphore" message when powering down CYW43xxx Wi-Fi driver
+- All Kinetis board definitions now use the modern `ARDUINO_UNO` form factor instead of the deprecated `ARDUINO` form factor
 
 ### Removed
+- `LPC54114` target removed (due to low/no current usage and the high effort that would be required to update it)
 
 ### Security
 

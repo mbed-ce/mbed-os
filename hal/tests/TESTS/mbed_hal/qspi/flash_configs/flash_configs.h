@@ -59,10 +59,10 @@
 #elif defined(TARGET_EFM32GG11_STK3701)
 #include "SiliconLabs/EFM32GG11_STK3701/flash_config.h"
 
-#elif defined(TARGET_K82F)
+#elif defined(TARGET_FRDM_K82F)
 #include "NXP/K82F/flash_config.h"
 
-#elif defined(TARGET_LPC546XX)
+#elif defined(TARGET_LPCXPRESSO_54628)
 #include "NXP/LPC546XX/flash_config.h"
 
 #elif(  defined(TARGET_CY8CKIT_062_BLE) ||          \

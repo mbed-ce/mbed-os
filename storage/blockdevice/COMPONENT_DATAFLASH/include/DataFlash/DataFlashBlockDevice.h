@@ -43,7 +43,7 @@
 /** BlockDevice for DataFlash flash devices
  *
  *  @code
- *  // Here's an example using the AT45DB on the K64F
+ *  // Here's an example using the AT45DB on the FRDM_K64F
  *  #include "mbed.h"
  *  #include "DataFlashBlockDevice.h"
  *

@@ -44,7 +44,7 @@
              "spi-clk":  "PTD1",
              "spi-cs":   "PTD0"
         },
-        "KL43Z": {
+        "FRDM_KL43Z": {
              "spi-mosi": "PTD6",
              "spi-miso": "PTD7",
              "spi-clk":  "PTD5",
@@ -56,13 +56,13 @@
              "spi-clk":  "PTD5",
              "spi-cs":   "PTD4"
         },
-        "K64F": {
+        "FRDM_K64F": {
             "spi-cs": "PTE4",
             "spi-mosi": "PTE3",
             "spi-miso": "PTE1",
             "spi-clk": "PTE2"
         },
-        "K66F": {
+        "FRDM_K66F": {
              "spi-mosi": "PTE3",
              "spi-miso": "PTE1",
              "spi-clk":  "PTE2",

@@ -98,7 +98,7 @@ void sleep_usticker_test()
     TEST_ASSERT_TRUE(sleep_manager_can_deep_sleep());
 }
 
-#if DEVICE_LPTICKER
+#if DEVICE_LPTICKER && MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
 
 /* Test that wake-up time from sleep should be less than 10 ms and
  * low power ticker interrupt can wake-up target from sleep. */
@@ -268,7 +268,7 @@ void greentea_test_teardown(const size_t passed, const size_t failed, const fail
 
 Case cases[] = {
     Case("sleep - source of wake-up - us ticker", sleep_usticker_test, greentea_failure_handler),
-#if DEVICE_LPTICKER
+#if DEVICE_LPTICKER && MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP
     Case("deep-sleep - source of wake-up - lp ticker", deepsleep_lpticker_test, greentea_failure_handler),
     Case("deep-sleep - high-speed clocks are turned off", deepsleep_high_speed_clocks_turned_off_test, greentea_failure_handler),
 #endif

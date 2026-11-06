@@ -7,7 +7,7 @@
 #
 # 1. Download new bootloader from https://app.box.com/s/lyv3mug3dpt41g3uom0sfqyte3mn11sz (I got this from the PE Micro site)
 # 2. Disable Storage Service in services.msc (type services.msc into the start menu to open it). It can be reenabled after the bootloader is updated.
-#    This is to avoid a bug that happens with Windows 8+ and the original version of the bootloader (https://os.mbed.com/blog/entry/DAPLink-bootloader-update/).
+#    This is to avoid a bug that happens with Windows 8+ and the original version of the bootloader (https://web.archive.org/web/20260205040228/https://os.mbed.com/blog/entry/DAPLink-bootloader-update/).
 # 3. Update bootloader via this guide: https://mcuoneclipse.com/2014/11/01/illustrated-step-by-step-instructions-updating-the-freescale-freedom-board-firmware/
 #    Use the bootloader downloaded in step 1.
 #    Note that if you are seeing 8 green LED flashes when in bootloader mode, you are running into the bootloader bug!

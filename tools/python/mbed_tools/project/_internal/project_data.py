@@ -27,10 +27,6 @@ CUSTOM_TARGETS_JSON5_FILE_NAME = "custom_targets.json5"
 MBED_OS_REFERENCE_URL = "https://github.com/ARMmbed/mbed-os"
 MBED_OS_REFERENCE_ID = "master"
 
-# For some reason Mbed OS expects the default mbed_app.json to contain some target_overrides
-# for the K64F target. TODO: Find out why this wouldn't be defined in targets.json.
-DEFAULT_APP_CONFIG = {"target_overrides": {"K64F": {"platform.stdio-baud-rate": 9600}}}
-
 
 @dataclass
 class MbedProgramFiles:
