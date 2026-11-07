@@ -184,11 +184,14 @@ typedef enum {
 
 typedef enum {
     PullNone = 0,
-    PullDown = 1,
-    PullUp   = 2,
+    PullDown = 1 << 0,
+    PullUp   = 1 << 2,
+    OpenDrain = 1 << 3,
+    OpenDrainPullUp = (OpenDrain | PullUp),
+    OpenDrainPullDown = (OpenDrain | PullDown),
+    OpenDrainNoPull = OpenDrain,
     PullDefault = PullUp
 } PinMode;
-
 #ifdef __cplusplus
 }
 #endif
