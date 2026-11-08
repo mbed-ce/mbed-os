@@ -61,8 +61,8 @@ void us_ticker_init(void)
         PIT_GetDefaultConfig(&pitConfig);
         PIT_Init(US_TICKER_PIT_INSTANCE, &pitConfig);
 
-        PIT->CHANNEL[kPIT_Chnl_0].LDVAL = (busClock / 1000000) - 1;
-        PIT->CHANNEL[kPIT_Chnl_1].LDVAL = 0xFFFFFFFF;
+        US_TICKER_PIT_INSTANCE->CHANNEL[kPIT_Chnl_0].LDVAL = (busClock / 1000000) - 1;
+        US_TICKER_PIT_INSTANCE->CHANNEL[kPIT_Chnl_1].LDVAL = 0xFFFFFFFF;
         PIT_SetTimerChainMode(US_TICKER_PIT_INSTANCE, kPIT_Chnl_1, true);
         PIT_StartTimer(US_TICKER_PIT_INSTANCE, kPIT_Chnl_0);
         PIT_StartTimer(US_TICKER_PIT_INSTANCE, kPIT_Chnl_1);
