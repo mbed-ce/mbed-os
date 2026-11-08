@@ -43,8 +43,16 @@ extern "C" {
 #define US_PER_S 1000000
 
 #define FORCE_OVERFLOW_TEST (false)
+
+// Threshold in ticker ticks used for interrupt tests
 #define TICKER_INT_VAL 500
+
+#if TARGET_MCU_KINETIS
+// Kinetis MCUs have a rather slow us ticker schedule implementation that needs a bit more tolerance
+#define TICKER_DELTA 25
+#else
 #define TICKER_DELTA 10
+#endif
 
 #define LP_TICKER_OVERFLOW_DELTA1   0   // this will allow to detect that ticker counter rollovers to 0
 #define LP_TICKER_OVERFLOW_DELTA2   0
@@ -68,6 +76,7 @@ extern "C" {
 using namespace utest::v1;
 
 volatile int intFlag = 0;
+volatile uint32_t intFireTime;
 const ticker_interface_t *intf;
 ticker_irq_handler_type prev_irq_handler;
 /* Some targets might fail overflow test uncertainly due to getting trapped in busy
@@ -144,9 +153,11 @@ void ticker_event_handler_stub(const ticker_data_t *const ticker)
 {
     if (ticker == get_us_ticker_data()) {
         us_ticker_clear_interrupt();
+        intFireTime = us_ticker_read();
     } else {
 #if DEVICE_LPTICKER
         lp_ticker_clear_interrupt();
+        intFireTime = lp_ticker_read();
 #endif
     }
 
@@ -241,27 +252,44 @@ void ticker_interrupt_test(void)
 
         /* Set interrupt. Interrupt should be fired when tick count is equal to:
          * tick_count + ticker_timeout[i]. */
-        intf->set_interrupt(tick_count + ticker_timeout[i]);
+        uint32_t scheduledTime = tick_count + ticker_timeout[i];
+        intf->set_interrupt(scheduledTime);
 
         /* Wait until ticker count reach value: tick_count + ticker_timeout[i] - TICKER_DELTA.
          * Interrupt should not be fired. */
-        while (intf->read() < (tick_count + ticker_timeout[i] - TICKER_DELTA)) {
+        while (intf->read() < (scheduledTime - TICKER_DELTA)) {
             /* Indicate failure if interrupt has fired earlier. */
-            TEST_ASSERT_EQUAL_INT_MESSAGE(0, intFlag, "Interrupt fired too early");
+            if(intFlag) {
+                printf("Interrupt fired too early, at tick offset +%" PRIu32 ", should not have fired until +%" PRIu32 " (test started at %" PRIu32")\n",
+                intFireTime - tick_count, scheduledTime - tick_count, tick_count);
+                TEST_FAIL();
+            }
         }
 
+        bool tooLateFailure = false;
         /* Wait until ticker count reach value: tick_count + ticker_timeout[i] + TICKER_DELTA.
          * Interrupt should be fired after this time. */
         while (intf->read() < (tick_count + ticker_timeout[i] + TICKER_DELTA)) {
             /* Just wait. */
         }
 
-        TEST_ASSERT_EQUAL(1, intFlag);
+        if(!intFlag) {
+            tooLateFailure = true;
+        }
 
         /* Wait until ticker count reach value: tick_count + 2 * ticker_timeout[i] + TICKER_DELTA.
          * Interrupt should not be triggered again. */
         while (intf->read() < (tick_count + 2 * ticker_timeout[i] + TICKER_DELTA)) {
             /* Just wait. */
+        }
+
+        if(intFlag == 2) {
+            TEST_FAIL_MESSAGE("Interrupt fired again when it should not!");
+        }
+        else if(intFlag == 1 && tooLateFailure) {
+            printf("Interrupt fired too late, at tick offset +%" PRIu32 ", should have fired at +%" PRIu32 " (test started at %" PRIu32")\n",
+                intFireTime - tick_count, scheduledTime - tick_count, tick_count);
+            TEST_FAIL();
         }
 
         TEST_ASSERT_EQUAL(1, intFlag);
@@ -327,20 +355,33 @@ void ticker_repeat_reschedule_test(void)
 
     const uint32_t tick_count = intf->read();
 
+    const uint32_t first_scheduled_time = tick_count + TICKER_INT_VAL;
+    const uint32_t second_scheduled_time = tick_count + 2*TICKER_INT_VAL;
+    const uint32_t third_scheduled_time = tick_count + 3*TICKER_INT_VAL;
+
     /* Set interrupt. Interrupt should be fired when tick count is equal to:
      * tick_count + TICKER_INT_VAL. */
-    intf->set_interrupt(tick_count + TICKER_INT_VAL);
+    intf->set_interrupt(first_scheduled_time);
 
     /* Reschedule interrupt - it should not be fired yet.
      * Re-schedule interrupt. */
-    intf->set_interrupt(tick_count + (2 * TICKER_INT_VAL));
-    intf->set_interrupt(tick_count + (3 * TICKER_INT_VAL));
+    intf->set_interrupt(second_scheduled_time);
+    intf->set_interrupt(third_scheduled_time);
+    const uint32_t done_rescheduling_time = intf->read();
+
+    // Rescheduling the interrupts should have been able to happen before the original fire time.
+    // If not, TICKER_INT_VAL needs to be increased.
+    TEST_ASSERT(done_rescheduling_time < first_scheduled_time)
 
     /* Wait until ticker count reach value: tick_count + 3*TICKER_INT_VAL - TICKER_DELTA.
      * Interrupt should not be fired. */
     while (intf->read() < (tick_count + 3 * TICKER_INT_VAL - TICKER_DELTA)) {
         /* Indicate failure if interrupt has fired earlier. */
-        TEST_ASSERT_EQUAL_INT_MESSAGE(0, intFlag, "Interrupt fired too early");
+        if(intFlag) {
+            printf("Interrupt fired too early, at tick offset +%" PRIu32 ", should not have fired until +%" PRIu32 " (was originally scheduled at +%" PRIu32 ", test started at %" PRIu32", rescheduling took %" PRIu32" ticks)\n",
+                intFireTime - tick_count, third_scheduled_time - tick_count, first_scheduled_time - tick_count, tick_count, done_rescheduling_time - tick_count);
+            TEST_FAIL();
+        }
     }
 
     /* Wait until ticker count reach value: tick_count + 3*TICKER_INT_VAL + TICKER_DELTA.

@@ -5065,6 +5065,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "NXP",
             "MCUXpresso_MCUS",
             "KSDK2_MCUS",
+            "MCU_KINETIS"
         ],
         "macros": [
             "FSL_RTOS_MBED"
@@ -5132,7 +5133,8 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCUXpresso_MCUS",
             "KSDK2_MCUS",
             "FRDM",
-            "FRAMEWORK_5_3_3"
+            "FRAMEWORK_5_3_3",
+            "MCU_KINETIS"
         ],
         "macros": [
             "FSL_RTOS_MBED",
@@ -5198,6 +5200,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "Freescale",
             "NXP",
             "MCUXpresso_MCUS",
+            "MCU_KINETIS"
         ],
         "is_mcu_family_target": true,
         "public": false,

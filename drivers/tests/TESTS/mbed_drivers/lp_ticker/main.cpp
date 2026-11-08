@@ -18,7 +18,7 @@
 #include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"
-
+#include <cinttypes>
 
 #if !DEVICE_LPTICKER
 #error [NOT_SUPPORTED] Low power ticker not supported for this target
@@ -184,6 +184,9 @@ void test_attach_time(void)
     ticker.detach();
     const auto time_diff = gtimer.elapsed_time();
 
+    printf("Set delay for %" PRIi64 " ms, actually slept for %" PRIi64 " us.\n",
+        std::chrono::milliseconds(delay).count(), time_diff.count());
+
     TEST_ASSERT_DURATION_WITHIN(TOLERANCE(delay), delay, time_diff);
 }
 
@@ -204,7 +207,7 @@ utest::v1::status_t greentea_test_setup(const size_t number_of_cases)
     return utest::v1::greentea_test_setup_handler(number_of_cases);
 }
 
-utest::v1::Specification specification(greentea_test_setup, cases, utest::v1::greentea_test_teardown_handler);
+utest::v1::Specification specification(greentea_test_setup, cases, utest::v1::greentea_test_teardown_handler, utest::v1::greentea_continue_handlers);
 
 int main()
 {

@@ -68,7 +68,7 @@ const clock_config_t g_defaultClockConfigVlpr = {
     .simConfig =
         {
             .er32kSrc = 0U,         /* ERCLK32K selection, use OSC. */
-            .clkdiv1 = 0x00040000U, /* SIM_CLKDIV1. */
+            .clkdiv1 = 0x00040000U, /* SIM_CLKDIV1. OUTDIV1=1, OUTDIV4=5 */
         },
     .oscConfig =
         {
@@ -87,15 +87,18 @@ const clock_config_t g_defaultClockConfigRun = {
             .ircs = kMCG_IrcFast,                /* Select IRC4M. */
             .fcrdiv = 0U,                        /* FCRDIV is 0. */
 
-            .frdiv = 5U,
+            .frdiv = 5U, // FLL input clock = 32MHz / 1024 = 31.25kHz
             .drs = kMCG_DrsMid,         /* Middle frequency range */
-            .dmx32 = kMCG_Dmx32Default, /* DCO has a default range of 25% */
-            .oscsel = kMCG_OscselOsc,   /* Select OSC */
+
+            // FLL factor = 1280, FLL output clock = 31.25kHz * 1280 = 40MHz
+            .dmx32 = kMCG_Dmx32Default,
+
+            .oscsel = kMCG_OscselOsc,   /* Select OSC, not RTC OSC */
         },
     .simConfig =
         {
             .er32kSrc = 0U,         /* ERCLK32K selection, use OSC. */
-            .clkdiv1 = 0x00010000U, /* SIM_CLKDIV1. */
+            .clkdiv1 = 0x00010000U, /* SIM_CLKDIV1. OUTDIV1=1, OUTDIV4=2 */
         },
     .oscConfig =
         {
