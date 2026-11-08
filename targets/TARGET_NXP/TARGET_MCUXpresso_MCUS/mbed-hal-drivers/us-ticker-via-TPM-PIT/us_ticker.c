@@ -40,8 +40,8 @@ static bool us_ticker_inited = false;
 static volatile uint32_t us_ticker_int_counter = 0;
 static volatile uint16_t us_ticker_int_remainder = 0;
 
-// Selected prescaler for the TPM clock. With the bus clock in the range
-// of ~20-50MHz, this gets TPM ticks at about 1-3 us.
+// Selected prescaler for the TPM clock. With the clock in the range
+// of ~16-32MHz, this gets TPM ticks at 1-2 us.
 const tpm_clock_prescale_t TPM_PRESCALER_SELECT = kTPM_Prescale_Divide_16;
 const uint32_t TPM_PRESCALER_VAL = 16;
 
