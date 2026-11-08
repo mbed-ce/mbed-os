@@ -259,9 +259,9 @@ void ticker_interrupt_test(void)
          * Interrupt should not be fired. */
         while (intf->read() < (scheduledTime - TICKER_DELTA)) {
             /* Indicate failure if interrupt has fired earlier. */
-            if(intFlag) {
+            if (intFlag) {
                 printf("Interrupt fired too early, at tick offset +%" PRIu32 ", should not have fired until +%" PRIu32 " (test started at %" PRIu32")\n",
-                intFireTime - tick_count, scheduledTime - tick_count, tick_count);
+                       intFireTime - tick_count, scheduledTime - tick_count, tick_count);
                 TEST_FAIL();
             }
         }
@@ -273,7 +273,7 @@ void ticker_interrupt_test(void)
             /* Just wait. */
         }
 
-        if(!intFlag) {
+        if (!intFlag) {
             tooLateFailure = true;
         }
 
@@ -283,12 +283,11 @@ void ticker_interrupt_test(void)
             /* Just wait. */
         }
 
-        if(intFlag == 2) {
+        if (intFlag == 2) {
             TEST_FAIL_MESSAGE("Interrupt fired again when it should not!");
-        }
-        else if(intFlag == 1 && tooLateFailure) {
+        } else if (intFlag == 1 && tooLateFailure) {
             printf("Interrupt fired too late, at tick offset +%" PRIu32 ", should have fired at +%" PRIu32 " (test started at %" PRIu32")\n",
-                intFireTime - tick_count, scheduledTime - tick_count, tick_count);
+                   intFireTime - tick_count, scheduledTime - tick_count, tick_count);
             TEST_FAIL();
         }
 
@@ -356,8 +355,8 @@ void ticker_repeat_reschedule_test(void)
     const uint32_t tick_count = intf->read();
 
     const uint32_t first_scheduled_time = tick_count + TICKER_INT_VAL;
-    const uint32_t second_scheduled_time = tick_count + 2*TICKER_INT_VAL;
-    const uint32_t third_scheduled_time = tick_count + 3*TICKER_INT_VAL;
+    const uint32_t second_scheduled_time = tick_count + 2 * TICKER_INT_VAL;
+    const uint32_t third_scheduled_time = tick_count + 3 * TICKER_INT_VAL;
 
     /* Set interrupt. Interrupt should be fired when tick count is equal to:
      * tick_count + TICKER_INT_VAL. */
@@ -377,9 +376,9 @@ void ticker_repeat_reschedule_test(void)
      * Interrupt should not be fired. */
     while (intf->read() < (tick_count + 3 * TICKER_INT_VAL - TICKER_DELTA)) {
         /* Indicate failure if interrupt has fired earlier. */
-        if(intFlag) {
+        if (intFlag) {
             printf("Interrupt fired too early, at tick offset +%" PRIu32 ", should not have fired until +%" PRIu32 " (was originally scheduled at +%" PRIu32 ", test started at %" PRIu32", rescheduling took %" PRIu32" ticks)\n",
-                intFireTime - tick_count, third_scheduled_time - tick_count, first_scheduled_time - tick_count, tick_count, done_rescheduling_time - tick_count);
+                   intFireTime - tick_count, third_scheduled_time - tick_count, first_scheduled_time - tick_count, tick_count, done_rescheduling_time - tick_count);
             TEST_FAIL();
         }
     }

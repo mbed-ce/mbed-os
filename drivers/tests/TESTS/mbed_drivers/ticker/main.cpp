@@ -282,7 +282,7 @@ void test_attach_time(void)
     const auto time_diff = gtimer.elapsed_time();
 
     printf("Set delay for %" PRIi64 " ms, actually slept for %" PRIi64 " us.\n",
-        std::chrono::milliseconds(delay).count(), time_diff.count());
+           std::chrono::milliseconds(delay).count(), time_diff.count());
 
     TEST_ASSERT_DURATION_WITHIN(TOLERANCE, delay, time_diff);
 }
