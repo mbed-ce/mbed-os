@@ -21,11 +21,15 @@
 #include "fsl_pit.h"
 #include "fsl_tpm.h"
 #include "fsl_clock_config.h"
+#include "mbed_interface.h"
+
+// Defined in mbed_overrides.c
+extern uint32_t tpm_get_clock();
 
 const ticker_info_t* us_ticker_get_info()
 {
     static const ticker_info_t info = {
-        3000000,
+        1000000,
         32
     };
     return &info;
@@ -33,8 +37,13 @@ const ticker_info_t* us_ticker_get_info()
 
 static bool us_ticker_inited = false;
 
-static uint32_t us_ticker_int_counter = 0;
-static uint16_t us_ticker_int_remainder = 0;
+static volatile uint32_t us_ticker_int_counter = 0;
+static volatile uint16_t us_ticker_int_remainder = 0;
+
+// Selected prescaler for the TPM clock. With the clock in the range
+// of ~16-32MHz, this gets TPM ticks at 1-2 us.
+const tpm_clock_prescale_t TPM_PRESCALER_SELECT = kTPM_Prescale_Divide_16;
+const uint32_t TPM_PRESCALER_VAL = 16;
 
 static void tpm_isr(void)
 {
@@ -59,10 +68,11 @@ static void tpm_isr(void)
     }
 }
 
+static uint32_t tpmClock;
+
 void us_ticker_init(void)
 {
-    /* Common for ticker/timer. */
-    uint32_t busClock;
+
     /* Structure to initialize PIT. */
     pit_config_t pitConfig;
 
@@ -75,10 +85,11 @@ void us_ticker_init(void)
     PIT_GetDefaultConfig(&pitConfig);
     PIT_Init(PIT, &pitConfig);
 
-    busClock = CLOCK_GetFreq(kCLOCK_BusClk);
+    uint32_t busClock = CLOCK_GetFreq(kCLOCK_BusClk);
+    tpmClock = tpm_get_clock();
 
-    PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, (busClock / 3000000) - 1);
-    PIT_SetTimerPeriod(PIT, kPIT_Chnl_1, 0xFFFFFFFF);
+    PIT->CHANNEL[kPIT_Chnl_0].LDVAL = (busClock / 1000000) - 1;
+    PIT->CHANNEL[kPIT_Chnl_1].LDVAL = 0xFFFFFFFF;
     PIT_SetTimerChainMode(PIT, kPIT_Chnl_1, true);
     PIT_StartTimer(PIT, kPIT_Chnl_0);
     PIT_StartTimer(PIT, kPIT_Chnl_1);
@@ -87,8 +98,8 @@ void us_ticker_init(void)
     tpm_config_t tpmConfig;
 
     TPM_GetDefaultConfig(&tpmConfig);
-    /* Set to Div 16 to get 3MHz clock source for TPM */
-    tpmConfig.prescale = kTPM_Prescale_Divide_16;
+    /* Set to Div 16 to get needed clock source for TPM */
+    tpmConfig.prescale = TPM_PRESCALER_SELECT;
     TPM_Init(TPM2, &tpmConfig);
     NVIC_SetVector(TPM2_IRQn, (uint32_t)tpm_isr);
     NVIC_EnableIRQ(TPM2_IRQn);
@@ -122,16 +133,19 @@ void us_ticker_set_interrupt(timestamp_t timestamp)
     uint32_t delta_ticks =
             timestamp >= now_ticks ? timestamp - now_ticks : (uint32_t)((uint64_t) timestamp + 0xFFFFFFFF - now_ticks);
 
-    if (delta_ticks == 0) {
-        /* The requested delay is less than the minimum resolution of this counter. */
-        delta_ticks = 1;
-    }
+    const uint32_t delta_us = (delta_ticks * US_TICKER_PERIOD_NUM) / US_TICKER_PERIOD_DEN;
+    uint64_t delta_tpm_counts = (((uint64_t)delta_us) * (tpmClock / TPM_PRESCALER_VAL) / 1000000);
 
-    us_ticker_int_counter   = (uint32_t)(delta_ticks >> 16);
-    us_ticker_int_remainder = (uint16_t)(0xFFFF & delta_ticks);
+    if (delta_tpm_counts == 0) {
+        /* The requested delay is less than the minimum resolution of this counter. */
+        delta_tpm_counts = 1;
+    }
 
     TPM_StopTimer(TPM2);
     TPM2->CNT = 0;
+
+    us_ticker_int_counter   = (uint32_t)(delta_tpm_counts >> 16);
+    us_ticker_int_remainder = (uint16_t)(0xFFFF & delta_tpm_counts);
 
     if (us_ticker_int_counter > 0) {
         TPM2->MOD = 0xFFFF;
@@ -157,5 +171,5 @@ void us_ticker_fire_interrupt(void)
 
 void us_ticker_free(void)
 {
-
+    TPM_StopTimer(TPM2);
 }

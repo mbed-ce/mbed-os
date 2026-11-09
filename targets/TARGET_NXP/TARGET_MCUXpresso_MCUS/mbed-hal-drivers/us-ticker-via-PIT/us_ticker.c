@@ -61,8 +61,8 @@ void us_ticker_init(void)
         PIT_GetDefaultConfig(&pitConfig);
         PIT_Init(US_TICKER_PIT_INSTANCE, &pitConfig);
 
-        PIT_SetTimerPeriod(US_TICKER_PIT_INSTANCE, kPIT_Chnl_0, busClock / 1000000 - 1);
-        PIT_SetTimerPeriod(US_TICKER_PIT_INSTANCE, kPIT_Chnl_1, 0xFFFFFFFF);
+        US_TICKER_PIT_INSTANCE->CHANNEL[kPIT_Chnl_0].LDVAL = (busClock / 1000000) - 1;
+        US_TICKER_PIT_INSTANCE->CHANNEL[kPIT_Chnl_1].LDVAL = 0xFFFFFFFF;
         PIT_SetTimerChainMode(US_TICKER_PIT_INSTANCE, kPIT_Chnl_1, true);
         PIT_StartTimer(US_TICKER_PIT_INSTANCE, kPIT_Chnl_0);
         PIT_StartTimer(US_TICKER_PIT_INSTANCE, kPIT_Chnl_1);
@@ -71,7 +71,7 @@ void us_ticker_init(void)
     /* Configure interrupt generation counters and disable ticker interrupts. */
     PIT_StopTimer(US_TICKER_PIT_INSTANCE, kPIT_Chnl_3);
     PIT_StopTimer(US_TICKER_PIT_INSTANCE, kPIT_Chnl_2);
-    PIT_SetTimerPeriod(US_TICKER_PIT_INSTANCE, kPIT_Chnl_2, busClock / 1000000 - 1);
+    PIT_SetTimerPeriod(US_TICKER_PIT_INSTANCE, kPIT_Chnl_2, busClock / 1000000);
     PIT_SetTimerChainMode(US_TICKER_PIT_INSTANCE, kPIT_Chnl_3, true);
     PIT_ClearStatusFlags(US_TICKER_PIT_INSTANCE, kPIT_Chnl_3, PIT_TFLG_TIF_MASK);
     NVIC_SetVector(US_TICKER_PIT_IRQ, (uint32_t) pit_isr);

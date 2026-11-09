@@ -38,6 +38,7 @@ A message that notes the main changes in the update.
 - Fixed pinmap error that occured when you powered down and then re-powered-up the CYW43xxx Wi-Fi driver (WhdSTAInterface)
 - Fixed spurious "Error setting semaphore" message when powering down CYW43xxx Wi-Fi driver
 - All Kinetis board definitions now use the modern `ARDUINO_UNO` form factor instead of the deprecated `ARDUINO` form factor
+- KL43: Fix speed of us ticker (3MHz) not matching value of `US_TICKER_PERIOD_DEN` constant. This caused inconsistencies such as `wait_us()` not waiting the correct amount of time.
 
 ### Removed
 - `LPC54114` target removed (due to low/no current usage and the high effort that would be required to update it)
