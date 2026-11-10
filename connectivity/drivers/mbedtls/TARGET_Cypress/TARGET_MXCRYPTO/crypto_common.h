@@ -39,6 +39,17 @@
 
 #include "cyhal_crypto_common.h"
 
+/* Compatibility checks for Mbed TLS 3. */
+#if !defined(MBEDTLS_INTERNAL_VALIDATE_RET)
+#define MBEDTLS_INTERNAL_VALIDATE_RET(cond, ret) \
+    do { if (!(cond)) { return (ret); } } while (0)
+#endif
+
+#if !defined(MBEDTLS_INTERNAL_VALIDATE)
+#define MBEDTLS_INTERNAL_VALIDATE(cond) \
+    do { if (!(cond)) { return; } } while (0)
+#endif
+
 /** CRYPTO object */
 typedef struct {
 #if defined(CY_IP_MXCRYPTO_INSTANCES) || defined(CPUSS_CRYPTO_PRESENT)

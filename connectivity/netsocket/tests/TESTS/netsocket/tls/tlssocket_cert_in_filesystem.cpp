@@ -47,5 +47,6 @@ void TLSSOCKET_CERT_IN_FILESYSTEM()
     SocketAddress a;
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, get_network_interface()->gethostbyname(ECHO_SERVER_ADDR, &a));
     a.set_port(ECHO_SERVER_PORT_TLS);
+    sock.set_hostname(ECHO_SERVER_ADDR);
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock.connect(a));
 }

@@ -42,8 +42,8 @@ static SingletonPtr<rtos::Mutex> sha256_mutex;
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 #define SHA256_VALIDATE_RET(cond)                           \
-    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_SHA256_BAD_INPUT_DATA )
-#define SHA256_VALIDATE(cond)  MBEDTLS_INTERNAL_VALIDATE( cond )
+    do { if (!(cond)) { return MBEDTLS_ERR_SHA256_BAD_INPUT_DATA; } } while (0)
+#define SHA256_VALIDATE(cond)  do { if (!(cond)) { return; } } while (0)
 
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -90,7 +90,7 @@ void mbedtls_sha256_clone(mbedtls_sha256_context *dst,
     *dst = *src;
 }
 
-int mbedtls_sha256_starts_ret(mbedtls_sha256_context *ctx, int is224)
+int mbedtls_sha256_starts(mbedtls_sha256_context *ctx, int is224)
 {
     int ret = 0;
 
@@ -177,7 +177,7 @@ exit :
     return (ret);
 }
 
-int mbedtls_sha256_update_ret(mbedtls_sha256_context *ctx,
+int mbedtls_sha256_update(mbedtls_sha256_context *ctx,
                               const unsigned char *input,
                               size_t ilen)
 {
@@ -266,8 +266,8 @@ exit :
     return (ret);
 }
 
-int mbedtls_sha256_finish_ret(mbedtls_sha256_context *ctx,
-                              unsigned char output[32])
+int mbedtls_sha256_finish(mbedtls_sha256_context *ctx,
+                              unsigned char *output)
 {
     int ret = 0;
 

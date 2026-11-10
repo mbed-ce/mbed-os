@@ -105,7 +105,7 @@ void mbedtls_sha1_clone(mbedtls_sha1_context *dst,
 /*
  * SHA-1 context setup
  */
-int mbedtls_sha1_starts_ret(mbedtls_sha1_context *ctx)
+int mbedtls_sha1_starts(mbedtls_sha1_context *ctx)
 {
     if (ctx->active_ctx == &ctx->hw_ctx) {
         mbedtls_sha1_hw_starts(&ctx->hw_ctx);
@@ -118,7 +118,7 @@ int mbedtls_sha1_starts_ret(mbedtls_sha1_context *ctx)
 /*
  * SHA-1 process buffer
  */
-int mbedtls_sha1_update_ret(mbedtls_sha1_context *ctx, const unsigned char *input, size_t ilen)
+int mbedtls_sha1_update(mbedtls_sha1_context *ctx, const unsigned char *input, size_t ilen)
 {
     if (ctx->active_ctx == &ctx->hw_ctx) {
         mbedtls_sha1_hw_update(&ctx->hw_ctx, input, ilen);
@@ -131,7 +131,7 @@ int mbedtls_sha1_update_ret(mbedtls_sha1_context *ctx, const unsigned char *inpu
 /*
  * SHA-1 final digest
  */
-int mbedtls_sha1_finish_ret(mbedtls_sha1_context *ctx, unsigned char output[20])
+int mbedtls_sha1_finish(mbedtls_sha1_context *ctx, unsigned char output[20])
 {
     if (ctx->active_ctx == &ctx->hw_ctx) {
         mbedtls_sha1_hw_finish(&ctx->hw_ctx, output);

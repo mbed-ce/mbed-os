@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else
@@ -56,7 +58,7 @@
 #define ECP_SHORTWEIERSTRASS
 
 #include "mbedtls/platform.h"
-#include "mbedtls/ecp_internal.h"
+#include "ecp_internal_alt.h"
 #include "mbed_toolchain.h"
 #include "mbed_assert.h"
 #include "mbed_error.h"
@@ -499,7 +501,7 @@ NU_STATIC int internal_run_eccop(const mbedtls_ecp_group *grp,
     
     /* Check supported maximum key bits */
     if (grp->pbits > NU_ECC_MAXKEYBITS) {
-        return MBEDTLS_ERR_PLATFORM_FEATURE_UNSUPPORTED;
+        return MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
     }
 
     /* NOTE: Engine doesn't support P + Q when P and Q are the same. Workaround by 2*P */
@@ -699,7 +701,7 @@ NU_STATIC int internal_run_modop(mbedtls_mpi *r,
     
     /* Check supported maximum key bits */
     if (pbits > NU_ECC_MAXKEYBITS) {
-        return MBEDTLS_ERR_PLATFORM_FEATURE_UNSUPPORTED;
+        return MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE;
     }
     
     /* Check MODOP operations are legal */

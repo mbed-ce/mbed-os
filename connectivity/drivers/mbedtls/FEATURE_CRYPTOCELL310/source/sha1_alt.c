@@ -22,6 +22,7 @@
 #if defined(MBEDTLS_SHA1_ALT)
 #include <string.h>
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 
 void mbedtls_sha1_init( mbedtls_sha1_context *ctx )
 {
@@ -44,7 +45,7 @@ void mbedtls_sha1_clone( mbedtls_sha1_context *dst,
     memcpy( dst, src, sizeof( mbedtls_sha1_context ) );
 }
 
-int mbedtls_sha1_starts_ret( mbedtls_sha1_context *ctx )
+int mbedtls_sha1_starts( mbedtls_sha1_context *ctx )
 {
     if( CRYS_HASH_Init( &ctx->crys_hash_ctx, CRYS_HASH_SHA1_mode ) != CRYS_OK )
             return ( MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED );
@@ -52,7 +53,7 @@ int mbedtls_sha1_starts_ret( mbedtls_sha1_context *ctx )
 }
 
 
-int mbedtls_sha1_update_ret( mbedtls_sha1_context *ctx,
+int mbedtls_sha1_update( mbedtls_sha1_context *ctx,
                              const unsigned char *input,
                              size_t ilen )
 {
@@ -61,7 +62,7 @@ int mbedtls_sha1_update_ret( mbedtls_sha1_context *ctx,
     return ( 0 );
 }
 
-int mbedtls_sha1_finish_ret( mbedtls_sha1_context *ctx,
+int mbedtls_sha1_finish( mbedtls_sha1_context *ctx,
                              unsigned char output[20] )
 {
     CRYSError_t crys_err = CRYS_OK;

@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 
 static int aes_set_key(mbedtls_aes_context *ctx, const unsigned char *key, unsigned int keybits)
 {

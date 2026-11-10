@@ -35,6 +35,7 @@
 
 #include "mbedtls/sha512.h"
 #include "mbedtls/platform_util.h"
+#include "crypto_common.h"
 
 #include <string.h>
 
@@ -71,7 +72,7 @@ void mbedtls_sha512_clone( mbedtls_sha512_context *dst, const mbedtls_sha512_con
 /*
  * SHA-512 context setup
  */
-int mbedtls_sha512_starts_ret( mbedtls_sha512_context *ctx, int is384)
+int mbedtls_sha512_starts( mbedtls_sha512_context *ctx, int is384)
 {
     SHA512_VALIDATE_RET( ctx != NULL );
     SHA512_VALIDATE_RET( is384 == 0 || is384 == 1 );
@@ -84,7 +85,7 @@ int mbedtls_sha512_starts_ret( mbedtls_sha512_context *ctx, int is384)
 /*
  * SHA-512 process buffer
  */
-int mbedtls_sha512_update_ret( mbedtls_sha512_context *ctx, const unsigned char *input, size_t ilen )
+int mbedtls_sha512_update( mbedtls_sha512_context *ctx, const unsigned char *input, size_t ilen )
 {
     SHA512_VALIDATE_RET( ctx != NULL );
     SHA512_VALIDATE_RET( ilen == 0 || input != NULL );
@@ -98,7 +99,7 @@ int mbedtls_sha512_update_ret( mbedtls_sha512_context *ctx, const unsigned char 
 /*
  * SHA-512 final digest
  */
-int mbedtls_sha512_finish_ret( mbedtls_sha512_context *ctx, unsigned char output[64] )
+int mbedtls_sha512_finish( mbedtls_sha512_context *ctx, unsigned char *output )
 {
     SHA512_VALIDATE_RET( ctx != NULL );
     SHA512_VALIDATE_RET( (unsigned char *)output != NULL );

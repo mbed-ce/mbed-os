@@ -17,7 +17,8 @@
 #include "ns_types.h"
 #include "arm_hal_random.h"
 
-#include "mbedtls/entropy_poll.h"
+#include "mbedtls/build_info.h"
+#include "mbed_trng.h"
 
 #ifdef MBEDTLS_ENTROPY_HARDWARE_ALT
 #if defined(MBEDTLS_PLATFORM_C)

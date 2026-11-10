@@ -27,6 +27,7 @@
 #include "crys_ecpki_domain.h"
 #include "crys_ec_edw_api.h"
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 #include "mbedtls/platform_util.h"
 #include "cc_internal.h"
 
@@ -275,7 +276,7 @@ int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
             goto cleanup;
         }
 
-        MBEDTLS_MPI_CHK( mbedtls_ecp_group_load( &ctx->grp, gid ) );
+        MBEDTLS_MPI_CHK( mbedtls_ecp_group_load( &ctx->MBEDTLS_PRIVATE(grp), gid ) );
 
         CrysRet = CRYS_ECPKI_ExportPublKey( &kgParams->pubKey, CRYS_EC_PointUncompressed, temp_buf,  &key_size );
         if ( CrysRet != CRYS_OK )
@@ -284,15 +285,15 @@ int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
             goto cleanup;
         }
 
-        ret = mbedtls_ecp_point_read_binary( &ctx->grp, &ctx->Q, temp_buf, key_size );
+        ret = mbedtls_ecp_point_read_binary( &ctx->MBEDTLS_PRIVATE(grp), &ctx->MBEDTLS_PRIVATE(Q), temp_buf, key_size );
         if ( ret != 0 )
             goto cleanup;
 
         memset ( temp_buf, 0 , sizeof(temp_buf) );
 
-        CrysRet = CRYS_COMMON_ConvertLswMswWordsToMsbLsbBytes( temp_buf, (ctx->grp.nbits+7)/8,
+        CrysRet = CRYS_COMMON_ConvertLswMswWordsToMsbLsbBytes( temp_buf, (ctx->MBEDTLS_PRIVATE(grp).nbits+7)/8,
                                                                kgParams->privKey.PrivKeyDbBuff,
-                                                               4*((((ctx->grp.nbits+7)/8)+3)/4) );
+                                                               4*((((ctx->MBEDTLS_PRIVATE(grp).nbits+7)/8)+3)/4) );
         if ( CrysRet != CRYS_OK )
         {
             ret = convert_CrysError_to_mbedtls_err( CrysRet );
@@ -300,7 +301,7 @@ int mbedtls_ecdsa_genkey( mbedtls_ecdsa_context *ctx, mbedtls_ecp_group_id gid,
             goto cleanup;
         }
 
-        ret = mbedtls_mpi_read_binary( &ctx->d, temp_buf, (ctx->grp.nbits+7)/8 );
+        ret = mbedtls_mpi_read_binary( &ctx->MBEDTLS_PRIVATE(d), temp_buf, (ctx->MBEDTLS_PRIVATE(grp).nbits+7)/8 );
         mbedtls_platform_zeroize( temp_buf, sizeof(temp_buf) );
         if ( ret != 0 )
         {

@@ -22,6 +22,7 @@
 #if defined(MBEDTLS_SHA256_ALT)
 #include <string.h>
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 
 void mbedtls_sha256_init( mbedtls_sha256_context *ctx )
 {
@@ -43,7 +44,7 @@ void mbedtls_sha256_clone( mbedtls_sha256_context *dst,
 }
 
 
-int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224 )
+int mbedtls_sha256_starts( mbedtls_sha256_context *ctx, int is224 )
 {
     if(CRYS_HASH_Init( &ctx->crys_hash_ctx, is224 ?
                     CRYS_HASH_SHA224_mode : CRYS_HASH_SHA256_mode ) != CRYS_OK )
@@ -57,7 +58,7 @@ int mbedtls_internal_sha256_process( mbedtls_sha256_context *ctx,
     return( MBEDTLS_ERR_PLATFORM_FEATURE_UNSUPPORTED );
 }
 
-int mbedtls_sha256_update_ret( mbedtls_sha256_context *ctx,
+int mbedtls_sha256_update( mbedtls_sha256_context *ctx,
                                const unsigned char *input,
                                size_t ilen )
 {
@@ -66,7 +67,7 @@ int mbedtls_sha256_update_ret( mbedtls_sha256_context *ctx,
     return ( 0 );
 }
 
-int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx,
+int mbedtls_sha256_finish( mbedtls_sha256_context *ctx,
                                unsigned char output[32] )
 {
     CRYSError_t crys_err = CRYS_OK;
@@ -81,4 +82,3 @@ int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx,
         return ( MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED );
 }
 #endif //MBEDTLS_SHA256_ALT
-

@@ -8,6 +8,8 @@ elseif("MXCRYPTO_02" IN_LIST MBED_TARGET_LABELS)
 endif()
 
 target_include_directories(mbed-mbedtls
+    PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/../../../../mbedtls/source
     PUBLIC
         .
 )

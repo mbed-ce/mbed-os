@@ -36,6 +36,7 @@
 #include <string.h>
 
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 #include "mbedtls/platform_util.h"
 
 #include "rtos/Mutex.h"
@@ -45,11 +46,11 @@ static SingletonPtr<rtos::Mutex> aes_mutex;
 
 #define MBEDTLS_DEBUG 0
 
-/* Parameter validation macros based on platform_util.h */
+/* Parameter validation macros */
 #define AES_VALIDATE_RET( cond )    \
-    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_AES_BAD_INPUT_DATA )
+    do { if (!(cond)) { return MBEDTLS_ERR_AES_BAD_INPUT_DATA; } } while (0)
 #define AES_VALIDATE( cond )        \
-    MBEDTLS_INTERNAL_VALIDATE( cond )
+    do { if (!(cond)) { return; } } while (0)
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
