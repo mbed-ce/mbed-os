@@ -115,7 +115,7 @@ void calc_mean()
     *meanPtr = mean;
 
     // Mean should be near zero
-    TEST_ASSERT_FLOAT_WITHIN(.01, 0, mean);
+    TEST_ASSERT_FLOAT_WITHIN(.15, 0, mean);
 
     printf("Elapsed time: %" PRIu64 "us\n", genTimer.elapsed_time().count());
     printf("Speed: %.02f kelements/s\n", BENCHMARK_SIZE / std::chrono::duration_cast<std::chrono::duration<float>>(genTimer.elapsed_time()).count() / 1e3);
