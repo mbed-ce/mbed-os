@@ -38,10 +38,6 @@ struct port_s {
     uint32_t mask;
 };
 
-struct pwmout_s {
-    PWMName pwm_name;
-};
-
 struct serial_s {
     int index;
 };

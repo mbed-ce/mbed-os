@@ -18,6 +18,7 @@
 #include "pinmap.h"
 #include "mbed_error.h"
 #include "fsl_common.h"
+#include "PeripheralNames.h"
 
 void pin_function(PinName pin, int function)
 {
@@ -34,7 +35,7 @@ void pin_function(PinName pin, int function)
     IOCON->PIO[port_number][pin_number] |= IOCON_PIO_DIGIMODE_MASK;
 
     reg = IOCON->PIO[port_number][pin_number];
-    reg = (reg & ~IOCON_PIO_FUNC_MASK) | (function & IOCON_PIO_FUNC_MASK);
+    reg = (reg & ~IOCON_PIO_FUNC_MASK) | (function & MBED_LPC_PIN_FUNCTION_FUNC_Msk);
     IOCON->PIO[port_number][pin_number] = reg;
 }
 
