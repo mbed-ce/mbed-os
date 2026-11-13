@@ -43,46 +43,46 @@ static void _i2c_init_direct(i2c_t *obj, const i2c_pinmap_t *pinmap)
     i2c_master_config_t master_config;
 
     switch (obj->i2c.instance) {
-        case 0:
+        case Flexcomm0:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM0);
             RESET_PeripheralReset(kFC0_RST_SHIFT_RSTn);
             break;
-        case 1:
+        case Flexcomm1:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM1);
             RESET_PeripheralReset(kFC1_RST_SHIFT_RSTn);
             break;
-        case 2:
+        case Flexcomm2:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM2);
             RESET_PeripheralReset(kFC2_RST_SHIFT_RSTn);
             break;
-        case 3:
+        case Flexcomm3:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM3);
             RESET_PeripheralReset(kFC3_RST_SHIFT_RSTn);
             break;
-        case 4:
+        case Flexcomm4:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM4);
             RESET_PeripheralReset(kFC4_RST_SHIFT_RSTn);
             break;
-        case 5:
+        case Flexcomm5:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM5);
             RESET_PeripheralReset(kFC5_RST_SHIFT_RSTn);
             break;
-        case 6:
+        case Flexcomm6:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM6);
             RESET_PeripheralReset(kFC6_RST_SHIFT_RSTn);
             break;
-        case 7:
+        case Flexcomm7:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM7);
             RESET_PeripheralReset(kFC7_RST_SHIFT_RSTn);
             break;
 #if (FSL_FEATURE_SOC_I2C_COUNT > 8U)
-        case 8:
+        case Flexcomm8:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM8);
             RESET_PeripheralReset(kFC8_RST_SHIFT_RSTn);
             break;
 #endif
 #if (FSL_FEATURE_SOC_I2C_COUNT > 9U)
-        case 9:
+        case Flexcomm9:
             CLOCK_AttachClk(kFRO12M_to_FLEXCOMM9);
             RESET_PeripheralReset(kFC9_RST_SHIFT_RSTn);
             break;

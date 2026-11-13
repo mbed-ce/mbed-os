@@ -46,8 +46,16 @@ typedef enum {
 #define STDIO_UART        UART_0
 
 typedef enum {
-    I2C_0 = Flexcomm1,
-    I2C_1 = Flexcomm2
+    I2C_0 = Flexcomm0,
+    I2C_1 = Flexcomm1,
+    I2C_2 = Flexcomm2,
+    I2C_3 = Flexcomm3,
+    I2C_4 = Flexcomm4,
+    I2C_5 = Flexcomm5,
+    I2C_6 = Flexcomm6,
+    I2C_7 = Flexcomm7,
+    I2C_8 = Flexcomm8,
+    I2C_9 = Flexcomm9,
 } I2CName;
 
 #define TPM_SHIFT   8
