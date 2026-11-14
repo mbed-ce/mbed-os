@@ -534,6 +534,13 @@ namespace mbed {
     public:
         CompositeEMAC::ErrCode init() override {
             rxPoolPayloadSize = memory_manager->get_pool_alloc_unit(RX_BUFFER_ALIGN);
+
+            // The pool payload buffers need to be not only aligned to cache lines, but also an even multiple of
+            // the cache line size. Otherwise, doing a cache invalidate on the buffer can destroy data after the
+            // end of the buffer.
+            rxPoolPayloadSize -= rxPoolPayloadSize % RX_BUFFER_ALIGN;
+            MBED_ASSERT(rxPoolPayloadSize > 0);
+
             rxBuildIndex = 0;
             rxNextIndex = 0;
 
