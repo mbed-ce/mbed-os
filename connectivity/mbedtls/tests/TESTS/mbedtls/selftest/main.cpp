@@ -39,6 +39,7 @@ using namespace utest::v1;
 #include "mbedtls/sha512.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/timing.h"
+#include "mbedtls/platform_time.h"
 
 #include <string.h>
 
@@ -77,7 +78,23 @@ MBEDTLS_SELF_TEST_TEST_CASE(mbedtls_timing_self_test)
 #warning "MBEDTLS_SELF_TEST not enabled"
 #endif /* MBEDTLS_SELF_TEST */
 
+#if defined(MBEDTLS_PLATFORM_MS_TIME_ALT)
+static void mbedtls_ms_time_test_case()
+{
+    const mbedtls_ms_time_t start = mbedtls_ms_time();
+    wait_us(20000);
+    const mbedtls_ms_time_t end = mbedtls_ms_time();
+    // Allow for ticker resolution and clock differences.
+    TEST_ASSERT_TRUE(end - start >= 10);
+    TEST_ASSERT_TRUE(end - start < 1000);
+    TEST_ASSERT_TRUE(mbedtls_ms_time() >= end);
+}
+#endif
+
 Case cases[] = {
+#if defined(MBEDTLS_PLATFORM_MS_TIME_ALT)
+    Case("mbedtls_ms_time advances in milliseconds", mbedtls_ms_time_test_case),
+#endif
 #if defined(MBEDTLS_SELF_TEST)
 
 #if defined(MBEDTLS_SHA256_C)

@@ -49,6 +49,8 @@ prepend_code() {
         "$FILE"
 }
 
+# Prepend decoded text to the whole file; Mbed TLS 3 has no include guard
+# to use as an insertion point for the entropy-selection block.
 prepend_file_code() {
     CODE=$(IFS=""; printf "%s" "$*")
     TEMP_FILE="${FILE}.tmp"
@@ -194,4 +196,6 @@ append_code                                                                     
     "\n"
 
 # Keep regenerated configuration files stable and avoid blank lines at EOF.
+# -0 reads the whole file, -p prints it, and -i writes it back in place.
+# Replace one or more trailing newlines (\n+ at \z) with a single newline.
 perl -0pi -e 's/\n+\z/\n/' "$FILE"
