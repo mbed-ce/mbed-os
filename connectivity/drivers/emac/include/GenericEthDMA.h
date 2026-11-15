@@ -585,6 +585,14 @@ namespace mbed {
                 // Store buffer address
                 rxDescStackBufs[rxBuildIndex] = buffer;
 
+                // Guard against the rare case that the CPU had written data to this memory region previously and
+                // it is still in the cache. Without the invalidate, this might lead to the CPU cache writing
+                // bytes from this region back to main memory during/after the DMA wrote the packet,
+                // corrupting it.
+#if __DCACHE_PRESENT
+                SCB_InvalidateDCache_by_Addr(memory_manager->get_ptr(buffer), rxPoolPayloadSize);
+#endif
+
                 // Send descriptor to DMA
                 returnDescriptor(rxBuildIndex, static_cast<uint8_t *>(memory_manager->get_ptr(buffer)));
 
