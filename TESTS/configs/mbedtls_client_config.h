@@ -1,4 +1,6 @@
-/* SPDX-License-Identifier: Apache-2.0 */
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef MBEDTLS_GREENTEA_CLIENT_CONFIG_H
 #define MBEDTLS_GREENTEA_CLIENT_CONFIG_H
