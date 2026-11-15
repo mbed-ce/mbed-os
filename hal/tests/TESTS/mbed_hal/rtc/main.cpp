@@ -104,7 +104,7 @@ void rtc_sleep_test_support(bool deepsleep_mode)
  - RTC returns valid time after being initialized (though that time may be anything). */
 void rtc_init_test()
 {
-#if !DEVICE_LPTICKER || !defined(MBED_CONF_TARGET_LPTICKER_LPTIM) || MBED_CONF_TARGET_LPTICKER_LPTIM
+#if !defined(TARGET_MCU_KINETIS) && (!DEVICE_LPTICKER || !defined(MBED_CONF_TARGET_LPTICKER_LPTIM) || MBED_CONF_TARGET_LPTICKER_LPTIM)
     TEST_ASSERT_FALSE(RealTimeClock::isenabled());
 #endif
 

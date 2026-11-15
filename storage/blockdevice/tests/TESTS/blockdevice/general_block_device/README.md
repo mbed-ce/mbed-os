@@ -17,28 +17,6 @@ You can find more information about the Mbed OS block device and other related p
 
 This test uses a block device as storage. This can be either an external block device (one of SPI flash, DataFlash or an SD card) or simulated on a heap block device on boards with enough RAM.
 
-## Usage
-
-#### Compile the test
-
-Invoke `mbed test`, and specify the name of your platform and your favorite toolchain (`GCC_ARM`, `ARM`, `IAR`). For example, for the ARM Compiler 5:
-
-```
-mbed test -m K64F -t ARM -n mbed-os-features-storage-tests-blockdevice-general_block_device --compile
-```
-
-#### Run the test
-
-Use `mbed test` again:
-
-```
-mbed test -m K64F -t ARM -n mbed-os-features-storage-tests-blockdevice-general_block_device --run -v
-```
-
-#### Troubleshooting
-
-Please review the [documentation](https://os.mbed.com/docs/latest/tutorials/debugging.html) for suggestions about how to fix possible issues you may face.
-
 ## Changing the block device
 
 In Mbed OS, a C++ class that inherits from the [BlockDevice](https://os.mbed.com/docs/latest/reference/storage.html#block-devices) interface represents each block device.
@@ -65,7 +43,7 @@ Now you can recompile and run.
 
 ## Tested configurations
 
-- K64F + SD.
-- K64F + Heap.
-- K82F + SPIF.
-- K82F + Heap.
+- FRDM_K64F + SD.
+- FRDM_K64F + Heap.
+- FRDM_K82F + SPIF.
+- FRDM_K82F + Heap.

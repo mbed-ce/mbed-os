@@ -5,7 +5,6 @@
 """API for listing devices."""
 
 from operator import attrgetter
-from typing import List, Optional
 
 from mbed_tools.devices._internal.detect_candidate_devices import detect_candidate_devices
 from mbed_tools.devices.device import ConnectedDevices, Device
@@ -28,7 +27,7 @@ def get_connected_devices() -> ConnectedDevices:
     return connected_devices
 
 
-def find_connected_device(target_name: str, identifier: Optional[int] = None) -> Device:
+def find_connected_device(target_name: str, identifier: int | None = None) -> Device:
     """
     Find a connected device matching the given target_name, if there is only one.
 
@@ -65,7 +64,7 @@ def find_connected_device(target_name: str, identifier: Optional[int] = None) ->
     raise DeviceLookupFailedError(msg)
 
 
-def find_all_connected_devices(target_name: str) -> List[Device]:
+def find_all_connected_devices(target_name: str) -> list[Device]:
     """
     Find all connected devices matching the given target_name.
 

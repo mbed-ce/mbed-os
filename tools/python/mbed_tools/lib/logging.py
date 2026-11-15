@@ -6,7 +6,7 @@
 
 import logging
 from types import TracebackType
-from typing import Optional, Type, cast
+from typing import cast
 
 from typing_extensions import Self
 
@@ -47,9 +47,9 @@ class MbedToolsHandler:
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        exc_traceback: Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        exc_traceback: TracebackType | None,
     ) -> bool:
         """Handle any raised exceptions, suppressing Tools errors and generating an error message instead."""
         if exc_type and issubclass(exc_type, ToolsError):

@@ -5,7 +5,6 @@
 """Representation of an Mbed-Enabled Development Board and related utilities."""
 
 from dataclasses import dataclass
-from typing import Tuple
 
 
 @dataclass(frozen=True, order=True)
@@ -32,9 +31,9 @@ class Board:
     product_code: str
     target_type: str
     slug: str
-    build_variant: Tuple[str, ...]
-    mbed_os_support: Tuple[str, ...]
-    mbed_enabled: Tuple[str, ...]
+    build_variant: tuple[str, ...]
+    mbed_os_support: tuple[str, ...]
+    mbed_enabled: tuple[str, ...]
 
     @classmethod
     def from_online_board_entry(cls, board_entry: dict) -> "Board":

@@ -80,6 +80,8 @@ nsapi_error_t Nanostack::EthernetInterface::bringup(bool dhcp, const char *ip,
         return NSAPI_ERROR_DEVICE_ERROR;
     }
 
+    enet_tasklet_started = true;
+
     if (blocking) {
         bool acquired = connect_semaphore.try_acquire_for(30s);
 
@@ -100,6 +102,10 @@ nsapi_error_t NanostackEthernetInterface::do_initialize()
 
 nsapi_error_t Nanostack::EthernetInterface::bringdown()
 {
+    if (!enet_tasklet_started) {
+        return NSAPI_ERROR_NO_CONNECTION;
+    }
+
     nanostack_lock();
     int8_t status = enet_tasklet_disconnect(true);
     nanostack_unlock();
@@ -113,6 +119,8 @@ nsapi_error_t Nanostack::EthernetInterface::bringdown()
     } else if (status != 0) {
         return NSAPI_ERROR_DEVICE_ERROR;
     }
+
+    enet_tasklet_started = false;
 
     if (_blocking) {
         bool acquired = disconnect_semaphore.try_acquire_for(30s);

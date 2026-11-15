@@ -24,13 +24,16 @@ import os
 import pathlib
 import re
 import sys
-from typing import Any, Dict, Sequence, Set
+from typing import TYPE_CHECKING, Any
 
 import click
 import cmsis_pack_manager
 import humanize
 
 from mbed_tools.lib.json_helpers import decode_json_file
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 LOGGER = logging.getLogger(__name__)
 
@@ -102,7 +105,7 @@ def find_json_files(
     return json_files
 
 
-def get_mcu_names_used_by_targets_json5() -> Set[str]:
+def get_mcu_names_used_by_targets_json5() -> set[str]:
     """
     Accumulate set of all `device_name` properties used by all targets defined in targets.json5 and custom_targets.json/json5.
     """
@@ -156,7 +159,7 @@ def find_unused() -> None:
 
     # Accumulate set of all keys in cmsis_mcu_descriptions.json
     LOGGER.info("Scanning cmsis_mcu_descriptions.json for MCUs to be pruned...")
-    cmsis_mcu_descriptions_json_contents: Dict[str, Any] = decode_json_file(CMSIS_MCU_DESCRIPTIONS_JSON_PATH)
+    cmsis_mcu_descriptions_json_contents: dict[str, Any] = decode_json_file(CMSIS_MCU_DESCRIPTIONS_JSON_PATH)
     available_mcu_names = cmsis_mcu_descriptions_json_contents.keys()
 
     # Figure out which MCUs can be removed
@@ -180,7 +183,7 @@ def check_missing() -> None:
 
     # Accumulate set of all keys in cmsis_mcu_descriptions.json
     LOGGER.info("Scanning cmsis_mcu_descriptions.json for missing MCUs...")
-    cmsis_mcu_descriptions_json_contents: Dict[str, Any] = decode_json_file(CMSIS_MCU_DESCRIPTIONS_JSON_PATH)
+    cmsis_mcu_descriptions_json_contents: dict[str, Any] = decode_json_file(CMSIS_MCU_DESCRIPTIONS_JSON_PATH)
     available_mcu_names = cmsis_mcu_descriptions_json_contents.keys()
 
     # Are there any missing?
@@ -213,7 +216,7 @@ def fetch_missing() -> None:
 
     # Accumulate set of all keys in cmsis_mcu_descriptions.json
     LOGGER.info("Scanning cmsis_mcu_descriptions.json5 file for missing MCUs...")
-    cmsis_mcu_descriptions_json_contents: Dict[str, Any] = decode_json_file(CMSIS_MCU_DESCRIPTIONS_JSON_PATH)
+    cmsis_mcu_descriptions_json_contents: dict[str, Any] = decode_json_file(CMSIS_MCU_DESCRIPTIONS_JSON_PATH)
     available_mcu_names = cmsis_mcu_descriptions_json_contents.keys()
 
     # Are there any missing?

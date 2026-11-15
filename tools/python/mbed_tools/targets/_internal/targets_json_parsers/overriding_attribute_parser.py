@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from collections import deque
 from functools import reduce
-from typing import TYPE_CHECKING, Any, Deque, Dict, List, Set
+from typing import TYPE_CHECKING, Any
 
 from mbed_tools.targets._internal.targets_json_parsers.accumulating_attribute_parser import ALL_ACCUMULATING_ATTRIBUTES
 
@@ -36,7 +36,7 @@ NON_INHERITED_ATTRIBUTES = ("public", "inherits", "is_mcu_family_target")
 NON_OVERRIDING_ATTRIBUTES = ALL_ACCUMULATING_ATTRIBUTES + NON_INHERITED_ATTRIBUTES
 
 
-def get_overriding_attributes_for_target(all_targets_data: Dict[str, TargetJSON], target_name: str) -> Dict[str, Any]:
+def get_overriding_attributes_for_target(all_targets_data: dict[str, TargetJSON], target_name: str) -> dict[str, Any]:
     """
     Parses the data for all targets and returns the overriding attributes for the specified target.
 
@@ -51,7 +51,7 @@ def get_overriding_attributes_for_target(all_targets_data: Dict[str, TargetJSON]
     return _determine_overridden_attributes(override_order)
 
 
-def get_labels_for_target(all_targets_data: Dict[str, TargetJSON], target_name: str) -> Set[str]:
+def get_labels_for_target(all_targets_data: dict[str, TargetJSON], target_name: str) -> set[str]:
     """
     The labels for a target are the names of all the boards (public and private) that the board inherits from.
 
@@ -68,7 +68,7 @@ def get_labels_for_target(all_targets_data: Dict[str, TargetJSON], target_name: 
     return _extract_target_labels(targets_in_order, target_name)
 
 
-def _targets_override_hierarchy(all_targets_data: Dict[str, TargetJSON], target_name: str) -> List[dict[str, Any]]:
+def _targets_override_hierarchy(all_targets_data: dict[str, TargetJSON], target_name: str) -> list[dict[str, Any]]:
     """
     List all ancestors of a target in order of overriding inheritance (depth-first).
 
@@ -93,9 +93,9 @@ def _targets_override_hierarchy(all_targets_data: Dict[str, TargetJSON], target_
     Returns:
         A list of dicts representing each target in the hierarchy.
     """
-    targets_in_order: List[dict[str, Any]] = []
+    targets_in_order: list[dict[str, Any]] = []
 
-    still_to_visit: Deque[TargetJSON] = deque()
+    still_to_visit: deque[TargetJSON] = deque()
     still_to_visit.appendleft(all_targets_data[target_name])
 
     while still_to_visit:
@@ -111,7 +111,7 @@ def _targets_override_hierarchy(all_targets_data: Dict[str, TargetJSON], target_
     return targets_in_order
 
 
-def _determine_overridden_attributes(targets_in_order: List[dict]) -> Dict[str, Any]:
+def _determine_overridden_attributes(targets_in_order: list[dict]) -> dict[str, Any]:
     """
     Finds all the overrideable attributes for a target from its list of ancestors.
 
@@ -138,12 +138,12 @@ def _determine_overridden_attributes(targets_in_order: List[dict]) -> Dict[str, 
     return _remove_unwanted_attributes(target_attributes)
 
 
-def _reduce_right_list_of_dictionaries(list_of_dicts: List[dict]) -> Dict[str, Any]:
+def _reduce_right_list_of_dictionaries(list_of_dicts: list[dict]) -> dict[str, Any]:
     """Starting from rightmost dict, merge dicts together, left dict overriding the right."""
     return reduce(lambda x, y: {**x, **y}, reversed(list_of_dicts))
 
 
-def _remove_unwanted_attributes(target_attributes: Dict[str, Any]) -> Dict[str, Any]:
+def _remove_unwanted_attributes(target_attributes: dict[str, Any]) -> dict[str, Any]:
     """
     Removes all non-overriding attributes.
 
@@ -164,7 +164,7 @@ def _remove_unwanted_attributes(target_attributes: Dict[str, Any]) -> Dict[str, 
     return output_dict
 
 
-def _extract_target_labels(targets_in_order: List[dict], target_name: str) -> Set[str]:
+def _extract_target_labels(targets_in_order: list[dict], target_name: str) -> set[str]:
     """
     Collect a set of all the board names from the inherits field in each target in the hierarchy.
 

@@ -5,7 +5,7 @@
 """Detect Mbed devices connected to host computer."""
 
 import platform
-from typing import Iterable
+from collections.abc import Iterable
 
 from mbed_tools.devices._internal.base_detector import DeviceDetector
 from mbed_tools.devices._internal.candidate_device import CandidateDevice

@@ -8,11 +8,14 @@ from __future__ import annotations
 
 import plistlib
 import subprocess
-from typing import Dict, Iterable, List, Optional, cast
+from typing import TYPE_CHECKING, cast
 
 from typing_extensions import TypedDict
 
-VolumeTree = Dict  # mypy does not work with recursive types, which nested "Partitions" would require
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+VolumeTree = dict  # mypy does not work with recursive types, which nested "Partitions" would require
 
 
 class Volume(TypedDict, total=False):
@@ -22,16 +25,16 @@ class Volume(TypedDict, total=False):
     DeviceIdentifier: str  # example: disk2
 
 
-def get_all_external_disks_data() -> List[Volume | VolumeTree]:
+def get_all_external_disks_data() -> list[Volume | VolumeTree]:
     """Returns parsed output of `diskutil` call, fetching only information of interest."""
     output = subprocess.check_output(["/usr/sbin/diskutil", "list", "-plist", "external"], stderr=subprocess.DEVNULL)
     if output:
-        data: Dict = plistlib.loads(output)
+        data: dict = plistlib.loads(output)
         return data.get("AllDisksAndPartitions", [])
     return []
 
 
-def get_all_external_volumes_data() -> List[Volume]:
+def get_all_external_volumes_data() -> list[Volume]:
     """
     Returns all external volumes data.
 
@@ -42,7 +45,7 @@ def get_all_external_volumes_data() -> List[Volume]:
     return _filter_volumes(data)
 
 
-def get_external_volume_data(device_identifier: str) -> Optional[Volume]:
+def get_external_volume_data(device_identifier: str) -> Volume | None:
     """Returns external volume data for a given identifier."""
     data = get_all_external_volumes_data()
     for device in data:
@@ -51,7 +54,7 @@ def get_external_volume_data(device_identifier: str) -> Optional[Volume]:
     return None
 
 
-def get_mount_point(device_identifier: str) -> Optional[str]:
+def get_mount_point(device_identifier: str) -> str | None:
     """Returns mount point of a given device."""
     device_data = get_external_volume_data(device_identifier)
     if device_data and "MountPoint" in device_data:
@@ -59,7 +62,7 @@ def get_mount_point(device_identifier: str) -> Optional[str]:
     return None
 
 
-def _filter_volumes(data: Iterable[VolumeTree | Volume]) -> List[Volume]:
+def _filter_volumes(data: Iterable[VolumeTree | Volume]) -> list[Volume]:
     """
     Flattens the structure returned by `diskutil` call.
 

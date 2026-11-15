@@ -7,7 +7,6 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +27,6 @@ CUSTOM_TARGETS_JSON5_FILE_NAME = "custom_targets.json5"
 MBED_OS_REFERENCE_URL = "https://github.com/ARMmbed/mbed-os"
 MBED_OS_REFERENCE_ID = "master"
 
-# For some reason Mbed OS expects the default mbed_app.json to contain some target_overrides
-# for the K64F target. TODO: Find out why this wouldn't be defined in targets.json.
-DEFAULT_APP_CONFIG = {"target_overrides": {"K64F": {"platform.stdio-baud-rate": 9600}}}
-
 
 @dataclass
 class MbedProgramFiles:
@@ -50,7 +45,7 @@ class MbedProgramFiles:
         cmake_build_dir: The CMake build tree.
     """
 
-    app_config_file: Optional[Path]
+    app_config_file: Path | None
     mbed_os_ref: Path
     cmakelists_file: Path
     cmake_build_dir: Path
@@ -65,7 +60,7 @@ class MbedProgramFiles:
             root_path: The path containing the MbedProgramFiles.
             build_dir: The directory to use for CMake build.
         """
-        app_config: Optional[Path] = None
+        app_config: Path | None = None
         if (root_path / APP_CONFIG_FILE_NAME_JSON5).exists():
             app_config = root_path / APP_CONFIG_FILE_NAME_JSON5
         elif (root_path / APP_CONFIG_FILE_NAME_JSON).exists():

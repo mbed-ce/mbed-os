@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 
 import pydantic
 
@@ -35,7 +35,7 @@ MEMORY_BANKS_JSON_FILE = "memory_banks.json"
 MBEDIGNORE_FILE = ".mbedignore"
 
 
-def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> Tuple[Config, pathlib.Path]:
+def generate_config(target_name: str, toolchain: str, program: MbedProgram) -> tuple[Config, pathlib.Path]:
     """
     Generate an Mbed config file after parsing the Mbed config system.
 

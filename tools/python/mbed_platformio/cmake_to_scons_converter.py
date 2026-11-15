@@ -10,7 +10,8 @@ from __future__ import annotations
 import collections
 import pathlib
 import typing
-from typing import TYPE_CHECKING, Sequence
+from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from click.parser import split_arg_string
 

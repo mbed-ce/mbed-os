@@ -8,10 +8,13 @@ from __future__ import annotations
 
 import fnmatch
 from pathlib import Path
-from typing import Callable, Iterable, List, Optional, Tuple
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
 
 
-def find_files(filename: str, directory: Path) -> List[Path]:
+def find_files(filename: str, directory: Path) -> list[Path]:
     """Proxy to `_find_files`, which applies legacy filtering rules."""
     # Temporary workaround, which replicates hardcoded ignore rules from old tools.
     # Legacy list of ignored directories is longer, however "TESTS" and
@@ -22,7 +25,7 @@ def find_files(filename: str, directory: Path) -> List[Path]:
     return _find_files(filename, directory, [legacy_ignore])
 
 
-def _find_files(filename: str, directory: Path, filters: Optional[List[Callable]] = None) -> List[Path]:
+def _find_files(filename: str, directory: Path, filters: list[Callable] | None = None) -> list[Path]:
     """
     Recursively find files by name under a given directory.
 
@@ -39,7 +42,7 @@ def _find_files(filename: str, directory: Path, filters: Optional[List[Callable]
     if filters is None:
         filters = []
 
-    result: List[Path] = []
+    result: list[Path] = []
 
     # Directories and files to process
     children = list(directory.iterdir())
@@ -114,7 +117,7 @@ class MbedignoreFilter:
     .gitignore and friends.
     """
 
-    def __init__(self, patterns: Tuple[str, ...]) -> None:
+    def __init__(self, patterns: tuple[str, ...]) -> None:
         """
         Initialise the filter attributes.
 

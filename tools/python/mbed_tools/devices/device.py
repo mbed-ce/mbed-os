@@ -4,9 +4,9 @@
 #
 """Data model definition for Device and ConnectedDevices."""
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Sequence
 
 from mbed_tools.devices._internal.candidate_device import CandidateDevice
 from mbed_tools.devices._internal.exceptions import NoBoardForCandidateError, ResolveBoardError
@@ -33,10 +33,10 @@ class Device:
 
     mbed_board: Board
     serial_number: str
-    serial_port: Optional[str]
+    serial_port: str | None
     mount_points: Sequence[Path]
     mbed_enabled: bool = False
-    interface_version: Optional[str] = None
+    interface_version: str | None = None
 
     @classmethod
     def from_candidate(cls, candidate: CandidateDevice) -> "Device":
@@ -93,8 +93,8 @@ class ConnectedDevices:
         unidentified_devices: A list of devices that could potentially be MbedTargets.
     """
 
-    identified_devices: List[Device] = field(default_factory=list)
-    unidentified_devices: List[Device] = field(default_factory=list)
+    identified_devices: list[Device] = field(default_factory=list)
+    unidentified_devices: list[Device] = field(default_factory=list)
 
     def add_device(self, device: Device) -> None:
         """

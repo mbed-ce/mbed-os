@@ -9,12 +9,12 @@ Pydantic schemas for Mbed OS JSON config files.
 
 from __future__ import annotations
 
-from typing import Literal, Union
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Self
 
-ConfigSettingValue = Union[int, float, bool, str, None]
+ConfigSettingValue = int | float | bool | str | None
 
 
 class ConfigEntryDetails(BaseModel):

@@ -4,7 +4,7 @@
 #
 """Aggregation of all USB data given by Windows in various locations."""
 
-from typing import List, NamedTuple, cast
+from typing import NamedTuple, cast
 
 from typing_extensions import override
 
@@ -22,11 +22,11 @@ class AggregatedUsbDataDefinition(NamedTuple):
     """Data aggregation with regards to a usb device."""
 
     usb_identifier: UsbIdentifier
-    disks: List[AggregatedDiskData]
-    serial_port: List[SerialPort]
+    disks: list[AggregatedDiskData]
+    serial_port: list[SerialPort]
     # On Windows, each interface e.g. Composite, Mass storage, Port is defined as
     # a separate independent UsbHub although they are related to the same device.
-    related_usb_interfaces: List[UsbHub]
+    related_usb_interfaces: list[UsbHub]
 
 
 class AggregatedUsbData(ComponentDescriptor):
@@ -101,6 +101,6 @@ class SystemUsbData:
             usb_data=self._usb_devices,
         )
 
-    def all(self) -> List[AggregatedUsbData]:
+    def all(self) -> list[AggregatedUsbData]:
         """Gets all the system data about USB devices."""
         return [self._aggregator.aggregate(usb_id) for usb_id in self._usb_devices.usb_device_ids()]

@@ -94,8 +94,9 @@ This can be found on connected J-Link devices. An example is shown below.
 import logging
 import pathlib
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, List, NamedTuple, Optional
+from typing import NamedTuple
 
 logger = logging.getLogger(__name__)
 
@@ -117,8 +118,8 @@ class OnlineId(NamedTuple):
 class DeviceFileInfo:
     """Information gathered from Mbed device files."""
 
-    product_code: Optional[str]
-    online_id: Optional[OnlineId]
+    product_code: str | None
+    online_id: OnlineId | None
     interface_details: dict
 
 
@@ -159,7 +160,7 @@ def read_device_files(directory_paths: Iterable[pathlib.Path]) -> DeviceFileInfo
     return DeviceFileInfo(code, online_id, details_txt_contents)
 
 
-def _read_product_code(file_contents: str) -> Optional[str]:
+def _read_product_code(file_contents: str) -> str | None:
     """Returns product code parsed from the file contents, None if not found."""
     regex = r"""
             (?:code|auth)=                   # attribute name
@@ -171,7 +172,7 @@ def _read_product_code(file_contents: str) -> Optional[str]:
     return None
 
 
-def _read_online_id(file_contents: str) -> Optional[OnlineId]:
+def _read_online_id(file_contents: str) -> OnlineId | None:
     """Returns online id parsed from the files contents, None if not found."""
     regex = r"""
             (?P<target_type>module|platform)s   # module|platform
@@ -184,7 +185,7 @@ def _read_online_id(file_contents: str) -> Optional[OnlineId]:
     return None
 
 
-def _read_url_slug(file_contents: str) -> Optional[str]:
+def _read_url_slug(file_contents: str) -> str | None:
     """Returns slug parsed from file contents, None if not found."""
     regex = r"""url=[^"]+\.[^"]+\/(?P<slug>[-\w]+)(\/|[\w.]+)?\""""
     match = re.search(regex, file_contents, re.VERBOSE)
@@ -228,7 +229,7 @@ def _read_details_txt(file_contents: str) -> dict:
     return output
 
 
-def _extract_product_code_from_htm(all_files_contents: Iterable[str]) -> Optional[str]:
+def _extract_product_code_from_htm(all_files_contents: Iterable[str]) -> str | None:
     """Return first product code found in files contents, None if not found."""
     for contents in all_files_contents:
         product_code = _read_product_code(contents)
@@ -237,7 +238,7 @@ def _extract_product_code_from_htm(all_files_contents: Iterable[str]) -> Optiona
     return None
 
 
-def _extract_online_id_from_htm(all_files_contents: Iterable[str]) -> Optional[OnlineId]:
+def _extract_online_id_from_htm(all_files_contents: Iterable[str]) -> OnlineId | None:
     """Return first online ID found in files contents, None if not found."""
     for contents in all_files_contents:
         online_id = _read_online_id(contents)
@@ -246,7 +247,7 @@ def _extract_online_id_from_htm(all_files_contents: Iterable[str]) -> Optional[O
     return None
 
 
-def _extract_online_id_jlink_html(file_paths: Iterable[pathlib.Path]) -> Optional[OnlineId]:
+def _extract_online_id_jlink_html(file_paths: Iterable[pathlib.Path]) -> OnlineId | None:
     """Return online ID found in Board.html, None if not found."""
     contents = _get_board_html_contents(file_paths)
     if contents is not None:
@@ -267,11 +268,11 @@ def _extract_version_jlink_html(file_paths: Iterable[pathlib.Path]) -> dict:
     return interface_data
 
 
-def _get_device_file_paths(directories: Iterable[pathlib.Path]) -> List[pathlib.Path]:
+def _get_device_file_paths(directories: Iterable[pathlib.Path]) -> list[pathlib.Path]:
     return [path for directory in directories for path in directory.iterdir() if not _is_hidden_file(path)]
 
 
-def _try_read_file_text(file_path: pathlib.Path) -> Optional[str]:
+def _try_read_file_text(file_path: pathlib.Path) -> str | None:
     try:
         return file_path.read_text()
     except OSError:
@@ -279,7 +280,7 @@ def _try_read_file_text(file_path: pathlib.Path) -> Optional[str]:
         return None
 
 
-def _read_htm_file_contents(all_files: Iterable[pathlib.Path]) -> List[str]:
+def _read_htm_file_contents(all_files: Iterable[pathlib.Path]) -> list[str]:
     htm_files_contents = []
     for file in all_files:
         if _is_htm_file(file):
@@ -289,14 +290,14 @@ def _read_htm_file_contents(all_files: Iterable[pathlib.Path]) -> List[str]:
     return htm_files_contents
 
 
-def _get_segger_html_content(file_paths: Iterable[pathlib.Path]) -> Optional[str]:
+def _get_segger_html_content(file_paths: Iterable[pathlib.Path]) -> str | None:
     for fp in file_paths:
         if fp.name.lower() == "segger.html":
             return _try_read_file_text(fp)
     return None
 
 
-def _get_board_html_contents(file_paths: Iterable[pathlib.Path]) -> Optional[str]:
+def _get_board_html_contents(file_paths: Iterable[pathlib.Path]) -> str | None:
     for fp in file_paths:
         if fp.name.lower() == "board.html":
             return _try_read_file_text(fp)

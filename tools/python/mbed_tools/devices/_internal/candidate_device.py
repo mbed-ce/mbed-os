@@ -6,7 +6,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional, Tuple, Union, cast
+from typing import Any, cast
 
 
 class CandidateDeviceError(ValueError):
@@ -62,7 +62,7 @@ class USBDescriptorString(DataField):
 class FilesystemMountpoints(DataField):
     """Data descriptor which must be set to a non-empty list or tuple."""
 
-    def __set__(self, instance: object, value: Union[tuple, list]) -> None:
+    def __set__(self, instance: object, value: tuple | list) -> None:
         """Prevent setting the descriptor to a non-sequence or empty sequence value."""
         if not value or not isinstance(value, (list, tuple)):
             msg = f"{self.name} must be set to a non-empty list or tuple."
@@ -93,8 +93,8 @@ class CandidateDevice:
     product_id: str = cast(str, USBDescriptorHex())  # pyright: ignore[reportInvalidCast]
     vendor_id: str = cast(str, USBDescriptorHex())  # pyright: ignore[reportInvalidCast]
     serial_number: str = cast(str, USBDescriptorString())  # pyright: ignore[reportInvalidCast]
-    mount_points: Tuple[Path, ...] = cast(Tuple[Path], FilesystemMountpoints())  # pyright: ignore[reportInvalidCast]
-    serial_port: Optional[str] = None
+    mount_points: tuple[Path, ...] = cast(tuple[Path], FilesystemMountpoints())  # pyright: ignore[reportInvalidCast]
+    serial_port: str | None = None
 
 
 def _format_hex(hex_value: str) -> str:

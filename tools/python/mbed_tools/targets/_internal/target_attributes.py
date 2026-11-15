@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import logging
 import pathlib
-from typing import Any, Dict, Optional, Set
+from typing import Any
 
 from mbed_tools.lib.exceptions import ToolsError
 from mbed_tools.lib.json_helpers import decode_json_file
@@ -84,7 +84,7 @@ def get_target_attributes(
 
 
 def _extract_full_target_definition(
-    all_targets_data: Dict[str, TargetJSON], target_name: str, allow_non_public_targets: bool
+    all_targets_data: dict[str, TargetJSON], target_name: str, allow_non_public_targets: bool
 ) -> TargetJSON:
     """
     Extracts the definition for a particular target from all the targets in targets.json, processing the inheritance hierarchy.
@@ -126,7 +126,7 @@ def _extract_full_target_definition(
     return TargetJSON.model_validate(target_attributes)
 
 
-def _extract_core_labels(target_core: Optional[str]) -> Set[str]:
+def _extract_core_labels(target_core: str | None) -> set[str]:
     """
     Find the labels associated with the target's core.
 
@@ -143,7 +143,7 @@ def _extract_core_labels(target_core: Optional[str]) -> Set[str]:
     return set()
 
 
-def _apply_config_overrides(config: Dict[str, Any], overrides: Dict[str, Any]) -> Dict[str, Any]:
+def _apply_config_overrides(config: dict[str, Any], overrides: dict[str, Any]) -> dict[str, Any]:
     """
     Returns the config attribute with any overrides applied.
 

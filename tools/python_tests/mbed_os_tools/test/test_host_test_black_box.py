@@ -23,12 +23,12 @@ from .mocks.environment.darwin import MockTestEnvironmentDarwin
 from .mocks.environment.windows import MockTestEnvironmentWindows
 
 mock_platform_info = {
-    "platform_name": "K64F",
+    "platform_name": "FRDM_K64F",
     "target_id": "0240000031754e45000c0018948500156461000097969900",
     "mount_point": "/mnt/DAPLINK",
     "serial_port": "/dev/ttyACM0",
 }
-mock_image_path = "BUILD/tests/K64F/GCC_ARM/TESTS/network/interface/interface.bin"
+mock_image_path = "BUILD/tests/FRDM_K64F/GCC_ARM/TESTS/network/interface/interface.bin"
 
 
 class BlackBoxHostTestTestCase(unittest.TestCase):

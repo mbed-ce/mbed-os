@@ -153,6 +153,7 @@ void enet_tasklet_main(arm_event_s *event)
                     }
                     tasklet_data_ptr->mesh_api_cb = NULL;
                     eventOS_timeout_cancel(tasklet_data_ptr->poll_network_status_timeout);
+                    tasklet_data_ptr->poll_network_status_timeout = NULL;
                 }
             }
             break;

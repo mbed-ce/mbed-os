@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional, Tuple
+from typing import Any
 
 import click
 
@@ -15,7 +15,7 @@ from mbed_tools.devices.exceptions import MbedDevicesError
 from mbed_tools.sterm import terminal
 
 
-def _get_target_id(target: str) -> Tuple[str, Optional[int]]:
+def _get_target_id(target: str) -> tuple[str, int | None]:
     if "[" in target:
         target_name, target_id = target.replace("]", "").split("[", maxsplit=1)
         if target_id.isdigit() and int(target_id) >= 0:
@@ -61,7 +61,7 @@ def _get_connected_mbed_devices() -> Any:
     return connected_devices.identified_devices
 
 
-def _find_target_serial_port_or_default(target: Optional[str]) -> str:
+def _find_target_serial_port_or_default(target: str | None) -> str:
     if target is None:
         # just return the first valid device found
         device, *_ = _get_connected_mbed_devices()

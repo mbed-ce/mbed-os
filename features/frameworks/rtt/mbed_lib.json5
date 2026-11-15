@@ -29,12 +29,12 @@
       "cb-search-range-start": 0x24000000,
       "cb-search-range-end": 0x2407FFFF
     },
-    "MIMXRT105X": {
+    "MCU_MIMXRT105X": {
       // RTT lives in DTCM
       "cb-search-range-start": 0x20000000,
       "cb-search-range-end": 0x2023FFFF
     },
-    "MIMXRT1170": {
+    "MCU_MIMXRT116x_7x": {
       // RTT lives in OCRAM combined
       "cb-search-range-start": 0x20240000,
       "cb-search-range-end": 0x2035FFFF

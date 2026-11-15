@@ -1503,127 +1503,6 @@
         "sub_family": "LPC176x",
         "vendor": "NXP:11"
     },
-    "LPC54114J256BD64": {
-        "algorithms": [
-            {
-                "default": true,
-                "file_name": "arm/LPC5411x_256.FLM",
-                "ram_size": 65536,
-                "ram_start": 536870912,
-                "size": 262144,
-                "start": 0
-            }
-        ],
-        "family": "LPC54114",
-        "from_pack": {
-            "pack": "LPC54114_DFP",
-            "url": "http://mcuxpresso.nxp.com/cmsis_pack/repo/",
-            "vendor": "NXP",
-            "version": "11.0.0"
-        },
-        "memories": {
-            "PROGRAM_FLASH": {
-                "access": {
-                    "execute": true,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": false
-                },
-                "default": true,
-                "size": 262144,
-                "start": 0,
-                "startup": true
-            },
-            "SRAM0": {
-                "access": {
-                    "execute": false,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": false,
-                "size": 65536,
-                "start": 536870912,
-                "startup": false
-            },
-            "SRAM1": {
-                "access": {
-                    "execute": false,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": true,
-                "size": 65536,
-                "start": 536936448,
-                "startup": false
-            },
-            "SRAM2": {
-                "access": {
-                    "execute": false,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": false,
-                "size": 32768,
-                "start": 537001984,
-                "startup": false
-            },
-            "SRAMX": {
-                "access": {
-                    "execute": false,
-                    "non_secure": false,
-                    "non_secure_callable": false,
-                    "peripheral": false,
-                    "read": true,
-                    "secure": false,
-                    "write": true
-                },
-                "default": false,
-                "size": 32768,
-                "start": 67108864,
-                "startup": false
-            }
-        },
-        "name": "LPC54114J256BD64",
-        "processor": {
-            "Asymmetric": {
-                "cm0plus": {
-                    "core": "CortexM0Plus",
-                    "fpu": "None",
-                    "mpu": "NotPresent",
-                    "units": 1
-                },
-                "cm4": {
-                    "core": "CortexM4",
-                    "fpu": "SinglePrecision",
-                    "mpu": "NotPresent",
-                    "units": 1
-                }
-            }
-        },
-        "sectors": [
-            [
-                0,
-                32768
-            ]
-        ],
-        "sub_family": null,
-        "vendor": "NXP:11"
-    },
     "LPC54628J512ET180": {
         "algorithms": [
             {
@@ -3042,7 +2921,7 @@
             "version": "11.0.0"
         },
         "memories": {
-            "PROGRAM_FLASH": {
+            "IROM1": {
                 "access": {
                     "execute": true,
                     "non_secure": false,
@@ -3053,11 +2932,11 @@
                     "write": false
                 },
                 "default": true,
-                "size": 524288,
+                "size": 0x80000,
                 "start": 0,
                 "startup": true
             },
-            "SRAM_LOWER": {
+            "SRAM_L": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3068,11 +2947,11 @@
                     "write": true
                 },
                 "default": false,
-                "size": 65536,
-                "start": 536805376,
+                "size": 0x10000,
+                "start": 0x1FFF0000,
                 "startup": false
             },
-            "SRAM_UPPER": {
+            "SRAM_U": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3083,8 +2962,8 @@
                     "write": true
                 },
                 "default": true,
-                "size": 65536,
-                "start": 536870912,
+                "size": 0x10000,
+                "start": 0x20000000,
                 "startup": false
             }
         },
@@ -3212,7 +3091,7 @@
             "version": "1.5.0"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM_U": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3223,11 +3102,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 196608,
-                "start": 536870912,
+                "size": 0x30000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IRAM2": {
+            "SRAM_L": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3238,8 +3117,8 @@
                     "write": true
                 },
                 "default": false,
-                "size": 65536,
-                "start": 536805376,
+                "size": 0x10000,
+                "start": 0x1FFF0000,
                 "startup": false
             },
             "IROM1": {
@@ -3295,7 +3174,7 @@
             "version": "1.1.1"
         },
         "memories": {
-            "IRAM1": {
+            "SRAM_U": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3306,11 +3185,11 @@
                     "write": true
                 },
                 "default": true,
-                "size": 196608,
-                "start": 536870912,
+                "size": 0x30000,
+                "start": 0x20000000,
                 "startup": false
             },
-            "IRAM2": {
+            "SRAM_L": {
                 "access": {
                     "execute": false,
                     "non_secure": false,
@@ -3321,8 +3200,8 @@
                     "write": true
                 },
                 "default": false,
-                "size": 65536,
-                "start": 536805376,
+                "size": 0x10000,
+                "start": 0x1FFF0000,
                 "startup": false
             },
             "IROM1": {

@@ -4,8 +4,6 @@
 #
 """Loads serial port data."""
 
-from typing import List, Optional
-
 from mbed_tools.devices._internal.windows.serial_port import SerialPort
 from mbed_tools.devices._internal.windows.system_data_loader import ComponentsLoader, SystemDataLoader
 from mbed_tools.devices._internal.windows.usb_device_identifier import UsbIdentifier, parse_device_id
@@ -16,7 +14,7 @@ class SystemSerialPortInformation:
 
     def __init__(self, data_loader: SystemDataLoader) -> None:
         """Initialiser."""
-        self._serial_port_by_usb_id: Optional[dict] = None
+        self._serial_port_by_usb_id: dict | None = None
         self._data_loader = data_loader
 
     def _load_data(self) -> None:
@@ -31,7 +29,7 @@ class SystemSerialPortInformation:
             self._load_data()
         return self._serial_port_by_usb_id or {}
 
-    def get_serial_port_information(self, usb_id: UsbIdentifier) -> List[SerialPort]:
+    def get_serial_port_information(self, usb_id: UsbIdentifier) -> list[SerialPort]:
         """Gets all disk information for a given serial number."""
         port = self.serial_port_data_by_id.get(usb_id)
         return [port] if port else []

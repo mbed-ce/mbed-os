@@ -37,12 +37,6 @@
             "s2lp.provide-default": true,
             "target.device_has_add": ["802_15_4_PHY"]
         },
-        "K64F": {
-          
-        },
-        "K66F": {
-
-        },
         "NUCLEO_F429ZI":  {
 
         }

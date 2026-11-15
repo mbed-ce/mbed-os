@@ -5,7 +5,6 @@
 """Defines a device detector for Windows."""
 
 from pathlib import Path
-from typing import List
 
 from typing_extensions import override
 
@@ -23,7 +22,7 @@ class WindowsDeviceDetector(DeviceDetector):
         self._data_loader = SystemDataLoader()
 
     @override
-    def find_candidates(self) -> List[CandidateDevice]:
+    def find_candidates(self) -> list[CandidateDevice]:
         """Return a generator of Candidates."""
         return [
             WindowsDeviceDetector.map_to_candidate(usb)

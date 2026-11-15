@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
     required=True,
     help="The toolchain you are using to build your app.",
 )
-@click.option("-m", "--mbed-target", required=True, help="A build target for an Mbed-enabled device, eg. K64F")
+@click.option("-m", "--mbed-target", required=True, help="A build target for an Mbed-enabled device, eg. FRDM_K64F")
 @click.option(
     "-o",
     "--output-dir",
@@ -67,7 +67,7 @@ def configure(
     Args:
         custom_targets_json: the path to custom_targets.json
         toolchain: the toolchain you are using (eg. GCC_ARM, ARM)
-        mbed_target: the target you are building for (eg. K64F)
+        mbed_target: the target you are building for (eg. FRDM_K64F)
         program_path: the path to the local Mbed program
         mbed_os_path: the path to the local Mbed OS directory
         output_dir: the path to the output directory

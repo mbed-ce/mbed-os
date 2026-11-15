@@ -193,7 +193,7 @@
             "socket-max":18,
             "mem-size": 65536
         },
-        "MIMXRT105X": {
+        "MCU_MIMXRT105X": {
             "mem-size": 36560
         },
         "MCU_STM32F7": {

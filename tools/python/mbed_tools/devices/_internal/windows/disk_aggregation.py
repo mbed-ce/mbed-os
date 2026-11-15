@@ -11,7 +11,8 @@ This file tries to reconcile all these pieces of information so that it is prese
 as a single object: AggregatedDiskData.
 """
 
-from typing import Callable, List, NamedTuple, Optional, cast
+from collections.abc import Callable
+from typing import NamedTuple, cast
 
 from typing_extensions import override
 
@@ -156,8 +157,8 @@ class SystemDiskInformation:
 
     def __init__(self, data_loader: SystemDataLoader) -> None:
         """Initialiser."""
-        self._disk_data_by_serial_number: Optional[dict] = None
-        self._disk_data_by_label: Optional[dict] = None
+        self._disk_data_by_serial_number: dict | None = None
+        self._disk_data_by_label: dict | None = None
         self._data_loader = data_loader
 
     def _load_data(self) -> None:
@@ -188,7 +189,7 @@ class SystemDiskInformation:
             self._load_data()
         return self._disk_data_by_label or {}
 
-    def get_disk_information(self, uid: WindowsUID) -> List[AggregatedDiskData]:
+    def get_disk_information(self, uid: WindowsUID) -> list[AggregatedDiskData]:
         """Gets all disk information for a given UID."""
         return self.disk_data_by_serial_number.get(uid.presumed_serial_number, [])
 

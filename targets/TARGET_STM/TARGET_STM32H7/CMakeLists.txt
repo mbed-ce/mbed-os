@@ -27,6 +27,11 @@ target_sources(mbed-stm32h7
         spi_api.c
 )
 
+if("STM32H747_ARDUINO" IN_LIST MBED_TARGET_LABELS)
+    target_sources(mbed-stm32h7 INTERFACE reset_reason_arduino.c)
+endif()
+
+
 target_include_directories(mbed-stm32h7
     INTERFACE
         .

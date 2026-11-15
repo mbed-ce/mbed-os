@@ -9,6 +9,9 @@
 #    board in DFU mode.
 # 3. On Linux, you will need to add a udev rule to be able to upload over DFU:
 #    SUBSYSTEM=="usb", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0366", MODE="664", GROUP="plugdev"
+# 4. The Arduino bootloader can interfere with debugging, as it seems to sometimes trap execution
+#    in the bootloader instead of executing the user application. In these instances, I have had reasonable
+#    luck with the GDB command "set $pc=Reset_Handler" to unstick things.
 
 # General config parameters
 # -------------------------------------------------------------

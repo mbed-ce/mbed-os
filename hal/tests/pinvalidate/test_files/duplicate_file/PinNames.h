@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* MBED TARGET LIST: K64F, LPC1768 */
+/* MBED TARGET LIST: FRDM_K64F, LPC1768 */
 
 #ifndef MBED_PINNAMES_H
 #define MBED_PINNAMES_H

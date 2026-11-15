@@ -15,7 +15,7 @@
         "TB_SENSE_12": {
             "nanostack.configuration": "lowpan_router"
         },
-        "KW41Z": {
+        "FRDM_KW41Z": {
             "nanostack.configuration": "lowpan_router"
         }
     }

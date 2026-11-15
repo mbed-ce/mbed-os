@@ -2,6 +2,7 @@
 
 """
 Copyright (c) 2020 ARM Limited
+SPDX-License-Identifier: Apache-2.0
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -64,7 +65,7 @@ def find_target_by_path(target_path):
         pin_names_file_content = pin_names_file.read()
 
     target_list_match = re.search(
-        "\/* MBED TARGET LIST: ([0-9A-Z_,* \n]+)*\/",
+        "/* MBED TARGET LIST: ([0-9A-Z_,* \n]+)*/",
         pin_names_file_content
     )
 
@@ -106,7 +107,7 @@ def find_target_by_name(target_name=""):
             pin_names_file_content = pin_names_file.read()
 
         target_list_match = re.search(
-            "\/* MBED TARGET LIST: ([0-9A-Z_,* \n]+)*\/",
+            "/* MBED TARGET LIST: ([0-9A-Z_,* \n]+)*/",
             pin_names_file_content
         )
 
@@ -147,7 +148,7 @@ def check_markers(test_mode=False):
             pin_names_file_content = pin_names_file.read()
 
         target_list_match = re.search(
-            "\/* MBED TARGET LIST: ([0-9A-Z_,* \n]+)*\/",
+            "/* MBED TARGET LIST: ([0-9A-Z_,* \n]+)*/",
             pin_names_file_content
         )
 
@@ -227,7 +228,7 @@ def check_duplicate_markers(test_mode=False):
             pin_names_file_content = pin_names_file.read()
 
         target_list_match = re.search(
-            "\/* MBED TARGET LIST: ([0-9A-Z_,* \n]+)*\/",
+            "/* MBED TARGET LIST: ([0-9A-Z_,* \n]+)*/",
             pin_names_file_content
         )
 

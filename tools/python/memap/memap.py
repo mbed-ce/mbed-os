@@ -297,7 +297,7 @@ class _GccParser(_Parser):
 
         return section_name, load_addr_offset
 
-    def check_input_section(self, line) -> Optional[str]:
+    def check_input_section(self, line) -> str | None:
         """Check whether a new input section in a map file has been detected.
 
         Positional arguments:

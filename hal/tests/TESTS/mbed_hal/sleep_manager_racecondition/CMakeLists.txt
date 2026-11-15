@@ -5,6 +5,10 @@ if(NOT "DEVICE_SLEEP=1" IN_LIST MBED_TARGET_DEFINITIONS)
 	set(TEST_SKIPPED "Sleep is not supported for this target")
 endif()
 
+if("MBED_CONF_PLATFORM_ENABLE_DEEP_SLEEP=0" IN_LIST MBED_CONFIG_DEFINITIONS)
+	set(TEST_SKIPPED "Deep sleep is not enabled for this target")
+endif()
+
 mbed_greentea_add_test(
 	TEST_NAME
 		mbed-hal-sleep-manager-racecondition

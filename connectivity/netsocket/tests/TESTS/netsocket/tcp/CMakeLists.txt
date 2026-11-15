@@ -33,22 +33,26 @@ endif()
 
 mbed_greentea_add_test(
     TEST_NAME
-        mbed-connectivity-netsocket-lwipstack-tcp
-    TEST_SOURCES
-        ${TEST_SOURCE_LIST}
-    TEST_REQUIRED_LIBS
-        ${MBED_NETSOCKET_TEST_COMMON_LIBS_LWIPSTACK}
-    TEST_SKIPPED
-        ${TEST_SKIPPED}
-)
-
-mbed_greentea_add_test(
-    TEST_NAME
         mbed-connectivity-netsocket-nanostack-tcp
     TEST_SOURCES
         ${TEST_SOURCE_LIST}
     TEST_REQUIRED_LIBS
         ${MBED_NETSOCKET_TEST_COMMON_LIBS_NANOSTACK}
+    TEST_SKIPPED
+        ${TEST_SKIPPED}
+)
+
+if("MBED_CONF_TARGET_NETWORK_DEFAULT_INTERFACE_TYPE=MESH" IN_LIST MBED_CONFIG_DEFINITIONS)
+    set(TEST_SKIPPED "LwIP does not support mesh networking.")
+endif()
+
+mbed_greentea_add_test(
+    TEST_NAME
+        mbed-connectivity-netsocket-lwipstack-tcp
+    TEST_SOURCES
+        ${TEST_SOURCE_LIST}
+    TEST_REQUIRED_LIBS
+        ${MBED_NETSOCKET_TEST_COMMON_LIBS_LWIPSTACK}
     TEST_SKIPPED
         ${TEST_SKIPPED}
 )

@@ -1,6 +1,7 @@
 """
 mbed SDK
 Copyright (c) 2011-2018 ARM Limited
+SPDX-License-Identifier: Apache-2.0
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -94,9 +95,11 @@ class PlatformDetectionTestCase(unittest.TestCase):
             file_object.__iter__.return_value = test_data_file_data.splitlines(True)
             return file_object
 
-        with patch("mbed_lstools.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr, patch(
-            "mbed_os_tools.detect.lstools_base.open", do_open
-        ) as _, patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir:
+        with (
+            patch("mbed_lstools.lstools_base.MbedLsToolsBase.mount_point_ready") as _mpr,
+            patch("mbed_os_tools.detect.lstools_base.open", do_open) as _,
+            patch("mbed_os_tools.detect.lstools_base.listdir") as _listdir,
+        ):
             _mpr.return_value = True
             _listdir.return_value = test_data_case_file_names
             results = self.base.list_mbeds(read_details_txt=True)
@@ -186,7 +189,7 @@ class PlatformDetectionTestCase(unittest.TestCase):
                 "product_id": "0204",
             },
             {
-                "platform_name": "K64F",
+                "platform_name": "FRDM_K64F",
                 "device_type": "daplink",
                 "target_id": "0240000032044e45000a700a997b00356781000097969900",
                 "target_id_usb_id": "0240000032044e45000a700a997b00356781000097969900",

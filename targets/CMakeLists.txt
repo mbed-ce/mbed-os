@@ -22,7 +22,8 @@ if(${CMAKE_CROSSCOMPILING})
             break()
         elseif(_label MATCHES "^Freescale$")
             add_subdirectory(TARGET_Freescale EXCLUDE_FROM_ALL)
-            break()
+            # Do NOT break here as some MCUs were moved from Freescale to NXP and
+            # have both target labels
         elseif(_label MATCHES "^Maxim$")
             add_subdirectory(TARGET_Maxim EXCLUDE_FROM_ALL)
             break()

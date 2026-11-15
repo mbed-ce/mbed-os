@@ -317,7 +317,7 @@ utest::v1::status_t greentea_test_setup(const size_t number_of_cases)
     return greentea_test_setup_handler(number_of_cases);
 }
 
-Specification specification(greentea_test_setup, cases, greentea_test_teardown_handler);
+Specification specification(greentea_test_setup, cases, greentea_test_teardown_handler, utest::v1::greentea_continue_handlers);
 
 int main()
 {

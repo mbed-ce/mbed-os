@@ -43,7 +43,6 @@ target_sources(mbed-stm
         port_api.c
         pwmout_api.c
         qspi_api.c
-        reset_reason.c
         rtc_api.c
         serial_api.c
         ${STM_SLEEP_API_SOURCE}
@@ -54,5 +53,8 @@ target_sources(mbed-stm
 		stm_dma_utils.c
         low_speed_clock.c
 )
+if(NOT "STM32H747_ARDUINO" IN_LIST MBED_TARGET_LABELS)
+	target_sources(mbed-stm INTERFACE reset_reason.c)
+endif()
 
 target_link_libraries(mbed-stm INTERFACE mbed-cmsis-cortex-m)

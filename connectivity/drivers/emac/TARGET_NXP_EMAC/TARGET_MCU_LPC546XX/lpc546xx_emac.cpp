@@ -39,6 +39,8 @@ enet_handle_t g_handle;
 emac_mem_buf_t *rx_buff[ENET_RX_RING_LEN];
 // TX packet buffer pointers
 emac_mem_buf_t *tx_buff[ENET_TX_RING_LEN];
+// Enet TX reclaim info
+enet_tx_reclaim_info_t tx_reclaim_info[ENET_TX_RING_LEN];
 // RX packet payload pointers
 uint32_t rx_ptr[ENET_RX_RING_LEN];
 
@@ -94,12 +96,12 @@ static void update_read_buffer(enet_rx_bd_struct_t *rxDesc, uint8_t *buf)
 
     rxBdRing->rxGenIdx = index;
     if (buf != NULL) {
-        rxDesc->buff1Addr = (uint32_t)buf;
+        rxDesc->rdes0 = (uint32_t)buf;
     }
 
-    rxDesc->buff2Addr = 0;
-    rxDesc->reserved = 0;
-    rxDesc->control = control;
+    rxDesc->rdes1 = 0;
+    rxDesc->rdes2 = 0;
+    rxDesc->rdes3 = control;
 }
 
 /** \brief  Free TX buffers that are complete
@@ -142,8 +144,10 @@ void LPC546XX_EMAC::tx_isr()
     osThreadFlagsSet(thread, FLAG_TX);
 }
 
-void LPC546XX_EMAC::ethernet_callback(ENET_Type *base, enet_handle_t *handle, enet_event_t event, uint8_t channel, void *param)
+void LPC546XX_EMAC::ethernet_callback(ENET_Type *base, enet_handle_t *handle, enet_event_t event, uint8_t channel, enet_tx_reclaim_info_t *txReclaimInfo, void *param)
 {
+    (void)txReclaimInfo;
+
     LPC546XX_EMAC *enet = static_cast<LPC546XX_EMAC *>(param);
 
     switch (event) {
@@ -210,6 +214,7 @@ bool LPC546XX_EMAC::low_level_init_successful()
         ENET_TX_RING_LEN,
         &tx_desc_start_addr[0],
         &tx_desc_start_addr[0],
+        tx_reclaim_info,
         &rx_desc_start_addr[0],
         &rx_desc_start_addr[ENET_RX_RING_LEN],
         rx_ptr,
@@ -254,7 +259,7 @@ emac_mem_buf_t *LPC546XX_EMAC::low_level_input()
     uint32_t length = 0;
 
     /* Determine if a frame has been received */
-    if ((bdPtr->control & ENET_RXDESCRIP_WR_OWN_MASK) != 0) {
+    if ((bdPtr->rdes3 & ENET_RXDESCRIP_WR_OWN_MASK) != 0) {
         return p;
     }
 
@@ -264,12 +269,12 @@ emac_mem_buf_t *LPC546XX_EMAC::low_level_input()
 #endif
 
     /* Determine if the received frame has an error */
-    if ((bdPtr->control & ENET_RXDESCRIP_WR_ERRSUM_MASK) != 0) {
+    if ((bdPtr->rdes3 & ENET_RXDESCRIP_WR_ERRSUM_MASK) != 0) {
         /* Re-use the same buffer in case of error */
         update_read_buffer(bdPtr, NULL);
     } else {
-        if (bdPtr->control & ENET_RXDESCRIP_WR_LD_MASK) {
-            length = (bdPtr->control & ENET_RXDESCRIP_WR_PACKETLEN_MASK) - 4;
+        if (bdPtr->rdes3 & ENET_RXDESCRIP_WR_LD_MASK) {
+            length = (bdPtr->rdes3 & ENET_RXDESCRIP_WR_PACKETLEN_MASK) - 4;
         } else {
             length = rxBdRing->rxBuffSizeAlign;
         }
@@ -360,7 +365,7 @@ void LPC546XX_EMAC::packet_rx()
         suspend = true;
     }
 
-    while ((bdPtr->control & ENET_RXDESCRIP_WR_OWN_MASK) == 0) {
+    while ((bdPtr->rdes3 & ENET_RXDESCRIP_WR_OWN_MASK) == 0) {
         input();
         /* rxGenIdx gets updated, gets the next receive buffer descriptor */
         bdPtr = rxBdRing->rxBdBase + rxBdRing->rxGenIdx;
@@ -416,7 +421,23 @@ bool LPC546XX_EMAC::link_out(emac_mem_buf_t *buf)
     /* Save the buffer so that it can be freed when transmit is done */
     tx_buff[index] = buf;
 
-    if (ENET_SendFrame(ENET, &g_handle, static_cast<uint8_t *>(memory_manager->get_ptr(buf)), memory_manager->get_len(buf)) != kStatus_Success) {
+    enet_buffer_struct_t txBuffer{
+        .buffer = static_cast<uint8_t *>(memory_manager->get_ptr(buf)),
+        .length = static_cast<uint16_t>(memory_manager->get_len(buf))
+    };
+    enet_tx_frame_struct_t txFrame = {
+        .txBuffArray = &txBuffer,
+        .txBuffNum = 1,
+        .txConfig = {
+            .intEnable = true,
+            .tsEnable = false,
+            .slotNum = 0,
+            .txOffloadOps = kENET_TxOffloadDisable
+        },
+        .context = this
+    };
+
+    if (ENET_SendFrame(ENET, &g_handle, &txFrame, 0) != kStatus_Success) {
         memory_manager->free(buf);
         tx_buff[index] = NULL;
         return false;

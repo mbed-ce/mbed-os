@@ -35,7 +35,7 @@ namespace mbed {
  * Generic Cellular module which can be used as a default module when porting new cellular module.
  * GENERIC_AT3GPP uses standard 3GPP AT commands (3GPP TS 27.007 V14.5.0 (2017-09)) to communicate with the modem.
  *
- * GENERIC_AT3GPP can be used as a shield for example on top K64F.
+ * GENERIC_AT3GPP can be used as a shield for example on top of FRDM_K64F.
  * Cellular example can be used for testing: https://github.com/ARMmbed/mbed-os-example-cellular
  * Define in mbed_app.json "target_overrides" correct pins and other setup for your modem.
  *

@@ -7,9 +7,9 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from collections.abc import Set as AbstractSet
 from dataclasses import asdict
-from typing import Callable, Iterable, Iterator, Sequence
 
 from typing_extensions import override
 

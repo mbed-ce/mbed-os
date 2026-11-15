@@ -4,10 +4,10 @@
 #
 """Helpers for python language related functions."""
 
-from typing import Iterable, List
+from collections.abc import Iterable
 
 
-def flatten_nested(input_iter: Iterable) -> List:
+def flatten_nested(input_iter: Iterable) -> list:
     """
     Flatten a nested Iterable with arbitrary levels of nesting.
 
