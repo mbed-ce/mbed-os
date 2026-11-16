@@ -18,12 +18,13 @@
 #pragma once
 
 #include <stdint.h>
+#include <mstd_cstddef> // this IS usable from C code
 
 /**
  * @brief Check whether an integer is an exact power of two.
  */
 // from https://stackoverflow.com/a/600306/7083698
-static inline bool mbed_is_power_of_two(const uint32_t x)
+static MSTD_CONSTEXPR_FN_14 bool mbed_is_power_of_two(const uint32_t x)
 {
     return x > 0 && (x & (x - 1)) == 0;
 }
@@ -33,10 +34,25 @@ static inline bool mbed_is_power_of_two(const uint32_t x)
  *
  * Rounds down to the nearest power of 2, i.e. \c mbed_integer_log_2(3) is 1.
  */
-static inline uint32_t mbed_integer_log_2(uint32_t x)
+static MSTD_CONSTEXPR_FN_14 uint32_t mbed_integer_log_2(uint32_t x)
 {
     return sizeof(uint32_t) * 8 - 1 - __builtin_clz(x);
 }
+
+#if __cplusplus
+/**
+ * @brief Divide two integers, rounding the result upward (towards + infinity) if fractional.
+ *
+ * Examples:
+ *  mbed_integer_div_round_up(12, 6) -> 2
+ *  mbed_integer_div_round_up(10, 6) -> 2
+ *  mbed_integer_div_round_up(-10, 6) -> -1
+ */
+template<typename IntegerT>
+static constexpr IntegerT mbed_integer_div_round_up(IntegerT dividend, IntegerT divisor) {
+    return (dividend + (divisor - 1)) / divisor;
+}
+#endif
 
 /**
  * @brief Align an address (\c addr) to a given \c alignment by adding between 0 and \c alignment-1 bytes to it.
