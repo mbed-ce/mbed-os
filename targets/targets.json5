@@ -5275,7 +5275,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_KINETIS_K_SERIES"
         ],
         "device_has_add": [
-//             "EMAC",
+             "EMAC",
         ],
         "is_mcu_family_target": true,
         "public": false
@@ -5306,7 +5306,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         ],
         "overrides": {
             "default-adc-vref": 3.3,
-//            "network-default-interface-type": "ETHERNET"
+            "network-default-interface-type": "ETHERNET"
         },
         "image_url": "https://mm.digikey.com/Volume0/opasdata/d220001/medias/images/407/MFG_FRDM-K64F.JPG"
     },
