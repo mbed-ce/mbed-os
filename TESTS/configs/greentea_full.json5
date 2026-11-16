@@ -37,12 +37,9 @@
     },
     "target_overrides": {
         "FRDM_KW41Z": {
-            // Fit the socket tests in 512 KiB: use a mesh host and TLS client.
+            // Socket tests need a mesh host, not a router.
             "nanostack.configuration": "lowpan_host",
-            "mbed-mesh-api.6lowpan-nd-device-type": "NET_6LOWPAN_HOST",
-            "target.macros_add": [
-                "MBEDTLS_USER_CONFIG_FILE=\"TESTS/configs/mbedtls_client_config.h\""
-            ]
+            "mbed-mesh-api.6lowpan-nd-device-type": "NET_6LOWPAN_HOST"
         },
         "MCU_LPC17XX": {
             // Configure Nanostack for Ethernet mode only. This is sufficient for our tests and is
@@ -51,6 +48,9 @@
             "nanostack.configuration": "ethernet_host"
         },
         "MCU_LPC546XX": {
+            "nanostack.configuration": "ethernet_host"
+        },
+        "MCU_PSOC6": {
             "nanostack.configuration": "ethernet_host"
         }
     }
