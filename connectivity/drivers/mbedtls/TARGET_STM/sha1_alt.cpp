@@ -42,8 +42,8 @@ static SingletonPtr<rtos::Mutex> sha1_mutex;
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 #define SHA1_VALIDATE_RET(cond)                             \
-    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_SHA1_BAD_INPUT_DATA )
-#define SHA1_VALIDATE(cond)  MBEDTLS_INTERNAL_VALIDATE( cond )
+    do { if (!(cond)) { return MBEDTLS_ERR_SHA1_BAD_INPUT_DATA; } } while (0)
+#define SHA1_VALIDATE(cond)  do { if (!(cond)) { return; } } while (0)
 
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -89,7 +89,7 @@ void mbedtls_sha1_clone(mbedtls_sha1_context *dst,
     *dst = *src;
 }
 
-int mbedtls_sha1_starts_ret(mbedtls_sha1_context *ctx)
+int mbedtls_sha1_starts(mbedtls_sha1_context *ctx)
 {
     int ret = 0;
 
@@ -164,7 +164,7 @@ exit :
     return (ret);
 }
 
-int mbedtls_sha1_update_ret(mbedtls_sha1_context *ctx,
+int mbedtls_sha1_update(mbedtls_sha1_context *ctx,
                             const unsigned char *input,
                             size_t ilen)
 {
@@ -235,7 +235,7 @@ exit :
     return (ret);
 }
 
-int mbedtls_sha1_finish_ret(mbedtls_sha1_context *ctx,
+int mbedtls_sha1_finish(mbedtls_sha1_context *ctx,
                             unsigned char output[32])
 {
     int ret = 0;

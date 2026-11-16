@@ -36,6 +36,11 @@
         "target.console-rtt": false
     },
     "target_overrides": {
+        "FRDM_KW41Z": {
+            // Socket tests need a mesh host, not a router.
+            "nanostack.configuration": "lowpan_host",
+            "mbed-mesh-api.6lowpan-nd-device-type": "NET_6LOWPAN_HOST"
+        },
         "MCU_LPC17XX": {
             // Configure Nanostack for Ethernet mode only. This is sufficient for our tests and is
             // needed because not every target has enough flash space for all of Nanostack (seems like
@@ -43,6 +48,9 @@
             "nanostack.configuration": "ethernet_host"
         },
         "MCU_LPC546XX": {
+            "nanostack.configuration": "ethernet_host"
+        },
+        "MCU_PSOC6": {
             "nanostack.configuration": "ethernet_host"
         }
     }

@@ -42,6 +42,8 @@
  *     <http://eprint.iacr.org/2004/342.pdf>
  */
 
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else
@@ -56,8 +58,9 @@
 #if defined( MBEDTLS_ECP_INTERNAL_ALT )
 
 #include "mbedtls/ecp.h"
-#include "mbedtls/ecp_internal.h"
+#include "ecp_internal_alt.h"
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 #include "em_crypto.h"
 #include "em_core.h"
 #include "crypto_management.h"

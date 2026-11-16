@@ -22,6 +22,7 @@
 #if defined(MBEDTLS_SHA512_ALT)
 #include <string.h>
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 
 void mbedtls_sha512_init( mbedtls_sha512_context *ctx )
 {
@@ -43,7 +44,7 @@ void mbedtls_sha512_clone( mbedtls_sha512_context *dst,
 }
 
 
-int mbedtls_sha512_starts_ret( mbedtls_sha512_context *ctx, int is384 )
+int mbedtls_sha512_starts( mbedtls_sha512_context *ctx, int is384 )
 {
     if( is384 )
         return( MBEDTLS_ERR_PLATFORM_FEATURE_UNSUPPORTED );
@@ -58,7 +59,7 @@ int mbedtls_internal_sha512_process( mbedtls_sha512_context *ctx,
     return( MBEDTLS_ERR_PLATFORM_FEATURE_UNSUPPORTED );
 }
 
-int mbedtls_sha512_update_ret( mbedtls_sha512_context *ctx,
+int mbedtls_sha512_update( mbedtls_sha512_context *ctx,
                                const unsigned char *input,
                                size_t ilen )
 {
@@ -67,7 +68,7 @@ int mbedtls_sha512_update_ret( mbedtls_sha512_context *ctx,
     return ( 0 );
 }
 
-int mbedtls_sha512_finish_ret( mbedtls_sha512_context *ctx,
+int mbedtls_sha512_finish( mbedtls_sha512_context *ctx,
                                unsigned char output[64] )
 {
     CRYSError_t crys_err = CRYS_OK;

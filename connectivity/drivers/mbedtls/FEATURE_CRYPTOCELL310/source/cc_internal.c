@@ -25,6 +25,7 @@
 #include "crys_ecpki_error.h"
 #include "crys_ec_mont_edw_error.h"
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 
 CRYS_ECPKI_DomainID_t convert_mbedtls_grp_id_to_crys_domain_id( mbedtls_ecp_group_id grp_id )
 {

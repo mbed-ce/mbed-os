@@ -123,7 +123,7 @@ static int aes_set_keys( mbedtls_aes_context *ctx, const unsigned char *key,
 
     if (CY_CRYPTO_SUCCESS != status)
     {
-        ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
+        ret = MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED;
     }
 
 exit:
@@ -248,7 +248,7 @@ int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
 
     if (CY_CRYPTO_SUCCESS != status)
     {
-        ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
+        ret = MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED;
     }
 
     return( ret );
@@ -280,7 +280,7 @@ int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
 
     if (CY_CRYPTO_SUCCESS != status)
     {
-        ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
+        ret = MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED;
     }
 
     return( ret );
@@ -360,7 +360,7 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
 
             if (CY_CRYPTO_SUCCESS != status)
             {
-                ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
+                ret = MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED;
             }
         }
     }
@@ -380,7 +380,7 @@ int mbedtls_aes_crypt_cbc( mbedtls_aes_context *ctx,
 
             if (CY_CRYPTO_SUCCESS != status)
             {
-                ret = MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
+                ret = MBEDTLS_ERR_PLATFORM_HW_ACCEL_FAILED;
             }
         }
     }

@@ -81,7 +81,7 @@ void mbedtls_sha256_clone( mbedtls_sha256_context *dst,
  *
  * \returns        error code
  */
-int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224 );
+int mbedtls_sha256_starts( mbedtls_sha256_context *ctx, int is224 );
 
 /**
  * \brief          SHA-256 process buffer
@@ -92,7 +92,7 @@ int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224 );
  *
  * \returns        error code
  */
-int mbedtls_sha256_update_ret( mbedtls_sha256_context *ctx, const unsigned char *input,
+int mbedtls_sha256_update( mbedtls_sha256_context *ctx, const unsigned char *input,
                     size_t ilen );
 
 /**
@@ -103,71 +103,12 @@ int mbedtls_sha256_update_ret( mbedtls_sha256_context *ctx, const unsigned char 
  *
  * \returns        error code
  */
-int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx, unsigned char output[32] );
+int mbedtls_sha256_finish( mbedtls_sha256_context *ctx, unsigned char *output );
 
 /* Internal use */
 int mbedtls_internal_sha256_process( mbedtls_sha256_context *ctx, const unsigned char data[64] );
 
-#if !defined(MBEDTLS_DEPRECATED_REMOVED)
-#if defined(MBEDTLS_DEPRECATED_WARNING)
-#define MBEDTLS_DEPRECATED      __attribute__((deprecated))
-#else
-#define MBEDTLS_DEPRECATED
-#endif
-/**
- * \brief          This function starts a SHA-256 checksum calculation.
- *
- * \deprecated     Superseded by mbedtls_sha256_starts_ret() in 2.7.0.
- *
- * \param ctx      The SHA-256 context to initialize.
- * \param is224    Determines which function to use.
- *                 <ul><li>0: Use SHA-256.</li>
- *                 <li>1: Use SHA-224.</li></ul>
- */
-MBEDTLS_DEPRECATED void mbedtls_sha256_starts( mbedtls_sha256_context *ctx,
-                                               int is224 );
 
-/**
- * \brief          This function feeds an input buffer into an ongoing
- *                 SHA-256 checksum calculation.
- *
- * \deprecated     Superseded by mbedtls_sha256_update_ret() in 2.7.0.
- *
- * \param ctx      The SHA-256 context to initialize.
- * \param input    The buffer holding the data.
- * \param ilen     The length of the input data.
- */
-MBEDTLS_DEPRECATED void mbedtls_sha256_update( mbedtls_sha256_context *ctx,
-                                               const unsigned char *input,
-                                               size_t ilen );
-
-/**
- * \brief          This function finishes the SHA-256 operation, and writes
- *                 the result to the output buffer.
- *
- * \deprecated     Superseded by mbedtls_sha256_finish_ret() in 2.7.0.
- *
- * \param ctx      The SHA-256 context.
- * \param output   The SHA-224or SHA-256 checksum result.
- */
-MBEDTLS_DEPRECATED void mbedtls_sha256_finish( mbedtls_sha256_context *ctx,
-                                               unsigned char output[32] );
-
-/**
- * \brief          This function processes a single data block within
- *                 the ongoing SHA-256 computation. This function is for
- *                 internal use only.
- *
- * \deprecated     Superseded by mbedtls_internal_sha256_process() in 2.7.0.
- *
- * \param ctx      The SHA-256 context.
- * \param data     The buffer holding one block of data.
- */
-MBEDTLS_DEPRECATED void mbedtls_sha256_process( mbedtls_sha256_context *ctx,
-                                                const unsigned char data[64] );
-
-#undef MBEDTLS_DEPRECATED
-#endif /* !MBEDTLS_DEPRECATED_REMOVED */
 
 #ifdef __cplusplus
 }

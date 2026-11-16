@@ -82,7 +82,7 @@ void mbedtls_sha256_clone(mbedtls_sha256_context *dst,
         dst->sw_ctx.total[0] = src->hw_ctx.total;
         dst->sw_ctx.total[1] = 0;
         {
-            unsigned char output[32];
+            unsigned char *output;
             crypto_sha_getinternstate(output, sizeof (output));
             unsigned char *output_pos = output;
             unsigned char *output_end = output + (sizeof (output) / sizeof (output[0]));
@@ -106,7 +106,7 @@ void mbedtls_sha256_clone(mbedtls_sha256_context *dst,
 /*
  * SHA-256 context setup
  */
-int mbedtls_sha256_starts_ret(mbedtls_sha256_context *ctx, int is224)
+int mbedtls_sha256_starts(mbedtls_sha256_context *ctx, int is224)
 {
     if (ctx->active_ctx == &ctx->hw_ctx) {
         mbedtls_sha256_hw_starts(&ctx->hw_ctx, is224);
@@ -119,7 +119,7 @@ int mbedtls_sha256_starts_ret(mbedtls_sha256_context *ctx, int is224)
 /*
  * SHA-256 process buffer
  */
-int mbedtls_sha256_update_ret(mbedtls_sha256_context *ctx, const unsigned char *input, size_t ilen)
+int mbedtls_sha256_update(mbedtls_sha256_context *ctx, const unsigned char *input, size_t ilen)
 {
     if (ctx->active_ctx == &ctx->hw_ctx) {
         mbedtls_sha256_hw_update(&ctx->hw_ctx, input, ilen);
@@ -132,7 +132,7 @@ int mbedtls_sha256_update_ret(mbedtls_sha256_context *ctx, const unsigned char *
 /*
  * SHA-256 final digest
  */
-int mbedtls_sha256_finish_ret(mbedtls_sha256_context *ctx, unsigned char output[32])
+int mbedtls_sha256_finish(mbedtls_sha256_context *ctx, unsigned char *output)
 {
     if (ctx->active_ctx == &ctx->hw_ctx) {
         mbedtls_sha256_hw_finish(&ctx->hw_ctx, output);

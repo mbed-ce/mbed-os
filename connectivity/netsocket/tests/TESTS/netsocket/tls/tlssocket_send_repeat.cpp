@@ -30,7 +30,7 @@ void TLSSOCKET_SEND_REPEAT()
 {
     SKIP_IF_TCP_UNSUPPORTED();
     TLSSocket sock;
-    tlssocket_connect_to_discard_srv(sock);
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, tlssocket_connect_to_discard_srv(sock));
 
     int snd;
     Timer timer;

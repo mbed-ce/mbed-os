@@ -22,7 +22,6 @@
 #endif
 
 #include "mbedtls/cipher.h"
-#include "mbedtls/cipher_internal.h"
 #include "mbedtls/platform_util.h"
 
 #include <stdlib.h>
@@ -210,4 +209,3 @@ int mbedtls_cipher_auth_decrypt(mbedtls_cipher_context_t *ctx,
     }
     return cipher_stub.int_value;
 }
-

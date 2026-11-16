@@ -28,6 +28,7 @@
 
 #include "mbedtls/platform_util.h"
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 
 #include "rtos/Mutex.h"
 #include "platform/SingletonPtr.h"
@@ -37,9 +38,9 @@ static SingletonPtr<rtos::Mutex> gcm_mutex;
 
 /* Parameter validation macros */
 #define GCM_VALIDATE_RET( cond ) \
-    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_GCM_BAD_INPUT )
+    do { if (!(cond)) { return MBEDTLS_ERR_GCM_BAD_INPUT; } } while (0)
 #define GCM_VALIDATE( cond ) \
-    MBEDTLS_INTERNAL_VALIDATE( cond )
+    do { if (!(cond)) { return; } } while (0)
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/

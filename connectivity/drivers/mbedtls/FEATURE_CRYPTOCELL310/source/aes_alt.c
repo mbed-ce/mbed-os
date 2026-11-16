@@ -23,6 +23,7 @@
 #include <string.h>
 #include "ssi_aes_defs.h"
 #include "mbedtls/platform.h"
+#include "mbedtls/error.h"
 
 #if defined(MBEDTLS_CIPHER_MODE_CFB)
 /*
