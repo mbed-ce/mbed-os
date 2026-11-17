@@ -26,6 +26,22 @@ namespace mbed
 
 class NuvotonM480EthMAC : public CompositeEMAC
 {
+    static constexpr Quirks quirks = {
+        .txDMA = {
+            .extraTxDescsToLeave = 0,
+            .supportsDescChaining = false, // we do NOT support multiple descriptors in the hardware
+            .manuallyAppendCRC = false,
+            .manuallyPadShortFrames = false
+        },
+        .rxDMA = {
+            .supportsFirstDescFlag = true,
+            .canReturnAllDescriptors = false,
+            .packetEndDiscardSize = 0,
+            .rxBufferSizeMultiple = 1,
+        },
+        .duplexChangeRequiresReinit = false
+    };
+
     class MACDriver : public CompositeEMAC::MACDriver
     {
         EMAC_T * const base;
@@ -86,7 +102,7 @@ class NuvotonM480EthMAC : public CompositeEMAC
         void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
     public:
         explicit TxDMA(EMAC_T * const base):
-        GenericTxDMARing(0, false), // we do NOT support multiple descriptors in the hardware
+        GenericTxDMARing(quirks),
         base(base)
         {}
     };
@@ -114,6 +130,7 @@ class NuvotonM480EthMAC : public CompositeEMAC
 
     public:
         explicit RxDMA(EMAC_T * const base):
+        GenericRxDMARing(quirks),
         base(base)
         {}
     };

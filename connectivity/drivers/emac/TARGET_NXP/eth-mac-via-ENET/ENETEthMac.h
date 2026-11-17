@@ -16,6 +16,22 @@ namespace mbed {
 
 class ENETEthMac : public CompositeEMAC {
 
+    static constexpr Quirks quirks = {
+        .txDMA = {
+            .extraTxDescsToLeave = 0,
+            .supportsDescChaining = true,
+            .manuallyAppendCRC = false,
+            .manuallyPadShortFrames = false
+        },
+        .rxDMA = {
+            .supportsFirstDescFlag = false,
+            .canReturnAllDescriptors = true,
+            .packetEndDiscardSize = sizeof(uint32_t),
+            .rxBufferSizeMultiple = 64, // Per the datasheet Rx buffer sizes should be a multiple of 64 for best performance
+        },
+        .duplexChangeRequiresReinit = true
+    };
+
     class MACDriver : public CompositeEMAC::MACDriver
     {
         size_t const enetNumber;
@@ -71,7 +87,7 @@ class ENETEthMac : public CompositeEMAC {
         void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
     public:
         explicit TxDMA(ENET_Type * const base):
-        GenericTxDMARing(1, true),
+        GenericTxDMARing(quirks),
         base(base)
         {}
     };
@@ -95,13 +111,10 @@ class ENETEthMac : public CompositeEMAC {
         void returnDescriptor(size_t descIdx, uint8_t * buffer) override;
 
         size_t getTotalLen(size_t firstDescIdx, size_t lastDescIdx) override;
-
-        static constexpr size_t END_DISCARD_SIZE = 4;
-
     public:
 
         explicit RxDMA(ENET_Type * const base):
-        GenericRxDMARing(false, true, END_DISCARD_SIZE),
+        GenericRxDMARing(quirks),
         base(base)
         {}
     };

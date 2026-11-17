@@ -275,7 +275,7 @@ size_t NuvotonM480EthMAC::RxDMA::getTotalLen(size_t firstDescIdx, size_t lastDes
 NuvotonM480EthMAC * NuvotonM480EthMAC::instance = nullptr;
 
 NuvotonM480EthMAC::NuvotonM480EthMAC():
-CompositeEMAC(txDMA, rxDMA, macDriver),
+CompositeEMAC(quirks, txDMA, rxDMA, macDriver),
 // Note: we can't use the "EMAC" symbol directly because it conflicts with the EMAC class. So we have to
 // use the integer address and cast it instead.
 base(reinterpret_cast<EMAC_T *>(EMAC_BASE)),

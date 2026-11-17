@@ -160,18 +160,52 @@ CompositeEMAC::ErrCode ENETEthMac::MACDriver::init() {
 
     // Enable IRQs.
     // Note that on Kinetis these are different IRQs but on MIMXRT they have been combined
-    // into one. So, we just always treat them as the same IRQ with the same handler.
+    // into one. So, we just point all of them to the same handler.
     for (auto irq : {s_enetTxIrqId[enetNumber], s_enetRxIrqId[enetNumber], s_enetErrIrqId[enetNumber]}) {
         NVIC_SetVector(irq, reinterpret_cast<uint32_t>(ENETIRQHandlers[enetNumber]));
         NVIC_SetPriority(irq, ((0x01 << 3) | 0x01));
         NVIC_ClearPendingIRQ(irq); // in case pending from previous time the MAC was used
         NVIC_EnableIRQ(irq);
     }
+
+    return ErrCode::SUCCESS;
 }
 
 CompositeEMAC::ErrCode ENETEthMac::MACDriver::deinit() {
     // Put the ENET under reset, clearing all settings.
     base->ECR |= ENET_ECR_RESET_MASK;
+
+    return ErrCode::SUCCESS;
+}
+
+CompositeEMAC::ErrCode ENETEthMac::MACDriver::enable(LinkSpeed speed, Duplex duplex) {
+
+    // Set speed
+    if (speed == LinkSpeed::LINK_10MBIT) {
+        base->RCR |= ENET_RCR_RMII_10T_MASK;
+    }
+    else {
+        base->RCR &= ~ENET_RCR_RMII_10T_MASK;
+    }
+
+    if (base->ECR & ENET_ECR_ETHEREN_MASK) {
+        // Not the first initialization, not allowed to change duplex settings. Just bring out of sleep.
+        // The quirks configuration will ensure that if the duplex is changed the MAC will be re-initialized.
+        base->ECR &= ~ENET_ECR_SLEEP_MASK;
+    }
+    else {
+        // First initialization, configure the duplex and enable the Ethernet peripheral
+        if (duplex == Duplex::HALF) {
+            base->RCR |= ENET_RCR_DRT_MASK;
+            base->TCR &= ~ENET_TCR_FDEN_MASK;
+        }
+        else {
+            base->RCR &= ~ENET_RCR_DRT_MASK;
+            base->TCR |= ENET_TCR_FDEN_MASK;
+        }
+
+        base->ECR = (base->ECR & ~ENET_ECR_SLEEP_MASK) | ENET_ECR_ETHEREN_MASK;
+    }
 
     return ErrCode::SUCCESS;
 }

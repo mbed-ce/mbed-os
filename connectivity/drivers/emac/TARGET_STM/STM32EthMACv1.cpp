@@ -511,7 +511,7 @@ void STM32EthMACv1::MACDriver::setPromiscuous(bool enable) {
 STM32EthMACv1 * STM32EthMACv1::instance = nullptr;
 
 STM32EthMACv1::STM32EthMACv1():
-CompositeEMAC(txDMA, rxDMA, macDriver),
+CompositeEMAC(quirks, txDMA, rxDMA, macDriver),
 base(ETH),
 txDMA(base),
 rxDMA(base),

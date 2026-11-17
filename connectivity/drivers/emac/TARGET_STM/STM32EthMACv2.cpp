@@ -524,7 +524,7 @@ namespace mbed {
     STM32EthMACv2 * STM32EthMACv2::instance = nullptr;
 
     STM32EthMACv2::STM32EthMACv2():
-    CompositeEMAC(txDMA, rxDMA, macDriver),
+    CompositeEMAC(quirks, txDMA, rxDMA, macDriver),
     base(ETH),
     txDMA(base),
     rxDMA(base),
