@@ -22,8 +22,13 @@
  * belong to. */
 
 /* Number of vector table entries reserved for external IRQs. Must match the
- * r_icu_isr entries of g_vector_table in vector_data.c. */
+ * r_icu_isr entries of g_vector_table in vector_data.c. Boards/cores can
+ * override both the count and the slot list through PeripheralNames.h (the
+ * Cortex-M33 build, for example, uses the CPU1-local ICU with a different
+ * vector table layout). */
+#ifndef EXT_IRQ_SLOT_COUNT
 #define EXT_IRQ_SLOT_COUNT        (12)
+#endif
 
 /* Interrupt priority used for all dynamically allocated external IRQs. */
 #define EXT_IRQ_IPL               (12)
@@ -31,10 +36,12 @@
 /* IRQ allocation table: NVIC vector indices reserved for external IRQs.
  * These are the only g_vector_table entries that hold r_icu_isr; their
  * IELSR registers stay 0 (unlinked) until a channel is allocated. */
+#ifndef EXT_IRQ_VECTOR_SLOTS
+#define EXT_IRQ_VECTOR_SLOTS      { 3, 8, 9, 10, 11, 12, 13, 14, 17, 22, 23, 24 }
+#endif
+
 static const IRQn_Type g_ext_irq_vector_slots[EXT_IRQ_SLOT_COUNT] =
-{
-    3, 8, 9, 10, 11, 12, 13, 14, 17, 22, 23, 24,
-};
+    EXT_IRQ_VECTOR_SLOTS;
 
 /* Bitmask of allocated slots (bit n == g_ext_irq_vector_slots[n] in use). */
 static uint16_t g_ext_irq_slot_used;

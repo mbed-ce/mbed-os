@@ -39,7 +39,9 @@
 // Cache setup
 // NOTE: On targets with a data cache, the RTT control block and buffers must be put in an uncached section of memory.
 // This requires that the linker script contain logic to place the ".noncached" section.
-#if defined(__DCACHE_PRESENT)
+// (Check the value, not just the presence, of __DCACHE_PRESENT: some CMSIS device
+// headers define it to 0 for cacheless cores such as the Cortex-M33.)
+#if defined(__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
 #define SEGGER_RTT_SECTION MBED_NONCACHED_SECTION_NAME
 #define SEGGER_RTT_BUFFER_SECTION MBED_NONCACHED_SECTION_NAME
 #elif defined(TARGET_CORTEX_A)

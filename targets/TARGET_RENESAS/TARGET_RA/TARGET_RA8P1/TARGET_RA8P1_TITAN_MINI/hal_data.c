@@ -5072,7 +5072,12 @@ const gpt_extended_cfg_t g_timer_gpt12_extend =
     .count_down_source   = (gpt_source_t) ( GPT_SOURCE_NONE),
     .capture_a_source    = (gpt_source_t) ( GPT_SOURCE_NONE),
     .capture_b_source    = (gpt_source_t) ( GPT_SOURCE_NONE),
+#if defined(TARGET_RA8P1_CM33)
+    /* GPT12 is the us_ticker timer on the Cortex-M33 (CPU1) build. */
+    .capture_a_ipl       = (12),
+#else
     .capture_a_ipl       = (BSP_IRQ_DISABLED),
+#endif
     .capture_b_ipl       = (BSP_IRQ_DISABLED),
     .compare_match_c_ipl = (BSP_IRQ_DISABLED),
     .compare_match_d_ipl = (BSP_IRQ_DISABLED),
@@ -5141,10 +5146,21 @@ const gpt_extended_cfg_t g_timer_gpt12_extend =
 
 const timer_cfg_t g_timer_gpt12_cfg =
 {
+#if defined(TARGET_RA8P1_CM33)
+    /* On the Cortex-M33 (CPU1) build GPT12 is the us_ticker timer:
+     * free-running 32-bit periodic counter clocked at PCLKD/16 = 15 MHz. */
+    .mode                = TIMER_MODE_PERIODIC,
+    .period_counts = (uint32_t) 0x100000000, .duty_cycle_counts = 0x80000000, .source_div = (timer_source_div_t)TIMER_SOURCE_DIV_16,
+#else
     .mode                = TIMER_MODE_PWM,
     /* Actual period: 0.00027306666666666667 seconds. Actual duty: 50%. */ .period_counts = (uint32_t) 0x10000, .duty_cycle_counts = 0x8000, .source_div = (timer_source_div_t)0,
+#endif
     .channel             = 12,
+#if defined(TARGET_RA8P1_CM33)
+    .p_callback          = usticker_compare_match_callback,
+#else
     .p_callback          = NULL,
+#endif
     /** If NULL then do not add & */
 #if defined(NULL)
     .p_context           = NULL,

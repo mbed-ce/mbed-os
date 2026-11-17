@@ -30,10 +30,12 @@ target_sources(mbed-ra8p1
         uart_device.c
         can_device.c
         ../ra/fsp/src/bsp/mcu/ra8p1/bsp_linker.c
+        # IPC driver (CPU0<->CPU1 FIFOs and doorbell interrupts, used by
+        # rpmsg-lite on both cores)
+        ../ra/fsp/src/r_ipc/r_ipc.c
 		../ra/fsp/src/r_adc_b/r_adc_b.c
 		../ra/fsp/src/r_agt/r_agt.c
 		../ra/fsp/src/r_cac/r_cac.c
-		../ra/fsp/src/r_canfd/r_canfd.c
 		../ra/fsp/src/r_cgc/r_cgc.c
 		../ra/fsp/src/r_crc/r_crc.c
 		../ra/fsp/src/r_dac_b/r_dac_b.c
@@ -343,9 +345,29 @@ target_sources(mbed-ra8p1
 )
 
 target_link_libraries(mbed-ra8p1 INTERFACE mbed-renesas-ra)
-if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
-	mbed_set_linker_script(mbed-ra8p1 ../ra/fsp/src/bsp/mcu/ra8p1/RA8P1.ld)
+
+# The FSP CANFD driver unconditionally references the CAN ICU vectors
+# (VECTOR_NUMBER_CAN_RXF/CAN_GLERR, r_canfd.c:349 etc.), which the CPU1-local
+# vector table of the CM33 boards does not provide. CAN/CAN_FD are removed
+# from device_has on MCU_RA8P1_CM33, so can_api.c compiles to an empty unit
+# there and the driver is simply not built; adding dormant CAN vectors
+# instead would keep the (KEEP'd) vector table referencing the CANFD ISRs
+# and drag the dead driver into the 192 KB CPU1 image.
+if(NOT "RA8P1_CM33" IN_LIST MBED_TARGET_LABELS)
+	target_sources(mbed-ra8p1 INTERFACE ../ra/fsp/src/r_canfd/r_canfd.c)
 endif()
 
+if(${MBED_TOOLCHAIN} STREQUAL "GCC_ARM")
+	if("RA8P1_CM33" IN_LIST MBED_TARGET_LABELS)
+		# Cortex-M33 (CPU1) image: links against the CPU1 flash/SRAM partitions
+		# and the CPU1-local TCMs (CTCM/STCM).
+		mbed_set_linker_script(mbed-ra8p1 TARGET_RA8P1_CM33/RA8P1_CM33.ld)
+	else()
+		mbed_set_linker_script(mbed-ra8p1 ../ra/fsp/src/bsp/mcu/ra8p1/RA8P1.ld)
+	endif()
+endif()
+
+add_subdirectory(TARGET_RA8P1_CM33 EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_CPKHMI_RA8P1 EXCLUDE_FROM_ALL)
 add_subdirectory(TARGET_RA8P1_TITAN_MINI EXCLUDE_FROM_ALL)
+add_subdirectory(TARGET_RA8P1_TITAN_MINI_CM33 EXCLUDE_FROM_ALL)

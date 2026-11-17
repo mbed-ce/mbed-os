@@ -13,6 +13,15 @@
             #define CPU0                                     (0)
             #define CPU1                                     (1)
 
+            /* The mbed target selects the core through a label
+             * (TARGET_RA8P1_CM85 / TARGET_RA8P1_CM33 from the
+             * MCU_RA8P1_CM85 / MCU_RA8P1_CM33 targets). */
+            #if defined(TARGET_RA8P1_CM33)
+                #define _RA_CORE                             (CPU1)
+            #else
+                #define _RA_CORE                             (CPU0)
+            #endif
+
             #if (_RA_CORE == CPU1)
                 #define BSP_CFG_CPU_CORE                     (1)
                 #define BSP_CFG_SKIP_INIT                    (1)
@@ -20,6 +29,11 @@
             #else
                 #define BSP_CFG_CPU_CORE                     (0)
             #endif
+
+            /* Dual-core memory partition of the RA8P1 (flash/SRAM/TCM slices
+             * per core). Also unlocks R_BSP_SecondaryCoreStart() on CPU0
+             * builds (see bsp_common.h). */
+            #include "bsp_dualcore_partition.h"
 
             #define BSP_LOCO_HZ                 (32768)
             #define BSP_MOCO_HZ                 (8000000)
@@ -431,7 +445,10 @@
      * the MicroSD debugging that needed it off is complete. */
     #define BSP_CFG_DCACHE_ENABLED (1)
  #else
-    #define BSP_CFG_DCACHE_ENABLED (1)
+    /* The Cortex-M33 (CPU1) has no D-cache (only the C-Cache flash cache,
+     * enabled separately in SystemInit), so the D-cache init path must not
+     * run on the secondary core. */
+    #define BSP_CFG_DCACHE_ENABLED (0)
  #endif
 #endif
 

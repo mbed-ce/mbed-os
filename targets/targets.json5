@@ -8970,7 +8970,6 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "MCU_RA"
         ],
         "public": false,
-        "core": "Cortex-M85",
         "device_has_add": [
             "CAN",
             "CAN_FD",
@@ -8980,9 +8979,84 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
             "RA8P1"
         ]
     },
-    "CPKHMI_RA8P1": {
+    // The RA8P1 is a dual-core device: CPU0 is a Cortex-M85 (primary/boot
+    // core), CPU1 is a Cortex-M33 that is held in reset until CPU0 releases
+    // it through the CPSCU CPU1ACTCSR registers. Following the STM32H745/H747
+    // pattern, each core is selected through its own mixin target that sets
+    // `core` plus the flash/RAM partitions of the shared memories:
+    //
+    //   Code MRAM (1 MB @ 0x02000000): [0x02000000, 0x020C0000) CPU0 (M85)
+    //                                   [0x020C0000, 0x02100000) CPU1 (M33)
+    //   SRAM (0x22000000):             [0x22000000, 0x22174000) CPU0 (M85)
+    //                                   [0x22174000, 0x22194000) shared (rpmsg)
+    //                                   [0x22194000, 0x221D4000) CPU1 (M33)
+    //   ITCM/DTCM (128 KB each) are private to CPU0, CTCM/STCM (64 KB each)
+    //   are private to CPU1 (mapped at the same local addresses 0x0/0x20000000
+    //   on both cores).
+    //
+    // The partition matches the official sdk-bsp-ra8p1-titan-mini BSP
+    // (bsp_linker_info.h) so Mbed CE images can interoperate with the Renesas
+    // / RT-Thread dual-core examples.
+    "MCU_RA8P1_CM85": {
         "inherits": [
             "MCU_RA8P1"
+        ],
+        "public": false,
+        "core": "Cortex-M85",
+        "extra_labels_add": [
+            "RA8P1_CM85"
+        ],
+        "memory_bank_config": {
+            // Reserve the upper 256 KB of Code MRAM for the CPU1 image.
+            "Flash": {
+                "start": 0x02000000,
+                "size": 0xC0000
+            },
+            // Reserve the shared slice [0x22174000, 0x22194000) and the CPU1
+            // slice [0x22194000, 0x221D4000) of SRAM.
+            "SRAM": {
+                "start": 0x22000000,
+                "size": 0x174000
+            }
+        }
+    },
+    // CPU1 (Cortex-M33) image. Links against the CPU1 flash partition at
+    // 0x020C0000 (this is the value CPU0 writes into CPSCU.CPU1INITVTOR to
+    // start the core) and the CPU1 SRAM slice at 0x22194000. The FSP BSP is
+    // built with _RA_CORE=1 (BSP_SECONDARY_CORE_BUILD): clock setup, option
+    // setting bytes and security init are skipped because CPU0 has already
+    // performed them. CTCM/STCM are reachable through the CTCM/STCM memory
+    // banks.
+    "MCU_RA8P1_CM33": {
+        "inherits": [
+            "MCU_RA8P1"
+        ],
+        "public": false,
+        "core": "Cortex-M33FE",
+        "extra_labels_add": [
+            "RA8P1_CM33"
+        ],
+        // CANFD is not available from CPU1 in this port: the CPU1-local ICU
+        // vector table provides no CAN vectors and the r_canfd driver is
+        // excluded from the CM33 build (see TARGET_RA8P1/CMakeLists.txt).
+        "device_has_remove": [
+            "CAN",
+            "CAN_FD"
+        ],
+        "memory_bank_config": {
+            "Flash": {
+                "start": 0x020C0000,
+                "size": 0x30000
+            },
+            "SRAM": {
+                "start": 0x22194000,
+                "size": 0x40000
+            }
+        }
+    },
+    "CPKHMI_RA8P1": {
+        "inherits": [
+            "MCU_RA8P1_CM85"
         ],
         "public": true,
         "device_name": "R7KA8P1KF",
@@ -9000,7 +9074,7 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
     },
     "RA8P1_TITAN_MINI": {
         "inherits": [
-            "MCU_RA8P1"
+            "MCU_RA8P1_CM85"
         ],
         "public": true,
         "device_name": "R7KA8P1KF",
@@ -9017,6 +9091,35 @@ mode is recommended for target MCUs with small amounts of flash and RAM.",
         "overrides": {
             "console-uart": true,
             "console-rtt": false
+        },
+    },
+    // Cortex-M33 (CPU1) view of the Titan Mini board. Same pins and UART
+    // mapping as RA8P1_TITAN_MINI, but the FSP instances are wired to the
+    // CPU1-local ICU vector table (see TARGET_RA8P1_TITAN_MINI_CM33). The
+    // default console is SEGGER RTT: the physical debug UART (P8_1/P8_2,
+    // SCI2) is owned by the M85 image, so the M33 firmware talks over
+    // rpmsg-lite instead (or RTT for debugging).
+    "RA8P1_TITAN_MINI_CM33": {
+        // NOTE: inherit from MCU_RA8P1_CM33 first so that target's attributes
+        // (core, macros, memory banks) get priority over RA8P1_TITAN_MINI's.
+        "inherits": [
+            "MCU_RA8P1_CM33",
+            "RA8P1_TITAN_MINI"
+        ],
+        "public": true,
+        "device_has_remove": [
+            "QSPI",
+            "EMAC"
+        ],
+        "components_remove": [
+            "QSPIF"
+        ],
+        "extra_labels_remove": [
+            "RENESAS_EMAC"
+        ],
+        "overrides": {
+            "console-uart": false,
+            "console-rtt": true
         },
     }
 }

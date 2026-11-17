@@ -39,6 +39,8 @@ void layer3_switch_eaei_isr(void);
         /* Vector table allocations */
         #define VECTOR_NUMBER_RTC_CARRY ((IRQn_Type) 0) /* RTC CARRY (Carry interrupt) */
         #define RTC_CARRY_IRQn          ((IRQn_Type) 0) /* RTC CARRY (Carry interrupt) */
+        #define VECTOR_NUMBER_IPC_IRQ1 ((IRQn_Type) 25) /* IPC IRQ1 (CPU mutual interrupt 1: CPU0 receives messages written by CPU1 into the IPC0 FIFO) */
+        #define IPC_IRQ1_IRQn          ((IRQn_Type) 25) /* IPC IRQ1 (CPU mutual interrupt 1: CPU0 receives messages written by CPU1 into the IPC0 FIFO) */
         #define VECTOR_NUMBER_GPT1_COUNTER_OVERFLOW ((IRQn_Type) 1) /* GPT1 COUNTER OVERFLOW (Overflow) */
         #define GPT1_COUNTER_OVERFLOW_IRQn          ((IRQn_Type) 1) /* GPT1 COUNTER OVERFLOW (Overflow) */
         #define VECTOR_NUMBER_GPT1_CAPTURE_COMPARE_A ((IRQn_Type) 2) /* GPT1 CAPTURE COMPARE A (Capture/Compare match A) */

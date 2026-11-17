@@ -3,6 +3,8 @@
         #include "r_ssi.h"
         extern void ssi_txi_isr(void);
         extern void ssi_int_isr(void);
+        /* r_ipc.c (FSP IPC driver, used by rpmsg-lite for the CPU0<->CPU1 doorbell) */
+        extern void ipc_isr(void);
         /* The ICU supports 32 external IRQ channels but only 12 vector table
          * entries are reserved for them. The entries below form the external
          * IRQ slot pool: each slot is linked to an ICU IRQ channel at runtime
@@ -35,6 +37,7 @@
             [19] = spi_b_tei_isr, /* SPI0 TEI (Transmission complete event) */
             [20] = spi_b_eri_isr, /* SPI0 ERI (Error) */
             [21] = dmac_int_isr, /* DMAC0 INT (DMAC0 transfer end) */
+            [25] = ipc_isr, /* IPC IRQ1 (CPU mutual interrupt 1: doorbell from CPU1, used by rpmsg-lite) */
             [22] = r_icu_isr, /* External IRQ slot 9 (dynamically linked to any ICU IRQ channel) */
             [23] = r_icu_isr, /* External IRQ slot 10 (dynamically linked to any ICU IRQ channel) */
             [24] = r_icu_isr, /* External IRQ slot 11 (dynamically linked to any ICU IRQ channel) */
@@ -125,6 +128,7 @@
             [19] = BSP_PRV_VECT_ENUM(EVENT_SPI0_TEI,GROUP3), /* SPI0 TEI (Transmission complete event) */
             [20] = BSP_PRV_VECT_ENUM(EVENT_SPI0_ERI,GROUP4), /* SPI0 ERI (Error) */
             [21] = BSP_PRV_VECT_ENUM(EVENT_DMAC0_INT,GROUP5), /* DMAC0 INT (DMAC0 transfer end) */
+            [25] = BSP_PRV_VECT_ENUM(EVENT_IPC_IRQ1,GROUP25), /* IPC IRQ1 (CPU mutual interrupt 1, doorbell from CPU1) */
             [27] = BSP_PRV_VECT_ENUM(EVENT_SCI0_RXI,GROUP3), /* SCI0 RXI (Receive data full) */
             [28] = BSP_PRV_VECT_ENUM(EVENT_SCI0_TXI,GROUP4), /* SCI0 TXI (Transmit data empty) */
             [29] = BSP_PRV_VECT_ENUM(EVENT_SCI0_TEI,GROUP5), /* SCI0 TEI (Transmit end) */
