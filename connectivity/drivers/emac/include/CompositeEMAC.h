@@ -22,6 +22,7 @@
 #include "Thread.h"
 
 #include <atomic>
+#include <optional>
 
 namespace mbed
 {
@@ -86,6 +87,56 @@ public:
     /// Basic MAC address type
     static constexpr size_t MAC_ADDR_SIZE = 6;
     typedef std::array<uint8_t, MAC_ADDR_SIZE> MACAddress;
+
+    /// Struct storing "quirks" (behavior changes needed to make specific vendor MACs work)
+    struct Quirks {
+        struct {
+            /// Whether the hardware has a first descriptor flag. If this is false, RxDMA::isFirstDesc() will always
+            /// return false. This reduces our ability to detect bad data in the DMA buffer.
+            bool supportsFirstDescFlag = false;
+
+            /// Whether it is possible to return all Ethernet Rx descriptors to the MAC at the same time.
+            /// Some DMA arrangements do not support this.
+            bool canReturnAllDescriptors = false;
+
+            /// This many bytes at the end of the packet will be discarded. This is used for EMACs which append
+            /// extra data to the end of the received Ethernet frame, such as the CRC.
+            size_t packetEndDiscardSize = 0;
+
+            /// The Rx buffer size on each descriptor must be a multiple of this value. If it is not, it will be
+            /// rounded down. Note that this controls the _size_ of the buffer, which is different from its _alignment_
+            /// Needed for: Kinetis K-series and MIMXRT105x
+            size_t rxBufferSizeMultiple = 1;
+        } rxDMA;
+
+        struct {
+            /// Extra, unfilled Tx descs to leave in the DMA ring at all times.
+            /// This is used to support Eth MACs that don't allow enqueuing every single descriptor at a time.
+            /// Needed for: STM32H7/H5
+            size_t extraTxDescsToLeave = 0;
+
+            /// Whether the hardware supports chaining multiple descriptors together to send one
+            /// packet that's split across multiple buffers.
+            /// If this is false than each packet will be combined into a single buffer before being sent.
+            /// Needed for: Nuvoton M48x
+            bool supportsDescChaining = true;
+
+            /// Whether we need to manually append the CRC at the end of the frame being transmitted.
+            /// Most MACs do this automatically but on some it is bugged.
+            /// Needed for: LPC17xx
+            bool manuallyAppendCRC = false;
+
+            /// Whether we need to manually pad short Ethernet frames up to 60 bytes.
+            /// Most MACs can do this in HW, but not all!
+            /// Needed for: LPC17xx
+            bool manuallyPadShortFrames = false;
+        } txDMA;
+
+        /// If true, then changing the duplex between half and full requires a full power-down and power-up
+        /// of the MAC.
+        /// Needed for: Kinetis K-series and MIMXRT105x
+        bool duplexChangeRequiresReinit = false;
+    };
 
     /**
      * @brief Abstract interface for a driver for the low level ethernet MAC hardware.
@@ -367,6 +418,8 @@ protected:
     emac_link_state_change_cb_t linkStateCallback{};
     emac_link_input_cb_t linkInputCallback{};
 
+    Quirks const & quirks;
+
     // Instances of each of the 4 component classes
     PHYDriver * phy = nullptr;
     RxDMA & rxDMA;
@@ -396,6 +449,9 @@ protected:
 
     std::atomic<LinkState> linkState = LinkState::DOWN;
 
+    // Last duplex that the link was brought up at. Owned by the PHY task.
+    std::optional<Duplex> lastDuplex;
+
     // Multicast subscribe information
     MACAddress mcastMacs[MBED_CONF_NSAPI_EMAC_MAX_MCAST_SUBSCRIBES];
 
@@ -424,7 +480,8 @@ protected:
     void onRxPoolSpaceAvail();
 
     /// Constructor. Should be called by subclass.
-    CompositeEMAC(TxDMA & txDMA, RxDMA & rxDMA, MACDriver & macDriver):
+    CompositeEMAC(Quirks & quirks, TxDMA & txDMA, RxDMA & rxDMA, MACDriver & macDriver):
+    quirks(quirks),
     rxDMA(rxDMA),
     txDMA(txDMA),
     mac(macDriver)

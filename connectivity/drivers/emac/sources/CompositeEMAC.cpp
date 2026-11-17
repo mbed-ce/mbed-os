@@ -82,6 +82,25 @@ namespace mbed {
                     return;
                 }
 
+                // On some EMACs (e.g. Kinetis/MIMXRT), the duplex value is locked in when the MAC is first
+                // initialized and cannot be changed later. If that quirk is enabled, deinit and reinit the MAC.
+                // We also need to do the DMA because deinitializing the MAC often wipes away the DMA configuration.
+                if (quirks.duplexChangeRequiresReinit && lastDuplex.has_value() && *lastDuplex != duplex) {
+                    if(txDMA.deinit() != ErrCode::SUCCESS || rxDMA.deinit() != ErrCode::SUCCESS) {
+                        tr_err("power_down(): Failed to disable DMA");
+                        return;
+                    }
+                    if(mac.deinit() != ErrCode::SUCCESS) {
+                        tr_err("power_down(): Failed to disable MAC");
+                    }
+                    if(mac.init() != ErrCode::SUCCESS) {
+                        tr_err("power_up(): Failed to init MAC!");
+                    }
+                    if(txDMA.init() != ErrCode::SUCCESS || rxDMA.init() != ErrCode::SUCCESS) {
+                        tr_err("power_up(): Failed to init DMA!");
+                    }
+                }
+
 #if MBED_TRACE_MAX_LEVEL >= TRACE_LEVEL_INFO
                 char const * speedStr;
                 if(speed == LinkSpeed::LINK_10MBIT) {
@@ -101,7 +120,7 @@ namespace mbed {
                 if(mac.enable(speed, duplex) != ErrCode::SUCCESS) {
                     tr_error("phyTask(): Mac failed to enable");
                 }
-
+                lastDuplex = duplex;
                 linkStateCallback(true);
             }
         }

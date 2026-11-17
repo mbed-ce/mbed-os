@@ -474,7 +474,7 @@ namespace mbed {
     }
 
     LPC17xxEthMAC::LPC17xxEthMAC(LPC_EMAC_TypeDef * const base):
-    CompositeEMAC(txDMA, rxDMA, macDriver),
+    CompositeEMAC(quirks, txDMA, rxDMA, macDriver),
     base(base),
     txDMA(base),
     rxDMA(base),

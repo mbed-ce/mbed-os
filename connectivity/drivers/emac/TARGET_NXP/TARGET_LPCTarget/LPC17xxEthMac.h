@@ -27,6 +27,22 @@ namespace mbed
 
 class LPC17xxEthMAC : public CompositeEMAC
 {
+    static constexpr Quirks quirks = {
+        .txDMA = {
+            .extraTxDescsToLeave = 1,
+            .supportsDescChaining = true,
+            .manuallyAppendCRC = true,
+            .manuallyPadShortFrames = true
+        },
+        .rxDMA = {
+            .supportsFirstDescFlag = false,
+            .canReturnAllDescriptors = true,
+            .packetEndDiscardSize = sizeof(uint32_t),
+            .rxBufferSizeMultiple = 1,
+        },
+        .duplexChangeRequiresReinit = false
+    };
+
     class MACDriver : public CompositeEMAC::MACDriver
     {
         LPC_EMAC_TypeDef * const base;
@@ -86,7 +102,7 @@ class LPC17xxEthMAC : public CompositeEMAC
         void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
     public:
         explicit TxDMA(LPC_EMAC_TypeDef * const base):
-        GenericTxDMARing(1, true, true, true),
+        GenericTxDMARing(quirks),
         base(base)
         {}
     };
@@ -110,13 +126,10 @@ class LPC17xxEthMAC : public CompositeEMAC
         void returnDescriptor(size_t descIdx, uint8_t * buffer) override;
 
         size_t getTotalLen(size_t firstDescIdx, size_t lastDescIdx) override;
-
-        static constexpr size_t END_DISCARD_SIZE = 4;
-
     public:
 
         explicit RxDMA(LPC_EMAC_TypeDef * const base):
-        GenericRxDMARing(false, true, END_DISCARD_SIZE),
+        GenericRxDMARing(quirks),
         base(base)
         {}
     };

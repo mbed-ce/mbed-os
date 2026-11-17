@@ -41,21 +41,7 @@ namespace mbed {
         static constexpr size_t TX_NUM_DESCS = MBED_CONF_NSAPI_EMAC_TX_NUM_DESCS;
 
     protected:
-        /// Extra, unfilled Tx descs to leave in the DMA ring at all times.
-        /// This is used to support Eth MACs that don't allow enqueuing every single descriptor at a time.
-        const size_t extraTxDescsToLeave;
-
-        /// Whether the hardware supports chaining multiple descriptors together to send one
-        /// packet that's split across multiple buffers.
-        const bool supportsDescChaining;
-
-        /// Whether we need to manually append the CRC at the end of the frame being transmitted.
-        /// Most MACs do this automatically but on some it is bugged (e.g. LPC1768)
-        const bool appendCRC;
-
-        /// Whether we need to manually pad short Ethernet frames up to 60 bytes.
-        /// Most MACs can do this in HW, but not LPC1768!
-        const bool padFrames;
+        CompositeEMAC::Quirks const & quirks;
 
         /// Pointer to first memory buffer in the chain associated with descriptor n.
         /// The buffer address shall only be set for the *last* descriptor, so that the entire chain is freed
@@ -65,7 +51,7 @@ namespace mbed {
         /// EventFlag used to signal when a Tx descriptor becomes available
         rtos::EventFlags txDescAvailFlag;
 
-        /// CRC generator. Only used if appendCRC is true.
+        /// CRC generator. Only used if quirks.txDMA.manuallyAppendCRC is true.
         MbedCRC<POLY_32BIT_ANSI, 32> crcGenerator;
 
         // Indexes for descriptor rings.
@@ -77,12 +63,8 @@ namespace mbed {
         size_t txReclaimIndex; ///< Index of the next Tx descriptor that will be reclaimed by the mac thread calling reclaimTxDescs().
 
         /// Construct, passing a value for extraTxDescsToLeave
-        GenericTxDMARing(size_t extraTxDescsToLeave = 0, bool supportsDescChaining = true, bool appendCRC = false, bool padFrames = false):
-        extraTxDescsToLeave(extraTxDescsToLeave),
-        supportsDescChaining(supportsDescChaining),
-        appendCRC(appendCRC),
-        padFrames(padFrames),
-
+        GenericTxDMARing(CompositeEMAC::Quirks const & quirks):
+        quirks(quirks),
         // Per Wikipedia and SO, we want input and output reflect on due to Ethernet transmitting
         // the CRC with backwards bit order compared to the rest of the data.
         crcGenerator(0xFFFFFFFF, 0xFFFFFFFF, true, true)
@@ -220,8 +202,8 @@ namespace mbed {
 
             // Step 0: Pad to 60/64 bytes (if appending CRC) if needed
             constexpr size_t ETH_MIN_SIZE = 60; // Ethernet packet, not including CRC at end, must be padded to at least this size
-            if(padFrames && memory_manager->get_total_len(buf) < ETH_MIN_SIZE) {
-                const size_t sizeToPadTo = ETH_MIN_SIZE + (appendCRC ? sizeof(uint32_t) : 0);
+            if(quirks.txDMA.manuallyPadShortFrames && memory_manager->get_total_len(buf) < ETH_MIN_SIZE) {
+                const size_t sizeToPadTo = ETH_MIN_SIZE + (quirks.txDMA.manuallyAppendCRC ? sizeof(uint32_t) : 0);
                 const size_t numPaddingBytes = sizeToPadTo - memory_manager->get_total_len(buf);
 
                 buf = memory_manager->realloc_heap(buf, 0, sizeToPadTo);
@@ -238,10 +220,10 @@ namespace mbed {
 
             // Step 1: Figure out if we can send this zero-copy, or if we need to copy it.
             size_t packetDescsUsed = memory_manager->count_buffers(buf);
-            size_t neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
+            size_t neededFreeDescs = packetDescsUsed + quirks.txDMA.extraTxDescsToLeave;
             bool needToCopy = false;
             if(!packetCopied) {
-                if(packetDescsUsed > 1 && !supportsDescChaining)
+                if(packetDescsUsed > 1 && !quirks.txDMA.supportsDescChaining)
                 {
                     /// Packet uses more than 1 descriptor and the hardware doesn't support that so
                     /// we have to copy it into one single descriptor.
@@ -256,7 +238,7 @@ namespace mbed {
                     needToCopy = true;
                 }
 
-                if(!needToCopy && (neededFreeDescs > txDescsOwnedByApplication && txDescsOwnedByApplication > extraTxDescsToLeave)) {
+                if(!needToCopy && (neededFreeDescs > txDescsOwnedByApplication && txDescsOwnedByApplication > quirks.txDMA.extraTxDescsToLeave)) {
                     // Packet uses more buffers than we have descriptors, but we can send it immediately if we copy
                     // it into a single buffer.
                     needToCopy = true;
@@ -287,7 +269,7 @@ namespace mbed {
             // Step 2: Copy packet if needed
             if(needToCopy)
             {
-                const size_t newLen = memory_manager->get_total_len(buf) + (appendCRC ? sizeof(uint32_t) : 0);
+                const size_t newLen = memory_manager->get_total_len(buf) + (quirks.txDMA.manuallyAppendCRC ? sizeof(uint32_t) : 0);
                 buf = memory_manager->realloc_heap(buf, 0, newLen);
                 if(buf == nullptr)
                 {
@@ -297,7 +279,7 @@ namespace mbed {
                 packetCopied = true;
 
                 packetDescsUsed = 1;
-                neededFreeDescs = packetDescsUsed + extraTxDescsToLeave;
+                neededFreeDescs = packetDescsUsed + quirks.txDMA.extraTxDescsToLeave;
             }
 
             tr_debug("Transmitting packet of length %lu in %zu buffers (starting at 0x%" PRIx32 ") and %zu descs (starting at %zu)",
@@ -309,7 +291,7 @@ namespace mbed {
             // via another descriptor.
             uint32_t crc;
             net_stack_mem_buf_t * crcBuf = nullptr; // CRC is saved here if it needs to be appended later
-            if(appendCRC) {
+            if(quirks.txDMA.manuallyAppendCRC) {
                 if(packetCopied) {
                     // Compute the CRC. Easy since we have a contiguous buffer, we just need to not do it over
                     // the last 4 bytes.
@@ -394,7 +376,7 @@ namespace mbed {
                 // Give the packet to DMA.
                 // If we are in appendCRC mode AND the packet was not copied, suppress the last desc flag
                 // since we need to enqueue one more later.
-                const bool isLast = nextBuf == nullptr && !(appendCRC && !packetCopied);
+                const bool isLast = nextBuf == nullptr && !(quirks.txDMA.manuallyAppendCRC && !packetCopied);
                 giveToDMA(txSendIndex, bufferPtr, bufferLen, descCount == 0, isLast);
 
                 // Update descriptor count and index
@@ -410,7 +392,7 @@ namespace mbed {
             // Step 6: Append CRC descriptor (if needed)
             // We do this by appending one more descriptor to the end of the packet in the Tx ring containing
             // the CRC. Logic here works the same as above.
-            if(appendCRC && !packetCopied) {
+            if(quirks.txDMA.manuallyAppendCRC && !packetCopied) {
                 descStackBuffers[txSendIndex] = crcBuf;
                 const auto bufferPtr = static_cast<uint8_t *>(memory_manager->get_ptr(crcBuf));
 
@@ -457,17 +439,7 @@ namespace mbed {
         static constexpr size_t RX_BUFFER_ALIGN = sizeof(uint32_t);
 #endif
     protected:
-        /// Whether the hardware has a first descriptor flag. If this is false, isFirstDesc() will always
-        /// return false. This reduces our ability to detect bad data in the DMA buffer.
-        const bool supportsFirstDescFlag;
-
-        /// Whether it is possible to return all Ethernet Rx descriptors to the MAC at the same time.
-        /// Some DMA arrangements do not support this.
-        const bool canReturnAllDescriptors;
-
-        /// This many bytes at the end of the packet will be discarded. This is used for EMACs which append
-        /// extra data to the end of the received Ethernet frame, such as the CRC.
-        const size_t packetEndDiscardSize;
+        CompositeEMAC::Quirks const & quirks;
 
         /// Pointer to the network stack buffer associated with the corresponding Rx descriptor.
         net_stack_mem_buf_t * rxDescStackBufs[RX_NUM_DESCS];
@@ -483,10 +455,8 @@ namespace mbed {
         size_t rxPoolPayloadSize;
 
         /// Constructor. Subclass must allocate descriptor array of size RX_NUM_DESCS
-        GenericRxDMARing(const bool supportsFirstDescFlag = true, const bool canReturnAllDescriptors = false, const size_t packetEndDiscardSize = 0):
-        supportsFirstDescFlag(supportsFirstDescFlag),
-        canReturnAllDescriptors(canReturnAllDescriptors),
-        packetEndDiscardSize(packetEndDiscardSize)
+        GenericRxDMARing(CompositeEMAC::Quirks const & quirks):
+        quirks(quirks)
         {}
 
         /// Configure DMA registers to point to the DMA ring,
@@ -570,7 +540,7 @@ namespace mbed {
 
             // Note: With some Ethernet peripherals, you can never give back every single descriptor to
             // the hardware, because then it thinks there are 0 descriptors left.
-            while (rxDescsOwnedByApplication > (canReturnAllDescriptors ? 0 : 1)) {
+            while (rxDescsOwnedByApplication > (quirks.rxDMA.canReturnAllDescriptors ? 0 : 1)) {
                 // Allocate new buffer
                 auto *const buffer = memory_manager->alloc_pool(rxPoolPayloadSize, RX_BUFFER_ALIGN);
                 if (buffer == nullptr) {
@@ -619,7 +589,7 @@ namespace mbed {
                     return false;
                 }
 
-                if(supportsFirstDescFlag && isFirstDesc(descIdx))
+                if(quirks.rxDMA.supportsFirstDescFlag && isFirstDesc(descIdx))
                 {
                     if(seenFirstDesc)
                     {
@@ -707,7 +677,7 @@ namespace mbed {
                     }
                 }
 
-                if (supportsFirstDescFlag) {
+                if (quirks.rxDMA.supportsFirstDescFlag) {
                     if (!firstDescIdx.has_value() && !isFirst) {
                         // Non-first-descriptor before a first descriptor
                         // (could be caused by incomplete packets/junk in the DMA buffer).
@@ -761,8 +731,8 @@ namespace mbed {
 
             // Calculate packet length
             size_t pktLen = getTotalLen(*firstDescIdx, *lastDescIdx);
-            MBED_ASSERT(pktLen > packetEndDiscardSize);
-            pktLen -= packetEndDiscardSize;
+            MBED_ASSERT(pktLen > quirks.rxDMA.packetEndDiscardSize);
+            pktLen -= quirks.rxDMA.packetEndDiscardSize;
 
             // Set length of first buffer
             net_stack_mem_buf_t *const headBuffer = rxDescStackBufs[*firstDescIdx];

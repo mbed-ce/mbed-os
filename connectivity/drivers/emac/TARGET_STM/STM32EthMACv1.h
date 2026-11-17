@@ -33,6 +33,22 @@ namespace mbed
  */
 class STM32EthMACv1 : public CompositeEMAC
 {
+    static constexpr Quirks quirks = {
+        .txDMA = {
+            .extraTxDescsToLeave = 0,
+            .supportsDescChaining = true,
+            .manuallyAppendCRC = false,
+            .manuallyPadShortFrames = false
+        },
+        .rxDMA = {
+            .supportsFirstDescFlag = true,
+            .canReturnAllDescriptors = false,
+            .packetEndDiscardSize = 0,
+            .rxBufferSizeMultiple = 1,
+        },
+        .duplexChangeRequiresReinit = false
+    };
+
     class TxDMA : public GenericTxDMARing
     {
     protected:
@@ -54,6 +70,7 @@ class STM32EthMACv1 : public CompositeEMAC
         void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
     public:
         explicit TxDMA(ETH_TypeDef * const base):
+        GenericTxDMARing(quirks),
         base(base)
         {}
     };
@@ -85,6 +102,7 @@ class STM32EthMACv1 : public CompositeEMAC
 
     public:
         explicit RxDMA(ETH_TypeDef * const base):
+        GenericRxDMARing(quirks),
         base(base)
         {}
     };

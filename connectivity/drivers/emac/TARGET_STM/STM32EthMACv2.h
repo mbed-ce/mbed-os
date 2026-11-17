@@ -27,6 +27,22 @@ namespace mbed {
      */
     class STM32EthMACv2 : public CompositeEMAC {
 
+        static constexpr Quirks quirks = {
+            .txDMA = {
+                .extraTxDescsToLeave = 1,
+                .supportsDescChaining = true,
+                .manuallyAppendCRC = false,
+                .manuallyPadShortFrames = false
+            },
+            .rxDMA = {
+                .supportsFirstDescFlag = true,
+                .canReturnAllDescriptors = false,
+                .packetEndDiscardSize = 0,
+                .rxBufferSizeMultiple = 1,
+            },
+            .duplexChangeRequiresReinit = false
+        };
+
         class TxDMA : public GenericTxDMARing
         {
         protected:
@@ -48,7 +64,7 @@ namespace mbed {
             void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
         public:
             explicit TxDMA(ETH_TypeDef * const base):
-            GenericTxDMARing(1), // Request that 1 Tx descriptor is always left unfilled
+            GenericTxDMARing(quirks),
             base(base)
             {}
         };
@@ -80,6 +96,7 @@ namespace mbed {
 
         public:
             explicit RxDMA(ETH_TypeDef * const base):
+            GenericRxDMARing(quirks),
             base(base)
             {}
         };
