@@ -574,7 +574,7 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
     // I2C master by default
     obj_s->slave = 0;
     obj_s->pending_slave_tx_master_rx = 0;
-    obj_s->pending_slave_rx_maxter_tx = 0;
+    obj_s->pending_slave_rx_master_tx = 0;
     obj_s->slave_tx_transfer_in_progress = 0;
     obj_s->slave_rx_transfer_in_progress = 0;
 #endif
@@ -1628,7 +1628,7 @@ void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, ui
     }
 
     if (TransferDirection == I2C_DIRECTION_TRANSMIT) {
-        obj_s->pending_slave_rx_maxter_tx = 1;
+        obj_s->pending_slave_rx_master_tx = 1;
     }
 }
 
@@ -1652,11 +1652,11 @@ void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *I2cHandle)
         if (obj_s->slave_rx_count < obj_s->slave_rx_buffer_size) {
             HAL_I2C_Slave_Seq_Receive_IT(I2cHandle, &(obj_s->slave_rx_buffer[obj_s->slave_rx_count]), 1, I2C_NEXT_FRAME);
         } else {
-            obj_s->pending_slave_rx_maxter_tx = 0;
+            obj_s->pending_slave_rx_master_tx = 0;
             obj_s->slave_rx_transfer_in_progress = 0;
         }
     } else {
-        obj_s->pending_slave_rx_maxter_tx = 0;
+        obj_s->pending_slave_rx_master_tx = 0;
         obj_s->slave_rx_transfer_in_progress = 0;
     }
 }
@@ -1667,7 +1667,7 @@ void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
     struct i2c_s *obj_s = I2C_S(obj);
 
     if (obj_s->slave == SLAVE_MODE_LISTEN) {
-        obj_s->pending_slave_rx_maxter_tx = 0;
+        obj_s->pending_slave_rx_master_tx = 0;
     }
 
     /* restart listening for master requests */
@@ -1680,7 +1680,7 @@ int i2c_slave_receive(i2c_t *obj)
     struct i2c_s *obj_s = I2C_S(obj);
     int retValue = NoData;
 
-    if (obj_s->pending_slave_rx_maxter_tx) {
+    if (obj_s->pending_slave_rx_master_tx) {
         retValue = WriteAddressed;
     }
 
