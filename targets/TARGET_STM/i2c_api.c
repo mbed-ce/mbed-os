@@ -187,6 +187,11 @@ static uint32_t      I2c_valid_timing_nbr = 0;
 #endif
 static I2C_HandleTypeDef *i2c_handles[I2C_NUM];
 
+#if DEVICE_I2CSLAVE
+// just temporary discard storage byte for each I2C
+static uint8_t i2c_slave_rx_discard[I2C_NUM]; 
+#endif
+
 /* Timeout values are based on core clock and I2C clock.
    The BYTE_TIMEOUT is computed as twice the number of cycles it would
    take to send 10 bits over I2C. Most Flags should take less than that.
@@ -1659,12 +1664,19 @@ void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *I2cHandle)
     struct i2c_s *obj_s = I2C_S(obj);
 
     if (obj_s->slave == SLAVE_MODE_LISTEN) {
-        obj_s->slave_rx_count++;
+        if (obj_s->slave_rx_count < obj_s->slave_rx_buffer_size) {
+            obj_s->slave_rx_count++;
+        }
+
         if (obj_s->slave_rx_count < obj_s->slave_rx_buffer_size) {
             HAL_I2C_Slave_Seq_Receive_IT(I2cHandle, &(obj_s->slave_rx_buffer[obj_s->slave_rx_count]), 1, I2C_NEXT_FRAME);
         } else {
+            /* Let read() return the requested buffer length, but continue
+             * consuming and dropping any extra bytes until the controller
+             * sends STOP, as required by the Mbed I2C slave HAL. */
             obj_s->pending_slave_rx_master_tx = 0;
             obj_s->slave_rx_transfer_in_progress = 0;
+            HAL_I2C_Slave_Seq_Receive_IT(I2cHandle, &i2c_slave_rx_discard[obj_s->index], 1, I2C_NEXT_FRAME);
         }
     } else {
         obj_s->pending_slave_rx_master_tx = 0;
