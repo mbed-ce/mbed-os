@@ -172,8 +172,19 @@ static uint32_t      I2c_valid_timing_nbr = 0;
 #define I2C_S(obj) (struct i2c_s *) (obj)
 #endif
 
-/*  Family specific description for I2C */
-#define I2C_NUM (6)
+#if defined(I2C6_BASE)
+#define I2C_NUM 6
+#elif defined(I2C5_BASE) || defined(FMPI2C1_BASE)
+#define I2C_NUM 5
+#elif defined(I2C4_BASE)
+#define I2C_NUM 4
+#elif defined(I2C3_BASE)
+#define I2C_NUM 3
+#elif defined(I2C2_BASE)
+#define I2C_NUM 2
+#else
+#define I2C_NUM 1
+#endif
 static I2C_HandleTypeDef *i2c_handles[I2C_NUM];
 
 /* Timeout values are based on core clock and I2C clock.
