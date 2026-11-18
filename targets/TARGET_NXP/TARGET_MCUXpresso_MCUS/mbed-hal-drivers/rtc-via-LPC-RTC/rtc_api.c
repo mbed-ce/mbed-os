@@ -24,8 +24,6 @@
 
 extern void rtc_setup_oscillator(void);
 
-static bool rtc_time_set = false;
-
 void rtc_init(void)
 {
     rtc_setup_oscillator();
@@ -33,6 +31,9 @@ void rtc_init(void)
     RTC_Init(RTC);
 
     RTC_StartTimer(RTC);
+
+    // Wait until the RTC reads back as enabled so that rtc_isenabled() will return true if called immediately after
+    while(!(RTC->CTRL & RTC_CTRL_RTC_EN_MASK)) {}
 }
 
 void rtc_free(void)
@@ -61,7 +62,7 @@ int rtc_isenabled(void)
         rtc_free();
     }
 
-    return (rtc_init_done & rtc_time_set);
+    return rtc_init_done;
 }
 
 time_t rtc_read(void)
@@ -74,8 +75,6 @@ void rtc_write(time_t t)
     RTC_StopTimer(RTC);
     RTC->COUNT = t;
     RTC_StartTimer(RTC);
-
-    rtc_time_set = true;
 }
 
 #endif

@@ -18,6 +18,7 @@
 #include "pinmap.h"
 #include "mbed_error.h"
 #include "fsl_common.h"
+#include "PeripheralNames.h"
 
 void pin_function(PinName pin, int function)
 {
@@ -34,7 +35,7 @@ void pin_function(PinName pin, int function)
     IOCON->PIO[port_number][pin_number] |= IOCON_PIO_DIGIMODE_MASK;
 
     reg = IOCON->PIO[port_number][pin_number];
-    reg = (reg & ~IOCON_PIO_FUNC_MASK) | (function & IOCON_PIO_FUNC_MASK);
+    reg = (reg & ~IOCON_PIO_FUNC_MASK) | (function & MBED_LPC_PIN_FUNCTION_FUNC_Msk);
     IOCON->PIO[port_number][pin_number] = reg;
 }
 
@@ -43,19 +44,37 @@ void pin_mode(PinName pin, PinMode mode)
     MBED_ASSERT(pin != (PinName)NC);
     uint32_t pin_number = pin & 0x1F;
     uint8_t port_number = pin / 32;
-    uint32_t reg = IOCON->PIO[port_number][pin_number] & ~IOCON_PIO_MODE_MASK;
+    uint32_t reg = IOCON->PIO[port_number][pin_number] & ~(IOCON_PIO_MODE_MASK | IOCON_PIO_OD_MASK);
 
-    switch (mode) {
-        case PullNone:
-            break;
-        case PullDown:
-            reg |= (1 << IOCON_PIO_MODE_SHIFT);
-            break;
-        case PullUp:
-            reg |= (2 << IOCON_PIO_MODE_SHIFT);
-            break;
-        default:
-            break;
+    // The "type I" fast-mode I2C pins have totally different bitfields available and do not support
+    // a lot of standard options
+#if TARGET_MCU_LPC546XX
+    const bool is_type_i_pin = (pin == P0_13 || pin == P0_14 || pin == P3_23 || pin == P3_24);
+#else
+#error "Don't know which pins are I-type pins."
+#endif
+
+    if(mode & PullDown) {
+        if(is_type_i_pin) {
+            MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_INVALID_OPERATION), "Cannot enable pulldown on Type-I GPIO pin", pin);
+        }
+
+        reg |= IOCON_PIO_MODE(1);
+    }
+    else if(mode & PullUp) {
+        if(is_type_i_pin) {
+            MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_INVALID_OPERATION), "Cannot enable pullup on Type-I GPIO pin", pin);
+        }
+
+        reg |= IOCON_PIO_MODE(2);
+    }
+
+    if(mode & OpenDrain) {
+        if(is_type_i_pin) {
+            MBED_ERROR1(MBED_MAKE_ERROR(MBED_MODULE_HAL, MBED_ERROR_CODE_INVALID_OPERATION), "Cannot enable open drain  on Type-I GPIO pin", pin);
+        }
+
+        reg |= IOCON_PIO_OD_MASK;
     }
 
     IOCON->PIO[port_number][pin_number] = reg;
