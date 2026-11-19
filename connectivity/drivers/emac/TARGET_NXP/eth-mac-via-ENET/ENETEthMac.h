@@ -37,8 +37,19 @@ class ENETEthMac : public CompositeEMAC {
         size_t const enetNumber;
         ENET_Type * const base;
 
+        // When passingAllMcasts = false,
+        bool passingAllMcasts = false;
+        uint32_t mcastMacHashTable[2];
+
         /// Set up timings for MDIO clock generation
         void setupMDIOClocking(uint32_t sourceClock);
+
+        /// Computes the 6-bit CRC of a MAC address, used for the unicast and multicast
+        /// hash filter. Adapted from ENET_AddMulticastGroup().
+        static uint8_t getMacAddrCRC(MACAddress const & address);
+
+        /// Write the mcastMacHashTable value to memory.
+        void writeMcastHashTable();
 
     public:
         explicit MACDriver(size_t enetNumber);

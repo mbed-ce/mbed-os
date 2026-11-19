@@ -35,6 +35,14 @@ namespace mbed {
     // Defined in PhyDrivers.cpp
     CompositeEMAC::PHYDriver * get_eth_phy_driver();
 
+    void CompositeEMAC::reAddMulticastMacs() {
+        for(size_t macIdx = 0; macIdx < numSubscribedMcastMacs; ++macIdx) {
+            if(mac.addMcastMAC(mcastMacs[macIdx]) != ErrCode::SUCCESS) {
+                tr_err("addMcastMAC() failed!");
+            }
+        }
+    }
+
     void CompositeEMAC::rxISR() {
         // Note: Not locking mutex here as this is an ISR and should be able to run while the MAC thread is executing.
         if(rxDMA.rxHasPackets_ISR()) {
@@ -99,6 +107,7 @@ namespace mbed {
                     if(txDMA.init() != ErrCode::SUCCESS || rxDMA.init() != ErrCode::SUCCESS) {
                         tr_err("power_up(): Failed to init DMA!");
                     }
+                    reAddMulticastMacs();
                 }
 
 #if MBED_TRACE_MAX_LEVEL >= TRACE_LEVEL_INFO
@@ -390,11 +399,7 @@ namespace mbed {
             tr_err("clearMcastFilter() failed!");
             return;
         }
-        for(size_t macIdx = 0; macIdx < numSubscribedMcastMacs; ++macIdx) {
-            if(mac.addMcastMAC(mcastMacs[macIdx]) != ErrCode::SUCCESS) {
-                tr_err("addMcastMAC() failed!");
-            }
-        }
+        reAddMulticastMacs();
     }
 
     void CompositeEMAC::set_all_multicast(bool all) {

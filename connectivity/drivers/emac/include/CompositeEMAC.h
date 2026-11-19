@@ -91,25 +91,6 @@ public:
     /// Struct storing "quirks" (behavior changes needed to make specific vendor MACs work)
     struct Quirks {
         struct {
-            /// Whether the hardware has a first descriptor flag. If this is false, RxDMA::isFirstDesc() will always
-            /// return false. This reduces our ability to detect bad data in the DMA buffer.
-            bool supportsFirstDescFlag = false;
-
-            /// Whether it is possible to return all Ethernet Rx descriptors to the MAC at the same time.
-            /// Some DMA arrangements do not support this.
-            bool canReturnAllDescriptors = false;
-
-            /// This many bytes at the end of the packet will be discarded. This is used for EMACs which append
-            /// extra data to the end of the received Ethernet frame, such as the CRC.
-            size_t packetEndDiscardSize = 0;
-
-            /// The Rx buffer size on each descriptor must be a multiple of this value. If it is not, it will be
-            /// rounded down. Note that this controls the _size_ of the buffer, which is different from its _alignment_
-            /// Needed for: Kinetis K-series and MIMXRT105x
-            size_t rxBufferSizeMultiple = 1;
-        } rxDMA;
-
-        struct {
             /// Extra, unfilled Tx descs to leave in the DMA ring at all times.
             /// This is used to support Eth MACs that don't allow enqueuing every single descriptor at a time.
             /// Needed for: STM32H7/H5
@@ -131,6 +112,25 @@ public:
             /// Needed for: LPC17xx
             bool manuallyPadShortFrames = false;
         } txDMA;
+
+        struct {
+            /// Whether the hardware has a first descriptor flag. If this is false, RxDMA::isFirstDesc() will always
+            /// return false. This reduces our ability to detect bad data in the DMA buffer.
+            bool supportsFirstDescFlag = false;
+
+            /// Whether it is possible to return all Ethernet Rx descriptors to the MAC at the same time.
+            /// Some DMA arrangements do not support this.
+            bool canReturnAllDescriptors = false;
+
+            /// This many bytes at the end of the packet will be discarded. This is used for EMACs which append
+            /// extra data to the end of the received Ethernet frame, such as the CRC.
+            size_t packetEndDiscardSize = 0;
+
+            /// The Rx buffer size on each descriptor must be a multiple of this value. If it is not, it will be
+            /// rounded down. Note that this controls the _size_ of the buffer, which is different from its _alignment_
+            /// Needed for: Kinetis K-series and MIMXRT105x
+            size_t rxBufferSizeMultiple = 1;
+        } rxDMA;
 
         /// If true, then changing the duplex between half and full requires a full power-down and power-up
         /// of the MAC.
@@ -463,6 +463,9 @@ protected:
     // Mutex that must be acquired before interacting with the MAC. This is used to protect against, for example,
     // one thread calling power_down() while the phy task is still running.
     rtos::Mutex macOpsMutex;
+
+    /// Re-add all subscribed multicast MACs to the EMAC driver
+    void reAddMulticastMacs();
 
     /// Subclass should call this when a receive interrupt is detected
     void rxISR();
