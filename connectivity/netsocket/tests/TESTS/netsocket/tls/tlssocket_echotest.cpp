@@ -61,10 +61,11 @@ void TLSSOCKET_ECHOTEST()
 {
     SKIP_IF_TCP_UNSUPPORTED();
     sock = new TLSSocket;
-    if (tlssocket_connect_to_echo_srv(*sock) != NSAPI_ERROR_OK) {
-        tr_error("Error from tlssocket_connect_to_echo_srv\n");
-        TEST_FAIL();
+    nsapi_error_t connect_result = tlssocket_connect_to_echo_srv(*sock);
+    if (connect_result != NSAPI_ERROR_OK) {
+        sock->close();
         delete sock;
+        TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, connect_result);
         return;
     }
 
@@ -88,7 +89,7 @@ void TLSSOCKET_ECHOTEST()
         int bytes2recv = sent;
         while (bytes2recv) {
             recvd = sock->recv(&(tls_global::rx_buffer[sent - bytes2recv]), bytes2recv);
-            if (recvd < 0) {
+            if (recvd <= 0) {
                 tr_error("[Round#%02d] network error %d\n", s_idx, recvd);
                 TEST_FAIL();
                 TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, sock->close());
@@ -114,7 +115,7 @@ void tlssocket_echotest_nonblock_receive()
                 receive_error = true;
             }
             return;
-        } else if (recvd < 0) {
+        } else if (recvd <= 0) {
             tr_error("sock.recv returned an error %d", recvd);
             TEST_FAIL();
             receive_error = true;
@@ -140,7 +141,14 @@ void TLSSOCKET_ECHOTEST_NONBLOCK()
     tc_exec_time.start();
     time_allotted = split2half_rmng_tls_test_time();
 
-    tlssocket_connect_to_echo_srv(*sock);
+    nsapi_error_t connect_result = tlssocket_connect_to_echo_srv(*sock);
+    if (connect_result != NSAPI_ERROR_OK) {
+        tc_exec_time.stop();
+        sock->close();
+        delete sock;
+        TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, connect_result);
+        return;
+    }
     sock->set_blocking(false);
     sock->sigio(callback(_sigio_handler, ThisThread::get_id()));
 

@@ -104,7 +104,7 @@ static void _spi_init_direct(spi_t *obj, const spi_pinmap_t *pinmap)
     if (pinmap->ssel_pin != NC) {
         pin_function(pinmap->ssel_pin, pinmap->ssel_function);
         pin_mode(pinmap->ssel_pin, PullNone);
-        obj->ssel_num = pinmap->ssel_function >> SSELNUM_SHIFT;
+        obj->ssel_num = (pinmap->ssel_function & MBED_LPC_PIN_FUNCTION_SSELNUM_Msk) >> MBED_LPC_PIN_FUNCTION_SSELNUM_Pos;
     }
 }
 

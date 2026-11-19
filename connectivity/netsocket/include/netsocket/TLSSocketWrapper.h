@@ -324,6 +324,8 @@ protected:
 private:
     /** Continue already initialized handshake */
     nsapi_error_t continue_handshake();
+    /** Seed the random number generator if it has not already been seeded. */
+    int seed_drbg();
     /**
      * Helper for pretty-printing Mbed TLS error codes
      */
@@ -382,6 +384,7 @@ private:
     bool _cacert_allocated: 1;
     bool _clicert_allocated: 1;
     bool _ssl_conf_allocated: 1;
+    bool _drbg_seeded: 1;
 
 };
 

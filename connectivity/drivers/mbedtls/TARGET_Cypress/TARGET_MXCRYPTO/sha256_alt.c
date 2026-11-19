@@ -35,6 +35,7 @@
 
 #include "mbedtls/sha256.h"
 #include "mbedtls/platform_util.h"
+#include "crypto_common.h"
 
 #include <string.h>
 
@@ -71,7 +72,7 @@ void mbedtls_sha256_clone( mbedtls_sha256_context *dst, const mbedtls_sha256_con
 /*
  * SHA-256 context setup
  */
-int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224)
+int mbedtls_sha256_starts( mbedtls_sha256_context *ctx, int is224)
 {
     SHA256_VALIDATE_RET( ctx != NULL );
     SHA256_VALIDATE_RET( is224 == 0 || is224 == 1 );
@@ -84,7 +85,7 @@ int mbedtls_sha256_starts_ret( mbedtls_sha256_context *ctx, int is224)
 /*
  * SHA-256 process buffer
  */
-int mbedtls_sha256_update_ret( mbedtls_sha256_context *ctx, const unsigned char *input, size_t ilen )
+int mbedtls_sha256_update( mbedtls_sha256_context *ctx, const unsigned char *input, size_t ilen )
 {
     SHA256_VALIDATE_RET( ctx != NULL );
     SHA256_VALIDATE_RET( ilen == 0 || input != NULL );
@@ -98,7 +99,7 @@ int mbedtls_sha256_update_ret( mbedtls_sha256_context *ctx, const unsigned char 
 /*
  * SHA-256 final digest
  */
-int mbedtls_sha256_finish_ret( mbedtls_sha256_context *ctx, unsigned char output[32] )
+int mbedtls_sha256_finish( mbedtls_sha256_context *ctx, unsigned char *output )
 {
     SHA256_VALIDATE_RET( ctx != NULL );
     SHA256_VALIDATE_RET( (unsigned char *)output != NULL );

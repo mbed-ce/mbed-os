@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 target_include_directories(mbed-mbedtls
+    PRIVATE
+        ${MBED_PATH}/connectivity/mbedtls/source
     PUBLIC
         .
         ./aes

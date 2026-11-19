@@ -42,8 +42,8 @@ static SingletonPtr<rtos::Mutex> md5_mutex;
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 #define MD5_VALIDATE_RET(cond)                             \
-    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_MD5_BAD_INPUT_DATA )
-#define MD5_VALIDATE(cond)  MBEDTLS_INTERNAL_VALIDATE( cond )
+    do { if (!(cond)) { return MBEDTLS_ERR_MD5_BAD_INPUT_DATA; } } while (0)
+#define MD5_VALIDATE(cond)  do { if (!(cond)) { return; } } while (0)
 
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -89,7 +89,7 @@ void mbedtls_md5_clone(mbedtls_md5_context *dst,
     *dst = *src;
 }
 
-int mbedtls_md5_starts_ret(mbedtls_md5_context *ctx)
+int mbedtls_md5_starts(mbedtls_md5_context *ctx)
 {
     int ret = 0;
 
@@ -164,7 +164,7 @@ exit :
     return (ret);
 }
 
-int mbedtls_md5_update_ret(mbedtls_md5_context *ctx,
+int mbedtls_md5_update(mbedtls_md5_context *ctx,
                            const unsigned char *input,
                            size_t ilen)
 {
@@ -235,7 +235,7 @@ exit :
     return (ret);
 }
 
-int mbedtls_md5_finish_ret(mbedtls_md5_context *ctx, unsigned char output[32])
+int mbedtls_md5_finish(mbedtls_md5_context *ctx, unsigned char output[16])
 {
     int ret = 0;
 

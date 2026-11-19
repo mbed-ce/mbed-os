@@ -43,7 +43,7 @@
  *
  *                 The structure is used both for SHA-256 and for SHA-224
  *                 checksum calculations. The choice between these two is
- *                 made in the call to mbedtls_sha256_starts_ret().
+ *                 made in the call to mbedtls_sha256_starts().
  */
 typedef struct mbedtls_sha256_context {
     int is224;                                      /*!< 0 = use SHA256, 1 = use SHA224 */
