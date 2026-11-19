@@ -52,7 +52,7 @@ void ENET2_IRQHandler() {
 }
 #endif
 
-static auto * const ENETIRQHandlers[FSL_FEATURE_SOC_ENET_COUNT + 1] = {
+static void (* const ENETIRQHandlers[FSL_FEATURE_SOC_ENET_COUNT + 1])() = {
     &ENET0_IRQHandler,
 #ifdef ENET2
     nullptr,
@@ -80,8 +80,41 @@ void ENETEthMac::MACDriver::setupMDIOClocking(uint32_t sourceClock) {
     const uint8_t holdTimeSourceClkCycles = std::ceil(10 / nsPerSourceClock);
 
     // Register fields are off by 1 so subtract 1
-    base->MSCR = ENET_MSCR_MII_SPEED_MASK(mdioClkDivider - 1) | ENET_MSCR_HOLDTIME_MASK(holdTimeSourceClkCycles - 1);
+    base->MSCR = ENET_MSCR_MII_SPEED(mdioClkDivider - 1) | ENET_MSCR_HOLDTIME(holdTimeSourceClkCycles - 1);
 
+}
+
+uint8_t ENETEthMac::MACDriver::getMacAddrCRC(MACAddress const & address) {
+    uint32_t crc            = 0xFFFFFFFFU;
+    uint32_t bitCount       = 0;
+
+    /* Calculates the CRC-32 polynomial on the multicast group address. */
+    for (uint8_t c : address)
+    {
+        for (bitCount = 0; bitCount < 0x08U; bitCount++)
+        {
+            if (0U != ((c ^ crc) & 1U))
+            {
+                crc >>= 1U;
+                c >>= 1U;
+                crc ^= 0xEDB88320U;
+            }
+            else
+            {
+                crc >>= 1U;
+                c >>= 1U;
+            }
+        }
+    }
+
+    crc = crc >> 26U;
+
+    return crc;
+}
+
+void ENETEthMac::MACDriver::writeMcastHashTable() {
+    base->GAUR = mcastMacHashTable[1];
+    base->GALR = mcastMacHashTable[0];
 }
 
 ENETEthMac::MACDriver::MACDriver(size_t enetNumber):
@@ -96,6 +129,9 @@ CompositeEMAC::ErrCode ENETEthMac::MACDriver::init() {
     /* Ungate ENET extra clock. */
     (void)CLOCK_EnableClock(s_enetExtraClock[instance]);
 #endif
+
+    passingAllMcasts = false;
+    memset(mcastMacHashTable, 0, sizeof(mcastMacHashTable));
 
     // Mux pins
     kinetis_init_eth_hardware();
@@ -210,4 +246,108 @@ CompositeEMAC::ErrCode ENETEthMac::MACDriver::enable(LinkSpeed speed, Duplex dup
     return ErrCode::SUCCESS;
 }
 
+CompositeEMAC::ErrCode ENETEthMac::MACDriver::disable() {
+    // Put the MAC to sleep. This stops operations without erasing any configuration.
+    base->ECR |= ENET_ECR_SLEEP_MASK;
+
+    return ErrCode::SUCCESS;
+}
+
+void ENETEthMac::MACDriver::setOwnMACAddr(const MACAddress &ownAddress) {
+    // Based on ENET_SetMacAddr().
+    // MAC address is in "backwards" order in memory (probably some endian related nonsense)
+    base->PALR =
+        (static_cast<uint32_t>(ownAddress[0]) << 24U) |
+        (static_cast<uint32_t>(ownAddress[1]) << 16U) |
+        (static_cast<uint32_t>(ownAddress[2]) << 8U) |
+        ownAddress[3];
+    base->PAUR = ENET_PAUR_PADDR2((static_cast<uint32_t>(ownAddress[4]) << 8U) | ownAddress[5]);
+}
+
+CompositeEMAC::ErrCode ENETEthMac::MACDriver::mdioRead(uint8_t devAddr, uint8_t regAddr, uint16_t &result) {
+    // Trigger MDIO Read operation.
+    // Note that oddly the "TA" field says in the datasheet that it must be set to 10, but MCUX SDK
+    // used 2. Not sure what's up there...
+    base->MMFR =
+        ENET_MMFR_ST(1U) | ENET_MMFR_OP(0b10) | ENET_MMFR_PA(devAddr) | ENET_MMFR_RA(regAddr) | ENET_MMFR_TA(10);
+
+    // Wait for transfer to finish
+    while (!(base->EIR & ENET_EIR_MII_MASK)) {}
+
+    // Grab data
+    result = base->MMFR & ENET_MMFR_DATA_MASK;
+
+    // Clear interrupt
+    base->EIR = ENET_EIR_MII_MASK;
+
+    return ErrCode::SUCCESS;
+}
+
+CompositeEMAC::ErrCode ENETEthMac::MACDriver::mdioWrite(uint8_t devAddr, uint8_t regAddr, uint16_t data) {
+    // Trigger MDIO Write operation.
+    // Note that oddly the "TA" field says in the datasheet that it must be set to 10, but MCUX SDK
+    // used 2. Not sure what's up there...
+    base->MMFR =
+        ENET_MMFR_ST(1U) | ENET_MMFR_OP(0b01) | ENET_MMFR_PA(devAddr) | ENET_MMFR_RA(regAddr) | ENET_MMFR_TA(10) | ENET_MMFR_DATA(data);
+
+    // Wait for transfer to finish
+    while (!(base->EIR & ENET_EIR_MII_MASK)) {}
+
+    // Clear interrupt
+    base->EIR = ENET_EIR_MII_MASK;
+
+    return ErrCode::SUCCESS;
+}
+
+PinName ENETEthMac::MACDriver::getPhyResetPin() {
+    // Currently none of the boards that use this MAC have a reset pin that we need to control
+    return NC;
+}
+
+CompositeEMAC::ErrCode ENETEthMac::MACDriver::addMcastMAC(MACAddress mac) {
+    uint8_t crc = getMacAddrCRC(mac);
+
+    // The CRC is 6 bits and maps to the 64 bits of GALR and GAUR.
+    mcastMacHashTable[crc >= 32] |= 1 << (crc % 32);
+
+    if (!passingAllMcasts) {
+        writeMcastHashTable();
+    }
+
+    return ErrCode::SUCCESS;
+}
+
+CompositeEMAC::ErrCode ENETEthMac::MACDriver::clearMcastFilter() {
+    memset(mcastMacHashTable, 0, sizeof(mcastMacHashTable));
+
+    if (!passingAllMcasts) {
+        writeMcastHashTable();
+    }
+
+    return ErrCode::SUCCESS;
+}
+
+void ENETEthMac::MACDriver::setPassAllMcast(bool pass) {
+    passingAllMcasts = pass;
+
+    // This EMAC does not have a dedicated pass-all-multicast bit. So, instead, we must
+    // set all bits of the multicast hash filter to 1s to enable pass-all-multicast,
+    // and write the remembered hash filter values back when disabling.
+    if (pass) {
+        base->GAUR = 0xFFFFFFFF;
+        base->GALR = 0xFFFFFFFF;
+    }
+    else {
+        writeMcastHashTable();
+    }
+}
+
+void ENETEthMac::MACDriver::setPromiscuous(bool enable) {
+    if (enable) {
+        base->RCR |= ENET_RCR_PROM_MASK;
+    }
+    else {
+        base->RCR &= ~ENET_RCR_PROM_MASK;
+    }
+}
 }
