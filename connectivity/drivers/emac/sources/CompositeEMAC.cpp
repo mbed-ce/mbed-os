@@ -110,7 +110,7 @@ namespace mbed {
                     reAddMulticastMacs();
                 }
 
-#if MBED_TRACE_MAX_LEVEL >= TRACE_LEVEL_INFO
+#if MBED_CONF_MBED_TRACE_ENABLE && MBED_TRACE_MAX_LEVEL >= TRACE_LEVEL_INFO
                 char const * speedStr;
                 if(speed == LinkSpeed::LINK_10MBIT) {
                     speedStr = "10Mbps";
