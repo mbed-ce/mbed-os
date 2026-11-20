@@ -350,4 +350,48 @@ void ENETEthMac::MACDriver::setPromiscuous(bool enable) {
         base->RCR &= ~ENET_RCR_PROM_MASK;
     }
 }
+
+void ENETEthMac::TxDMA::startDMA() {
+    base->TDSR = reinterpret_cast<uint32_t>(&txDescs[0]);
+}
+
+void ENETEthMac::TxDMA::stopDMA() {
+    // No-op, DMA is disabled by disabling ECR.ETHEREN at the MAC level
+}
+
+bool ENETEthMac::TxDMA::descOwnedByDMA(size_t descIdx) {
+    return txDescs[descIdx].ready;
+}
+
+bool ENETEthMac::TxDMA::isDMAReadableBuffer(uint8_t const *start, size_t size) const {
+    // To my knowledge there are no restrictions on what address ranges the EMAC can read in devices where it is present
+    (void)start;
+    (void)size;
+    return true;
+}
+
+void ENETEthMac::TxDMA::giveToDMA(size_t descIdx, uint8_t const *buffer, size_t len, bool firstDesc, bool lastDesc) {
+    txDescs[descIdx].dataBuffer = buffer;
+    txDescs[descIdx].dataLength = len;
+    txDescs[descIdx].transmitCRC = lastDesc;
+    txDescs[descIdx].lastDescriptor = lastDesc;
+    txDescs[descIdx].wrapToStartOfRing = descIdx >= TX_NUM_DESCS - 1;
+    txDescs[descIdx].lastDescUpdateDone = false; // A bit unclear but datasheet implies this should be reset to false by the application
+
+    // For now only generate an interrupt when the last buffer is transmitted.
+    // If your device is very constrained on network stack memory it may be worth setting this to true always,
+    // which will free up memory sooner at the cost of more CPU usage from the ISR.
+    txDescs[descIdx].interruptOnTx = lastDesc;
+
+    // Give to DMA!
+    txDescs[descIdx].ready = true;
+
+    // Flush descriptor to main memory
+#if __DCACHE_PRESENT
+    SCB_CleanDCache_by_Addr(&txDescs[descIdx], memory_manager->get_len(currBuf));
+#endif
+
+    // Poke DMA to indicate that we have made a new frame available
+    base->TDAR = 0;
+}
 }
