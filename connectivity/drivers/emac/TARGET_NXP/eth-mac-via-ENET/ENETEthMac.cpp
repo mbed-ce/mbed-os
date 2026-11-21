@@ -394,4 +394,8 @@ void ENETEthMac::TxDMA::giveToDMA(size_t descIdx, uint8_t const *buffer, size_t 
     // Poke DMA to indicate that we have made a new frame available
     base->TDAR = 0;
 }
+
+void ENETEthMac::RxDMA::startDMA() {
+
+}
 }

@@ -68,3 +68,10 @@ static inline void *mbed_align_up_to(void *addr, size_t alignment)
     // Now we just have to multiply up again to get an address (adding 1 to go forward by 1 block)
     return (void *)((prev_block_start + 1) * alignment);
 }
+
+/**
+ * @brief Reduce \c size until it is a multiple of \c alignment
+ */
+static MSTD_CONSTEXPR_FN_14 size_t mbed_align_size_down_to(size_t size, size_t alignment) {
+    return size - (size % alignment);
+}
