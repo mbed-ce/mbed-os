@@ -908,6 +908,11 @@ int i2c_stop(i2c_t *obj)
         }
     }
 
+    /* A single-byte NACK leaves AF set; do not leak it into the next HAL transfer. */
+    if (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF)) {
+        __HAL_I2C_CLEAR_FLAG(handle, I2C_FLAG_AF);
+    }
+
     return 0;
 }
 
@@ -943,17 +948,28 @@ int i2c_byte_write(i2c_t *obj, int data)
     int timeout;
     struct i2c_s *obj_s = I2C_S(obj);
     I2C_HandleTypeDef *handle = &(obj_s->handle);
+    
+    // If a previous byte/address was NACKed. Do not put another byte on the bus.
+    if (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF) != RESET) {
+        return 0;
+    }
 
     handle->Instance->DR = (uint8_t)data;
 
     // Wait until the byte (might be the address) is transmitted
     timeout = FLAG_TIMEOUT;
     while ((__HAL_I2C_GET_FLAG(handle, I2C_FLAG_TXE) == RESET) &&
-            (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_BTF) == RESET) &&
-            (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_ADDR) == RESET)) {
+           (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_BTF) == RESET) &&
+           (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_ADDR) == RESET) &&
+           (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF) == RESET)) {
         if ((timeout--) == 0) {
             return 2;
         }
+    }
+
+    // This byte, including an address byte, was NACKed.
+    if (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF) != RESET) {
+        return 0;
     }
 
     if (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_ADDR) != RESET) {
@@ -1336,7 +1352,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
             DEBUG_PRINTF("TIMEOUT or error in i2c_read\r\n");
 
             // Pass up the error code indicating a NACK
-            if(obj_s->event | I2C_EVENT_ERROR_NO_SLAVE)
+            if(obj_s->event & I2C_EVENT_ERROR_NO_SLAVE)
             {
                 count = I2C_ERROR_NO_SLAVE;
             }
@@ -1406,7 +1422,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
             DEBUG_PRINTF(" TIMEOUT or error in i2c_write\r\n");
 
             // Pass up the error code indicating a NACK
-            if(obj_s->event | I2C_EVENT_ERROR_NO_SLAVE)
+            if(obj_s->event & I2C_EVENT_ERROR_NO_SLAVE)
             {
                 count = I2C_ERROR_NO_SLAVE;
             }
@@ -1876,7 +1892,7 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
 
     if(halRet != HAL_OK) {
         DEBUG_PRINTF("Error %d trying to start async I2C transaction.\n", halRet);
-#if defined(I2C_IP_VERSION_V1) && defined(TARGET_STM32F4)
+#if defined(I2C_IP_VERSION_V1)
         obj_s->bus_held = false;
 #endif
     }
@@ -1916,7 +1932,27 @@ void i2c_abort_asynch(i2c_t *obj)
     /* Abort HAL requires DevAddress, but is not used. Use Dummy */
     uint16_t Dummy_DevAddress = 0x00;
 
-    HAL_I2C_Master_Abort_IT(handle, Dummy_DevAddress);
+    HAL_StatusTypeDef ret = HAL_I2C_Master_Abort_IT(handle, Dummy_DevAddress);
+
+    uint32_t timeout = FLAG_TIMEOUT;
+
+    if (ret == HAL_OK) {
+    while ((handle->State != HAL_I2C_STATE_READY) && (--timeout != 0)) {
+        wait_us(1);
+    }
+
+#if defined(I2C_IP_VERSION_V1)
+    while (((__HAL_I2C_GET_FLAG(handle, I2C_FLAG_BUSY) != RESET) ||
+            ((handle->Instance->CR1 & I2C_CR1_STOP) != 0)) &&
+           (--timeout != 0)) {
+        wait_us(1);
+    }
+#endif
+}
+
+    if ((ret != HAL_OK) || (timeout == 0)) {
+        i2c_init_internal(obj, NULL);
+    }
 
 #if defined(I2C_IP_VERSION_V1)
     obj_s->bus_held = false;
@@ -2431,8 +2467,8 @@ uint32_t i2c_get_timing(I2CName i2c, uint32_t current_timing, int current_hz,
 
 #endif /* I2C_IP_VERSION_V2 */
 
-#ifdef I2C_IP_VERSION_V2
 // Report I2C capabilities
+#ifdef I2C_IP_VERSION_V2
 static const i2c_capabilities_t i2c_caps = {
     .single_byte_address_delayed = false,
     .single_byte_start_cond_delayed = false,
@@ -2440,10 +2476,19 @@ static const i2c_capabilities_t i2c_caps = {
     .supports_zero_length_transfer_single_byte = false,
     .supports_zero_length_transfer_transaction = true
 };
+#else
+static const i2c_capabilities_t i2c_caps = {
+    .single_byte_address_delayed = false,
+    .single_byte_start_cond_delayed = false,
+    .supports_single_byte = true,
+    .supports_zero_length_transfer_single_byte = false,
+    .supports_zero_length_transfer_transaction = false
+};
+#endif
+
 MBED_WEAK i2c_capabilities_t const * i2c_get_capabilities()
 {
     return &i2c_caps;
 }
-#endif
 
 #endif // DEVICE_I2C
