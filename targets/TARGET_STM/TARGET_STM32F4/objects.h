@@ -88,7 +88,7 @@ struct i2c_s {
     int scl_func;
     IRQn_Type event_i2cIRQ;
     IRQn_Type error_i2cIRQ;
-    uint32_t XferOperation;
+    volatile bool bus_held;
     volatile uint8_t event;
 #if DEVICE_I2CSLAVE
     uint8_t slave;

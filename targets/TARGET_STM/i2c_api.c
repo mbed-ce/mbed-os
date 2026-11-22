@@ -582,8 +582,7 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
 #ifdef I2C_IP_VERSION_V2
     obj_s->current_hz = obj_s->hz;
 #else
-    // I2C Xfer operation init
-    obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
+    obj_s->bus_held = false;
 #endif
 
 #if DEVICE_I2CSLAVE
@@ -883,6 +882,9 @@ int i2c_start(i2c_t *obj)
         }
     }
 
+#if defined(I2C_IP_VERSION_V1)
+    obj_s->bus_held = true;
+#endif
     return 0;
 }
 
@@ -890,11 +892,13 @@ int i2c_stop(i2c_t *obj)
 {
     struct i2c_s *obj_s = I2C_S(obj);
     I2C_TypeDef *i2c = (I2C_TypeDef *)obj_s->i2c;
+    I2C_HandleTypeDef *handle = &(obj_s->handle);
 
     // Generate the STOP condition
     i2c->CR1 |= I2C_CR1_STOP;
 
-    obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
+    obj_s->bus_held = false;
+    obj_s->handle.PreviousState = I2C_STATE_NONE;
 
     // Wait until condition is generated
     int timeout = FLAG_TIMEOUT;
@@ -958,7 +962,25 @@ int i2c_byte_write(i2c_t *obj, int data)
 
     return 1;
 }
+
+/*
+ * Each Mbed transaction starts with an address. FIRST frames are correct when
+ * the bus was idle. If driver already owns the bus, OTHER frames are required to
+ * force a repeated START and address even when the direction is unchanged.
+ */
+static uint32_t get_hal_xfer_options(struct i2c_s *obj_s, bool stop)
+{
+    const bool was_held = obj_s->bus_held;
+    obj_s->bus_held = !stop;
+
+    if (!was_held) {
+        return stop ? I2C_FIRST_AND_LAST_FRAME : I2C_FIRST_FRAME;
+    }
+
+    return stop ? I2C_OTHER_AND_LAST_FRAME : I2C_OTHER_FRAME;
+}
 #endif //I2C_IP_VERSION_V1
+
 #ifdef I2C_IP_VERSION_V2
 
 /**
@@ -1278,24 +1300,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     int count = I2C_ERROR_BUS_BUSY;
     uint32_t xferOptions;
 #if defined(I2C_IP_VERSION_V1)
-    // Trick to remove compiler warning "left and right operands are identical" in some cases
-    uint32_t op1 = I2C_FIRST_AND_LAST_FRAME;
-    uint32_t op2 = I2C_LAST_FRAME;
-    if ((obj_s->XferOperation == op1) || (obj_s->XferOperation == op2)) {
-        if (stop) {
-            obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
-        } else {
-            obj_s->XferOperation = I2C_FIRST_FRAME;
-        }
-    } else if ((obj_s->XferOperation == I2C_FIRST_FRAME) ||
-               (obj_s->XferOperation == I2C_NEXT_FRAME)) {
-        if (stop) {
-            obj_s->XferOperation = I2C_LAST_FRAME;
-        } else {
-            obj_s->XferOperation = I2C_NEXT_FRAME;
-        }
-    }
-    xferOptions = obj_s->XferOperation;
+    xferOptions = get_hal_xfer_options(obj_s, stop);
 #elif defined(I2C_IP_VERSION_V2)
     if(!i2c_is_ready_for_transaction_start(obj_s->state))
     {
@@ -1350,6 +1355,9 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     } else {
         DEBUG_PRINTF("ERROR in i2c_read:%d\r\n", ret);
 
+#if defined(I2C_IP_VERSION_V1)
+        obj_s->bus_held = false;
+#endif
         STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
     }
 
@@ -1364,24 +1372,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
     uint32_t xferOptions;
 
 #if defined(I2C_IP_VERSION_V1)
-    // Trick to remove compiler warning "left and right operands are identical" in some cases
-    uint32_t op1 = I2C_FIRST_AND_LAST_FRAME;
-    uint32_t op2 = I2C_LAST_FRAME;
-    if ((obj_s->XferOperation == op1) || (obj_s->XferOperation == op2)) {
-        if (stop) {
-            obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
-        } else {
-            obj_s->XferOperation = I2C_FIRST_FRAME;
-        }
-    } else if ((obj_s->XferOperation == I2C_FIRST_FRAME) ||
-               (obj_s->XferOperation == I2C_NEXT_FRAME)) {
-        if (stop) {
-            obj_s->XferOperation = I2C_LAST_FRAME;
-        } else {
-            obj_s->XferOperation = I2C_NEXT_FRAME;
-        }
-    }
-    xferOptions = obj_s->XferOperation;
+    xferOptions = get_hal_xfer_options(obj_s, stop);
 #elif defined(I2C_IP_VERSION_V2)
     if(!i2c_is_ready_for_transaction_start(obj_s->state))
     {
@@ -1433,6 +1424,9 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
         }
     } else {
         DEBUG_PRINTF("ERROR in i2c_write\r\n");
+#if defined(I2C_IP_VERSION_V1)
+        obj_s->bus_held = false;
+#endif
         STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
     }
 
@@ -1448,12 +1442,8 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 #if DEVICE_I2C_ASYNCH
 #if defined(I2C_IP_VERSION_V1)
     if ((obj->tx_buff.length) && (obj->rx_buff.length)) {
-        if (obj_s->stop) {
-            obj_s->XferOperation = I2C_LAST_FRAME;
-        } else {
-            obj_s->XferOperation = I2C_NEXT_FRAME;
-        }
-        HAL_I2C_Master_Seq_Receive_IT(hi2c, obj_s->address, (uint8_t *)obj->rx_buff.buffer, obj->rx_buff.length, obj_s->XferOperation);
+        uint32_t XferOperation = get_hal_xfer_options(obj_s, obj_s->stop);
+        HAL_I2C_Master_Seq_Receive_IT(hi2c, obj_s->address, (uint8_t *)obj->rx_buff.buffer, obj->rx_buff.length, XferOperation);
     } else
 #elif defined(I2C_IP_VERSION_V2)
     if(obj_s->state == STM_I2C_ASYNC_WRITE_IN_PROGRESS)
@@ -1545,6 +1535,9 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
     // If we only got a NACK, no reason to call the cavalry
     if(handle->ErrorCode == HAL_I2C_ERROR_AF)
     {
+#if defined(I2C_IP_VERSION_V1)
+        obj_s->bus_held = false;
+#endif
         STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE); // Hardware stops the transaction when it gets a NACK
         obj_s->event = event_code;
         return;
@@ -1802,6 +1795,9 @@ void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c)
 
     /* Set event flag */
     obj_s->event = I2C_EVENT_ERROR;
+#if defined(I2C_IP_VERSION_V1)
+    obj_s->bus_held = false;
+#endif
 }
 
 void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
@@ -1836,43 +1832,14 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
 
     int halRet = HAL_OK;
 #if defined(I2C_IP_VERSION_V1)
-    /* Set operation step depending if stop sending required or not */
-    if ((tx_length && !rx_length) || (!tx_length && rx_length)) {
-        // Trick to remove compiler warning "left and right operands are identical" in some cases
-        uint32_t op1 = I2C_FIRST_AND_LAST_FRAME;
-        uint32_t op2 = I2C_LAST_FRAME;
-        if ((obj_s->XferOperation == op1) || (obj_s->XferOperation == op2)) {
-            if (stop) {
-                obj_s->XferOperation = I2C_FIRST_AND_LAST_FRAME;
-            } else {
-                obj_s->XferOperation = I2C_FIRST_FRAME;
-            }
-        } else if ((obj_s->XferOperation == I2C_FIRST_FRAME) ||
-                   (obj_s->XferOperation == I2C_NEXT_FRAME)) {
-            if (stop) {
-                obj_s->XferOperation = I2C_LAST_FRAME;
-            } else {
-                obj_s->XferOperation = I2C_NEXT_FRAME;
-            }
-        }
+    // A combined write/read must not stop between its two addressed phases.
+    const bool send_stop_on_first_transfer = stop && ((tx_length == 0) || (rx_length == 0));
+    uint32_t XferOperation = get_hal_xfer_options(obj_s, send_stop_on_first_transfer);
 
-        if (tx_length > 0) {
-            halRet = HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *)tx, tx_length, obj_s->XferOperation);
-        }
-        else { // RX
-            halRet = HAL_I2C_Master_Seq_Receive_IT(handle, address, (uint8_t *)rx, rx_length, obj_s->XferOperation);
-        }
-    } else if (tx_length && rx_length) {
-
-        // Trick to remove compiler warning "left and right operands are identical" in some cases
-        uint32_t op1 = I2C_FIRST_AND_LAST_FRAME;
-        uint32_t op2 = I2C_LAST_FRAME;
-        if ((obj_s->XferOperation == op1) || (obj_s->XferOperation == op2)) {
-            halRet = HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *)tx, tx_length, I2C_FIRST_FRAME);
-        } else if ((obj_s->XferOperation == I2C_FIRST_FRAME) ||
-                   (obj_s->XferOperation == I2C_NEXT_FRAME)) {
-            halRet = HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *)tx, tx_length, I2C_NEXT_FRAME);
-        }
+    if (tx_length > 0) {
+        halRet = HAL_I2C_Master_Seq_Transmit_IT(handle, address, (uint8_t *)tx, tx_length, XferOperation);
+    } else if (rx_length > 0) {
+        halRet = HAL_I2C_Master_Seq_Receive_IT(handle, address, (uint8_t *)rx, rx_length, XferOperation);
     }
 #elif defined(I2C_IP_VERSION_V2)
 
@@ -1909,6 +1876,9 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
 
     if(halRet != HAL_OK) {
         DEBUG_PRINTF("Error %d trying to start async I2C transaction.\n", halRet);
+#if defined(I2C_IP_VERSION_V1) && defined(TARGET_STM32F4)
+        obj_s->bus_held = false;
+#endif
     }
 }
 
@@ -1933,7 +1903,7 @@ uint8_t i2c_active(i2c_t *obj)
 #ifdef I2C_IP_VERSION_V2
     return !i2c_is_ready_for_transaction_start(obj_s->state);
 #else
-    return obj_s->handle.State != HAL_I2C_STATE_READY;
+    return (obj_s->handle.State != HAL_I2C_STATE_READY) || obj_s->bus_held;
 #endif
 }
 
@@ -1948,6 +1918,9 @@ void i2c_abort_asynch(i2c_t *obj)
 
     HAL_I2C_Master_Abort_IT(handle, Dummy_DevAddress);
 
+#if defined(I2C_IP_VERSION_V1)
+    obj_s->bus_held = false;
+#endif
     STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
 }
 #endif // DEVICE_I2C_ASYNCH
