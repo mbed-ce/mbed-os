@@ -102,7 +102,7 @@ class NuvotonM480EthMAC : public CompositeEMAC
         void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
     public:
         explicit TxDMA(EMAC_T * const base):
-        GenericTxDMARing(quirks),
+        GenericTxDMARing(NuvotonM480EthMAC::quirks),
         base(base)
         {}
     };
@@ -130,7 +130,7 @@ class NuvotonM480EthMAC : public CompositeEMAC
 
     public:
         explicit RxDMA(EMAC_T * const base):
-        GenericRxDMARing(quirks),
+        GenericRxDMARing(NuvotonM480EthMAC::quirks),
         base(base)
         {}
     };

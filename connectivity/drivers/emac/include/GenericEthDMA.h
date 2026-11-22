@@ -25,6 +25,8 @@
 #include <atomic>
 #include <optional>
 
+#include "mbed_math_helpers.h"
+
 #define TRACE_GROUP  "GEDMA"
 
 namespace mbed {
@@ -484,7 +486,9 @@ namespace mbed {
         /// Note that the descriptor will already have been invalidated in cache if needed.
         virtual bool isLastDesc(size_t descIdx) = 0;
 
-        /// Is the given descriptor an error descriptor?
+        /// Is the given descriptor for a packet containing an error (e.g. invalid CRC, invalid length, etc)
+        /// Descriptors for error packets (as well as any previous descriptors that are part of the same packet)
+        /// will have their data dropped and will be returned to the MAC.
         /// Note that the descriptor will already have been invalidated in cache if needed.
         virtual bool isErrorDesc(size_t descIdx) = 0;
 
@@ -503,8 +507,15 @@ namespace mbed {
 
     public:
         CompositeEMAC::ErrCode init() override {
-            rxPoolPayloadSize = memory_manager->get_pool_alloc_unit(RX_BUFFER_ALIGN);
-            // Keep cache invalidation inside the receive buffer, including its last cache line.
+
+            // The size of a receive buffer needs to be an even number of cache lines, if the cache is present.
+            // We also need to respect the rxBufferSizeMultiple quirk.
+            const size_t bufferSizeAlign = std::max(RX_BUFFER_ALIGN, quirks.rxDMA.rxBufferSizeMultiple);
+            rxPoolPayloadSize = mbed_align_size_down_to(
+                memory_manager->get_pool_alloc_unit(RX_BUFFER_ALIGN),
+                bufferSizeAlign
+            );
+
             rxPoolPayloadSize -= rxPoolPayloadSize % RX_BUFFER_ALIGN;
 
             MBED_ASSERT(rxPoolPayloadSize > 0);

@@ -70,7 +70,7 @@ class STM32EthMACv1 : public CompositeEMAC
         void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
     public:
         explicit TxDMA(ETH_TypeDef * const base):
-        GenericTxDMARing(quirks),
+        GenericTxDMARing(STM32EthMACv1::quirks),
         base(base)
         {}
     };
@@ -102,7 +102,7 @@ class STM32EthMACv1 : public CompositeEMAC
 
     public:
         explicit RxDMA(ETH_TypeDef * const base):
-        GenericRxDMARing(quirks),
+        GenericRxDMARing(STM32EthMACv1::quirks),
         base(base)
         {}
     };

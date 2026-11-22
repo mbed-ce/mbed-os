@@ -483,7 +483,7 @@ protected:
     void onRxPoolSpaceAvail();
 
     /// Constructor. Should be called by subclass.
-    CompositeEMAC(Quirks & quirks, TxDMA & txDMA, RxDMA & rxDMA, MACDriver & macDriver):
+    CompositeEMAC(Quirks const & quirks, TxDMA & txDMA, RxDMA & rxDMA, MACDriver & macDriver):
     quirks(quirks),
     rxDMA(rxDMA),
     txDMA(txDMA),

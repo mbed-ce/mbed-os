@@ -10,6 +10,7 @@
 
 #include <cmath>
 
+#include "mbed_error.h"
 #include "mbed_math_helpers.h"
 
 extern "C" void kinetis_init_eth_hardware(); // Defined in hardware_init.c for your target
@@ -40,6 +41,40 @@ static const IRQn_Type s_enetRxIrqId[] = ENET_Receive_IRQS;
 static const IRQn_Type s_enetErrIrqId[] = ENET_Error_IRQS;
 
 ENETEthMac * ENETEthMac::instances[FSL_FEATURE_SOC_ENET_COUNT + 1]{};
+
+ENETEthMac::ENETEthMac(size_t instanceNumber):
+CompositeEMAC(quirks, txDMA, rxDMA, macDriver),
+instanceNumber(instanceNumber),
+base(s_enetBases[instanceNumber]),
+txDMA(base),
+rxDMA(base),
+macDriver(instanceNumber)
+{
+    // Set instance pointer
+    MBED_ASSERT(instances[instanceNumber] == nullptr);
+    instances[instanceNumber] = this;
+}
+
+ENETEthMac::~ENETEthMac() {
+    instances[instanceNumber] = nullptr;
+}
+
+void ENETEthMac::enetIrqHandler() {
+    const uint32_t eir = base->EIR;
+    if (eir & ENET_EIR_TXB_MASK) {
+        base->EIR = ENET_EIR_TXB_MASK;
+        txISR();
+    }
+    if (eir & (ENET_EIR_RXF_MASK | ENET_EIR_BABR_MASK | ENET_EIR_PLR_MASK))
+    {
+        base->EIR = ENET_EIR_RXF_MASK | ENET_EIR_BABR_MASK | ENET_EIR_PLR_MASK;
+        rxISR();
+    }
+    if (eir & ENET_EIR_EBERR_MASK) {
+        MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_ETHERNET, EIO), \
+                   "ENET EMAC: Hardware reports fatal DMA error\n");
+    }
+}
 
 // IRQ handlers for each Ethernet
 void ENET0_IRQHandler() {
@@ -210,6 +245,11 @@ CompositeEMAC::ErrCode ENETEthMac::MACDriver::init() {
 CompositeEMAC::ErrCode ENETEthMac::MACDriver::deinit() {
     // Put the ENET under reset, clearing all settings.
     base->ECR |= ENET_ECR_RESET_MASK;
+
+    // Disable interrupts
+    for (auto irq : {s_enetTxIrqId[enetNumber], s_enetRxIrqId[enetNumber], s_enetErrIrqId[enetNumber]}) {
+        NVIC_DisableIRQ(irq);
+    }
 
     return ErrCode::SUCCESS;
 }
@@ -388,7 +428,7 @@ void ENETEthMac::TxDMA::giveToDMA(size_t descIdx, uint8_t const *buffer, size_t 
 
     // Flush descriptor to main memory
 #if __DCACHE_PRESENT
-    SCB_CleanDCache_by_Addr(&txDescs[descIdx], memory_manager->get_len(currBuf));
+    SCB_CleanDCache_by_Addr(&txDescs[descIdx], sizeof(NXP_ENET::EthTxDescriptor));
 #endif
 
     // Poke DMA to indicate that we have made a new frame available
@@ -396,6 +436,60 @@ void ENETEthMac::TxDMA::giveToDMA(size_t descIdx, uint8_t const *buffer, size_t 
 }
 
 void ENETEthMac::RxDMA::startDMA() {
+    base->RDSR = reinterpret_cast<uint32_t>(&rxDescs[0]);
+    base->MRBR = rxPoolPayloadSize;
+}
 
+void ENETEthMac::RxDMA::stopDMA() {
+    // No-op, DMA is disabled by disabling ECR.ETHEREN at the MAC level
+}
+
+bool ENETEthMac::RxDMA::descOwnedByDMA(size_t descIdx) {
+    return rxDescs[descIdx].empty;
+}
+
+bool ENETEthMac::RxDMA::isFirstDesc(size_t descIdx) {
+    return false; // Not supported
+}
+
+bool ENETEthMac::RxDMA::isLastDesc(size_t descIdx) {
+    return rxDescs[descIdx].last;
+}
+
+bool ENETEthMac::RxDMA::isErrorDesc(size_t descIdx) {
+    // Generally the error flags are not valid for non-last descriptors
+    if (!rxDescs[descIdx].last) {
+        return false;
+    }
+
+    return rxDescs[descIdx].lengthViolation || rxDescs[descIdx].nonOctetAligned || rxDescs[descIdx].phyOrCRCError || rxDescs[descIdx].truncated ||
+        rxDescs[descIdx].ipChksumErr || rxDescs[descIdx].protChksumErr || rxDescs[descIdx].macErr || rxDescs[descIdx].phyErr || rxDescs[descIdx].collision;
+}
+
+void ENETEthMac::RxDMA::returnDescriptor(size_t descIdx, uint8_t *buffer) {
+    rxDescs[descIdx].dataBuffer = buffer;
+
+    rxDescs[descIdx].interrupt = true;
+    rxDescs[descIdx].lastDescUpdateDone = false; // A bit unclear but datasheet implies this should be reset to false by the application
+    rxDescs[descIdx].wrap = descIdx >= RX_NUM_DESCS - 1;
+
+    // Give to DMA!
+    rxDescs[descIdx].empty = true;
+
+    // Flush descriptor to main memory
+#if __DCACHE_PRESENT
+    SCB_CleanDCache_by_Addr(&rxDescs[descIdx], sizeof(NXP_ENET::EthTxDescriptor));
+#endif
+
+    // Poke DMA to indicate that we have made a new frame available
+    base->RDAR = 0;
+}
+
+size_t ENETEthMac::RxDMA::getTotalLen(size_t firstDescIdx, size_t lastDescIdx) {
+    size_t totalSize = 0;
+    for(size_t descIdx = firstDescIdx; descIdx != (lastDescIdx + 1) % RX_NUM_DESCS; descIdx = (descIdx + 1) % RX_NUM_DESCS) {
+        totalSize += rxDescs[descIdx].dataLength;
+    }
+    return totalSize;
 }
 }

@@ -98,7 +98,7 @@ class ENETEthMac : public CompositeEMAC {
         void giveToDMA(size_t descIdx, uint8_t const * buffer, size_t len, bool firstDesc, bool lastDesc) override;
     public:
         explicit TxDMA(ENET_Type * const base):
-        GenericTxDMARing(quirks),
+        GenericTxDMARing(ENETEthMac::quirks),
         base(base)
         {}
     };
@@ -106,6 +106,9 @@ class ENETEthMac : public CompositeEMAC {
     class RxDMA : public GenericRxDMARing {
     protected:
         ENET_Type * const base; // Base address of Ethernet peripheral
+
+        // Rx descriptor array. Per the datasheet, for optimal performance this should be 64-byte aligned.
+        alignas(64) NXP_ENET::EthRxDescriptor rxDescs[RX_NUM_DESCS];
 
         void startDMA() override;
 
@@ -125,11 +128,12 @@ class ENETEthMac : public CompositeEMAC {
     public:
 
         explicit RxDMA(ENET_Type * const base):
-        GenericRxDMARing(quirks),
+        GenericRxDMARing(ENETEthMac::quirks),
         base(base)
         {}
     };
 
+    size_t instanceNumber;
     ENET_Type * const base; // Base address of Ethernet peripheral
 
     // Components of the ethernet MAC
