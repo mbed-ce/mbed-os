@@ -814,11 +814,12 @@ void i2c_frequency(i2c_t *obj, int hz)
     
     HAL_I2C_Init(handle);
 
+#if DEVICE_I2CSLAVE
     // In slave mode, reenable slave interrupts after calling init
-    if(obj_s->slave != 0)
-    {
+    if (obj_s->slave != 0) {
         HAL_I2C_EnableListen_IT(&obj_s->handle);
     }
+#endif
 
     /*  store frequency for timeout computation */
     obj_s->hz = hz;
@@ -1317,7 +1318,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
     int ret = HAL_I2C_Master_Seq_Receive_IT(handle, address, (uint8_t *) data, length, xferOptions);
 
     if (ret == HAL_OK) {
-        STM_I2C_SET_STATE(obj_s, STM_I2C_TR_WRITE_IN_PROGRESS);
+        STM_I2C_SET_STATE(obj_s, STM_I2C_TR_READ_IN_PROGRESS);
         uint32_t timeout = BYTE_TIMEOUT_US * (length + 1);
         /*  transfer started : wait completion or timeout */
         while (!(obj_s->event & I2C_EVENT_ALL) && (--timeout != 0)) {
@@ -1739,7 +1740,7 @@ int i2c_slave_read(i2c_t *obj, char *data, int length)
     ret = HAL_I2C_Slave_Seq_Receive_IT(handle, (uint8_t *) data, _length, I2C_NEXT_FRAME);
 
     if (ret == HAL_OK) {
-        timeout = BYTE_TIMEOUT_US * (_length + 1);
+        timeout = BYTE_TIMEOUT_US * (length + 1);
         while (obj_s->slave_rx_transfer_in_progress && (--timeout != 0)) {
             wait_us(1);
         }
