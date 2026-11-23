@@ -602,9 +602,14 @@ void i2c_deinit_internal(i2c_t *obj)
 {
     struct i2c_s *obj_s = I2C_S(obj);
 
+    i2c_ev_err_disable(obj);
+
     i2c_hw_reset(obj);
 
     HAL_I2C_DeInit(&(obj_s->handle));
+
+    NVIC_ClearPendingIRQ(obj_s->event_i2cIRQ);
+    NVIC_ClearPendingIRQ(obj_s->error_i2cIRQ);
 
 #if defined I2C1_BASE
     if (obj_s->i2c == I2C_1) {
@@ -882,9 +887,7 @@ int i2c_start(i2c_t *obj)
         }
     }
 
-#if defined(I2C_IP_VERSION_V1)
     obj_s->bus_held = true;
-#endif
     return 0;
 }
 
@@ -948,7 +951,7 @@ int i2c_byte_write(i2c_t *obj, int data)
     int timeout;
     struct i2c_s *obj_s = I2C_S(obj);
     I2C_HandleTypeDef *handle = &(obj_s->handle);
-    
+
     // If a previous byte/address was NACKed. Do not put another byte on the bus.
     if (__HAL_I2C_GET_FLAG(handle, I2C_FLAG_AF) != RESET) {
         return 0;
@@ -1033,25 +1036,6 @@ static void prep_for_restart_if_needed(struct i2c_s *obj_s) {
                 break;
             }
         }
-    }
-}
-
-/**
- * Generate the STM32 HAL "xferOptions" value based on the current state and whether we are going to send a
- * STOP at the end of the current transaction.
- */
-static uint32_t get_hal_xfer_options(struct i2c_s *obj_s, bool stop) {
-    (void)obj_s;
-
-    // Note: The naming used by STM32 HAL is quite counterintuitive.  "OTHER_FRAME" means "always send a
-    // start/restart condition at the start of the frame".  In contrast, "FIRST_FRAME" means "don't send
-    // a start/restart if the previous transfer was going the same direction".
-    if(stop) {
-        // Generate start condition and stop at end
-        return I2C_OTHER_AND_LAST_FRAME;
-    } else {
-        // Generate only the start condition
-        return I2C_OTHER_FRAME;
     }
 }
 
