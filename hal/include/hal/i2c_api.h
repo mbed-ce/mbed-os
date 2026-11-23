@@ -91,10 +91,12 @@ typedef struct {
 } i2c_t;
 
 enum {
+    I2C_ERROR_NONE = 0,
     I2C_ERROR_NO_SLAVE = -1,
     I2C_ERROR_BUS_BUSY = -2,
-    I2C_ERROR_INVALID_USAGE = -3, // Invalid usage of the I2C API, e.g. by mixing single-byte and transactional function calls.
-    I2C_ERROR_OTHER = -4, ///< Other internal error
+    I2C_ERROR_TIMEOUT = -3,
+    I2C_ERROR_INVALID_USAGE = -4, // Invalid usage of the I2C API, e.g. by mixing single-byte and transactional function calls.
+    I2C_ERROR_OTHER = -5, ///< Other internal error
 };
 
 typedef struct {
@@ -264,7 +266,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop);
  * @param obj     The I2C object
  * @param address 8/11-bit address (last bit is 0)
  * @param data    The buffer for sending
- *  @param length  Number of bytes to write. Allowed to be 0 *only* if the \c supports_zero_length_transfer_transaction
+ * @param length  Number of bytes to write. Allowed to be 0 *only* if the \c supports_zero_length_transfer_transaction
  *     capability is true.
  * @param stop    Stop to be generated after the transfer is done
  * @retval zero or non-zero - Number of written bytes
@@ -290,6 +292,9 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop);
  * - BYTE_WRITE
  *
  * @param obj The I2C object
+ * @retval I2C_ERROR_NONE on success or negative - I2C_ERROR_XXX status
+ * @note After calling this function, the caller must call i2c_stop() to finish
+ *       the sequence, including when this function returns an error.
  */
 int i2c_start(i2c_t *obj);
 
@@ -297,11 +302,13 @@ int i2c_start(i2c_t *obj);
  * @brief Send STOP command
  *
  * This function may be called in these I2C states:
- * - ADDRESSED (to complete a zero length transaction, *only* allowed if the \c supports_zero_length_transfer_single_byte capability is enabled)
+ * - STARTED
+ * - ADDRESSED
  * - BYTE_READ
  * - BYTE_WRITE
  *
  * @param obj The I2C object
+ * @retval I2C_ERROR_NONE on success or negative - I2C_ERROR_XXX status
  */
 int i2c_stop(i2c_t *obj);
 

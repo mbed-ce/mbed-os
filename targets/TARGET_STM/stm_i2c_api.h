@@ -102,4 +102,17 @@ struct i2c_s {
 #define STM_I2C_SET_STATE(i2c_s, new_state) (void)i2c_s
 #endif
 
+#if DEVICE_SLEEP && defined(DEEPSTOP2) 
+typedef enum {
+    PERIPHERAL_I2C,
+    PERIPHERAL_COUNT
+} peripheral_t;
+
+typedef void (*peripheral_restore_callback_t)(void);
+
+void register_peripheral_restore_callback(
+    peripheral_t peripheral,
+    peripheral_restore_callback_t callback);
+#endif
+
 #endif //MBED_STM_I2C_API_H

@@ -450,24 +450,23 @@ public:
 
 #if !defined(DOXYGEN_ONLY)
 protected:
+    void irq_handler_asynch(void);
+    event_callback_t _callback;
+    CThunk<I2C> _irq;
+    DMAUsage _usage;
+    bool _async_transfer_is_repeated; // Flag that the current async transfer is configured for a repeated start
+#endif // !defined(DOXYGEN_ONLY)
+#endif // DEVICE_I2C_ASYNCH
+
+#if !defined(DOXYGEN_ONLY)
+protected:
     /** Lock deep sleep only if it is not yet locked */
     void lock_deep_sleep();
 
     /** Unlock deep sleep only if it has been locked */
     void unlock_deep_sleep();
 
-    void irq_handler_asynch(void);
-    event_callback_t _callback;
-    CThunk<I2C> _irq;
-    DMAUsage _usage;
     bool _deep_sleep_locked;
-    bool _async_transfer_is_repeated; // Flag that the current async transfer is configured for a repeated start
-#endif
-#endif
-
-#if !defined(DOXYGEN_ONLY)
-protected:
-
     i2c_t _i2c;
     int    _hz;
     SingletonPtr<rtos::Mutex> _mutex;

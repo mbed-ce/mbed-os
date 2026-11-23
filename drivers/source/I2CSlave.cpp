@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 #include "drivers/I2CSlave.h"
+#include "platform/mbed_power_mgmt.h"
 
 #if DEVICE_I2CSLAVE
 
@@ -22,6 +23,7 @@ namespace mbed {
 
 I2CSlave::I2CSlave(PinName sda, PinName scl) : _i2c()
 {
+    sleep_manager_lock_deep_sleep();
     i2c_init(&_i2c, sda, scl);
     i2c_frequency(&_i2c, 100000);
     i2c_slave_mode(&_i2c, 1);
@@ -29,9 +31,16 @@ I2CSlave::I2CSlave(PinName sda, PinName scl) : _i2c()
 
 I2CSlave::I2CSlave(const i2c_pinmap_t &static_pinmap) : _i2c()
 {
+    sleep_manager_lock_deep_sleep();
     i2c_init_direct(&_i2c, &static_pinmap);
     i2c_frequency(&_i2c, 100000);
     i2c_slave_mode(&_i2c, 1);
+}
+
+I2CSlave::~I2CSlave()
+{
+    i2c_free(&_i2c);
+    sleep_manager_unlock_deep_sleep();
 }
 
 void I2CSlave::frequency(int hz)

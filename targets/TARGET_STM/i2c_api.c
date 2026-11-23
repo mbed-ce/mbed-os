@@ -187,6 +187,10 @@ static uint32_t      I2c_valid_timing_nbr = 0;
 #endif
 static I2C_HandleTypeDef *i2c_handles[I2C_NUM];
 
+#if DEVICE_SLEEP && defined(DEEPSTOP2) 
+static void i2c_restore_from_deep_sleep(void);
+#endif
+
 #if DEVICE_I2CSLAVE
 // just temporary discard storage byte for each I2C
 static uint8_t i2c_slave_rx_discard[I2C_NUM]; 
@@ -596,6 +600,11 @@ void i2c_init_internal(i2c_t *obj, const i2c_pinmap_t *pinmap)
 
     obj_s->event = 0;
     STM_I2C_SET_STATE(obj_s, STM_I2C_IDLE);
+
+#if DEVICE_SLEEP && defined(DEEPSTOP2)
+    i2c_handles[obj_s->index] = &obj_s->handle;
+    register_peripheral_restore_callback(PERIPHERAL_I2C, i2c_restore_from_deep_sleep);
+#endif
 }
 
 void i2c_deinit_internal(i2c_t *obj)
@@ -607,6 +616,12 @@ void i2c_deinit_internal(i2c_t *obj)
     i2c_hw_reset(obj);
 
     HAL_I2C_DeInit(&(obj_s->handle));
+
+#if DEVICE_I2CSLAVE
+    if (obj_s->slave) {
+        obj_s->slave = 0;
+    }
+#endif
 
     NVIC_ClearPendingIRQ(obj_s->event_i2cIRQ);
     NVIC_ClearPendingIRQ(obj_s->error_i2cIRQ);
@@ -650,6 +665,21 @@ void i2c_deinit_internal(i2c_t *obj)
 #if defined FMPI2C1_BASE
     if (obj_s->i2c == FMPI2C_1) {
         __HAL_RCC_FMPI2C1_CLK_DISABLE();
+    }
+#endif
+
+#if DEVICE_SLEEP && defined(DEEPSTOP2)
+    i2c_handles[obj_s->index] = NULL;
+    bool i2c_active = false;
+    for (uint32_t index = 0; index < I2C_NUM; index++) {
+        if (i2c_handles[index] != NULL) {
+            i2c_active = true;
+            break;
+        }
+    }
+    if (!i2c_active) {
+        /* No initialized I2C instance remains, so disable its wake restore. */
+        register_peripheral_restore_callback(PERIPHERAL_I2C, NULL);
     }
 #endif
 
@@ -894,6 +924,12 @@ int i2c_start(i2c_t *obj)
 int i2c_stop(i2c_t *obj)
 {
     struct i2c_s *obj_s = I2C_S(obj);
+
+#if DEVICE_I2CSLAVE
+    if (obj_s->slave) {
+        return I2C_ERROR_NONE;
+    }
+#endif
     I2C_TypeDef *i2c = (I2C_TypeDef *)obj_s->i2c;
     I2C_HandleTypeDef *handle = &(obj_s->handle);
 
@@ -1613,7 +1649,7 @@ void i2c_slave_mode(i2c_t *obj, int enable_slave)
     if (enable_slave) {
         obj_s->slave = DEFAULT_SLAVE_MODE;
         HAL_I2C_EnableListen_IT(handle);
-    } else {
+    } else if (obj_s->slave) {
         obj_s->slave = 0;
         HAL_I2C_DisableListen_IT(handle);
     }
@@ -1779,6 +1815,26 @@ int i2c_slave_write(i2c_t *obj, const char *data, int length)
     return count;
 }
 #endif // DEVICE_I2CSLAVE
+
+#if DEVICE_SLEEP && defined(DEEPSTOP2) 
+static void i2c_restore_from_deep_sleep(void)
+{
+    for (uint32_t index = 0; index < I2C_NUM; index++) {
+        I2C_HandleTypeDef *handle = i2c_handles[index];
+        if (handle == NULL) {
+            continue;
+        }
+
+        i2c_t *obj = get_i2c_obj(handle);
+        struct i2c_s *obj_s = I2C_S(obj);
+        if (obj_s->i2c == (I2CName)NC) {
+            continue;
+        }
+
+        i2c_frequency(obj, obj_s->hz);
+    }
+}
+#endif
 
 #if DEVICE_I2C_ASYNCH
 /* ASYNCH MASTER API FUNCTIONS */

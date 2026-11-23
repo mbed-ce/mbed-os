@@ -149,6 +149,9 @@ public:
     I2CSlave(const i2c_pinmap_t &static_pinmap);
     I2CSlave(const i2c_pinmap_t &&) = delete; // prevent passing of temporary objects
 
+    /** Stop slave operation and release the peripheral and its sleep locks. */
+    ~I2CSlave();
+
     /** Set the frequency of the I2C interface.
      *
      *  @param hz The bus frequency in Hertz.
