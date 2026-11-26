@@ -1252,7 +1252,8 @@ int i2c_byte_write(i2c_t *obj, int data)
     if (obj_s->state == STM_I2C_PENDING_START)
     {
         //*  First byte after the start is the address */
-        tmpreg |= (uint32_t)((uint32_t)data & I2C_CR2_SADD);
+        tmpreg &= ~I2C_CR2_SADD;
+        tmpreg |= (uint32_t)data & I2C_CR2_SADD;
         if (data & 0x01) {
             tmpreg |= I2C_CR2_START | I2C_CR2_RD_WRN;
         } else {
@@ -1264,7 +1265,8 @@ int i2c_byte_write(i2c_t *obj, int data)
         /*  Disable Autoend */
         tmpreg &= ~I2C_CR2_AUTOEND;
         /*  Set transfer size to 1 */
-        tmpreg |= (I2C_CR2_NBYTES & (1 << I2C_CR2_NBYTES_Pos));
+        tmpreg &= ~I2C_CR2_NBYTES_Msk;
+        tmpreg |= (1 << I2C_CR2_NBYTES_Pos);
         /* Set the prepared configuration */
         handle->Instance->CR2 = tmpreg;
 
@@ -1293,7 +1295,8 @@ int i2c_byte_write(i2c_t *obj, int data)
         /*  Enable reload mode as we don't know how many bytes will be sent */
         tmpreg |= I2C_CR2_RELOAD;
         /*  Set transfer size to 1 */
-        tmpreg |= (I2C_CR2_NBYTES & (1 << 16));
+        tmpreg &= ~I2C_CR2_NBYTES_Msk;
+        tmpreg |= (1 << I2C_CR2_NBYTES_Pos);
         /* Set the prepared configuration */
         handle->Instance->CR2 = tmpreg;
         /*  Prepare next write */
@@ -1396,7 +1399,7 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop)
         }
     } else {
         DEBUG_PRINTF("ERROR in i2c_read:%d\r\n", ret);
-
+        i2c_ev_err_disable(obj);
 #if defined(I2C_IP_VERSION_V1)
         obj_s->bus_held = false;
 #endif
@@ -1466,6 +1469,7 @@ int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop)
         }
     } else {
         DEBUG_PRINTF("ERROR in i2c_write\r\n");
+        i2c_ev_err_disable(obj);
 #if defined(I2C_IP_VERSION_V1)
         obj_s->bus_held = false;
 #endif
@@ -1933,7 +1937,6 @@ int i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, 
     if(halRet != HAL_OK) {
         DEBUG_PRINTF("Error %d trying to start async I2C transaction.\n", halRet);
         i2c_ev_err_disable(obj);
-        i2c_init_internal(obj, NULL);
 #if defined(I2C_IP_VERSION_V1)
         obj_s->bus_held = false;
 #endif
