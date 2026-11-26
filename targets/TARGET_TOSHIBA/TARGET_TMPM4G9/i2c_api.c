@@ -267,7 +267,7 @@ const PinMap *i2c_slave_scl_pinmap()
 
 #if DEVICE_I2C_ASYNCH
 
-void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address,
+int i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address,
                          uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
 {
     struct i2c_s *obj_s = I2C_S(obj);
@@ -277,6 +277,7 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
     set_i2c(obj_s->index, &obj_s->my_i2c.info.irqn);
     NVIC_SetVector(obj_s->irqn, handler);
     i2c_transfer_asynch_t(&obj_s->my_i2c, (uint8_t *)tx, tx_length, (uint8_t *)rx, rx_length, address, stop);
+    return I2C_ERROR_NONE;
 }
 
 uint32_t i2c_irq_handler_asynch(i2c_t *obj)

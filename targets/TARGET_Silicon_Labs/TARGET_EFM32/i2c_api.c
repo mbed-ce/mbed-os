@@ -496,11 +496,11 @@ void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask)
  *  @param handler The I2C IRQ handler to be set
  *  @param hint    DMA hint usage
  */
-void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
+int i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
 {
     I2C_TransferReturn_TypeDef retval;
-    if(i2c_active(obj)) return;
-    if((tx_length == 0) && (rx_length == 0)) return;
+    if(i2c_active(obj)) return I2C_ERROR_BUS_BUSY;
+    if((tx_length == 0) && (rx_length == 0)) return I2C_ERROR_INVALID_USAGE;
     // For now, we are assuming a solely interrupt-driven implementation.
 
 #ifdef I2C_ROUTE_SDAPEN
@@ -544,6 +544,7 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
     retval = I2C_TransferInit(obj->i2c.i2c, &(obj->i2c.xfer));
 
     MBED_ASSERT(retval == i2cTransferInProgress);
+    return I2C_ERROR_NONE;
 }
 
 /** The asynchronous IRQ handler

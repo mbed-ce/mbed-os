@@ -30,7 +30,7 @@ namespace mbed {
 
 I2C::I2C(PinName sda, PinName scl) :
 #if DEVICE_I2C_ASYNCH
-    _irq(this), _usage(DMA_USAGE_NEVER), _deep_sleep_locked(false),
+    _event_mask(0), _irq(this), _usage(DMA_USAGE_NEVER), _async_transfer_is_repeated(false), _deep_sleep_locked(false),
 #endif
     _i2c(), _hz(100000)
 {
@@ -45,7 +45,7 @@ I2C::I2C(PinName sda, PinName scl) :
 
 I2C::I2C(const i2c_pinmap_t &static_pinmap) :
 #if DEVICE_I2C_ASYNCH
-    _irq(this), _usage(DMA_USAGE_NEVER), _deep_sleep_locked(false),
+    _event_mask(0), _irq(this), _usage(DMA_USAGE_NEVER), _async_transfer_is_repeated(false), _deep_sleep_locked(false),
 #endif
     _i2c(), _hz(100000)
 {
@@ -282,8 +282,20 @@ int I2C::transfer(int address, const char *tx_buffer, int tx_length, char *rx_bu
 {
     lock();
 
-    if (_i2c.state != MBED_HAL_I2C_STATE_IDLE && _i2c.state != MBED_HAL_I2C_STATE_HOLDING_BUS && _i2c.state != MBED_HAL_I2C_STATE_BYTE_READ && _i2c.state != MBED_HAL_I2C_STATE_BYTE_WRITE) {
+    if (_i2c.state != MBED_HAL_I2C_STATE_IDLE
+        && _i2c.state != MBED_HAL_I2C_STATE_HOLDING_BUS
+        && _i2c.state != MBED_HAL_I2C_STATE_BYTE_READ
+        && _i2c.state != MBED_HAL_I2C_STATE_BYTE_WRITE) {
         // Invalid state for new transaction
+        unlock();
+        return -1;
+    }
+
+    const bool had_open_transaction = _i2c.state != MBED_HAL_I2C_STATE_IDLE;
+
+    if (tx_length < 0 || rx_length < 0 || (tx_length == 0 && rx_length == 0) ||
+            (tx_length > 0 && tx_buffer == nullptr) || (rx_length > 0 && rx_buffer == nullptr)) {
+        // Invalid buffer or transfer length
         unlock();
         return -1;
     }
@@ -291,21 +303,45 @@ int I2C::transfer(int address, const char *tx_buffer, int tx_length, char *rx_bu
     lock_deep_sleep();
 
     _callback = callback;
+    _event_mask = event;
     _async_transfer_is_repeated = repeated;
     int stop = (repeated) ? 0 : 1;
+
     _irq.callback(&I2C::irq_handler_asynch);
     _i2c.state = MBED_HAL_I2C_STATE_ASYNC_TRANSACTION;
-    i2c_transfer_asynch(&_i2c, (void *)tx_buffer, tx_length, (void *)rx_buffer, rx_length, address, stop, _irq.entry(), event, _usage);
+
+    // Subscribe the HAL to all terminal events so driver cleanup does not depend
+    // on which events the application requested for its callback.
+    int result = i2c_transfer_asynch(&_i2c, (void *)tx_buffer, tx_length, (void *)rx_buffer, rx_length, address, stop, _irq.entry(), I2C_EVENT_ALL, _usage);
+    if (result != 0) {
+        // If the transfer failed to start, reset state and unlock deep sleep
+        _callback = nullptr;
+        _event_mask = 0;
+        _async_transfer_is_repeated = false;
+        if (had_open_transaction) {
+            i2c_reset(&_i2c);
+        }
+        _i2c.state = MBED_HAL_I2C_STATE_IDLE;
+        unlock_deep_sleep();
+        result = -1;
+    }
     unlock();
-    return 0;
+    return result;
 }
 
 void I2C::abort_transfer()
 {
     lock();
     if (_i2c.state == MBED_HAL_I2C_STATE_ASYNC_TRANSACTION) {
+        _callback = nullptr;
+        _event_mask = 0;
+        _async_transfer_is_repeated = false;
+
+        // The _asynch suffix identifies the transfer being aborted; the abort
+        // itself must finish before returning so its buffers can be released.
         i2c_abort_asynch(&_i2c);
         unlock_deep_sleep();
+        _i2c.state = MBED_HAL_I2C_STATE_IDLE;
     }
     unlock();
 }
@@ -340,14 +376,15 @@ I2C::Result I2C::transfer_and_wait(int address, const char *tx_buffer, int tx_le
     } else {
         // Note: Cannot use a switch here because multiple flags might be set at the same time (possible
         // in the STM32 HAL code at least).
-        if (result & I2C_EVENT_TRANSFER_COMPLETE) {
-            return Result::ACK;
-        } else if ((result & I2C_EVENT_ERROR_NO_SLAVE) || (result & I2C_EVENT_TRANSFER_EARLY_NACK)) {
+        if ((result & I2C_EVENT_ERROR_NO_SLAVE) 
+            || (result & I2C_EVENT_TRANSFER_EARLY_NACK)) {
             // Both of these events mean that a NACK was received somewhere.  Theoretically NO_SLAVE means
             // NACK while transmitting address and EARLY_NACK means nack during the write operation.
             // But these aren't distinguished in the Result enum and even some of the HALs treat them
             // interchangeably.
             return Result::NACK;
+        } else if (result & I2C_EVENT_TRANSFER_COMPLETE) {
+            return Result::ACK;
         } else {
             // Other / unknown error code
             return Result::OTHER_ERROR;
@@ -358,17 +395,22 @@ I2C::Result I2C::transfer_and_wait(int address, const char *tx_buffer, int tx_le
 void I2C::irq_handler_asynch(void)
 {
     int event = i2c_irq_handler_asynch(&_i2c);
-    if (_callback && event) {
-        _callback.call(event);
+    if (event) {
+        // Reset state, accounting for the repeated start flag
+        const int error_events = I2C_EVENT_ERROR | I2C_EVENT_ERROR_NO_SLAVE | I2C_EVENT_TRANSFER_EARLY_NACK;
+        _i2c.state = ((event & I2C_EVENT_TRANSFER_COMPLETE) && !(event & error_events) && _async_transfer_is_repeated) ? MBED_HAL_I2C_STATE_HOLDING_BUS : MBED_HAL_I2C_STATE_IDLE;
+        if (_i2c.state != MBED_HAL_I2C_STATE_HOLDING_BUS) {
+            unlock_deep_sleep();
+        }
     }
 
-    if (event) {
-        unlock_deep_sleep();
-
-        // Reset state, accounting for the repeated start flag
-        _i2c.state = (event & I2C_EVENT_TRANSFER_COMPLETE && _async_transfer_is_repeated) ? MBED_HAL_I2C_STATE_HOLDING_BUS : MBED_HAL_I2C_STATE_IDLE;
+    int callback_event = event & _event_mask;
+    if (_callback && callback_event) {
+        _callback.call(callback_event);
     }
 }
+
+
 
 void I2C::lock_deep_sleep()
 {
@@ -386,7 +428,7 @@ void I2C::unlock_deep_sleep()
     }
 }
 
-#endif
+#endif // DEVICE_I2C_ASYNCH
 
 } // namespace mbed
 

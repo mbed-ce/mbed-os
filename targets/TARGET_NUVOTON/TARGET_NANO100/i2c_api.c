@@ -907,7 +907,7 @@ static void i2c_fsm_tranfini(i2c_t *obj, int lastdatanaked)
 
 #if DEVICE_I2C_ASYNCH
 
-void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
+int i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
 {
     // NOTE: M451 I2C only supports 7-bit slave address. The mbed I2C address passed in is shifted left by 1 bit (7-bit addr << 1).
     MBED_ASSERT((address & 0xFFFFFF00) == 0);
@@ -923,6 +923,7 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
 
     obj->i2c.hdlr_async = handler;
     i2c_start(obj);
+    return I2C_ERROR_NONE;
 }
 
 uint32_t i2c_irq_handler_asynch(i2c_t *obj)

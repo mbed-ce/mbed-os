@@ -463,8 +463,10 @@ void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask);
  *  @param handler   The I2C IRQ handler to be set
  *  @param event     Event mask for the transfer. See \ref hal_I2CEvents
  *  @param hint      DMA hint usage
+ *  @return          I2C_ERROR_NONE on success or negative - I2C_ERROR_XXX status
+ *  @note            With error no asynchronous transfer remains active and the completion handler will not be invoked.
  */
-void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint);
+int i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint);
 
 /** The asynchronous IRQ handler
  *
@@ -482,7 +484,10 @@ uint8_t i2c_active(i2c_t *obj);
 
 /** Abort asynchronous transfer
  *
- *  This function does not perform any check - that should happen in upper layers.
+ *  On return, the peripheral must be inactive, transfer interrupts
+ *  or DMA must no longer access the application buffers, and the transfer
+ *  handler must not be invoked later.
+ *
  *  @param obj The I2C object
  */
 void i2c_abort_asynch(i2c_t *obj);

@@ -109,10 +109,10 @@ int i2c_start(i2c_t *obj)
 int i2c_stop(i2c_t *obj)
 {
     if (I2C_MasterStop(i2c_addrs[obj->i2c.instance]) != kStatus_Success) {
-        return 1;
+        return I2C_ERROR_OTHER;
     }
 
-    return 0;
+    return I2C_ERROR_NONE;
 }
 
 void i2c_frequency(i2c_t *obj, int hz)

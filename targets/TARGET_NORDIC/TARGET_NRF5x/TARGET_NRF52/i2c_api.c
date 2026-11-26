@@ -904,7 +904,7 @@ static void nordic_nrf5_twi_event_handler(nrfx_twi_evt_t const *p_event, void *p
  *  @param event     Event mask for the transfer. See \ref hal_I2CEvents
  *  @param hint      DMA hint usage
  */
-void i2c_transfer_asynch(i2c_t *obj,
+int i2c_transfer_asynch(i2c_t *obj,
                          const void *tx,
                          size_t tx_length,
                          void *rx,
@@ -948,22 +948,18 @@ void i2c_transfer_asynch(i2c_t *obj,
                                       &twi_config,
                                       flags);
 
-    /* Signal error if event mask matches and event handler is set. */
-    if ((result != NRF_SUCCESS) && (mask & I2C_EVENT_ERROR) && handler) {
-
-        /* Store event value so it can be read back. */
-        config->event = I2C_EVENT_ERROR;
-
-        /* Cast handler to function pointer. */
-        void (*callback)(void) = (void (*)(void)) handler;
-
+    if (result != NRF_SUCCESS) {
         /* Reset handler and force reconfiguration. */
         config->handler = 0;
         config->update = true;
 
-        /* Signal callback handler. */
-        callback();
+        if (result == NRFX_ERROR_BUSY) {
+            return I2C_ERROR_BUS_BUSY;
+        }
+
+        return I2C_ERROR_OTHER;
     }
+    return I2C_ERROR_NONE;
 }
 
 /** The asynchronous IRQ handler

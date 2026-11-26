@@ -287,7 +287,7 @@ void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask)
 
 #if DEVICE_I2C_ASYNCH
 
-void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
+int i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
 {
     struct i2c_s *i2c = cy_get_i2c(obj);
     core_util_critical_section_enter();
@@ -297,6 +297,7 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
     if (CY_RSLT_SUCCESS != cyhal_i2c_master_transfer_async(&(i2c->hal_i2c), address, tx, tx_length, rx, rx_length)) {
         MBED_ERROR(MBED_MAKE_ERROR(MBED_MODULE_DRIVER_I2C, MBED_ERROR_CODE_FAILED_OPERATION), "cyhal_i2c_master_transfer_async");
     }
+    return I2C_ERROR_NONE;
 }
 
 uint32_t i2c_irq_handler_asynch(i2c_t *obj)

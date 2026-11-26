@@ -379,7 +379,7 @@ void i2c_slave_address(i2c_t *obj, int idx, uint32_t address, uint32_t mask)
 
 
 #if DEVICE_I2C_ASYNCH
-void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address,
+int i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address,
                          uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
 {
     struct i2c_s *obj_s = I2C_S(obj);
@@ -408,6 +408,7 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
         I2C_SetSendData(obj_s->i2c, address | SBI_I2C_SEND);
     }
     I2C_GenerateStart(obj_s->i2c);
+    return I2C_ERROR_NONE;
 }
 
 uint32_t i2c_irq_handler_asynch(i2c_t *obj)

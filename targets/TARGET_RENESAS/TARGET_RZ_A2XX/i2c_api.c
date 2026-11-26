@@ -1133,7 +1133,7 @@ static void i2c_irqs_set(i2c_t *obj, uint32_t enable)
  * ASYNCHRONOUS HAL
  ******************************************************************************/
 
-void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
+int i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx, size_t rx_length, uint32_t address, uint32_t stop, uint32_t handler, uint32_t event, DMAUsage hint)
 {
     MBED_ASSERT(obj);
     MBED_ASSERT(tx ? tx_length : 1);
@@ -1159,10 +1159,8 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
     if (obj->i2c.last_stop_flag != 0) {
         if (i2c_start(obj) != 0) {
             i2c_set_err_noslave(obj);
-            i2c_data[obj->i2c.index].event = I2C_EVENT_ERROR | I2C_EVENT_ERROR_NO_SLAVE;
             i2c_abort_asynch(obj);
-            ((void (*)())handler)();
-            return;
+            return I2C_ERROR_OTHER;
         }
     }
     obj->i2c.last_stop_flag = stop;
@@ -1179,11 +1177,10 @@ void i2c_transfer_asynch(i2c_t *obj, const void *tx, size_t tx_length, void *rx,
     /* Send Slave address */
     if (i2c_do_write(obj, address) != 0) {
         i2c_set_err_noslave(obj);
-        i2c_data[obj->i2c.index].event = I2C_EVENT_ERROR | I2C_EVENT_ERROR_NO_SLAVE;
         i2c_abort_asynch(obj);
-        ((void (*)())handler)();
-        return;
+        return I2C_ERROR_OTHER;
     }
+    return I2C_ERROR_NONE;
 }
 
 uint32_t i2c_irq_handler_asynch(i2c_t *obj)

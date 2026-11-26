@@ -452,6 +452,7 @@ public:
 protected:
     void irq_handler_asynch(void);
     event_callback_t _callback;
+	int _event_mask;
     CThunk<I2C> _irq;
     DMAUsage _usage;
     bool _async_transfer_is_repeated; // Flag that the current async transfer is configured for a repeated start

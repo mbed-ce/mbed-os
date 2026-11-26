@@ -129,7 +129,11 @@ inline int i2c_start(i2c_t *obj) {
 
     // Clear start bit now that it's transmitted
     i2c_conclr(obj, 1, 0, 0, 0);
-    return status;
+    if (status == 0x08 || status == 0x10) {
+        return I2C_ERROR_NONE;
+    }
+
+    return I2C_ERROR_BUS_BUSY;
 }
 
 inline int i2c_stop(i2c_t *obj) {
@@ -142,10 +146,10 @@ inline int i2c_stop(i2c_t *obj) {
     // wait for STO bit to reset
     while(I2C_CONSET(obj) & (1 << 4)) {
         timeout ++;
-        if (timeout > 100000) return 1;
+        if (timeout > 100000) return I2C_ERROR_TIMEOUT;
     }
 
-    return 0;
+    return I2C_ERROR_NONE;
 }
 
 
@@ -207,11 +211,10 @@ void i2c_frequency(i2c_t *obj, int hz) {
 int i2c_read(i2c_t *obj, int address, char *data, int length, int stop) {
     int count, status;
     
-    status = i2c_start(obj);
-    
-    if ((status != 0x10) && (status != 0x08)) {
+    int start_result = i2c_start(obj);
+    if (start_result != I2C_ERROR_NONE) {
         i2c_stop(obj);
-        return I2C_ERROR_BUS_BUSY;
+        return start_result;
     }
     
     status = i2c_do_write(obj, (address | 0x01), 1);
@@ -252,11 +255,10 @@ int i2c_read(i2c_t *obj, int address, char *data, int length, int stop) {
 int i2c_write(i2c_t *obj, int address, const char *data, int length, int stop) {
     int i, status;
     
-    status = i2c_start(obj);
-    
-    if ((status != 0x10) && (status != 0x08)) {
+    int start_result = i2c_start(obj);
+    if (start_result != I2C_ERROR_NONE) {
         i2c_stop(obj);
-        return I2C_ERROR_BUS_BUSY;
+        return start_result;
     }
     
     status = i2c_do_write(obj, (address & 0xFE), 1);
